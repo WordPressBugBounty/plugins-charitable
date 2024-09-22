@@ -1,0 +1,351 @@
+.charitable-preview.charitable-builder-template-<?php echo $slug; ?> { /* everything wraps in this */
+
+
+
+}
+
+/* this narrows things down a little to the preview area div.charitable-campaign-row/tabs */
+
+<?php echo $wrapper; ?> {
+/* field items in preview area */
+
+font-family: SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+/* wide spread changes in div.charitable-campaign-row vs tabs */
+
+<?php echo $wrapper; ?> .charitable-field {
+  display: flex;
+}
+
+<?php echo $wrapper; ?> div.charitable-campaign-row {
+  background-color: <?php echo $primary; ?>;
+  padding: 30px;
+  color: white;
+}
+<?php echo $wrapper; ?> div.charitable-campaign-row.no-padding,
+<?php echo $wrapper; ?> div.charitable-campaign-row.no-padding .charitable-campaign-column {
+  padding: 0 !important;
+}
+<?php echo $wrapper; ?> div.charitable-campaign-row.no-padding {
+  background-color: transparent;
+}
+<?php echo $wrapper; ?> div.charitable-campaign-row h1,
+<?php echo $wrapper; ?> div.charitable-campaign-row h2,
+<?php echo $wrapper; ?> div.charitable-campaign-row h3,
+<?php echo $wrapper; ?> div.charitable-campaign-row h4,
+<?php echo $wrapper; ?> div.charitable-campaign-row h5,
+<?php echo $wrapper; ?> div.charitable-campaign-row h6 {
+  color: <?php echo $primary; ?>;
+}
+<?php echo $wrapper; ?> div.charitable-campaign-row h1:empty,
+<?php echo $wrapper; ?> div.charitable-campaign-row h2:empty,
+<?php echo $wrapper; ?> div.charitable-campaign-row h3:empty,
+<?php echo $wrapper; ?> div.charitable-campaign-row h4:empty,
+<?php echo $wrapper; ?> div.charitable-campaign-row h5:empty,
+<?php echo $wrapper; ?> div.charitable-campaign-row h6:empty {
+    display: none;
+}
+<?php echo $wrapper; ?> .tab-content h1,
+<?php echo $wrapper; ?> .tab-content h2,
+<?php echo $wrapper; ?> .tab-content h3,
+<?php echo $wrapper; ?> .tab-content h4,
+<?php echo $wrapper; ?> .tab-content h5,
+<?php echo $wrapper; ?> .tab-content h6 {
+  color: black;
+  font-size: 32px;
+  line-height: 38px;
+}
+<?php echo $wrapper; ?> .tab-content {
+  color: <?php echo $tertiary; ?>;
+}
+<?php echo $wrapper; ?> .tab-content > * {
+  color: #92908F;
+}
+<?php echo $wrapper; ?> div.charitable-campaign-row > * {
+  color: <?php echo $tertiary; ?>;
+}
+<?php echo $wrapper; ?> div.charitable-campaign-row h5 {
+  font-size: 24px;
+  line-height: 28px;
+}
+
+
+<?php echo $wrapper; ?>  .placeholder {
+  padding: 0;
+}
+
+/* aligns */
+
+<?php echo $wrapper; ?> .charitable-preview-align-left > div {
+  margin-left: 0;
+  margin-right: auto;
+}
+<?php echo $wrapper; ?> .charitable-preview-align-center > div,
+<?php echo $wrapper; ?> .charitable-preview-align-center .charitable-header {
+  margin-left: auto;
+  margin-right: auto;
+}
+<?php echo $wrapper; ?> .charitable-preview-align-right > div {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* column specifics */
+
+<?php echo $wrapper; ?> .charitable-campaign-column:nth-child(even) {
+  flex: 1;
+  border: 0;
+  padding-top: 0;
+}
+<?php echo $wrapper; ?> .charitable-campaign-column:nth-child(odd) {
+  border: 0;
+  flex: 1;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* section specifics */
+
+
+/* header specifics */
+
+<?php echo $wrapper; ?> .charitable-header .charitable-template-align-center  {
+  text-align: center;
+}
+
+/* headlines in general */
+
+<?php echo $wrapper; ?> div.charitable-campaign-row h5.charitable-field-template-headline {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px;
+}
+<?php echo $wrapper; ?> div.charitable-preview-row .charitable-campaign-column:nth-child(even) h5.charitable-field-template-headline {
+  color: white;
+}
+<?php echo $wrapper; ?> .tab-content h5.charitable-field-template-headline {
+  color: black !important;
+  font-weight: 700 !important;
+  text-transform: inherit;
+  font-size: 42px !important;
+  line-height: 48px !important;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+<?php echo $wrapper; ?> .charitable-header h5.charitable-field-template-headline {
+  color: <?php echo $primary; ?> !important;
+  font-weight: 500 !important;
+  text-transform: inherit;
+  font-size: 42px !important;
+  line-height: 48px !important;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+/* field: campaign title */
+
+
+
+/* field: campaign description */
+
+
+
+
+/* field: text */
+
+<?php echo $wrapper; ?>  .charitable-campaign-field-text .charitable-campaign-builder-placeholder-preview-text {
+  padding: 0;
+
+}
+<?php echo $wrapper; ?> .charitable-campaign-field-text h5.charitable-field-template-headline {
+
+}
+
+
+/* field: button */
+
+
+/* field: photo */
+
+<?php echo $wrapper; ?> charitable-campaign-field.charitable-campaign-field-photo .primary-image {
+  border: transparent;
+}
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-photo img {
+  width: 100%;
+  border: 0;
+  border-radius: 0px;
+}
+
+/* field: photo */
+
+<?php echo $wrapper; ?> div.charitable-campaign-row .primary-image-container {
+  margin: 0;
+  padding: 0;
+}
+
+<?php echo $wrapper; ?> .tab-content .primary-image-container {
+  margin: 0;
+  padding: 0;
+}
+
+/* field: progress bar */
+
+
+
+
+
+/* field: campaign summary */
+
+
+/* tabs: container */
+
+<?php echo $wrapper; ?> article {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  color: #000;
+}
+<?php echo $wrapper; ?> article .tab-content > ul li {
+    padding-top: 20px;
+    padding-bottom: 25px;
+    font-size: 14px;
+    line-height: 24px;
+    color: black;
+}
+<?php echo $wrapper; ?> article .tab-content > ul > li {
+    display: none;
+}
+<?php echo $wrapper; ?> article .tab-content li {
+    display: block;
+}
+
+/* tabs: tab nav */
+
+<?php echo $wrapper; ?> article nav.charitable-campaign-nav {
+  width: auto;
+}
+<?php echo $wrapper; ?> article nav.charitable-campaign-nav > ul {
+
+}
+<?php echo $wrapper; ?> article nav.charitable-campaign-nav > ul,
+<?php echo $wrapper; ?> article .tab-content > ul {
+
+}
+<?php echo $wrapper; ?> article nav.charitable-campaign-nav li {
+  padding: 0;
+}
+<?php echo $wrapper; ?> article nav.charitable-campaign-nav li a {
+  color: <?php echo $primary; ?>;
+  display: block;
+  font-weight: 500 !important;
+  font-size: 17px !important;
+  line-height: 22px !important;
+  text-transform: uppercase;
+}
+<?php echo $wrapper; ?> article nav.charitable-campaign-nav li.active {
+  border-color: <?php echo $button; ?>;
+}
+<?php echo $wrapper; ?> article nav.charitable-campaign-nav li.active a {
+
+}
+
+/* field: donate amount */
+
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options {
+
+}
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts {
+  margin: 25px auto;
+}
+
+
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options {
+
+}
+<?php echo $wrapper; ?>  .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts {
+  margin: 25px auto;
+}
+<?php echo $wrapper; ?>  .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts li.charitable-template-donation-amount {
+
+}
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts li.charitable-template-donation-amount.selected {
+
+}
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts .charitable-template-donation-amount input[type=radio] {
+
+}
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts .charitable-template-donation-amount .amount {
+
+}
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts li.charitable-template-donation-amount > label {
+
+}
+<?php echo $wrapper; ?>  .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts li.charitable-template-donation-amount:hover label,
+<?php echo $wrapper; ?>  .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts li.charitable-template-donation-amount.selected > label {
+  background-color: <?php echo $button; ?>;
+}
+<?php echo $wrapper; ?>  .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts li.charitable-template-donation-amount.selected > label span {
+  color: white;
+}
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts li.charitable-template-donation-amount.selected > * {
+
+}
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts .charitable-template-donation-amount.custom-donation-amount {
+
+}
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts .charitable-template-donation-amount.custom-donation-amount label {
+
+}
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts .charitable-template-donation-amount.custom-donation-amount input[type=text] {
+
+}
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts .charitable-template-donation-amount.custom-donation-amount.selected input[type=text] {
+  background-color: white;
+  color: black;
+}
+
+
+/* field: donate form */
+
+<?php echo $wrapper; ?> form.charitable-donation-form .donation-amount.selected {
+  background-color: <?php echo $primary; ?>;
+  border-color: <?php echo $primary; ?>;
+}
+
+<?php echo $wrapper; ?> form.charitable-donation-form .charitable-form-field.charitable-radio-list li {
+  display: inline-block;
+}
+
+<?php echo $wrapper; ?> form.charitable-donation-form .charitable-notice {
+  padding: 0;
+}
+
+/* field: doante amount */
+
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-amount ul.charitable-preview-donation-amounts li.selected label {
+  background-color: <?php echo $button; ?> !important;
+}
+
+/* missing addons? */
+
+<?php echo $wrapper; ?> .charitable-field-charitable-videos {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    min-height: 500px;
+    background-color: rgba(0,0,0,.7);
+    display: table;
+}
+<?php echo $wrapper; ?> .charitable-field-charitable-videos .charitable-missing-addon-content {
+    background-color: transparent;
+    vertical-align: middle;
+    display: table-cell;
+    height: 100;
+}
+<?php echo $wrapper; ?> .charitable-field-charitable-videos .charitable-missing-addon-content h2 {
+    color: white;
+}
+<?php echo $wrapper; ?> .charitable-field-charitable-videos .chartiable-missing-addon-bg {
+    background-size: cover;
+}
+

@@ -1,0 +1,159 @@
+<?php
+
+/*
+
+/* General Structure */
+
+/*
+<div class="charitable-campaign-wrap template-youth-sports"> <!-- is-charitable-preview also possible as a class -->
+    <div class="charitable-campaign-container">
+    <header>
+        <div class="row">
+        <div class="column"></div>
+        <div class="column"></div>
+    </header>
+    <article>
+        <nav class="charitable-campaign-nav"></div>
+        <div class="tab-content">
+            <ul></ul>
+        </div>
+    </article>
+    </div>
+</div>
+*/
+
+/*********************************************************************/
+/* BASE CSS */
+
+/* This CSS establishes the main header, colums, rows, and structure */
+
+?>
+
+/* this narrows things down a little to the preview area header/tabs */
+
+<?php echo $wrapper; ?> {
+/* field items in preview area */
+
+font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* wide spread changes in header vs tabs */
+
+
+<?php echo $wrapper; ?> .charitable-campaign-row h1,
+<?php echo $wrapper; ?> .charitable-campaign-row h2,
+<?php echo $wrapper; ?> .charitable-campaign-row h3,
+<?php echo $wrapper; ?> .charitable-campaign-row h4,
+<?php echo $wrapper; ?> .charitable-campaign-row h5,
+<?php echo $wrapper; ?> .charitable-campaign-row h6 {
+  color: <?php echo $secondary; ?>
+}
+<?php echo $wrapper; ?> .tab-content h1,
+<?php echo $wrapper; ?> .tab-content h2,
+<?php echo $wrapper; ?> .tab-content h3,
+<?php echo $wrapper; ?> .tab-content h4,
+<?php echo $wrapper; ?> .tab-content h5,
+<?php echo $wrapper; ?> .tab-content h6 {
+  color: black;
+}
+<?php echo $wrapper; ?> .tab-content {
+  color: <?php echo $tertiary; ?>;
+}
+<?php echo $wrapper; ?> .tab-content > * {
+  color: #92908F;
+}
+<?php echo $wrapper; ?> .charitable-campaign-row {
+  padding: 25px;
+}
+<?php echo $wrapper; ?> .charitable-campaign-row > * {
+  color: #5B5B5B;
+}
+
+<?php echo $wrapper; ?> .charitable-campaign-row h5:empty {
+    margin: 0;
+}
+
+<?php echo $wrapper; ?>  .placeholder {
+  padding: 0;
+}
+
+/* aligns */
+
+<?php echo $wrapper; ?> .charitable-campaign-align-left {
+  margin-left: 0;
+  margin-right: auto;
+}
+<?php echo $wrapper; ?> .charitable-campaign-align-center {
+  margin-left: auto;
+  margin-right: auto;
+}
+<?php echo $wrapper; ?> .charitable-campaign-align-right {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* column specifics */
+
+
+/* headlines in general */
+
+
+
+/* field: campaign title */
+
+
+
+/* field: campaign description */
+
+
+/* field: text */
+
+
+/* field: button */
+
+
+/* field: photo */
+
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-photo .primary-image {
+border: transparent;
+border-radius: 0px;
+}
+
+/* field: photo */
+
+<?php echo $wrapper; ?> header .primary-image-container {
+  margin: 0;
+  padding: 0;
+}
+
+<?php echo $wrapper; ?> .tab-content .primary-image-container {
+  margin: 0;
+  padding: 0;
+}
+
+/* field: progress bar */
+
+
+
+/* field: social linking */
+
+
+/* field: social sharing */
+
+
+
+/* field: campaign summary */
+
+
+
+
+/* field: donate amount */
+
+
+
+/* tabs: container */
+
+
+/* tabs: tab nav */
+
+

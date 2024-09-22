@@ -1,0 +1,32 @@
+.charitable-campaign-field.charitable-campaign-field-campaign-summary {
+
+    .charitable-field-template-campaign-summary {
+        padding-left: 0;
+        padding-right: 0;
+
+        div.campaign-summary-item {
+            color: $color_theme_base_primary;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 16px;
+            text-align: left;
+            text-transform: capitalize;
+            float: left;
+            width: 49%;
+            margin-bottom: 10px;
+
+            span {
+                color: $color_theme_base_secondary;
+                font-weight: 600;
+                font-size: 32px;
+                line-height: 38px;
+                text-align: left;
+                text-transform: capitalize;
+                display: block;
+            }
+
+        }
+
+    }
+
+}

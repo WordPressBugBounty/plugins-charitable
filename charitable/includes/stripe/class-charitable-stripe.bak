@@ -1,0 +1,572 @@
+<?php
+/**
+ * The main Charitable Stripe class.
+ *
+ * The responsibility of this class is to load all the plugin's functionality.
+ *
+ * @package   Charitable Stripe
+ * @copyright Copyright (c) 2021-2022, David Bisset
+ * @license   http://opensource.org/licenses/gpl-1.0.0.php GNU Public License
+ * @since     1.0.0
+ * @version   1.4.14
+ */
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+if ( ! class_exists( 'Charitable_Stripe' ) ) :
+
+	/**
+	 * Charitable_Stripe
+	 *
+	 * @since 1.0.0
+	 */
+	class Charitable_Stripe {
+
+		/** The plugin version. */
+		const VERSION = '1.4.14';
+
+		/** The product name. */
+		const NAME = 'Charitable Stripe';
+
+		/** The plugin author name. */
+		const AUTHOR = 'WP Charitable LLC';
+
+		/**
+		 * The one and only class instance.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @var   Charitable_Stripe
+		 */
+		private static $instance = null;
+
+		/**
+		 * The root file of the plugin.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @var   string
+		 */
+		private $plugin_file;
+
+		/**
+		 * The root directory of the plugin.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @var   string
+		 */
+		private $directory_path;
+
+		/**
+		 * The root directory of the plugin as a URL.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @var   string
+		 */
+		private $directory_url;
+
+		/**
+		 * Create class instance.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $plugin_file The path to the main plugin file.
+		 */
+		public function __construct( $plugin_file ) {
+			$this->plugin_file    = $plugin_file;
+			$this->directory_path = plugin_dir_path( $plugin_file );
+			$this->directory_url  = plugin_dir_url( $plugin_file );
+
+			add_action( 'charitable_start', array( $this, 'start' ), 1 );
+		}
+
+		/**
+		 * Returns the original instance of this class.
+		 *
+		 * @since  1.0.0
+		 *
+		 * @return Charitable_Stripe
+		 */
+		public static function get_instance() {
+			return self::$instance;
+		}
+
+		/**
+		 * Run the startup sequence on the charitable_start hook.
+		 *
+		 * This is only ever executed once.
+		 *
+		 * @since  1.0.0
+		 *
+		 * @return void
+		 */
+		public function start() {
+			/* If we've already started (i.e. run this function once before), do not pass go. */
+			if ( $this->started() ) {
+				return;
+			}
+
+			/* Set static instance. */
+			self::$instance = $this;
+
+			$this->load_dependencies();
+
+			$this->setup_licensing();
+
+			$this->setup_i18n();
+
+			$this->maybe_start_admin();
+
+			$this->attach_hooks_and_filters();
+
+			// Set up classes.
+			new Charitable_Stripe_Privacy();
+
+			// Hook in here to do something when the plugin is first loaded.
+			do_action( 'charitable_stripe_start', $this );
+		}
+
+		/**
+		 * Include necessary files.
+		 *
+		 * @since  1.0.0
+		 *
+		 * @return void
+		 */
+		private function load_dependencies() {
+			$dir = $this->get_path( 'includes' );
+
+			/* Load Stripe SDK */
+			require_once( $this->get_path( 'directory' ) . 'vendor/autoload.php' );
+
+			/* Interfaces */
+			require_once( $dir . 'interfaces/interface-charitable-stripe-gateway-processor.php' );
+
+			/* Abstract classes */
+			require_once( $dir . 'abstracts/class-charitable-stripe-gateway-processor.php' );
+
+			/* Classes */
+			require_once( $dir . 'donations/class-charitable-stripe-donation-log.php' );
+			require_once( $dir . 'donations/class-charitable-stripe-recurring-donation-log.php' );
+			require_once( $dir . 'i18n/class-charitable-stripe-i18n.php' );
+			require_once( $dir . 'gateway/class-charitable-gateway-stripe.php' );
+			require_once( $dir . 'gateway/class-charitable-stripe-connected-customer.php' );
+			require_once( $dir . 'gateway/class-charitable-stripe-customer.php' );
+			require_once( $dir . 'gateway/class-charitable-stripe-gateway-processor-checkout.php' );
+			require_once( $dir . 'gateway/class-charitable-stripe-gateway-processor-payment-intents.php' );
+			require_once( $dir . 'gateway/class-charitable-stripe-payment-intent.php' );
+			require_once( $dir . 'gateway/class-charitable-stripe-plan.php' );
+			require_once( $dir . 'gateway/class-charitable-stripe-product.php' );
+			require_once( $dir . 'gateway/class-charitable-stripe-webhook-api.php' );
+			require_once( $dir . 'gateway/class-charitable-stripe-webhook-processor.php' );
+			require_once( $dir . 'privacy/class-charitable-stripe-privacy.php' );
+			require_once( $dir . 'public/class-charitable-stripe-template.php' );
+
+			/* Upgrades */
+			require_once( $dir . 'upgrades/class-charitable-stripe-upgrade.php' );
+
+			/* Functions & Hooks */
+			require_once( $dir . 'charitable-stripe-core-functions.php' );
+			require_once( $dir . 'donations/charitable-stripe-donation-functions.php' );
+			require_once( $dir . 'gateway/charitable-stripe-gateway-hooks.php' );
+			require_once( $dir . 'compat/charitable-stripe-compat-functions.php' );
+
+			/* Stripe Connect compatibility */
+			if ( class_exists( 'Charitable_Stripe_Connect' ) ) {
+				require_once( $dir . 'connect/charitable-stripe-connect-functions.php' );
+			}
+		}
+
+		/**
+		 * Set up hook and filter callback functions.
+		 *
+		 * @since  1.0.0
+		 *
+		 * @return void
+		 */
+		private function attach_hooks_and_filters() {
+			/**
+			 * Prepare Recurring Donations compatibility.
+			 */
+			add_action( 'charitable_recurring_start', array( $this, 'load_recurring_compat' ) );
+
+			/**
+			 * Set up scripts & stylesheets & enqueue them when appropriate.
+			 */
+			add_action( 'wp_enqueue_scripts', array( $this, 'setup_scripts' ), 11 );
+			add_action( 'charitable_form_after_fields', array( $this, 'maybe_setup_scripts_in_donation_form' ) );
+			add_action( 'charitable_campaign_loop_after', array( $this, 'maybe_setup_scripts_in_campaign_loop' ) );
+
+			/**
+			 * Do some tweaks to the template.
+			 */
+			add_action( 'after_setup_theme', array( $this, 'setup_template_tweaks' ), 11 );
+
+			/**
+			 * Backwards compat for Charitable < 1.4.0.
+			 */
+			if ( version_compare( charitable()->get_version(), '1.4.0', '<' ) ) {
+				add_filter( 'charitable_javascript_vars', array( $this, 'set_js_error_messages' ) );
+			}
+
+			/**
+			 * Set up upgrade process.
+			 */
+			add_action( 'admin_notices', array( Charitable_Stripe_Upgrade::get_instance(), 'add_upgrade_notice' ) );
+			add_action( 'init', array( Charitable_Stripe_Upgrade::get_instance(), 'do_immediate_upgrades' ), 5 );
+
+			/**
+			 * Specific upgrade processes.
+			 */
+			add_action( 'charitable_stripe_update_hidden_settings', array( Charitable_Stripe_Upgrade::get_instance(), 'update_hidden_settings' ) );
+
+			/**
+			 * Require SSL on the donation page and webhook listener.
+			 */
+			add_filter( 'charitable_campaign_donation_endpoint_force_https', '__return_true' );
+			add_filter( 'charitable_webhook_listener_endpoint_force_https', '__return_true' );
+		}
+
+		/**
+		 * Set up licensing for the extension.
+		 *
+		 * @since  1.0.0
+		 *
+		 * @return void
+		 */
+		public function setup_licensing() {
+			charitable_get_helper( 'licenses' )->register_licensed_product(
+				Charitable_Stripe::NAME,
+				Charitable_Stripe::AUTHOR,
+				Charitable_Stripe::VERSION,
+				$this->plugin_file
+			);
+		}
+
+		/**
+		 * Set up the internationalisation for the plugin.
+		 *
+		 * @since  1.0.0
+		 *
+		 * @return void
+		 */
+		private function setup_i18n() {
+			if ( class_exists( 'Charitable_i18n' ) ) {
+
+				require_once( $this->get_path( 'includes' ) . 'i18n/class-charitable-stripe-i18n.php' );
+
+				Charitable_Stripe_i18n::get_instance();
+			}
+		}
+
+		/**
+		 * Load the admin-only functionality.
+		 *
+		 * @since  1.1.0
+		 *
+		 * @return void
+		 */
+		private function maybe_start_admin() {
+			if ( ! is_admin() ) {
+				return;
+			}
+
+			require_once( $this->get_path( 'includes' ) . 'admin/class-charitable-stripe-admin.php' );
+
+			new Charitable_Stripe_Admin;
+		}
+
+		/**
+		 * Register Stripe scripts.
+		 *
+		 * @since  1.1.0
+		 *
+		 * @return void
+		 */
+		public function setup_scripts() {
+			if ( is_admin() ) {
+				return;
+			}
+
+			if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+				$version = '';
+				$suffix  = '';
+			} else {
+				$version = $this->get_version();
+				$suffix  = '.min';
+			}
+
+			$gateway = new Charitable_Gateway_Stripe_AM;
+			$keys    = $gateway->get_keys();
+
+			$stripe_vars = array(
+				'key'          => $keys['public_key'],
+				'currency'     => charitable_get_currency(),
+				'site_name'    => get_option( 'blogname' ),
+				'zero_decimal' => Charitable_Gateway_Stripe_AM::is_zero_decimal_currency(),
+			);
+
+			/* Register Stripe JS script. */
+			wp_register_script(
+				'stripe-v3',
+				'https://js.stripe.com/v3/',
+				array(),
+				$version,
+				true
+			);
+
+			$dependencies = array( 'charitable-script', 'stripe-v3', 'jquery' );
+
+			if ( charitable_get_option( array( 'gateways_stripe', 'enable_stripe_checkout' ) ) ) {
+				$stripe_vars['mode'] = 'checkout';
+			} else {
+				$stripe_vars['mode'] = 'payment-intents';
+			}
+
+			wp_register_script(
+				'charitable-stripe',
+				$this->get_path( 'assets', false ) . 'js/charitable-stripe' . $suffix . '.js',
+				$dependencies,
+				$version,
+				true
+			);
+
+			wp_localize_script(
+				'charitable-stripe',
+				'CHARITABLE_STRIPE_VARS',
+				$stripe_vars
+			);
+
+			if ( 'payment-intents' == $stripe_vars['mode'] ) {
+				/**
+				 * Prevent the Stripe script from loading site-wide.
+				 *
+				 * @since 1.4.3
+				 *
+				 * @param boolean $load Whether to load the scripts sitewide. Defaults to true.
+				 */
+				if ( apply_filters( 'charitable_stripe_load_stripe_scripts_sitewide', true ) ) {
+					wp_enqueue_script( 'stripe-v3' );
+				}
+			}
+		}
+
+
+		/**
+		 * Load Stripe JS, as well as our handling scripts.
+		 *
+		 * @since  1.4.0
+		 *
+		 * @return boolean
+		 */
+		public function enqueue_scripts() {
+			if ( ! Charitable_Gateways::get_instance()->is_active_gateway( Charitable_Gateway_Stripe_AM::get_gateway_id() ) ) {
+				return false;
+			}
+
+			wp_enqueue_script( 'charitable-stripe' );
+
+			return true;
+		}
+
+		/**
+		 * Load Stripe JS or Stripe Checkout, as well as our handling script.
+		 *
+		 * @uses   Charitable_Stripe::enqueue_scripts()
+		 *
+		 * @since  1.4.0
+		 *
+		 * @param  Charitable_Donation_Form $form The current form object.
+		 * @return boolean
+		 */
+		public function maybe_setup_scripts_in_donation_form( $form ) {
+			if ( ! is_a( $form, 'Charitable_Donation_Form' ) ) {
+				return false;
+			}
+
+			if ( 'make_donation' !== $form->get_form_action() ) {
+				return false;
+			}
+
+			return $this->enqueue_scripts();
+		}
+
+		/**
+		 * Enqueue the Stripe JS/Checkout scripts after a campaign loop if modal donations are in use.
+		 *
+		 * @uses Charitable_Stripe::enqueue_scripts()
+		 *
+		 * @since  1.4.0
+		 *
+		 * @return boolean
+		 */
+		public function maybe_setup_scripts_in_campaign_loop() {
+			if ( 'modal' !== charitable_get_option( 'donation_form_display', 'separate_page' ) ) {
+				return false;
+			}
+
+			return $this->enqueue_scripts();
+		}
+
+		/**
+		 * Set up some template tweaks.
+		 *
+		 * @since  1.4.3
+		 *
+		 * @return void
+		 */
+		public function setup_template_tweaks() {
+			/**
+			 * Block modal donations in the loop if payment intents are
+			 * on and modal donations are turned on.
+			 */
+			if ( ! charitable_get_option( array( 'gateways_stripe', 'enable_stripe_checkout' ), false ) ) {
+				remove_action( 'charitable_campaign_loop_before', 'charitable_template_campaign_loop_add_modal' );
+			}
+		}
+
+		/**
+		 * Load Recurring compat file.
+		 *
+		 * @since  1.3.0
+		 *
+		 * @return void
+		 */
+		public function load_recurring_compat() {
+			require_once( $this->get_path( 'includes' ) . 'compat/charitable-stripe-recurring-compat-functions.php' );
+		}
+
+		/**
+		 * Set the error message for invalid amount when a donation form is submitted.
+		 *
+		 * This function can be removed once Charitable 1.4 is out and about.
+		 *
+		 * @since  1.0.0
+		 *
+		 * @param  string[] $vars Javascript vars.
+		 * @return string[]
+		 */
+		public function set_js_error_messages( $vars ) {
+			$vars['error_invalid_amount'] = sprintf(
+				/* translators: %s: formatted monetary amount. */
+				__( 'You must donate more than %s.', 'charitable-stripe' ),
+				charitable_format_money( '0' )
+			);
+			$vars['error_invalid_cc_number'] = __( 'The credit card passed is not valid.', 'charitable-stripe' );
+			$vars['error_invalid_cc_expiry'] = __( 'The credit card expiry date is not valid.', 'charitable-stripe' );
+			return $vars;
+		}
+
+		/**
+		 * Returns whether we are currently in the start phase of the plugin.
+		 *
+		 * @since  1.0.0
+		 *
+		 * @return boolean
+		 */
+		public function is_start() {
+			return current_filter() === 'charitable_stripe_start';
+		}
+
+		/**
+		 * Returns whether the plugin has already started.
+		 *
+		 * @since  1.0.0
+		 *
+		 * @return boolean
+		 */
+		public function started() {
+			return did_action( 'charitable_stripe_start' ) || current_filter() === 'charitable_stripe_start';
+		}
+
+		/**
+		 * Returns the plugin's version number.
+		 *
+		 * @since  1.0.0
+		 *
+		 * @return string
+		 */
+		public function get_version() {
+			return self::VERSION;
+		}
+
+		/**
+		 * Returns plugin paths.
+		 *
+		 * @since  1.0.0
+		 *
+		 * @param  string  $type          If empty, returns the path to the plugin.
+		 * @param  boolean $absolute_path If true, returns the file system path. If false, returns it as a URL.
+		 * @return string
+		 */
+		public function get_path( $type = '', $absolute_path = true ) {
+			$base = $absolute_path ? $this->directory_path : $this->directory_url;
+
+			switch ( $type ) {
+				case 'includes':
+					$path = $base . 'includes/';
+					break;
+
+				case 'admin':
+					$path = $base . 'includes/admin/';
+					break;
+
+				case 'templates':
+					$path = $base . 'templates/';
+					break;
+
+				case 'assets':
+					$path = $base . 'assets/';
+					break;
+
+				case 'directory':
+					$path = $base;
+					break;
+
+				default:
+					$path = $this->plugin_file;
+
+			}//end switch
+
+			return $path;
+		}
+
+		/**
+		 * Throw error on object clone.
+		 *
+		 * This class is specifically designed to be instantiated once.
+		 *
+		 * @return void
+		 *
+		 * @since  1.0.0
+		 */
+		public function __clone() {
+			charitable_get_deprecated()->doing_it_wrong(
+				__FUNCTION__,
+				__( 'Cloning this object is forbidden.', 'charitable-stripe' ),
+				'1.0.0'
+			);
+		}
+
+		/**
+		 * Disable unserializing of the class.
+		 *
+		 * @return void
+		 *
+		 * @since  1.0.0
+		 */
+		public function __wakeup() {
+			charitable_get_deprecated()->doing_it_wrong(
+				__FUNCTION__,
+				__( 'Unserializing instances of this class is forbidden.', 'charitable-stripe' ),
+				'1.0.0'
+			);
+		}
+	}
+
+endif;
