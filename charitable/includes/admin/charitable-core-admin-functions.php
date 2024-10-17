@@ -398,6 +398,20 @@ function charitable_add_upgrade_item() {
 }
 add_action( 'admin_menu', 'charitable_add_upgrade_item' );
 
+/**
+ * Determines if Charitable allows legacy campaigns to be created.
+ *
+ * @since 1.8.2
+ *
+ * @return bool
+ */
+function charitable_disable_legacy_campaigns() {
+
+	$disable_legacy_campaign = charitable_get_option( 'disable_campaign_legacy_mode', false ) ? true : false;
+	$disable_legacy_campaign = apply_filters( 'charitable_disable_legacy_campaign', $disable_legacy_campaign );
+
+	return $disable_legacy_campaign;
+}
 
 /**
  * Outputs "please rate" text.
@@ -414,7 +428,7 @@ function charitable_add_footer_text( $footer_text ) {
 
 	return sprintf(
 		/* translators: %1$s Opening strong tag, do not translate. %2$s Closing strong tag, do not translate. %3$s Opening anchor tag, do not translate. %4$s Closing anchor tag, do not translate. */
-		__( 'Please rate %1$sWP Charitable%2$s %3$s★★★★★%4$s on %3$sWordPress.org%4$s to help us spread the word. Thank you from the WP Charitable team!', 'stripe' ),
+		__( 'Please rate %1$sCharitable%2$s %3$s★★★★★%4$s on %3$sWordPress.org%4$s to help us spread the word. Thank you from the Charitable team!', 'stripe' ),
 		'<strong>',
 		'</strong>',
 		'<a href="https://wordpress.org/support/plugin/charitable/reviews/?filter=5#new-post" rel="noopener noreferrer" target="_blank">',
@@ -1297,3 +1311,41 @@ function charitable_filter_admin_notices( $notice_type, $prefix ) {
 
 add_action( 'admin_print_scripts', 'hide_non_charitable_warnings' );
 add_action( 'admin_head', 'hide_non_charitable_warnings', PHP_INT_MAX );
+
+
+/**
+ * Remove a dashboard notification via AJAX.
+ *
+ * @since 1.8.2
+ *
+ * @return void
+ */
+function charitable_disable_dashboard_notification_ajax() {
+
+	// Run a security check.
+	check_ajax_referer( 'charitable-admin', 'nonce' );
+
+	$notification_id = isset( $_POST['notification_id'] ) ? sanitize_text_field( wp_unslash( $_POST['notification_id'] ) ) : false;
+
+	if ( ! $notification_id ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'Invalid notification ID.', 'charitable' ) ) );
+	}
+
+	$notifications = (array) get_option( 'charitable_dashboard_notifications', array() );
+
+	if ( empty( $notifications ) ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'No notifications found.', 'charitable' ) ) );
+	}
+
+	if ( ! empty( $notifications[ $notification_id ] ) ) {
+		// add a 'dismissed' key to the notification with the current time.
+		$notifications[ $notification_id ]['dismissed'] = time();
+		update_option( 'charitable_dashboard_notifications', $notifications );
+		wp_send_json_success( array( 'message' => esc_html__( 'Notification removed.', 'charitable' ) ) );
+	} else {
+		wp_send_json_error( array( 'message' => esc_html__( 'Notification not found.', 'charitable' ) ) );
+	}
+
+}
+
+add_action( 'wp_ajax_charitable_disable_dashboard_notification', 'charitable_disable_dashboard_notification_ajax' );

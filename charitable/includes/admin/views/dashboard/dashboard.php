@@ -96,11 +96,20 @@ ob_start();
 			<br class="clear">
 		</div>
 
+		<?php
+		/**
+		 * Do or render something after the dashboard title bar but before the reporting.
+		 *
+		 * @since 1.8.2
+		 */
+		do_action( 'charitable_before_admin_dashboard_reports' );
+		?>
+
 		<div id="charitable-dashboard-report-container">
 
 			<div class="charitable-dashboard-report">
 
-				<?php if ( $notices ) : ?>
+				<?php /* if ( $notices ) : ?>
 
 					<div class="charitable-container charitable-report-card charitable-important" data-notice-ids="donation-security">
 						<div class="header">
@@ -113,11 +122,22 @@ ob_start();
 						</div>
 					</div>
 
-				<?php endif; ?>
+				<?php endif; */ ?>
 
 				<!--- dashboard welcome start -->
 
+				<?php
+				/**
+				 * Do or render something after the dashboard title bar but before the reporting.
+				 *
+				 * @since 1.8.2
+				 */
+				do_action( 'charitable_admin_dashboard_notifications' );
+				?>
+
 				<div class="charitable-dashboard-title-cards">
+
+					<?php /*
 
 					<div class="charitable-container charitable-dashboard-title-card thank-you">
 
@@ -178,19 +198,20 @@ ob_start();
 								<?php else : ?>
 									<li class="not-done"><a href="<?php echo admin_url( 'admin.php?page=charitable-settings&tab=emails' ); // phpcs:ignore ?>"><?php _e( 'Turn on email notifications', 'charitable' ); // phpcs:ignore ?></a></li>
 								<?php endif ?>
-								<?php
-									/**
-									 * Do or render something right after the default items in the getting started list.
-									 *
-									 * @since 1.8.1
-									 */
-									do_action( 'charitable_after_getting_started_dashboard' );
-								?>
 							</ul>
 
 						</div>
 
-					</div>
+					</div> */ ?>
+
+					<?php
+						/**
+						 * Do or render something above dashboard items (like a notice).
+						 *
+						 * @since 1.8.1.15
+						 */
+						do_action( 'charitable_after_getting_started_dashboard' );
+					?>
 
 				</div>
 

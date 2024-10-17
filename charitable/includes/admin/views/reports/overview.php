@@ -74,7 +74,7 @@ $total_count_donations  = count( $donations );
 $total_amount_donations = $charitable_reports->get_donations_total();
 $donation_breakdown     = $charitable_reports->get_donations_by_day();
 $payment_breakdown      = $charitable_reports->get_donations_by_payment();
-$donation_average       = ( $total_amount_donations > 0 && $total_amount_donations > 0 ) ? charitable_format_money( $total_amount_donations / $total_count_donations ) : charitable_format_money( 0 );
+$donation_average       = ( $total_amount_donations > 0 && $total_amount_donations > 0 ) ? ( charitable_format_money( $total_amount_donations / $total_count_donations, 2, true ) ) : charitable_format_money( 0 );
 $donation_total         = charitable_format_money( $total_amount_donations );
 
 // donors.
@@ -93,6 +93,9 @@ $top_campaigns     = Charitable_Campaigns::ordered_by_amount( $args );
 $campaign_dropdown = array();
 if ( ! empty( $top_campaigns->posts ) ) :
 	$campaign_dropdown = wp_list_pluck( $top_campaigns->posts, 'post_title', 'ID' );
+	$campaign_dropdown = array_map( 'esc_html', $campaign_dropdown );
+	// sort by title.
+	asort( $campaign_dropdown );
 endif;
 
 $campaign_categories  = $charitable_reports->get_campaign_categories();
@@ -104,7 +107,7 @@ $campaign_category_id = 0;
 	<div class="alignleft actions">
 		<label for="report-campaign-filter" class="screen-reader-text"><?php echo esc_html__( 'Select Campaign', 'charitable' ); ?></label>
 		<select name="action" id="report-campaign-filter">
-			<option value="-1"><?php echo esc_html__( 'Showing results for', 'charitable' ); ?> <strong><?php echo esc_html__( 'All Campaigns', 'charitable' ); ?></strong></option>
+			<option value="-1"><?php echo esc_html__( 'Showing Results for', 'charitable' ); ?> <strong><?php echo esc_html__( 'All Campaigns', 'charitable' ); ?></strong></option>
 			<?php if ( ! empty( $campaign_dropdown ) ) : ?>
 				<?php foreach ( $campaign_dropdown as $campaign_dropdown_id => $campaign_title ) : ?>
 				<option value="<?php echo intval( $campaign_dropdown_id ); ?>"><?php echo esc_html( $campaign_title ); ?></option>

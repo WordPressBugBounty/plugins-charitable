@@ -432,7 +432,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 					$badge_css   = strtolower( $donation_parent ) === 'recurring' ? 'recurring' : 'one-time';
 					$badge_label = strtolower( $donation_parent ) === 'recurring' ? esc_html__( 'Recurring', 'charitable' ) : esc_html__( 'One-Time', 'charitable' );
 
-					$display_amount = ! empty( $top_donor->total_donation_amount ) ? charitable_format_money( $top_donor->total_donation_amount ) : charitable_format_money( esc_html( $top_donor->amount ) );
+					$display_amount = ! empty( $top_donor->total_donation_amount ) ? charitable_format_money( $top_donor->total_donation_amount, 2, true ) : charitable_format_money( esc_html( $top_donor->amount ), 2, true );
 					$display_count  = ! empty( $top_donor->total_donation_count ) ? intval( $top_donor->total_donation_count ) : 1;
 
 					// based on display count, override the badge css/label.
@@ -708,13 +708,13 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 					$admin_campaign_url = ! empty( $activity->campaign_id ) ? charitable_get_admin_campaign_edit_url( $activity->campaign_id ) : '#';
 					$admin_donation_url = ! empty( $activity->item_id ) ? charitable_get_admin_donation_edit_url( $activity->item_id ) : false;
 					$campaign_title     = ! empty( $activity->campaign_title ) ? ' to <a target="_blank" href="' . $admin_campaign_url . '"><span class="campaign-title">' . $activity->campaign_title . '</span></a> ' : '';
-					$secondary_info     = $admin_donation_url ? '<p class="charitable-reports-activity-secondary-info amount"><a href="' . $admin_donation_url . '" target="_blank">' . charitable_format_money( $activity->amount ) . '</a>' . $campaign_title . '</p>' : '<p class="charitable-reports-activity-secondary-info amount">' . charitable_format_money( $activity->amount ) . $campaign_title . '</p>';
+					$secondary_info     = $admin_donation_url ? '<p class="charitable-reports-activity-secondary-info amount"><a href="' . $admin_donation_url . '" target="_blank">' . charitable_format_money( $activity->amount, 2, true ) . '</a>' . $campaign_title . '</p>' : '<p class="charitable-reports-activity-secondary-info amount">' . charitable_format_money( $activity->amount, 2, true ) . $campaign_title . '</p>';
 					break;
 				default:
 					$admin_campaign_url = ! empty( $activity->campaign_id ) ? charitable_get_admin_campaign_edit_url( $activity->campaign_id ) : '#';
 					$admin_donation_url = ! empty( $activity->item_id ) ? charitable_get_admin_donation_edit_url( $activity->item_id ) : false;
 					$campaign_title     = ! empty( $activity->campaign_title ) ? ' to <a target="_blank" href="' . $admin_campaign_url . '"><span class="campaign-title">' . $activity->campaign_title . '</span></a> ' : '';
-					$secondary_info     = $admin_donation_url ? '<p class="charitable-reports-activity-secondary-info amount"><a href="' . $admin_donation_url . '" target="_blank">' . charitable_format_money( $activity->amount ) . '</a>' . $campaign_title . '</p>' : '<p class="charitable-reports-activity-secondary-info amount">' . charitable_format_money( $activity->amount ) . $campaign_title . '</p>';
+					$secondary_info     = $admin_donation_url ? '<p class="charitable-reports-activity-secondary-info amount"><a href="' . $admin_donation_url . '" target="_blank">' . charitable_format_money( $activity->amount, 2, true ) . '</a>' . $campaign_title . '</p>' : '<p class="charitable-reports-activity-secondary-info amount">' . charitable_format_money( $activity->amount, 2, true ) . $campaign_title . '</p>';
 					break;
 			}
 
@@ -1119,9 +1119,9 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 							$last_donation_html = $last_donation_campaign_name;
 						}
 					} elseif ( $last_donation_date && $last_donation_campaign_name && $last_donation_campaign_id ) {
-							$last_donation_html = charitable_format_money( esc_html( $data->amount ) ) . '<br/><a href="' . $action_link . '" target="_blank">' . $last_donation_campaign_name . '</a><br/>' . $last_donation_date;
+						$last_donation_html = charitable_format_money( esc_html( $data->amount ), 2, true ) . '<br/><a href="' . $action_link . '" target="_blank">' . $last_donation_campaign_name . '</a><br/>' . $last_donation_date;
 					} elseif ( $is_sample_data ) {
-						$last_donation_html = charitable_format_money( esc_html( $data->amount ) ) . '<br/>' . $last_donation_campaign_name . '<br/>' . $last_donation_date;
+						$last_donation_html = charitable_format_money( esc_html( $data->amount ), 2, true ) . '<br/>' . $last_donation_campaign_name . '<br/>' . $last_donation_date;
 					}
 
 					if ( $report_type === 'donors-first-time' ) {
@@ -1130,7 +1130,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 					<tr id="type-<?php echo esc_attr( $report_type ); ?>-donor-<?php echo intval( $donor_id ); ?>" class="type-<?php echo esc_attr( $report_type ); ?>">
 						<td class="charitable-avatar" style="width: 32px;"><img src="<?php echo esc_url( $donor_avatar ); ?>" class="avatar avatar-32 photo charitable-avatar-donor-<?php echo intval( $donor_id ); ?>" width="32" height="32" alt="<?php echo esc_html__( 'Profile picture of', 'charitable' ); ?> <?php echo esc_html( $donor_name ); ?>"></td>
 						<td class="donated column-date" data-colname="<?php echo esc_html__( 'Name / Email', 'charitable' ); ?>"><?php echo esc_html( $donor_name ); ?><br/><?php echo esc_html( $donor_email ); ?></td>
-						<td class="donated column-donation-amount" data-colname="<?php echo esc_html__( 'Donation Amount', 'charitable' ); ?>"><?php echo charitable_format_money( esc_html( $data->total_amount ) ); // phpcs:ignore ?></td>
+						<td class="donated column-donation-amount" data-colname="<?php echo esc_html__( 'Donation Amount', 'charitable' ); ?>"><?php echo charitable_format_money( esc_html( $data->total_amount ), 2, true ); // phpcs:ignore ?></td>
 						<td class="donated column-campaign" data-colname="<?php echo esc_html__( 'Campaign', 'charitable' ); ?>"><?php echo $last_donation_html; // phpcs:ignore ?></td>
 						<td class="donated column-date" data-colname="<?php echo esc_html__( 'Date', 'charitable' ); ?>"><?php echo esc_html( $last_donation_date ); ?></td>
 						<?php
@@ -1149,9 +1149,9 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 						<tr id="type-<?php echo esc_attr( $report_type ); ?>-donor-<?php echo intval( $donor_id ); ?>" class="type-<?php echo esc_attr( $report_type ); ?>">
 						<td class="charitable-avatar" style="width: 32px;"><img src="<?php echo esc_url( $donor_avatar ); ?>" class="avatar avatar-32 photo charitable-avatar-donor-<?php echo intval( $donor_id ); ?>" width="32" height="32" alt="<?php echo esc_html__( 'Profile picture of', 'charitable' ); ?> <?php echo esc_html( $donor_name ); ?>"></td>
 						<td class="donated column-date" data-colname="<?php echo esc_html__( 'Name / Email', 'charitable' ); ?>"><?php echo esc_html( $donor_name ); ?><br/><?php echo esc_html( $donor_email ); ?></td>
-						<td class="donated column-total-donations" data-colname="<?php echo esc_html__( 'Total Donations', 'charitable' ); ?>"><?php echo charitable_format_money( esc_html( $data->total_amount ) ); // phpcs:ignore ?></td>
+						<td class="donated column-total-donations" data-colname="<?php echo esc_html__( 'Total Donations', 'charitable' ); ?>"><?php echo charitable_format_money( esc_html( $data->total_amount ), 2, true ); // phpcs:ignore ?></td>
 						<td class="donated column-number-donations" data-colname="Number of Donations"><?php echo esc_html( $donor_number_donations ); ?></td>
-						<td class="donated column-average" data-colname="Average"><?php echo charitable_format_money( $donor_average ); // phpcs:ignore ?></td>
+						<td class="donated column-average" data-colname="Average"><?php echo charitable_format_money( $donor_average, 2, true ); // phpcs:ignore ?></td>
 						<td class="donated column-number-campaigns" data-colname="Number of Campaigns"><?php echo esc_html( $donor_number_campaigns ); ?></td>
 						<td class="donated column-last-donation" data-colname="Last Donation"><?php echo $last_donation_html; // phpcs:ignore ?></td>
 							<?php
@@ -3034,6 +3034,10 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 					$total_amount_donations_from = array_sum( array_column( $advanced_report_data, 'total_donation_amount_compare_from' ) );
 					$total_amount_donations_to   = array_sum( array_column( $advanced_report_data, 'total_donation_amount_compare_to' ) );
 
+					// if value does not have decimals, then add two decimal places.
+					$total_amount_donations_from = ( false === strpos( $total_amount_donations_from, '.' ) ) ? $total_amount_donations_from . '.00' : $total_amount_donations_from;
+					$total_amount_donations_to   = ( false === strpos( $total_amount_donations_to, '.' ) ) ? $total_amount_donations_to . '.00' : $total_amount_donations_to;
+
 					$from_date_range = '( ' . $report_args['start_date_compare_from'] . ' - ' . $report_args['end_date_compare_from'] . ' )';
 					$to_date_range   = '( ' . $report_args['start_date_compare_to'] . ' - ' . $report_args['end_date_compare_to'] . ' )';
 
@@ -3047,6 +3051,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 					$to_date_range               = '2023/01/01 - 2023/12/31';
 
 				endif;
+
 
 				?>
 
@@ -3062,12 +3067,12 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 						<p><?php echo esc_html( $to_date_range ); ?></p>
 					</div>
 					<div class="charitable-container charitable-report-ui charitable-card">
-						<strong><span id="charitable-top-donor-count"><?php echo charitable_format_money( $total_amount_donations_from ); // phpcs:ignore ?></span></strong>
+						<strong><span id="charitable-top-donor-count"><?php echo charitable_format_money( $total_amount_donations_from, 2, true ); // phpcs:ignore ?></span></strong>
 						<p><?php echo esc_html__( 'Donations', 'charitable' ); ?></p>
 						<p><?php echo esc_html( $from_date_range ); ?></p>
 					</div>
 					<div class="charitable-container charitable-report-ui charitable-card">
-						<strong><span id="charitable-top-donor-count"><?php echo charitable_format_money( $total_amount_donations_to ); // phpcs:ignore ?></span></strong>
+						<strong><span id="charitable-top-donor-count"><?php echo charitable_format_money( $total_amount_donations_to, 2, true ); // phpcs:ignore ?></span></strong>
 						<p><?php echo esc_html__( 'Donations', 'charitable' ); ?></p>
 						<p><?php echo esc_html( $to_date_range ); ?></p>
 					</div>
@@ -3307,11 +3312,11 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 					$donor_email                        = $data->donor_email;
 					$donor_avatar                       = ( is_email( $donor_email ) ) ? get_avatar_url( $donor_email ) : charitable()->get_path( 'assets', false ) . '/images/misc/placeholder-avatar-small.jpg';
 					$total_donation_count_compare_to    = $data->total_donation_count_compare_to;
-					$total_donation_amount_compare_to   = $data->total_donation_amount_compare_to;
+					$total_donation_amount_compare_to   = number_format( $data->total_donation_amount_compare_to, 2 );
 					$total_donation_count_compare_from  = $data->total_donation_count_compare_from;
-					$total_donation_amount_compare_from = $data->total_donation_amount_compare_from;
+					$total_donation_amount_compare_from = number_format( $data->total_donation_amount_compare_from, 2 );
 					$last_donation_amount               = $data->last_donation_amount;
-					$total_life_amount                  = $data->total_life_amount;
+					$total_life_amount                  = number_format( $data->total_life_amount, 2 );
 					$campaign_links                     = implode( ',', $data->last_donation_campaign_links );
 					$link                               = false;
 					$actions_display                    = '';
@@ -3322,10 +3327,10 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 						<td class="charitable-avatar" style="width: 32px;"><img src="<?php echo esc_url( $donor_avatar ); ?>" class="avatar avatar-<?php echo esc_html( $donor_id ); ?> photo" width="32" height="32" alt="<?php esc_html__( 'Profile picture of', 'charitable' ); ?> <?php echo esc_html( $donor_name ); ?>"></td>
 						<td class="donated column-date" data-colname="<?php echo esc_html__( 'Date.', 'charitable' ); ?>"><?php echo esc_html( $donor_name ); ?><br/><?php echo esc_html( $donor_email ); ?></td>
 						<td class="donated column-donations" data-colname="Donations"><?php echo charitable_format_money( $last_donation_amount ); // phpcs:ignore ?></td>
-						<td class="donated column-donors" data-colname="Number of Donors"><?php echo esc_html( $total_donation_count_compare_from ); ?> <?php echo esc_html__( 'Donations', 'charitable' ); ?><br/><small><?php echo charitable_format_money( $total_donation_amount_compare_from ); // phpcs:ignore ?></small></td>
-						<td class="donated column-donors" data-colname="Number of Donors"><?php echo esc_html( $total_donation_count_compare_to ); ?> <?php echo esc_html__( 'Donations', 'charitable' ); ?><br/><small><?php echo charitable_format_money( $total_donation_amount_compare_to ); // phpcs:ignore ?></small></td>
+						<td class="donated column-donors" data-colname="Number of Donors"><?php echo esc_html( $total_donation_count_compare_from ); ?> <?php echo esc_html__( 'Donations', 'charitable' ); ?><br/><small><?php echo charitable_format_money( $total_donation_amount_compare_from, 2, true ); // phpcs:ignore ?></small></td>
+						<td class="donated column-donors" data-colname="Number of Donors"><?php echo esc_html( $total_donation_count_compare_to ); ?> <?php echo esc_html__( 'Donations', 'charitable' ); ?><br/><small><?php echo charitable_format_money( $total_donation_amount_compare_to, 2, true ); // phpcs:ignore ?></small></td>
 						<td class="donated column-refunds" data-colname="Refunds"><?php echo $campaign_links; // phpcs:ignore ?></td>
-						<td class="donated column-net " data-colname="Net"><?php echo charitable_format_money( $total_life_amount ); // phpcs:ignore ?></td>
+						<td class="donated column-net " data-colname="Net"><?php echo charitable_format_money( $total_life_amount, 2, true ); // phpcs:ignore ?></td>
 						<?php
 
 						if ( $show_actions ) :
@@ -4107,6 +4112,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 
 			// Add Javascript vars at the footer of the WordPress admin, at the dashboard and the overview tab of reporting.
 			if ( ! is_null( $screen ) && ( $screen->id === 'charitable_page_charitable-reports' && ( empty( $_GET['tab'] ) || ( ! empty( $_GET['tab'] ) && charitable_reports_allow_tab_load_scripts( strtolower( $_GET['tab'] ) ) ) ) ) ) { // phpcs:ignore
+
 				// Specific styles for the "overview" tab.
 				add_action( 'admin_footer', [ $this, 'report_vars' ], 100 );
 			}

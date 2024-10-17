@@ -145,7 +145,7 @@ if ( ! class_exists( 'Charitable_Admin_Pages' ) ) :
 		/**
 		 * Returns an array with all the submenu pages.
 		 *
-		 * @since  1.0.0
+		 * @since   1.0.0
 		 *
 		 * @return array
 		 */
@@ -157,10 +157,11 @@ if ( ! class_exists( 'Charitable_Admin_Pages' ) ) :
 			 * Filter the list of submenu pages that come
 			 * under the Charitable menu tab.
 			 *
-			 * @since 1.0.0
+			 * @since   1.0.0
 			 * @version 1.8.1 Added dashboard and reports.
 			 * @version 1.8.1.6 Added tools.
 			 * @version 1.8.1.8 Added SMTP.
+			 * @version 1.8.2 Remove categories, tags, and customize.
 			 *
 			 * @param array $pages Every page is an array with at least a page_title,
 			 *                     menu_title and menu_slug set.
@@ -192,24 +193,6 @@ if ( ! class_exists( 'Charitable_Admin_Pages' ) ) :
 						'menu_title' => $donation_post_type->labels->menu_name,
 						'menu_slug'  => 'edit.php?post_type=donation',
 						'capability' => 'edit_donations',
-					),
-					array(
-						'page_title' => __( 'Campaign Categories', 'charitable' ),
-						'menu_title' => __( 'Categories', 'charitable' ),
-						'menu_slug'  => 'edit-tags.php?taxonomy=campaign_category&post_type=campaign',
-						'capability' => 'manage_campaign_terms',
-					),
-					array(
-						'page_title' => __( 'Campaign Tags', 'charitable' ),
-						'menu_title' => __( 'Tags', 'charitable' ),
-						'menu_slug'  => 'edit-tags.php?taxonomy=campaign_tag&post_type=campaign',
-						'capability' => 'manage_campaign_terms',
-					),
-					array(
-						'page_title' => __( 'Customize', 'charitable' ),
-						'menu_title' => __( 'Customize', 'charitable' ),
-						'menu_slug'  => 'customize.php?autofocus[panel]=charitable&url=' . $this->get_customizer_campaign_preview_url(),
-						'capability' => 'manage_charitable_settings',
 					),
 					array(
 						'page_title' => __( 'Charitable Reports', 'charitable' ),
@@ -385,17 +368,6 @@ if ( ! class_exists( 'Charitable_Admin_Pages' ) ) :
 		 */
 		public function render_welcome_page() {
 			charitable_admin_view( 'welcome-page/page' );
-		}
-
-		/**
-		 * Display the Charitable Growth Tools page.
-		 *
-		 * @since  1.8.1.12
-		 *
-		 * @return void
-		 */
-		public function render_setup_checklist_page() {
-			charitable_admin_view( 'setup-checklist/setup-checklist' );
 		}
 
 		/**

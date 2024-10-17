@@ -160,6 +160,26 @@ if ( ! class_exists( 'Charitable_Onboarding' ) ) :
 		}
 
 		/**
+		 * Check if the first donation step is completed.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @return bool
+		 */
+		public function check_step_first_donation() {
+			if ( $this->is_step_completed( 'first-donation' ) ) {
+				return true;
+			}
+			if ( ! isset( $_GET['post_type'] ) || 'donation' !== $_GET['post_type'] ) { // phpcs:ignore
+				return false;
+			}
+
+			$this->mark_step_completed( 'first-campaign' );
+
+			return true;
+		}
+
+		/**
 		 * Mark a step as completed.
 		 *
 		 * @since 1.8.1.12
@@ -174,10 +194,10 @@ if ( ! class_exists( 'Charitable_Onboarding' ) ) :
 			}
 
 			// we store this as an option, so load the option and check the array key.
-			$completed_steps = get_option( $this->$checklist_option_name, array() );
+			$completed_steps = get_option( $this->checklist_option_name, array() );
 			if ( ! in_array( $step, $completed_steps ) ) {
 				$completed_steps[] = $step;
-				update_option( $this->$checklist_option_name, $completed_steps );
+				update_option( $this->checklist_option_name, $completed_steps );
 			}
 
 			return true;

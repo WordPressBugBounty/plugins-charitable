@@ -1,3 +1,21 @@
+# 1.8.2
+* NEW: "Charitable Checklist" so new users can check vital settings, connect gateways, and get to building their first campaign.
+* NEW: Warning messages for admin users - in gateway settings page and viewing donation forms (as admins) - if Stripe is enabled, but no keys are detected.
+* NEW: Dashboard notifications for important messages and notices.
+* NEW: Added 'charitable_email_fields_donation_field_value' filter which can help with output of custom field values in emails.
+* NEW: Campaigns shortcode now has a new "description_limit" parameter that limits words displayed from campaign description.
+* NEW: Added a donation button shortcode. [More Information](https://www.wpcharitable.com/documentation/donation-button-shortcode/)
+* NEW: Added both a filter and an option (in beta) in the general setting tab to disable showing a login form or registeration reminder on donation forms. [More Information](https://www.wpcharitable.com/documentation/hiding-the-login-register-form-on-donation-forms/)
+* UPDATED: Improved tour guide for visual campaign builder with more interactivity and showing more elements.
+* UPDATED: Campaigns shortcode now displays a photo and campaign description from campaigns built with the visual builder.
+* UPDATED: Moved "Categories", "Tags", and "Customize" menus from main menu. Now found in the Charitable -> "Tools" page.
+* FIX: Adjusted appearance of the donation button in Youth Sports campaign theme when modal button setting was on.
+* FIX: Resolved an issue with the donation summary field for the visual campaign builder involving showing/hiding items.
+* FIX: Resolved several instances where donation amounts were not being formatted currently in non-English languages in the reporting screens.
+* FIX: Improved loading for the WordPress dashboard widget.
+* FIX: Adjustments to CSS on the Dashboard page.
+* FIX: Minor translation, misc CSS, UI, and PHP coding updates.
+
 # 1.8.1.15
 * NEW: Added exit modal popup on getting started screen when user visits Pro page.
 * NEW: Added ability via two global PHP variables to force/not force "tour" for visual campaign builder.
@@ -48,9 +66,9 @@
 
 # 1.8.1.8
 * NEW: Add three WordPress hooks to allow developers to add custom content in the gateway fieldset in the donation form.
-* NEW: Add 'charitable_stripe_payment_intent_data' filter payment_intent_data sent to Stripe (example: remove setup_future_usage for some Stripe payment integrations).
+* NEW: Add 'charitable_stripe_payment_intent_data' filter for the "payment_intent_data" attribute sent to Stripe (example: use to remove "setup_future_usage" value for payment integrations).
 * NEW: New menu item "SMTP" with ability to download and install WP Mail SMTP.
-* NEW: Added hooks 'charitable_gateway_fields_front', 'charitable_gateway_fields_after_legend', and 'charitable_gateway_fields_after_legend' to insert text into gateway fields area in donation form.
+* NEW: Added hooks 'charitable_gateway_fields_front', 'charitable_gateway_fields_after_legend', and 'charitable_gateway_fields_end' to insert text into gateway fields area in donation form.
 * NEW: Updated charitable.pot.
 * FIX: Resolved a security issue when checking to see if a campaign can recieve donation.
 * FIX: Resolved issue related to exporting recurring donations.

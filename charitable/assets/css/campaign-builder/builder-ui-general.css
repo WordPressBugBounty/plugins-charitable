@@ -44,7 +44,7 @@
   font-size: 18px;
   font-weight: 400;
   margin: 21px 450px 0 114px;
-  max-width: calc(100% - 500px);
+  max-width: calc(100% - 750px);
   text-align: left;
 }
 #charitable-builder .charitable-toolbar .charitable-center-form-name {
@@ -390,9 +390,9 @@
 
 .charitable-panel-field {
   margin-bottom: 20px;
-  max-width: 70%;
+  max-width: 95%;
   display: table;
-  width: 99%;
+  width: 95%;
 }
 .charitable-panel-field.wide, .charitable-panel-field.charitable-panel-field-tinymce, .charitable-panel-field.charitable-panel-field-warning {
   max-width: 800px;
@@ -1816,6 +1816,8 @@
 
 .charitable-edit-campaign-title-area {
   position: relative;
+  display: inline-block;
+  width: calc(100% - 250px);
 }
 .charitable-edit-campaign-title-area input.charitable-form-name {
   font-size: 18px;
@@ -1825,7 +1827,7 @@
   margin-right: 10px;
   border: 1px solid #cccccc;
   border-radius: 4px;
-  width: calc(100% - 545px);
+  width: 100%;
 }
 .charitable-edit-campaign-title-area input.charitable-form-name::-webkit-input-placeholder {
   font-weight: lighter;
@@ -1854,4 +1856,14 @@
 }
 .charitable-edit-campaign-title-area.edit input.charitable-form-name:focus {
   border: none;
+}
+
+@media screen and (max-width: 1320px) {
+  .charitable-edit-campaign-title-label {
+    display: none;
+  }
+  .charitable-edit-campaign-title-area {
+    width: 100%;
+    margin-top: -5px;
+  }
 }

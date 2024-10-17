@@ -24,6 +24,9 @@ var CharitableAdminUI = window.CharitableAdminUI || ( function( document, window
 
 		ready: function() {
 
+            // Move navigation elements on certain pages.
+            app.moveNavigationElements();
+
 			elements.$addNewCampaignButton = $( 'body.post-type-campaign .page-title-action' );
 
 			// Bind all actions.
@@ -45,6 +48,17 @@ var CharitableAdminUI = window.CharitableAdminUI || ( function( document, window
             $(window).on('hashchange', function() {
                 app.scrollToAnchor();
             });
+
+        },
+
+        moveNavigationElements: function() {
+
+            // if the body class has the class 'post-type-charitable' and 'edit-tags-php' then move the navigation elements "#charitable-tools-nav" right after form.search-form.
+            if ( $('body.post-type-charitable.edit-tags-php').length > 0 ) {
+                $('#charitable-tools-nav').insertBefore('h1.wp-heading-inline');
+            }
+
+
 
         },
 
@@ -95,18 +109,119 @@ var CharitableAdminUI = window.CharitableAdminUI || ( function( document, window
             // Upgrade Modal.
             app.initUpgradeModal();
 
+            // Notifications
+            app.initNotifications();
+
         },
 
+        /**
+         * Initialize the notifications.
+         *
+         * @return {void}
+         *
+         * @since 1.8.2
+         *
+         */
+        initNotifications: function() {
+
+            // when a prev or next button is clicked inside the notification navigation.
+            $('body .charitable-dashboard-notification-navigation').on( 'click', 'a', function( e ) {
+                e.preventDefault();
+
+                var $this = $(this),
+                    // find the notification id and number of the notification that does not have the charitable-hidden css class.
+                    notification_number = $this.closest('.charitable-dashboard-notifications').find('.charitable-dashboard-notification:not(.charitable-hidden)').data('notification-number'),
+                    notification_id = $this.closest('.charitable-dashboard-notifications').find('.charitable-dashboard-notification:not(.charitable-hidden)').data('notification-id'),
+                    notification_type = $this.closest('.charitable-dashboard-notifications').find('.charitable-dashboard-notification:not(.charitable-hidden)').data('notification-type'),
+                    notification_count = $this.closest('.charitable-dashboard-notifications').find('.charitable-dashboard-notification').length,
+                    $container = $this.closest('.charitable-dashboard-notifications');
+
+                if ( $this.hasClass('next') ) {
+                    // add the charitable-hidden of the current notification.
+                    $container.find('.charitable-dashboard-notification[data-notification-number="' + notification_number + '"]').addClass('charitable-hidden');
+                    notification_number++;
+                    if ( notification_number > notification_count ) {
+                        notification_number = 1;
+                    }
+                    // remove the charitable-hidden of the next notification.
+                    $container.find('.charitable-dashboard-notification[data-notification-number="' + notification_number + '"]').removeClass('charitable-hidden');
+                } else if ( $this.hasClass('prev') ) {
+                    // add the charitable-hidden of the current notification.
+                    $container.find('.charitable-dashboard-notification[data-notification-number="' + notification_number + '"]').addClass('charitable-hidden');
+                    notification_number--;
+                    if ( notification_number < 1 ) {
+                        notification_number = notification_count;
+                    }
+                    // remove the charitable-hidden of the next notification.
+                    $container.find('.charitable-dashboard-notification[data-notification-number="' + notification_number + '"]').removeClass('charitable-hidden');
+                }
+            }
+            );
+
+            // when the close button is clicked, remove the notificaiton from the HTML and do an ajax call removing the notficaition from the database.
+            $('body .charitable-dashboard-notifications').on( 'click', '.charitable-remove-dashboard-notification', function( e ) {
+                e.preventDefault();
+
+                var $this = $(this),
+                    $container = $this.closest('.charitable-dashboard-notifications'),
+                    notification_id = $container.find('.charitable-dashboard-notification:not(.charitable-hidden)').data('notification-id');
+                    // notification_id = $this.closest('.charitable-dashboard-notification').data('notification-id');
+
+                // find the notificaiton that is currently being displayed... basically fine .charitable-dashboard-notification that doesn't have a css class of charitable-hidden.
+
+                // ajax call to diable the notification.
+                $.ajax({
+                    type: 'POST',
+                    url: ajaxurl,
+                    data: {
+                        action: 'charitable_disable_dashboard_notification',
+                        notification_id: notification_id,
+                        nonce: charitable_admin.nonce,
+                    },
+                    success: function( response ) {
+                        if ( response.success ) {
+                            // remove the element that has the notification id.
+                            $container.find('.charitable-dashboard-notification[data-notification-id="' + notification_id + '"]').remove();
+                            // count the number of notifications that are left.
+                            var notification_count = $container.find('.charitable-dashboard-notification').length;
+                            // if there are no more notifications, remove the entire container.
+                            if ( notification_count === 0 ) {
+                                $container.remove();
+                            }
+                        }
+                    }
+                });
+
+            });
+
+        },
+
+        /**
+         * Scroll to anchor.
+         * If the url has a hash, scroll to the anchor.
+         *
+         * @return {void}
+         *
+         * @since 1.8.2
+        */
         scrollToAnchor: function() {
             // get the hash from the url.
             var hash = window.location.hash;
             hash = hash.substring(1);
 
             if ( hash ) {
-                var $target = $( 'a#wpchr-' + hash ),
-                    $container = $target.length ? $target.closest('.charitable-growth-content') : false;
 
-                    // remove all css classes 'charitable-selected' from all containers.
+                // santitize the hash.
+                hash = hash.replace(/[^a-zA-Z0-9-_]/g, '');
+
+                var $target = $( 'a#wpchr-' + hash ),
+                    $container = false;
+
+                if ( $target.length ) {
+                    $container = $target.length ? $target.closest('.charitable-growth-content') : false;
+                }
+
+                // remove all css classes 'charitable-selected' from all containers.
                 $('.charitable-growth-content').removeClass('charitable-selected');
 
                 if ( $target.length ) {

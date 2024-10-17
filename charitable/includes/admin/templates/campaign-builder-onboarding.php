@@ -1,6 +1,6 @@
 <?php
 /**
- * Challenge HTML template specific to Form Builder.
+ * Challenge HTML template specific to Campaign Builder.
  *
  * @since 1.8.1.12
  */

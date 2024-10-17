@@ -139,6 +139,7 @@ if ( ! class_exists( 'Charitable_Email_Fields_Donation' ) ) :
 		 * Return the value for a particular field that is registered as a Charitable_Donation_Field.
 		 *
 		 * @since  1.5.0
+		 * @version 1.8.2 - added filter.
 		 *
 		 * @param  string $value The content to display in place of the shortcode.
 		 * @param  array  $args  Optional set of arguments.
@@ -149,7 +150,10 @@ if ( ! class_exists( 'Charitable_Email_Fields_Donation' ) ) :
 				return '';
 			}
 
-			return $this->donation->get( $this->fields[ $args['show'] ]['field'] );
+			$field_id     = ! empty( $this->fields ) && ! empty( $this->fields[ $args['show'] ]['field'] ) ? $this->fields[ $args['show'] ]['field'] : '';
+			$return_value = $this->donation->get( $this->fields[ $args['show'] ]['field'] );
+
+			return apply_filters( 'charitable_email_fields_donation_field_value', $return_value, $value, $args, $field_id );
 		}
 
 		/**

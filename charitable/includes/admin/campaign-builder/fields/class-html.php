@@ -138,14 +138,14 @@ if ( ! class_exists( 'Charitable_Field_HTML' ) ) :
 			}
 
 			$html_content = ! empty( $field_data['content'] ) ? $this->format( $field, $field_data['content'], $campaign_data ) : false;
-			$css_class    = ! empty( $field_data['css_class'] ) ? ' class="' . esc_attr( $field_data['css_class'] ) . '" ' : '';
+			$css_class    = ! empty( $field_data['css_class'] ) ? ' class="' . esc_html( $field_data['css_class'] ) . '" ' : '';
 
 			ob_start();
 
 			?>
 
 		<div class="charitable-campaign-field charitable-campaign-field_<?php echo esc_attr( $this->type ); ?>">
-			<div <?php echo sanitize_text_field( $css_class ); ?>>
+			<div <?php echo esc_attr( $css_class ); ?>>
 				<?php echo $html_content; ?>
 			</div>
 		</div>

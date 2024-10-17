@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.6.2
 Requires PHP: 7.2
-Stable tag: 1.8.1.15
+Stable tag: 1.8.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,7 +14,7 @@ The best WordPress donation plugin. Create fundraising donation forms, accept re
 
 = The Best WordPress Donation & Fundraising Plugin =
 
-[Charitable](https://wpcharitable.com/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) is the best WordPress donation plugin that's both EASY & POWERFUL. Add a simple donate button, create beautiful fundraising campaigns with smart donation forms, accept recurring donations with Stripe, PayPal, & Square), add crowdfunding / peer-to-peer fundraising, and other powerful donation features to your site in minutes with just a few clicks!
+[Charitable](https://wpcharitable.com/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) is the best WordPress donation plugin that's both EASY & POWERFUL. Add a simple donate button, create beautiful fundraising campaigns with smart donation forms, accept recurring donations with Stripe, PayPal, & Square, add crowdfunding / peer-to-peer fundraising, and other powerful donation features to your site in minutes with just a few clicks!
 
 At Charitable, user experience is our #1 priority. Our pre-built donation form templates and workflows make Charitable the most beginner-friendly donation plugin on the market. You can create a fundraising campaign in less than 5 minutes with our drag & drop donation form builder or by using our pre-built donation campaign templates to get a head start.
 
@@ -23,7 +23,7 @@ Over 10,000+ nonprofits, charity foundations, clubs & NGOs get more donations fr
 > <strong>Charitable Pro</strong><br />
 > This plugin is the Lite version of Charitable Pro, which comes with additional email marketing & payment integrations, crowdfunding, peer-to-peer fundraising, automated workflows, and more. [Click here to purchase the best premium WordPress donation & fundraising plugin now!](https://wpcharitable.com/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin&utm_content=charitablepro)
 
-[youtube https://www.youtube.com/watch?v=CqNOJ4H8guI]
+[youtube https://www.youtube.com/watch?v=834h3huzzk8]
 
 = Fully Customizable Donation Forms with Drag & Drop =
 
@@ -175,7 +175,7 @@ Charitable&reg; is a registered trademark of WP Charitable LLC. When writing abo
 
 = What's Next =
 
-Help make Charitable make a bigger impact around the world by translating our donation plugin in our language. [Contribute to the translation project in your language.](https://translate.wordpress.org/projects/wp-plugins/charitable)
+Help make Charitable make a bigger impact around the world by translating our donation plugin in your language. [Contribute to the translation project in your language.](https://translate.wordpress.org/projects/wp-plugins/charitable)
 
 Love Charitable? [Leave us a review](https://wordpress.org/support/plugin/charitable/reviews/?filter=5#new-post) - it's really motivating for our team.
 
@@ -207,7 +207,7 @@ Visit [WPBeginner](https://www.wpbeginner.com/ "WPBeginner") to learn from their
 
 Yes you can! If you use Stripe, donors will be able to make credit card donations right on your website. If you use PayPal, donors will be redirected to PayPal to complete their donation. You can also use the Offline Donations gateway to allow your donors to create a donation and make the payment via cheque or bank transfer (you can display your payment details to them).
 
-Want to accept credit card donatinos from other payment gateways? [Upgrade to Charitable Pro](https://wpcharitable.com/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin).
+Want to accept credit card donations from other payment gateways? [Upgrade to Charitable Pro](https://wpcharitable.com/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin).
 
 = How do I add a grid of fundraising campaigns to my page? =
 
@@ -257,6 +257,24 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.2 =
+* NEW: "Charitable Checklist" so new users can check vital settings, connect gateways, and get to building their first campaign.
+* NEW: Warning messages for admin users - in gateway settings page and viewing donation forms (as admins) - if Stripe is enabled, but no keys are detected.
+* NEW: Dashboard notifications for important messages and notices.
+* NEW: Added 'charitable_email_fields_donation_field_value' filter which can help with output of custom field values in emails.
+* NEW: Campaigns shortcode now has a new "description_limit" parameter that limits words displayed from campaign description.
+* NEW: Added a donation button shortcode. [More Information](https://www.wpcharitable.com/documentation/donation-button-shortcode/)
+* NEW: Added both a filter and an option (in beta) in the general setting tab to disable showing a login form or registeration reminder on donation forms. [More Information](https://www.wpcharitable.com/documentation/hiding-the-login-register-form-on-donation-forms/)
+* UPDATED: Improved tour guide for visual campaign builder with more interactivity and showing more elements.
+* UPDATED: Campaigns shortcode now displays a photo and campaign description from campaigns built with the visual builder.
+* UPDATED: Moved "Categories", "Tags", and "Customize" menus from main menu. Now found in the Charitable -> "Tools" page.
+* FIX: Adjusted appearance of the donation button in Youth Sports campaign theme when modal button setting was on.
+* FIX: Resolved an issue with the donation summary field for the visual campaign builder involving showing/hiding items.
+* FIX: Resolved several instances where donation amounts were not being formatted currently in non-English languages in the reporting screens.
+* FIX: Improved loading for the WordPress dashboard widget.
+* FIX: Adjustments to CSS on the Dashboard page.
+* FIX: Minor translation, misc CSS, UI, and PHP coding updates.
 
 = Donation Form & Fundraising Campaigns v1.8.1.15 =
 * NEW: Added exit modal popup on getting started screen when user visits Pro page.
@@ -308,9 +326,9 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 
 = Donation Form & Fundraising Campaigns v1.8.1.8 =
 * NEW: Add three WordPress hooks to allow developers to add custom content in the gateway fieldset in the donation form.
-* NEW: Add 'charitable_stripe_payment_intent_data' filter payment_intent_data sent to Stripe (example: remove setup_future_usage for some Stripe payment integrations).
+* NEW: Add 'charitable_stripe_payment_intent_data' filter for the "payment_intent_data" attribute sent to Stripe (example: use to remove "setup_future_usage" value for payment integrations).
 * NEW: New menu item "SMTP" with ability to download and install WP Mail SMTP.
-* NEW: Added hooks 'charitable_gateway_fields_front', 'charitable_gateway_fields_after_legend', and 'charitable_gateway_fields_after_legend' to insert text into gateway fields area in donation form.
+* NEW: Added hooks 'charitable_gateway_fields_front', 'charitable_gateway_fields_after_legend', and 'charitable_gateway_fields_end' to insert text into gateway fields area in donation form.
 * NEW: Updated charitable.pot.
 * FIX: Resolved a security issue when checking to see if a campaign can recieve donation.
 * FIX: Resolved issue related to exporting recurring donations.

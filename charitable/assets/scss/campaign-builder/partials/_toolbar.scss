@@ -53,16 +53,12 @@
 		font-size: $font_size_l;
 		font-weight: 400;
 		margin: 21px 450px 0 114px;
-		max-width: calc( 100% - 500px );
+		max-width: calc( 100% - 750px );
 		text-align: left;
 	}
 
 	.charitable-center-form-name {
 		cursor: pointer;
-
-		// &:hover {
-		// 	text-decoration: underline;
-		// }
 	}
 
 	.charitable-form-name {

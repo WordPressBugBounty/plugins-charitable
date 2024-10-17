@@ -4,12 +4,17 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitc52d9475efbd3c9eb8ffd0ed9fcf171a
+class ComposerStaticInit38c1852057a6e3ae12ab11237bcb980b
 {
     public static $prefixLengthsPsr4 = array (
         'S' => 
         array (
             'Stripe\\' => 7,
+        ),
+        'C' => 
+        array (
+            'CharitablePluginUpdater\\' => 24,
+            'CharitableLicenses\\' => 19,
         ),
     );
 
@@ -17,6 +22,14 @@ class ComposerStaticInitc52d9475efbd3c9eb8ffd0ed9fcf171a
         'Stripe\\' => 
         array (
             0 => __DIR__ . '/..' . '/stripe/stripe-php/lib',
+        ),
+        'CharitablePluginUpdater\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/wpcharitable/charitable-licenses/src',
+        ),
+        'CharitableLicenses\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/wpcharitable/charitable-licenses/src',
         ),
     );
 
@@ -27,9 +40,9 @@ class ComposerStaticInitc52d9475efbd3c9eb8ffd0ed9fcf171a
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitc52d9475efbd3c9eb8ffd0ed9fcf171a::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitc52d9475efbd3c9eb8ffd0ed9fcf171a::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitc52d9475efbd3c9eb8ffd0ed9fcf171a::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit38c1852057a6e3ae12ab11237bcb980b::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit38c1852057a6e3ae12ab11237bcb980b::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit38c1852057a6e3ae12ab11237bcb980b::$classMap;
 
         }, null, ClassLoader::class);
     }

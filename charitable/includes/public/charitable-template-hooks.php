@@ -80,13 +80,15 @@ add_action( 'charitable_campaign_content_loop_before_title', 'charitable_templat
 /**
  * Campaigns loop, after the main title.
  *
+ * @version 1.8.2 added 2nd parameter to charitable_template_campaign_description()
+ *
  * @see charitable_template_campaign_description()
  * @see charitable_template_campaign_progress_bar()
  * @see charitable_template_campaign_loop_donation_stats()
  * @see charitable_template_campaign_donate_link()
  * @see charitable_template_campaign_loop_more_link()
  */
-add_action( 'charitable_campaign_content_loop_after', 'charitable_template_campaign_description', 4 );
+add_action( 'charitable_campaign_content_loop_after', 'charitable_template_campaign_description', 4, 2 );
 add_action( 'charitable_campaign_content_loop_after', 'charitable_template_campaign_progress_bar', 6 );
 add_action( 'charitable_campaign_content_loop_after', 'charitable_template_campaign_loop_donation_stats', 8 );
 add_action( 'charitable_campaign_content_loop_after', 'charitable_template_campaign_loop_donate_link', 10, 2 );

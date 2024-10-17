@@ -274,6 +274,11 @@ if ( ! class_exists( 'Charitable_Public' ) ) :
 				$gateway = new Charitable_Gateway_Stripe_AM();
 				$keys    = $gateway->get_keys();
 
+				// If there is no public key, do not load the scripts. Added in 1.8.2.
+				if ( ! isset( $keys['public_key'] ) || empty( $keys['public_key'] ) ) {
+					return;
+				}
+
 				$stripe_vars = array(
 					'key'          => $keys['public_key'],
 					'currency'     => charitable_get_currency(),

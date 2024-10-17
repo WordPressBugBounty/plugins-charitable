@@ -149,6 +149,9 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 		 * Get campaign settings from an ID in the querystring.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.2 add maybe_unserialize
+		 *
+		 * @param int|bool $campaign_id The campaign ID.
 		 */
 		public function get_campaign_settings( $campaign_id = false ) {
 
@@ -162,6 +165,10 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 
 				if ( empty( $this->campaign_data ) || false === $this->campaign_data ) {
 					$this->campaign_data = $this->get_default_settings();
+				}
+
+				if ( is_string( $this->campaign_data ) ) {
+					$this->campaign_data = maybe_unserialize( $this->campaign_data );
 				}
 
 				$this->campaign_data['id']          = $campaign_id;
@@ -290,6 +297,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				'modals',
 				'alerts',
 				'onboarding',
+				'tour',
 			);
 
 			foreach ( $builder_styles as $style ) {
@@ -577,8 +585,26 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 			/* added in 1.8.1.12 */
 			wp_enqueue_script(
 				'charitable-admin-builder-onboarding',
-				charitable()->get_path( 'directory', false ) . "assets/js/campaign-builder/admin-onboarding{$min}.js",
+				charitable()->get_path( 'directory', false ) . "assets/js/campaign-builder/admin-onboarding-test{$min}.js",
 				array( 'jquery', 'charitable-admin-utils', 'charitable-builder' ),
+				charitable()->get_version()
+			);
+
+			/* added in 1.8.2 */
+
+			/* tour */
+
+			wp_enqueue_script(
+				'charitable-shepherd',
+				charitable()->get_path( 'directory', false ) . 'assets/js/libraries/shepherd.js',
+				array( 'jquery', 'charitable-float-ui-core', 'charitable-float-ui-dom' ),
+				charitable()->get_version()
+			);
+
+			wp_enqueue_script(
+				'charitable-admin-builder-tour',
+				charitable()->get_path( 'directory', false ) . 'assets/js/campaign-builder/admin-tour.js',
+				array( 'jquery', 'charitable-admin-utils', 'charitable-builder', 'charitable-shepherd', 'charitable-float-ui-core', 'charitable-float-ui-dom' ),
 				charitable()->get_version()
 			);
 
@@ -586,11 +612,35 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				'charitable-admin-builder-onboarding',
 				'charitable_admin_builder_onboarding',
 				[
-					'nonce'  => wp_create_nonce( 'charitable_onboarding_ajax_nonce' ),
-					'option' => array(
-						'status' => $this->get_onboarding_option( 'status' ),
+					'nonce'   => wp_create_nonce( 'charitable_onboarding_ajax_nonce' ),
+					'ajaxurl' => admin_url( 'admin-ajax.php' ),
+					'option'  => array(
+						'tour' => array(
+							'status' => $this->get_tour_option( 'status' ),
+						),
 					),
 				]
+			);
+
+			wp_enqueue_style(
+				'charitable-shepherd',
+				charitable()->get_path( 'directory', false ) . "assets/css/libraries/shepherd{$min}.css",
+				array(),
+				$style_version
+			);
+
+			wp_enqueue_script(
+				'charitable-float-ui-core',
+				charitable()->get_path( 'directory', false ) . 'assets/js/libraries/floating-ui-core.min.js',
+				array( 'jquery' ),
+				charitable()->get_version()
+			);
+
+			wp_enqueue_script(
+				'charitable-float-ui-dom',
+				charitable()->get_path( 'directory', false ) . 'assets/js/libraries/floating-ui-dom.min.js',
+				array( 'charitable-float-ui-core' ),
+				charitable()->get_version()
 			);
 
 			/* color picker for admin settings */
@@ -619,7 +669,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 			$currency_helper = charitable_get_currency_helper();
 
 			$strings = array(
-				'version'                           => '1.8.0',
+				'version'                           => '1.8.1.15',
 				'currency_symbol'                   => $currency_helper->get_currency_symbol(),
 				'and'                               => esc_html__( 'And', 'charitable' ),
 				'assets_url'                        => admin_url( 'admin-ajax.php' ),
@@ -885,6 +935,92 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				),
 			);
 
+			if ( $this->is_tour_active() ) {
+				$strings['onboarding_tour'] = array(
+					'next'              => esc_html__( 'Next', 'charitable' ),
+					'start_tour'        => esc_html__( 'Start Tour', 'charitable' ),
+					'watch_video'       => esc_html__( 'Watch Video', 'charitable' ),
+					'choose_a_template' => esc_html__( 'Choose a Template', 'charitable' ),
+					'lets_get_started'  => esc_html__( 'Get Started', 'charitable' ),
+					'step_0_text'       => '<h2>' . esc_html__( 'Welcome to the Campaign Builder!', 'charitable' ) . '</h2><p>' . esc_html__( 'This is where you build, manage, and add features to your campaigns. The following steps will walk you through essential areas.', 'charitable' ) . '</p><div id="charitable-tour-video"></div>',
+					'step_1_title'      => esc_html__( 'Name Your Campaign', 'charitable' ),
+					'step_1_text'       => sprintf(
+						'<p>%1$s <strong>%2$s</strong> %3$s.</p>',
+						esc_html__( 'Give your campaign a name so you can easily identify it. Once you have entered a name, click', 'charitable' ),
+						esc_html__( 'Next', 'charitable' ),
+						esc_html__( 'to continue', 'charitable' )
+					),
+					'step_2_title'      => esc_html__( 'Select A Template', 'charitable' ),
+					'step_2_text'       => sprintf(
+						'<p>%1$s <strong>%2$s</strong> %3$s.</p><p class="charitable-tour-tip"><strong>%4$s</strong> %5$s <strong>%6$s</strong> %7$s.</p>',
+						esc_html__( 'Build your campaign from scratch or use one of our pre-made templates. Hover over a thumbnail and select', 'charitable' ),
+						esc_html__( 'Create Campaign', 'charitable' ),
+						esc_html__( 'to get started', 'charitable' ),
+						esc_html__( 'For example:', 'charitable' ),
+						esc_html__( 'The', 'charitable' ),
+						esc_html__( 'Animal Sanctuary', 'charitable' ),
+						esc_html__( 'template is perfect for animal rescue organizations', 'charitable' )
+					),
+					'step_3_title'      => esc_html__( 'Campaign Fields', 'charitable' ),
+					'step_3_text'       => sprintf(
+						'<p>%1$s</p>',
+						esc_html__( 'Clicking on this tab shows you the available fields for your campaign. You can drag additional fields to add to your page.', 'charitable' )
+					),
+					'step_4_title'      => esc_html__( 'Recommended Fields', 'charitable' ),
+					'step_4_text'       => sprintf(
+						'<p>%1$s <span class="charitable-tour-check"></span> %2$s.</p>',
+						esc_html__( 'These fields are usually found on all campaign pages. A', 'charitable' ),
+						esc_html__( 'means that the field already is on your campaign page', 'charitable' )
+					),
+					'step_5_title'      => esc_html__( 'Standard Fields', 'charitable' ),
+					'step_5_text'       => sprintf(
+						'<p>%1$s</p>',
+						esc_html__( 'These are common fields you can use when you need them.', 'charitable' )
+					),
+					'step_6_title'      => esc_html__( 'Pro Fields', 'charitable' ),
+					'step_6_text'       => sprintf(
+						'<p>%1$s</p>',
+						esc_html__( 'Fields that offer advanced features offered by addons or third-party integrations.', 'charitable' )
+					),
+					'step_7_title'      => esc_html__( 'Save', 'charitable' ),
+					'step_7_text'       => sprintf(
+						'<p>%1$s</p>',
+						esc_html__( 'Save your campaign progress at any time.', 'charitable' )
+					),
+					'step_8_title'      => esc_html__( 'Publish Your Campaign', 'charitable' ),
+					'step_8_text'       => sprintf(
+						'<p>%1$s</p>',
+						esc_html__( 'When you\'re ready, launch your campaign and start raising funds.', 'charitable' )
+					),
+					'step_9_title'      => esc_html__( 'Preview', 'charitable' ),
+					'step_9_text'       => sprintf(
+						'<p>%1$s</p>',
+						esc_html__( 'See how your campaign will look while in draft or before making updates.', 'charitable' )
+					),
+					'step_10_title'     => esc_html__( 'View', 'charitable' ),
+					'step_10_text'      => sprintf(
+						'<p>%1$s</p>',
+						esc_html__( 'You can also check out your campaign once it\'s live.', 'charitable' )
+					),
+					'step_11_title'     => esc_html__( 'Embed', 'charitable' ),
+					'step_11_text'      => sprintf(
+						'<p>%1$s</p>',
+						esc_html__( 'Add a campaign to a new or existing page with our embed wizard, or use the shortcode provided.', 'charitable' )
+					),
+					'step_12_title'     => esc_html__( 'Settings', 'charitable' ),
+					'step_12_text'      => sprintf(
+						'<p>%1$s</p><p>%2$s</p>',
+						esc_html__( 'Customize campaign details, preferences, and enable new functionality.', 'charitable' ),
+						esc_html__( 'Start with general settings where you can add donation goals, end dates, suggested amounts, and more.', 'charitable' )
+					),
+					'step_13_title'     => esc_html__( 'We hope you enjoyed the tour!', 'charitable' ),
+					'step_13_text'      => sprintf(
+						'<p>%1$s</p>',
+						sprintf( __( 'Remember that you can view our <a href="%1$s" target="_blank">getting started guide</a>, read our <a href="%2$s" target="_blank">documentation</a>, or <a href="%3$s" target="_blank">reach out to us</a> for support if you have any questions.', 'charitable' ), 'https://wpcharitable.com/getting-started', 'https://wpcharitable.com/documentation', 'https://wpcharitable.com/support' )
+					),
+				);
+			}
+
 			$strings = apply_filters( 'charitable_builder_strings', $strings, $this->campaign );
 
 			// phpcs:disable WordPress.Security.NonceVerification.Recommended
@@ -1118,7 +1254,12 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				$this->campaign_data = $this->get_campaign_settings( intval( $_GET['campaign_id'] ) );
 			}
 
-			$builder_template = new Charitable_Campaign_Builder_Templates();
+			$builder_template      = new Charitable_Campaign_Builder_Templates();
+			$load_checklist_assets = Charitable_Checklist::get_instance()->maybe_load_checklist_assets();
+			$is_checklist_skipped  = Charitable_Checklist::get_instance()->is_checklist_skipped();
+			$display_tour_divs     = $this->display_tour_divs();
+
+			( $load_checklist_assets && ! $is_checklist_skipped ) ? true : false;
 
 			$campaign_id       = $this->campaign_data ? absint( $this->campaign_data['id'] ) : 0;
 			$template_id       = $this->campaign_data && isset( $this->campaign_data['template_id'] ) ? esc_attr( $this->campaign_data['template_id'] ) : '';
@@ -1265,6 +1406,11 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 							</a>
 
 							<div id="charitable-status" class="charitable-status-container">
+
+							<?php if ( $display_tour_divs ) : ?>
+								<div id="charitable-tour-block-4" class="charitable-tour-block"></div>
+							<?php endif; ?>
+
 								<button id="charitable-status-button" class="charitable-btn charitable-btn-toolbar charitable-btn-light-grey" data-status="draft">
 									<span class="text"><?php echo esc_html__( 'Publish', 'charitable' ); ?></span>
 									<img class="topbar_icon" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/expand_more.svg'; ?>" />
@@ -1275,6 +1421,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 									<li><a data-status="draft" data-status-label="Draft" class="draft" href="#"><?php echo esc_html__( 'Draft', 'charitable' ); ?></a></li>
 								</ul>
 							</div>
+
 
 							<button id="charitable-save" class="charitable-btn charitable-btn-toolbar charitable-btn-green" title="Save Campaign Ctrl+S">
 									<img class="topbar_icon" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/topbar_check.svg'; ?>" />
@@ -1491,6 +1638,286 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 			include charitable()->get_path( 'includes' ) . 'admin/templates/campaign-builder-onboarding.php';
 		}
 
+		/* TOUR */
+
+		/**
+		 * Save tour option via AJAX.
+		 *
+		 * @since 1.8.1.12
+		 *
+		 * @return array
+		 */
+		public function save_tour_option_ajax() {
+
+			if ( ! is_admin() ) {
+				return;
+			}
+
+			// check_admin_referer( 'charitable_onboarding_ajax_nonce' );
+
+			// Array
+			// (
+			// [action] => charitable_onboarding_tour_save_option
+			// [dataType] => json
+			// [data] => Array
+			// (
+			// [type] => tour
+			// [optionData] => Array
+			// (
+			// [status] => skipped
+			// )
+
+			// )
+
+			// [nonce] => a035b753ed
+			// )
+
+			if ( empty( $_POST['data'] ) || empty( $_POST['data']['optionData'] ) || empty( $_POST['data']['type'] ) ) {
+				wp_send_json_error();
+			}
+
+			$schema      = $this->get_onboarding_option_schema();
+			$schema_tour = $schema['tour'];
+			$query       = [];
+
+			foreach ( $schema_tour as $key => $value ) {
+				if ( isset( $_POST['data']['optionData'][ $key ] ) ) {
+					$query[ $key ] = sanitize_text_field( wp_unslash( $_POST['data']['optionData'][ $key ] ) );
+				}
+			}
+
+			if ( empty( $query ) ) {
+				wp_send_json_error();
+			}
+
+			if ( ! empty( $query['status'] ) && $query['status'] === 'started' ) {
+				$query['started_date_gmt'] = current_time( 'mysql', true );
+			}
+
+			if ( ! empty( $query['status'] ) && in_array( $query['status'], [ 'completed', 'canceled', 'skipped' ], true ) ) {
+				$query['finished_date_gmt'] = current_time( 'mysql', true );
+			}
+
+			if ( ! empty( $query['status'] ) && $query['status'] === 'skipped' ) {
+				$query['started_date_gmt']  = current_time( 'mysql', true );
+				$query['finished_date_gmt'] = $query['started_date_gmt'];
+			}
+
+			$this->set_tour_option( $query );
+
+			wp_send_json_success();
+		}
+
+		/**
+		 * Set tour parameter(s) to tour option.
+		 *
+		 * @since 1.8.1.12
+		 *
+		 * @param array $query Query using 'charitable_builder_tour' schema keys.
+		 */
+		public function set_tour_option( $query ) {
+
+			if ( empty( $query ) || ! is_array( $query ) ) {
+				return;
+			}
+
+			$schema      = $this->get_onboarding_option_schema();
+			$schema_tour = $schema['tour'];
+			$replace     = array_intersect_key( $query, $schema_tour );
+
+			if ( ! $replace ) {
+				return;
+			}
+
+			// Validate and sanitize the data.
+			foreach ( $replace as $key => $value ) {
+				if ( in_array( $key, [ 'step', 'user_id' ], true ) ) {
+					$replace[ $key ] = absint( $value );
+
+					continue;
+				}
+				$replace[ $key ] = sanitize_text_field( $value );
+			}
+
+			$option      = $this->get_onboarding_options(); // get_option( 'charitable_builder_onboarding' );
+			$option_tour = empty( $option['tour'] ) || ! $option['tour'] || ! is_array( $option['tour'] ) ? $schema_tour : $option['tour'];
+			$option_tour = array_merge( $option_tour, $replace );
+
+			$option['tour'] = $option_tour;
+
+			update_option( 'charitable_builder_onboarding', $option );
+		}
+
+		/**
+		 * Get tour parameter(s).
+		 *
+		 * @since 1.8.1.12
+		 * @version 1.8.1.15 - updated global defines.
+		 *
+		 * @param string $option Option key.
+		 * @return mixed
+		 */
+		public function get_tour_option( $option = false ) {
+
+			$schema  = $this->get_onboarding_option_schema();
+			$options = get_option( 'charitable_builder_onboarding', array() );
+
+			if ( 'status' === $option && defined( 'CHARITABLE_CAMPAIGN_BUILDER_FORCE_TOUR' ) && CHARITABLE_CAMPAIGN_BUILDER_FORCE_TOUR ) {
+				return 'init';
+			}
+
+			// Step in and override here... if 'status' is the option being requested and there is already at least one campaign created then return 'skipped'.
+			if ( 'status' === $option && ( ! empty( $tours ) || ! isset( $options['tour']['status'] ) || 'init' === $options['tour']['status'] ) ) {
+
+				$count_campaigns = wp_count_posts( 'campaign' );
+				$total_campaigns = isset( $count_campaigns->publish ) ? $count_campaigns->publish : 0;
+
+				if ( $total_campaigns > 0 ) {
+					return 'skipped';
+				}
+
+				if ( ( defined( 'CHARITABLE_CAMPAIGN_BUILDER_FORCE_NO_TOUR' ) && CHARITABLE_CAMPAIGN_BUILDER_FORCE_NO_TOUR ) ) { // phpcs:ignore
+					return 'skipped';
+				}
+			}
+
+			if ( ! $options || ! is_array( $options ) || ! is_array( $options['tour'] ) ) {
+				return $schema['tour'][ $option ] ?? '';
+			}
+
+			return $options['tour'][ $option ] ?? $schema['tour'][ $option ] ?? '';
+		}
+
+		/**
+		 * Check if the tour is active.
+		 *
+		 * @since 1.8.1.15
+		 *
+		 * @return bool
+		 */
+		public function is_tour_active() {
+
+			$status = $this->get_tour_option( 'status' );
+
+			return 'init' === $status || 'started' === $status;
+		}
+
+
+		/**
+		 * Display the tour divs HTML.
+		 *
+		 * @since 1.8.1.1.16
+		 *
+		 * @return bool
+		 */
+		public function display_tour_divs() {
+
+			$is_tour_active = $this->is_tour_active();
+			$tour_status    = $this->get_tour_option( 'status' );
+			if ( $is_tour_active ) {
+				return true;
+			}
+
+			return false;
+		}
+
+
+		/**
+		 * Get option schema for all the onboarding options.
+		 *
+		 * @since 1.8.1.15
+		 *
+		 * @return array
+		 */
+		public function get_onboarding_option_schema() {
+
+			return [
+				'tour'      => [
+					'status'            => 'init',
+					'step'              => 0,
+					'user_id'           => get_current_user_id(),
+					'started_date_gmt'  => '',
+					'finished_date_gmt' => '',
+					'window_closed'     => '',
+				],
+				'checklist' => [
+					'status' => 'init',
+				],
+			];
+		}
+
+		/**
+		 * Get onboarding options.
+		 *
+		 * @since 1.8.1.15
+		 *
+		 * @return array
+		 */
+		public function get_onboarding_options() {
+
+			$option = get_option( 'charitable_builder_onboarding' );
+			if ( empty( $option ) ) {
+				$option = $this->get_onboarding_option_schema();
+				// Update the option.
+				update_option( 'charitable_builder_onboarding', $option );
+			}
+			return $option;
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		/* ONBOARDING */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		/**
 		 * Save onboarding option via AJAX.
 		 *
@@ -1555,7 +1982,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 			$schema      = $this->get_onboarding_option_schema();
 			$onboardings = get_option( 'charitable_builder_onboarding' );
 
-			if ( 'status' == $option && defined( 'CHARITABLE_CAMPAIGN_BUILDER_FORCE_ONBOARDING' ) && CHARITABLE_CAMPAIGN_BUILDER_FORCE_ONBOARDING ) {
+			if ( 'status' === $option && defined( 'CHARITABLE_CAMPAIGN_BUILDER_FORCE_ONBOARDING' ) && CHARITABLE_CAMPAIGN_BUILDER_FORCE_ONBOARDING ) {
 				return 'init';
 			}
 
@@ -1620,32 +2047,6 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 			$option = ! $option || ! is_array( $option ) ? $schema : $option;
 
 			update_option( 'charitable_builder_onboarding', array_merge( $option, $replace ) );
-		}
-
-		/**
-		 * Get 'charitable_builder_onboarding' option schema.
-		 *
-		 * @since 1.8.1.12
-		 *
-		 * @return array
-		 */
-		public function get_onboarding_option_schema() {
-
-			return [
-				'status'              => 'init',
-				'step'                => 0,
-				'user_id'             => get_current_user_id(),
-				'form_id'             => 0,
-				'embed_page'          => 0,
-				'embed_page_title'    => '',
-				'started_date_gmt'    => '',
-				'finished_date_gmt'   => '',
-				'seconds_spent'       => 0,
-				'seconds_left'        => 0,
-				'feedback_sent'       => false,
-				'feedback_contact_me' => false,
-				'window_closed'       => '',
-			];
 		}
 	}
 

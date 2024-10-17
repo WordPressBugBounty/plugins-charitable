@@ -202,8 +202,19 @@ add_action( 'plugins_loaded', array( Charitable_Admin_Getting_Started::get_insta
 add_action( 'admin_footer', array( Charitable_Campaign_Builder::get_instance(), 'render_onboarding_html' ), 5 );
 
 /**
- * Save an onboarding option via AJAX.
+ * Save an onboarding options via AJAX.
  *
  * @see Charitable_Campaign_Builder::save_onboarding_option_ajax()
  */
 add_action( 'wp_ajax_charitable_onboarding_save_option', array( Charitable_Campaign_Builder::get_instance(), 'save_onboarding_option_ajax' ), 5 );
+add_action( 'wp_ajax_charitable_onboarding_tour_save_option', array( Charitable_Campaign_Builder::get_instance(), 'save_tour_option_ajax' ), 5 );
+add_action( 'wp_ajax_charitable_onboarding_checklist_save_option', array( Charitable_Checklist::get_instance(), 'save_checklist_option_ajax' ), 5 );
+
+
+/**
+ * Checklist: check to mark step as completed.
+ *
+ * @see Charitable_Checklist::check_step_first_donation()
+ */
+// add_action( 'admin_init', array( Charitable_Onboarding::get_instance(), 'check_step_first_donation' ), 5 );
+add_action( 'admin_init', array( Charitable_Checklist::get_instance(), 'maybe_redirect_to_next_step' ), 999 );

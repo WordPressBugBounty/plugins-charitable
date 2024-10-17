@@ -81,7 +81,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Sharing' ) ) :
 
 			// $social_networks = $this->get_social_networks( $campaign_data );
 
-			$headline = ! empty( $field_data['headline'] ) ? esc_html( $field_data['headline'] ) : esc_html( 'Share:', 'charitable' );
+			$headline = ! empty( $field_data['headline'] ) ? esc_html( $field_data['headline'] ) : esc_html__( 'Share:', 'charitable' );
 
 			$html = '<div class="charitable-field-' . $mode . '-social-sharing">
 					<div class="charitable-field-' . $mode . '-social-sharing-headline-container placeholder">';

@@ -7,4 +7,6 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Stripe\\' => array($vendorDir . '/stripe/stripe-php/lib'),
+    'CharitablePluginUpdater\\' => array($vendorDir . '/wpcharitable/charitable-licenses/src'),
+    'CharitableLicenses\\' => array($vendorDir . '/wpcharitable/charitable-licenses/src'),
 );

@@ -19,6 +19,8 @@
 
 .charitable-edit-campaign-title-area {
     position: relative;
+    display: inline-block;
+    width: calc( 100% - 250px );
     input.charitable-form-name {
         font-size: 18px;
         font-weight: 400;
@@ -31,7 +33,7 @@
         // background-size: 20px;
         border: 1px solid #cccccc;
         border-radius: 4px;
-        width: calc(100% - 545px);
+        width: 100%;
     }
     input.charitable-form-name::-webkit-input-placeholder {
         font-weight: lighter;
@@ -62,6 +64,16 @@
         input.charitable-form-name:focus {
             border: none;
         }
+    }
+}
+
+@media screen and (max-width: 1320px) {
+    .charitable-edit-campaign-title-label {
+        display: none;
+    }
+    .charitable-edit-campaign-title-area {
+        width: 100%;
+        margin-top: -5px;
     }
 }
 

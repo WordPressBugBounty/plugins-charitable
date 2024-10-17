@@ -70,13 +70,50 @@ if ( ! class_exists( 'Charitable_Post_Types' ) ) :
 			// Update the "add new" button link on the campaign post type page.
 			add_action( 'admin_head', [ $this, 'update_campaign_link_visual_builder' ] );
 
+			// Alter the "Edit" link on the campaign post type page.
+			add_action( 'get_edit_post_link', [ $this, 'campaign_edit_post_link' ], 1000 );
+
+		}
+
+		/**
+		 * Alter the "Edit" link on the campaign post type page, especially in the admin bar on the front end.
+		 *
+		 * @since 1.8.1.15
+		 *
+		 * @param string $link The edit post link.
+		 *
+		 * @return string
+		 */
+		public function campaign_edit_post_link( $link = '' ) {
+
+			global $post;
+
+			if ( is_admin() || ! is_object( $post ) || ! is_singular( 'campaign' ) || empty( $post->ID ) ) {
+				return $link;
+			}
+
+			$post_id = intval( $post->ID );
+
+			if ( 0 === $post_id ) {
+				return $link;
+			}
+
+			// Determine if this is a "legacy" campaign.
+			$is_legacy_campaign = charitable_is_campaign_legacy( $post_id );
+
+			if ( ! $is_legacy_campaign ) {
+				$link = admin_url( 'admin.php?page=charitable-campaign-builder&campaign_id=' . $post_id . '&view=design' );
+				return $link;
+			}
+
+			return $link;
 		}
 
 		/**
 		 * Alter the "Add New" label on the campaign post type page.
 		 *
 		 * @since 1.8.1.12
-		 * @version 1.8.1.15
+		 * @version 1.8.1.14
 		 */
 		public function update_campaign_link_visual_builder() {
 			global $post_new_file, $post_type_object;
@@ -92,7 +129,6 @@ if ( ! class_exists( 'Charitable_Post_Types' ) ) :
 			} else {
 				$post_new_file = 'admin.php?page=charitable-campaign-builder&view=template';
 			}
-
 		}
 
 		/**
@@ -423,7 +459,7 @@ if ( ! class_exists( 'Charitable_Post_Types' ) ) :
 			$labels = array(
 				'name'                       => _x( 'Campaign Tags', 'Taxonomy General Name', 'charitable' ),
 				'singular_name'              => _x( 'Campaign Tag', 'Taxonomy Singular Name', 'charitable' ),
-				'menu_name'                  => __( 'Tags', 'charitable' ),
+				'menu_name'                  => __( 'Tagss', 'charitable' ),
 				'all_items'                  => __( 'All Campaign Tags', 'charitable' ),
 				'parent_item'                => __( 'Parent Campaign Tag', 'charitable' ),
 				'parent_item_colon'          => __( 'Parent Campaign Tag:', 'charitable' ),
@@ -448,7 +484,7 @@ if ( ! class_exists( 'Charitable_Post_Types' ) ) :
 				'show_admin_column' => true,
 				'show_in_nav_menus' => true,
 				'show_tagcloud'     => true,
-				'show_in_menu'      => true,
+				'show_in_menu'      => false,
 				'capabilities'      => array(
 					'manage_terms' => 'manage_campaign_terms',
 					'edit_terms'   => 'edit_campaign_terms',

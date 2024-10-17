@@ -71,6 +71,7 @@ if ( ! class_exists( 'Charitable_Field_Organizer' ) ) :
 		 * Render the field.
 		 *
 		 * @since 1.8.0
+		 * @version 1.1.8.16 added 'charitable_campaign_builder_organizer_image' filter.
 		 *
 		 * @param array   $field_data     Any field data.
 		 * @param array   $campaign_data  Amount data and settings.
@@ -90,13 +91,12 @@ if ( ! class_exists( 'Charitable_Field_Organizer' ) ) :
 				}
 				$campaign_creator_id = ( false === $campaign_creator_id ) ? get_current_user_id() : $campaign_creator_id;
 
-				$user_obj          = get_user_by( 'id', $campaign_creator_id );
-				$image_url         = esc_url( get_avatar_url( $campaign_creator_id ) );
+				$image_url         = apply_filters( 'charitable_campaign_builder_organizer_image', esc_url( get_avatar_url( $campaign_creator_id ) ), $campaign_creator_id, $campaign_data );
 				$creator_name      = $this->get_creator_data( $campaign_creator_id );
 				$role_or_title     = ! empty( $field_data['role_or_title'] ) ? esc_html( $field_data['role_or_title'] ) : 'Organizer';
 				$organizer_content = ! empty( $field_data['content'] ) ? $this->format( $field_id, $field_data['content'], $campaign_data ) : '';
 
-				$image_bg_css = ( $image_url ) ? ' style="background-image: url(' . $image_url . ');"' : false;
+				$image_bg_css = ( $image_url ) ? ' style="background-image: url(' . esc_url( $image_url ) . ');"' : false;
 
 				return '<div class="charitable-organizer-container">
                         <div class="charitable-organizer-image-column">
@@ -119,13 +119,12 @@ if ( ! class_exists( 'Charitable_Field_Organizer' ) ) :
 				}
 				$campaign_creator_id = ( false === $campaign_creator_id ) ? get_current_user_id() : $campaign_creator_id;
 
-				$user_obj          = get_user_by( 'id', $campaign_creator_id );
-				$image_url         = esc_url( get_avatar_url( $campaign_creator_id ) );
+				$image_url         = apply_filters( 'charitable_campaign_builder_organizer_image', esc_url( get_avatar_url( $campaign_creator_id ) ), $campaign_creator_id, $campaign_data );
 				$creator_name      = $this->get_creator_data( $campaign_creator_id );
 				$role_or_title     = ! empty( $field_data['role_or_title'] ) ? esc_html( $field_data['role_or_title'] ) : 'Organizer';
 				$organizer_content = ! empty( $field_data['content'] ) ? trim( $field_data['content'] ) : '';
 
-				$image_bg_css = ( $image_url ) ? ' style="background-image: url(' . $image_url . ');"' : false;
+				$image_bg_css = ( $image_url ) ? ' style="background-image: url(' . esc_url( $image_url ) . ');"' : false;
 
 				return '<div class="charitable-organizer-container">
                         <div class="charitable-organizer-image-column">

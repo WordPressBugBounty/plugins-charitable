@@ -92,7 +92,6 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
 
             app.initDatePicker();
 
-
             // Bind all actions.
             app.bindUIActions();
 

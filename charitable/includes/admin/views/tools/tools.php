@@ -12,8 +12,8 @@
 
 $active_tab      = isset( $_GET['tab'] ) ? esc_html( $_GET['tab'] ) : 'export';  // phpcs:ignore
 $group           = isset( $_GET['group'] ) ? esc_html( $_GET['group'] ) : $active_tab; // phpcs:ignore
-$tab_no_form_tag = array( 'import', 'export', 'system-info', 'snippets' );
-$tab_no_fields   = array( 'system-info', 'snippets' );
+$tab_no_form_tag = array( 'import', 'export', 'system-info', 'snippets', 'customize' );
+$tab_no_fields   = array( 'system-info', 'snippets', 'customize' );
 $sections        = charitable_get_admin_tools()->get_sections();
 $show_return     = $group !== $active_tab;
 
@@ -49,6 +49,7 @@ ob_start();
 		endif;
 
 		if ( ! in_array( strtolower( $active_tab ), $tab_no_fields, true ) ) :
+
 			charitable_do_tools_fields( 'charitable_tools_' . $group, 'charitable_tools_' . $group );
 
 		else :

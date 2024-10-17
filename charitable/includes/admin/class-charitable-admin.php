@@ -213,7 +213,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 			$screen = get_current_screen();
 
 			/* This check covers the category and tags pages, only load the main admin css (upgrade banner, etc.) */
-			if ( ! is_null( $screen ) && in_array( $screen->base, array( 'edit-tags', 'edit-categories' ) ) ) {
+			if ( ! is_null( $screen ) && ( in_array( $screen->id, array( 'edit-campaign_category', 'edit-campaign_tag' ), true ) || ( in_array( $screen->base, array( 'edit-tags', 'edit-categories' ), true ) ) ) ) {
 
 				wp_register_style(
 					'charitable-admin',
@@ -244,16 +244,16 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 			wp_enqueue_style( 'charitable-admin-2.0' );
 
-			if ( ! is_null( $screen ) && in_array( $screen->id, $this->get_charitable_screens() ) ) {
+			wp_register_style(
+				'charitable-admin',
+				$assets_dir . 'css/charitable-admin' . $min . '.css',
+				array(),
+				$version
+			);
 
-				wp_register_style(
-					'charitable-admin',
-					$assets_dir . 'css/charitable-admin' . $min . '.css',
-					array(),
-					$version
-				);
+			wp_enqueue_style( 'charitable-admin' );
 
-				wp_enqueue_style( 'charitable-admin' );
+			if ( ! is_null( $screen ) && in_array( $screen->id, charitable_get_charitable_screens() ) ) {
 
 				$dependencies   = array( 'jquery-ui-datepicker', 'jquery-ui-tabs', 'jquery-ui-sortable' );
 				$localized_vars = array(
@@ -498,6 +498,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		 *
 		 * @since  1.5.0
 		 * @version 1.8.1.6
+		 * @version 1.8.2 Added pro/lite check.
 		 *
 		 * @param  string $classes Existing list of classes.
 		 * @return string
@@ -520,6 +521,8 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 			if ( function_exists( 'charitable_use_legacy_dashboard' ) && charitable_use_legacy_dashboard() ) {
 				$classes .= ' charitable_legacy_dashboard';
 			}
+
+			$classes .= function_exists( 'charitable_is_pro' ) && charitable_is_pro() ? ' charitable-pro' : ' charitable-lite';
 
 			return $classes;
 		}
@@ -976,6 +979,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 		/**
 		 * Returns an array of screen IDs where the Charitable scripts should be loaded.
+		 * (Deprecated in 1.8.1.15, use charitable_get_charitable_Screens() in core functions instead).
 		 *
 		 * @uses   charitable_admin_screens
 		 *

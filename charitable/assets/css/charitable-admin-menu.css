@@ -75,4 +75,36 @@ body.taxonomy-campaign_tag #adminmenu a[href^="edit-tags.php?taxonomy=campaign_t
   font-weight: 600;
 }
 
+/* checklist */
+#adminmenu li#toplevel_page_charitable ul li.checklist {
+  color: #fff;
+  /* background-color: #f89d35 !important;
+  border-bottom: 1px solid #fff;
+  margin-bottom: 10px; */
+}
+#adminmenu li#toplevel_page_charitable ul li.checklist:after {
+  border-bottom: 1px solid hsla(0,0%,100%,.2);
+  display: block;
+  float: left;
+  margin: 4px -15px 14px;
+  content: "";
+  width: calc(100% + 26px);
+}
+#adminmenu li#toplevel_page_charitable ul li.checklist a {
+  color: #fff !important;
+  font-weight: 500;
+  /* margin-top: -7px; */
+}
+#adminmenu li#toplevel_page_charitable ul li.checklist span.charitable-checklist-progress-bar-container {
+
+}
+#adminmenu li#toplevel_page_charitable ul li.checklist span.charitable-checklist-progress-bar-container span {
+
+}
+body.charitable-checklist-completed:not(.charitable_page_charitable-setup-checklist) #adminmenu li#toplevel_page_charitable ul li.checklist {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+
 /*# sourceMappingURL=charitable-admin-menu.css.map */

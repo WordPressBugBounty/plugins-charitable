@@ -376,7 +376,7 @@ if ( ! class_exists( 'Charitable_Currency' ) ) :
 						),
 						'COP' => sprintf(
 							/* translators: %s: currency symbol */
-							__( 'Colombian Peso (%s', 'charitable' ),
+							__( 'Colombian Peso (%s)', 'charitable' ),
 							$this->get_currency_symbol( 'COP' )
 						),
 						'CZK' => sprintf(

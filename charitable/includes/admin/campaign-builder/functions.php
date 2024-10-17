@@ -185,3 +185,4 @@ function charitable_get_tooltip_html( $tooltip_text = false, $extra_css = '' ) {
 
 	return $html;
 }
+

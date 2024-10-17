@@ -29,7 +29,7 @@ if ( isset( $view_args['nonce_action_name'] ) && 'import_donations' === $view_ar
     $error_message = '<strong>' . __('You have no campaigns to import donations into.', 'charitable' ) . '</strong>';
 }
 ?>
-<form action="<?php echo $form_action_url; ?>" method="POST" enctype="multipart/form-data" class="form-contains-file">
+<form action="<?php echo $form_action_url; ?>" method="POST" enctype="multipart/form-data" class="form-contains-file charitable-import-campaign-donations-form">
 
 <?php wp_nonce_field( $nonce_action_name, $nonce_field_name ); ?>
 

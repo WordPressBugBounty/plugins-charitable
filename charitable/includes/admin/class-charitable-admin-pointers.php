@@ -68,25 +68,17 @@ if ( ! class_exists( 'Charitable_Admin_Pointers' ) ) :
 				return;
 			}
 
-			if ( ! in_array( $screen->id, Charitable_Admin::get_instance()->get_charitable_screens() ) ) {
+			if ( ! in_array( $screen->id, charitable_get_charitable_screens() ) ) {
 				return;
 			}
 
 			// Don't show this immediately for new users.
 			$slug = 'help-pointers';
 
-			// determine when to display this message. for now, there should be some sensible boundaries before showing the notification: a minimum of 14 days of use, created one donation form and received at least one donation.
-			$activated_datetime = ( false !== get_option( 'wpcharitable_activated_datetime' ) ) ? get_option( 'wpcharitable_activated_datetime' ) : false;
-			$days               = 0;
-			if ( $activated_datetime ) {
-				$diff = current_time( 'timestamp' ) - $activated_datetime;
-				$days = abs( round( $diff / 86400 ) );
-			}
-
 			$count_campaigns = wp_count_posts( 'campaign' );
 			$total_campaigns = isset( $count_campaigns->publish ) ? $count_campaigns->publish : 0;
 
-			if ( $days >= apply_filters( 'charitable_days_since_activated', 14 ) && $total_campaigns >= 1 ) {
+			if ( $total_campaigns >= 1 ) {
 				// check transient.
 				$help_pointers = get_transient( 'charitable_' . $slug . '_onboarding' );
 
@@ -120,68 +112,13 @@ if ( ! class_exists( 'Charitable_Admin_Pointers' ) ) :
 			// These pointers will chain - they will not be shown at once.
 			$this->pointers = array(
 				'pointers' => array(
-					'dashboard' => array(
-						'target'       => '#toplevel_page_charitable ul li.dashboard',
-						'next'         => 'campaigns',
-						'next_trigger' => array(),
-						'options'      => array(
-							'content'      => '<h3>' . esc_html__( 'Enhanced Dashboard', 'charitable' ) . '</h3>' .
-											'<h4>' . esc_html__( 'Empowering Insights at Your Fingertips!', 'charitable' ) . '</h4>' .
-											'<p>' . esc_html__( 'The revamped Charitable dashboard offers at-a-glance insights and powerful features. Monitor donation trends, view recent contributions, track campaign progress, and more. Stay informed, take action, and elevate your fundraising game effortlessly.', 'charitable' ) . '</p>',
-							'position'     => array(
-								'edge'  => 'left',
-								'align' => 'left',
-							),
-							'visit_button' => array(
-								'url'   => admin_url( 'admin.php?page=charitable-dashboard' ),
-								'label' => esc_html__( 'Go Here', 'charitable' ),
-							),
-						),
-					),
-					'campaigns' => array(
-						'target'       => '#toplevel_page_charitable ul li.campaigns',
-						'next'         => 'reports',
-						'next_trigger' => array(),
-						'options'      => array(
-							'content'      => '<h3>' . esc_html__( 'Visual Campaign Builder', 'charitable' ) . '</h3>' .
-											'<h4>' . esc_html__( 'Craft Stunning Campaign Pages with Ease!', 'charitable' ) . '</h4>' .
-											'<p>' . esc_html__( 'Unleash your creativity and customize campaigns effortlessly with text, photos, donation buttons, and more. Elevate your campaign for maximum impact and success by adding marketing and payment features from addons and third-party tools!', 'charitable' ) . '</p>',
-							'position'     => array(
-								'edge'  => 'left',
-								'align' => 'left',
-							),
-							'visit_button' => array(
-								'url'   => admin_url( 'edit.php?post_type=campaign' ),
-								'label' => esc_html__( 'Go Here', 'charitable' ),
-							),
-						),
-					),
-					'reports'   => array(
-						'target'       => '#toplevel_page_charitable ul li.reports',
-						'next'         => 'tools',
-						'next_trigger' => array(),
-						'options'      => array(
-							'content'      => '<h3>' . esc_html__( 'Improved Reporting', 'charitable' ) . '</h3>' .
-											'<h4>' . esc_html__( 'Unlock Insights, Enhance Performance!', 'charitable' ) . '</h4>' .
-											'<p>' . esc_html__( 'Dive into detailed insights including donation breakdowns, activity tracking, top donors, and LYBUNT/SYBUNT reports. Monitor site activities, optimize your strategies and strengthen your donor relationships. ', 'charitable' ) . '</p>',
-							'position'     => array(
-								'edge'  => 'left',
-								'align' => 'left',
-							),
-							'visit_button' => array(
-								'url'   => admin_url( 'admin.php?page=charitable-reports' ),
-								'label' => esc_html__( 'Go Here', 'charitable' ),
-							),
-						),
-					),
 					'tools'     => array(
 						'target'       => '#toplevel_page_charitable ul li.tools',
-						'next'         => '',
+						'next'         => false,
 						'next_trigger' => array(),
 						'options'      => array(
-							'content'      => '<h3>' . esc_html__( 'New Tool Page', 'charitable' ) . '</h3>' .
-											'<h4>' . esc_html__( 'Dedicated tools and integrations!', 'charitable' ) . '</h4>' .
-											'<p>' . esc_html__( 'Export and import campaigns and donations from Charitable, install and track code snippets, and more!', 'charitable' ) . '</p>',
+							'content'      => '<h3>' . esc_html__( 'New Tool Page Updates', 'charitable' ) . '</h3>' .
+											'<p>' . esc_html__( 'The categories, tags, and customize menu items have moved into the Tools area.', 'charitable' ) . '</p>',
 							'position'     => array(
 								'edge'  => 'left',
 								'align' => 'left',
@@ -262,7 +199,7 @@ if ( ! class_exists( 'Charitable_Admin_Pointers' ) ) :
 									next        = '" . esc_js( __( 'Next', 'charitable' ) ) . "',
 									visit	    = '" . esc_js( __( 'Go Here', 'charitable' ) ) . "',
 									button      = $( '<a class=\"close\" href=\"#\">' + close + '</a>' ),
-									button2     = $( '<a class=\"button button-primary\" href=\"#\">' + next + '</a>' ),
+									button2     = pointer.next ? $( '<a class=\"button button-primary\" href=\"#\">' + next + '</a>' ) : '';
 									button_goto = $( '<a class=\"button button-primary button-visit\" href=\"' + pointer.options.visit_button.url + '\">' + pointer.options.visit_button.label + '</a>' ),
 									wrapper     = $( '<div class=\"charitable-pointer-buttons\" />' );
 
@@ -287,29 +224,33 @@ if ( ! class_exists( 'Charitable_Admin_Pointers' ) ) :
 
 								});
 
-								button2.bind( 'click.pointer', function(e) {
-									e.preventDefault();
-									t.element.pointer('close');
+								if ( button2 !== '' ) {
+									button2.bind( 'click.pointer', function(e) {
+										e.preventDefault();
+										t.element.pointer('close');
 
-									$.ajax({
-										type: 'POST',
-										data: {
-											action  : 'charitable_dismiss_pointer',
-											pointer : id,
-											notice  : '',
-										},
-										dataType: 'json',
-										url: ajaxurl
-									}).fail(function ( response ) {
-										if ( window.console && window.console.log ) {
-											console.log( response );
-										}
+										$.ajax({
+											type: 'POST',
+											data: {
+												action  : 'charitable_dismiss_pointer',
+												pointer : id,
+												notice  : '',
+											},
+											dataType: 'json',
+											url: ajaxurl
+										}).fail(function ( response ) {
+											if ( window.console && window.console.log ) {
+												console.log( response );
+											}
+										});
+
 									});
-
-								});
+								}
 
 								wrapper.append( button );
-								wrapper.append( button2 );
+								if ( button2 !== '' ) {
+									wrapper.append( button2 );
+								}
 								wrapper.append( button_goto );
 
 								return wrapper;

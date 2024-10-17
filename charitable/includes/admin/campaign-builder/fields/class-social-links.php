@@ -82,7 +82,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 			$social_networks_settings = $field_id !== false && ! empty( $campaign_data['fields'] ) && ! empty( $campaign_data['fields'][ intval( $field_id ) ] ) ? $campaign_data['fields'][ intval( $field_id ) ] : false;
 			$social_networks_settings = empty( $social_networks_settings ) && ! empty( $field_data ) ? $field_data : $social_networks_settings;
 			$headline                 = ! empty( $field_data['headline'] ) ? esc_html( $field_data['headline'] ) : false;
-			$headline                 = false === $headline ? esc_html( 'Learn More:', 'charitable' ) : $headline;
+			$headline                 = false === $headline ? esc_html__( 'Learn More:', 'charitable' ) : $headline;
 			$open_new_tab             = ! empty( $field_data['open_new_tab'] ) ? esc_html( $field_data['open_new_tab'] ) : false;
 			$new_tab                  = ( 1 === intval( $open_new_tab ) ) ? 'target="_blank"' : false;
 

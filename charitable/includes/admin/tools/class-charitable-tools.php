@@ -47,8 +47,36 @@ if ( ! class_exists( 'Charitable_Tools' ) ) :
 		 */
 		public function __construct() {
 
+			// Set the default tab.
 			if ( charitable_is_tools_view() && ! isset( $_GET['tab'] ) ) {
-				$link = admin_url( 'admin.php?page=charitable-tools&tab=export' );
+				$link = admin_url( 'edit-tags.php?taxonomy=campaign_category&post_type=campaign' );
+				wp_safe_redirect( $link );
+				exit();
+			}
+
+			add_action( 'campaign_category_pre_add_form', array( $this, 'add_tools_nav_to_taxononmy_pages' ), 10, 1 );
+			add_action( 'campaign_tag_pre_add_form', array( $this, 'add_tools_nav_to_taxononmy_pages' ), 10, 1 );
+			add_action( 'campaign_category_pre_edit_form', array( $this, 'add_tools_nav_to_taxononmy_pages' ), 10, 1 );
+			add_action( 'campaign_tag_pre_edit_form', array( $this, 'add_tools_nav_to_taxononmy_pages' ), 10, 1 );
+			add_action( 'admin_init', array( $this, 'taxonomy_redirects' ), 10, 1 );
+		}
+
+		/**
+		 * Redirects to the correct taxonomy page.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @return void
+		 */
+		public function taxonomy_redirects() {
+			if ( isset( $_GET['page'] ) && 'charitable-tools' == $_GET['page'] && isset( $_GET['tab'] ) && 'categories' == $_GET['tab'] ) {
+				$link = admin_url( 'edit-tags.php?taxonomy=campaign_category&post_type=campaign' );
+				wp_safe_redirect( $link );
+				exit();
+			}
+
+			if ( isset( $_GET['page'] ) && 'charitable-tools' == $_GET['page'] && isset( $_GET['tab'] ) && 'tags' == $_GET['tab'] ) {
+				$link = admin_url( 'edit-tags.php?taxonomy=campaign_tag&post_type=campaign' );
 				wp_safe_redirect( $link );
 				exit();
 			}
@@ -97,6 +125,9 @@ if ( ! class_exists( 'Charitable_Tools' ) ) :
 			return apply_filters(
 				'charitable_tools_tabs',
 				array(
+					'categories'  => __( 'Categories', 'charitable' ),
+					'tags'        => __( 'Tags', 'charitable' ),
+					'customize'   => __( 'Customize', 'charitable' ),
 					'export'      => __( 'Export', 'charitable' ),
 					'import'      => __( 'Import', 'charitable' ),
 					'system-info' => __( 'System Info', 'charitable' ),
@@ -359,6 +390,44 @@ if ( ! class_exists( 'Charitable_Tools' ) ) :
 			}
 
 			return $this->pages;
+		}
+
+		/**
+		 * Add tools nav to taxonomy pages.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @param string $taxonomy The taxonomy.
+		 *
+		 * @return void
+		 */
+		public function add_tools_nav_to_taxononmy_pages( $taxonomy = false ) { // phpcs:ignore
+
+			ob_start();
+
+			$categories_css = isset( $_GET['taxonomy'] ) && 'campaign_category' == $_GET['taxonomy'] ? 'nav-tab-active' : '';
+			$tags_css       = isset( $_GET['taxonomy'] ) && 'campaign_tag' == $_GET['taxonomy'] ? 'nav-tab-active' : '';
+
+			?>
+
+			<div id="charitable-tools-nav">
+				<h1><?php echo esc_html__( 'Charitable Tools', 'charitable' ); ?></h1>
+				<h2 class="nav-tab-wrapper">
+						<a href="<?php echo admin_url( 'edit-tags.php?taxonomy=campaign_category&post_type=campaign' ); ?>" class="nav-tab <?php echo $categories_css; ?>"><?php echo esc_html__( 'Categories', 'charitable' ); ?></a>
+						<a href="<?php echo admin_url( 'edit-tags.php?taxonomy=campaign_tag&post_type=campaign' ); ?>" class="nav-tab <?php echo $tags_css; ?>"><?php echo esc_html__( 'Tags', 'charitable' ); ?></a>
+						<a href="<?php echo admin_url( 'admin.php?page=charitable-tools&tab=customize' ); ?>" class="nav-tab "><?php echo esc_html__( 'Customize', 'charitable' ); ?></a>
+						<a href="<?php echo admin_url( 'admin.php?page=charitable-tools&tab=export' ); ?>" class="nav-tab"><?php echo esc_html__( 'Export', 'charitable' ); ?></a>
+						<a href="<?php echo admin_url( 'admin.php?page=charitable-tools&tab=import' ); ?>" class="nav-tab"><?php echo esc_html__( 'Import', 'charitable' ); ?></a>
+						<a href="<?php echo admin_url( 'admin.php?page=charitable-tools&tab=system-info' ); ?>" class="nav-tab"><?php echo esc_html__( 'System Info', 'charitable' ); ?></a>
+						<a href="<?php echo admin_url( 'admin.php?page=charitable-tools&tab=snippets' ); ?>" class="nav-tab"><?php echo esc_html__( 'Code Snippets', 'charitable' ); ?></a>
+				</h2>
+			</div>
+
+			<?php
+
+			$content = ob_get_clean();
+
+			echo $content;
 		}
 	}
 

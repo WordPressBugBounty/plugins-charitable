@@ -199,6 +199,19 @@ function charitable_save_campaign() {
 					$campaign_settings_v2['settings']['donation-options']['recurring_donation_amounts'][ $first_key ][ $second_key ] = $value;
 				// }
 
+			} elseif ( strpos( $post_field_name, '[recurring_donation_periods_to_display]' ) !== false ) {
+
+				$post_field_name = str_replace( 'settings[', '', $post_field_name );
+				$post_field_name = str_replace( 'donation-options]', '', $post_field_name );
+				$post_field_name = str_replace( '[recurring_donation_periods_to_display]', '', $post_field_name );
+
+				$output = charitable_convert_campaign_string_to_array_new( $post_field_name, $post_field_data['value'] );
+
+				$first_key  = esc_attr( array_key_first( $output ) );
+				$value = wp_strip_all_tags( $post_field_data['value'] );
+
+				$campaign_settings_v2['settings']['donation-options']['recurring_donation_periods_to_display'][ $first_key ] = $value;
+
 			} elseif ( strpos( $post_field_name, '[row]' ) !== false && strpos( $post_field_name, '[column]' ) !== false && strpos( $post_field_name, '[row-type-tabs]' ) === false ) {
 
 				$post_field_name = str_replace( 'layout[row]', '', $post_field_name );
@@ -647,6 +660,7 @@ function charitable_save_campaign() {
 			$campaign_settings_v2['layout']['_tabs'][ $tab_id ]['order'] = array_keys( $campaign_settings_v2['layout']['_tabs'][ $tab_id ]['fields'] );
 		endforeach;
 	endif;
+
 
 	// todo: remove this at some point - this was likely just because of testing.
 	unset( $campaign_settings_v2['settings]'] );

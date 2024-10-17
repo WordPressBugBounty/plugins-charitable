@@ -112,7 +112,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 			app.showLoadingOverlay();
 
-			s.version = '1.8.1.12';
+			s.version = '1.8.2';
 
 			// Cache builder element.
 			$builder     = $( '#charitable-builder' );
@@ -242,27 +242,6 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 				}
 
 			} );
-
-			// Only load the tooltips if the charitable_admin_builder_onboarding var exists and the charitable_admin_builder_onboarding.status isn't "completed".
-			if ( typeof charitable_admin_builder_onboarding !== 'undefined' && charitable_admin_builder_onboarding.option.status !== 'completed'  && charitable_admin_builder_onboarding.option.status !== 'skipped' ) {
-
-				// Load Tooltips. Where they live.
-				var tooltipAnchors = [
-					'#charitable_settings_title',
-					'.charitable-setup-title-after',
-					'#add-layout a',
-					'button#charitable-save span',
-					'#charitable-status-dropdown li:first-child a',
-					'#charitable-preview-btn span',
-					'#charitable-embed span',
-					'.charitable-panel-sidebar-section.charitable-panel-sidebar-section-general i'
-				];
-
-				$.each( tooltipAnchors, function( i, anchor ) {
-					CharitableOnboarding.initTooltips( i + 1, anchor, null );
-				} );
-
-			}
 
 			// Secret builder hotkeys.
 			app.builderHotkeys();
@@ -1080,6 +1059,8 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 					CharitableUtils.triggerEvent( $builder, 'charitableCampaignFormScreen', [ s.templateID ]  );
 
+					// Shepherd.activeTour.next();
+
 				}
 
 			} );
@@ -1164,9 +1145,6 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 									app.restartForm( s.templateID, 'design', s.templateLabel );
 									app.restartTemplateScreen( s.templateID );
-
-
-
 
 								}
 							},
@@ -1339,6 +1317,8 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 					// Finally, make sure to note that the campaign isn't saved.
 					app.setCampaignNotSaved();
+
+					$builder.trigger( 'charitableEditorScreenStart' );
 
 				} else {
 
@@ -3314,9 +3294,9 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 					// $(this).find('.campaign-time-left.campaign-summary-item').removeClass('charitable-hidden');
 
-					$(this).find('.campaign-time-left.campaign-summary-item').addClass('charitable-hidden');
+					//$(this).find('.campaign-time-left.campaign-summary-item').removeClass('charitable-hidden');
 					// ... and also enable the checkbox field to hide the amount raised.
-					elements.$fieldOptions.find( 'input[name="_fields[' + field_id + '][show_hide][campaign_hide_time_remaining]' ).attr( 'disabled', false ).removeClass('charitable-disabled').prop( 'checked', false ).next().removeClass('charitable-disabled');
+					elements.$fieldOptions.find( 'input[name="_fields[' + field_id + '][show_hide][campaign_hide_time_remaining]' ).attr( 'disabled', false ).removeClass('charitable-disabled').next().removeClass('charitable-disabled');
 
 				});
 
@@ -5072,7 +5052,6 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 			if ( options.position === 'top' ) {
 				// Add field to top of base level fields.
-				wpchar.debug ('made it here 1');
 				$baseFieldsContainer.prepend( $newField );
 				return;
 			}
@@ -5092,7 +5071,6 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 			}
 
 			if ( options.position === 'bottom' ) {
-				wpchar.debug ('made it here 2');
 				options.position = totalBaseFields;
 			}
 
@@ -5100,8 +5078,6 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 				options.position === totalBaseFields &&
 				$lastBaseField.length && $lastBaseField.hasClass( 'charitable-field-stick' )
 			) {
-
-				wpchar.debug ('made it here 3');
 
 				// Check to see if the last field we have is configured to
 				// be stuck to the bottom, if so add the field above it.
@@ -5114,9 +5090,6 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 			$fieldInPosition = $baseFieldsContainer.children( ':not(.charitable-field-drag-pending)' ).eq( options.position );
 
 			if ( $fieldInPosition.length ) {
-				wpchar.debug ('made it here ALMOST final with position ' + options.position );
-				wpchar.debug( $fieldInPosition );
-				wpchar.debug( $fieldInPosition.length )
 				// Add field to a specific location.
 				$fieldInPosition.before( $newField );
 				// $fieldOptions.find( `#charitable-field-option-${fieldInPositionId}` ).before( $newOptions );
@@ -5125,7 +5098,6 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 			}
 
 			// Something is wrong. Just add the field. This should never occur.
-			wpchar.debug ('made it here final');
 			$baseFieldsContainer.append( $newField );
 
 		},
@@ -7150,7 +7122,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 			});
 
-			$table.on( 'click', 'th.default_amount-col a', function() {
+			$table.on( 'click', 'th.default_amount-col a, a.charitable-clear-defaults', function() {
 				$table.find('.default_amount-col input').prop('checked', false);
 				$( this ).blur();
 				return false;

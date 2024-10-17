@@ -329,6 +329,10 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 	var setup_advanced_meta_box = function() {
 		var $meta_box = $('#charitable-campaign-advanced-metabox');
 
+		if ( ! $meta_box.length ) {
+			return;
+		}
+
 		$meta_box.tabs();
 
 		var min_height = $meta_box.find('.charitable-tabs').height();
@@ -343,6 +347,11 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 			$suggestions = $('.charitable-campaign-suggested-donations tbody tr:not(.to-copy)'),
 			has_suggestions = $suggestions.length > 1 || false === $suggestions.first().hasClass('no-suggested-amounts');
 
+		// check to see if $custom exists.
+		if ( ! $custom.length ) {
+			return;
+		}
+
 		$custom.prop( 'disabled', ! has_suggestions );
 
 		if ( ! has_suggestions ) {
@@ -352,19 +361,27 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 
 	// Suggested Donations (in settings)
 	var setup_sortable_suggested_donations = function(){
-		$('.charitable-campaign-suggested-donations tbody').sortable({
-			items: "tr:not(.to-copy)",
-			handle: ".handle",
-			stop: function( event, ui ) {
-				reindex_rows();
-			}
+		if ( 'undefined' !== typeof $.fn.sortable ) {
+			$('.charitable-campaign-suggested-donations tbody').sortable({
+				items: "tr:not(.to-copy)",
+				handle: ".handle",
+				stop: function( event, ui ) {
+					reindex_rows();
+				}
 
-	    });
+			});
+		}
 	};
 
 	var add_suggested_amount_row = function( $button ) {
 		var $table = $button.closest( '.charitable-campaign-suggested-donations' ).find('tbody');
 		var $clone = $table.find('tr.to-copy').clone().removeClass('to-copy hidden');
+
+		// check to see if $table or $clone exists.
+		if ( ! $table.length || ! $clone.length ) {
+			return;
+		}
+
 		$table.find( '.no-suggested-amounts' ).hide();
 		$table.append( $clone );
 		reindex_rows();
@@ -397,14 +414,16 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 
 	// Suggested Donations (in left sidebar in preview)
 	var setup_sortable_suggested_donations_mini = function(){
-		$('.charitable-campaign-suggested-donations-mini tbody').sortable({
-			items: "tr:not(.to-copy)",
-			handle: ".handle",
-			stop: function( event, ui ) {
-				reindex_rows_mini();
-			}
+		if ( 'undefined' !== typeof $.fn.sortable ) {
+			$('.charitable-campaign-suggested-donations-mini tbody').sortable({
+				items: "tr:not(.to-copy)",
+				handle: ".handle",
+				stop: function( event, ui ) {
+					reindex_rows_mini();
+				}
 
-	    });
+			});
+		}
 	};
 
 	var reindex_rows_mini = function(){
@@ -420,22 +439,22 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 		});
 	};
 
-	var setup_dashboard_widgets = function() {
-		var $widget = $( '#charitable_dashboard_donations' );
+	// var setup_dashboard_widgets = function() {
+	// 	var $widget = $( '#charitable_dashboard_donations' );
 
-		if ( $widget.length ) {
-			$.ajax({
-				type: "GET",
-				data: {
-					action: 'charitable_load_dashboard_donations_widget'
-				},
-				url: ajaxurl,
-				success: function (response) {
-					$widget.find( '.inside' ).html( response );
-				}
-			});
-		}
-	};
+	// 	if ( $widget.length ) {
+	// 		$.ajax({
+	// 			type: "GET",
+	// 			data: {
+	// 				action: 'charitable_load_dashboard_donations_widget'
+	// 			},
+	// 			url: ajaxurl,
+	// 			success: function (response) {
+	// 				$widget.find( '.inside' ).html( response );
+	// 			}
+	// 		});
+	// 	}
+	// };
 
 	var setup_actions_form = function() {
 		var $form = $( '.charitable-actions-form-wrapper' ),
@@ -776,7 +795,7 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 		toggle_custom_donations_checkbox();
 		setup_charitable_ajax();
 		setup_charitable_toggle();
-		setup_dashboard_widgets();
+		// setup_dashboard_widgets();
 		setup_campaign_end_date_field();
 		setup_actions_form();
 		setup_select2();

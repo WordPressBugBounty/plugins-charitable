@@ -371,6 +371,7 @@ class Charitable_Builder_Form_Fields {
 	 * Output a generic set of checkboxes for the form settings in the left sidebar.
 	 *
 	 * @since 1.8.0
+	 * @version 1.8.2 added tooltips, container_class.
 	 *
 	 * @param string $value Field value.
 	 * @param string $label Feld label.
@@ -381,14 +382,18 @@ class Charitable_Builder_Form_Fields {
 	public function generate_checkboxes( $value = false, $label = false, $args = false ) {
 
 		$defaults = array(
-			'name'     => '',
-			'id'       => '',
-			'class'    => '',
-			'field_id' => '',
-			'defaults' => array(),
+			'name'            => '',
+			'id'              => '',
+			'class'           => '',
+			'container_class' => '',
+			'field_id'        => '',
+			'tooltip'         => false,
+			'visibility'      => false,
+			'defaults'        => array(),
 		);
 
-		$params = array_replace_recursive( $defaults, $args );
+		$params    = array_replace_recursive( $defaults, $args );
+		$extra_css = $this->maybe_add_visibility_classes( $params['class'], $params['visibility'] );
 
 		if ( ! is_array( $value ) && false !== $value ) {
 			$value = array( $value );
@@ -401,15 +406,22 @@ class Charitable_Builder_Form_Fields {
 			$params['name'] = str_replace( $params['name'][0] . ']', $params['name'][0], $name );
 		}
 
+		$css_container_classes      = isset( $params['container_class'] ) ? explode( ' ', $params['container_class'] ) : array();
+		$css_container_classes      = array_unique( $css_container_classes );
+		$params['container_class']  = implode( ' ', $css_container_classes );
+		$params['container_class'] .= $extra_css;
+
 		$field_id_attr = '' !== $params['field_id'] ? 'data-field-id="' . intval( $params['field_id'] ) . '"' : false;
 		$description   = ( isset( $params['description'] ) && false !== $params['description'] ) ? '<p class="charitable-campaign-builder-field-checkbox-description">' . esc_html( $params['description'] ) . '</p>' : false;
+		$tooltip_html  = ( isset( $params['tooltip'] ) && false !== $params['tooltip'] ) ? $this->get_tooltip_html( $params['tooltip'] ) : false;
 
-		$html = '<div id="' . $this->id_slug . '-' . $params['id'] . '-wrap" class="charitable-panel-field charitable-panel-field-checkboxes ' . $params['class'] . '" ' . $field_id_attr . '>
-                    <label for="' . $this->id_slug . '-' . $params['id'] . '">' . $label . '</label>' . $description;
+		$html = '<div id="' . $this->id_slug . '-' . $params['id'] . '-wrap" class="charitable-panel-field charitable-panel-field-checkboxes ' . $params['container_class'] . '" ' . $field_id_attr . '>
+                    <label for="' . $this->id_slug . '-' . $params['id'] . '"> ' . $label . ' ' . $tooltip_html . '</label>' . $description;
 
 		foreach ( $params['options'] as $text => $box_id ) {
 
-			$checked = ( empty( $value ) && ! empty( $defaults ) && in_array( $box_id, $params['defaults'] ) ) || ( $value !== false && key_exists( $box_id, $value ) && $value[ $box_id ] !== false ) ? 'checked="checked"' : false;
+			$checked = ( empty( $value ) && ! empty( $defaults ) && in_array( $box_id, $params['defaults'] ) )
+					   || ( $value !== false && key_exists( $box_id, $value ) && $value[ $box_id ] !== false ) ? 'checked="checked"' : false;
 
 			$html .= '<p ' . $field_id_attr . '><input id="' . $params['name'] . '-' . $box_id . '" type="checkbox" ' . $checked . ' name="' . $params['name'] . '[' . $box_id . ']" value="1" /><label for="' . $params['name'] . '-' . $box_id . '">' . $text . '</label></p>';
 
@@ -1401,7 +1413,7 @@ class Charitable_Builder_Form_Fields {
 		$html .= '
 			<tr>
                 <th class="spacer"></th>
-                <th class="default_amount-col">Default (<a href="javascript:void(0);">Clear</a>)</th>
+                <th class="default_amount-col">Default</th>
                 <th class="amount-col">Amount</th>
                 <th class="description-col">Description (optional)</th>
                 <th class="remove-col"></th>
@@ -1504,7 +1516,7 @@ class Charitable_Builder_Form_Fields {
 		$html .= '</tbody>
             <tfoot>
                 <tr>
-                    <td colspan="5"><a class="charitable-button" href="#" data-charitable-add-row="' . $params['data_add_row'] . '">+ ' . $params['button_label'] . '</a></td>
+                    <td colspan="5"><a class="charitable-button" href="#" data-charitable-add-row="' . $params['data_add_row'] . '">+ ' . $params['button_label'] . '</a> <a class="charitable-clear-defaults" href="javascript:void(0);">Clear Defaults</a></td>
                 </tr>
             </tfoot>
         </table>

@@ -258,12 +258,16 @@ if ( ! class_exists( 'Charitable_Emails' ) ) :
 		 * Enable an email.
 		 *
 		 * @since  1.0.0
+		 * @version 1.8.2 - Added array check.
 		 *
 		 * @param  string $email The email to be enabled.
 		 * @return void
 		 */
 		protected function enable_email( $email ) {
-			$settings                   = get_option( 'charitable_settings' );
+			$settings                   = get_option( 'charitable_settings', array() );
+			if ( ! is_array( $settings ) ) {
+				$settings = array();
+			}
 			$enabled_emails             = isset( $settings['enabled_emails'] ) ? $settings['enabled_emails'] : array();
 			$enabled_emails[ $email ]   = $this->emails[ $email ];
 			$settings['enabled_emails'] = $enabled_emails;

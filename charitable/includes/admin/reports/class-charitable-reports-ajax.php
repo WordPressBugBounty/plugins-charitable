@@ -99,14 +99,14 @@ if ( ! class_exists( 'Charitable_Reports_Ajax' ) ) :
 			$total_count_donations  = count( $donations );
 			$total_amount_donations = $charitable_reports->get_donations_total();
 			$donation_breakdown     = $charitable_reports->get_donations_by_day();
-			$donation_average       = intval( $total_amount_donations ) > 0 && intval( $total_count_donations ) > 0 ? charitable_format_money( $total_amount_donations / $total_count_donations ) : 0;
-			$donation_total         = charitable_format_money( $total_amount_donations );
+			$donation_average       = intval( $total_amount_donations ) > 0 && intval( $total_count_donations ) > 0 ? charitable_format_money( $total_amount_donations / $total_count_donations, 2, true ) : 0;
+			$donation_total         = charitable_format_money( $total_amount_donations, 2, true );
 			$total_count_donors     = $charitable_reports->get_donors_count();
 
 			$donation_breakdown = $charitable_reports->get_donations_by_day();
 
 			$refunds_data         = $charitable_reports->get_refunds();
-			$total_amount_refunds = charitable_format_money( $refunds_data['total_amount'] );
+			$total_amount_refunds = charitable_format_money( $refunds_data['total_amount'], 2, true );
 			$total_count_refunds  = $refunds_data['total_count'];
 
 			$payment_breakdown = $charitable_reports->get_donations_by_payment();

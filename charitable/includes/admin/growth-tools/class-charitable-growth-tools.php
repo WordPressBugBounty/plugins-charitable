@@ -487,7 +487,7 @@ if ( ! class_exists( 'Charitable_Guide_Tools' ) ) :
 				<p class="more-recommendations"><?php echo esc_html__( 'More recommendations:', 'charitable' ); ?> <a target="_blank" href="<?php echo admin_url( 'admin.php?page=charitable-growth-tools' ); ?>"><?php echo esc_html__( 'Growth Tools', 'charitable' ); ?></a> - <a target="_blank" href="<?php echo admin_url( 'admin.php?page=charitable-addons' ); ?>"><?php echo esc_html__( 'Charitable Addons', 'charitable' ); ?></a></p>
 				<p class="charitable-dashboard-notice-another-suggestion"><a href="#"><strong><?php echo esc_html__( 'Get another suggestion.', 'charitable' ); ?></a></p>
 
-				<a href="#" class="charitable-remove-growth-tools">X</a>
+				<a href="#" class="charitable-remove-growth-tools" title="<?php echo esc_html__( 'Close this notice.', 'charitable' ); ?>"></a>
 
 			<?php
 

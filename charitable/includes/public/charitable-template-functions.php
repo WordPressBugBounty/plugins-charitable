@@ -130,17 +130,26 @@ if ( ! function_exists( 'charitable_template_campaign_description' ) ) :
 	/**
 	 * Display the campaign description before the summary and rest of content.
 	 *
-	 * @since  1.0.0
-	 * @since  1.8.1 Add check for CHARITABLE_NO_LEGACY_CHECK_CAMPAIGN_DESCRIPTION constant.
+	 * @since   1.0.0
+	 * @version 1.8.1 Add check for CHARITABLE_NO_LEGACY_CHECK_CAMPAIGN_DESCRIPTION constant.
+	 * @version 1.8.2 Added charitable_find_description_in_campaign_settings method
 	 *
 	 * @param  Charitable_Campaign $campaign The campaign object.
 	 * @return void
 	 */
-	function charitable_template_campaign_description( $campaign ) {
+	function charitable_template_campaign_description( $campaign, $view_args = array() ) {
 		if ( charitable_is_campaign_legacy( $campaign ) || ( defined( 'CHARITABLE_NO_LEGACY_CHECK_CAMPAIGN_DESCRIPTION' ) && CHARITABLE_NO_LEGACY_CHECK_CAMPAIGN_DESCRIPTION ) ) {
-			charitable_template( 'campaign/description.php', array( 'campaign' => $campaign ) );
+			charitable_template( 'campaign/description.php', array( 'campaign' => $campaign, 'view_args' => $view_args ) );
+		} elseif ( $campaign->ID && ! empty( $view_args['shortcode'] ) ) {
+				$campaign_settings = get_post_meta( $campaign->ID, 'campaign_settings_v2', true );
+			 	if ( is_array( $campaign_settings ) && ! empty( $campaign_settings ) ) {
+					$description_limit = isset( $view_args['description_limit'] ) ? intval( $view_args['description_limit'] ) : 0;
+					$description       = charitable_find_description_in_campaign_settings( $campaign_settings, $description_limit );
+					charitable_template( 'campaign/description.php', array( 'campaign' => $campaign, 'description' => $description, 'view_args' => $view_args ) );
+			 	}
 		}
 	}
+
 
 endif;
 
@@ -421,6 +430,7 @@ if ( ! function_exists( 'charitable_template_campaign_modal_donation_window' ) )
 	 * @since  1.0.0
 	 * @since  1.5.0 Function now returns true/false depending
 	 *               on whether the template is rendered.
+	 * @version 1.8.2 Added additional pattern to search for campaign id in the content.
 	 *
 	 * @global WP_Query $wp_query
 	 * @return boolean
@@ -443,6 +453,12 @@ if ( ! function_exists( 'charitable_template_campaign_modal_donation_window' ) )
 			$pattern = '/{"campaignID":"(\d+)"}/';
 			preg_match_all( $pattern, $post->post_content, $matches );
 			$campaign_ids = array_unique( $matches[1] );
+			// if empty, then find all instances of "campaign id=126" in the content and extract all the different campaign ID and put them into a PHP array.
+			if ( empty( $campaign_ids ) ) {
+				$pattern = '/campaign id="(\d+)"/';
+				preg_match_all( $pattern, $post->post_content, $matches );
+				$campaign_ids = array_unique( $matches[1] );
+			}
 
 		} else {
 
@@ -880,20 +896,28 @@ if ( ! function_exists( 'charitable_template_donation_form_login' ) ) :
 	/**
 	 * Display a prompt to login at the start of the user fields block.
 	 *
-	 * @since  1.0.0
+	 * @since   1.0.0
+	 * @version 1.8.2
 	 *
 	 * @param  Charitable_Donation_Form_Interface $form The donation form object.
 	 * @return void
 	 */
 	function charitable_template_donation_form_login( Charitable_Donation_Form_Interface $form ) {
-
 		$user = $form->get_user();
 
 		if ( $user ) {
 			return;
 		}
 
-		charitable_template( 'donation-form/donor-fields/login-form.php' );
+		$allow_login_form = apply_filters( 'charitable_donation_form_login_allow', true );
+
+		if ( ! $allow_login_form ) {
+			return;
+		}
+
+		if ( '0' !== charitable_get_option( 'donation_form_show_login_message', '1' ) ) {
+			charitable_template( 'donation-form/donor-fields/login-form.php' );
+		}
 	}
 
 endif;
@@ -1330,7 +1354,6 @@ if ( ! function_exists( 'charitable_is_campaign_legacy' ) ) :
 		$campaign_v2_settings = get_post_meta( $campaign_id, 'campaign_settings_v2', true );
 
 		return ! empty( $campaign_v2_settings ) ? false : true;
-
 	}
 
 endif;

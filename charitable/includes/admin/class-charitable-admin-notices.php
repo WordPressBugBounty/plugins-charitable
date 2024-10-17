@@ -62,7 +62,6 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 			add_action( 'admin_notices', array( $this, 'render_license_expiring_banner' ) );
 			add_action( 'admin_notices', array( $this, 'render_license_expired_banner' ) );
 			add_action( 'admin_notices', array( $this, 'render_five_star_rating' ) );
-			add_action( 'admin_notices', array( $this, 'render_dashboard_reporting_notice' ) );
 			add_action( 'charitable_dismiss_notice', array( $this, 'dismiss_five_star_notice' ), 10, 1 );
 			add_action( 'charitable_dismiss_notice', array( $this, 'dismiss_campaign_builder_notice' ), 10, 1 );
 			add_action( 'charitable_dismiss_notice', array( $this, 'dismiss_dashboard_reporting_notice' ), 10, 1 );
@@ -270,7 +269,7 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 				return;
 			}
 			$screen = get_current_screen();
-			if ( ! is_null( $screen ) && ( in_array( $screen->id, $this->get_charitable_screens() ) || ( isset( $screen->taxonomy ) && 'campaign_category' === $screen->taxonomy ) || ( isset( $screen->taxonomy ) && 'campaign_tag' === $screen->taxonomy ) ) ) {
+			if ( ! is_null( $screen ) && ( in_array( $screen->id, charitable_get_charitable_screens() ) || ( isset( $screen->taxonomy ) && 'campaign_category' === $screen->taxonomy ) || ( isset( $screen->taxonomy ) && 'campaign_tag' === $screen->taxonomy ) ) ) {
 				$banner = get_transient( 'charitable_charitablelitetopro_banner' );
 				if ( ! $banner ) {
 					$utm_link = charitable_pro_upgrade_url( 'Upgrade From Lite Top Banner Link', 'To unlock more features consider upgrading to Pro.' );
@@ -291,7 +290,8 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 		 * @since 1.8.1.12
 		 */
 		public function render_license_expiring_banner() {
-			if ( ! charitable_is_pro() || ! class_exists( 'Charitable_Licenses_Settings' ) ) {
+
+			if ( ! charitable_is_pro() || ! class_exists( 'Charitable_Licenses_Settings' ) || ! class_exists( 'Charitable_Addons_Directory' ) ) {
 				// This should only show if the user has a license already entered.
 				return;
 			}
@@ -303,9 +303,10 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 
 			// Is the license expiring within 14 days?
 			$is_license_expiring = Charitable_Licenses_Settings::get_instance()->is_license_expiring( 1209600 );
+
 			if ( $is_license_expiring ) {
 				$screen = get_current_screen();
-				if ( ! is_null( $screen ) && ( in_array( $screen->id, $this->get_charitable_screens(), true ) || ( isset( $screen->taxonomy ) && 'campaign_category' === $screen->taxonomy ) || ( isset( $screen->taxonomy ) && 'campaign_tag' === $screen->taxonomy ) ) ) {
+				if ( ! is_null( $screen ) && ( in_array( $screen->id, charitable_get_charitable_screens(), true ) || ( isset( $screen->taxonomy ) && 'campaign_category' === $screen->taxonomy ) || ( isset( $screen->taxonomy ) && 'campaign_tag' === $screen->taxonomy ) ) ) {
 					$banner = get_transient( 'charitable_expiringlicense_banner' );
 					if ( ! $banner ) {
 						$this->render_banner(
@@ -330,7 +331,7 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 		 * @since 1.8.1.12
 		 */
 		public function render_license_expired_banner() {
-			if ( ! charitable_is_pro() || ! class_exists( 'Charitable_Licenses_Settings' ) ) {
+			if ( ! charitable_is_pro() || ! class_exists( 'Charitable_Licenses_Settings' ) || ! class_exists( 'Charitable_Addons_Directory' ) ) {
 				// This should only show if the user has a license already entered.
 				return;
 			}
@@ -342,9 +343,10 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 
 			// Is the license expiring within 14 days?
 			$is_license_expired = Charitable_Licenses_Settings::get_instance()->is_license_expired();
+
 			if ( $is_license_expired ) {
 				$screen = get_current_screen();
-				if ( ! is_null( $screen ) && ( in_array( $screen->id, $this->get_charitable_screens(), true ) || ( isset( $screen->taxonomy ) && 'campaign_category' === $screen->taxonomy ) || ( isset( $screen->taxonomy ) && 'campaign_tag' === $screen->taxonomy ) ) ) {
+				if ( ! is_null( $screen ) && ( in_array( $screen->id, charitable_get_charitable_screens(), true ) || ( isset( $screen->taxonomy ) && 'campaign_category' === $screen->taxonomy ) || ( isset( $screen->taxonomy ) && 'campaign_tag' === $screen->taxonomy ) ) ) {
 					$banner = get_transient( 'charitable_expiredlicense_banner' );
 					if ( ! $banner ) {
 						$this->render_banner(
@@ -404,7 +406,7 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 			$screen = get_current_screen();
 
 			// determine if we are on the current screen.
-			if ( ! is_null( $screen ) && ( in_array( $screen->id, $this->get_charitable_screens() ) || ( isset( $screen->taxonomy ) && 'campaign_category' === $screen->taxonomy ) || ( isset( $screen->taxonomy ) && 'campaign_tag' === $screen->taxonomy ) ) ) {
+			if ( ! is_null( $screen ) && ( in_array( $screen->id, charitable_get_charitable_screens() ) || ( isset( $screen->taxonomy ) && 'campaign_category' === $screen->taxonomy ) || ( isset( $screen->taxonomy ) && 'campaign_tag' === $screen->taxonomy ) ) ) {
 
 				$slug = 'five-star-review';
 
@@ -452,7 +454,7 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 			$screen = get_current_screen();
 
 			// determine if we are on the current screen.
-			if ( ! is_null( $screen ) && ( in_array( $screen->id, $this->get_charitable_screens() ) || ( isset( $screen->taxonomy ) && 'campaign_category' === $screen->taxonomy ) || ( isset( $screen->taxonomy ) && 'campaign_tag' === $screen->taxonomy ) ) ) {
+			if ( ! is_null( $screen ) && ( in_array( $screen->id, charitable_get_charitable_screens() ) || ( isset( $screen->taxonomy ) && 'campaign_category' === $screen->taxonomy ) || ( isset( $screen->taxonomy ) && 'campaign_tag' === $screen->taxonomy ) ) ) {
 
 				$slug = 'campaign-builder';
 
@@ -473,7 +475,8 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 		 * Render a banner to promote
 		 *
 		 * @since 1.8.1
-		 * @since 1.8.1.10
+		 * @version 1.8.1.10
+		 * @version 1.8.2 deprecated.
 		 */
 		public function render_dashboard_reporting_notice() {
 
@@ -484,7 +487,7 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 			$screen = get_current_screen();
 
 			// determine if we are on the current screen.
-			if ( ! is_null( $screen ) && ( in_array( $screen->id, $this->get_charitable_screens() ) || ( isset( $screen->taxonomy ) && 'campaign_category' === $screen->taxonomy ) || ( isset( $screen->taxonomy ) && 'campaign_tag' === $screen->taxonomy ) ) ) {
+			if ( ! is_null( $screen ) && ( in_array( $screen->id, charitable_get_charitable_screens() ) || ( isset( $screen->taxonomy ) && 'campaign_category' === $screen->taxonomy ) || ( isset( $screen->taxonomy ) && 'campaign_tag' === $screen->taxonomy ) ) ) {
 
 				$slug = 'dashboard-reporting';
 
@@ -678,6 +681,7 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 
 		/**
 		 * Returns an array of screen IDs where the Charitable notices should be displayed.
+		 * (Deprecated in 1.8.1.15)
 		 *
 		 * @uses   charitable_admin_screens
 		 *

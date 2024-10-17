@@ -6,6 +6,7 @@
  *
  * @package     Charitable/Functions/Shortcodes
  * @version     1.2.0
+ * @version     1.8.2 - Added donate button shortcode.
  * @author      David Bisset
  * @copyright   Copyright (c) 2023, WP Charitable LLC
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -29,6 +30,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @see Charitable_Registration_Shortcode::display()
  * @see Charitable_Profile_Shortcode::display()
  * @see Charitable_Email_Shortcode::display()
+ * @see Charitable_Stat_Shortcode::display()
+ * @see Charitable_Donate_Button_Shortcode::display()
  */
 add_shortcode( 'campaigns', array( 'Charitable_Campaigns_Shortcode', 'display' ) );
 add_shortcode( 'charitable_donors', array( 'Charitable_Donors_Shortcode', 'display' ) );
@@ -41,6 +44,7 @@ add_shortcode( 'charitable_registration', array( 'Charitable_Registration_Shortc
 add_shortcode( 'charitable_profile', array( 'Charitable_Profile_Shortcode', 'display' ) );
 add_shortcode( 'charitable_stat', array( 'Charitable_Stat_Shortcode', 'display' ) );
 add_shortcode( 'charitable_email', array( 'Charitable_Email_Shortcode', 'display' ) );
+add_shortcode( 'charitable_donate_button', array( 'Charitable_Donate_Button_Shortcode', 'display' ) );
 
 /**
  * Fingerprint the login form with our charitable=true hidden field.
@@ -66,7 +70,9 @@ add_action( 'charitable_before_preview_email', array( 'Charitable_Email_Shortcod
 add_action( 'charitable_after_send_email', array( 'Charitable_Email_Shortcode', 'flush' ) );
 add_action( 'charitable_after_preview_email', array( 'Charitable_Email_Shortcode', 'flush' ) );
 
-
-// v2
-
+/**
+ * Campaign shortcode for visual campaign.
+ *
+ * @see Charitable_Campaign_Shortcode::display()
+ */
 add_shortcode( 'campaign', array( 'Charitable_Campaign_Shortcode', 'display' ) );

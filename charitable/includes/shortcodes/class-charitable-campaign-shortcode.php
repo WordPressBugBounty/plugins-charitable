@@ -164,7 +164,8 @@ if ( ! class_exists( 'Charitable_Campaign_Shortcode' ) ) :
 		 * Load template specific CSS in the footer.
 		 *
 		 * @since   1.8.0
-		 * @since   1.8.1 Added $template_id blank check.
+		 * @version 1.8.1 Added $template_id blank check.
+		 * @version 1.8.2 removed $min from frotend styles.
 		 *
 		 * @param string $template_id Template slug.
 		 * @param array  $campaign_data Saved campaign data.
@@ -202,7 +203,7 @@ if ( ! class_exists( 'Charitable_Campaign_Shortcode' ) ) :
 					$template_id,
 					$campaign_data
 				),
-				$assets_dir . 'css/campaign-builder/themes/frontend/' . $template_id . $min . '.php'
+				$assets_dir . 'css/campaign-builder/themes/frontend/' . $template_id . '.php'
 			);
 
 			wp_enqueue_style(
@@ -233,8 +234,6 @@ if ( ! class_exists( 'Charitable_Campaign_Shortcode' ) ) :
 		public static function get_template( $template_id = 'basic' ) {
 
 			/**
-			 * Form Builder panels slugs array filter.
-			 *
 			 * Allows developers to disable loading of some builder panels.
 			 *
 			 * @since 1.8.0

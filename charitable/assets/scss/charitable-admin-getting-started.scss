@@ -9,7 +9,7 @@ body div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-default {
 #charitable-welcome {
     border-top: 3px solid #e27730;
     color: #555;
-    padding-top: 110px;
+    padding-top: 80px;
 
     .container {
         margin: 0 auto;
@@ -161,6 +161,51 @@ body div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-default {
         display: table
     }
 
+    .charitable-checklist-section {
+        border-radius: 2px;
+        box-shadow: 0 0 50px 0 rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+        background: #444 url("../images/onboarding/checklist/getting-started.png") center right 20px no-repeat;
+        background-size: contain;
+        .block {
+            padding: 40px;
+            max-width: 420px;
+        }
+        h1 {
+            color: #ffffff;
+            text-align: left;
+            margin: 20px 0 22px
+        }
+        h6 {
+            font-size: 17px;
+            font-weight: 400;
+            text-align: left;
+            color: #cccccc;
+            margin: 0 0 34px;
+        }
+        .button-wrap {
+            a {
+                background-color: #e27730;
+                color: #fff;
+                font-size: 16px;
+                font-weight: 600;
+                padding: 12px 28px;
+                position: relative;
+                top: -4px;
+                text-decoration: none;
+                border-radius: 5px;
+                text-shadow: none;
+                line-height: 24px;
+                cursor: pointer;
+                margin-left: auto;
+                margin-right: auto;
+                display: inline-block;
+                text-align: center;
+            }
+        }
+
+    }
+
     .charitable-features {
         background-color: #fff;
         border: 2px solid #e1e1e1;
@@ -219,91 +264,100 @@ body div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-default {
         }
     }
 
-    .charitable-upgrade-cta .block {
-        display: flex;
-        flex-direction: row;
-    }
     .charitable-upgrade-cta {
         background-color: #000;
         border: 2px solid #e1e1e1;
+        margin: 40px auto;
         border-top: 0;
         border-bottom: 0;
-        color: #fff
-    }
-
-    .charitable-upgrade-cta h2 {
         color: #fff;
-        font-size: 20px;
-        margin: 0 0 30px 0
-    }
-
-    .charitable-upgrade-cta ul {
-        display: -ms-flex;
-        display: -webkit-flex;
-        display: flex;
-        -webkit-flex-wrap: wrap;
-        flex-wrap: wrap;
-        font-size: 15px;
-        margin: 0;
-        padding: 0
-    }
-
-    .charitable-upgrade-cta ul li {
-        display: flex;
-        width: 50%;
-        margin: 0 0 8px 0;
-        padding: 0;
-        gap: 5px
-    }
-
-    .charitable-upgrade-cta ul li .dashicons {
-        color: #008a20
-    }
-
-    .charitable-upgrade-cta .left {
-        // float: left;
-        // width: 66.666666%;
-        // padding-right: 20px
-    }
-    .charitable-upgrade-cta .right {
-        // float: right;
-        // width: 33.333333%;
-        // padding: 20px 0 0 20px;
-        text-align: center
-    }
-    .charitable-upgrade-cta .right h2 {
-        text-align: center;
-        margin: 0
-    }
-
-    .charitable-upgrade-cta .right h2 span {
-        display: inline-block;
-        border-bottom: 1px solid #555;
-        padding: 0 15px 12px
-    }
-
-    .charitable-upgrade-cta .right .price {
-        padding: 26px 0
-    }
-
-    .charitable-upgrade-cta .right .price .amount {
-        font-size: 48px;
-        font-weight: 600;
-        position: relative;
-        display: inline-block
-    }
-
-    .charitable-upgrade-cta .right .price .amount:before {
-        content: '$';
-        position: absolute;
-        top: -8px;
-        left: -16px;
-        font-size: 18px
-    }
-
-    .charitable-upgrade-cta .right .price .term {
-        font-size: 12px;
-        display: inline-block
+        .block {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+        h2 {
+            color: #fff;
+            font-size: 20px;
+            margin: 0 0 30px 0;
+        }
+        ul {
+            display: -ms-flex;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-flex-wrap: wrap;
+            flex-wrap: wrap;
+            font-size: 15px;
+            margin: 0;
+            padding: 0;
+            li {
+                display: flex;
+                width: 50%;
+                margin: 0 0 8px 0;
+                padding: 0;
+                gap: 5px;
+                .dashicons {
+                    color: #008a20
+                }
+            }
+        }
+        .left {
+            max-width: 470px;
+        }
+        .right {
+            // float: right;
+            // width: 33.333333%;
+            // padding: 20px 0 0 20px;
+            text-align: center;
+            h2 {
+                text-align: center;
+                margin: 0
+                span {
+                    display: inline-block;
+                    border-bottom: 1px solid #555;
+                    padding: 0 15px 12px
+                }
+            }
+            .price {
+                padding: 26px 0;
+                .amount {
+                    font-size: 48px;
+                    font-weight: 600;
+                    position: relative;
+                    display: inline-block
+                }
+                .amount:before {
+                    content: '$';
+                    position: absolute;
+                    top: -8px;
+                    left: -16px;
+                    font-size: 18px
+                }
+                .term {
+                    font-size: 12px;
+                    display: inline-block
+                }
+            }
+            a {
+                background-color: #e27730;
+                color: #fff;
+                font-size: 16px;
+                font-weight: 600;
+                padding: 12px 28px;
+                position: relative;
+                top: -4px;
+                text-decoration: none;
+                border-radius: 5px;
+                text-shadow: none;
+                line-height: 24px;
+                cursor: pointer;
+                margin-left: auto;
+                margin-right: auto;
+                display: block;
+                max-width: 80%;
+                text-align: center;
+            }
+        }
     }
 
     .testimonials {

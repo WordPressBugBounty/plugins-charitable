@@ -126,6 +126,8 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 
 			add_action( 'charitable_after_admin_dashboard', [ $this, 'dashboard_cta' ] );
 
+			add_action( 'charitable_admin_dashboard_notifications', [ $this, 'display_notifications' ] );
+
 			$this->init( $args );
 		}
 
@@ -184,7 +186,118 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 			$this->dashboard_data = (array) $dashboard_data_args;
 
 			$this->maybe_load_scripts();
+
+			// Allow Charitable and third-party plugins to hook into the dashboard.
+			do_action( 'charitable_admin_dashboard_init_end', $this );
 		}
+
+		/**
+		 * Get the cached dashboard notifications.
+		 *
+		 * @since  1.8.2
+		 *
+		 * @return array
+		 */
+		public function display_notifications() {
+
+			// Grab the array of notifications, which includes the title, some meta, and the message.
+			$notifications = get_option( 'charitable_dashboard_notifications', array() );
+
+			if ( empty( $notifications ) ) {
+				return false;
+			}
+
+			// remove any notifications that don't have a 'type' key.
+			$notifications = array_filter(
+				$notifications,
+				function ( $notification ) {
+					return isset( $notification['type'] );
+				}
+			);
+
+			// remove any notifications that have a 'dismissed' key.
+			$notifications = array_filter(
+				$notifications,
+				function ( $notification ) {
+					return ! isset( $notification['dismissed'] );
+				}
+			);
+
+			if ( empty( $notifications ) ) {
+				return false;
+			}
+
+			// sort notifications by type = 'error' first, then 'warning', followed by 'notice'.
+			uasort(
+				$notifications,
+				function ( $a, $b ) {
+					$types = array( 'error', 'warning', 'notice' );
+					$pos_a = array_search( $a['type'], $types );
+					$pos_b = array_search( $b['type'], $types );
+
+					return $pos_a - $pos_b;
+				}
+			);
+
+			include charitable()->get_path( 'includes' ) . 'admin/templates/dashboard-notifications.php';
+
+		}
+
+
+		/**
+		 * Remove a dashboard notification.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @param  string $notification_id The notification ID.
+		 *
+		 * @return boolean
+		 */
+		public function charitable_remove_dashboard_notification( $notification_id = false ) {
+
+			// check nonce.
+			// if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'charitable_dashboard_notification_nonce' ) ) {
+			// 	wp_send_json_error( array( 'message' => esc_html__( 'Invalid nonce.', 'charitable' ) ) );
+			// }
+
+			if ( false === $notification_id ) {
+				return false;
+			}
+
+			$notification_id = sanitize_text_field( wp_unslash( $notification_id ) );
+
+			$notifications = (array) get_option( 'charitable_dashboard_notifications', array() );
+
+			if ( empty( $notifications ) ) {
+				return false;
+			}
+
+			if ( ! empty( $notifications[ $notification_id ] ) ) {
+				unset( $notifications[ $notification_id ] );
+				update_option( 'charitable_dashboard_notifications', $notifications );
+				return true;
+			} else {
+				return false;
+			}
+
+		}
+
+
+
+		// public function add_notification( $notification = array() ) {
+
+		// 	$notifications = (array) get_option( 'charitable_dashboard_notifications', array() );
+
+
+
+		// 	$notifications[] = $notification;
+
+		// 	update_option( 'charitable_dashboard_notifications', $notifications );
+		// }
+
+
+
+
 
 		/**
 		 * Get the donation axis information for the highlight chart.
@@ -354,7 +467,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 				$donations              = $charitable_reports->get_donations();
 				$total_count_donations  = count( $donations );
 				$total_amount_donations = $charitable_reports->get_donations_total();
-				$donation_average       = $total_amount_donations > 0 && $total_count_donations > 0 ? charitable_format_money( $total_amount_donations / $total_count_donations ) : charitable_format_money( 0 );
+				$donation_average       = ( $total_amount_donations > 0 && $total_amount_donations > 0 ) ? ( charitable_format_money( $total_amount_donations / $total_count_donations, 2, true ) ) : charitable_format_money( 0 );
 				$donation_total         = charitable_format_money( $total_amount_donations );
 
 				// donors.
@@ -450,7 +563,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 							<?php endif; ?>
 						</div>
 						<div class="more">
-							<?php if ( ! empty( $list ) && false === $action ) : ?>
+							<?php if ( false === $action ) : ?>
 							<a href="<?php echo admin_url( 'edit.php?post_type=donation' ); // phpcs:ignore ?>"><?php echo esc_html__( 'View All Donations', 'charitable' ); ?>
 												<?php
 												if ( $include_icons ) :
@@ -1215,30 +1328,17 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		}
 
 		/**
-		 * Get the notices to display on the dashboard.
+		 * Get the notices to display on the dashboard. Get any stored notices/notifications from the database.
 		 *
 		 * @since  1.8.1.6
+		 * @version 1.8.2
 		 *
 		 * @return array
 		 */
 		public function get_notices() {
 
-			$notices     = array();
-			$notice_html = '';
+			return (array) apply_filters( 'charitable_dashboard_notices', get_option( 'charitable_dashboard_notifications', array() ) );
 
-			$notices = (array) apply_filters( 'charitable_dashboard_notices', $notices );
-
-			if ( ! empty( $notices ) ) {
-				foreach ( $notices as $key => $notice ) {
-					if ( isset( $notice['message'] ) ) {
-						$notice_html .= '<div class="charitable-dashboard-notice">';
-						$notice_html .= $notice['message'];
-						$notice_html .= '</div>';
-					}
-				}
-			}
-
-			return $notice_html;
 		}
 
 		/**

@@ -572,8 +572,6 @@ Charitable.Admin.Builder.DragFields = Charitable.Admin.Builder.DragFields || ( f
 
 						} else {
 
-							wpchar.debug('drag made it here 1');
-							wpchar.debug( position );
 							app.addFieldAfterDrag( $field, isNewField, isColumn, position, area, column_id, tab_id, section_id, fieldId, fieldType, $sortable, vars.section )
 
 						}
@@ -616,8 +614,7 @@ Charitable.Admin.Builder.DragFields = Charitable.Admin.Builder.DragFields || ( f
 						} );
 
 					} else {
-						wpchar.debug('drag made it here 2');
-						wpchar.debug( position );
+
 						app.addFieldAfterDrag( $field, isNewField, isColumn, position, area, column_id, tab_id, section_id, fieldId, fieldType, $sortable, vars.section );
 
 					}

@@ -28,25 +28,28 @@ if ( ! class_exists( 'Charitable_Campaigns_Shortcode' ) ) :
 		 * Display the shortcode output. This is the callback method for the campaigns shortcode.
 		 *
 		 * @since   1.0.0
+		 * @version 1.8.2 added 'description_limit' to the shortcode_atts and view_args filter.
 		 *
 		 * @param  array $atts The user-defined shortcode attributes.
 		 * @return string
 		 */
 		public static function display( $atts ) {
 			$default = array(
-				'id'               => '',
-				'orderby'          => 'post_date',
-				'order'            => '',
-				'number'           => get_option( 'posts_per_page' ),
-				'category'         => '',
-				'tag'              => '',
-				'creator'          => '',
-				'exclude'          => '',
-				'include_inactive' => false,
-				'columns'          => 2,
-				'button'           => 'donate',
-				'responsive'       => 1,
-				'masonry'          => 0,
+				'id'                => '',
+				'orderby'           => 'post_date',
+				'order'             => '',
+				'number'            => get_option( 'posts_per_page' ),
+				'category'          => '',
+				'tag'               => '',
+				'creator'           => '',
+				'exclude'           => '',
+				'include_inactive'  => false,
+				'columns'           => 2,
+				'button'            => 'donate',
+				'responsive'        => 1,
+				'masonry'           => 0,
+				'description_limit' => 0,
+				'shortcode'			=> 'campaigns',
 			);
 
 			$args              = shortcode_atts( $default, $atts, 'campaigns' );
@@ -81,7 +84,7 @@ if ( ! class_exists( 'Charitable_Campaigns_Shortcode' ) ) :
 			 * @param array $view_args The arguments to pass.
 			 * @param array $args      All the parsed arguments.
 			 */
-			$view_args = apply_filters( 'charitable_campaigns_shortcode_view_args', charitable_array_subset( $args, array( 'campaigns', 'columns', 'button', 'responsive', 'masonry' ) ), $args );
+			$view_args = apply_filters( 'charitable_campaigns_shortcode_view_args', charitable_array_subset( $args, array( 'campaigns', 'columns', 'button', 'responsive', 'masonry', 'description_limit', 'shortcode' ) ), $args );
 
 			$template->set_view_args( $view_args );
 

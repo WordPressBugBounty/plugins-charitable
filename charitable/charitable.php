@@ -3,12 +3,12 @@
  * Plugin Name: Charitable
  * Plugin URI: https://www.wpcharitable.com
  * Description: The WordPress fundraising alternative for non-profits, created to help non-profits raise money on their own website.
- * Version: 1.8.1.15
+ * Version: 1.8.2
  * Author: Charitable Donations & Fundraising Team
  * Author URI: https://wpcharitable.com
  * Requires at least: 4.1
  * Tested up to: 6.6.2
- * Stable tag: 1.8.1.15
+ * Stable tag: 1.8.2
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
@@ -17,7 +17,7 @@
  *
  * @package   Charitable
  * @author    David Bisset
- * @copyright Copyright (c) 2023, WP Charitable LLC
+ * @copyright Copyright (c) 2024, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -40,7 +40,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		const AUTHOR = 'WP Charitable';
 
 		/* Plugin version. */
-		const VERSION = '1.8.1.15';
+		const VERSION = '1.8.2';
 
 		/* Version of database schema. */
 		const DB_VERSION = '20180522';
@@ -1285,7 +1285,8 @@ if ( ! class_exists( 'Charitable' ) ) :
 						unset( $current[ $key ] );
 						update_option( 'active_plugins', $current );
 
-						$message = __( '<p><strong style="color:red;">NOTICE:</strong> <strong>Charitable</strong> detected an out-of-date and incompatible version of <strong>Charitable Stripe</strong> addon. To avoid issues with Stripe donations, <strong>Charitable Stripe</strong> ' . Charitable_Stripe::VERSION . ' was deactivated. Please update <strong>Charitable Stripe</strong> to version 1.5.0 or higher.</p><p>You can get the latest version of <strong>Charitable Stripe</strong> through your <a href="https://www.wpcharitable.com/account/" target="_blank">Charitable account at wpcharitable.com</a>. All active licenses are accessible in the "My Downloads" tab.</p>', 'charitable-stripe' );
+						// translators: %s is the version number.
+						$message = sprintf(	__( '<p><strong style="color:red;">NOTICE:</strong> <strong>Charitable</strong> detected an out-of-date and incompatible version of <strong>Charitable Stripe</strong> addon. To avoid issues with Stripe donations, <strong>Charitable Stripe</strong> %s was deactivated. Please update <strong>Charitable Stripe</strong> to version 1.5.0 or higher.</p><p>You can get the latest version of <strong>Charitable Stripe</strong> through your <a href="https://www.wpcharitable.com/account/" target="_blank">Charitable account at wpcharitable.com</a>. All active licenses are accessible in the "My Downloads" tab.</p>', 'charitable' ), Charitable_Stripe::VERSION );
 
 						wp_die( $message . ' <a href="' . admin_url( 'plugins.php' ) . '">Click here to return to the plugins screen.</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}

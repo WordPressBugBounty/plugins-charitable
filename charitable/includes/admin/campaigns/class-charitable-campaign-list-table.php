@@ -535,10 +535,12 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 					</h2>
 
 					<div class="charitable-blank-slate-buttons">
-						<a class="charitable-blank-slate-cta button-primary button" target="_blank" href="https://www.wpcharitable.com/learn-more-campaign/"><?php esc_html_e( 'Learn More About Campaigns', 'charitable' ); ?></a>
-						<a class="charitable-blank-slate-cta charitable-blank-slate-create-campaign-updated button-secondary button" target="_blank" href="<?php echo admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ); ?>"><?php esc_html_e( 'Create Campaign', 'charitable' ); ?></a>
+						<a class="charitable-blank-slate-cta charitable-button" target="_blank" href="<?php echo admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ); ?>"><?php esc_html_e( 'Create Campaign', 'charitable' ); ?></a>
 						<div class="charitable-blank-slate-buttons-legacy">
-							<div><a href="<?php echo admin_url( 'post-new.php?post_type=campaign' ); ?>"><?php esc_html_e( 'Create Campaign (Legacy)', 'charitable' ); ?></a></div>
+							<div><a target="_blank" href="https://www.wpcharitable.com/documentation/creating-your-first-campaign/?utm_campaign=liteplugin&utm_source=charitableplugin&utm_medium=campaign-page&utm_content=Read%20The%20Full%20Guide"><?php esc_html_e( 'Read The Guide On Creating Your First Campaign', 'charitable' ); ?></a></div>
+							<?php if ( ! charitable_disable_legacy_campaigns() ) : ?>
+								<div><a href="<?php echo admin_url( 'post-new.php?post_type=campaign' ); ?>"><?php esc_html_e( 'Create Campaign (Legacy)', 'charitable' ); ?></a></div>
+							<?php endif; ?>
 						</div>
 					</div>
 
@@ -563,7 +565,7 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 					</div>
 						<?php if ( false !== $recommendations ) : ?>
 						<div class="charitable-intergration-steps">
-							<?php echo $recommendations; ?>
+							<?php echo $recommendations; // phpcs:ignore ?>
 						</div>
 					<?php endif; ?>
 					<div class="marketplace-suggestions-container marketplace-suggestions-container-footer showing-suggestion">
@@ -654,8 +656,6 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 			if ( ! empty( $recommended_addon ) ) {
 
 				// this is a Chartiable addon.
-
-				$icon        = charitable()->get_path( 'directory', false ) . 'assets/images/plugins/charitable/' . str_replace( 'charitable-', '', $slug ) . '.png';
 				$title       = str_replace( 'Charitable', '', $recommended_addon['name'] );
 				$sections    = ! empty( $recommended_addon['sections'] ) ? unserialize( $recommended_addon['sections'] ) : false;
 				$description = is_array( $sections ) && ! empty( $sections['description'] ) ? $sections['description'] : '';
@@ -667,10 +667,9 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 				<div class="charitable-intergration-step charitable-addon charitable-plugin-suggestion" data-status="<?php echo esc_attr( $slug ); ?>">
 					<div class="instructions">
 						<header class="charitable-intergration-step-header">
-							<img src="<?php echo esc_url( $icon ); ?>" class="marketplace-suggestion-icon" width="55" height="55">
 							<div class="sub-header">
 								<h3><?php echo esc_html( $title ); ?></h3>
-								<span class="badge"><a href="#">Pro</a></span>
+								<span class="badge"><a href="#"><?php esc_html_e( 'Pro', 'charitable' ); ?></a></span>
 							</div>
 						</header>
 						<p class="description"><?php echo wp_strip_all_tags( $description ); ?></p>
@@ -678,7 +677,7 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 					</div>
 					<div class="step">
 						<div class="vertical-wrapper">
-							<div class="step-image"><a class="suggestion-dismiss" title="Dismiss this suggestion" data-plugin-slug="<?php echo esc_attr( $slug ); ?>" data-plugin-type="addon" href="#">X</a></div>
+							<div class="step-image"><a class="suggestion-dismiss" title="<?php esc_html_e( 'Dismiss this suggestion', 'charitable' ); ?>" data-plugin-slug="<?php echo esc_attr( $slug ); ?>" data-plugin-type="addon" href="#"><i class="" title="<?php esc_html_e( 'Dismiss this suggestion', 'charitable' ); ?>"></i></a></div>
 						</div>
 					</div>
 				</div>
@@ -695,8 +694,6 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 				$charitable_plugins_third_party = new Charitable_Admin_Plugins_Third_Party();
 				$plugin_data                    = $charitable_plugins_third_party->get_plugin( esc_attr( $slug ) );
 
-				$icon = isset( $plugin_data['icon'] ) ? $plugin_data['icon'] : charitable()->get_path( 'directory', false ) . 'assets/images/icons/blank-slate-donations.svg';
-
 				if ( ! $plugin_data ) {
 					return '';
 				}
@@ -709,7 +706,6 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 					<div class="instructions">
 
 						<header class="charitable-intergration-step-header">
-							<img src="<?php echo esc_url( $icon ); ?>" class="marketplace-suggestion-icon" width="55" height="55">
 							<div class="sub-header">
 								<h3><?php echo esc_html( $plugin_data['title'] ); ?></h3>
 								<span class="badge"><a href="#"><?php esc_html_e( 'Partner', 'charitable' ); ?></a></span>
@@ -724,7 +720,9 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 					</div>
 					<div class="step">
 						<div class="vertical-wrapper">
-							<div class="step-image"><a class="suggestion-dismiss" title="<?php esc_html_e( 'Dismiss this suggestion', 'charitable' ); ?><" data-plugin-slug="<?php echo esc_attr( $slug ); ?>" data-plugin-type="partner" href="#">X</a></div>
+
+							<div class="step-image"><a class="suggestion-dismiss" title="<?php esc_html_e( 'Dismiss this suggestion', 'charitable' ); ?>" data-plugin-slug="<?php echo esc_attr( $slug ); ?>" data-plugin-type="partner" href="#"><i class="" title="<?php esc_html_e( 'Dismiss this suggestion', 'charitable' ); ?>"></i></a></div>
+
 						</div>
 					</div>
 				</div>

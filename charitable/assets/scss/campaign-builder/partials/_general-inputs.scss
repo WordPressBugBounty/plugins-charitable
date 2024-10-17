@@ -996,9 +996,23 @@ div.charitable-form {
 		}
 		th.default_amount-col {
 			width: 150px;
+			line-height: normal;
+			min-width: 75px;
+			text-align: center;
+			a {
+				display: block;
+				margin: 4px auto 0 auto;
+				font-size: 11px;
+			}
 		}
 		th.amount-col {
 			width: 200px;
+		}
+		td.default_amount-col {
+			input {
+				margin-left: auto;
+				margin-right: auto;
+			}
 		}
 		td.description-col {
 			input {
@@ -1017,6 +1031,19 @@ div.charitable-form {
 			margin: 0px 0 15px 0;
 			display: inline-block;
 			width: auto;
+		}
+		a.charitable-clear-defaults {
+			color: black;
+			opacity: 0.5;
+			margin: 0 0 0 15px;
+			font-size: 13px;
+			list-style: 13px;
+			text-decoration: none;
+			display: inline-block;
+			width: auto;
+			&:hover {
+				text-decoration: underline;
+			}
 		}
 	}
 	.remove-col span {

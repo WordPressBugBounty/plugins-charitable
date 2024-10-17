@@ -131,15 +131,22 @@ $wrapper = '.charitable-campaign-wrap.template-' . $slug;
 	background-color: <?php echo $button; ?> !important;
 	border-color: <?php echo $button; ?> !important;
 	text-transform: none;
-border-radius: 0px;
-text-transform: uppercase;
-margin-top: 0;
-margin-bottom: 0;
-width: 100%;
-font-weight: 400;
-height: 50px;
-font-size: 16px;
-line-height: 16px;
+	border-radius: 0px;
+	text-transform: uppercase;
+	margin-top: 0;
+	margin-bottom: 0;
+	width: 100%;
+	font-weight: 400;
+	height: 50px;
+	font-size: 16px;
+	line-height: 16px;
+}
+<?php echo $wrapper; ?> a.charitable-button.donate-button {
+	font-size: 16px;
+	line-height: 36px;
+  	display: inline-block;
+  	text-align: center;
+  	text-decoration: none;
 }
 
 /* field: progress bar */

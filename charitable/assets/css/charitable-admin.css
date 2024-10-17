@@ -885,6 +885,12 @@ select.charitable-settings-field {
   width: auto;
   min-width: 300px; }
 
+#charitable_settings_export_campaign.charitable-settings-field,
+#charitable_settings_export_donations.charitable-settings-field,
+#charitable_settings_import_donations.charitable-settings-field {
+  height: 38px;
+}
+
 .charitable-settings-object {
   max-width: 860px;
   padding: 10px 20px;
@@ -918,6 +924,9 @@ select.charitable-settings-field {
   background-color: #fef4e8; }
 .charitable-settings-notice.license-notice {
   margin-top: -10px;
+}
+.charitable-settings-notice.charitable-stripe-key-notice {
+  margin: -15px 0 15px 0;
 }
 
 .charitable-licensed-product h4 {

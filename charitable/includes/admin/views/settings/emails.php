@@ -8,6 +8,7 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
  * @version   1.0.0
+ * @version   1.8.2 Added checklist querystring value to action_url.
  */
 
 $helper = charitable_get_helper( 'emails' );
@@ -17,23 +18,37 @@ if ( count( $emails ) ) :
 
 	foreach ( $emails as $email ) :
 
-		$email      = new $email;
+		$email      = new $email();
 		$is_enabled = $helper->is_enabled_email( $email->get_email_id() );
-		$action_url = esc_url( add_query_arg( array(
-			'charitable_action' => $is_enabled ? 'disable_email' : 'enable_email',
-			'email_id'          => $email->get_email_id(),
-			'_nonce'            => wp_create_nonce( 'email' ),
-		), admin_url( 'admin.php?page=charitable-settings&tab=emails' ) ) );
+		$action_url = esc_url(
+			add_query_arg(
+				array(
+					'charitable_action' => $is_enabled ? 'disable_email' : 'enable_email',
+					'email_id'          => $email->get_email_id(),
+					'_nonce'            => wp_create_nonce( 'email' ),
+				),
+				admin_url( 'admin.php?page=charitable-settings&tab=emails' )
+			)
+		);
+		// if the querystring value of checklist exists then add it to the action_url.
+		if ( isset( $_GET['checklist'] ) ) { // phpcs:ignore
+			$action_url .= '&checklist=' . esc_attr( $_GET['checklist'] ); // phpcs:ignore
+		}
 
 		?>
 		<div class="charitable-settings-object charitable-email cf">
-			<h4><?php echo $email->get_name(); ?></h4>
+			<h4><?php echo esc_html( $email->get_name() ); ?></h4>
 			<span class="actions">
 				<?php
 				if ( $is_enabled ) :
-					$settings_url = esc_url( add_query_arg( array(
-						'group' => 'emails_' . $email->get_email_id(),
-					), admin_url( 'admin.php?page=charitable-settings&tab=emails' ) ) );
+					$settings_url = esc_url(
+						add_query_arg(
+							array(
+								'group' => 'emails_' . $email->get_email_id(),
+							),
+							admin_url( 'admin.php?page=charitable-settings&tab=emails' )
+						)
+					);
 					?>
 					<a href="<?php echo $settings_url; ?>" class="button button-primary"><?php _e( 'Email Settings', 'charitable' ); ?></a>
 				<?php endif ?>
@@ -47,7 +62,7 @@ if ( count( $emails ) ) :
 			</span>
 		</div>
 	<?php endforeach ?>
-<?php
+	<?php
 else :
 	_e( 'There are no emails available in your system.', 'charitable' );
 endif;

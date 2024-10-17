@@ -170,6 +170,16 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 			}
 
 			$expire_date  = $this->get_license_expire_date( 'timestamp' );
+
+			if ( false === $expire_date ) {
+				return false;
+			}
+
+			// expire_date must be a timestamp, if not then return false.
+			if ( ! is_numeric( $expire_date ) ) {
+				return false;
+			}
+
 			$current_date = time();
 			// If the license is expiring in x seconds, return true.
 			if ( $expire_date - $current_date < $seconds ) {
@@ -192,7 +202,17 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 				return true;
 			}
 
-			$expire_date  = $this->get_license_expire_date( 'timestamp' );
+			$expire_date = $this->get_license_expire_date( 'timestamp' );
+
+			if ( false === $expire_date ) {
+				return false;
+			}
+
+			// expire_date must be a timestamp, if not then return false.
+			if ( ! is_numeric( $expire_date ) ) {
+				return false;
+			}
+
 			$current_date = time();
 			// If the license is expiring in x seconds, return true.
 			if ( $expire_date - $current_date < 0 ) {
@@ -476,7 +496,7 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 								'strong' => [],
 							]
 						),
-						'https://wpcharitable.com/documentation/expired-expiring-license',
+						'https://wpcharitable.com/documentation/expired-expiring-license'
 					) . '</p>';
 				} elseif ( $this->is_license_expired() ) {
 					$output .= '<p style="color:red;">' . sprintf(
@@ -494,7 +514,7 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 								'strong' => [],
 							]
 						),
-						'https://wpcharitable.com/documentation/expired-expiring-license',
+						'https://wpcharitable.com/documentation/expired-expiring-license'
 					) . '</p>';
 				}
 

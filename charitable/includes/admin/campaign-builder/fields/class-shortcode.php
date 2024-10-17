@@ -39,7 +39,7 @@ if ( ! class_exists( 'Charitable_Field_Shortcode' ) ) :
 			$this->can_be_deleted    = true;
 			$this->can_be_duplicated = true;
 			$this->edit_label        = esc_html__( 'Edit Shotcode', 'charitable' );
-			$this->edit_type         = 'shortcode'; // was settings
+			$this->edit_type         = 'shortcode'; // was settings.
 			$this->edit_section      = 'standard';
 
 			// Misc.

@@ -897,19 +897,37 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 		 * @return void
 		 */
 		public function render_blank_state(): void {
+
+			$counts = (array) wp_count_posts( 'campaign' );
+			unset( $counts['auto-draft'] );
+			$campaign_exists = array_sum( $counts ) > 0 ? true : false;
+
 			?>
 				<div class="charitable-blank-slate">
 
 					<img class="charitable-blank-slate-hero-image" src="<?php echo charitable()->get_path( 'directory', false ) . 'assets/images/icons/blank-slate-donations.svg'; ?>" alt=""  />
 
-					<h2 class="charitable-blank-slate-message">
-						<?php esc_html_e( 'Want Donations Faster? We Recommend:', 'charitable' ); ?>
-					</h2>
-
-					<div class="charitable-blank-slate-buttons">
-						<a class="charitable-blank-slate-cta button-primary button" target="_blank" href="https://www.wpcharitable.com/documentation/learn-more-donations/"><?php esc_html_e( 'Learn more about donations', 'charitable' ); ?></a>
-						<a class="charitable-blank-slate-cta button-secondary button" target="_blank" href="<?php echo admin_url( 'post-new.php?post_type=donation' ); ?>"><?php esc_html_e( 'Add a donation', 'charitable' ); ?></a>
-					</div>
+					<?php if ( $campaign_exists ) : ?>
+						<h2 class="charitable-blank-slate-message">
+							<?php esc_html_e( 'No Donations Yet!', 'charitable' ); ?>
+						</h2>
+						<div class="charitable-blank-slate-buttons">
+							<a class="charitable-blank-slate-cta charitable-button" href="<?php echo admin_url( 'post-new.php?post_type=donation' ); ?>"><?php esc_html_e( 'Add A Manual Donation', 'charitable' ); ?></a>
+							<div class="charitable-blank-slate-buttons-legacy">
+								<div><a target="_blank" href="https://www.wpcharitable.com/documentation/learn-more-donations/"><?php esc_html_e( 'Learn More About Donations', 'charitable' ); ?></a></div>
+							</div>
+						</div>
+					<?php else : ?>
+						<h2 class="charitable-blank-slate-message">
+							<?php esc_html_e( 'Create A Campaign To Start Accepting Donations!', 'charitable' ); ?>
+						</h2>
+						<div class="charitable-blank-slate-buttons">
+							<a class="charitable-blank-slate-cta charitable-button" target="_blank" href="<?php echo admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ); ?>"><?php esc_html_e( 'Create Campaign', 'charitable' ); ?></a>
+							<div class="charitable-blank-slate-buttons-legacy">
+								<div><a href="<?php echo admin_url( 'post-new.php?post_type=donation' ); ?>"><?php esc_html_e( 'Create A Donation Manually', 'charitable' ); ?></a></div>
+							</div>
+						</div>
+					<?php endif; ?>
 
 					<?php
 					/**
@@ -1024,7 +1042,6 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 
 				// this is a Chartiable addon.
 
-				$icon        = charitable()->get_path( 'directory', false ) . 'assets/images/plugins/charitable/' . str_replace( 'charitable-', '', $slug ) . '.png';
 				$title       = str_replace( 'Charitable', '', $recommended_addon['name'] );
 				$sections    = ! empty( $recommended_addon['sections'] ) ? unserialize( $recommended_addon['sections'] ) : false;
 				$description = is_array( $sections ) && ! empty( $sections['description'] ) ? $sections['description'] : '';
@@ -1036,7 +1053,6 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 				<div class="charitable-intergration-step charitable-addon charitable-plugin-suggestion" data-status="<?php echo esc_attr( $slug ); ?>">
 					<div class="instructions">
 						<header class="charitable-intergration-step-header">
-							<img src="<?php echo esc_url( $icon ); ?>" class="marketplace-suggestion-icon" width="55" height="55">
 							<div class="sub-header">
 								<h3><?php echo esc_html( $title ); ?></h3>
 								<span class="badge"><a href="#">Pro</a></span>
@@ -1047,7 +1063,7 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 					</div>
 					<div class="step">
 						<div class="vertical-wrapper">
-							<div class="step-image"><a class="suggestion-dismiss" title="<?php esc_html_e( 'Dismiss this suggestion', 'charitable' ); ?>" data-plugin-slug="<?php echo esc_attr( $slug ); ?>" data-plugin-type="addon" href="#">X</a></div>
+							<div class="step-image"><a class="suggestion-dismiss" title="<?php esc_html_e( 'Dismiss this suggestion', 'charitable' ); ?>" data-plugin-slug="<?php echo esc_attr( $slug ); ?>" data-plugin-type="addon" href="#"><i class="" title="<?php esc_html_e( 'Dismiss this suggestion', 'charitable' ); ?>"></i></a></div>
 						</div>
 					</div>
 				</div>
@@ -1064,8 +1080,6 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 				$charitable_plugins_third_party = new Charitable_Admin_Plugins_Third_Party();
 				$plugin_data                    = $charitable_plugins_third_party->get_plugin( esc_attr( $slug ) );
 
-				$icon = isset( $plugin_data['icon'] ) ? $plugin_data['icon'] : charitable()->get_path( 'directory', false ) . 'assets/images/icons/blank-slate-donations.svg';
-
 				if ( ! $plugin_data ) {
 					return '';
 				}
@@ -1079,7 +1093,6 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 					<div class="instructions">
 
 						<header class="charitable-intergration-step-header">
-							<img src="<?php echo esc_url( $icon ); ?>" class="marketplace-suggestion-icon" width="55" height="55">
 							<div class="sub-header">
 								<h3><?php echo esc_html( $plugin_data['title'] ); ?></h3>
 								<span class="badge"><a href="#"><?php esc_html_e( 'Partner', 'charitable' ); ?></a></span>
@@ -1094,7 +1107,7 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 					</div>
 					<div class="step">
 						<div class="vertical-wrapper">
-							<div class="step-image"><a class="suggestion-dismiss" title="Dismiss this suggestion" data-plugin-slug="<?php echo esc_attr( $slug ); ?>" data-plugin-type="partner" href="#">X</a></div>
+							<div class="step-image"><a class="suggestion-dismiss" title="Dismiss this suggestion" data-plugin-slug="<?php echo esc_attr( $slug ); ?>" data-plugin-type="partner" href="#"><i class="" title="<?php esc_html_e( 'Dismiss this suggestion', 'charitable' ); ?>"></i></a></div>
 						</div>
 					</div>
 				</div>

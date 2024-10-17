@@ -193,6 +193,16 @@ if ( ! class_exists( 'Charitable_Tools_Settings' ) ) :
 		}
 
 		/**
+		 * Placeholder function.
+		 *
+		 * @since 1.8.2
+		 */
+		public function add_tools_customize_fields() {
+
+			return array();
+		}
+
+		/**
 		 * Return the list of user donation field options.
 		 *
 		 * @since  1.8.1.6

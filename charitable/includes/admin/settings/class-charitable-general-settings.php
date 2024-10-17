@@ -95,7 +95,7 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 				'section_locale'                         => array(
 					'title'    => __( 'Currency & Location', 'charitable' ),
 					'type'     => 'heading',
-					'class'    => 'section-heading general-settings',
+					'class'    => 'section-heading general-setting currrency-location',
 					'priority' => 3,
 				),
 				'country'                                => array(
@@ -103,7 +103,7 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 					'type'     => 'select',
 					'priority' => 4,
 					'default'  => 'US',
-					'class'    => 'general-settings',
+					'class'    => 'general-setting',
 					'options'  => charitable_get_location_helper()->get_countries(),
 				),
 				'currency'                               => array(
@@ -189,8 +189,20 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 					),
 					'help'     => __( 'Choose if you wish fields not required on the donation form to be hidden.', 'charitable' ),
 				),
+				'donation_form_show_login_message' => array(
+					'title'    => __( 'Show login form <span class="badge beta">Beta</span>', 'charitable' ),
+					'type'     => 'radio',
+					'priority' => 25,
+					'class'    => 'general-settings',
+					'default'  => '1',
+					'options'  => array(
+						'1' => __( 'Yes', 'charitable' ),
+						'0' => __( 'No', 'charitable' ),
+					),
+					'help'     => __( 'Choose if you wish to display a register reminder or login form at the top of the donation form.', 'charitable' ),
+				),
 				'donation_form_minimal_amount_notice_display' => array(
-					'title'    => __( 'Minimum donation location  <span class="badge beta">Beta</span>', 'charitable' ),
+					'title'    => __( 'Minimum donation location <span class="badge beta">Beta</span>', 'charitable' ),
 					'type'     => 'select',
 					'priority' => 26,
 					'class'    => 'general-settings',
@@ -205,7 +217,7 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 				'donation_form_notices_display'          => array(
 					'title'    => __( 'Notice display location  <span class="badge beta">Beta</span>', 'charitable' ),
 					'type'     => 'select',
-					'priority' => 28,
+					'priority' => 27,
 					'default'  => 'top',
 					'class'    => 'general-settings',
 					'options'  => array(
@@ -232,7 +244,7 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 					'title'    => __( 'Login Page', 'charitable' ),
 					'type'     => 'select',
 					'class'    => 'general-settings',
-					'priority' => 32,
+					'priority' => 31,
 					'default'  => 'wp',
 					'options'  => array(
 						'wp'    => __( 'Use WordPress Login', 'charitable' ),
@@ -246,7 +258,7 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 				'registration_page'                      => array(
 					'title'    => __( 'Registration Page', 'charitable' ),
 					'type'     => 'select',
-					'priority' => 34,
+					'priority' => 32,
 					'default'  => 'wp',
 					'class'    => 'general-settings',
 					'options'  => array(
@@ -261,7 +273,7 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 				'profile_page'                           => array(
 					'title'    => __( 'Profile Page', 'charitable' ),
 					'type'     => 'select',
-					'priority' => 36,
+					'priority' => 33,
 					'class'    => 'general-settings',
 					'options'  => charitable_get_admin_settings()->get_pages(),
 					'help'     => __( 'The static page should contain the <code>[charitable_profile]</code> shortcode.', 'charitable' ),
@@ -269,7 +281,7 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 				'donation_receipt_page'                  => array(
 					'title'    => __( 'Donation Receipt Page', 'charitable' ),
 					'type'     => 'select',
-					'priority' => 38,
+					'priority' => 34,
 					'default'  => 'auto',
 					'class'    => 'general-settings',
 					'options'  => array(

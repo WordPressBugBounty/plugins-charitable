@@ -762,6 +762,7 @@
 
 .charitable-add-fields-group {
   border-bottom: 1px solid #ced7e0;
+  position: relative;
 }
 .charitable-add-fields-group:first-of-type {
   margin-top: -20px;

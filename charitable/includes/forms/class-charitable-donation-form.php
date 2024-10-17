@@ -110,6 +110,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		 *
 		 * @since 1.0.0
 		 * @since 1.5.0 $campaign argument became optional. Previously it was required.
+		 * @since 1.8.2 Added minimum donation amount notice display option.
 		 *
 		 * @param Charitable_Campaign|null $campaign Optional. Campaign receiving the donation, or NULL if
 		 *                                           the campaign will be selected in the form.
@@ -120,6 +121,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 
 			$this->setup_payment_fields();
 			$this->check_test_mode();
+			$this->stripe_key_check();
 
 			/* For backwards-compatibility */
 			add_action( 'charitable_form_field', array( $this, 'render_field' ), 10, 6 );
@@ -1348,6 +1350,64 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			);
 
 			return apply_filters( 'charitable_test_mode_active_notice', $notice, current_user_can( 'manage_charitable_settings' ) );
+		}
+
+		/**
+		 * Determine if there is a Stripe key set if Stripe is a payment gateway
+		 *
+		 * @since  1.8.2
+		 *
+		 * @return void
+		 */
+		protected function stripe_key_check() {
+
+			if ( defined( 'CHARITABLE_DISABLE_STRIPE_KEY_CHECK' ) && CHARITABLE_DISABLE_STRIPE_KEY_CHECK ) {
+				return;
+			}
+
+			if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) {
+				return;
+			}
+
+			$active_gateways = charitable_get_helper( 'gateways' )->get_active_gateways();
+			$has_gateways    = apply_filters( 'charitable_has_active_gateways', ! empty( $active_gateways ) );
+
+			if ( ! $has_gateways ) {
+				return;
+			}
+
+			if ( ! is_array( $active_gateways ) || ! in_array( 'Charitable_Gateway_Stripe_AM', $active_gateways ) ) {
+				return;
+			}
+
+			// Stripe is enabled, check if the keys are set.
+			$gateway = new Charitable_Gateway_Stripe_AM();
+			$keys    = $gateway->get_keys();
+
+			// If there is no public key, and current user is an admin, display an alert on the form. */
+			if ( ( ! isset( $keys['public_key'] ) || empty( $keys['public_key'] ) ) && current_user_can( 'manage_charitable_settings' ) ) {
+				charitable_get_notices()->add_error( $this->get_stripe_key_check_notice() );
+			}
+
+		}
+
+		/**
+		 * A formatted notice to advise that Test Mode is active.
+		 *
+		 * @since  1.8.2
+		 *
+		 * @return string
+		 */
+		protected function get_stripe_key_check_notice() {
+			$notice = $this->get_credentialed_notice(
+				__( 'Stripe is enabled but some keys are missing.', 'charitable' ),
+				sprintf( '<a href="%s">%s</a>.',
+					admin_url( 'admin.php?page=charitable-settings&tab=gateways&group=gateways_stripe' ),
+					__( 'View Settings', 'charitable' )
+				)
+			);
+
+			return apply_filters( 'charitable_stripe_key_check_notice', $notice, current_user_can( 'manage_charitable_settings' ) );
 		}
 
 		/**

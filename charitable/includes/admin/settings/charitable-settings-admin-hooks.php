@@ -10,6 +10,7 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.2.0
  * @version   1.6.0
+ * @version   1.8.2
  */
 
 // Exit if accessed directly.
@@ -121,6 +122,9 @@ add_filter( 'charitable_settings_tab_fields_advanced', array( Charitable_Advance
 add_filter( 'charitable_save_settings', array( Charitable_Advanced_Settings::get_instance(), 'clear_expired_options' ), 10, 2 );
 add_filter( 'charitable_save_settings', array( Charitable_Advanced_Settings::get_instance(), 'clear_activity_database' ), 10, 2 );
 add_filter( 'charitable_save_settings', array( Charitable_Advanced_Settings::get_instance(), 'minification_settings' ), 10, 2 );
+add_filter( 'charitable_save_settings', array( Charitable_Checklist::get_instance(), 'confirm_general_settings' ), 10, 2 );
+add_filter( 'charitable_save_settings', array( Charitable_Checklist::get_instance(), 'confirm_email_settings' ), 10, 2 );
+add_filter( 'admin_init', array( Charitable_Checklist::get_instance(), 'confirm_email_changes' ), 10 );
 
 /**
  * Add extra settings for the individual gateways & emails tabs.
@@ -137,3 +141,13 @@ add_filter( 'charitable_settings_tab_fields', array( Charitable_Email_Settings::
  * @see Charitable_Advanced_Settings::add_advanced_fields()
  */
 add_action( 'admin_init', array( Charitable_Addons_Directory::get_instance(), 'init' ), 5 );
+
+/**
+ * Checklist.
+ *
+ * @see Charitable_Checklist::maybe_redirect_to_checklist_after_event()
+ */
+add_action( 'charitable_save_settings', array( Charitable_Checklist::get_instance(), 'maybe_redirect_to_checklist_after_event' ), 99, 2 );
+add_filter( 'admin_body_class', array( Charitable_Checklist::get_instance(), 'add_body_class' ), 10 );
+add_filter( 'charitable_submenu_pages', array( Charitable_Checklist::get_instance(), 'add_checklist_to_menu' ), 2 );
+add_action( 'admin_init', array( Charitable_Checklist::get_instance(), 'maybe_complete_checklist' ), 10 );

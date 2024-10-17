@@ -606,8 +606,8 @@ function charitable_get_upgrade_modal_text( $type = 'pro' ) {
 			esc_url(
 				charitable_utm_link(
 					'https://wpcharitable.com/contact/',
-					'starting-guide-modal',
-					'support'
+					'Upgrade Intention Alert',
+					'Upgrade Intention Alert'
 				)
 			)
 		) .
@@ -638,9 +638,9 @@ function charitable_get_upgrade_modal_text( $type = 'pro' ) {
 			),
 			esc_url(
 				charitable_utm_link(
-					'https://wpcharitable.com/documentation/',
-					'starting-guide-modal',
-					'check-out-documentation'
+					'https://wpcharitable.com/lite-vs-pro/',
+					'Upgrade Intention Alert',
+					'Upgrade Documentation'
 				)
 			)
 		) .
@@ -775,3 +775,45 @@ function charitable_is_script_minification_enabled() {
 
 	return 'scripts-enabled' === charitable_get_option( 'script_minification', 'scripts-enabled' );
 }
+
+/**
+ * Returns an array of screen IDs where the Charitable scripts should be loaded.
+ * Used to be get_charitable_screens() in class-charitable-admin.php.
+ *
+ * @uses   charitable_admin_screens
+ *
+ * @since  1.0.0
+ *
+ * @return array
+ */
+function charitable_get_charitable_screens() {
+	/**
+	 * Filter admin screens where Charitable styles & scripts should be loaded.
+	 *
+	 * @since 1.8.0
+	 * @version 1.8.1 Added `charitable_page_charitable-dashboard` and 'charitable_page_charitable-reports' to the list of screens.
+	 * @version 1.8.1.6 Added 'charitable_page_charitable-tools' and 'charitable_page_charitable-growth-tool' to the list of screens.
+	 * @version 1.8.1.15 Added to core functions, added 'charitable_page_charitable-setup-checklist' to the list of screens.
+	 *
+	 * @param string[] $screens List of screen ids.
+	 */
+	return apply_filters(
+		'charitable_admin_screens',
+		array(
+			'campaign',
+			'donation',
+			'charitable_page_charitable-reports',
+			'charitable_page_charitable-dashboard',
+			'charitable_page_charitable-settings',
+			'charitable_page_charitable-tools',
+			'charitable_page_charitable-growth-tools',
+			'edit-campaign',
+			'edit-donation',
+			//'dashboard',
+			'toplevel_page_charitable',
+			'charitable_page_charitable-addons',
+			'charitable_page_charitable-setup-checklist',
+		)
+	);
+}
+

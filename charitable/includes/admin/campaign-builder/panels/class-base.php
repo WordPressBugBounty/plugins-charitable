@@ -161,6 +161,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel' ) ) :
 		 * Get campaign settings and set to the class var.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.2 add maybe_unserialize
 		 */
 		public function get_campaign_settings() {
 
@@ -172,6 +173,10 @@ if ( ! class_exists( 'Charitable_Builder_Panel' ) ) :
 
 				if ( empty( $this->campaign_data ) || false === $this->campaign_data ) {
 					$this->campaign_data = $this->get_default_settings();
+				}
+
+				if ( is_string( $this->campaign_data ) ) {
+					$this->campaign_data = maybe_unserialize( $this->campaign_data );
 				}
 
 				$this->campaign_data['id'] = $this->campaign_data['campaign_id'] = $campaign_id; // this should be fixed at some point.
@@ -288,12 +293,10 @@ if ( ! class_exists( 'Charitable_Builder_Panel' ) ) :
 
 			if ( in_array( $this->slug, [ 'settings', 'revisions' ], true ) ) {
 				$classes[] = 'charitable-panel-settings';
-				// $field_slug_id = 'fields';
 			}
 
 			if ( in_array( $this->slug, [ 'template', 'revisions' ], true ) ) {
 				$classes[] = 'charitable-panel-template';
-				// $field_slug_id = 'fields';
 			}
 
 			if ( $view == $this->slug ) {

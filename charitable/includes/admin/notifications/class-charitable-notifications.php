@@ -82,7 +82,9 @@ class Charitable_Notifications {
 
 	public function __construct() {
 
-		$this->init();
+		if ( defined( 'CHARITABLE_ENABLE_NOTIFICATIONS' ) && CHARITABLE_ENABLE_NOTIFICATIONS ) {
+			$this->init();
+		}
 	}
 
 	/**
@@ -101,17 +103,11 @@ class Charitable_Notifications {
 	 * @since 1.7.5
 	 */
 	public function hooks() {
-
 		add_action( 'after_charitable_admin_enqueue_scripts', [ $this, 'enqueues' ], 10, 3 );
-
-		// add_action( 'charitable_admin_overview_before_table', [ $this, 'output' ] ); // where the notifications comes out in the admin
 		add_action( 'admin_notices', [ $this, 'output_notices' ], 99 ); // where the notifications comes out in the admin
 		add_action( 'charitable_maybe_show_notification', [ $this, 'output' ], 99 ); // where the notifications comes out in the admin
-
 		add_action( 'charitable_admin_notifications_update', [ $this, 'update' ] );
-
 		add_action( 'deactivate_plugin', [ $this, 'delete' ], 10, 2 );
-
 		add_action( 'wp_ajax_charitable_notification_dismiss', [ $this, 'dismiss' ] );
 	}
 
@@ -172,6 +168,10 @@ class Charitable_Notifications {
 	 */
 	public function fetch_feed() {
 
+		if ( ! defined( 'CHARITABLE_ENABLE_NOTIFICATIONS' ) || ! CHARITABLE_ENABLE_NOTIFICATIONS ) {
+			return [];
+		}
+
 		$response = wp_remote_get(
 			self::SOURCE_URL,
 			[
@@ -218,7 +218,7 @@ class Charitable_Notifications {
 			// 2. license type does not match.
 			// 3. notification is expired.
 			// 4. notification has already been dismissed.
-			// 5. notification existed before installing WPCharitable.
+			// 5. notification existed before installing Charitable.
 			// (Prevents bombarding the user with notifications after activation).
 			if (
 				empty( $notification['content'] ) ||
@@ -274,6 +274,10 @@ class Charitable_Notifications {
 	 * @return array
 	 */
 	public function get() {
+
+		if ( ! defined( 'CHARITABLE_ENABLE_NOTIFICATIONS' ) || ! CHARITABLE_ENABLE_NOTIFICATIONS ) {
+			return [];
+		}
 
 		if ( ! $this->has_access() ) {
 			return [];
@@ -551,6 +555,10 @@ class Charitable_Notifications {
 	 */
 	public function output( $location = false ) {
 
+		if ( ! defined( 'CHARITABLE_ENABLE_NOTIFICATIONS' ) || ! CHARITABLE_ENABLE_NOTIFICATIONS ) {
+			return;
+		}
+
 		global $post;
 
 		if ( 'notices' === $location && ! $this->show_notifications() ) {
@@ -822,10 +830,10 @@ class Charitable_Notifications {
 		if ( isset( $_GET['taxonomy'] ) ) {
 			return false;
 		}
-		if ( isset( $_GET['post_type'] ) && $_GET['post_type'] == 'campaign' ) {
+		if ( isset( $_GET['post_type'] ) && sanitize_text_field( $_GET['post_type'] ) === 'campaign' ) {
 			return true;
 		}
-		if ( isset( $_GET['post_type'] ) && $_GET['post_type'] == 'donation' ) {
+		if ( isset( $_GET['post_type'] ) && sanitize_text_field( $_GET['post_type'] ) === 'donation' ) {
 			return true;
 		}
 		return false;

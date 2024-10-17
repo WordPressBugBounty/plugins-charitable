@@ -131,7 +131,7 @@ $array_to_return = array(
 	'Wp_Session_Utils'                               => 'libraries/wp-session/class-wp-session-utils.php',
 	'Wp_Session'                                     => 'libraries/wp-session/class-wp-session.php',
 	'Charitable_Licenses'                            => 'licensing/class-charitable-licenses.php',
-	'Charitable_Plugin_Updater'                      => 'licensing/class-charitable-plugin-updater.php',
+	'Charitable_Checker'                             => 'licensing/class-charitable-checker.php',
 	'Charitable_i18n'                                => 'locale/class-charitable-i18n.php',
 	'Charitable_Locale'                              => 'locale/class-charitable-locale.php',
 	'Charitable_Locations'                           => 'locale/class-charitable-locations.php',
@@ -205,6 +205,8 @@ $array_to_return = array(
 	'Charitable_Intergrations_SMTP'                  => 'admin/intergrations/class-charitable-intergrations-smtp.php', // v1.8.1.8.
 	'Charitable_Onboarding'                          => 'admin/onboarding/class-charitable-onboarding.php', // v1.8.1.12.
 	'Charitable_Admin_Getting_Started'               => 'admin/class-charitable-admin-getting-started.php', // v1.8.1.12.
+	'Charitable_Checklist'                           => 'admin/onboarding/class-charitable-checklist.php', // v1.8.1.15.
+	'Charitable_Donate_Button_Shortcode'             => 'shortcodes/class-charitable-donate-button-shortcode.php', // v1.8.2.
 );
 
 return $array_to_return;

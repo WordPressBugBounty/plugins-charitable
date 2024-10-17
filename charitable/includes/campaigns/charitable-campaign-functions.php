@@ -295,3 +295,157 @@ function charitable_get_admin_donation_edit_url( $donation_id = false ) {
 
 	return $admin_donation_edit_url;
 }
+
+/**
+ * Find the photo in the (v2) campaign settings.
+ *
+ * @since 1.8.2
+ *
+ * @param  array $campaign_settings The campaign settings.
+ *
+ * @return mixed
+ */
+function charitable_find_photo_in_campaign_settings( $campaign_settings ) {
+
+	$layout = isset( $campaign_settings['layout'] ) ? $campaign_settings['layout'] : false;
+
+	if ( ! $layout ) {
+		return false;
+	}
+
+	$found_row_id   = -1;
+	$found_field_id = -1;
+
+	foreach ( $layout['rows'] as $row_id => $layout_row ) {
+		$found_row_id = $row_id;
+		if ( ! empty( $layout_row['fields'] ) ) {
+			foreach ( $layout_row['fields'] as $field_id => $layout_field_type ) {
+				if ( $layout_field_type === 'photo' ) {
+					$found_field_id = $field_id;
+					break;
+				}
+			}
+		}
+	}
+
+	if ( $found_field_id < 0 || $found_row_id < 0 ) {
+		return false;
+	}
+
+	$found_field_id = apply_filters( 'charitable_campaign_photo_field_id', $found_field_id, $campaign_settings );
+
+	// get file url.
+	$file_url = ! empty( $campaign_settings['fields'][ $found_field_id ] ) ? ( $campaign_settings['fields'][ $found_field_id ] ) : false;
+	$media_id = chartitable_get_image_attached_id_from_url( $file_url['file'] );
+
+	return array(
+		'file'     => $file_url['file'],
+		'media_id' => $media_id,
+	);
+}
+
+/**
+ * Charitable's function to get the attachment ID from the image URL.
+ * To be used sparingly, and likely only in the context of the campaign builder. Cache the results to be planned.
+ *
+ * @since 1.8.2
+ *
+ * @param  string $image_url The image URL.
+ *
+ * @return mixed
+ */
+function chartitable_get_image_attached_id_from_url( $image_url = false ) {
+	global $wpdb;
+	if ( ! $image_url ) {
+		return false;
+	}
+	$attachment = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE guid='%s';", $image_url ) );
+	if ( ! empty( $attachment[0] ) ) {
+		return $attachment[0];
+	}
+	return false;
+}
+
+/**
+ * Find the description in the (v2) campaign settings.
+ *
+ * @since  1.8.2
+ *
+ * @param  array $campaign_settings The campaign settings.
+ * @param  int   $description_limit The description limit.
+ *
+ * @return string
+ */
+function charitable_find_description_in_campaign_settings( $campaign_settings = false, $description_limit = 0 ) {
+
+	if ( ! $campaign_settings ) {
+		return false;
+	}
+
+	$layout = isset( $campaign_settings['layout'] ) ? $campaign_settings['layout'] : false;
+
+	if ( ! $layout ) {
+		return false;
+	}
+
+	$description    = '';
+	$found_row_id   = -1;
+	$found_field_id = -1;
+
+	foreach ( $layout['rows'] as $row_id => $layout_row ) {
+		$found_row_id = (int) $row_id;
+		if ( ! empty( $layout_row['fields'] ) ) {
+			foreach ( $layout_row['fields'] as $field_id => $layout_field_type ) {
+				if ( $layout_field_type === 'campaign-description' ) {
+					$found_field_id = (int) $field_id;
+					break;
+				}
+			}
+		}
+	}
+
+	$found_field_id = apply_filters( 'charitable_campaign_description_field_id', $found_field_id, $campaign_settings );
+
+	if ( $found_field_id >= 0 && $found_row_id >= 0 ) {
+		$description = ! empty( $campaign_settings['fields'][ $found_field_id ] ) && ! empty( $campaign_settings['fields'][ $found_field_id ]['content'] ) ? ( $campaign_settings['fields'][ $found_field_id ]['content'] ) : false;
+	}
+
+	// limit the description if the value is greater than 0.
+	// add the "..." if the description is longer than the limit.
+	if ( false !== $description && '' !== trim( $description ) && $description_limit > 0 ) {
+		$description = wp_trim_words( $description, $description_limit, '...' );
+	}
+
+	if ( $description ) {
+		return $description;
+	}
+
+	$found_row_id   = -1;
+	$found_field_id = -1;
+
+	foreach ( $layout['rows'] as $row_id => $layout_row ) {
+		$found_row_id = $row_id;
+		if ( ! empty( $layout_row['fields'] ) ) {
+			foreach ( $layout_row['fields'] as $field_id => $layout_field_type ) {
+				if ( $layout_field_type === 'text' ) {
+					$found_field_id = (int) $field_id;
+					break;
+				}
+			}
+		}
+	}
+
+	if ( $found_field_id < 0 || $found_row_id < 0 ) {
+		return false;
+	}
+
+	$description = ! empty( $campaign_settings['fields'][ $found_field_id ] ) ? ( $campaign_settings['fields'][ $found_field_id ]['content'] ) : false;
+
+	// limit the description if the value is greater than 0.
+	// add the "..." if the description is longer than the limit.
+	if ( false !== $description && '' !== trim( $description ) && $description_limit > 0 ) {
+		$description = wp_trim_words( $description, $description_limit, '...' );
+	}
+
+	return apply_filters( 'charitable_campaign_settings_description', $description, $campaign_settings );
+}

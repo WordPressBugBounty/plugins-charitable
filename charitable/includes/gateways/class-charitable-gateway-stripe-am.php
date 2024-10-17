@@ -338,6 +338,15 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 			return $this->check_keys_exist( 'live' ) || $this->check_keys_exist( 'test' );
 		}
 
+		/**
+		 * Get connection status content.
+		 *
+		 * @since 1.8.1.12
+		 *
+		 * @param bool $force_test_mode Whether to force test mode.
+		 *
+		 * @return bool
+		 */
 		public function get_connection_status_content( $force_test_mode = false ) {
 
 			if ( charitable_get_option( 'test_mode' ) || $force_test_mode ) {
@@ -374,6 +383,14 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 			return $html;
 		}
 
+		/**
+		 * Generate the Stripe Connect button.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @param string $redirect_url The URL to redirect to after connecting.
+		 * @return string
+		 */
 		public function get_stripe_connect_button( $redirect_url = '' ) {
 
 			$url = $this->get_stripe_connect_url( $redirect_url );
@@ -426,6 +443,14 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 			return ob_get_clean();
 		}
 
+		/**
+		 * Get the URL to connect to Stripe.
+		 *
+		 * @since 1.8.0
+		 *
+		 * @param string $redirect_url The URL to redirect to after connecting.
+		 * @return string
+		 */
 		public function get_stripe_connect_url( $redirect_url = '' ) {
 			if ( empty( $redirect_url ) ) {
 
@@ -450,6 +475,13 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 			);
 		}
 
+		/**
+		 * Get the URL to disconnect from Stripe.
+		 *
+		 * @since 1.8.0
+		 *
+		 * @return string
+		 */
 		public function get_stripe_disconnect_url() {
 			return add_query_arg(
 				array(
@@ -500,6 +532,13 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 			return $keys;
 		}
 
+		/**
+		 * Check if Stripe keys exist.
+		 *
+		 * @since  1.7.0
+		 * @param  string $mode The mode to check for keys.
+		 * @return boolean
+		 */
 		public function check_keys_exist( $mode ) {
 
 			$secret_key      = trim( $this->get_value( $mode . '_secret_key' ) );

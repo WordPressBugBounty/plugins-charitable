@@ -14,11 +14,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-
 charitable_get_system_info()->display();
-
-
-
-
 
 ?>

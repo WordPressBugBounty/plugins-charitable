@@ -104,6 +104,20 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 
 		</ul>
 
+
+			<?php
+
+			$display_tour_divs = Charitable_Campaign_Builder::get_instance()->display_tour_divs();
+
+			if ( $display_tour_divs ) :
+				?>
+
+				<div id="charitable-tour-block-1" class="charitable-tour-block"></div>
+				<div id="charitable-tour-block-2" class="charitable-tour-block"></div>
+				<div id="charitable-tour-block-3" class="charitable-tour-block"></div>
+
+			<?php endif; ?>
+
 		<div class="charitable-add-fields charitable-tab-content">
 			<?php do_action( 'charitable_builder_fields', $this->campaign_data ); ?>
 		</div>
@@ -719,7 +733,8 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 								</div>
 							</div>
 							<!-- end rows -->
-						</div> <!-- end group --> */?>
+						</div> <!-- end group --> */
+						?>
 
 						<?php
 					}

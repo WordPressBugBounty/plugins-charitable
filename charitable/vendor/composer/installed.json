@@ -62,6 +62,29 @@
                 "source": "https://github.com/stripe/stripe-php/tree/v9.0.0"
             },
             "install-path": "../stripe/stripe-php"
+        },
+        {
+            "name": "wpcharitable/charitable-licenses",
+            "version": "1.0.0",
+            "version_normalized": "1.0.0.0",
+            "dist": {
+                "type": "path",
+                "url": "custom-packages/charitable-licenses",
+                "reference": "d44b2dea0c544183b9ba09ab0c13bacdcb90e571"
+            },
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "CharitableLicenses\\": "src/",
+                    "CharitablePluginUpdater\\": "src/"
+                }
+            },
+            "transport-options": {
+                "symlink": false,
+                "relative": true
+            },
+            "install-path": "../wpcharitable/charitable-licenses"
         }
     ],
     "dev": true,

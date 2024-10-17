@@ -1291,9 +1291,21 @@ div.charitable-form.charitable-processing .charitable-loading-spinner {
 }
 .widefat.charitable-campaign-suggested-donations th.default_amount-col {
   width: 150px;
+  line-height: normal;
+  min-width: 75px;
+  text-align: center;
+}
+.widefat.charitable-campaign-suggested-donations th.default_amount-col a {
+  display: block;
+  margin: 4px auto 0 auto;
+  font-size: 11px;
 }
 .widefat.charitable-campaign-suggested-donations th.amount-col {
   width: 200px;
+}
+.widefat.charitable-campaign-suggested-donations td.default_amount-col input {
+  margin-left: auto;
+  margin-right: auto;
 }
 .widefat.charitable-campaign-suggested-donations td.description-col input {
   width: 100%;
@@ -1309,6 +1321,19 @@ div.charitable-form.charitable-processing .charitable-loading-spinner {
   margin: 0px 0 15px 0;
   display: inline-block;
   width: auto;
+}
+.widefat.charitable-campaign-suggested-donations a.charitable-clear-defaults {
+  color: black;
+  opacity: 0.5;
+  margin: 0 0 0 15px;
+  font-size: 13px;
+  list-style: 13px;
+  text-decoration: none;
+  display: inline-block;
+  width: auto;
+}
+.widefat.charitable-campaign-suggested-donations a.charitable-clear-defaults:hover {
+  text-decoration: underline;
 }
 .widefat .remove-col span {
   cursor: pointer;

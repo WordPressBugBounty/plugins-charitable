@@ -9,13 +9,30 @@
  * @since     1.0.0
  * @version   1.6.38
  * @version   1.8.0
- * @version   1.8.1.10
+ * @version   1.8.1.10 - Cleanup
+ * @version   1.8.2 - Add Stripe Warning
  */
 
 $helper   = charitable_get_helper( 'gateways' );
 $gateways = $helper->get_available_gateways();
 $default  = $helper->get_default_gateway();
 $upgrades = $helper->get_recommended_gateways();
+
+// Add a warning message here if Stripe is an enabled gateway, but no keys are found.
+
+if ( class_exists( 'Charitable_Gateway_Stripe_AM' ) ) {
+
+	if ( ( ! defined( 'CHARITABLE_DISABLE_STRIPE_KEY_CHECK' ) || ! CHARITABLE_DISABLE_STRIPE_KEY_CHECK ) && is_array( $gateways ) && ! empty( $gateways ) && in_array( 'Charitable_Gateway_Stripe_AM', $gateways, true ) && $helper->is_active_gateway( 'Charitable_Gateway_Stripe_AM' ) ) {
+		$stripe_gateway = new Charitable_Gateway_Stripe_AM();
+		$stripe_keys    = $stripe_gateway->get_keys();
+
+		if ( ! isset( $stripe_keys['public_key'] ) || empty( $stripe_keys['public_key'] ) ) {
+			// Display the warning message HTML.
+			echo '<div class="charitable-settings-notice charitable-stripe-key-notice"> ' . ( sprintf( __( '<strong>Note:</strong> Stripe is enabled but it does not appear to be connected or API keys are missing. <a href="%s">Confirm Stripe settings to keep using this gateway</a>.', 'charitable' ), admin_url( 'admin.php?page=charitable-settings&tab=gateways&group=gateways_stripe' ) ) ) . '</div>';
+		}
+
+	}
+}
 
 foreach ( $gateways as $gateway ) :
 

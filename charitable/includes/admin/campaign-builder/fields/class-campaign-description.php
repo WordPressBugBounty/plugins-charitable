@@ -56,7 +56,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Description' ) ) :
 
 			// Misc.
 			$this->tooltip                 = esc_html__( 'Placeholder tool tip', 'charitable' );
-			$this->preview_character_limit = 550;
+			$this->preview_character_limit = 99550;
 
 			// Define additional field properties.
 			add_action( 'charitable_frontend_js', [ $this, 'frontend_js' ] );
@@ -100,9 +100,12 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Description' ) ) :
 
 			if ( '' !== $campaign_description ) {
 
+				// Adjust the character limit - no character limit for the campaign description on the frontend. Limit for admin preview only.
+				$preview_character_limit = $mode === 'template' ? $this->preview_character_limit : strlen( $campaign_description );
+
 				$field_preview_html .= wpautop(
 					wp_kses(
-						strlen( $campaign_description ) > $this->preview_character_limit ? substr( $campaign_description, 0, $this->preview_character_limit ) . '...' : $campaign_description,
+						strlen( $campaign_description ) > $preview_character_limit ? substr( $campaign_description, 0, $this->preview_character_limit ) . '...' : $campaign_description,
 						[
 							'strong' => [],
 							'em'     => [],
@@ -185,6 +188,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Description' ) ) :
 		 * The display on the form settings backend when the user clicks on the field/block.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.2
 		 *
 		 * @param array $field_id Field ID.
 		 * @param array $campaign_data  Campaign data and settings.

@@ -130,6 +130,7 @@ add_action( 'charitable_recurring_donation_status_changed', 'charitable_update_c
  * Upon security check failure, update the total number of errors to allow a notice to be displayed.
  *
  * @see Charitable_Donation_Notice::update_security_check_error_total
+ * @see Charitable_Donation_Notice::get_dashboard_notices
  */
 add_filter( 'charitable_validate_donation_form_submission_security_check', array( Charitable_Donation_Notices::get_instance(), 'update_security_check_error_total' ), 10, 2 );
-add_filter( 'charitable_dashboard_notices', array( Charitable_Donation_Notices::get_instance(), 'get_dashboard_notices' ), 10 );
+add_filter( 'charitable_admin_dashboard_init_end', array( Charitable_Donation_Notices::get_instance(), 'get_dashboard_notices' ), 10 );

@@ -99,7 +99,6 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 					'gateways' => __( 'Payment Gateways', 'charitable' ),
 					'emails'   => __( 'Emails', 'charitable' ),
 					'privacy'  => __( 'Privacy', 'charitable' ),
-					// 'tools'    => __( 'Tools', 'charitable' ),
 					'advanced' => __( 'Advanced', 'charitable' ),
 				)
 			);

@@ -10,7 +10,7 @@ body div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-default {
 #charitable-welcome {
   border-top: 3px solid #e27730;
   color: #555;
-  padding-top: 110px;
+  padding-top: 80px;
 }
 #charitable-welcome .container {
   margin: 0 auto;
@@ -143,6 +143,47 @@ body div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-default {
   content: " ";
   display: table;
 }
+#charitable-welcome .charitable-checklist-section {
+  border-radius: 2px;
+  box-shadow: 0 0 50px 0 rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  background: #444 url("../images/onboarding/checklist/getting-started.png") center right 20px no-repeat;
+  background-size: contain;
+}
+#charitable-welcome .charitable-checklist-section .block {
+  padding: 40px;
+  max-width: 420px;
+}
+#charitable-welcome .charitable-checklist-section h1 {
+  color: #ffffff;
+  text-align: left;
+  margin: 20px 0 22px;
+}
+#charitable-welcome .charitable-checklist-section h6 {
+  font-size: 17px;
+  font-weight: 400;
+  text-align: left;
+  color: #cccccc;
+  margin: 0 0 34px;
+}
+#charitable-welcome .charitable-checklist-section .button-wrap a {
+  background-color: #e27730;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 28px;
+  position: relative;
+  top: -4px;
+  text-decoration: none;
+  border-radius: 5px;
+  text-shadow: none;
+  line-height: 24px;
+  cursor: pointer;
+  margin-left: auto;
+  margin-right: auto;
+  display: inline-block;
+  text-align: center;
+}
 #charitable-welcome .charitable-features {
   background-color: #fff;
   border: 2px solid #e1e1e1;
@@ -194,16 +235,18 @@ body div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-default {
   text-align: center;
   display: flex;
 }
-#charitable-welcome .charitable-upgrade-cta .block {
-  display: flex;
-  flex-direction: row;
-}
 #charitable-welcome .charitable-upgrade-cta {
   background-color: #000;
   border: 2px solid #e1e1e1;
+  margin: 40px auto;
   border-top: 0;
   border-bottom: 0;
   color: #fff;
+}
+#charitable-welcome .charitable-upgrade-cta .block {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 #charitable-welcome .charitable-upgrade-cta h2 {
   color: #fff;
@@ -230,17 +273,18 @@ body div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-default {
 #charitable-welcome .charitable-upgrade-cta ul li .dashicons {
   color: #008a20;
 }
+#charitable-welcome .charitable-upgrade-cta .left {
+  max-width: 470px;
+}
 #charitable-welcome .charitable-upgrade-cta .right {
   text-align: center;
 }
 #charitable-welcome .charitable-upgrade-cta .right h2 {
   text-align: center;
-  margin: 0;
-}
-#charitable-welcome .charitable-upgrade-cta .right h2 span {
-  display: inline-block;
-  border-bottom: 1px solid #555;
-  padding: 0 15px 12px;
+  margin: 0 span;
+  margin-display: inline-block;
+  margin-border-bottom: 1px solid #555;
+  margin-padding: 0 15px 12px;
 }
 #charitable-welcome .charitable-upgrade-cta .right .price {
   padding: 26px 0;
@@ -261,6 +305,25 @@ body div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-default {
 #charitable-welcome .charitable-upgrade-cta .right .price .term {
   font-size: 12px;
   display: inline-block;
+}
+#charitable-welcome .charitable-upgrade-cta .right a {
+  background-color: #e27730;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 28px;
+  position: relative;
+  top: -4px;
+  text-decoration: none;
+  border-radius: 5px;
+  text-shadow: none;
+  line-height: 24px;
+  cursor: pointer;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  max-width: 80%;
+  text-align: center;
 }
 #charitable-welcome .testimonials {
   background-color: #fff;

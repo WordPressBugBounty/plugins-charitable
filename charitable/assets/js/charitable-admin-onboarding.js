@@ -40,57 +40,7 @@ var CharitableOnboarding = window.CharitableOnboarding || (function (document, w
             //     return;
             // }
 
-            // wpchar.debug('charitable_reporting');
-            // wpchar.debug(charitable_reporting);
-
             $checklist = $('#charitable-setup-checklist');
-
-            // $reports = $('#charitable-reports');
-
-            // if ( $reports.length === 0 ) {
-            //     return;
-            // }
-
-            // // UI elements.
-            // elements.$start_datepicker       = $( '#charitable-reports-start_date' );
-            // elements.$end_datepicker         = $( '#charitable-reports-end_date' );
-            // elements.$filter_button          = $( '#charitable-reports-filter-button');
-            // elements.$report_campaign_filter = $('#report-campaign-filter');
-            // elements.$report_category_filter = $('#report-category-filter');
-
-            // // Data containers.
-            // elements.$top_donation_amount                = $('#charitable-top-donation-total-amount');
-            // elements.$top_donation_count                 = $('#charitable-top-donation-total-count');
-            // elements.$top_donation_average               = $('#charitable-top-donation-average');
-            // elements.$top_donation_donors_count          = $('#charitable-top-donor-count');
-            // elements.$top_charitable_refund_total_amount = $('#charitable-top-refund-total-amount');
-            // elements.$top_charitable_refund_count        = $('#charitable-top-refund-count');
-            // elements.$top_donors_list                    = $('#charitable-top-donors-list');
-            // elements.$donations_breakdown_list           = $('#donations-breakdown-list');
-            // elements.$payment_methods_list               = $('ul#charitable-payment-methods-list');
-            // elements.$activity_list                      = $('#charitable-activity-list');
-            // elements.$top_campaigns_list                 = $('#charitable-top-campaigns-list');
-            // elements.$report_date_range_filter           = $('#report-date-range-filter');
-            // elements.$topnav_datepicker                  = $('#charitable-reports-topnav-datepicker');
-            // elements.$topnav_datepicker_comparefrom      = $('#charitable-reports-topnav-datepicker-comparefrom-lybunt');
-            // elements.$topnav_datepicker_compareto        = $('#charitable-reports-topnav-datepicker-compareto-lybunt');
-
-            // s.datePickerStartDate = '';
-            // s.datePickerEndDate   = '';
-
-            // s.datePickerCompareFromStartDate = '';
-            // s.datePickerCompareFromEndDate   = '';
-            // s.datePickerCompareToStartDate   = '';
-            // s.datePickerCompareToEndDate     = '';
-
-
-            // if ( app.isAdvancedPage() ) {
-            //     app.initDatePickerRanges( 'ranged' );
-            // } else {
-            //     app.initDatePickerRanges( '' );
-            // }
-
-            // app.initDatePicker();
 
             // Bind all actions.
             app.bindUIActions();
@@ -109,6 +59,22 @@ var CharitableOnboarding = window.CharitableOnboarding || (function (document, w
                 // remove the focus from the button.
                 $(this).blur();
                 app.fieldSectionToggle($(this), 'click');
+            });
+
+            $checklist.on('click', '.charitable-toggle-optin-allow', function (e) {
+                e.preventDefault();
+                // remove the focus from the button.
+                $(this).blur();
+                var $this = $(this),
+                    $toggleGroup = $('.charitable-checklist-allow'),
+                    $icon = $this.find('i');
+                $icon.toggleClass('charitable-angle-right');
+                $toggleGroup.stop().slideToggle('', function () {
+                    $toggleGroup.toggleClass('charitable-closed');
+                    if ($toggleGroup.hasClass('charitable-closed')) {
+                        $toggleGroup.removeClass('charitable-open');
+                    }
+                });
             });
 
             $checklist.on('click', '#wpchar-no-stripe', function (e) {
