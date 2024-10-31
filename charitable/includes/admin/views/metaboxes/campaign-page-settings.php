@@ -18,7 +18,7 @@ $_campaign_donate_button_text = trim( $_campaign_donate_button_text ) === '' ? f
 
 ?>
 <div id="charitable-campaign-page-settings-metabox-wrap" class="charitable-metaboxx-wrap">
-	<h4 style="margin-top: 0;"><?php _e( 'Hide Information', 'charitable' ); ?></h4>
+	<h4 style="margin-top: 0;"><?php echo esc_html__( 'Hide Information', 'charitable' ); ?></h4>
 	<div class="charitable-metabox" style="width: 100%">
 		<?php
 
@@ -34,7 +34,7 @@ $_campaign_donate_button_text = trim( $_campaign_donate_button_text ) === '' ? f
 				<?php
 				$checked = ( false !== $meta_field && is_countable( $meta_field ) && count( $meta_field ) > 0 && in_array( 'hide_' . $santitized_field, $meta_field, true ) ) ? 'checked="checked"' : false;
 				?>
-				<li><input type="checkbox" <?php echo $checked; ?> name="_campaign_hide_<?php echo $santitized_field; ?>[]" value="hide_<?php echo $santitized_field; ?>" id="_campaign_hide_<?php echo $santitized_field; ?>_<?php echo $santitized_field; ?>" /><label for="_campaign_hide_<?php echo $santitized_field; ?>_<?php echo $santitized_field; ?>"><?php _e( $field ); ?></label></li>
+				<li><input type="checkbox" <?php echo esc_attr( $checked ); ?> name="_campaign_hide_<?php echo esc_attr( $santitized_field ); ?>[]" value="hide_<?php echo esc_attr( $santitized_field ); ?>" id="_campaign_hide_<?php echo esc_attr( $santitized_field ); ?>_<?php echo esc_attr( $santitized_field ); ?>" /><label for="_campaign_hide_<?php echo esc_attr( $santitized_field ); ?>_<?php echo esc_attr( $santitized_field ); ?>"><?php echo esc_html( $field ); ?></label></li>
 		</ul>
 		</div>
 		<?php endforeach; ?>
@@ -43,9 +43,9 @@ $_campaign_donate_button_text = trim( $_campaign_donate_button_text ) === '' ? f
 </div>
 
 <div id="charitable-campaign-min-donation-metabox-wrap" class="charitable-metabox-wrap">
-	<h4><?php _e( 'Donation Button Text:', 'charitable' ); ?></h4>
-	<label class="screen-reader-text" for="campaign_minimum_donation_amount"><?php _e( 'Donate', 'charitable' ); ?></label>
-	<input type="text" id="campaign_donate_button_text" name="_campaign_donate_button_text"  placeholder="<?php _e( 'Donate' ); ?>" value="<?php echo esc_html( $_campaign_donate_button_text ); ?>" />
+	<h4><?php echo esc_html__( 'Donation Button Text:', 'charitable' ); ?></h4>
+	<label class="screen-reader-text" for="campaign_minimum_donation_amount"><?php echo esc_html__( 'Donate', 'charitable' ); ?></label>
+	<input type="text" id="campaign_donate_button_text" name="_campaign_donate_button_text"  placeholder="<?php echo esc_html__( 'Donate', 'charitable' ); ?>" value="<?php echo esc_html( $_campaign_donate_button_text ); ?>" />
 	<?php echo $description; ?>
 </div>
 

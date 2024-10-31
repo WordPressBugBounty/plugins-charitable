@@ -48,11 +48,23 @@ if ( ! class_exists( 'Charitable_Campaigns_Shortcode' ) ) :
 				'button'            => 'donate',
 				'responsive'        => 1,
 				'masonry'           => 0,
-				'description_limit' => 0,
-				'shortcode'			=> 'campaigns',
+				'description_limit' => 100,
+				'shortcode'         => 'campaigns',
 			);
 
-			$args              = shortcode_atts( $default, $atts, 'campaigns' );
+			$args = shortcode_atts( $default, $atts, 'campaigns' );
+
+			/**
+			 * Modify the arguments passed to the campaigns shortcode.
+			 *
+			 * As an example, Ambassadors extension can add 'fundraiser_type' to the shortcode_atts which is used to filter campaigns by fundraiser type.
+			 *
+			 * @since 1.8.3
+			 *
+			 * @param array $args The arguments passed to the shortcode.
+			 */
+			$args = apply_filters( 'charitable_campaigns_shortcode_atts', $args );
+
 			$args['campaigns'] = self::get_campaigns( $args );
 
 			/**

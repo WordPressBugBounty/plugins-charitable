@@ -241,7 +241,7 @@ if ( ! class_exists( 'Charitable_Stripe_Payment_Intent' ) ) :
 		 */
 		public static function ajax_update() {
 			if ( ! array_key_exists( 'amount', $_POST ) ) {
-				wp_send_json_error( __( 'Missing amount in request.', 'charitable-stripe' ) );
+				wp_send_json_error( __( 'Missing amount in request.', 'charitable' ) );
 			}
 
 			if ( 0 == $_POST['amount'] ) {

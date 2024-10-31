@@ -306,10 +306,17 @@ function charitable_is_admin_debug() {
  * Returns if charitable is in debug mode, mostly by checking the constant.
  *
  * @since  1.8.0
+ * @since  1.8.3 Added 'vendor' mode.
+ *
+ * @param string $mode Optional. 'vendor' to check for vendor debug mode.
  *
  * @return boolean
  */
-function charitable_is_debug() {
+function charitable_is_debug( $mode = '' ) {
+
+	if ( 'vendor' === $mode ) {
+		return ( defined( 'CHARITABLE_DEBUG_VENDOR' ) && CHARITABLE_DEBUG_VENDOR ) ? true : false;
+	}
 
 	return ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) ? true : false;
 }
@@ -809,7 +816,6 @@ function charitable_get_charitable_screens() {
 			'charitable_page_charitable-growth-tools',
 			'edit-campaign',
 			'edit-donation',
-			//'dashboard',
 			'toplevel_page_charitable',
 			'charitable_page_charitable-addons',
 			'charitable_page_charitable-setup-checklist',
@@ -817,3 +823,23 @@ function charitable_get_charitable_screens() {
 	);
 }
 
+/**
+ * Determines if it's ok to show plugin notifications when the dashboard page is visited.
+ * Shouldn't do it every time, so we limit it.
+ *
+ * Returns true to show the notifications, false to not auto show them.
+ *
+ * @since  1.8.3
+ *
+ * @return bool
+ */
+function charitable_get_autoshow_plugin_notifications() {
+
+	if ( false === ( $autoshow_plugin = get_transient( 'charitable_autoshow_plugin_notifications' ) ) ) {
+		// It wasn't there, so regenerate the data and save the transient.
+		set_transient( 'charitable_autoshow_plugin_notifications', true, 60 * 60 ); // one hour.
+		return true;
+	} else {
+		return false;
+	}
+}

@@ -1,4 +1,12 @@
 <?php
+/**
+ * Charitable Admin Getting Started.
+ *
+ * @package Charitable/Classes/Charitable_Admin_Getting_Started
+ * @since 1.8.1.15
+ * @version 1.8.1.15
+ * @category Class
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -69,7 +77,7 @@ class Charitable_Admin_Getting_Started {
 	 */
 	public function enqueues() {
 
-		$min            = ''; // charitable_get_min_suffix();
+		$min            = charitable_get_min_suffix();
 		$style_version  = charitable_get_style_version();
 		$script_version = charitable()->get_version();
 		$assets_dir     = charitable()->get_path( 'assets', false );
@@ -77,7 +85,7 @@ class Charitable_Admin_Getting_Started {
 
 		wp_enqueue_style(
 			'charitable-admin-getting-started',
-			charitable()->get_path( 'assets', false ) . "css/charitable-admin-getting-started{$min}.css",
+			charitable()->get_path( 'assets', false ) . "css/admin/charitable-admin-getting-started{$min}.css",
 			null,
 			$style_version
 		);
@@ -106,7 +114,7 @@ class Charitable_Admin_Getting_Started {
 
 		wp_register_script(
 			'charitable-admin-2.0',
-			$assets_dir . 'js/charitable-admin-2.0.js',
+			$assets_dir . 'js/admin/charitable-admin-2.0.js',
 			$dependencies,
 			$script_version,
 			false
@@ -151,7 +159,7 @@ class Charitable_Admin_Getting_Started {
 		add_dashboard_page(
 			esc_html__( 'Welcome to Charitable', 'charitable' ),
 			esc_html__( 'Welcome to Charitable', 'charitable' ),
-			'manage_charitable_settings',
+			'manage_charitable_settings', // phpcs:ignore
 			self::SLUG,
 			[ $this, 'output' ]
 		);
@@ -176,6 +184,7 @@ class Charitable_Admin_Getting_Started {
 	 * then we redirect the user to the appropriate page.
 	 *
 	 * @since 1.8.1.12
+	 * @version 1.8.3 tweak what is an initial install.
 	 */
 	public function redirect() {
 
@@ -198,9 +207,9 @@ class Charitable_Admin_Getting_Started {
 		}
 
 		// Check if this is an update or first install.
-		$upgrade = get_option( 'charitable_version_upgraded_from' );
+		$upgrade = get_option( 'charitable_version_upgraded_from', [] );
 
-		if ( ! $upgrade ) {
+		if ( ! $upgrade || 1 === count( $upgrade ) ) {
 			// Initial install.
 			wp_safe_redirect( admin_url( 'index.php?page=' . self::SLUG ) );
 			exit;
@@ -250,7 +259,7 @@ class Charitable_Admin_Getting_Started {
 					</div>
 
 					<a href="#" class="play-video" title="<?php esc_attr_e( 'Watch to learn more about Charitable', 'charitable' ); ?>">
-						<img src="<?php echo charitable()->get_path( 'assets', false ); ?>images/onboarding/getting-started/video-poster.jpg" width="100%" alt="<?php esc_attr_e( 'Watch how to create your first campaign', 'charitable' ); ?>" class="video-thumbnail">
+						<img src="<?php echo charitable()->get_path( 'assets', false ); // phpcs:ignore ?>images/onboarding/getting-started/video-poster.jpg" width="100%" alt="<?php esc_attr_e( 'Watch how to create your first campaign', 'charitable' ); ?>" class="video-thumbnail">
 					</a>
 
 					<div class="block">
@@ -284,7 +293,7 @@ class Charitable_Admin_Getting_Started {
 						<?php if ( $stripe_connect_url ) : ?>
 							<div class="charitable-sub-container charitable-connect-stripe">
 								<div>
-									<div class="charitable-gateway-icon"><img src="<?php echo charitable()->get_path( 'assets', false ); ?>/images/onboarding/stripe-checklist.svg" alt=""></div><div class="charitable-gateway-info-column"><h3><?php esc_html_e( 'Stripe', 'charitable' ); ?> <span class="charitable-badge charitable-badge-sm charitable-badge-inline charitable-badge-green charitable-badge-rounded"><i class="fa fa-star" aria-hidden="true"></i><?php esc_html_e( 'Recommended', 'charitable' ); ?></span></h3>
+									<div class="charitable-gateway-icon"><img src="<?php echo charitable()->get_path( 'assets', false ); // phpcs:ignore ?>/images/onboarding/stripe-checklist.svg" alt=""></div><div class="charitable-gateway-info-column"><h3><?php esc_html_e( 'Stripe', 'charitable' ); ?> <span class="charitable-badge charitable-badge-sm charitable-badge-inline charitable-badge-green charitable-badge-rounded"><i class="fa fa-star" aria-hidden="true"></i><?php esc_html_e( 'Recommended', 'charitable' ); ?></span></h3>
 										<?php if ( ! $stripe_connected ) : ?>
 											<p><?php esc_html_e( 'You can create and connect to your Stripe account in just a few minutes.', 'charitable' ); ?></p>
 										<?php else : ?>
@@ -305,7 +314,7 @@ class Charitable_Admin_Getting_Started {
 								<?php else : ?>
 
 								<div>
-									<a href="<?php echo admin_url( 'admin.php?page=charitable-settings&tab=gateways&group=gateways_stripe' ); ?>  " class="charitable-button-link charitable-button"><?php esc_html_e( 'Connected', 'charitable' ); ?></a>
+									<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-settings&tab=gateways&group=gateways_stripe' ) ); ?>  " class="charitable-button-link charitable-button"><?php esc_html_e( 'Connected', 'charitable' ); ?></a>
 								</div>
 
 								<?php endif; ?>
@@ -317,7 +326,8 @@ class Charitable_Admin_Getting_Started {
 
 								?>
 							<div class="charitable-gateway-footer">
-								<p><?php printf( __( '<strong>Stripe not available in your country?</strong> Charitable works with payment gateways like PayPal, Authorize.net, Braintree, Payrexx, PayUMoney, GoCardless, and others. <a target="_blank" href="%s">View additional payment options</a> available with PRO extensions.', 'charitable' ), admin_url( 'admin.php?page=charitable-addons' ) ); ?></p>
+								<?php // translators: %s is the URL. ?>
+								<p><?php printf( __( '<strong>Stripe not available in your country?</strong> Charitable works with payment gateways like PayPal, Authorize.net, Braintree, Payrexx, PayUMoney, GoCardless, and others. <a target="_blank" href="%s">View additional payment options</a> available with PRO extensions.', 'charitable' ), esc_url( admin_url( 'admin.php?page=charitable-addons' ) ) ); ?></p>
 							</div>
 							<?php endif; ?>
 						<?php endif; ?>
@@ -485,7 +495,7 @@ class Charitable_Admin_Getting_Started {
 						<h1><?php esc_html_e( 'Testimonials', 'charitable' ); ?></h1>
 
 						<div class="testimonial-block charitable-clear">
-							<img src="<?php echo charitable()->get_path( 'assets', false ); ?>/images/onboarding/getting-started/stephen-circle2x.jpg">
+							<img src="<?php echo charitable()->get_path( 'assets', false ); // phpcs:ignore ?>/images/onboarding/getting-started/stephen-circle2x.jpg">
 							<div class="testimonials-stars">
 								<div><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.776 4.454a.25.25 0 01.448 0l2.069 4.192a.25.25 0 00.188.137l4.626.672a.25.25 0 01.139.426l-3.348 3.263a.25.25 0 00-.072.222l.79 4.607a.25.25 0 01-.362.263l-4.138-2.175a.25.25 0 00-.232 0l-4.138 2.175a.25.25 0 01-.363-.263l.79-4.607a.25.25 0 00-.071-.222L4.754 9.881a.25.25 0 01.139-.426l4.626-.672a.25.25 0 00.188-.137l2.069-4.192z"></path></svg></div>
 								<div><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.776 4.454a.25.25 0 01.448 0l2.069 4.192a.25.25 0 00.188.137l4.626.672a.25.25 0 01.139.426l-3.348 3.263a.25.25 0 00-.072.222l.79 4.607a.25.25 0 01-.362.263l-4.138-2.175a.25.25 0 00-.232 0l-4.138 2.175a.25.25 0 01-.363-.263l.79-4.607a.25.25 0 00-.071-.222L4.754 9.881a.25.25 0 01.139-.426l4.626-.672a.25.25 0 00.188-.137l2.069-4.192z"></path></svg></div>
@@ -494,13 +504,13 @@ class Charitable_Admin_Getting_Started {
 								<div><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.776 4.454a.25.25 0 01.448 0l2.069 4.192a.25.25 0 00.188.137l4.626.672a.25.25 0 01.139.426l-3.348 3.263a.25.25 0 00-.072.222l.79 4.607a.25.25 0 01-.362.263l-4.138-2.175a.25.25 0 00-.232 0l-4.138 2.175a.25.25 0 01-.363-.263l.79-4.607a.25.25 0 00-.071-.222L4.754 9.881a.25.25 0 01.139-.426l4.626-.672a.25.25 0 00.188-.137l2.069-4.192z"></path></svg></div>
 							</div>
 							<p><?php esc_html_e( '"This plugin is exactly what our small, parent-run organization needed... Easy to set up. Easy to customize... and superior support! Thanks so much for this full-featured software.”', 'charitable' ); ?></p>
-							<p class="chartiable-cerified-user"><strong><?php esc_html_e( 'Stephen Weinberg' ); ?></strong> <svg xmlns="http://www.w3.org/2000/svg" width="105" height="22" viewBox="0 0 105 22" fill="none"><rect x="0.5" y="0.5" width="104" height="20.3636" rx="10.1818" stroke="#C4D6C6" stroke-linejoin="round"></rect><path d="M12.8364 17.3636L11.6273 15.3273L9.33636 14.8182L9.55909 12.4636L8 10.6818L9.55909 8.9L9.33636 6.54545L11.6273 6.03636L12.8364 4L15 4.92273L17.1636 4L18.3727 6.03636L20.6636 6.54545L20.4409 8.9L22 10.6818L20.4409 12.4636L20.6636 14.8182L18.3727 15.3273L17.1636 17.3636L15 16.4409L12.8364 17.3636ZM14.3318 12.9409L17.9273 9.34545L17.0364 8.42273L14.3318 11.1273L12.9636 9.79091L12.0727 10.6818L14.3318 12.9409Z" fill="#65AD27"></path><path d="M28.6155 13.6819L26.1405 7.17488H27.0855L28.6695 11.3329C28.8135 11.7019 28.9395 12.0709 29.0745 12.5569C29.2275 12.0439 29.3805 11.6119 29.4885 11.3239L31.0635 7.17488H31.9815L29.5335 13.6819H28.6155ZM37.3361 13.6819H33.3671V7.17488H37.3361V7.98488H34.2491V10.0189H37.0301V10.8019H34.2491V12.8629H37.3361V13.6819ZM40.0361 13.6819H39.1541V7.17488H41.6111C43.0061 7.17488 43.8341 7.91288 43.8341 9.12788C43.8341 10.0279 43.3841 10.6759 42.5741 10.9369L43.8971 13.6819H42.9161L41.7011 11.1079H40.0361V13.6819ZM40.0361 7.96688V10.3249H41.6201C42.4391 10.3249 42.9071 9.88388 42.9071 9.13688C42.9071 8.38088 42.4211 7.96688 41.6111 7.96688H40.0361ZM46.4648 7.17488V13.6819H45.5828V7.17488H46.4648ZM51.9602 10.9189H49.4042V13.6819H48.5222V7.17488H52.4462V7.98488H49.4042V10.1179H51.9602V10.9189ZM54.9364 7.17488V13.6819H54.0544V7.17488H54.9364ZM60.9628 13.6819H56.9938V7.17488H60.9628V7.98488H57.8758V10.0189H60.6568V10.8019H57.8758V12.8629H60.9628V13.6819ZM64.9319 13.6819H62.7809V7.17488H64.8959C66.8399 7.17488 68.1539 8.48888 68.1539 10.4329C68.1539 12.3679 66.8579 13.6819 64.9319 13.6819ZM64.8329 7.98488H63.6629V12.8629H64.8689C66.3179 12.8629 67.2359 11.9269 67.2359 10.4329C67.2359 8.92088 66.3179 7.98488 64.8329 7.98488ZM72.7719 11.3689V7.17488H73.6539V11.3149C73.6539 12.3589 74.2299 12.9349 75.2649 12.9349C76.2909 12.9349 76.8579 12.3499 76.8579 11.3149V7.17488H77.7489V11.3689C77.7489 12.8629 76.7949 13.7899 75.2649 13.7899C73.7259 13.7899 72.7719 12.8719 72.7719 11.3689ZM79.3774 8.92988C79.3774 7.81388 80.2774 7.05788 81.6184 7.05788C82.8604 7.05788 83.6614 7.75088 83.7334 8.87588H82.8424C82.7974 8.22788 82.3384 7.84988 81.6094 7.84988C80.7904 7.84988 80.2594 8.26388 80.2594 8.90288C80.2594 9.42488 80.5564 9.73988 81.1684 9.88388L82.2394 10.1359C83.3014 10.3789 83.8414 10.9549 83.8414 11.8729C83.8414 13.0429 82.9324 13.7899 81.5464 13.7899C80.2234 13.7899 79.3414 13.0969 79.2874 11.9809H80.1874C80.2054 12.6019 80.7274 12.9979 81.5464 12.9979C82.4104 12.9979 82.9594 12.5929 82.9594 11.9449C82.9594 11.4319 82.6804 11.1079 82.0594 10.9639L80.9884 10.7209C79.9264 10.4779 79.3774 9.86588 79.3774 8.92988ZM89.4587 13.6819H85.4897V7.17488H89.4587V7.98488H86.3717V10.0189H89.1527V10.8019H86.3717V12.8629H89.4587V13.6819ZM92.1588 13.6819H91.2768V7.17488H93.7338C95.1288 7.17488 95.9568 7.91288 95.9568 9.12788C95.9568 10.0279 95.5068 10.6759 94.6968 10.9369L96.0198 13.6819H95.0388L93.8238 11.1079H92.1588V13.6819ZM92.1588 7.96688V10.3249H93.7428C94.5618 10.3249 95.0298 9.88388 95.0298 9.13688C95.0298 8.38088 94.5438 7.96688 93.7338 7.96688H92.1588Z" fill="#1E1515"></path></svg></p>
+							<p class="chartiable-cerified-user"><strong><?php esc_html_e( 'Stephen Weinberg', 'charitable' ); ?></strong> <svg xmlns="http://www.w3.org/2000/svg" width="105" height="22" viewBox="0 0 105 22" fill="none"><rect x="0.5" y="0.5" width="104" height="20.3636" rx="10.1818" stroke="#C4D6C6" stroke-linejoin="round"></rect><path d="M12.8364 17.3636L11.6273 15.3273L9.33636 14.8182L9.55909 12.4636L8 10.6818L9.55909 8.9L9.33636 6.54545L11.6273 6.03636L12.8364 4L15 4.92273L17.1636 4L18.3727 6.03636L20.6636 6.54545L20.4409 8.9L22 10.6818L20.4409 12.4636L20.6636 14.8182L18.3727 15.3273L17.1636 17.3636L15 16.4409L12.8364 17.3636ZM14.3318 12.9409L17.9273 9.34545L17.0364 8.42273L14.3318 11.1273L12.9636 9.79091L12.0727 10.6818L14.3318 12.9409Z" fill="#65AD27"></path><path d="M28.6155 13.6819L26.1405 7.17488H27.0855L28.6695 11.3329C28.8135 11.7019 28.9395 12.0709 29.0745 12.5569C29.2275 12.0439 29.3805 11.6119 29.4885 11.3239L31.0635 7.17488H31.9815L29.5335 13.6819H28.6155ZM37.3361 13.6819H33.3671V7.17488H37.3361V7.98488H34.2491V10.0189H37.0301V10.8019H34.2491V12.8629H37.3361V13.6819ZM40.0361 13.6819H39.1541V7.17488H41.6111C43.0061 7.17488 43.8341 7.91288 43.8341 9.12788C43.8341 10.0279 43.3841 10.6759 42.5741 10.9369L43.8971 13.6819H42.9161L41.7011 11.1079H40.0361V13.6819ZM40.0361 7.96688V10.3249H41.6201C42.4391 10.3249 42.9071 9.88388 42.9071 9.13688C42.9071 8.38088 42.4211 7.96688 41.6111 7.96688H40.0361ZM46.4648 7.17488V13.6819H45.5828V7.17488H46.4648ZM51.9602 10.9189H49.4042V13.6819H48.5222V7.17488H52.4462V7.98488H49.4042V10.1179H51.9602V10.9189ZM54.9364 7.17488V13.6819H54.0544V7.17488H54.9364ZM60.9628 13.6819H56.9938V7.17488H60.9628V7.98488H57.8758V10.0189H60.6568V10.8019H57.8758V12.8629H60.9628V13.6819ZM64.9319 13.6819H62.7809V7.17488H64.8959C66.8399 7.17488 68.1539 8.48888 68.1539 10.4329C68.1539 12.3679 66.8579 13.6819 64.9319 13.6819ZM64.8329 7.98488H63.6629V12.8629H64.8689C66.3179 12.8629 67.2359 11.9269 67.2359 10.4329C67.2359 8.92088 66.3179 7.98488 64.8329 7.98488ZM72.7719 11.3689V7.17488H73.6539V11.3149C73.6539 12.3589 74.2299 12.9349 75.2649 12.9349C76.2909 12.9349 76.8579 12.3499 76.8579 11.3149V7.17488H77.7489V11.3689C77.7489 12.8629 76.7949 13.7899 75.2649 13.7899C73.7259 13.7899 72.7719 12.8719 72.7719 11.3689ZM79.3774 8.92988C79.3774 7.81388 80.2774 7.05788 81.6184 7.05788C82.8604 7.05788 83.6614 7.75088 83.7334 8.87588H82.8424C82.7974 8.22788 82.3384 7.84988 81.6094 7.84988C80.7904 7.84988 80.2594 8.26388 80.2594 8.90288C80.2594 9.42488 80.5564 9.73988 81.1684 9.88388L82.2394 10.1359C83.3014 10.3789 83.8414 10.9549 83.8414 11.8729C83.8414 13.0429 82.9324 13.7899 81.5464 13.7899C80.2234 13.7899 79.3414 13.0969 79.2874 11.9809H80.1874C80.2054 12.6019 80.7274 12.9979 81.5464 12.9979C82.4104 12.9979 82.9594 12.5929 82.9594 11.9449C82.9594 11.4319 82.6804 11.1079 82.0594 10.9639L80.9884 10.7209C79.9264 10.4779 79.3774 9.86588 79.3774 8.92988ZM89.4587 13.6819H85.4897V7.17488H89.4587V7.98488H86.3717V10.0189H89.1527V10.8019H86.3717V12.8629H89.4587V13.6819ZM92.1588 13.6819H91.2768V7.17488H93.7338C95.1288 7.17488 95.9568 7.91288 95.9568 9.12788C95.9568 10.0279 95.5068 10.6759 94.6968 10.9369L96.0198 13.6819H95.0388L93.8238 11.1079H92.1588V13.6819ZM92.1588 7.96688V10.3249H93.7428C94.5618 10.3249 95.0298 9.88388 95.0298 9.13688C95.0298 8.38088 94.5438 7.96688 93.7338 7.96688H92.1588Z" fill="#1E1515"></path></svg></p>
 						</div>
 
 
 
 						<div class="testimonial-block charitable-clear">
-						<img src="<?php echo charitable()->get_path( 'assets', false ); ?>/images/onboarding/getting-started/paul-circle2x.jpg" />
+						<img src="<?php echo charitable()->get_path( 'assets', false ); // phpcs:ignore ?>/images/onboarding/getting-started/paul-circle2x.jpg" />
 							<div class="testimonials-stars">
 								<div><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.776 4.454a.25.25 0 01.448 0l2.069 4.192a.25.25 0 00.188.137l4.626.672a.25.25 0 01.139.426l-3.348 3.263a.25.25 0 00-.072.222l.79 4.607a.25.25 0 01-.362.263l-4.138-2.175a.25.25 0 00-.232 0l-4.138 2.175a.25.25 0 01-.363-.263l.79-4.607a.25.25 0 00-.071-.222L4.754 9.881a.25.25 0 01.139-.426l4.626-.672a.25.25 0 00.188-.137l2.069-4.192z"></path></svg></div>
 								<div><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.776 4.454a.25.25 0 01.448 0l2.069 4.192a.25.25 0 00.188.137l4.626.672a.25.25 0 01.139.426l-3.348 3.263a.25.25 0 00-.072.222l.79 4.607a.25.25 0 01-.362.263l-4.138-2.175a.25.25 0 00-.232 0l-4.138 2.175a.25.25 0 01-.363-.263l.79-4.607a.25.25 0 00-.071-.222L4.754 9.881a.25.25 0 01.139-.426l4.626-.672a.25.25 0 00.188-.137l2.069-4.192z"></path></svg></div>
@@ -509,7 +519,7 @@ class Charitable_Admin_Getting_Started {
 								<div><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.776 4.454a.25.25 0 01.448 0l2.069 4.192a.25.25 0 00.188.137l4.626.672a.25.25 0 01.139.426l-3.348 3.263a.25.25 0 00-.072.222l.79 4.607a.25.25 0 01-.362.263l-4.138-2.175a.25.25 0 00-.232 0l-4.138 2.175a.25.25 0 01-.363-.263l.79-4.607a.25.25 0 00-.071-.222L4.754 9.881a.25.25 0 01.139-.426l4.626-.672a.25.25 0 00.188-.137l2.069-4.192z"></path></svg></div>
 							</div>
 							<p><?php esc_html_e( '"I would like to thank you both for making such a great tool at such a great cost. It’s literally 24 times cheaper than the platform we were using before I came on board."', 'charitable' ); ?></p>
-							<p class="chartiable-cerified-user"><strong><?php esc_html_e( 'Paul Lawley-Jones' ); ?></strong> <svg xmlns="http://www.w3.org/2000/svg" width="105" height="22" viewBox="0 0 105 22" fill="none"><rect x="0.5" y="0.5" width="104" height="20.3636" rx="10.1818" stroke="#C4D6C6" stroke-linejoin="round"></rect><path d="M12.8364 17.3636L11.6273 15.3273L9.33636 14.8182L9.55909 12.4636L8 10.6818L9.55909 8.9L9.33636 6.54545L11.6273 6.03636L12.8364 4L15 4.92273L17.1636 4L18.3727 6.03636L20.6636 6.54545L20.4409 8.9L22 10.6818L20.4409 12.4636L20.6636 14.8182L18.3727 15.3273L17.1636 17.3636L15 16.4409L12.8364 17.3636ZM14.3318 12.9409L17.9273 9.34545L17.0364 8.42273L14.3318 11.1273L12.9636 9.79091L12.0727 10.6818L14.3318 12.9409Z" fill="#65AD27"></path><path d="M28.6155 13.6819L26.1405 7.17488H27.0855L28.6695 11.3329C28.8135 11.7019 28.9395 12.0709 29.0745 12.5569C29.2275 12.0439 29.3805 11.6119 29.4885 11.3239L31.0635 7.17488H31.9815L29.5335 13.6819H28.6155ZM37.3361 13.6819H33.3671V7.17488H37.3361V7.98488H34.2491V10.0189H37.0301V10.8019H34.2491V12.8629H37.3361V13.6819ZM40.0361 13.6819H39.1541V7.17488H41.6111C43.0061 7.17488 43.8341 7.91288 43.8341 9.12788C43.8341 10.0279 43.3841 10.6759 42.5741 10.9369L43.8971 13.6819H42.9161L41.7011 11.1079H40.0361V13.6819ZM40.0361 7.96688V10.3249H41.6201C42.4391 10.3249 42.9071 9.88388 42.9071 9.13688C42.9071 8.38088 42.4211 7.96688 41.6111 7.96688H40.0361ZM46.4648 7.17488V13.6819H45.5828V7.17488H46.4648ZM51.9602 10.9189H49.4042V13.6819H48.5222V7.17488H52.4462V7.98488H49.4042V10.1179H51.9602V10.9189ZM54.9364 7.17488V13.6819H54.0544V7.17488H54.9364ZM60.9628 13.6819H56.9938V7.17488H60.9628V7.98488H57.8758V10.0189H60.6568V10.8019H57.8758V12.8629H60.9628V13.6819ZM64.9319 13.6819H62.7809V7.17488H64.8959C66.8399 7.17488 68.1539 8.48888 68.1539 10.4329C68.1539 12.3679 66.8579 13.6819 64.9319 13.6819ZM64.8329 7.98488H63.6629V12.8629H64.8689C66.3179 12.8629 67.2359 11.9269 67.2359 10.4329C67.2359 8.92088 66.3179 7.98488 64.8329 7.98488ZM72.7719 11.3689V7.17488H73.6539V11.3149C73.6539 12.3589 74.2299 12.9349 75.2649 12.9349C76.2909 12.9349 76.8579 12.3499 76.8579 11.3149V7.17488H77.7489V11.3689C77.7489 12.8629 76.7949 13.7899 75.2649 13.7899C73.7259 13.7899 72.7719 12.8719 72.7719 11.3689ZM79.3774 8.92988C79.3774 7.81388 80.2774 7.05788 81.6184 7.05788C82.8604 7.05788 83.6614 7.75088 83.7334 8.87588H82.8424C82.7974 8.22788 82.3384 7.84988 81.6094 7.84988C80.7904 7.84988 80.2594 8.26388 80.2594 8.90288C80.2594 9.42488 80.5564 9.73988 81.1684 9.88388L82.2394 10.1359C83.3014 10.3789 83.8414 10.9549 83.8414 11.8729C83.8414 13.0429 82.9324 13.7899 81.5464 13.7899C80.2234 13.7899 79.3414 13.0969 79.2874 11.9809H80.1874C80.2054 12.6019 80.7274 12.9979 81.5464 12.9979C82.4104 12.9979 82.9594 12.5929 82.9594 11.9449C82.9594 11.4319 82.6804 11.1079 82.0594 10.9639L80.9884 10.7209C79.9264 10.4779 79.3774 9.86588 79.3774 8.92988ZM89.4587 13.6819H85.4897V7.17488H89.4587V7.98488H86.3717V10.0189H89.1527V10.8019H86.3717V12.8629H89.4587V13.6819ZM92.1588 13.6819H91.2768V7.17488H93.7338C95.1288 7.17488 95.9568 7.91288 95.9568 9.12788C95.9568 10.0279 95.5068 10.6759 94.6968 10.9369L96.0198 13.6819H95.0388L93.8238 11.1079H92.1588V13.6819ZM92.1588 7.96688V10.3249H93.7428C94.5618 10.3249 95.0298 9.88388 95.0298 9.13688C95.0298 8.38088 94.5438 7.96688 93.7338 7.96688H92.1588Z" fill="#1E1515"></path></svg></p>
+							<p class="chartiable-cerified-user"><strong><?php esc_html_e( 'Paul Lawley-Jones', 'charitable' ); ?></strong> <svg xmlns="http://www.w3.org/2000/svg" width="105" height="22" viewBox="0 0 105 22" fill="none"><rect x="0.5" y="0.5" width="104" height="20.3636" rx="10.1818" stroke="#C4D6C6" stroke-linejoin="round"></rect><path d="M12.8364 17.3636L11.6273 15.3273L9.33636 14.8182L9.55909 12.4636L8 10.6818L9.55909 8.9L9.33636 6.54545L11.6273 6.03636L12.8364 4L15 4.92273L17.1636 4L18.3727 6.03636L20.6636 6.54545L20.4409 8.9L22 10.6818L20.4409 12.4636L20.6636 14.8182L18.3727 15.3273L17.1636 17.3636L15 16.4409L12.8364 17.3636ZM14.3318 12.9409L17.9273 9.34545L17.0364 8.42273L14.3318 11.1273L12.9636 9.79091L12.0727 10.6818L14.3318 12.9409Z" fill="#65AD27"></path><path d="M28.6155 13.6819L26.1405 7.17488H27.0855L28.6695 11.3329C28.8135 11.7019 28.9395 12.0709 29.0745 12.5569C29.2275 12.0439 29.3805 11.6119 29.4885 11.3239L31.0635 7.17488H31.9815L29.5335 13.6819H28.6155ZM37.3361 13.6819H33.3671V7.17488H37.3361V7.98488H34.2491V10.0189H37.0301V10.8019H34.2491V12.8629H37.3361V13.6819ZM40.0361 13.6819H39.1541V7.17488H41.6111C43.0061 7.17488 43.8341 7.91288 43.8341 9.12788C43.8341 10.0279 43.3841 10.6759 42.5741 10.9369L43.8971 13.6819H42.9161L41.7011 11.1079H40.0361V13.6819ZM40.0361 7.96688V10.3249H41.6201C42.4391 10.3249 42.9071 9.88388 42.9071 9.13688C42.9071 8.38088 42.4211 7.96688 41.6111 7.96688H40.0361ZM46.4648 7.17488V13.6819H45.5828V7.17488H46.4648ZM51.9602 10.9189H49.4042V13.6819H48.5222V7.17488H52.4462V7.98488H49.4042V10.1179H51.9602V10.9189ZM54.9364 7.17488V13.6819H54.0544V7.17488H54.9364ZM60.9628 13.6819H56.9938V7.17488H60.9628V7.98488H57.8758V10.0189H60.6568V10.8019H57.8758V12.8629H60.9628V13.6819ZM64.9319 13.6819H62.7809V7.17488H64.8959C66.8399 7.17488 68.1539 8.48888 68.1539 10.4329C68.1539 12.3679 66.8579 13.6819 64.9319 13.6819ZM64.8329 7.98488H63.6629V12.8629H64.8689C66.3179 12.8629 67.2359 11.9269 67.2359 10.4329C67.2359 8.92088 66.3179 7.98488 64.8329 7.98488ZM72.7719 11.3689V7.17488H73.6539V11.3149C73.6539 12.3589 74.2299 12.9349 75.2649 12.9349C76.2909 12.9349 76.8579 12.3499 76.8579 11.3149V7.17488H77.7489V11.3689C77.7489 12.8629 76.7949 13.7899 75.2649 13.7899C73.7259 13.7899 72.7719 12.8719 72.7719 11.3689ZM79.3774 8.92988C79.3774 7.81388 80.2774 7.05788 81.6184 7.05788C82.8604 7.05788 83.6614 7.75088 83.7334 8.87588H82.8424C82.7974 8.22788 82.3384 7.84988 81.6094 7.84988C80.7904 7.84988 80.2594 8.26388 80.2594 8.90288C80.2594 9.42488 80.5564 9.73988 81.1684 9.88388L82.2394 10.1359C83.3014 10.3789 83.8414 10.9549 83.8414 11.8729C83.8414 13.0429 82.9324 13.7899 81.5464 13.7899C80.2234 13.7899 79.3414 13.0969 79.2874 11.9809H80.1874C80.2054 12.6019 80.7274 12.9979 81.5464 12.9979C82.4104 12.9979 82.9594 12.5929 82.9594 11.9449C82.9594 11.4319 82.6804 11.1079 82.0594 10.9639L80.9884 10.7209C79.9264 10.4779 79.3774 9.86588 79.3774 8.92988ZM89.4587 13.6819H85.4897V7.17488H89.4587V7.98488H86.3717V10.0189H89.1527V10.8019H86.3717V12.8629H89.4587V13.6819ZM92.1588 13.6819H91.2768V7.17488H93.7338C95.1288 7.17488 95.9568 7.91288 95.9568 9.12788C95.9568 10.0279 95.5068 10.6759 94.6968 10.9369L96.0198 13.6819H95.0388L93.8238 11.1079H92.1588V13.6819ZM92.1588 7.96688V10.3249H93.7428C94.5618 10.3249 95.0298 9.88388 95.0298 9.13688C95.0298 8.38088 94.5438 7.96688 93.7338 7.96688H92.1588Z" fill="#1E1515"></path></svg></p>
 						</div>
 
 					</div>
@@ -546,5 +556,4 @@ class Charitable_Admin_Getting_Started {
 		</div><!-- /#charitable-welcome -->
 		<?php
 	}
-
 }

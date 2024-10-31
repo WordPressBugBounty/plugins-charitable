@@ -66,7 +66,7 @@ if ( ! class_exists( 'Charitable_Onboarding' ) ) :
 		 */
 		public function enqueue_scripts() {
 
-			$min        = ''; // charitable_get_min_suffix(); // todo: undo this.
+			$min        = charitable_get_min_suffix();
 			$version    = charitable()->get_version();
 			$assets_dir = charitable()->get_path( 'assets', false );
 

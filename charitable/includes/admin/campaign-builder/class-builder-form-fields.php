@@ -1343,10 +1343,10 @@ class Charitable_Builder_Form_Fields {
 
 					<?php else : ?>
 
-					<h3 class="creator-name"><a href="<?php echo admin_url( 'user-edit.php?user_id=' . $creator->ID ); ?>"><?php printf( '%s (%s %d)', $creator->display_name, __( 'User ID', 'charitable' ), $creator->ID ); ?></a></h3>
-					<p class="joined-on"><?php printf( '%s <span>%s</span>', _x( 'Joined on', 'joined on date', 'charitable-ambassadors' ), date_i18n( 'F Y', strtotime( $creator->user_registered ) ) ); ?></p>
+					<h3 class="creator-name"><a href="<?php echo esc_url( admin_url( 'user-edit.php?user_id=' . $creator->ID ) ); ?>"><?php printf( '%s (%s %d)', $creator->display_name, __( 'User ID', 'charitable' ), $creator->ID ); ?></a></h3>
+					<p class="joined-on"><?php printf( '%s <span>%s</span>', _x( 'Joined on', 'joined on date', 'charitable' ), date_i18n( 'F Y', strtotime( $creator->user_registered ) ) ); ?></p>
 					<ul>
-						<li><a target="_blank" class="public-profile-link" href="<?php echo get_author_posts_url( $creator->ID ); ?>"><?php _e( 'Public Profile', 'charitable' ); ?></a></li><li><a target="_blank" class="edit-profile-link" href="<?php echo admin_url( 'user-edit.php?user_id=' . $creator->ID ); ?>"><?php _e( 'Edit Profile', 'charitable' ); ?></a></li>
+						<li><a target="_blank" class="public-profile-link" href="<?php echo esc_url( get_author_posts_url( $creator->ID ) ); ?>"><?php esc_html_e( 'Public Profile', 'charitable' ); ?></a></li><li><a target="_blank" class="edit-profile-link" href="<?php echo esc_url( admin_url( 'user-edit.php?user_id=' . $creator->ID ) ); ?>"><?php esc_html_e( 'Edit Profile', 'charitable' ); ?></a></li>
 					</ul>
 
 					<?php endif; ?>

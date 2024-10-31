@@ -72,7 +72,6 @@ if ( ! class_exists( 'Charitable_Post_Types' ) ) :
 
 			// Alter the "Edit" link on the campaign post type page.
 			add_action( 'get_edit_post_link', [ $this, 'campaign_edit_post_link' ], 1000 );
-
 		}
 
 		/**
@@ -121,7 +120,7 @@ if ( ! class_exists( 'Charitable_Post_Types' ) ) :
 				return false;
 			}
 			// determine if we are on a legacy page or not.
-			$legacy_page = ( ( isset( $_GET['post'] ) && 'campaign' === $_GET['post']) || ( isset( $_GET['action'] ) && 'edit' === $_GET['action'] ) );
+			$legacy_page = ( ( isset( $_GET['post'] ) && 'campaign' === $_GET['post'] ) || ( isset( $_GET['action'] ) && 'edit' === $_GET['action'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			if ( $legacy_page ) {
 				if ( isset( $post_type_object->labels ) && isset( $post_type_object->labels->add_new ) ) {
 					$post_type_object->labels->add_new = 'Add New Legacy Campaign';

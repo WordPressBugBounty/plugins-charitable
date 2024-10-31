@@ -335,7 +335,7 @@ if ( ! class_exists( 'Charitable_Public' ) ) :
 			/* General forms scripts. */
 			wp_register_script(
 				'charitable-frontend-v2',
-				$assets_dir . 'js/charitable-frontend-2.0' . $min . '.js',
+				$assets_dir . 'js/charitable-frontend' . $min . '.js',
 				array( 'jquery' ),
 				$version,
 				true

@@ -88,7 +88,7 @@ if ( ! class_exists( 'Charitable_Donors_Widget' ) ) :
 			<p>
 				<label for="<?php echo esc_attr( $this->get_field_id( 'campaign_id' ) ); ?>"><?php _e( 'Show donors by campaign', 'charitable' ); ?>:</label>
 				<select name="<?php echo esc_attr( $this->get_field_name( 'campaign_id' ) ); ?>">
-					<option value="all" <?php selected( 'all', $args['campaign_id'] ); ?>><?php _e( 'Include all campaigns' ); ?></option>
+					<option value="all" <?php selected( 'all', $args['campaign_id'] ); ?>><?php _e( 'Include all campaigns', 'charitable' ); ?></option>
 					<option value="current" <?php selected( 'current', $args['campaign_id'] ); ?>><?php _e( 'Campaign currently viewed', 'charitable' ); ?></option>
 					<optgroup label="<?php _e( 'Specific campaign', 'charitable' ); ?>">
 						<?php foreach ( $campaigns->posts as $campaign ) : ?>

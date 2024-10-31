@@ -144,7 +144,7 @@ if ( ! class_exists( 'Charitable_i18n' ) ) :
 		 */
 		public function decline_months() {
 			if ( ! isset( $this->decline_months ) ) {
-				$this->decline_months = 'on' === _x( 'off', 'decline months names: on or off' );
+				$this->decline_months = 'on' === _x( 'off', 'decline months names: on or off', 'charitable' );
 			}
 
 			return $this->decline_months;

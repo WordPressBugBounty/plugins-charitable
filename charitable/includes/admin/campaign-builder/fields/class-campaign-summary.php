@@ -162,11 +162,11 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Summary' ) ) :
 			$preview_css_class = 'charitable-hidden';
 
 			if ( 'template' === $mode ) {
-				if ( ! empty( $field_data['show_hide'] ) && 1 === intval( $field_data['show_hide']['campaign_hide_time_remaining'] ) ) {
+				if ( ! empty( $field_data['show_hide'] ) && isset( $field_data['show_hide']['campaign_hide_time_remaining'] ) && 1 === intval( $field_data['show_hide']['campaign_hide_time_remaining'] ) ) {
 					$preview_css_class = $is_time_left ? false : 'charitable-hidden';
 				}
 			} else {
-				if ( ! empty( $field_data['show_hide'] ) && 1 === intval( $field_data['show_hide']['campaign_hide_time_remaining'] ) ) {
+				if ( ! empty( $field_data['show_hide'] ) && isset( $field_data['show_hide']['campaign_hide_time_remaining'] ) && 1 === intval( $field_data['show_hide']['campaign_hide_time_remaining'] ) ) {
 					$preview_css_class = $is_time_left ? false : 'charitable-hidden';
 				}
 			}

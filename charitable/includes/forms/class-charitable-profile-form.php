@@ -69,7 +69,7 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 			/* For backwards-compatibility */
 			add_action( 'charitable_form_field', array( $this, 'render_field' ), 10, 6 );
 
-			add_filter( 'charitable_user_fields',           array( $this, 'add_avatar_field' ), 10, 2 );
+			add_filter( 'charitable_user_fields', array( $this, 'add_avatar_field' ), 10, 2 );
 			add_filter( 'charitable_profile_update_values', array( $this, 'save_avatar' ), 10, 3 );
 		}
 
@@ -138,52 +138,56 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 		 * @return array
 		 */
 		public function get_user_fields() {
-			$user_fields = apply_filters( 'charitable_user_fields', array(
-				'username'     => array(
-					'type'     => 'paragraph',
-					'priority' => '',
-					'content'  => sprintf(
-						/* translators: %s: username */
-						__( 'Username: %s.', 'charitable' ),
-						$this->get_user()->user_login
+			$user_fields = apply_filters(
+				'charitable_user_fields',
+				array(
+					'username'     => array(
+						'type'     => 'paragraph',
+						'priority' => '',
+						'content'  => sprintf(
+							/* translators: %s: username */
+							__( 'Username: %s.', 'charitable' ),
+							$this->get_user()->user_login
+						),
+					),
+					'first_name'   => array(
+						'label'    => __( 'First name', 'charitable' ),
+						'type'     => 'text',
+						'priority' => 4,
+						'required' => true,
+						'value'    => $this->get_user_value( 'first_name' ),
+					),
+					'last_name'    => array(
+						'label'    => __( 'Last name', 'charitable' ),
+						'type'     => 'text',
+						'priority' => 6,
+						'required' => true,
+						'value'    => $this->get_user_value( 'last_name' ),
+					),
+					'user_email'   => array(
+						'label'    => __( 'Email', 'charitable' ),
+						'type'     => 'email',
+						'required' => true,
+						'priority' => 8,
+						'value'    => $this->get_user_value( 'user_email' ),
+					),
+					'organisation' => array(
+						'label'    => __( 'Organization', 'charitable' ),
+						'type'     => 'text',
+						'priority' => 10,
+						'required' => false,
+						'value'    => $this->get_user_value( 'organisation' ),
+					),
+					'description'  => array(
+						'label'    => __( 'Bio', 'charitable' ),
+						'type'     => 'textarea',
+						'required' => false,
+						'priority' => 12,
+						'value'    => $this->get_user_value( 'description' ),
 					),
 				),
-				'first_name'   => array(
-					'label'    => __( 'First name', 'charitable' ),
-					'type'     => 'text',
-					'priority' => 4,
-					'required' => true,
-					'value'    => $this->get_user_value( 'first_name' ),
-				),
-				'last_name'    => array(
-					'label'    => __( 'Last name', 'charitable' ),
-					'type'     => 'text',
-					'priority' => 6,
-					'required' => true,
-					'value'    => $this->get_user_value( 'last_name' ),
-				),
-				'user_email'   => array(
-					'label'    => __( 'Email', 'charitable' ),
-					'type'     => 'email',
-					'required' => true,
-					'priority' => 8,
-					'value'    => $this->get_user_value( 'user_email' ),
-				),
-				'organisation' => array(
-					'label'    => __( 'Organization', 'charitable' ),
-					'type'     => 'text',
-					'priority' => 10,
-					'required' => false,
-					'value'    => $this->get_user_value( 'organisation' ),
-				),
-				'description'  => array(
-					'label'    => __( 'Bio', 'charitable' ),
-					'type'     => 'textarea',
-					'required' => false,
-					'priority' => 12,
-					'value'    => $this->get_user_value( 'description' ),
-				),
-			), $this );
+				$this
+			);
 
 			uasort( $user_fields, 'charitable_priority_sort' );
 
@@ -276,29 +280,33 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 		 * @return array
 		 */
 		public function get_social_fields() {
-			$social_fields = apply_filters( 'charitable_user_social_fields', array(
-				'user_url' => array(
-					'label'    => __( 'Your Website', 'charitable' ),
-					'type'     => 'url',
-					'priority' => 42,
-					'required' => false,
-					'value'    => $this->get_user_value( 'user_url' ),
+			$social_fields = apply_filters(
+				'charitable_user_social_fields',
+				array(
+					'user_url' => array(
+						'label'    => __( 'Your Website', 'charitable' ),
+						'type'     => 'url',
+						'priority' => 42,
+						'required' => false,
+						'value'    => $this->get_user_value( 'user_url' ),
+					),
+					'twitter'  => array(
+						'label'    => __( 'Twitter', 'charitable' ),
+						'type'     => 'text',
+						'priority' => 44,
+						'required' => false,
+						'value'    => $this->get_user_value( 'twitter' ),
+					),
+					'facebook' => array(
+						'label'    => __( 'Facebook', 'charitable' ),
+						'type'     => 'text',
+						'priority' => 46,
+						'required' => false,
+						'value'    => $this->get_user_value( 'facebook' ),
+					),
 				),
-				'twitter'  => array(
-					'label'    => __( 'Twitter', 'charitable' ),
-					'type'     => 'text',
-					'priority' => 44,
-					'required' => false,
-					'value'    => $this->get_user_value( 'twitter' ),
-				),
-				'facebook'  => array(
-					'label'    => __( 'Facebook', 'charitable' ),
-					'type'     => 'text',
-					'priority' => 46,
-					'required' => false,
-					'value'    => $this->get_user_value( 'facebook' ),
-				),
-			), $this );
+				$this
+			);
 
 			uasort( $social_fields, 'charitable_priority_sort' );
 
@@ -320,8 +328,8 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 
 			$donor = $this->get_user()->get_donor();
 
-			if ( array_key_exists( 'contact_consent', $_POST ) ) {
-				$consent = $_POST['contact_consent'];
+			if ( array_key_exists( 'contact_consent', $_POST ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				$consent = sanitize_text_field( wp_unslash( $_POST['contact_consent'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			} elseif ( is_null( $donor ) ) {
 				$consent = false;
 			} else {
@@ -336,15 +344,19 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 			 * @param array                   $communication_fields List of fields.
 			 * @param Charitable_Profile_Form $form                 Instance of `Charitable_Profile_Form`.
 			 */
-			$communication_fields = apply_filters( 'charitable_user_communication_preferences_fields', array(
-				'contact_consent' => array(
-					'type'     => 'checkbox',
-					'label'    => charitable_get_option( 'contact_consent_label', __( 'Yes, I am happy for you to contact me via email or phone.', 'charitable' ) ),
-					'priority' => 8,
-					'required' => false,
-					'checked'  => $consent,
+			$communication_fields = apply_filters(
+				'charitable_user_communication_preferences_fields',
+				array(
+					'contact_consent' => array(
+						'type'     => 'checkbox',
+						'label'    => charitable_get_option( 'contact_consent_label', __( 'Yes, I am happy for you to contact me via email or phone.', 'charitable' ) ),
+						'priority' => 8,
+						'required' => false,
+						'checked'  => $consent,
+					),
 				),
-			), $this );
+				$this
+			);
 
 			if ( empty( $communication_fields ) ) {
 				return $fields;
@@ -352,14 +364,17 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 
 			uasort( $fields, 'charitable_priority_sort' );
 
-			return array_merge( $fields, array(
-				'communication_fields' => array(
-					'legend'   => __( 'Communication Preferences', 'charitable' ),
-					'type'     => 'fieldset',
-					'fields'   => $communication_fields,
-					'priority' => 60,
-				),
-			) );
+			return array_merge(
+				$fields,
+				array(
+					'communication_fields' => array(
+						'legend'   => __( 'Communication Preferences', 'charitable' ),
+						'type'     => 'fieldset',
+						'fields'   => $communication_fields,
+						'priority' => 60,
+					),
+				)
+			);
 		}
 
 		/**
@@ -370,32 +385,36 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 		 * @return array[]
 		 */
 		public function get_fields() {
-			$fields = apply_filters( 'charitable_user_profile_fields', array(
-				'user_fields'     => array(
-					'legend'   => __( 'Your Details', 'charitable' ),
-					'type'     => 'fieldset',
-					'fields'   => $this->get_user_fields(),
-					'priority' => 0,
+			$fields = apply_filters(
+				'charitable_user_profile_fields',
+				array(
+					'user_fields'     => array(
+						'legend'   => __( 'Your Details', 'charitable' ),
+						'type'     => 'fieldset',
+						'fields'   => $this->get_user_fields(),
+						'priority' => 0,
+					),
+					'password_fields' => array(
+						'legend'   => __( 'Change Your Password', 'charitable' ),
+						'type'     => 'fieldset',
+						'fields'   => $this->get_password_fields(),
+						'priority' => 10,
+					),
+					'address_fields'  => array(
+						'legend'   => __( 'Your Address', 'charitable' ),
+						'type'     => 'fieldset',
+						'fields'   => $this->get_address_fields(),
+						'priority' => 20,
+					),
+					'social_fields'   => array(
+						'legend'   => __( 'Your Social Profiles', 'charitable' ),
+						'type'     => 'fieldset',
+						'fields'   => $this->get_social_fields(),
+						'priority' => 40,
+					),
 				),
-				'password_fields' => array(
-					'legend'   => __( 'Change Your Password', 'charitable' ),
-					'type'     => 'fieldset',
-					'fields'   => $this->get_password_fields(),
-					'priority' => 10,
-				),
-				'address_fields'  => array(
-					'legend'   => __( 'Your Address', 'charitable' ),
-					'type'     => 'fieldset',
-					'fields'   => $this->get_address_fields(),
-					'priority' => 20,
-				),
-				'social_fields'   => array(
-					'legend'   => __( 'Your Social Profiles', 'charitable' ),
-					'type'     => 'fieldset',
-					'fields'   => $this->get_social_fields(),
-					'priority' => 40,
-				),
-			), $this );
+				$this
+			);
 
 			$fields = $this->maybe_get_communication_preferences_fields( $fields );
 
@@ -412,9 +431,12 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 		 * @return array
 		 */
 		public function get_hidden_fields() {
-			return array_merge( parent::get_hidden_fields(), array(
-				'current_email' => $this->get_user()->get_email(),
-			) );
+			return array_merge(
+				parent::get_hidden_fields(),
+				array(
+					'current_email' => $this->get_user()->get_email(),
+				)
+			);
 		}
 
 		/**
@@ -425,27 +447,31 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 		 * @return array[]
 		 */
 		public function get_password_fields() {
-			$password_fields = apply_filters( 'charitable_user_profile_password_fields', array(
-				'current_pass'     => array(
-					'priority' => 2,
-					'type'     => 'password',
-					'label'    => __( 'Current Password (leave blank to leave unchanged)', 'charitable' ),
-					'value'    => '',
-					'required' => false,
+			$password_fields = apply_filters(
+				'charitable_user_profile_password_fields',
+				array(
+					'current_pass'     => array(
+						'priority' => 2,
+						'type'     => 'password',
+						'label'    => __( 'Current Password (leave blank to leave unchanged)', 'charitable' ),
+						'value'    => '',
+						'required' => false,
+					),
+					'user_pass'        => array(
+						'priority' => 4,
+						'type'     => 'password',
+						'label'    => __( 'New Password (leave blank to leave unchanged)', 'charitable' ),
+						'required' => false,
+					),
+					'user_pass_repeat' => array(
+						'priority' => 6,
+						'type'     => 'password',
+						'label'    => __( 'New Password (again)', 'charitable' ),
+						'required' => false,
+					),
 				),
-				'user_pass'        => array(
-					'priority' => 4,
-					'type'     => 'password',
-					'label'    => __( 'New Password (leave blank to leave unchanged)', 'charitable' ),
-					'required' => false,
-				),
-				'user_pass_repeat' => array(
-					'priority' => 6,
-					'type'     => 'password',
-					'label'    => __( 'New Password (again)', 'charitable' ),
-					'required' => false,
-				),
-			), $this );
+				$this
+			);
 
 			uasort( $password_fields, 'charitable_priority_sort' );
 
@@ -519,11 +545,11 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 		 * @return boolean
 		 */
 		public function is_changing_password() {
-			if ( ! isset( $_POST['user_pass'] ) || empty( $_POST['user_pass'] ) ) {
+			if ( ! isset( $_POST['user_pass'] ) || empty( $_POST['user_pass'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 				return false;
 			}
 
-			if ( ! isset( $_POST['current_pass'] ) || empty( $_POST['current_pass'] ) ) {
+			if ( ! isset( $_POST['current_pass'] ) || empty( $_POST['current_pass'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 				return false;
 			}
 
@@ -561,15 +587,15 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 		 * @return boolean
 		 */
 		public function is_changing_email() {
-			if ( ! isset( $_POST['user_email'] ) || empty( $_POST['user_email'] ) ) {
+			if ( ! isset( $_POST['user_email'] ) || empty( $_POST['user_email'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 				return false;
 			}
 
-			if ( ! isset( $_POST['current_email'] ) ) {
-				return $_POST['user_email'] != $this->get_user()->get_email();
+			if ( ! isset( $_POST['current_email'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				return $_POST['user_email'] !== $this->get_user()->get_email(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			}
 
-			return $_POST['user_email'] != $_POST['current_email'];
+			return $_POST['user_email'] !== $_POST['current_email']; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		}
 
 		/**
@@ -632,8 +658,8 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 		/**
 		 * Add avatar section to user profile form.
 		 *
-		 * @param   array[]                 $fields
-		 * @param   Charitable_Profile_Form $form
+		 * @param   array[]                 $fields The fields in the form.
+		 * @param   Charitable_Profile_Form $form  The profile form object.
 		 * @return  array[]
 		 * @access  public
 		 * @since   1.0.0
@@ -647,15 +673,18 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 				$avatar = get_avatar( $user->ID, 100 );
 			}
 
-			$fields['avatar'] = apply_filters( 'charitable_user_avatar_field_args', array(
-				'label'     => __( 'Your Profile Photo', 'charitable-user-avatar' ),
-				'type'      => 'picture',
-				'uploader'  => true,
-				'size'      => 100,
-				'value'     => $avatar,
-				'priority'  => 14,
-				'fullwidth' => true,
-			) );
+			$fields['avatar'] = apply_filters(
+				'charitable_user_avatar_field_args',
+				array(
+					'label'     => __( 'Your Profile Photo', 'charitable' ),
+					'type'      => 'picture',
+					'uploader'  => true,
+					'size'      => 100,
+					'value'     => $avatar,
+					'priority'  => 14,
+					'fullwidth' => true,
+				)
+			);
 
 			return $fields;
 		}
@@ -671,7 +700,7 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 		 * @since   1.0.0
 		 */
 		public function save_avatar( $submitted, $fields, $form ) {
-			if ( isset( $_FILES ) && isset( $_FILES['avatar'] ) ) {
+			if ( isset( $_FILES ) && isset( $_FILES['avatar'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 				$attachment_id = $form->upload_post_attachment( 'avatar', 0 );
 
@@ -706,7 +735,6 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 
 			return $submitted;
 		}
-
 	}
 
 endif;

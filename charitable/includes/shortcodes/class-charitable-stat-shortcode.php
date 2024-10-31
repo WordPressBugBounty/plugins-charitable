@@ -141,7 +141,7 @@ if ( ! class_exists( 'Charitable_Stat_Shortcode' ) ) :
 		 */
 		private function get_report_args() {
 			$args                = array();
-			$args['report_type'] = in_array( $this->type, array( 'progress', 'total' ) ) ? 'amount' : $this->type;
+			$args['report_type'] = in_array( $this->type, array( 'progress', 'total' ), true ) ? 'amount' : $this->type;
 			$args['campaigns']   = $this->args['campaigns'];
 
 			return $args;

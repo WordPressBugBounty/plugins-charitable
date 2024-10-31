@@ -308,6 +308,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 		 * Generate HTML for the Top Campaigns list.
 		 *
 		 * @since  1.8.1
+		 * @version 1.8.3 Make status translatable.
 		 *
 		 * @param  object $top_campaigns The top campaigns data.
 		 * @param  bool   $include_icons Whether to include icons.
@@ -326,6 +327,23 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 
 				$_campaign       = $campaign->ID ? charitable_get_campaign( $campaign->ID ) : false;
 				$status          = $_campaign ? $_campaign->get_status() : false;
+				switch ( $status ) {
+					case 'active':
+						$status_string = esc_html__( 'Active', 'charitable' );
+						break;
+					case 'draft':
+						$status_string = esc_html__( 'Draft', 'charitable' );
+						break;
+					case 'completed':
+						$status_string = esc_html__( 'Completed', 'charitable' );
+						break;
+					case 'failed':
+						$status_string = esc_html__( 'Failed', 'charitable' );
+						break;
+					default:
+						$status_string = $status;
+						break;
+				}
 				$donated_amount  = $_campaign->get_donated_amount();
 				$donor_count     = $_campaign->get_donor_count();
 				$donation_goal   = $_campaign->get_goal();
@@ -353,7 +371,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 							</div>
 						</div>
 						<div class="status">
-							<p><span class="badge <?php echo esc_attr( $status ); ?>"><?php echo esc_html( ucwords( $status ) ); ?></span></p>
+							<p><span class="badge <?php echo esc_attr( $status ); ?>"><?php echo esc_html( $status_string ); ?></span></p>
 						</div>
 					</div>
 					<?php

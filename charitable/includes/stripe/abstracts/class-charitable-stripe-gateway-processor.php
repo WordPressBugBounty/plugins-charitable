@@ -480,7 +480,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 				$token = \Stripe\Token::create( [ 'customer' => $customer ], $this->options );
 			} catch ( Exception $e ) {
 				$body    = $e->getJsonBody();
-				$message = isset( $body['error']['message'] ) ? $body['error']['message'] : __( 'Something went wrong.', 'charitable-stripe' );
+				$message = isset( $body['error']['message'] ) ? $body['error']['message'] : __( 'Something went wrong.', 'charitable' );
 
 				charitable_get_notices()->add_error( $message );
 
@@ -643,7 +643,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 			$plan_id               = $period . '-' . $interval . '-' . $amount . $currency . '-' . $campaign_id;
 			$plan_name             = sprintf(
 				/* translators: %1$s: campaign title; %2$s: amount; %3$s: currency; %4$s: period */
-				_x( '%1$s - %2$s %3$s every %4$s', 'campaign title — amount every period', 'charitable-stripe' ),
+				_x( '%1$s - %2$s %3$s every %4$s', 'campaign title — amount every period', 'charitable' ),
 				get_the_title( $campaign_id ),
 				charitable_sanitize_amount( $amount_description ),
 				$currency,
@@ -1056,7 +1056,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 				$this->donation_log->add(
 					sprintf(
 						/* translators: %s: link to Stripe charge details */
-						__( 'Stripe charge: %s', 'charitable-stripe' ),
+						__( 'Stripe charge: %s', 'charitable' ),
 						'<a href="' . $url . '" target="_blank"><code>' . $charge_result->id . '</code></a>'
 					)
 				);
@@ -1081,7 +1081,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 			$this->donation_log->add(
 				sprintf(
 					/* translators: %s: link to Stripe application fee details */
-					__( 'Stripe application fee: %s', 'charitable-stripe' ),
+					__( 'Stripe application fee: %s', 'charitable' ),
 					'<a href="' . $url . '" target="_blank"><code>' . $charge_result->application_fee . '</code></a>'
 				)
 			);
@@ -1121,7 +1121,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 
 			/* We cannot support multiple campaign donations in a single donation with Stripe Connect. */
 			if ( 1 < count( $campaign_donations ) ) {
-				wp_die( __( 'Error: Unable to process multiple campaign donations in a single donation with Stripe Connect.', 'charitable-stripe' ) );
+				wp_die( __( 'Error: Unable to process multiple campaign donations in a single donation with Stripe Connect.', 'charitable' ) );
 			}
 
 			$connected_account = charitable_stripe_get_connected_account_for_campaign( current( $campaign_donations )->campaign_id );
@@ -1324,7 +1324,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 				$card     = $customer->sources->create( [ 'source' => $card_args ] );
 			} catch ( Exception $e ) {
 				$body    = $e->getJsonBody();
-				$message = isset( $body['error']['message'] ) ? $body['error']['message'] : __( 'Something went wrong.', 'charitable-stripe' );
+				$message = isset( $body['error']['message'] ) ? $body['error']['message'] : __( 'Something went wrong.', 'charitable' );
 
 				charitable_get_notices()->add_error( $message );
 

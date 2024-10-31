@@ -33,7 +33,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor_Payment_Intents' ) ) :
 		 */
 		public function run() {
 			if ( ! $this->set_stripe_api_key() ) {
-				$this->donation_log->add( __( 'Missing secret API key.', 'charitable-stripe' ) );
+				$this->donation_log->add( __( 'Missing secret API key.', 'charitable' ) );
 				return false;
 			}
 
@@ -42,7 +42,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor_Payment_Intents' ) ) :
 			$customer_id    = $this->get_stripe_customer( $payment_method );
 
 			if ( ! $customer_id ) {
-				$this->donation_log->add( __( 'Unable to retrieve customer.', 'charitable-stripe' ) );
+				$this->donation_log->add( __( 'Unable to retrieve customer.', 'charitable' ) );
 				return false;
 			}
 
@@ -145,7 +145,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor_Payment_Intents' ) ) :
 			if ( ! $recurring ) {
 				return new WP_Error(
 					'missing_recurring_donation',
-					__( 'Could not create customer subscription. No associated recurring donation.', 'charitable-stripe' )
+					__( 'Could not create customer subscription. No associated recurring donation.', 'charitable' )
 				);
 			}
 
@@ -164,11 +164,11 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor_Payment_Intents' ) ) :
 				$plan_id = $plans->create_plan();
 
 				if ( ! $plan_id ) {
-					$this->donation_log->add( __( 'Unable to add plan.', 'charitable-stripe' ) );
+					$this->donation_log->add( __( 'Unable to add plan.', 'charitable' ) );
 
 					return new WP_Error(
 						'error_creating_plan',
-						__( 'Could not create recurring donation plan.', 'charitable-stripe' )
+						__( 'Could not create recurring donation plan.', 'charitable' )
 					);
 				}
 			}
@@ -231,27 +231,27 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor_Payment_Intents' ) ) :
 				$status = self::get_subscription_status( $subscription );
 
 			} catch ( \Stripe\Error\Card $e ) {
-				$message = __( 'There was an error processing your payment, please ensure you have entered your card number correctly.', 'charitable-stripe' );
+				$message = __( 'There was an error processing your payment, please ensure you have entered your card number correctly.', 'charitable' );
 				$status  = 'charitable-failed';
 			} catch ( \Stripe\Error\ApiConnection $e ) {
-				$message = __( 'There was an error processing your payment (our payment gateways\'s API is down), please try again.', 'charitable-stripe' );
+				$message = __( 'There was an error processing your payment (our payment gateways\'s API is down), please try again.', 'charitable' );
 				$status  = 'charitable-failed';
 			} catch ( \Stripe\Error\InvalidRequest $e ) {
-				$message = __( 'The payment gateway API request was invalid, please try again.', 'charitable-stripe' );
+				$message = __( 'The payment gateway API request was invalid, please try again.', 'charitable' );
 				$status  = 'charitable-failed';
 			} catch ( \Stripe\Error\API $e ) {
-				$message = __( 'The payment gateway API request was invalid, please try again.', 'charitable-stripe' );
+				$message = __( 'The payment gateway API request was invalid, please try again.', 'charitable' );
 				$status  = 'charitable-failed';
 			} catch ( \Stripe\Error\Authentication $e ) {
-				$message = __( 'The API keys entered in settings are incorrect', 'charitable-stripe' );
+				$message = __( 'The API keys entered in settings are incorrect', 'charitable' );
 				$status  = 'charitable-failed';
 			} catch ( Exception $e ) {
-				$message = __( 'Something went wrong.', 'charitable-stripe' );
+				$message = __( 'Something went wrong.', 'charitable' );
 				$status  = 'charitable-failed';
 			}//end try
 
 			if ( 'charitable-failed' == $status ) {
-				$recurring->set_to_failed( __( 'Initial subscription payment failed', 'charitable-stripe' ) );
+				$recurring->set_to_failed( __( 'Initial subscription payment failed', 'charitable' ) );
 
 				return new WP_Error(
 					'error_creating_subscription',

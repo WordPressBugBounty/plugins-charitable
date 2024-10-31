@@ -1,6 +1,6 @@
 <?php
 /**
- * Charitable Reports UI.
+ * Charitable Dashboard UI.
  *
  * @package   Charitable/Classes/Charitable_Dashboard
  * @author    David Bisset
@@ -240,7 +240,6 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 			);
 
 			include charitable()->get_path( 'includes' ) . 'admin/templates/dashboard-notifications.php';
-
 		}
 
 
@@ -257,7 +256,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 
 			// check nonce.
 			// if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'charitable_dashboard_notification_nonce' ) ) {
-			// 	wp_send_json_error( array( 'message' => esc_html__( 'Invalid nonce.', 'charitable' ) ) );
+			// wp_send_json_error( array( 'message' => esc_html__( 'Invalid nonce.', 'charitable' ) ) );
 			// }
 
 			if ( false === $notification_id ) {
@@ -279,20 +278,19 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 			} else {
 				return false;
 			}
-
 		}
 
 
 
 		// public function add_notification( $notification = array() ) {
 
-		// 	$notifications = (array) get_option( 'charitable_dashboard_notifications', array() );
+		// $notifications = (array) get_option( 'charitable_dashboard_notifications', array() );
 
 
 
-		// 	$notifications[] = $notification;
+		// $notifications[] = $notification;
 
-		// 	update_option( 'charitable_dashboard_notifications', $notifications );
+		// update_option( 'charitable_dashboard_notifications', $notifications );
 		// }
 
 
@@ -403,7 +401,8 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 				'action'                    => false,
 				'show_recommended_addons'   => true,
 				'show_recommended_snippets' => true,
-				'use_cache'                 => 'maybe',
+				'show_notifications'        => true,
+				'use_cache'                 => 'no', // 'yes' or 'no' or 'maybe'.
 			);
 
 			$args = apply_filters( 'charitable_dashboard_report_html_args', wp_parse_args( $args, $defaults ) );
@@ -606,7 +605,6 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 					</div>
 
 					<?php
-
 					if ( $show_recommended_snippets ) :
 
 						$recommended_snippets = $this->get_dashboard_recommended_snippets( 2 );
@@ -698,6 +696,12 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 							<?php
 
 						endif; // support links not empty.
+
+					endif; // show support box.
+
+					if ( $show_notifications ) :
+
+						Charitable_Notifications::get_instance()->output( 'dashboard' );
 
 					endif; // show support box.
 
@@ -1080,7 +1084,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 					'description' => esc_html__( 'Accept donations in Indian Rupees with PayUmoney', 'charitable' ),
 				),
 				'easy-digital-downloads-connect' => array(
-					'title'       => esc_html__( 'Easy Digital Downloads Connect', 'charitable' ),
+					'title'       => esc_html__( 'Easy Digital Downloads', 'charitable' ),
 					'description' => esc_html__( 'Collect donations with Easy Digital Downloads', 'charitable' ),
 				),
 				'recurring-donations'            => array(
@@ -1218,6 +1222,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		 * Get the recommended dashboard addons.
 		 *
 		 * @since  1.8.1.5
+		 * @version 1.8.3
 		 *
 		 * @return array
 		 */
@@ -1248,6 +1253,12 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 
 						$sections    = unserialize( $addon['sections'] );
 						$description = isset( $sections['description'] ) ? $sections['description'] : '';
+
+						// subsutite test for translations, trying in 1.8.3.
+						$addon['name'] = ! empty( $addon['name'] ) && strtolower( $addon['name'] ) === 'charitable recurring donations' ? __( 'Charitable Recurring Donations', 'charitable' ) : $addon['name'];
+						$addon['name'] = ! empty( $addon['name'] ) && strtolower( $addon['name'] ) === 'charitable pdf receipts' ? __( 'Charitable PDF Receipts', 'charitable' ) : $addon['name'];
+						$description   = ! empty( $description ) && strpos( $description, 'with recurring donations' ) !== false ? __( 'Grow your organization\'s revenue with recurring donations.', 'charitable' ) : $description;
+						$description   = ! empty( $description ) && strpos( $description, 'PDF receipt' ) !== false ? __( 'Make life easy for your donors by providing them with a PDF receipt for their donation.', 'charitable' ) : $description;
 
 						$recommended_to_return[ str_replace( 'charitable-', '', $addon['slug'] ) ] = array(
 							'title'       => $addon['name'],
@@ -1330,6 +1341,21 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Get the notices to display on the dashboard. Get any stored notices/notifications from the database.
 		 *
+		 * @since  1.8.3
+		 *
+		 * @return array
+		 */
+		public function get_notifications() {
+
+			$notifications_html = Charitable_Notifications::get_instance()->output( 'dashboard' );
+
+			return $notifications_html;
+
+		}
+
+		/**
+		 * Get the notices to display on the dashboard. Get any stored notices/notifications from the database.
+		 *
 		 * @since  1.8.1.6
 		 * @version 1.8.2
 		 *
@@ -1338,7 +1364,6 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		public function get_notices() {
 
 			return (array) apply_filters( 'charitable_dashboard_notices', get_option( 'charitable_dashboard_notifications', array() ) );
-
 		}
 
 		/**

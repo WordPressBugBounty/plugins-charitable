@@ -80,10 +80,10 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 		public function register_script() {
 			$screen = get_current_screen();
 
-			if ( 'campaign' == $screen->id ) {
+			if ( 'campaign' === $screen->id ) {
 				$min = charitable_get_min_suffix();
 
-				wp_register_script( 'charitable-benefactors-js', charitable()->get_path( 'assets', false ) . 'js/charitable-admin-benefactors' . $min . '.js', array( 'charitable-admin' ), charitable()->get_version(), false );
+				wp_register_script( 'charitable-benefactors-js', charitable()->get_path( 'assets', false ) . 'js/admin/charitable-admin-benefactors' . $min . '.js', array( 'charitable-admin' ), charitable()->get_version(), false );
 				wp_enqueue_script( 'charitable-benefactors-js' );
 			}
 		}

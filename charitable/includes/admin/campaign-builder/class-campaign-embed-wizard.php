@@ -431,7 +431,7 @@ if ( ! class_exists( 'Charitable_Campaign_Embed_Wizard' ) ) :
 			if ( ! check_ajax_referer( 'campaign_admin_campaign_embed_wizard_nonce', false, false ) ) {
 				wp_send_json_error(
 					[
-						'msg' => esc_html__( 'Your session expired. Please reload the builder.', 'campaign-lite' ),
+						'msg' => esc_html__( 'Your session expired. Please reload the builder.', 'charitable' ),
 					]
 				);
 			}
@@ -439,7 +439,7 @@ if ( ! class_exists( 'Charitable_Campaign_Embed_Wizard' ) ) :
 			if ( ! array_key_exists( 'search', $_GET ) ) {
 				wp_send_json_error(
 					[
-						'msg' => esc_html__( 'Incorrect usage of this operation.', 'campaign-lite' ),
+						'msg' => esc_html__( 'Incorrect usage of this operation.', 'charitable' ),
 					]
 				);
 			}

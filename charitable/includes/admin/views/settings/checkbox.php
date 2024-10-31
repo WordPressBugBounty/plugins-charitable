@@ -17,13 +17,20 @@ if ( ! strlen( $value ) ) {
 }
 
 ?>
-<input type="checkbox"
-	id="<?php printf( 'charitable_settings_%s', implode( '_', $view_args['key'] ) ); ?>"
-	name="<?php printf( 'charitable_settings[%s]', $view_args['name'] ); ?>"
-	class="<?php echo esc_attr( $view_args['classes'] ); ?>"
-	<?php checked( $value ); ?>
-	<?php echo charitable_get_arbitrary_attributes( $view_args ); ?>/>
-<?php if ( isset( $view_args['help'] ) ) : ?>
-	<div class="charitable-help"><?php echo $view_args['help']; ?></div>
-<?php
-endif;
+
+<div class="charitable-admin-ui charitable-admin-ui-field charitable-admin-ui-toggle">
+
+	<div id="<?php printf( 'charitable_settings_%s', esc_attr( implode( '_', $view_args['key'] ) ) ); ?>-wrap" class="charitable-panel-field charitable-panel-field-toggle">
+		<span class="charitable-toggle-control">
+		<input type="checkbox" id="<?php printf( 'charitable_settings_%s', esc_attr( implode( '_', $view_args['key'] ) ) ); ?>" name="<?php printf( 'charitable_settings[%s]', esc_attr( $view_args['name'] ) ); ?>" value="1" class="<?php echo esc_attr( $view_args['classes'] ); ?>" <?php checked( $value ); ?> <?php echo charitable_get_arbitrary_attributes( $view_args ); ?>/>
+		<label class="charitable-toggle-control-icon" for="<?php printf( 'charitable_settings_%s', esc_attr( implode( '_', $view_args['key'] ) ) ); ?>"></label>
+		<?php if ( isset( $view_args['label'] ) ) : ?>
+			<label for="<?php printf( 'charitable_settings_%s', esc_attr( implode( '_', $view_args['key'] ) ) ); ?>"><?php echo esc_html( $view_args['label'] ); ?></label>
+		<?php endif; ?>
+		</span>
+		<?php if ( isset( $view_args['help'] ) ) : ?>
+			<div class="charitable-help"><?php echo $view_args['help']; ?></div>
+		<?php endif; ?>
+	</div>
+
+</div>

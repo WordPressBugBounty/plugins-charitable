@@ -101,7 +101,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function is_pro() {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: is_pro()' );
 			}
 
@@ -119,7 +119,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function is_v3_license_valid() {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: is_v3_license_valid()' );
 			}
 
@@ -137,7 +137,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function check_for_updates( $_transient_data ) {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: check_for_updates()' );
 			}
 
@@ -160,7 +160,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function plugins_api_filter( $_data, $_action = '', $_args = null ) {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: plugins_api_filter()' );
 			}
 
@@ -179,7 +179,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function is_missing_version_info( $product, $update_cache = false ) {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: is_missing_version_info()' );
 			}
 
@@ -198,7 +198,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function get_version_info( $slug, $update_cache = false ) {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_version_info()' );
 			}
 
@@ -217,7 +217,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		protected function able_to_update( $version_info ) {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: able_to_update()' );
 			}
 
@@ -235,7 +235,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function get_expired_license_package( $plugin ) {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_expired_license_package()' );
 			}
 
@@ -254,7 +254,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function get_missing_requirements_package( $plugin ) {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_missing_requirements_package()' );
 			}
 
@@ -276,7 +276,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function register_licensed_product( $item_name, $author, $version, $file, $url = false ) {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: register_licensed_product()' );
 			}
 
@@ -293,7 +293,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function get_products() {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_products()' );
 			}
 
@@ -311,7 +311,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function get_product_license_details( $item ) {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_product_license_details()' );
 			}
 
@@ -329,7 +329,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function has_valid_license( $item ) {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: has_valid_license()' );
 			}
 
@@ -347,7 +347,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function get_license( $item ) {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_license()' );
 			}
 
@@ -365,7 +365,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function get_license_details( $item ) {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_license_details()' );
 			}
 
@@ -385,7 +385,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function get_licenses() {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_licenses()' );
 			}
 
@@ -406,7 +406,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function verify_license( $item, $license, $force = false, $legacy = false ) {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: verify_license()' );
 			}
 
@@ -424,7 +424,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function get_license_deactivation_url( $item ) {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_license_deactivation_url()' );
 			}
 
@@ -441,7 +441,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function deactivate_license() {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: deactivate_license()' );
 			}
 
@@ -459,7 +459,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		protected function flush_update_cache() {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: flush_update_cache()' );
 			}
 
@@ -477,7 +477,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		protected function get_item_key( $item_name ) {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_item_key()' );
 			}
 
@@ -496,7 +496,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		protected function get_versions() {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_versions()' );
 			}
 
@@ -518,7 +518,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		private function log_failed_request() {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: log_failed_request()' );
 			}
 
@@ -535,7 +535,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		private function request_recently_failed() {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: request_recently_failed()' );
 			}
 
@@ -553,7 +553,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		 */
 		public function ajax_license_check() {
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug( 'vendor' ) ) {
 				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: ajax_license_check()' );
 			}
 

@@ -237,7 +237,7 @@ if ( ! class_exists( 'Charitable_Stripe_Plan' ) ) :
 			$plan_id               = $period . '-' . $interval . '-' . $amount . $currency . '-' . $this->campaign_id;
 			$plan_name             = sprintf(
 				/* translators: %1$s: campaign title; %2$s: amount; %3$s: currency; %4$s: period */
-				_x( '%1$s - %2$s %3$s every %4$s', 'campaign title — amount every period', 'charitable-stripe' ),
+				_x( '%1$s - %2$s %3$s every %4$s', 'campaign title — amount every period', 'charitable' ),
 				get_the_title( $this->campaign_id ),
 				charitable_sanitize_amount( $amount_description ),
 				$currency,

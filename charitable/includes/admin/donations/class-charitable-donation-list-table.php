@@ -912,9 +912,9 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 							<?php esc_html_e( 'No Donations Yet!', 'charitable' ); ?>
 						</h2>
 						<div class="charitable-blank-slate-buttons">
-							<a class="charitable-blank-slate-cta charitable-button" href="<?php echo admin_url( 'post-new.php?post_type=donation' ); ?>"><?php esc_html_e( 'Add A Manual Donation', 'charitable' ); ?></a>
+							<a class="charitable-blank-slate-cta charitable-button" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=donation' ) ); ?>"><?php esc_html_e( 'Add A Manual Donation', 'charitable' ); ?></a>
 							<div class="charitable-blank-slate-buttons-legacy">
-								<div><a target="_blank" href="https://www.wpcharitable.com/documentation/learn-more-donations/"><?php esc_html_e( 'Learn More About Donations', 'charitable' ); ?></a></div>
+								<div><a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=donation' ) ); ?>"><?php esc_html_e( 'Create A Donation Manually', 'charitable' ); ?></a></div>
 							</div>
 						</div>
 					<?php else : ?>
@@ -922,9 +922,9 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 							<?php esc_html_e( 'Create A Campaign To Start Accepting Donations!', 'charitable' ); ?>
 						</h2>
 						<div class="charitable-blank-slate-buttons">
-							<a class="charitable-blank-slate-cta charitable-button" target="_blank" href="<?php echo admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ); ?>"><?php esc_html_e( 'Create Campaign', 'charitable' ); ?></a>
+							<a class="charitable-blank-slate-cta charitable-button" target="_blank" href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ) ); ?>"><?php esc_html_e( 'Create Campaign', 'charitable' ); ?></a>
 							<div class="charitable-blank-slate-buttons-legacy">
-								<div><a href="<?php echo admin_url( 'post-new.php?post_type=donation' ); ?>"><?php esc_html_e( 'Create A Donation Manually', 'charitable' ); ?></a></div>
+								<div><a target="_blank" href="https://www.wpcharitable.com/documentation/learn-more-donations/"><?php esc_html_e( 'Learn More About Donations', 'charitable' ); ?></a></div>
 							</div>
 						</div>
 					<?php endif; ?>
@@ -957,8 +957,8 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 						<div class="marketplace-suggestion-container marketplace-suggestion-container-footer">
 							<div class="marketplace-suggestion-container-content"></div>
 							<div class="marketplace-suggestion-container-cta">
-								<a href="<?php echo admin_url( 'admin.php?page=charitable-addons' ); ?>" class="linkout"><?php esc_html_e( 'Browse all addons', 'charitable' ); ?></a>
-								<a href="<?php echo admin_url( 'admin.php?page=charitable-growth-tools' ); ?>" target="_blank" class="linkout"><?php esc_html_e( 'Growth Tools', 'charitable' ); ?></a>
+								<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-addons' ) ); ?>" class="linkout"><?php esc_html_e( 'Browse all addons', 'charitable' ); ?></a>
+								<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-growth-tools' ) ); ?>" target="_blank" class="linkout"><?php esc_html_e( 'Growth Tools', 'charitable' ); ?></a>
 							</div>
 						</div>
 					</div>

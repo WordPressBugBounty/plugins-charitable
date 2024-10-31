@@ -124,7 +124,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 							'default'  => 'auto',
 							'options'  => [
 								'auto'   => __( 'Use campaign title', 'charitable' ),
-								'custom' => __( 'Set a custom descriptor', 'charitable-stipe' ),
+								'custom' => __( 'Set a custom descriptor', 'charitable' ),
 							],
 						],
 						'statement_descriptor_custom'  => [
@@ -250,7 +250,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 							'default'  => 'auto',
 							'options'  => [
 								'auto'   => __( 'Use campaign title', 'charitable' ),
-								'custom' => __( 'Set a custom descriptor', 'charitable-stipe' ),
+								'custom' => __( 'Set a custom descriptor', 'charitable' ),
 							],
 						],
 						'statement_descriptor_custom'  => [
@@ -362,21 +362,21 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 			} else {
 				$html .= '<p id="wpcharitable-stripe-auth-error-account-actions" style="display: block;">' . sprintf(
 					/* translators: %1$s Stripe payment mode. %2$s Opening anchor tag for reconnecting to Stripe, do not translate. %3$s Opening anchor tag for disconnecting Stripe, do not translate. %4$s Closing anchor tag, do not translate. */
-					__( '%1$sDisconnect this account%2$s.', 'stripe' ),
+					__( '%1$sDisconnect this account%2$s.', 'charitable' ),
 					'<strong>Connected in ' . $mode . ' mode</strong>. <a href="' . esc_url( $this->get_stripe_disconnect_url() ) . '" class="wpcharitable-disconnect-link">',
 					'</a>'
 				) . '</p>';
 
 				$html .= '<p id="wpcharitable-stripe-activated-account-actions" style="display: none;">' . sprintf(
 					/* translators: %1$s Stripe payment mode. %2$s Opening anchor tag for reconnecting to Stripe, do not translate. %3$s Opening anchor tag for disconnecting Stripe, do not translate. %4$s Closing anchor tag, do not translate. */
-					__( 'Your Stripe account is connected in %1$s mode. %2$sDisconnect this account%3$s.', 'stripe' ),
+					__( 'Your Stripe account is connected in %1$s mode. %2$sDisconnect this account%3$s.', 'charitable' ),
 					'<strong>' . $mode . '</strong>',
 					'<a href="' . esc_url( $this->get_stripe_disconnect_url() ) . '" class="wpcharitable-disconnect-link">',
 					'</a>'
 				) . '</p>';
 
 				$html .= '<p id="wpcharitable-stripe-unactivated-account-actions" style="display: none;"><a href="' . esc_url( $this->get_stripe_disconnect_url() ) . '">' .
-				__( 'Disconnect temporary account', 'stripe' ) .
+				__( 'Disconnect temporary account', 'charitable' ) .
 				'</a></p>';
 			}
 
@@ -398,11 +398,11 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 			ob_start();
 			?>
 
-			<a href="<?php echo esc_url( $url ); ?>" aria-label="<?php echo esc_attr__( 'Connect with Stripe', 'stripe' ); ?>" class="wpcharitable-stripe-connect">
+			<a href="<?php echo esc_url( $url ); ?>" aria-label="<?php echo esc_attr__( 'Connect with Stripe', 'charitable' ); ?>" class="wpcharitable-stripe-connect">
 				<span>
 				<?php
 				/* translators: Text before Stripe logo for "Connect with Stripe" button. */
-				esc_html_e( 'Connect with', 'stripe' );
+				esc_html_e( 'Connect with', 'charitable' );
 				?>
 				</span>
 

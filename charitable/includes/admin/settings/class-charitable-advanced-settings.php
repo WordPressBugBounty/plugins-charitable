@@ -71,31 +71,31 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 			return apply_filters(
 				'charitable_settings_advanced_fields',
 				array(
-					'section_hidden_advanced'     => array(
+					'section_hidden_advanced'      => array(
 						'title'    => '',
 						'type'     => 'hidden',
 						'priority' => 10000,
 						'value'    => 'advanced',
 					),
-					'section_dangerous'           => array(
+					'section_dangerous'            => array(
 						'title'    => __( 'Advanced Settings', 'charitable' ),
 						'type'     => 'heading',
 						'class'    => 'section-heading',
 						'priority' => 100,
 					),
-					'delete_data_on_uninstall'    => array(
+					'delete_data_on_uninstall'     => array(
 						'label_for' => __( 'Reset Data', 'charitable' ),
 						'type'      => 'checkbox',
-						'help'      => '<span style="color:red;font-weight:bold;">' . __( 'DELETE ALL DATA' ) . '</span> ' . __( 'when uninstalling the plugin.', 'charitable' ),
+						'help'      => '<span style="color:red;font-weight:bold;">' . __( 'DELETE ALL DATA', 'charitable' ) . '</span> ' . __( 'when uninstalling the plugin.', 'charitable' ),
 						'priority'  => 105,
 					),
-					'clear_expire_options'        => array(
+					'clear_expire_options'         => array(
 						'label_for' => __( 'Clear Cache', 'charitable' ),
 						'type'      => 'checkbox',
 						'help'      => __( 'This removes and refreshes temporarily stored items in the database specific to Charitable.', 'charitable' ),
 						'priority'  => 120,
 					),
-					'clear_activity_database'     => array(
+					'clear_activity_database'      => array(
 						'label_for' => __( 'Activity Database', 'charitable' ),
 						'type'      => 'select',
 						'options'   => array(
@@ -114,20 +114,20 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 						'priority'  => 155,
 						'default'   => false,
 					),
-					'section_hidden_licenses'     => array(
+					'section_hidden_licenses'      => array(
 						'title'    => '',
 						'type'     => 'hidden',
 						'priority' => 10000,
 						'value'    => 'licenses',
 						'save'     => false,
 					),
-					'section_licenses'            => array(
+					'section_licenses'             => array(
 						'title'    => __( 'Legacy Licenses', 'charitable' ),
 						'type'     => 'heading',
 						'class'    => 'section-heading',
 						'priority' => 202,
 					),
-					'licenses'                    => array(
+					'licenses'                     => array(
 						'title'    => false,
 						'callback' => array( $this, 'render_licenses_table' ),
 						'priority' => 204,
@@ -165,7 +165,7 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 		 *
 		 * @since   1.7.0.7
 		 * @version 1.8.1.12 Added expiringlicense and expiredlicense.
-		 * @version 1.8.2
+		 * @version 1.8.3
 		 *
 		 * @param   mixed[] $values The parsed values combining old values & new values.
 		 * @param   mixed[] $new_values The newly submitted values.
@@ -187,6 +187,7 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 			delete_option( 'charitable_lite_reports_upgrade' );
 			delete_option( 'charitable_builder_onboarding' ); // v1.8.1.12.
 			delete_option( 'charitable_onboarding_checklist' ); // v1.8.2.
+			delete_option( 'charitable_notifications' ); // v1.8.3.
 
 			// Delete transients (related to notices).
 			$notice_slugs = array( 'campaign-builder', 'dashboard-reporting', 'five-star-review', 'expiringlicense', 'expiredlicense' );
@@ -202,6 +203,9 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 
 			// Delete transients (related to security checks and logs).
 			delete_transient( 'charitable_donation_security_checks' ); // v1.8.1.6.
+
+			// Delete transients (related to notifications).
+			delete_transient( 'charitable_autoshow_plugin_notifications' ); // v1.8.3.
 
 			// Delete all transients whose names start with "charitable-report".
 			charitable_delete_transients_from_keys( charitable_search_database_for_transients_by_prefix( 'charitable-report', '-' ) );

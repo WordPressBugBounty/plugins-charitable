@@ -664,7 +664,7 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 						/* translators: %1$s Opening anchor tag, do not translate. %2$s Closing anchor tag, do not translate. */
 						__(
 							'There was an error getting your Stripe credentials. Please %1$stry again%2$s. If you continue to have this problem, please contact support.',
-							'stripe'
+							'charitable'
 						),
 						'<a href="' . esc_url( $stripe_account_settings_url ) . '">',
 						'</a>'

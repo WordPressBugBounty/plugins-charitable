@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.1.12
- * @version   1.8.2
+ * @version   1.8.3
  */
 
 // Exit if accessed directly.
@@ -44,3 +44,10 @@ add_action( 'admin_footer', array( Charitable_Checklist::get_instance(), 'maybe_
  * @see Charitable_Checklist::get_dashboard_notices()
  */
 add_filter( 'charitable_admin_dashboard_init_end', array( Charitable_Checklist::get_instance(), 'get_dashboard_notices' ), 10 );
+
+/**
+ * Redirect from the notifications page if necessary.
+ *
+ * @see Charitable_Checklist::maybe_redirect_from_notifications_page()
+ */
+add_action( 'init', array( Charitable_Checklist::get_instance(), 'maybe_redirect_from_checklist_page' ) );

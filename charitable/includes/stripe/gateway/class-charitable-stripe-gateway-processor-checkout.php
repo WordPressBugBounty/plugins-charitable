@@ -33,7 +33,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor_Checkout' ) ) :
 		 */
 		public function run() {
 			if ( ! $this->set_stripe_api_key() ) {
-				$this->donation_log->add( __( 'Missing secret API key.', 'charitable-stripe' ) );
+				$this->donation_log->add( __( 'Missing secret API key.', 'charitable' ) );
 				return false;
 			}
 
@@ -84,7 +84,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor_Checkout' ) ) :
 				$session = \Stripe\Checkout\Session::create( $args, $this->options );
 			} catch ( Exception $e ) {
 				$body    = $e->getJsonBody();
-				$message = isset( $body['error']['message'] ) ? $body['error']['message'] : __( 'Something went wrong.', 'charitable-stripe' );
+				$message = isset( $body['error']['message'] ) ? $body['error']['message'] : __( 'Something went wrong.', 'charitable' );
 
 				charitable_get_notices()->add_error( $message );
 
@@ -125,7 +125,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor_Checkout' ) ) :
 						$item = $campaign_donation->campaign_name;
 
 						if ( empty( $item ) ) {
-							$item = sprintf( __( 'Donation to campaign %d', 'charitable-stripe' ), $campaign_donation->campaign_id );
+							$item = sprintf( __( 'Donation to campaign %d', 'charitable' ), $campaign_donation->campaign_id );
 						}
 
 						return [
@@ -160,7 +160,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor_Checkout' ) ) :
 								$plan_id = $plan->create_plan();
 
 								if ( ! $plan_id ) {
-									$this->donation_log->add( __( 'Unable to add plan.', 'charitable-stripe' ) );
+									$this->donation_log->add( __( 'Unable to add plan.', 'charitable' ) );
 									return [];
 								}
 							}

@@ -89,7 +89,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 
 			if ( ! $event ) {
 				status_header( 500 );
-				die( __( 'Invalid Stripe event.', 'charitable-stripe' ) );
+				die( __( 'Invalid Stripe event.', 'charitable' ) );
 			}
 
 			try {
@@ -99,7 +99,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 				$event = \Stripe\Event::constructFrom( $event );
 			} catch( \UnexpectedValueException $e ) {
 				status_header( 400 );
-				die( __( 'Unable to construct Stripe object with payload.', 'charitable-stripe' ) );
+				die( __( 'Unable to construct Stripe object with payload.', 'charitable' ) );
 			}
 
 			$processor = new Charitable_Stripe_Webhook_Processor( $event );
@@ -124,12 +124,12 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 
 				/* This is Stripe's test webhook, so just die with a success message. */
 				if ( 'evt_00000000000000' == $this->event->id ) {
-					die( __( 'Test webhook successfully received.', 'charitable-stripe' ) );
+					die( __( 'Test webhook successfully received.', 'charitable' ) );
 				}
 
 				$this->run_event_processors();
 
-				die( __( 'Webhook processed.', 'charitable-stripe' ) );
+				die( __( 'Webhook processed.', 'charitable' ) );
 
 			} catch ( Exception $e ) {
 				$body = $e->getJsonBody();
@@ -138,7 +138,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 				}
 				status_header( 500 );
 
-				die( __( 'Error while retrieving event.', 'charitable-stripe' ) );
+				die( __( 'Error while retrieving event.', 'charitable' ) );
 			}//end try
 		}
 
@@ -341,7 +341,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			 * This probably isn't a Charitable payment.
 			 */
 			if ( ! isset( $charge->metadata->donation_id ) ) {
-				return __( 'Donation Webhook: Missing donation ID', 'charitable-stripe' );
+				return __( 'Donation Webhook: Missing donation ID', 'charitable' );
 			}
 
 			$donation_id   = $charge->metadata->donation_id;
@@ -353,7 +353,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			}
 
 			if ( Charitable::DONATION_POST_TYPE !== get_post_type( $donation_id ) ) {
-				return __( 'Donation Webhook: Refund donation ID not valid', 'charitable-stripe' );
+				return __( 'Donation Webhook: Refund donation ID not valid', 'charitable' );
 			}
 
 			$donation = new Charitable_Donation( $donation_id );
@@ -365,12 +365,12 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			 * @see https://bitbucket.org/wpcharitable/charitable-stripe/issues/54/webhooks-distinguish-between-webhooks-for
 			 */
 			if ( $donation->get_gateway_transaction_id() != $charge->id ) {
-				return __( 'Donation Webhook: Charge ID does not match donation reference on this site', 'charitable-stripe' );
+				return __( 'Donation Webhook: Charge ID does not match donation reference on this site', 'charitable' );
 			}
 
-			$donation->process_refund( $refund_amount, __( 'Donation refunded from the Stripe dashboard.', 'charitable-stripe' ) );
+			$donation->process_refund( $refund_amount, __( 'Donation refunded from the Stripe dashboard.', 'charitable' ) );
 
-			return __( 'Donation Webhook: Refund processed', 'charitable-stripe' );
+			return __( 'Donation Webhook: Refund processed', 'charitable' );
 		}
 
 		/**
@@ -390,13 +390,13 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			}
 
 			if ( ! isset( $payment_intent->metadata->donation_id ) ) {
-				return __( 'Donation Webhook: Missing donation ID', 'charitable-stripe' );
+				return __( 'Donation Webhook: Missing donation ID', 'charitable' );
 			}
 
 			$donation_id = $payment_intent->metadata->donation_id;
 
 			if ( Charitable::DONATION_POST_TYPE !== get_post_type( $donation_id ) ) {
-				return __( 'Donation Webhook: Donation ID not valid', 'charitable-stripe' );
+				return __( 'Donation Webhook: Donation ID not valid', 'charitable' );
 			}
 
 			$donation = new Charitable_Donation( $donation_id );
@@ -408,7 +408,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			 * @see https://github.com/Charitable/Charitable-Stripe/issues/54/
 			 */
 			if ( get_post_meta( $donation_id, '_stripe_payment_intent', true ) != $payment_intent->id ) {
-				return __( 'Donation Webhook: Payment Intent does not match donation reference on this site', 'charitable-stripe' );
+				return __( 'Donation Webhook: Payment Intent does not match donation reference on this site', 'charitable' );
 			}
 
 			/* Log the payment error along with the error code. */
@@ -427,7 +427,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			/* Mark the donation as Failed. */
 			$donation->update_status( 'charitable-failed' );
 
-			return __( 'Donation Webhook: Donation marked as Failed', 'charitable-stripe' );
+			return __( 'Donation Webhook: Donation marked as Failed', 'charitable' );
 		}
 
 		/**
@@ -440,7 +440,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 		 */
 		public function process_payment_intent_payment_failed_for_subscription( $event ) {
 			if ( ! $this->is_recurring_installed() ) {
-				return __( 'Subscription Webhook: Unable to process without Charitable Recurring extension.', 'charitable-stripe' );
+				return __( 'Subscription Webhook: Unable to process without Charitable Recurring extension.', 'charitable' );
 			}
 
 			$payment_intent = $event->data->object;
@@ -452,13 +452,13 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 				/* Get the invoice, so we can get the subscription id from that. */
 				$invoice = \Stripe\Invoice::retrieve( $payment_intent->invoice, $this->get_options() );
 			} catch ( Exception $e ) {
-				return __( 'Donation Webhook: Unable to retrieve invoice for failed payment intent.', 'charitable-stripe' );
+				return __( 'Donation Webhook: Unable to retrieve invoice for failed payment intent.', 'charitable' );
 			}
 
 			$subscription = charitable_recurring_get_subscription_by_gateway_id( $invoice->subscription, 'stripe' );
 
 			if ( ! $subscription || ! is_a( $subscription, 'Charitable_Recurring_Donation' ) ) {
-				return __( 'Donation Webhook: No matching subscription found for invoice with failed payment intent.', 'charitable-stripe' );
+				return __( 'Donation Webhook: No matching subscription found for invoice with failed payment intent.', 'charitable' );
 			}
 
 			$subscription_log = new Charitable_Stripe_Recurring_Donation_Log( $subscription );
@@ -471,10 +471,10 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 				/* Mark the subscription as cancelled. */
 				if ( 'canceled' == $payment_intent->status ) {
 					$subscription->update_status( 'charitable-cancelled' );
-					return __( 'Donation Webhook: Recurring donation for payment intent marked as cancelled.', 'charitable-stripe' );
+					return __( 'Donation Webhook: Recurring donation for payment intent marked as cancelled.', 'charitable' );
 				} else {
 					$subscription->update_status( 'charitable-cancel' );
-					return __( 'Donation Webhook: Recurring donation for payment intent marked as pending cancellation.', 'charitable-stripe' );
+					return __( 'Donation Webhook: Recurring donation for payment intent marked as pending cancellation.', 'charitable' );
 				}
 			}
 
@@ -500,7 +500,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			/* Mark the donation as Failed. */
 			$donation->update_status( 'charitable-failed' );
 
-			return __( 'Donation Webhook: Recurring donation and initial payment for payment intent marked as failed'. 'charitable-stripe' );
+			return __( 'Donation Webhook: Recurring donation and initial payment for payment intent marked as failed'. 'charitable' );
 		}
 
 		/**
@@ -524,7 +524,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			}
 
 			if ( ! isset( $payment_intent->metadata->donation_id ) ) {
-				return __( 'Donation Webhook: Missing donation ID', 'charitable-stripe' );
+				return __( 'Donation Webhook: Missing donation ID', 'charitable' );
 			}
 
 			$donation_id = $payment_intent->metadata->donation_id;
@@ -534,7 +534,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			}
 
 			if ( Charitable::DONATION_POST_TYPE !== get_post_type( $donation_id ) ) {
-				return __( 'Donation Webhook: Donation ID not valid', 'charitable-stripe' );
+				return __( 'Donation Webhook: Donation ID not valid', 'charitable' );
 			}
 
 			/**
@@ -544,7 +544,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			 * @see https://bitbucket.org/wpcharitable/charitable-stripe/issues/54/webhooks-distinguish-between-webhooks-for
 			 */
 			if ( get_post_meta( $donation_id, '_stripe_payment_intent', true ) != $payment_intent->id ) {
-				return __( 'Donation Webhook: Payment Intent does not match donation reference on this site', 'charitable-stripe' );
+				return __( 'Donation Webhook: Payment Intent does not match donation reference on this site', 'charitable' );
 			}
 
 			$donation = new Charitable_Donation( $donation_id );
@@ -584,7 +584,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			/* Finally, update the donation status. */
 			$donation->update_status( 'charitable-completed' );
 
-			return __( 'Donation Webhook: Donation marked as Paid', 'charitable-stripe' );
+			return __( 'Donation Webhook: Donation marked as Paid', 'charitable' );
 		}
 
 		/**
@@ -613,12 +613,12 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			 * @see https://bitbucket.org/wpcharitable/charitable-stripe/issues/54/webhooks-distinguish-between-webhooks-for
 			 */
 			if ( $session->id != get_post_meta( $donation_id, '_stripe_session_id', true ) ) {
-				return __( 'Donation Webhook: Session id does not match donation reference on this site', 'charitable-stripe' );
+				return __( 'Donation Webhook: Session id does not match donation reference on this site', 'charitable' );
 			}
 
 			/* Ensure the post type is correct. */
 			if ( Charitable::DONATION_POST_TYPE !== get_post_type( $donation_id ) ) {
-				return __( 'Donation Webhook: Donation ID not valid', 'charitable-stripe' );
+				return __( 'Donation Webhook: Donation ID not valid', 'charitable' );
 			}
 
 			/* Process subscriptions separately. */
@@ -628,7 +628,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 
 			/* If this is not a subscription, we need a payment intent. */
 			if ( is_null( $session->payment_intent ) ) {
-				return __( 'Donation Webhook: Missing payment intent', 'charitable-stripe' );
+				return __( 'Donation Webhook: Missing payment intent', 'charitable' );
 			}
 
 			/* Mark the donation as complete. */
@@ -645,7 +645,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 				$log->log_payment_intent( $session->payment_intent );
 			}
 
-			return __( 'Session Webhook: Donation updated with Payment Intent data', 'charitable-stripe' );
+			return __( 'Session Webhook: Donation updated with Payment Intent data', 'charitable' );
 		}
 
 		/**
@@ -662,7 +662,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 
 			/* Make sure we have a subscription. */
 			if ( is_null( $session->subscription ) ) {
-				return __( 'Session Webhook: Missing subscription', 'charitable-stripe' );
+				return __( 'Session Webhook: Missing subscription', 'charitable' );
 			}
 
 			/* Mark the donation as complete. */
@@ -671,7 +671,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 
 			/* Make sure a valid subscription exists. */
 			if ( ! $subscription ) {
-				return __( 'Session Webhook: Invalid subscription', 'charitable-stripe' );
+				return __( 'Session Webhook: Invalid subscription', 'charitable' );
 			}
 
 			/* Log the subscription id. */
@@ -696,12 +696,12 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 						$stripe_sub->cancel_at = $cancel_at - HOUR_IN_SECONDS;
 						$stripe_sub->save();
 					} catch ( Exception $e ) {
-						$subscription->update_donation_log( __( 'Unable to set cancel time for subscription.', 'charitable-stripe' ) );
+						$subscription->update_donation_log( __( 'Unable to set cancel time for subscription.', 'charitable' ) );
 					}
 				}
 			}
 
-			return __( 'Session Webhook: Donation and subscription updated with session data', 'charitable-stripe' );
+			return __( 'Session Webhook: Donation and subscription updated with session data', 'charitable' );
 		}
 
 		/**
@@ -714,14 +714,14 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 		 */
 		public function process_invoice_created( $event ) {
 			if ( ! $this->is_recurring_installed() ) {
-				return __( 'Subscription Webhook: Unable to process without Charitable Recurring extension.', 'charitable-stripe' );
+				return __( 'Subscription Webhook: Unable to process without Charitable Recurring extension.', 'charitable' );
 			}
 
 			$invoice      = $event->data->object;
 			$subscription = $this->get_subscription_for_webhook_object( $invoice );
 
 			if ( ! $subscription || ! is_a( $subscription, 'Charitable_Recurring_Donation' ) ) {
-				return __( 'Subscription Webhook: Missing subscription', 'charitable-stripe' );
+				return __( 'Subscription Webhook: Missing subscription', 'charitable' );
 			}
 
 			/* Record the invoice in the subscription. */
@@ -730,7 +730,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 				$log->log_new_invoice( $invoice->id );
 			}
 
-			return __( 'Subscription Webhook: Invoice created', 'charitable-stripe' );
+			return __( 'Subscription Webhook: Invoice created', 'charitable' );
 		}
 
 		/**
@@ -743,19 +743,19 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 		 */
 		public function process_invoice_payment_failed( $event ) {
 			if ( ! $this->is_recurring_installed() ) {
-				return __( 'Subscription Webhook: Unable to process without Charitable Recurring extension.', 'charitable-stripe' );
+				return __( 'Subscription Webhook: Unable to process without Charitable Recurring extension.', 'charitable' );
 			}
 
 			$invoice = $event->data->object;
 
 			if ( ! in_array( $invoice->status, [ 'void', 'uncollectible' ] ) ) {
-				return sprintf( __( 'Subscription Webhook: Not processing invoice with a status of %s.', 'charitable-stripe' ), $invoice->status );
+				return sprintf( __( 'Subscription Webhook: Not processing invoice with a status of %s.', 'charitable' ), $invoice->status );
 			}
 
 			$subscription = $this->get_subscription_for_webhook_object( $invoice );
 
 			if ( empty( $subscription ) || ! is_a( $subscription, 'Charitable_Recurring_Donation' ) ) {
-				return __( 'Subscription Webhook: Missing subscription', 'charitable-stripe' );
+				return __( 'Subscription Webhook: Missing subscription', 'charitable' );
 			}
 
 			$subscription_log = new Charitable_Stripe_Recurring_Donation_Log( $subscription );
@@ -763,7 +763,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 				$subscription_log->get_failed_invoice_log_message( $invoice->id, $invoice->payment_intent )
 			);
 
-			return __( 'Subscription Webhook: Invoice payment failed', 'charitable-stripe' );
+			return __( 'Subscription Webhook: Invoice payment failed', 'charitable' );
 		}
 
 		/**
@@ -776,14 +776,14 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 		 */
 		public function process_invoice_payment_succeeded( $event ) {
 			if ( ! $this->is_recurring_installed() ) {
-				return __( 'Subscription Webhook: Unable to process without Charitable Recurring extension.', 'charitable-stripe' );
+				return __( 'Subscription Webhook: Unable to process without Charitable Recurring extension.', 'charitable' );
 			}
 
 			$invoice      = $event->data->object;
 			$subscription = $this->get_subscription_for_webhook_object( $invoice );
 
 			if ( empty( $subscription ) || ! is_a( $subscription, 'Charitable_Recurring_Donation' )  ) {
-				return __( 'Subscription Webhook: Missing subscription', 'charitable-stripe' );
+				return __( 'Subscription Webhook: Missing subscription', 'charitable' );
 			}
 
 			/* The first donation is pending, which means this is the payment for that webhook. */
@@ -795,7 +795,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			} else {
 				/* Check whether we've already added this renewal. */
 				if ( charitable_get_donation_by_transaction_id( $invoice->payment_intent ) ) {
-					return __( 'Subscription Webhook: Renewal has already been added', 'charitable-stripe' );
+					return __( 'Subscription Webhook: Renewal has already been added', 'charitable' );
 				}
 
 				$donation_id = $subscription->create_renewal_donation( [ 'status' => 'charitable-completed' ] );
@@ -827,10 +827,10 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 				$charge->metadata = charitable_stripe_get_donation_metadata( $donation );
 				$charge->save();
 			} catch ( Exception $e ) {
-				$donation->update_donation_log( __( 'Unable to save donation ID to Stripe charge metadata.', 'charitable-stripe' ) );
+				$donation->update_donation_log( __( 'Unable to save donation ID to Stripe charge metadata.', 'charitable' ) );
 			}
 
-			return __( 'Subscription Webhook: Payment complete', 'charitable-stripe' );
+			return __( 'Subscription Webhook: Payment complete', 'charitable' );
 		}
 
 		/**
@@ -843,14 +843,14 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 		 */
 		public function process_customer_subscription_updated( $event ) {
 			if ( ! $this->is_recurring_installed() ) {
-				return __( 'Subscription Webhook: Unable to process without Charitable Recurring extension.', 'charitable-stripe' );
+				return __( 'Subscription Webhook: Unable to process without Charitable Recurring extension.', 'charitable' );
 			}
 
 			$object       = $event->data->object;
 			$subscription = $this->get_subscription_for_webhook_object( $object );
 
 			if ( empty( $subscription ) ) {
-				return __( 'Subscription Webhook: Missing subscription', 'charitable-stripe' );
+				return __( 'Subscription Webhook: Missing subscription', 'charitable' );
 			}
 
 			$stripe_status  = $this->get_subscription_status( $object->status );
@@ -860,7 +860,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 				$subscription->update_status( $stripe_status );
 			}
 
-			return __( 'Subscription Webhook: Recurring donation updated', 'charitable-stripe' );
+			return __( 'Subscription Webhook: Recurring donation updated', 'charitable' );
 		}
 
 		/**
@@ -873,21 +873,21 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 		 */
 		public function process_customer_subscription_deleted( $event ) {
 			if ( ! $this->is_recurring_installed() ) {
-				return __( 'Subscription Webhook: Unable to process without Charitable Recurring extension.', 'charitable-stripe' );
+				return __( 'Subscription Webhook: Unable to process without Charitable Recurring extension.', 'charitable' );
 			}
 
 			$object       = $event->data->object;
 			$subscription = $this->get_subscription_for_webhook_object( $object );
 
 			if ( empty( $subscription ) ) {
-				return __( 'Subscription Webhook: Missing subscription', 'charitable-stripe' );
+				return __( 'Subscription Webhook: Missing subscription', 'charitable' );
 			}
 
 			if ( 'charitable-completed' != $subscription->get_status() ) {
 				$subscription->update_status( 'charitable-cancelled' );
 			}
 
-			return __( 'Subscription Webhook: Recurring donation cancelled', 'charitable-stripe' );
+			return __( 'Subscription Webhook: Recurring donation cancelled', 'charitable' );
 		}
 
 		/**
@@ -969,7 +969,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 				$donation->log()->add(
 					sprintf(
 						/* translators: %d: threshold */
-						__( 'The payment intent has been cancelled after %d failed payment attempts.', 'charitable-stripe' ),
+						__( 'The payment intent has been cancelled after %d failed payment attempts.', 'charitable' ),
 						$threshold
 					)
 				);

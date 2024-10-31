@@ -108,7 +108,7 @@ if ( ! class_exists( 'Charitable_Guide_Tools' ) ) :
 		 */
 		public function enqueue_scripts() {
 
-			$min        = ''; // charitable_get_min_suffix(); // todo: undo this.
+			$min        = charitable_get_min_suffix();
 			$version    = charitable()->get_version();
 			$assets_dir = charitable()->get_path( 'assets', false );
 
@@ -484,7 +484,7 @@ if ( ! class_exists( 'Charitable_Guide_Tools' ) ) :
 					<p class="charitable-notice-why"><strong><?php echo esc_html__( 'Tip:', 'charitable' ); ?></strong><br/><?php echo esc_html( $suggestion['tip'] ); ?></p>
 				<?php endif; ?>
 
-				<p class="more-recommendations"><?php echo esc_html__( 'More recommendations:', 'charitable' ); ?> <a target="_blank" href="<?php echo admin_url( 'admin.php?page=charitable-growth-tools' ); ?>"><?php echo esc_html__( 'Growth Tools', 'charitable' ); ?></a> - <a target="_blank" href="<?php echo admin_url( 'admin.php?page=charitable-addons' ); ?>"><?php echo esc_html__( 'Charitable Addons', 'charitable' ); ?></a></p>
+				<p class="more-recommendations"><?php echo esc_html__( 'More recommendations:', 'charitable' ); ?> <a target="_blank" href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-growth-tools' ) ); ?>"><?php echo esc_html__( 'Growth Tools', 'charitable' ); ?></a> - <a target="_blank" href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-addons' ) ); ?>"><?php echo esc_html__( 'Charitable Addons', 'charitable' ); ?></a></p>
 				<p class="charitable-dashboard-notice-another-suggestion"><a href="#"><strong><?php echo esc_html__( 'Get another suggestion.', 'charitable' ); ?></a></p>
 
 				<a href="#" class="charitable-remove-growth-tools" title="<?php echo esc_html__( 'Close this notice.', 'charitable' ); ?>"></a>

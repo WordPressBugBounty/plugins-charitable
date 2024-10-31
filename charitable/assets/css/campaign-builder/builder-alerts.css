@@ -123,7 +123,7 @@
   padding: 0 20px;
   overflow: scroll;
   position: fixed;
-  z-index: 100110;
+  z-index: 9900110; /* was 100110 */
   text-align: center;
   top: 0;
   right: 0;

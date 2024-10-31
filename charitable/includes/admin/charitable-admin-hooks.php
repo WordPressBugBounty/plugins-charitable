@@ -210,11 +210,32 @@ add_action( 'wp_ajax_charitable_onboarding_save_option', array( Charitable_Campa
 add_action( 'wp_ajax_charitable_onboarding_tour_save_option', array( Charitable_Campaign_Builder::get_instance(), 'save_tour_option_ajax' ), 5 );
 add_action( 'wp_ajax_charitable_onboarding_checklist_save_option', array( Charitable_Checklist::get_instance(), 'save_checklist_option_ajax' ), 5 );
 
-
 /**
  * Checklist: check to mark step as completed.
  *
  * @see Charitable_Checklist::check_step_first_donation()
  */
-// add_action( 'admin_init', array( Charitable_Onboarding::get_instance(), 'check_step_first_donation' ), 5 );
 add_action( 'admin_init', array( Charitable_Checklist::get_instance(), 'maybe_redirect_to_next_step' ), 999 );
+
+/**
+ * Plugin notifications, added mostly in 1.8.3.
+ *
+ * @see Charitable_Notifications::add_notifications_to_menu()
+ * @see Charitable_Notifications::dismiss()
+ * @see Charitable_Notifications::dismiss_multiple()
+ * @see Charitable_Notifications::maybe_redirect_from_notifications()
+ */
+add_filter( 'admin_init', array( Charitable_Notifications::get_instance(), 'init' ), 9 );
+add_filter( 'charitable_submenu_pages', array( Charitable_Notifications::get_instance(), 'add_notifications_to_menu' ), 2 );
+add_filter( 'wp_ajax_charitable_notification_dismiss', array( Charitable_Notifications::get_instance(), 'dismiss' ), 10 );
+add_filter( 'wp_ajax_charitable_notification_dismiss_multiple', array( Charitable_Notifications::get_instance(), 'dismiss_multiple' ), 10 );
+add_action( 'admin_init', array( Charitable_Notifications::get_instance(), 'maybe_redirect_from_notifications' ), 10 );
+
+/**
+ * Event Driven notifications and items, added mostly in 1.8.3.
+ *
+ * @see Charitable_EventDriven::init()
+ * @see Charitable_EventDriven::update_events()
+ */
+add_action( 'plugins_loaded', array( Charitable_EventDriven::get_instance(), 'init' ), 999 );
+add_filter( 'charitable_admin_notifications_update_data', array( Charitable_EventDriven::get_instance(), 'update_events' ), 9 );

@@ -147,10 +147,10 @@ if ( ! class_exists( 'Charitable_Tools_Settings' ) ) :
 					'nonce_field_name'  => 'charitable_nonce',
 					'name'              => 'campaign',
 					'action'            => 'export-campaign',
-					'button_label'      => esc_html__( 'Export Campaign', 'charitable' ),
+					'button_label'      => __( 'Export Campaign', 'charitable' ),
 					'help'              => sprintf(
 						/* translators: %1$s: HTML strong tag. %2$s: HTML closing strong tag. %1$s: HTML break tag. */
-						esc_html__( 'Campaign exports files can be used to create a backup of your campaigns or to import campaigns into another site with Charitable installed.%3$s %1$sCampaign exports do not include donations or campaign creators%2$s.', 'charitable' ),
+						__( 'Campaign exports files can be used to create a backup of your campaigns or to import campaigns into another site with Charitable installed.%3$s %1$sCampaign exports do not include donations or campaign creators%2$s.', 'charitable' ),
 						'<strong>',
 						'</strong>',
 						'<br />'
@@ -167,10 +167,10 @@ if ( ! class_exists( 'Charitable_Tools_Settings' ) ) :
 					'nonce_field_name'  => 'charitable_nonce',
 					'name'              => 'donations',
 					'action'            => 'export-donations-from-campaign',
-					'button_label'      => esc_html__( 'Export Donations', 'charitable' ),
+					'button_label'      => __( 'Export Donations', 'charitable' ),
 					'help'              => sprintf(
 						/* translators: %1$s: HTML strong tag. %2$s: HTML closing strong tag. %1$s: HTML break tag. */
-						esc_html__( 'Donation exports files can be used to create a backup of your donations or to import donations if you are migrating campaigns to another site with Charitable installed. %3$s All donation types (paid, refunded, pending) will be exported. %1$sRecurring donations are not included%2$s.', 'charitable' ),
+						__( 'Donation exports files can be used to create a backup of your donations or to import donations if you are migrating campaigns to another site with Charitable installed. %3$s All donation types (paid, refunded, pending) will be exported. %1$sRecurring donations are not included%2$s.', 'charitable' ),
 						'<strong>',
 						'</strong>',
 						'<br />'

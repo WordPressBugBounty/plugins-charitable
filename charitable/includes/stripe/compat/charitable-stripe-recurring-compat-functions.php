@@ -22,18 +22,18 @@ if ( ! function_exists( 'charitable_recurring_get_donation_periods_i18n' ) ) :
 	 *
 	 * @since  1.3.0
 	 *
-	 * @param  int    Optional. An interval in the range 1-6.
-	 * @param  string Optional. month|quarter|semiannual|year. If empty, all subscription periods are returned.
+	 * @param  int    $number Optional. An interval in the range 1-6.
+	 * @param  string $period Optional. month|quarter|semiannual|year. If empty, all subscription periods are returned.
 	 * @return mixed string|array
 	 */
 	function charitable_recurring_get_donation_periods_i18n( $number = 1, $period = '' ) {
 		$translated_periods = apply_filters(
 			'charitable_recurring_periods',
 			[
-				'month'      => sprintf( _n( 'month', '%s months', $number, 'charitable-recurring' ), $number ),
-				'quarter'    => sprintf( _n( 'quarter', '%s quarters', $number, 'charitable-recurring' ), $number ),
-				'semiannual' => sprintf( _n( 'semiannual', '%s semiannuals', $number, 'charitable-recurring' ), $number ),
-				'year'       => sprintf( _n( 'year', '%s years', $number, 'charitable-recurring' ), $number ),
+				'month'      => sprintf( _n( 'month', '%s months', $number, 'charitable' ), $number ),
+				'quarter'    => sprintf( _n( 'quarter', '%s quarters', $number, 'charitable' ), $number ),
+				'semiannual' => sprintf( _n( 'semiannual', '%s semiannuals', $number, 'charitable' ), $number ),
+				'year'       => sprintf( _n( 'year', '%s years', $number, 'charitable' ), $number ),
 			]
 		);
 

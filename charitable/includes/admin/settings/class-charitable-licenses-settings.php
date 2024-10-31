@@ -340,6 +340,7 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 		 * Outputs the "new" license HTML for the general settings tab.
 		 *
 		 * @since   1.7.0.4
+		 * @version 1.8.3 added charitable_is_pro() check.
 		 *
 		 * @param   string $has_valid_license Allows us to control HTML based on valid license already in the system.
 		 * @return  string
@@ -353,6 +354,8 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 
 			if ( $slug === false || strtolower( $slug ) === 'lite' ) {
 				$has_valid_license = false;
+			} elseif ( charitable_is_pro() ) {
+				$has_valid_license = true;
 			}
 
 			$output = '<div id="charitable-license-message" class="license-message license-valid-' . $has_valid_license . '">';

@@ -311,6 +311,7 @@ if ( ! class_exists( 'Charitable_Field_HTML' ) ) :
 		 * Format and sanitize field.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.3 added img, svg, ul, ol, li.
 		 *
 		 * @param int   $field_id      Field type.
 		 * @param mixed $field_submit  Field value that was submitted.
@@ -364,6 +365,36 @@ if ( ! class_exists( 'Charitable_Field_HTML' ) ) :
 					],
 					'h6'     => [
 						'class' => [],
+					],
+					'img'    => [
+						'src'     => [],
+						'target'  => [],
+						'class'   => [],
+						'alt'     => [],
+						'width'   => [],
+						'height'  => [],
+						'style'   => [],
+						'loading' => [],
+					],
+					'svg'    => [
+						'class'   => [],
+						'width'   => [],
+						'height'  => [],
+						'viewBox' => [],
+						'fill'    => [],
+						'xmlns'   => [],
+					],
+					'ul'     => [
+						'class' => [],
+						'style' => [],
+					],
+					'ol'     => [
+						'class' => [],
+						'style' => [],
+					],
+					'li'     => [
+						'class' => [],
+						'style' => [],
 					],
 				),
 				$campaign_data

@@ -276,7 +276,7 @@ if ( ! class_exists( 'Charitable_Stripe_Connected_Customer' ) ) :
 
 			} catch ( Exception $e ) {
 				$body    = $e->getJsonBody();
-				$message = isset( $body['error']['message'] ) ? $body['error']['message'] : __( 'Something went wrong.', 'charitable-stripe' );
+				$message = isset( $body['error']['message'] ) ? $body['error']['message'] : __( 'Something went wrong.', 'charitable' );
 
 				charitable_get_notices()->add_error( $message );
 

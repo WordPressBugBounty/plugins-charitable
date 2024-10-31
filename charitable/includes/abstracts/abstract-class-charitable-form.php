@@ -99,7 +99,7 @@ if ( ! class_exists( 'Charitable_Form' ) ) :
 				__METHOD__,
 				sprintf(
 					/* translators: %s: class name */
-					__( 'None of the callbacks are required as of Charitable 1.5; use `Charitable_Public_Form_View` instead. Issue encountered in %s class.' ),
+					__( 'None of the callbacks are required as of Charitable 1.5; use `Charitable_Public_Form_View` instead. Issue encountered in %s class.', 'charitable' ),
 					get_class( $this )
 				),
 				'1.5.0'

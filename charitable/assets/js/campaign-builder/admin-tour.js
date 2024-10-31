@@ -66,6 +66,10 @@ var CharitableTour =
           typeof charitable_admin_builder_onboarding.option.tour.status ===
             "undefined"
         ) {
+          // output error message to console.
+          console.error(
+            "Charitable Error: Shepherd or charitable_admin_builder_onboarding is not available.",
+          );
           // eslint-disable-line
           return;
         }

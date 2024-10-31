@@ -137,7 +137,7 @@ if ( ! class_exists( 'Charitable_Reports_Download' ) ) :
 			ob_start();
 
 			$page_args = array(
-				'charitable_admin_2_0_css' => $assets_dir . 'css/charitable-admin-report-' . $action . '.css', // phpcs:ignore
+				'charitable_admin_2_0_css' => $assets_dir . 'css/admin/charitable-admin-report-' . $action . '.css', // phpcs:ignore
 				'action'                   => $action,
 				'charitable_cards'         => $html['charitable_cards'], // phpcs:ignore
 				'charitable_reports'       => $html['charitable_reports'], // phpcs:ignore
@@ -237,7 +237,7 @@ if ( ! class_exists( 'Charitable_Reports_Download' ) ) :
 			charitable_template(
 				'print/overview.php',
 				array(
-					'charitable_admin_2_0_css'      => $assets_dir . 'css/charitable-admin-report-' . $action . '.css',
+					'charitable_admin_2_0_css'      => $assets_dir . 'css/admin/charitable-admin-report-' . $action . '.css',
 					'action'                        => $action,
 					'donations'                     => $donations,
 					'total_count_donations'         => $total_count_donations,

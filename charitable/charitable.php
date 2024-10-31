@@ -3,12 +3,12 @@
  * Plugin Name: Charitable
  * Plugin URI: https://www.wpcharitable.com
  * Description: The WordPress fundraising alternative for non-profits, created to help non-profits raise money on their own website.
- * Version: 1.8.2
+ * Version: 1.8.3
  * Author: Charitable Donations & Fundraising Team
  * Author URI: https://wpcharitable.com
  * Requires at least: 4.1
  * Tested up to: 6.6.2
- * Stable tag: 1.8.2
+ * Stable tag: 1.8.3
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
@@ -40,7 +40,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		const AUTHOR = 'WP Charitable';
 
 		/* Plugin version. */
-		const VERSION = '1.8.2';
+		const VERSION = '1.8.3';
 
 		/* Version of database schema. */
 		const DB_VERSION = '20180522';
@@ -583,8 +583,9 @@ if ( ! class_exists( 'Charitable' ) ) :
 		 * Fires off an action right after Charitable is installed, allowing other
 		 * plugins/themes to do something at this point.
 		 *
-		 * @since  1.0.1
-		 * @since  1.8.1.12 - Added transient for activation redirect.
+		 * @since   1.0.1
+		 * @version 1.8.1.12 - Added transient for activation redirect.
+		 * @version 1.8.3 - Added call to add version and delete notifications.
 		 *
 		 * @return void
 		 */
@@ -613,10 +614,15 @@ if ( ! class_exists( 'Charitable' ) ) :
 				set_transient( 'charitable_activation_redirect', true, 30 );
 			}
 
+			$this->add_version_to_upgraded_from();
+
 			if ( empty( $activated[ $type ] ) ) {
 				$activated[ $type ] = time();
 				update_option( 'charitable_activated', $activated );
 			}
+
+			// Clear notifications.
+			delete_option( 'charitable_notifications' );
 		}
 
 		/**
@@ -728,6 +734,24 @@ if ( ! class_exists( 'Charitable' ) ) :
 			}
 
 			return $version;
+		}
+
+		/**
+		 * Adds previous versions to the upgraded_from option.
+		 *
+		 * @since  1.8.3
+		 */
+		public function add_version_to_upgraded_from() {
+
+			$upgraded_from = get_option( 'charitable_version_upgraded_from', array() );
+
+			if ( ! is_array( $upgraded_from ) ) {
+				$upgraded_from = array();
+			}
+
+			$upgraded_from[] = $this->get_version();
+
+			update_option( 'charitable_version_upgraded_from', $upgraded_from, false );
 		}
 
 		/**
@@ -1194,8 +1218,9 @@ if ( ! class_exists( 'Charitable' ) ) :
 		 *
 		 * @since  1.7.0
 		 *
-		 * @param  array  $actions    An array of existing actions.
-		 * @param  string $plugin_file The plugin file we are modifying.
+		 * @param  array   $actions    An array of existing actions.
+		 * @param  string  $plugin_file The plugin file we are modifying.
+		 * @param  boolean $action_links An array of action links to add.
 		 * @return array              An array of action links.
 		 */
 		public function plugin_action_links( $actions, $plugin_file, $action_links = false ) {
@@ -1226,9 +1251,10 @@ if ( ! class_exists( 'Charitable' ) ) :
 		 *
 		 * @since 1.7.0
 		 *
-		 * @param  array  $actions
-		 * @param  string $pluginFile
-		 * @param
+		 * @param array  $actions   An array of existing actions.
+		 * @param string $pluginFile The plugin file we are modifying.
+		 * @param array  $action_links An array of action links to add.
+		 * @param string $position  The position to add the action links.
 		 * @return array
 		 */
 		protected function parse_action_links( $actions, $pluginFile, $action_links = [], $position = 'after' ) {
@@ -1258,7 +1284,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		 */
 		public function setup_licensing() {
 			charitable_get_helper( 'licenses' )->register_licensed_product(
-				self::NAME, // . ' Pro',
+				self::NAME,
 				self::AUTHOR,
 				self::VERSION,
 				__FILE__

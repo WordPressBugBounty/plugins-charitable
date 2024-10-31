@@ -1,13 +1,13 @@
 <?php
 /**
- * Admin campaign model class.
+ * Events for notification class.
  *
- * @package   Charitable/Classes/Charitable_Admin_Campaign
+ * @package   Charitable/Classes/Charitable_Admin_Form
  * @author    David Bisset
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since     1.7.5
- * @version   1.7.5
+ * @since     1.5.0
+ * @version   1.5.0
  */
 
 // Exit if accessed directly.
@@ -18,23 +18,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class EventDriven.
  *
- * @since 1.7.5
+ * @since 1.8.3
  */
 class Charitable_EventDriven {
 
 	/**
+	 * The single instance of this class.
+	 *
+	 * @var Charitable_Notifications|null
+	 */
+	private static $instance = null;
+
+	/**
 	 * Charitable version when the Event Driven feature has been introduced.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @var string
 	 */
-	const FEATURE_INTRODUCED = '1.7.5';
+	const FEATURE_INTRODUCED = '1.8.3';
 
 	/**
 	 * Expected date format for notifications.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @var string
 	 */
@@ -43,7 +50,7 @@ class Charitable_EventDriven {
 	/**
 	 * Common UTM parameters.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @var array
 	 */
@@ -63,7 +70,7 @@ class Charitable_EventDriven {
 	 *  - pro (activated/installed)
 	 *  - lite (activated/installed)
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @var array
 	 */
@@ -72,16 +79,24 @@ class Charitable_EventDriven {
 	/**
 	 * Timestamps.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @var array
 	 */
 	private $timestamps = [];
 
 	/**
+	 * Create object instance.
+	 *
+	 * @since 1.8.3
+	 */
+	public function __construct() {
+	}
+
+	/**
 	 * Initialize class.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 */
 	public function init() {
 
@@ -89,35 +104,33 @@ class Charitable_EventDriven {
 			return;
 		}
 
-		$this->hooks();
+		// $this->hooks();
 	}
 
 	/**
 	 * Indicate if this is allowed to load.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @return bool
 	 */
 	private function allow_load() {
 
-		return charitable()->get( 'notifications' )->has_access() || wp_doing_cron();
+		return charitable()->registry()->get( 'notifications' )->has_access() || wp_doing_cron();
 	}
 
 	/**
 	 * Hooks.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 */
 	private function hooks() {
-
-		add_filter( 'charitable_admin_notifications_update_data', [ $this, 'update_events' ] );
 	}
 
 	/**
 	 * Add Event Driven notifications before saving them in database.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param array $data Notification data.
 	 *
@@ -127,22 +140,16 @@ class Charitable_EventDriven {
 
 		$updated = [];
 
-		if ( ! defined( 'CHARITABLE_ENABLE_NOTIFICATIONS' ) || ! CHARITABLE_ENABLE_NOTIFICATIONS ) {
-			$data['events'] = $updated;
-
-			return $data;
-		}
-
 		/**
 		 * Allow developers to turn on debug mode: store all notifications and then show all of them.
 		 *
-		 * @since 1.7.5
+		 * @since 1.8.3
 		 *
 		 * @param bool $is_debug True if it's a debug mode. Default: false.
 		 */
 		$is_debug = (bool) apply_filters( 'charitable_admin_notifications_event_driven_update_events_debug', false );
 
-		$charitable_notifications = charitable()->get( 'notifications' );
+		$charitable_notifications = charitable()->registry()->get( 'notifications' );
 
 		foreach ( $this->get_notifications() as $slug => $notification ) {
 
@@ -201,7 +208,7 @@ class Charitable_EventDriven {
 	/**
 	 * Prepare and retrieve date logic.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param array $notification Notification data.
 	 *
@@ -217,7 +224,7 @@ class Charitable_EventDriven {
 	/**
 	 * Retrieve a notification timestamp based on date logic.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param array $args Date logic.
 	 *
@@ -249,7 +256,7 @@ class Charitable_EventDriven {
 	/**
 	 * Retrieve a callback that determines needed timestamp.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param string $target Date logic target.
 	 *
@@ -280,19 +287,19 @@ class Charitable_EventDriven {
 	/**
 	 * Retrieve a timestamp when Charitable was upgraded.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param string $version Charitable version.
 	 *
 	 * @return int|false Unix timestamp. False on failure.
 	 */
-	private function get_timestamp_upgraded( $version ) {
+	private function get_timestamp_upgraded( $version = false ) {
 
-		if ( $version === 'upgraded' ) {
-			$version = CHARITABLE_VERSION;
+		if ( false === $version || $version === 'upgraded' ) {
+			$version = charitable()->get_version();
 		}
 
-		$timestamp = charitable_get_upgraded_timestamp( $version );
+		$timestamp = charitable_get_updated_timestamp( $version );
 
 		if ( $timestamp === false ) {
 			return false;
@@ -305,7 +312,7 @@ class Charitable_EventDriven {
 	/**
 	 * Retrieve a timestamp when Charitable was first installed/activated.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @return int|false Unix timestamp. False on failure.
 	 */
@@ -317,7 +324,7 @@ class Charitable_EventDriven {
 	/**
 	 * Retrieve a timestamp when Lite was first installed.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @return int|false Unix timestamp. False on failure.
 	 */
@@ -331,7 +338,7 @@ class Charitable_EventDriven {
 	/**
 	 * Retrieve a timestamp when Pro was first installed.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @return int|false Unix timestamp. False on failure.
 	 */
@@ -343,9 +350,9 @@ class Charitable_EventDriven {
 	}
 
 	/**
-	 * Retrieve a timestamp when a first campaign was created.
+	 * Retrieve a timestamp when a first form was created.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @return int|false Unix timestamp. False on failure.
 	 */
@@ -359,7 +366,7 @@ class Charitable_EventDriven {
 	/**
 	 * Retrieve a number of entries.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @return int
 	 */
@@ -391,7 +398,7 @@ class Charitable_EventDriven {
 				);";
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-		$count = (int) $wpdb->get_var( $query );
+		$count = (int) $wpdb->get_var( $query ); // phpcs:ignore
 
 		return $count;
 	}
@@ -399,57 +406,79 @@ class Charitable_EventDriven {
 	/**
 	 * Retrieve campaigns.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
-	 * @param int $posts_per_page Number of campaign to return.
+	 * @param int $posts_per_page Number of form to return.
 	 *
 	 * @return array
 	 */
-	private function get_campaigns( $posts_per_page ) {
-
-		$campaigns = charitable()->get( 'campaign' )->get(
-			'',
-			[
-				'posts_per_page'         => (int) $posts_per_page,
-				'nopaging'               => false,
-				'update_post_meta_cache' => false,
-				'update_post_term_cache' => false,
-				'cap'                    => false,
-			]
-		);
+	private function get_campaigns( $posts_per_page ) { // phpcs:ignore
 
 		return ! empty( $campaigns ) ? (array) $campaigns : [];
 	}
 
 	/**
-	 * Determine if the user has at least 1 campaign.
+	 * Determine if the user has at least 1 form.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @return bool
 	 */
-	private function has_campaign() {
+	private function has_form() {
 
 		return ! empty( $this->get_campaigns( 1 ) );
 	}
 
 	/**
-	 * Determine if it is a new user.
+	 * Determine if it is a new user, usually by checking if the plugin has been updated or first installed.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @return bool
 	 */
 	private function is_new_user() {
 
-		// Check if this is an update or first install.
-		return ! get_option( 'charitable_version_upgraded_from' );
+		$activated = (array) get_option( 'charitable_activated', array() );
+
+		if ( empty( $activated ) || ! is_array( $activated ) ) {
+			delete_transient( 'charitable_autoshow_plugin_notifications' );
+			return true;
+		}
+
+		// Find for the oldest unix timestamp in the values of $activated and assign it to a variable.
+		$activated_time = max( $activated );
+
+		// If the timestamp eariler than 30 days from current time, then the user is new.
+		$is_new_user = ( time() - $activated_time ) < 30 * DAY_IN_SECONDS;
+
+		if ( ! $is_new_user ) {
+			return false;
+		}
+
+		$versions_upgraded_from = get_option( 'charitable_version_upgraded_from', [] );
+
+		if ( empty( $versions_upgraded_from ) ) {
+			return true;
+		}
+
+		// Get the first value in the $versions_upgraded_from array.
+		$version = reset( $versions_upgraded_from );
+
+		// If the version equals the current version, then it is a new user.
+		$is_new_user = version_compare( $version, charitable()->get_version(), '=' );
+
+		if ( $is_new_user ) {
+			delete_transient( 'charitable_autoshow_plugin_notifications' );
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
 	 * Determine if it's an English site.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @return bool
 	 */
@@ -475,7 +504,7 @@ class Charitable_EventDriven {
 	/**
 	 * Convert language to ISO.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param string $lang Language value.
 	 *
@@ -489,7 +518,7 @@ class Charitable_EventDriven {
 	/**
 	 * Retrieve a modified URL query string.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param array  $args An associative array of query variables.
 	 * @param string $url  A URL to act upon.
@@ -507,7 +536,7 @@ class Charitable_EventDriven {
 	/**
 	 * Retrieve UTM parameters for Event Driven notifications links.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @return array
 	 */
@@ -519,7 +548,7 @@ class Charitable_EventDriven {
 			$utm_params = [
 				'utm_source'   => self::UTM_PARAMS['utm_source'],
 				'utm_medium'   => rawurlencode( self::UTM_PARAMS['utm_medium'] ),
-				'utm_campaign' => charitable()->is_pro() ? 'plugin' : 'liteplugin',
+				'utm_campaign' => charitable_is_pro() ? 'plugin' : 'liteplugin',
 			];
 		}
 
@@ -529,26 +558,26 @@ class Charitable_EventDriven {
 	/**
 	 * Retrieve Event Driven notifications.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @return array
 	 */
 	private function get_notifications() {
 
 		return [
-			'welcome-message'        => [
+			'welcome-message' => [
 				'id'        => 'welcome-message',
 				'title'     => esc_html__( 'Welcome to Charitable!', 'charitable' ),
-				'content'   => esc_html__( 'We’re grateful that you chose Charitable for your website! Now that you’ve installed the plugin, you’re less than 5 minutes away from publishing your first campaign. To make it easy, we’ve got 400+ campaign templates to get you started!', 'charitable' ),
+				'content'   => esc_html__( 'We’re grateful that you chose Charitable! Now that you’ve installed the plugin, you’re less than 5 minutes away from publishing your first campaign. To make it easy, we’ve got a checklist to get you started!', 'charitable' ),
 				'btns'      => [
 					'main' => [
-						'url'  => admin_url( 'admin.php?page=charitable-builder' ),
-						'text' => esc_html__( 'Start Building', 'charitable' ),
+						'url'  => admin_url( 'admin.php?page=charitable-setup-checklist' ),
+						'text' => esc_html__( 'Start Checklist', 'charitable' ),
 					],
 					'alt'  => [
 						'url'  => $this->add_query_arg(
 							[ 'utm_content' => 'Welcome Read the Guide' ],
-							'https://wpcharitable.com/docs/creating-first-campaign/'
+							'https://wpcharitable.com/documentation/creating-your-first-campaign/'
 						),
 						'text' => esc_html__( 'Read the Guide', 'charitable' ),
 					],
@@ -560,10 +589,27 @@ class Charitable_EventDriven {
 					'pro',
 					'agency',
 					'elite',
+					'ultimate',
+					'lifetime',
 				],
 				// Immediately after activation (new users only, not upgrades).
 				'condition' => $this->is_new_user(),
 			],
 		];
+	}
+
+	/**
+	 * Returns and/or create the single instance of this class.
+	 *
+	 * @since  1.8.3
+	 *
+	 * @return Charitable_EventDriven
+	 */
+	public static function get_instance() {
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
 	}
 }

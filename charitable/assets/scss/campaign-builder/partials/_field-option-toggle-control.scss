@@ -60,16 +60,17 @@
 		margin: 0 1px;
 		position: relative;
 		text-indent: -9999px;
-		width: 27px;
+		width: 32px;
 
 		&:after {
 			background: $color_white;
 			border-radius: 50%;
 			content: "";
-			height: 13px;
+			height: 15px;
 			left: 2px;
 			position: absolute;
-			top: 2px;
+			// top: 2px;
+			top: 1px;
 			width: $option_toggle_width;
 
 			@include transition( all, $transition_slow, ease-out );

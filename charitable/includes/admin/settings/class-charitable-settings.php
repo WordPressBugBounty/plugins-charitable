@@ -102,7 +102,6 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 					'advanced' => __( 'Advanced', 'charitable' ),
 				)
 			);
-
 		}
 
 		/**
@@ -257,7 +256,7 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 			}
 
 			// determine if Charitable gateway "test mode" is being changed, and if so add a notice to the user.
-			if ( array_key_exists('test_mode', $new_values ) && array_key_exists('test_mode', $old_values ) && $old_values['test_mode'] !== $new_values['test_mode'] ) {
+			if ( array_key_exists( 'test_mode', $new_values ) && array_key_exists( 'test_mode', $old_values ) && $old_values['test_mode'] !== $new_values['test_mode'] ) {
 				$old_settings_keys = array_keys( $old_values );
 				$dismissible       = true;
 				if ( in_array( 'gateways_stripe', $old_settings_keys ) ) {
@@ -297,7 +296,7 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 				$new_values['gateways_stripe']['live_public_key'] = ( isset( $values['gateways_stripe']['live_public_key'] ) && ( false !== $values['gateways_stripe']['live_public_key'] ) ) ? $values['gateways_stripe']['live_public_key'] : null;
 				$new_values['gateways_stripe']['test_secret_key'] = ( isset( $values['gateways_stripe']['test_secret_key'] ) && ( false !== $values['gateways_stripe']['test_secret_key'] ) ) ? $values['gateways_stripe']['test_secret_key'] : null;
 				$new_values['gateways_stripe']['test_public_key'] = ( isset( $values['gateways_stripe']['test_public_key'] ) && ( false !== $values['gateways_stripe']['test_public_key'] ) ) ? $values['gateways_stripe']['test_public_key'] : null;
-			} else if ( in_array( 'gateways_stripe', $settings_keys ) ) {
+			} elseif ( in_array( 'gateways_stripe', $settings_keys ) ) {
 				// otherwise we preserve the keys.
 				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
 					error_log( 'charitable debug, final with debug on:' );
@@ -601,7 +600,7 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 			switch ( $field_type ) {
 
 				case 'checkbox':
-					$value = intval( array_key_exists( $key, $submitted ) && 'on' == $submitted[ $key ] );
+					$value = intval( array_key_exists( $key, $submitted ) && ( 'on' === $submitted[ $key ] || 1 === (int) $submitted[ $key ] ) );
 					break;
 
 				case 'multi-checkbox':

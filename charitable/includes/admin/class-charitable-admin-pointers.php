@@ -75,10 +75,18 @@ if ( ! class_exists( 'Charitable_Admin_Pointers' ) ) :
 			// Don't show this immediately for new users.
 			$slug = 'help-pointers';
 
+			// determine when to display this message. for now, there should be some sensible boundaries before showing the notification: a minimum of 14 days of use, created one donation form and received at least one donation.
+			$activated_datetime = ( false !== get_option( 'wpcharitable_activated_datetime' ) ) ? get_option( 'wpcharitable_activated_datetime' ) : false;
+			$days               = 0;
+			if ( $activated_datetime ) {
+				$diff = current_time( 'timestamp' ) - $activated_datetime;
+				$days = abs( round( $diff / 86400 ) );
+			}
+
 			$count_campaigns = wp_count_posts( 'campaign' );
 			$total_campaigns = isset( $count_campaigns->publish ) ? $count_campaigns->publish : 0;
 
-			if ( $total_campaigns >= 1 ) {
+			if ( $days >= apply_filters( 'charitable_days_since_activated', 21 ) && $total_campaigns >= 1 ) {
 				// check transient.
 				$help_pointers = get_transient( 'charitable_' . $slug . '_onboarding' );
 

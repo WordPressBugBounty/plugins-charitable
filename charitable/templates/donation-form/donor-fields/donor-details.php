@@ -28,7 +28,7 @@ if ( ! $user && ! is_customize_preview() ) {
 	<p class="donor-contact-details">
 		<?php
 		/* translators: %s: email address */
-		printf( __( 'Email: %s', 'charitable ' ), $user->user_email );
+		printf( __( 'Email: %s', 'charitable' ), $user->user_email );
 
 		if ( ! empty( $user->get( 'donor_phone' ) ) ) :
 			/* translators: %s: phone number */

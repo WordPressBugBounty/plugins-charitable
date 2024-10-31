@@ -32,21 +32,21 @@ $authors    = get_users(
 				<?php echo $creator->get_avatar(); ?>
 			</div><!--.creator-avatar-->
 			<div class="creator-facts charitable-media-body">
-				<h3 class="creator-name"><a href="<?php echo admin_url( 'user-edit.php?user_id=' . $creator->ID ); ?>"><?php printf( '%s (%s %d)', $creator->display_name, __( 'User ID', 'charitable-ambassadors' ), $creator->ID ); ?></a></h3>
-				<p><?php printf( '%s %s', _x( 'Joined on', 'joined on date', 'charitable-ambassadors' ), date_i18n( 'F Y', strtotime( $creator->user_registered ) ) ); ?></p>
+				<h3 class="creator-name"><a href="<?php echo admin_url( 'user-edit.php?user_id=' . $creator->ID ); ?>"><?php printf( '%s (%s %d)', $creator->display_name, __( 'User ID', 'charitable' ), $creator->ID ); ?></a></h3>
+				<p><?php printf( '%s %s', _x( 'Joined on', 'joined on date', 'charitable' ), date_i18n( 'F Y', strtotime( $creator->user_registered ) ) ); ?></p>
 				<ul>
-					<li><a href="<?php echo get_author_posts_url( $creator->ID ); ?>"><?php _e( 'Public Profile', 'charitable-ambassadors' ); ?></a></li>
+					<li><a href="<?php echo get_author_posts_url( $creator->ID ); ?>"><?php _e( 'Public Profile', 'charitable' ); ?></a></li>
 					<li><a href="<?php echo admin_url( 'user-edit.php?user_id=' . $creator->ID ); ?>"><?php _e( 'Edit Profile', 'charitable' ); ?></a></li>
 				</ul>
 			</div><!--.creator-facts-->
 		</div><!--#campaign-creator-->
 	<?php endif; ?>
 	<div id="charitable-post-author-wrap" class="charitable-metabox charitable-select-wrap">
-		<label for="post_author_override"><?php _e( 'Change the campaign creator' ); ?></label>
+		<label for="post_author_override"><?php _e( 'Change the campaign creator', 'charitable' ); ?></label>
 		<select name="post_author_override">
 			<option value="-" <?php selected( $creator_id, 0 ); ?>><?php _e( 'Select a user', 'charitable' ); ?></option>
 			<?php foreach ( $authors as $author ) : ?>
-			<option value="<?php echo esc_attr( $author->ID ); ?>" <?php selected( $creator_id, $author->ID ); ?>><?php echo $author->display_name; ?></option>
+			<option value="<?php echo esc_attr( $author->ID ); ?>" <?php selected( $creator_id, $author->ID ); ?>><?php echo esc_html( $author->display_name ); ?></option>
 			<?php endforeach; ?>
 		</select>
 	</div>

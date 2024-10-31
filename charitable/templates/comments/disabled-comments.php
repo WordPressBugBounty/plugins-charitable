@@ -18,4 +18,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 ?>
-<!-- <?php _e( 'Comments are disabled on this Charitable endpoint.' ); ?> -->
+<!-- <?php _e( 'Comments are disabled on this Charitable endpoint.', 'charitable' ); ?> -->

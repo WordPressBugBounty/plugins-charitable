@@ -132,8 +132,8 @@
   font-size: 16px;
   font-weight: 600;
   line-height: 19px;
-  max-width: calc( 50% - 15px );
-  width: calc( 50% - 15px );
+  max-width: calc(50% - 15px);
+  width: calc(50% - 15px);
   overflow: hidden;
   padding: 10px 20px;
   text-align: center;
@@ -415,7 +415,6 @@ span.charitable-admin-campaign-embed-wizard-dot {
   height: 42px;
   top: -65px;
   left: 145px;
-  background-image: url(../images/challenge/red-arrow.svg);
   background-size: 15px 42px;
   background-repeat: no-repeat;
 }

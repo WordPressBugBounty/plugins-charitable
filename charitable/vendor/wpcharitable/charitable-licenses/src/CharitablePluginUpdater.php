@@ -4,7 +4,7 @@ namespace CharitablePluginUpdater;
 
 /**
  * Class CharitablePluginUpdater
-*/
+ */
 class CharitablePluginUpdater {
 
 	private $api_url  = '';
@@ -57,9 +57,9 @@ class CharitablePluginUpdater {
 	 * and sets up our own callback to show the update notification.
 	 *
 	 * @since  1.4.20
-     *
-     * @return void
-     */
+	 *
+	 * @return void
+	 */
 	public function setup_update_notification() {
 		remove_action( 'after_plugin_row_' . $this->name, 'wp_plugin_update_row', 10 );
 		add_action( 'after_plugin_row_' . $this->name, array( $this, 'show_update_notification' ), 10, 2 );
@@ -114,7 +114,7 @@ class CharitablePluginUpdater {
 					default:
 						if ( isset( $version_info->download_link ) !== false ) {
 							$name = esc_html( $version_info->name );
-						} else if ( isset( $version_info->slug ) !== false ) {
+						} elseif ( isset( $version_info->slug ) !== false ) {
 							$name = esc_html( $version_info->slug );
 						} else {
 							$name = 'Charitable';
@@ -131,7 +131,7 @@ class CharitablePluginUpdater {
 			} else {
 				if ( isset( $version_info->download_link ) !== false ) {
 					$name = esc_html( $version_info->name );
-				} else if ( isset( $version_info->slug ) !== false ) {
+				} elseif ( isset( $version_info->slug ) !== false ) {
 					$name = esc_html( $version_info->slug );
 				} else {
 					$name = 'Charitable';

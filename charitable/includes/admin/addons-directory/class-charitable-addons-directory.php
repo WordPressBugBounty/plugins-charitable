@@ -91,7 +91,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		 */
 		public function charitable_admin_scripts() {
 
-			$min     = ''; // charitable_get_min_suffix(); // todo: undo this.
+			$min     = charitable_get_min_suffix();
 			$version = charitable()->get_version();
 
 			$assets_dir = charitable()->get_path( 'assets', false );
@@ -122,7 +122,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				'addon_search'                    => esc_html__( 'Searching Addons', 'charitable' ),
 				'ajax_url'                        => admin_url( 'admin-ajax.php' ),
 				'admin_url'                       => admin_url(),
-				'ok'                          	  => esc_html__( 'OK', 'charitable' ),
+				'ok'                              => esc_html__( 'OK', 'charitable' ),
 				'cancel'                          => esc_html__( 'Cancel', 'charitable' ),
 				'close'                           => esc_html__( 'Close', 'charitable' ),
 				'plugin_install_activate_btn'     => esc_html__( 'Install and Activate', 'charitable' ),
@@ -147,6 +147,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				'settings'                        => esc_html__( 'Settings', 'charitable' ),
 				'thanks_for_interest'             => esc_html__( 'Thanks for your interest in Charitable Pro!', 'charitable' ),
 				'upgrade_modal'                   => charitable_get_upgrade_modal_text(),
+				'autoshow_plugin_notifications'   => charitable_get_autoshow_plugin_notifications(),
 			];
 
 			wp_enqueue_script(
@@ -159,7 +160,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 			wp_register_style(
 				'charitable-admin-addons-directory',
-				$assets_dir . 'css/charitable-admin-addons-directory' . $min . '.css',
+				$assets_dir . 'css/admin/charitable-admin-addons-directory' . $min . '.css',
 				array(),
 				$version
 			);
@@ -167,7 +168,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 			wp_register_script(
 				'charitable-admin-addon-directory',
-				$assets_dir . 'js/charitable-admin-addon-directory' . $min . '.js',
+				$assets_dir . 'js/admin/charitable-admin-addon-directory' . $min . '.js',
 				array( 'jquery' ),
 				$version,
 				true
@@ -354,7 +355,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			$preset_search     = ( isset( $_GET['search'] ) ) ? trim( esc_attr( $_GET['search'] ) ) : ''; // phpcs:ignore
 			?>
 
-			<h1 class="page-title"><?php echo get_admin_page_title(); ?><input type="search" placeholder="Search Addons" id="charitable-admin-addons-search" value="<?php echo $preset_search; ?>" /></h1>
+			<h1 class="page-title"><?php echo get_admin_page_title(); ?><input type="search" placeholder="<?php esc_html_e( 'Search Addons', 'charitable' ); ?><" id="charitable-admin-addons-search" value="<?php echo $preset_search; ?>" /></h1>
 
 			<?php
 

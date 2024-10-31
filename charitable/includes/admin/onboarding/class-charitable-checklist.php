@@ -94,7 +94,7 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 
 			if ( $this->maybe_load_checklist_assets() ) {
 
-				$min           = ''; // charitable_get_min_suffix(); // todo: undo this.
+				$min           = charitable_get_min_suffix(); // 1.8.3
 				$version       = charitable()->get_version();
 				$assets_dir    = charitable()->get_path( 'assets', false );
 				$style_version = charitable_get_style_version();
@@ -138,7 +138,7 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 
 				wp_enqueue_script(
 					'charitable-admin-checklist',
-					charitable()->get_path( 'directory', false ) . 'assets/js/charitable-admin-checklist.js',
+					charitable()->get_path( 'directory', false ) . 'assets/js/admin/charitable-admin-checklist.js',
 					array( 'jquery', 'charitable-shepherd', 'charitable-float-ui-core', 'charitable-float-ui-dom' ), // 'charitable-admin-utils',
 					charitable()->get_version()
 				);
@@ -296,7 +296,7 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 		 */
 		public function save_checklist_option_ajax() {
 
-			if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], 'charitable_onboarding_ajax_nonce' ) ) {
+			if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], 'charitable_onboarding_ajax_nonce' ) ) { // phpcs:ignore
 				wp_send_json_error( array( 'message' => 'Invalid nonce' ) );
 			}
 
@@ -740,10 +740,10 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 				'general_settings_step_0_text'  => '<p style="margin-bottom: 0;">' . esc_html__( 'This is where general settings for your Charitable plugin live. You can change your currency, country, and the behavior of your donation form on this page.', 'charitable' ) . '</p>',
 				'general_settings_step_1_text'  => '<p>' . esc_html__( 'Confirm your settings and save changes to complete this item on the checklist.', 'charitable' ) . '</p>',
 				'email_settings_step_0_title'   => esc_html__( 'Email Settings', 'charitable' ),
-				'email_settings_step_0_text'    => '<p>' . esc_html__( 'Enable and configure email notifications for donors, campaign creators, and site admins (like you).', 'chartiable' ) . '</p>',
+				'email_settings_step_0_text'    => '<p>' . esc_html__( 'Enable and configure email notifications for donors, campaign creators, and site admins (like you).', 'charitable' ) . '</p>',
 				'email_settings_step_1_text'    => '<h2>' . esc_html__( 'Donor Donation Receipt', 'charitable' ) . '</h2><p>' . esc_html__( 'This email sends donors a receipt after they make a donation.', 'charitable' ) . '</p>',
 				'email_settings_step_2_text'    => '<h2>' . esc_html__( 'Admin New Donation Notification', 'charitable' ) . '</h2><p>' . esc_html__( 'This email sends you (the admin) a notification when a new donation has been received.', 'charitable' ) . '</p><p>' . esc_html__( 'You can ', 'charitable' ) . '<a href="https://www.wpcharitable.com/documentation/start-here/#Emails" target="_blank">' . esc_html__( 'read more about email settings', 'charitable' ) . '</a> ' . esc_html__( 'in our docs', 'charitable' ) . '.</p>',
-				'email_settings_step_3_text'    => '<p>' . esc_html( 'Confirm your email settings and save changes to complete this item on the checklist.', 'charitable' ) . '</p>',
+				'email_settings_step_3_text'    => '<p>' . esc_html__( 'Confirm your email settings and save changes to complete this item on the checklist.', 'charitable' ) . '</p>',
 
 				'gateway_settings_step_0_text'  => '<h2>' . esc_html__( 'Gateway Settings', 'charitable' ) . '</h2><p>' . esc_html__( 'Connect to a gateway to start getting donations as soon possible. Want to test before setting up a gateway or taking alternate methods of payment? Enable "Offline Mode".', 'charitable' ) . '</p>',
 				'gateway_settings_step_1_text'  => '<p>' . esc_html__( 'We recommend Stripe if it\'s available in your country', 'charitable' ) . '</p>',
@@ -1094,6 +1094,23 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 			}
 
 			return true;
+		}
+
+		/**
+		 * This will incercept the request and redirect to the dashboard page.
+		 *
+		 * @since 1.8.3
+		 */
+		public function maybe_redirect_from_checklist_page() {
+
+			if ( ! empty( $_GET['page'] ) && 'charitable-checklist' === $_GET['page'] ) { // phpcs:ignore
+				// is the checklist active?
+				if ( ! $this->maybe_load_checklist_assets() ) {
+					// if the checklist is not active, then redirect to the dashboard page.
+					wp_safe_redirect( admin_url( 'admin.php?page=charitable-dashboard' ) );
+					exit;
+				}
+			}
 		}
 
 		/**

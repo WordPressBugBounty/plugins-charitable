@@ -2,50 +2,60 @@
 /**
  * Admin Notifications template.
  *
- * @since 1.7.0.3
- *
- * @var array $notifications
+ * @since 1.8.3
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$active_count        = intval( $args['notifications']['active_count'] );
+$dismissed_count     = intval( $args['notifications']['dismissed_count'] );
+$notifications_title = $active_count > 1 ? esc_html__( 'New Notifications', 'charitable' ) : esc_html__( 'New Notifications', 'charitable' );
+
 ?>
-<div id="charitable-notifications">
-	<div class="charitable-notifications-header">
-		<div class="charitable-notifications-bell">
-			<svg xmlns="http://www.w3.org/2000/svg" width="15" height="17" fill="none">
-				<path fill="#777" d="M7.68 16.56c1.14 0 2.04-.95 2.04-2.17h-4.1c0 1.22.9 2.17 2.06 2.17Zm6.96-5.06c-.62-.71-1.81-1.76-1.81-5.26A5.32 5.32 0 0 0 8.69.97H6.65A5.32 5.32 0 0 0 2.5 6.24c0 3.5-1.2 4.55-1.81 5.26a.9.9 0 0 0-.26.72c0 .57.39 1.08 1.04 1.08h12.38c.65 0 1.04-.5 1.07-1.08 0-.24-.1-.51-.3-.72Z"/>
-			</svg>
-			<span class="wp-ui-notification charitable-notifications-circle"></span>
-		</div>
-		<div class="charitable-notifications-title"><?php esc_html_e( 'Notifications', 'charitable' ); ?></div>
-	</div>
 
-	<div class="charitable-notifications-body">
-
-		<button type="button" class="notice-dismiss dismiss">
-			<span class="screen-reader-text">
-				<?php esc_attr_e( 'Dismiss this notice', 'charitable' ); ?>
-			</span>
-		</button>
-
-		<?php if ( (int) $notifications['count'] > 1 ) : ?>
-			<div class="navigation">
-				<a class="prev">
-					<span class="screen-reader-text"><?php esc_attr_e( 'Previous message', 'charitable' ); ?></span>
-					<span aria-hidden="true">&lsaquo;</span>
-				</a>
-				<a class="next">
-					<span class="screen-reader-text"><?php esc_attr_e( 'Next message', 'charitable' ); ?></span>
-					<span aria-hidden="true">&rsaquo;</span>
-				</a>
+<div class="charitable-plugin-notifications" id="charitable-plugin-notifications">
+	<div class="notification-menu">
+		<div class="notification-header">
+			<span class="new-notifications notifications-visible">(<span id="new-notifications-count"><strong><?php echo intval( $active_count ); ?></strong></span>) <?php echo esc_html( $notifications_title ); ?></span>
+			<span class="old-notifications">(<span id="dismissed-notifications-count"><strong><?php echo intval( $dismissed_count ); ?></strong></span>) <?php esc_attr_e( 'Dismissed Notifications', 'charitable' ); ?></span>
+			<div class="dismissed-notifications">
+				<!---->
+				<a href="#" data-status="dismissed"><?php esc_attr_e( 'Dismissed Notifications', 'charitable' ); ?></a>
+				<!---->
 			</div>
-		<?php endif; ?>
+			<div>
+				<svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" class="charitable-close">
+					<path d="M11.8211 1.3415L10.6451 0.166504L5.98305 4.82484L1.32097 0.166504L0.14502 1.3415L4.80711 5.99984L0.14502 10.6582L1.32097 11.8332L5.98305 7.17484L10.6451 11.8332L11.8211 10.6582L7.159 5.99984L11.8211 1.3415Z" fill="currentColor"></path>
+				</svg>
+			</div>
+		</div>
+		<div class="charitable-notification-cards notification-cards notification-cards-active notification-cards-visible">
+			<?php echo $args['notifications']['active_html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<!---->
+		</div>
+		<div class="charitable-notification-cards notification-cards notification-cards-dismissed">
+			<?php if ( empty( $args['notifications']['dismissed_html'] ) ) : ?>
+				<div class="notification-card">
+					<div class="notification-card-content">
+						<span class="notification-no-dismissed-title"><?php esc_attr_e( 'No dismissed notifications.', 'charitable' ); ?></span>
+					</div>
+				</div>
+			<?php else : ?>
+				<?php echo $args['notifications']['dismissed_html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php endif; ?>
+		</div>
+		<div class="notification-footer">
+			<?php
 
-		<div class="charitable-notifications-messages">
-			<?php echo $notifications['html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				// Show the dismiss all button if there are active notifications.
+			if ( $active_count > 0 ) :
+
+				?>
+			<div class="dismiss-all"><a href="#" class="dismiss"><?php esc_attr_e( 'Dismiss All', 'charitable' ); ?></a></div>
+			<?php endif; ?>
 		</div>
 	</div>
+	<div class="charitable-notifications-overlay"></div>
 </div>

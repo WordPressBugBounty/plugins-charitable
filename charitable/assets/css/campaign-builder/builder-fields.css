@@ -1333,16 +1333,16 @@
   margin: 0 1px;
   position: relative;
   text-indent: -9999px;
-  width: 27px;
+  width: 32px;
 }
 .charitable-toggle-control .charitable-toggle-control-icon:after {
   background: #ffffff;
   border-radius: 50%;
   content: "";
-  height: 13px;
+  height: 15px;
   left: 2px;
   position: absolute;
-  top: 2px;
+  top: 1px;
   width: 13px;
   transition-property: all;
   transition-duration: 0.25s;

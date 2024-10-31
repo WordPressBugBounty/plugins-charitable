@@ -1,3 +1,18 @@
+# 1.8.3
+* NEW: WordPress editor block: "Campaigns". Displays multiple Charitable campaigns in a grid.
+* NEW: WordPress editor block: "Donations". Display a simple donation widget for a campaign.
+* NEW: WordPress editor block: "Donors". Display a list of donors to one or all of your campaigns.
+* NEW: WordPress editor block: "Campaign Stats". Allows various statistics to be dynamically calculated and displayed on a page.
+* NEW: WordPress editor block: "Donation Button". Displays a donation button for a particular campaign.
+* NEW: WordPress editor block: "Campaign Progress Bar". Displays a live progress bar for a particular campaign.
+* NEW: WordPress editor block: "My Donations". Displayss a list of donations for the current logged in user.
+* NEW: Added a new notifications engine to keep you informed of all important updates, license information, and news. New inbox icon and notifications menu items will alert when new notifications are available.
+* NEW: Updated charitable.pot.
+* UPDATED: Additional minification of JS and CSS to increase performance.
+* FIX: Resolved an issue regarding campaign descriptions not displaying properly with the campaign shortcode in some scenarios.
+* FIX: Fixed alt-text of a LinkedIn share icon in visual campaign builder.
+* FIX: Code tweaks related to translations, CSS, UI, and PHP warnings.
+
 # 1.8.2
 * NEW: "Charitable Checklist" so new users can check vital settings, connect gateways, and get to building their first campaign.
 * NEW: Warning messages for admin users - in gateway settings page and viewing donation forms (as admins) - if Stripe is enabled, but no keys are detected.

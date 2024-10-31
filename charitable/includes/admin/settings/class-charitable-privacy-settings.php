@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.6.0
- * @version   1.6.0
+ * @version   1.8.3
  */
 
 // Exit if accessed directly.
@@ -124,30 +124,30 @@ if ( ! class_exists( 'Charitable_Privacy_Settings' ) ) :
 						'data-trigger-value' => '!0',
 					),
 				),
-				'privacy_policy' => array(
-					'title'             => __( 'Privacy Policy', 'charitable' ),
-					'type'              => 'textarea',
-					'priority'          => 35,
-					'default'           => 'Your personal data will be used to process your donation, support your experience throughout this website, and for other purposes described in our [privacy_policy].',
-					'help'				=> 'Information about your website privacy policy for people to see when they donate, register an account, or manage their profile. Leave empty to disable.'
+				'privacy_policy'                => array(
+					'title'    => __( 'Privacy Policy', 'charitable' ),
+					'type'     => 'textarea',
+					'priority' => 35,
+					'default'  => __( 'Your personal data will be used to process your donation, support your experience throughout this website, and for other purposes described in our [privacy_policy].', 'charitable' ),
+					'help'     => __( 'Information about your website privacy policy for people to see when they donate, register an account, or manage their profile. Leave empty to disable.', 'charitable' ),
 				),
-				'donation_form_minimal_fields' => array(
-					'title'             => __( 'Contact Consent Field', 'charitable' ),
-					'type'              => 'radio',
-					'priority'          => 40,
-					'default'           => '1',
-					'options'           => array(
-						'1' 			=> __( 'Yes', 'charitable' ),
-						'0'     		=> __( 'No', 'charitable' ),
+				'donation_form_minimal_fields'  => array(
+					'title'    => __( 'Contact Consent Field', 'charitable' ),
+					'type'     => 'radio',
+					'priority' => 40,
+					'default'  => '1',
+					'options'  => array(
+						'1' => __( 'Yes', 'charitable' ),
+						'0' => __( 'No', 'charitable' ),
 					),
-					'help'              => __( 'Display a checkbox asking people for their consent to being contacted when they donate, register an account, or manage their profile.', 'charitable' ),
+					'help'     => __( 'Display a checkbox asking people for their consent to being contacted when they donate, register an account, or manage their profile.', 'charitable' ),
 				),
-				'contact_consent_label' => array(
-					'title'             => __( 'Contact Consent Label', 'charitable' ),
-					'type'              => 'textarea',
-					'priority'          => 50,
-					'default'           => 'Yes, I am happy for you to contact me via email or phone.',
-					'help'				=> 'A short statement describing how you would like to contact people.'
+				'contact_consent_label'         => array(
+					'title'    => __( 'Contact Consent Label', 'charitable' ),
+					'type'     => 'textarea',
+					'priority' => 50,
+					'default'  => __( 'Yes, I am happy for you to contact me via email or phone.', 'charitable' ),
+					'help'     => __( 'A short statement describing how you would like to contact people.', 'charitable' ),
 				),
 			);
 		}

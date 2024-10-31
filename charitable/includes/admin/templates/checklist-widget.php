@@ -119,7 +119,7 @@ $closed_css = $checklist_class->get_checklist_option( 'window_closed' ) ? 'close
 				<?php
 				printf(
 					/* translators: %1$s Opening strong tag, do not translate. %2$s Closing strong tag, do not translate. %3$s Opening anchor tag, do not translate. %4$s Closing anchor tag, do not translate. */
-					__( 'Please rate %1$sCharitable%2$s %3$s★★★★★%4$s on %3$sWordPress.org%4$s!', 'stripe' ),
+					__( 'Please rate %1$sCharitable%2$s %3$s★★★★★%4$s on %3$sWordPress.org%4$s!', 'charitable' ),
 					'<strong>',
 					'</strong>',
 					'<a href="https://wordpress.org/support/plugin/charitable/reviews/?filter=5#new-post" rel="noopener noreferrer" target="_blank">',

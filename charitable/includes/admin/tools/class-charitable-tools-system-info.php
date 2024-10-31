@@ -177,6 +177,7 @@ if ( ! class_exists( 'Charitable_Tools_System_Info' ) ) :
 		 * Get Charitable info.
 		 *
 		 * @since 1.8.1.6
+		 * @version 1.8.3 added version upgraded from.
 		 *
 		 * @return string
 		 */
@@ -191,6 +192,14 @@ if ( ! class_exists( 'Charitable_Tools_System_Info' ) ) :
 
 			$wpc_plugin_failure = (array) get_option( 'wpc_edd_sl_failed_plugin_versions' );
 
+			$versions_upgraded_from = get_option( 'charitable_version_upgraded_from', [] );
+			if ( ! empty( $versions_upgraded_from ) ) {
+				$versions_upgraded_from = array_unique( $versions_upgraded_from );
+			}
+
+			if ( ! empty( $versions_upgraded_from ) ) {
+				$data .= 'Versions Upgraded From:  ' . implode( ',', $versions_upgraded_from ) . "\n";
+			}
 			if ( ! empty( $slug_dismissed ) ) {
 				$data .= 'Pointer Slugs Dismissed:  ' . implode( ',', $slug_dismissed ) . "\n";
 			}

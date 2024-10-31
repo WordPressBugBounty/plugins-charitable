@@ -582,16 +582,6 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				$this->get_conditionals()
 			);
 
-			/* added in 1.8.1.12 */
-			wp_enqueue_script(
-				'charitable-admin-builder-onboarding',
-				charitable()->get_path( 'directory', false ) . "assets/js/campaign-builder/admin-onboarding-test{$min}.js",
-				array( 'jquery', 'charitable-admin-utils', 'charitable-builder' ),
-				charitable()->get_version()
-			);
-
-			/* added in 1.8.2 */
-
 			/* tour */
 
 			wp_enqueue_script(
@@ -609,7 +599,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 			);
 
 			wp_localize_script(
-				'charitable-admin-builder-onboarding',
+				'charitable-admin-builder-tour',
 				'charitable_admin_builder_onboarding',
 				[
 					'nonce'   => wp_create_nonce( 'charitable_onboarding_ajax_nonce' ),
@@ -1653,24 +1643,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				return;
 			}
 
-			// check_admin_referer( 'charitable_onboarding_ajax_nonce' );
-
-			// Array
-			// (
-			// [action] => charitable_onboarding_tour_save_option
-			// [dataType] => json
-			// [data] => Array
-			// (
-			// [type] => tour
-			// [optionData] => Array
-			// (
-			// [status] => skipped
-			// )
-
-			// )
-
-			// [nonce] => a035b753ed
-			// )
+			check_admin_referer( 'charitable_onboarding_ajax_nonce' );
 
 			if ( empty( $_POST['data'] ) || empty( $_POST['data']['optionData'] ) || empty( $_POST['data']['type'] ) ) {
 				wp_send_json_error();

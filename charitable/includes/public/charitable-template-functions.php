@@ -135,18 +135,32 @@ if ( ! function_exists( 'charitable_template_campaign_description' ) ) :
 	 * @version 1.8.2 Added charitable_find_description_in_campaign_settings method
 	 *
 	 * @param  Charitable_Campaign $campaign The campaign object.
+	 * @param  array               $view_args The view arguments.
 	 * @return void
 	 */
 	function charitable_template_campaign_description( $campaign, $view_args = array() ) {
 		if ( charitable_is_campaign_legacy( $campaign ) || ( defined( 'CHARITABLE_NO_LEGACY_CHECK_CAMPAIGN_DESCRIPTION' ) && CHARITABLE_NO_LEGACY_CHECK_CAMPAIGN_DESCRIPTION ) ) {
-			charitable_template( 'campaign/description.php', array( 'campaign' => $campaign, 'view_args' => $view_args ) );
+			charitable_template(
+				'campaign/description.php',
+				array(
+					'campaign'  => $campaign,
+					'view_args' => $view_args,
+				)
+			);
 		} elseif ( $campaign->ID && ! empty( $view_args['shortcode'] ) ) {
 				$campaign_settings = get_post_meta( $campaign->ID, 'campaign_settings_v2', true );
-			 	if ( is_array( $campaign_settings ) && ! empty( $campaign_settings ) ) {
-					$description_limit = isset( $view_args['description_limit'] ) ? intval( $view_args['description_limit'] ) : 0;
-					$description       = charitable_find_description_in_campaign_settings( $campaign_settings, $description_limit );
-					charitable_template( 'campaign/description.php', array( 'campaign' => $campaign, 'description' => $description, 'view_args' => $view_args ) );
-			 	}
+			if ( is_array( $campaign_settings ) && ! empty( $campaign_settings ) ) {
+				$description_limit = isset( $view_args['description_limit'] ) ? intval( $view_args['description_limit'] ) : 0;
+				$description       = charitable_find_description_in_campaign_settings( $campaign_settings, $description_limit );
+				charitable_template(
+					'campaign/description.php',
+					array(
+						'campaign'    => $campaign,
+						'description' => $description,
+						'view_args'   => $view_args,
+					)
+				);
+			}
 		}
 	}
 
@@ -657,9 +671,8 @@ if ( ! function_exists( 'charitable_template_campaign_loop_modal_donation_window
 
 endif;
 
-/**********************************************/
-/* DONATION FORM
-/**********************************************/
+/* DONATION FORM */
+
 
 if ( ! function_exists( 'charitable_template_donation_form' ) ) :
 
@@ -749,7 +762,6 @@ if ( ! function_exists( 'charitable_template_donation_receipt_content' ) ) :
 		}
 
 		return charitable_template_donation_receipt_output( $content );
-
 	}
 
 endif;
@@ -1168,7 +1180,8 @@ if ( ! function_exists( 'charitable_maybe_hide_campaign_percentage_raised' ) ) :
 	 *
 	 * @since  1.7.0.8
 	 *
-	 * @param  boolean $current_value Current value of boolean passed in.
+	 * @param  boolean             $current_value Current value of boolean passed in.
+	 * @param  Charitable_Campaign $campaign The campaign object.
 	 * @return boolean
 	 */
 	function charitable_maybe_hide_campaign_percentage_raised( $current_value = true, $campaign = false ) {
@@ -1188,7 +1201,6 @@ if ( ! function_exists( 'charitable_maybe_hide_campaign_percentage_raised' ) ) :
 		}
 
 		return $current_value;
-
 	}
 
 endif;
@@ -1223,7 +1235,6 @@ if ( ! function_exists( 'charitable_maybe_hide_campaign_donor_count' ) ) :
 		}
 
 		return $current_value;
-
 	}
 
 endif;
@@ -1236,10 +1247,13 @@ if ( ! function_exists( 'charitable_maybe_hide_campaign_amount_donated' ) ) :
 	 *
 	 * @since  1.7.0.8
 	 *
-	 * @param  boolean $current_value Current value of boolean passed in.
+	 * @param  boolean             $current_value Current value of boolean passed in.
+	 * @param  Charitable_Campaign $campaign The campaign object.
+	 * @param  int                 $amount The amount donated.
+	 * @param  int                 $goal The campaign goal.
 	 * @return boolean
 	 */
-	function charitable_maybe_hide_campaign_amount_donated( $current_value, $campaign, $amount, $goal ) {
+	function charitable_maybe_hide_campaign_amount_donated( $current_value, $campaign, $amount, $goal ) { // phpcs:ignore
 
 		if ( false === $campaign || 0 === $campaign->get_campaign_id() ) {
 			return $current_value;
@@ -1256,7 +1270,6 @@ if ( ! function_exists( 'charitable_maybe_hide_campaign_amount_donated' ) ) :
 		}
 
 		return $current_value;
-
 	}
 
 endif;
@@ -1289,7 +1302,6 @@ if ( ! function_exists( 'charitable_maybe_hide_campaign_time_remaining' ) ) :
 		}
 
 		return $current_value;
-
 	}
 
 endif;

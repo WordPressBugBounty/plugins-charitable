@@ -1,13 +1,13 @@
 <?php
 /**
- * Admin form model class.
+ * Charitable Admin Plugin Notifications.
  *
  * @package   Charitable/Classes/Charitable_Admin_Form
  * @author    David Bisset
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
- * @since     1.5.0
- * @version   1.5.0
+ * @since     1.8.3
+ * @version   1.8.3
  */
 
 // Exit if accessed directly.
@@ -18,7 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Notifications.
  *
- * @since 1.7.5
+ * @since 1.8.3
+ * @version 1.8.3
  */
 class Charitable_Notifications {
 
@@ -32,25 +33,25 @@ class Charitable_Notifications {
 	/**
 	 * Source of notifications content.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @var string
 	 */
-	const SOURCE_URL = 'https://plugin.wpcharitable.com/wp-content/notifications.json';
+	const SOURCE_URL = 'https://plugin.wpcharitable.com/wp-content/charitable-notifications.json';
 
 	/**
 	 * Array of license types, that are considered being Elite level.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @var array
 	 */
-	const LICENSES_ELITE = [ 'agency', 'pro' ];
+	const LICENSES_ELITE = [ 'agency', 'pro', 'elite' ];
 
 	/**
 	 * Option value.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @var bool|array
 	 */
@@ -59,7 +60,7 @@ class Charitable_Notifications {
 	/**
 	 * Current license type.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @var string
 	 */
@@ -80,9 +81,14 @@ class Charitable_Notifications {
 		return self::$instance;
 	}
 
+	/**
+	 * Constructor.
+	 *
+	 * @since 1.8.3
+	 */
 	public function __construct() {
 
-		if ( defined( 'CHARITABLE_ENABLE_NOTIFICATIONS' ) && CHARITABLE_ENABLE_NOTIFICATIONS ) {
+		if ( ! defined( 'CHARITABLE_DISABLE_NOTIFICATIONS' ) || ! CHARITABLE_DISABLE_NOTIFICATIONS ) {
 			$this->init();
 		}
 	}
@@ -90,7 +96,7 @@ class Charitable_Notifications {
 	/**
 	 * Initialize class.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 */
 	public function init() {
 
@@ -100,21 +106,18 @@ class Charitable_Notifications {
 	/**
 	 * Register hooks.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 */
 	public function hooks() {
-		add_action( 'after_charitable_admin_enqueue_scripts', [ $this, 'enqueues' ], 10, 3 );
-		add_action( 'admin_notices', [ $this, 'output_notices' ], 99 ); // where the notifications comes out in the admin
-		add_action( 'charitable_maybe_show_notification', [ $this, 'output' ], 99 ); // where the notifications comes out in the admin
+		add_action( 'charitable_maybe_show_plugin_notifications', [ $this, 'output' ], 99 ); // where the notifications comes out in the admin.
 		add_action( 'charitable_admin_notifications_update', [ $this, 'update' ] );
 		add_action( 'deactivate_plugin', [ $this, 'delete' ], 10, 2 );
-		add_action( 'wp_ajax_charitable_notification_dismiss', [ $this, 'dismiss' ] );
 	}
 
 	/**
 	 * Check if user has access and is enabled.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @return bool
 	 */
@@ -133,9 +136,61 @@ class Charitable_Notifications {
 	}
 
 	/**
+	 * Add notifications to the WordPress admin menu for Charitable.
+	 *
+	 * @since 1.8.3
+	 *
+	 * @param array $submenu Array of menu items.
+	 * @return bool
+	 */
+	public function add_notifications_to_menu( $submenu = array() ) {
+
+		if ( ( defined( 'CHARITABLE_NOTIFICATIONS_FORCE_OFF' ) && CHARITABLE_NOTIFICATIONS_FORCE_OFF ) ) {
+			return $submenu;
+		}
+
+		$notifications_menu_item = array(
+			'page_title' => __( 'Notifications', 'charitable' ),
+			'menu_title' => __( 'Notifications', 'charitable' ),
+			'menu_slug'  => 'charitable-notifications',
+			'function'   => array( $this, 'render_plugin_notifications_page' ),
+			'capability' => 'manage_charitable_settings',
+		);
+
+		// if there are new notifications add the indicator to the menu title.
+		if ( $this->get_new_notifications_count() ) {
+			$notifications_menu_item['menu_title'] .= '<div class="charitable-menu-notification-indicator"></div>';
+		}
+
+		// If the checklist exists in the submenu, add this item after it.
+		$checklist_key = array_search( 'charitable-setup-checklist', array_column( $submenu, 'menu_slug' ), true );
+		if ( false !== $checklist_key ) {
+			$submenu = array_merge(
+				array_slice( $submenu, 0, $checklist_key + 1 ),
+				array( $notifications_menu_item ),
+				array_slice( $submenu, $checklist_key + 1 )
+			);
+		} else {
+			array_unshift( $submenu, $notifications_menu_item );
+		}
+
+		return $submenu;
+	}
+
+	/**
+	 * Technically this should render the plugin notifications page.
+	 * However, notifications aren't rendering with this method. There should be a redirect, but the existance of this function prevents fatal errors.
+	 *
+	 * @since 1.8.3
+	 */
+	public function render_plugin_notifications_page() {
+		$this->output();
+	}
+
+	/**
 	 * Get option value.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param bool $cache Reference property cache if available.
 	 *
@@ -148,6 +203,7 @@ class Charitable_Notifications {
 		}
 
 		$option = (array) get_option( 'charitable_notifications', [] );
+		// $option = [];
 
 		$this->option = [
 			'update'    => ! empty( $option['update'] ) ? (int) $option['update'] : 0,
@@ -162,22 +218,21 @@ class Charitable_Notifications {
 	/**
 	 * Fetch notifications from feed.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @return array
 	 */
 	public function fetch_feed() {
 
-		if ( ! defined( 'CHARITABLE_ENABLE_NOTIFICATIONS' ) || ! CHARITABLE_ENABLE_NOTIFICATIONS ) {
-			return [];
-		}
+		$args = [
+			'timeout'    => 10,
+			'sslverify'  => false,
+			'user-agent' => charitable_get_default_user_agent(),
+		];
 
 		$response = wp_remote_get(
 			self::SOURCE_URL,
-			[
-				'timeout'    => 10,
-				'user-agent' => charitable_get_default_user_agent(),
-			]
+			$args
 		);
 
 		if ( is_wp_error( $response ) ) {
@@ -196,7 +251,7 @@ class Charitable_Notifications {
 	/**
 	 * Verify notification data before it is saved.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param array $notifications Array of notifications items to verify.
 	 *
@@ -239,7 +294,7 @@ class Charitable_Notifications {
 	/**
 	 * Verify saved notification data for active notifications.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param array $notifications Array of notifications items to verify.
 	 *
@@ -269,13 +324,13 @@ class Charitable_Notifications {
 	/**
 	 * Get notification data.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @return array
 	 */
 	public function get() {
 
-		if ( ! defined( 'CHARITABLE_ENABLE_NOTIFICATIONS' ) || ! CHARITABLE_ENABLE_NOTIFICATIONS ) {
+		if ( defined( 'CHARITABLE_DISABLE_NOTIFICATIONS' ) && CHARITABLE_DISABLE_NOTIFICATIONS ) {
 			return [];
 		}
 
@@ -288,17 +343,8 @@ class Charitable_Notifications {
 		// Update notifications using async task.
 		if ( empty( $option['update'] ) || time() > $option['update'] + DAY_IN_SECONDS ) {
 
-			$this->update();
+			$option = $this->update();
 
-			// $tasks = charitable()->get( 'tasks' );
-
-			// if ( ! $tasks->is_scheduled( 'charitable_admin_notifications_update' ) !== false ) {
-			// $tasks
-			// ->create( 'charitable_admin_notifications_update' )
-			// ->async()
-			// ->params()
-			// ->register();
-			// }
 		}
 
 		$feed   = ! empty( $option['feed'] ) ? $this->verify_active( $option['feed'] ) : [];
@@ -308,21 +354,50 @@ class Charitable_Notifications {
 	}
 
 	/**
-	 * Get notification count.
+	 * Get notification count in the feed, regardless if they are dismissed or not.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @return int
 	 */
 	public function get_count() {
-
 		return count( $this->get() );
+	}
+
+	/**
+	 * Get new notifications by comparing those in the feed vs dismissed.
+	 *
+	 * @since 1.8.3
+	 *
+	 * @return int
+	 */
+	public function get_new_notifications_count() {
+
+		$option            = $this->get_option();
+		$dimissed_ids      = ! empty( $option['dismissed'] ) ? $option['dismissed'] : [];
+		$notification_feed = $this->get();
+
+		// if $option is empty or if the feed is empty, there are no new notifications.
+		if ( empty( $option ) || empty( $notification_feed ) ) {
+			return 0;
+		}
+
+		$count = 0;
+
+		foreach ( $notification_feed as $notification ) {
+			// check the id of the notification against the dismissed ids.
+			if ( ! in_array( (string) $notification['id'], $dimissed_ids, true ) ) {
+				++$count;
+			}
+		}
+
+		return (int) $count;
 	}
 
 	/**
 	 * Add a new Event Driven notification.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param array $notification Notification data.
 	 */
@@ -353,7 +428,7 @@ class Charitable_Notifications {
 	/**
 	 * Determine if notification data is valid.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param array $notification Notification data.
 	 *
@@ -371,7 +446,7 @@ class Charitable_Notifications {
 	/**
 	 * Determine if notification has already been dismissed.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param array $notification Notification data.
 	 *
@@ -388,7 +463,7 @@ class Charitable_Notifications {
 	/**
 	 * Determine if license type is match.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param array $notification Notification data.
 	 *
@@ -407,21 +482,36 @@ class Charitable_Notifications {
 	/**
 	 * Determine if notification is expired.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param array $notification Notification data.
 	 *
 	 * @return bool
 	 */
 	private function is_expired( $notification ) {
+		// Check if the notification 'end' parameter is set and not empty.
+		if ( empty( $notification['end'] ) ) {
+			return false;
+		}
 
-		return ! empty( $notification['end'] ) && time() > strtotime( $notification['end'] );
+		// Set default timezone to Eastern Time Zone (New York).
+		date_default_timezone_set( 'America/New_York' );
+
+		// Convert the notification end date to a DateTime object in the Eastern timezone.
+		$endTime = new DateTime( $notification['end'], new DateTimeZone( 'America/New_York' ) );
+
+		// Get the current server time as a DateTime object in the Eastern timezone.
+		$currentTime = new DateTime( 'now', new DateTimeZone( 'America/New_York' ) );
+
+		// Compare the current time with the notification end time.
+		return $currentTime > $endTime;
 	}
 
 	/**
 	 * Determine if notification existed before installing Charitable.
+	 * If there is an "allow_on_activation" key, it will be used to determine to display even if the notification existed before.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param array $notification Notification data.
 	 *
@@ -431,20 +521,27 @@ class Charitable_Notifications {
 
 		$activated = charitable_get_activated_timestamp();
 
-		return ! empty( $activated ) &&
+		if ( ! isset( $notification['allow_on_activation'] ) ) {
+			return ! empty( $activated ) &&
 			! empty( $notification['start'] ) &&
 			$activated > strtotime( $notification['start'] );
+		} else {
+			return ! empty( $activated ) &&
+			! empty( $notification['start'] ) &&
+			false === $notification['allow_on_activation'];
+		}
 	}
 
 	/**
 	 * Update notification data from feed.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 */
 	public function update() {
 
 		$option = $this->get_option();
-		$data   = [
+
+		$data = [
 			'update'    => time(),
 			'feed'      => $this->fetch_feed(),
 			'events'    => $option['events'],
@@ -455,7 +552,7 @@ class Charitable_Notifications {
 		/**
 		 * Allow changing notification data before it will be updated in database.
 		 *
-		 * @since 1.7.5
+		 * @since 1.8.3
 		 *
 		 * @param array $data New notification data.
 		 */
@@ -463,12 +560,14 @@ class Charitable_Notifications {
 		// phpcs:enable Charitable.PHP.ValidateHooks.InvalidHookName
 
 		update_option( 'charitable_notifications', $data );
+
+		return $data;
 	}
 
 	/**
 	 * Remove notification data from database before a plugin is deactivated.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param string $plugin               Path to the plugin file relative to the plugins directory.
 	 * @param bool   $network_deactivating Whether the plugin is deactivated for all sites in the network
@@ -477,7 +576,6 @@ class Charitable_Notifications {
 	public function delete( $plugin, $network_deactivating ) { // phpcs:ignore
 
 		$charitable_plugins = [
-			'charitable/charitable.php',
 			'charitable/charitable.php',
 		];
 
@@ -489,60 +587,9 @@ class Charitable_Notifications {
 	}
 
 	/**
-	 * Enqueue assets on Form Overview admin page.
-	 *
-	 * @since 1.7.5
-	 *
-	 * @param string $suffix    Script/style suffix.
-	 * @param string $version   Script/style version.
-	 * @param string $assets_dir Assets directory.
-	 */
-	public function enqueues( $suffix = false, $version = false, $assets_dir = false ) {
-
-		if ( ! $this->get_count() ) {
-			return;
-		}
-
-		wp_register_style(
-			'charitable-admin-notifications',
-			$assets_dir . 'css/charitable-admin-notifications' . $suffix . '.css',
-			array( 'charitable-lity' ),
-			$version
-		);
-
-		wp_enqueue_style( 'charitable-admin-notifications' );
-
-		wp_register_script(
-			'charitable-admin-notifications',
-			$assets_dir . 'js/charitable-admin-notifications' . $suffix . '.js',
-			array( 'jquery', 'charitable-lity' ),
-			$version,
-			true
-		);
-
-		wp_enqueue_script( 'charitable-admin-notifications' );
-
-		// Lity.
-		wp_enqueue_style(
-			'charitable-lity',
-			$assets_dir . 'lib/lity/lity.min.css',
-			[],
-			$version
-		);
-
-		wp_enqueue_script(
-			'charitable-lity',
-			$assets_dir . 'lib/lity/lity.min.js',
-			[ 'jquery' ],
-			$version,
-			true
-		);
-	}
-
-	/**
 	 * Output notices.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 */
 	public function output_notices() {
 		return $this->output( 'notices' );
@@ -551,11 +598,14 @@ class Charitable_Notifications {
 	/**
 	 * Output notifications on Form Overview admin area.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
+	 *
+	 * @param string $location Location where the notifications are output.
+	 * @param int    $limit_active Limit of active notifications to show.
 	 */
-	public function output( $location = false ) {
+	public function output( $location = false, $limit_active = 4 ) {
 
-		if ( ! defined( 'CHARITABLE_ENABLE_NOTIFICATIONS' ) || ! CHARITABLE_ENABLE_NOTIFICATIONS ) {
+		if ( defined( 'CHARITABLE_DISABLE_NOTIFICATIONS' ) && CHARITABLE_DISABLE_NOTIFICATIONS ) {
 			return;
 		}
 
@@ -571,9 +621,12 @@ class Charitable_Notifications {
 			return;
 		}
 
-		$notifications_html   = '';
-		$current_class        = ' current';
-		$content_allowed_tags = [
+		$active_notifications_html     = '';
+		$dismissed_notifications_html  = '';
+		$active_notifications_count    = 0;
+		$dismissed_notifications_count = 0;
+		$current_class                 = ' current';
+		$content_allowed_tags          = [
 			'em'     => [],
 			'strong' => [],
 			'span'   => [
@@ -586,6 +639,7 @@ class Charitable_Notifications {
 			],
 		];
 
+		// Get active notifications.
 		foreach ( $notifications as $notification ) {
 
 			// Prepare required arguments.
@@ -606,32 +660,128 @@ class Charitable_Notifications {
 				continue;
 			}
 
-			// Notification HTML.
-			$notifications_html .= sprintf(
-				'<div class="charitable-notifications-message%5$s" data-message-id="%4$s">
-					<h3 class="charitable-notifications-title">%1$s%6$s</h3>
-					<p class="charitable-notifications-content">%2$s</p>
-					%3$s
-				</div>',
-				esc_html( $title ),
-				wp_kses( $content, $content_allowed_tags ),
-				$this->get_notification_buttons_html( $notification ),
-				esc_attr( $notification['id'] ),
-				esc_attr( $current_class ),
-				$this->get_video_badge_html( $this->get_component_data( $notification['video'] ) )
-			);
+			// If the notification ID is not a part of the dismissed notifications, add it to the list.
+			if ( ! $this->is_dismissed( $notification ) ) {
+
+				if ( 'dashboard' === $location ) {
+
+					// Notification HTML, slightyl different for dashboard.
+					$active_notifications_html .= sprintf(
+						'<div aria-expanded="true" class="charitable-notification charitable-notification-%5$s %8$s" data-notification-id="%6$s">
+							<div>
+								%7$s
+								<div class="body">
+									<div class="title">
+										<div>%1$s</div>
+										<div class="date">%3$s</div>
+									</div>
+									<div class="notification-content">%2$s</div>
+									<div class="actions">
+										%4$s
+										<!----><a href="#" class="dismiss">Dismiss</a>
+									</div>
+								</div>
+							</div>
+						</div>',
+						esc_html( $title ),
+						wp_kses( $content, $content_allowed_tags ),
+						! empty( $notification['start'] ) ? $this->human_readable_date_from_mysql( $notification['start'] ) : '',
+						$this->get_notification_buttons_html( $notification ),
+						esc_attr( $notification['id'] ),
+						esc_attr( $notification['id'] ),
+						$this->get_notification_icon_html( $notification ),
+						esc_attr( $current_class )
+						// $this->get_video_badge_html( $this->get_component_data( $notification['video'] ) )
+					);
+
+				} else {
+
+					// Notification HTML.
+					$active_notifications_html .= sprintf(
+						'<div aria-expanded="true" class="charitable-notification charitable-notification-%5$s %8$s" data-notification-id="%6$s">
+							<div>
+								%7$s
+								<div class="body">
+									<div class="title">
+										<div>%1$s</div>
+										<div class="date">%3$s</div>
+									</div>
+									<div class="notification-content">%2$s</div>
+									<div class="actions">
+										%4$s
+										<!----><a href="#" class="dismiss">Dismiss</a>
+									</div>
+								</div>
+							</div>
+						</div>',
+						esc_html( $title ),
+						wp_kses( $content, $content_allowed_tags ),
+						! empty( $notification['start'] ) ? $this->human_readable_date_from_mysql( $notification['start'] ) : '',
+						$this->get_notification_buttons_html( $notification ),
+						esc_attr( $notification['id'] ),
+						esc_attr( $notification['id'] ),
+						$this->get_notification_icon_html( $notification ),
+						esc_attr( $current_class )
+						// $this->get_video_badge_html( $this->get_component_data( $notification['video'] ) )
+					);
+
+				}
+
+				++$active_notifications_count;
+
+			} else {
+
+				// Dismissed notification.
+				$dismissed_notifications_html .= sprintf(
+					'<div aria-expanded="true" class="charitable-notification charitable-notification-%5$s %8$s" data-notification-id="%6$s">
+						<div>
+							%7$s
+							<div class="body">
+								<div class="title">
+									<div>%1$s</div>
+									<div class="date">%3$s</div>
+								</div>
+								<div class="notification-content">%2$s</div>
+								<div class="actions">
+									%4$s
+								</div>
+							</div>
+						</div>
+					</div>',
+					esc_html( $title ),
+					wp_kses( $content, $content_allowed_tags ),
+					! empty( $notification['start'] ) ? $this->human_readable_date_from_mysql( $notification['start'] ) : '',
+					$this->get_notification_buttons_html( $notification ),
+					esc_attr( $notification['id'] ),
+					esc_attr( $notification['id'] ),
+					$this->get_notification_icon_html( $notification ),
+					esc_attr( $current_class )
+					// $this->get_video_badge_html( $this->get_component_data( $notification['video'] ) )
+				);
+
+				++$dismissed_notifications_count;
+			}
 
 			// Only first notification is current.
 			$current_class = '';
+
+			if ( 'dashboard' === $location && $active_notifications_count >= $limit_active ) {
+				break;
+			}
 		}
+
+		$template_location = $location === 'dashboard' ? '/admin/templates/notifications-dashboard' : '/admin/templates/notifications';
+		$template_location = apply_filters( 'charitable_admin_notifications_template_location', $template_location, $location );
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo charitable_render(
-			'/admin/templates/notifications',
+			$template_location,
 			[
 				'notifications' => [
-					'count' => count( $notifications ),
-					'html'  => $notifications_html,
+					'active_count'    => $active_notifications_count,
+					'dismissed_count' => $dismissed_notifications_count,
+					'active_html'     => $active_notifications_html,
+					'dismissed_html'  => $dismissed_notifications_html,
 				],
 			],
 			true
@@ -639,9 +789,75 @@ class Charitable_Notifications {
 	}
 
 	/**
+	 * Get notificaiton icon html based on if the type is a success, warning, info.
+	 *
+	 * @since 1.8.3
+	 *
+	 * @param array $notification Notification data.
+	 *
+	 * @return string
+	 */
+	private function get_notification_icon_html( $notification ) {
+
+		$icon = '';
+
+		$notification_type = ! empty( $notification['notification_type'] ) ? sanitize_text_field( $notification['notification_type'] ) : '';
+
+		switch ( $notification_type ) {
+			case 'warning':
+				$html = '<div class="icon">
+					<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="charitable-circle-exclamation warning">
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M11.99 2.00012C6.47 2.00012 2 6.48012 2 12.0001C2 17.5201 6.47 22.0001 11.99 22.0001C17.52 22.0001 22 17.5201 22 12.0001C22 6.48012 17.52 2.00012 11.99 2.00012ZM13 13.0001V7.00012H11V13.0001H13ZM13 17.0001V15.0001H11V17.0001H13ZM4 12.0001C4 16.4201 7.58 20.0001 12 20.0001C16.42 20.0001 20 16.4201 20 12.0001C20 7.58012 16.42 4.00012 12 4.00012C7.58 4.00012 4 7.58012 4 12.0001Z" fill="currentColor"></path>
+					</svg>
+				</div>';
+				break;
+			case 'success':
+				$html = '<div class="icon"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="charitable-circle-check success""><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM10 14.17L16.59 7.58L18 9L10 17L6 13L7.41 11.59L10 14.17Z" fill="currentColor"></path></svg></div>';
+				break;
+			default:
+				$html = '<div class="icon"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="charitable-circle-check success""><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM10 14.17L16.59 7.58L18 9L10 17L6 13L7.41 11.59L10 14.17Z" fill="currentColor"></path></svg></div>';
+				break;
+		}
+
+		return $html;
+	}
+
+	/**
+	 * Get human readable date from MySQL timestamp.
+	 *
+	 * @since 1.8.3
+	 *
+	 * @param string $mysql_timestamp MySQL timestamp.
+	 *
+	 * @return bool
+	 */
+	private function human_readable_date_from_mysql( $mysql_timestamp = false ) {
+
+		// Convert the MySQL timestamp to a Unix timestamp.
+		$timestamp = strtotime( $mysql_timestamp );
+
+		// Get the current time as a Unix timestamp.
+		$current_time = current_time( 'timestamp' ); // phpcs:ignore
+
+		// Calculate the difference in seconds.
+		$time_diff = $current_time - $timestamp;
+
+		// 30 days in seconds
+		$thirty_days = 30 * 24 * 60 * 60;
+
+		if ( $time_diff < $thirty_days ) {
+			// If the timestamp is less than 30 days ago, return a 'time ago' format.
+			return human_time_diff( $timestamp, $current_time ) . ' ago';
+		} else {
+			// If the timestamp is 30 days or more in the past, use 'F j, Y' format.
+			return date( 'F j, Y', $timestamp );  // phpcs:ignore
+		}
+	}
+
+	/**
 	 * Retrieve notification's buttons HTML.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param array $notification Notification data.
 	 *
@@ -682,7 +898,7 @@ class Charitable_Notifications {
 	/**
 	 * Retrieve notification's component data by a license type.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param mixed $data Component data.
 	 *
@@ -706,7 +922,7 @@ class Charitable_Notifications {
 	/**
 	 * Retrieve the current installation license type (always lowercase).
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @return string
 	 */
@@ -721,48 +937,73 @@ class Charitable_Notifications {
 		} else {
 			return 'lite';
 		}
-
-		// $this->license_type = charitable_get_license_type();
-
-		// if ( ! $this->license_type ) {
-		// $this->license_type = 'lite';
-		// }
-
-		// return $this->license_type;
 	}
 
 	/**
 	 * Dismiss notification via AJAX.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 */
 	public function dismiss() {
 
 		// Check for required param, security and access.
 		if (
-			empty( $_POST['id'] ) ||
+			empty( $_POST['notification_id'] ) ||
 			! check_ajax_referer( 'charitable-admin', 'nonce', false ) ||
 			! $this->has_access()
 		) {
 			wp_send_json_error();
 		}
 
-		$id     = sanitize_key( $_POST['id'] );
+		$id     = sanitize_key( $_POST['notification_id'] );
 		$type   = is_numeric( $id ) ? 'feed' : 'events';
 		$option = $this->get_option();
 
 		$option['dismissed'][] = $id;
 		$option['dismissed']   = array_unique( $option['dismissed'] );
 
-		// Remove notification.
-		if ( is_array( $option[ $type ] ) && ! empty( $option[ $type ] ) ) {
-			foreach ( $option[ $type ] as $key => $notification ) {
-				if ( (string) $notification['id'] === (string) $id ) {
-					unset( $option[ $type ][ $key ] );
+		update_option( 'charitable_notifications', $option );
 
-					break;
-				}
-			}
+		wp_send_json_success();
+	}
+
+	/**
+	 * Dismiss multiple notifications via AJAX.
+	 *
+	 * @since 1.8.3
+	 */
+	public function dismiss_multiple() {
+
+		// Check for required param, security and access.
+		if (
+			empty( $_POST['notification_ids'] ) ||
+			! check_ajax_referer( 'charitable-admin', 'nonce', false ) ||
+			! $this->has_access()
+		) {
+			wp_send_json_error();
+		}
+
+		if ( ! is_array( $_POST['notification_ids'] ) ) {
+			wp_send_json_error();
+		}
+
+		$option           = $this->get_option();
+		$notification_ids = array_map( 'sanitize_key', $_POST['notification_ids'] );
+		foreach ( $notification_ids as $id ) {
+			$type                  = is_numeric( $id ) ? 'feed' : 'events';
+			$option['dismissed'][] = $id;
+			$option['dismissed']   = array_unique( $option['dismissed'] );
+
+			// Remove notification.
+			// if ( is_array( $option[ $type ] ) && ! empty( $option[ $type ] ) ) {
+			// 	foreach ( $option[ $type ] as $key => $notification ) {
+			// 		if ( (string) $notification['id'] === (string) $id ) {
+			// 			unset( $option[ $type ][ $key ] );
+
+			// 			break;
+			// 		}
+			// 	}
+			// }
 		}
 
 		update_option( 'charitable_notifications', $option );
@@ -773,7 +1014,7 @@ class Charitable_Notifications {
 	/**
 	 * Prepare button URL.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param array $btn Button data.
 	 *
@@ -795,7 +1036,7 @@ class Charitable_Notifications {
 	/**
 	 * Get the notification's video badge HTML.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.3
 	 *
 	 * @param string $video_url Valid video URL.
 	 *
@@ -827,15 +1068,28 @@ class Charitable_Notifications {
 	 * @return boolean
 	 */
 	public function show_notifications() {
-		if ( isset( $_GET['taxonomy'] ) ) {
+		if ( isset( $_GET['taxonomy'] ) ) { // phpcs:ignore
 			return false;
 		}
-		if ( isset( $_GET['post_type'] ) && sanitize_text_field( $_GET['post_type'] ) === 'campaign' ) {
+		if ( isset( $_GET['post_type'] ) && sanitize_text_field( $_GET['post_type'] ) === 'campaign' ) { // phpcs:ignore
 			return true;
 		}
-		if ( isset( $_GET['post_type'] ) && sanitize_text_field( $_GET['post_type'] ) === 'donation' ) {
+		if ( isset( $_GET['post_type'] ) && sanitize_text_field( $_GET['post_type'] ) === 'donation' ) { // phpcs:ignore
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * This will incercept the request and redirect to the dashboard page.
+	 *
+	 * @since 1.8.3
+	 */
+	public function maybe_redirect_from_notifications() {
+
+		if ( ! empty( $_GET['page'] ) && 'charitable-notifications' === $_GET['page'] ) { // phpcs:ignore
+			wp_safe_redirect( admin_url( 'admin.php?page=charitable-dashboard' ) );
+			exit;
+		}
 	}
 }

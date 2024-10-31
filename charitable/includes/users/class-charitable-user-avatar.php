@@ -7,10 +7,11 @@
  * @package   Charitable User Avatar
  * @copyright Copyright (c) 2017, Eric Daams
  * @license   http://opensource.org/licenses/gpl-1.0.0.php GNU Public License
- * @since  	  1.0.0
+ * @since     1.0.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; }
 
 if ( ! class_exists( 'Charitable_User_Avatar' ) ) :
 
@@ -72,14 +73,8 @@ if ( ! class_exists( 'Charitable_User_Avatar' ) ) :
 		 * Create class instance.
 		 *
 		 * @since 1.0.0
-		 *
-		 * @param string $plugin_file The core plugin file.
 		 */
 		public function __construct() {
-			// $this->plugin_file 		= $plugin_file;
-			// $this->directory_path 	= plugin_dir_path( $plugin_file );
-			// $this->directory_url 	= plugin_dir_url( $plugin_file );
-
 			add_action( 'charitable_start', array( $this, 'start' ), 5 );
 		}
 
@@ -112,29 +107,10 @@ if ( ! class_exists( 'Charitable_User_Avatar' ) ) :
 			// Set static instance.
 			self::$instance = $this;
 
-			// $this->load_dependencies();
-
 			$this->attach_hooks_and_filters();
 
-			// $this->maybe_start_ambassadors();
-
-			// $this->setup_licensing();
-
-			// $this->setup_i18n();
-
-			// Hook in here to do something when the plugin is first loaded.
+			// Hook in here to do something when the first loaded.
 			do_action( 'charitable_user_avatar_start', $this );
-		}
-
-		/**
-		 * Include necessary files.
-		 *
-		 * @return void
-		 * @since  1.0.0
-		 */
-		private function load_dependencies() {
-			require_once( $this->get_path( 'includes' ) . 'charitable-user-avatar-functions.php' );
-			require_once( $this->get_path( 'includes' ) . 'class-charitable-user-avatar-profile-form.php' );
 		}
 
 		/**
@@ -144,56 +120,10 @@ if ( ! class_exists( 'Charitable_User_Avatar' ) ) :
 		 * @since  1.0.0
 		 */
 		private function attach_hooks_and_filters() {
-			// add_action( 'charitable_user_avatar_start',	array( 'Charitable_User_Avatar_Profile_Form', 'start' ) );
+			// add_action( 'charitable_user_avatar_start',  array( 'Charitable_User_Avatar_Profile_Form', 'start' ) );
 
-			add_filter( 'charitable_user_avatar', 		array( $this, 'get_user_avatar' ), 10, 3 );
-			add_filter( 'charitable_user_avatar_src', 	array( $this, 'get_user_avatar_src' ), 10, 3 );
-		}
-
-		/**
-		 * Load up the Ambassadors integration if Ambassadors is installed.
-		 *
-		 * @return void
-		 * @since  1.0.2
-		 */
-		private function maybe_start_ambassadors() {
-			if ( ! class_exists( 'Charitable_Ambassadors' ) ) {
-				return;
-			}
-
-			require_once( $this->get_path( 'includes' ) . 'ambassadors/class-charitable-user-avatar-campaign-form.php' );
-
-			add_action( 'charitable_user_avatar_start', array( 'Charitable_User_Avatar_Campaign_Form', 'start' ) );
-		}
-
-		/**
-		 * Set up licensing for the extension.
-		 *
-		 * @return void
-		 * @since  1.0.0
-		 */
-		private function setup_licensing() {
-			charitable_get_helper( 'licenses' )->register_licensed_product(
-				Charitable_User_Avatar::NAME,
-				Charitable_User_Avatar::AUTHOR,
-				Charitable_User_Avatar::VERSION,
-				$this->plugin_file
-			);
-		}
-
-		/**
-		 * Set up the internationalisation for the plugin.
-		 *
-		 * @return void
-		 * @since  1.1.0
-		 */
-		private function setup_i18n() {
-			if ( class_exists( 'Charitable_i18n' ) ) {
-
-				require_once( $this->get_path( 'includes' ) . 'i18n/class-charitable-user-avatar-i18n.php' );
-
-				Charitable_User_Avatar_i18n::get_instance();
-			}
+			add_filter( 'charitable_user_avatar', array( $this, 'get_user_avatar' ), 10, 3 );
+			add_filter( 'charitable_user_avatar_src', array( $this, 'get_user_avatar_src' ), 10, 3 );
 		}
 
 		/**
@@ -229,36 +159,36 @@ if ( ! class_exists( 'Charitable_User_Avatar' ) ) :
 		/**
 		 * Returns plugin paths.
 		 *
-		 * @param  string $path 			// If empty, returns the path to the plugin.
-		 * @param  bool $absolute_path 	// If true, returns the file system path. If false, returns it as a URL.
+		 * @param  string $type          If empty, returns the path to the plugin.
+		 * @param  bool   $absolute_path If true, returns the file system path. If false, returns it as a URL.
 		 * @return string
 		 * @since  1.0.0
 		 */
-		public function get_path($type = '', $absolute_path = true ) {
+		public function get_path( $type = '', $absolute_path = true ) {
 			$base = $absolute_path ? $this->directory_path : $this->directory_url;
 
-			switch( $type ) {
-				case 'includes' :
+			switch ( $type ) {
+				case 'includes':
 					$path = $base . 'includes/';
 					break;
 
-				case 'admin' :
+				case 'admin':
 					$path = $base . 'includes/admin/';
 					break;
 
-				case 'templates' :
+				case 'templates':
 					$path = $base . 'templates/';
 					break;
 
-				case 'assets' :
+				case 'assets':
 					$path = $base . 'assets/';
 					break;
 
-				case 'directory' :
+				case 'directory':
 					$path = $base;
 					break;
 
-				default :
+				default:
 					$path = $this->plugin_file;
 			}
 
@@ -270,7 +200,7 @@ if ( ! class_exists( 'Charitable_User_Avatar' ) ) :
 		 *
 		 * @since  1.0.0
 		 *
-		 * @param  mixed $object
+		 * @param  mixed $object The object to store.
 		 * @return void
 		 */
 		public function register_object( $object ) {
@@ -321,9 +251,9 @@ if ( ! class_exists( 'Charitable_User_Avatar' ) ) :
 		/**
 		 * Return the src of the user's avatar, or false if they have not uploaded their own.
 		 *
-		 * @param  string|false $avatar_src
+		 * @param  string|false    $avatar_src
 		 * @param  Charitable_User $user
-		 * @param  string $size
+		 * @param  string          $size
 		 * @return string|false
 		 * @since  1.0.0
 		 */
@@ -334,7 +264,7 @@ if ( ! class_exists( 'Charitable_User_Avatar' ) ) :
 				$attachment_src = wp_get_attachment_image_src( $avatar_attachment_id, $size );
 
 				if ( $attachment_src ) {
-					$avatar_src = $attachment_src[ 0 ];
+					$avatar_src = $attachment_src[0];
 				}
 			}
 
@@ -352,7 +282,7 @@ if ( ! class_exists( 'Charitable_User_Avatar' ) ) :
 		public function __clone() {
 			charitable_get_deprecated()->doing_it_wrong(
 				__FUNCTION__,
-				__( 'Cheatin&#8217; huh?', 'charitable-user-avatar' ),
+				__( 'Cheatin&#8217; huh?', 'charitable' ),
 				'1.0.0'
 			);
 		}
@@ -366,7 +296,7 @@ if ( ! class_exists( 'Charitable_User_Avatar' ) ) :
 		public function __wakeup() {
 			charitable_get_deprecated()->doing_it_wrong(
 				__FUNCTION__,
-				__( 'Cheatin&#8217; huh?', 'charitable-user-avatar' ),
+				__( 'Cheatin&#8217; huh?', 'charitable' ),
 				'1.0.0'
 			);
 		}

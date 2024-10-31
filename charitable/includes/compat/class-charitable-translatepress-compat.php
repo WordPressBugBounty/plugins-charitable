@@ -73,7 +73,7 @@ if ( ! class_exists( 'Charitable_Translatepress_Compat' ) ) :
 				foreach ( $fields->get_fields() as $field ) {
 
 					/* Update the field label. */
-					$field->label = __( $field->label );
+					$field->label = __( $field->label ); // phpcs:ignore
 
 					foreach ( $api['forms'] as $form ) {
 						$form_settings = $field->$form;
@@ -85,7 +85,7 @@ if ( ! class_exists( 'Charitable_Translatepress_Compat' ) ) :
 						/* Translate form label and placeholder. */
 						foreach ( $translateable_form_fields as $form_field ) {
 							if ( array_key_exists( $form_field, $form_settings ) ) {
-								$field->set( $form, $form_field, __( $form_settings[ $form_field ] ) );
+								$field->set( $form, $form_field, __( $form_settings[ $form_field ] ) ); // phpcs:ignore
 							}
 						}
 
@@ -94,7 +94,7 @@ if ( ! class_exists( 'Charitable_Translatepress_Compat' ) ) :
 							$options = $form_settings['options'];
 
 							foreach ( $options as $key => $value ) {
-								$options[ $key ] = __( $value );
+								$options[ $key ] = __( $value ); // phpcs:ignore
 							}
 
 							if ( in_array( $field->field, array( 'country', 'state' ) ) ) {
@@ -109,8 +109,10 @@ if ( ! class_exists( 'Charitable_Translatepress_Compat' ) ) :
 
 			if ( function_exists( 'charitable_get_recipient_types' ) ) {
 				foreach ( charitable_get_recipient_types() as $option => $recipient_type ) {
-					$recipient_type['label']       = __( $recipient_type['label'], 'charitable-ambassadors' );
-					$recipient_type['description'] = __( $recipient_type['description'], 'charitable-ambassadors' );
+					// Translators: %s is the label of the recipient type.
+					$recipient_type['label']       = sprintf( __( '%s', 'charitable' ), $recipient_type['label'] ); // phpcs:ignore
+					// Translators: %s is the label of the description.
+					$recipient_type['description'] = sprintf( __( '%s', 'charitable' ), $recipient_type['description'] ); // phpcs:ignore
 
 					charitable_register_recipient_type( $option, $recipient_type );
 				}

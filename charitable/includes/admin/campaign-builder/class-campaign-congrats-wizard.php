@@ -139,7 +139,7 @@ if ( ! class_exists( 'Charitable_Campaign_Congrats_Wizard' ) ) :
 		 */
 		public function enqueues() {
 
-			$min     = ''; // charitable_get_min_suffix(); // todo: undo this.
+			$min           = charitable_get_min_suffix();
 			$style_version = charitable_get_style_version();
 
 			wp_enqueue_style(
@@ -188,25 +188,6 @@ if ( ! class_exists( 'Charitable_Campaign_Congrats_Wizard' ) ) :
 
 			include $template;
 		}
-
-		/**
-		 * Check if Challenge is active.
-		 *
-		 * @since 1.8.0
-		 *
-		 * @return boolean
-		 */
-		// public function is_challenge_active() {
-
-		// 	static $challenge_active = null;
-
-		// 	if ( $challenge_active === null ) {
-		// 		$challenge        = campaign()->get( 'challenge' );
-		// 		$challenge_active = method_exists( $challenge, 'challenge_active' ) ? $challenge->challenge_active() : false;
-		// 	}
-
-		// 	return $challenge_active;
-		// }
 
 		/**
 		 * Check if the current page is a campaign embed page.

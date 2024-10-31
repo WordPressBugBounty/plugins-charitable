@@ -373,7 +373,6 @@ function charitable_get_donation_actions() {
 	return Charitable_Admin::get_instance()->get_donation_actions();
 }
 
-
 /**
  * Adds the "Upgrade to Pro" menu item to the very end of the submenu.
  *
@@ -387,7 +386,7 @@ function charitable_add_upgrade_item() {
 	}
 
 	$submenu['charitable'][99] = array(
-		__( 'Upgrade to Pro', 'chartiable' ),
+		__( 'Upgrade to Pro', 'charitable' ),
 		'manage_options',
 		charitable_ga_url(
 			'https://wpcharitable.com/lite-vs-pro/',
@@ -428,7 +427,7 @@ function charitable_add_footer_text( $footer_text ) {
 
 	return sprintf(
 		/* translators: %1$s Opening strong tag, do not translate. %2$s Closing strong tag, do not translate. %3$s Opening anchor tag, do not translate. %4$s Closing anchor tag, do not translate. */
-		__( 'Please rate %1$sCharitable%2$s %3$s★★★★★%4$s on %3$sWordPress.org%4$s to help us spread the word. Thank you from the Charitable team!', 'stripe' ),
+		__( 'Please rate %1$sCharitable%2$s %3$s★★★★★%4$s on %3$sWordPress.org%4$s to help us spread the word. Thank you from the Charitable team!', 'charitable' ),
 		'<strong>',
 		'</strong>',
 		'<a href="https://wordpress.org/support/plugin/charitable/reviews/?filter=5#new-post" rel="noopener noreferrer" target="_blank">',
@@ -554,6 +553,43 @@ function charitable_get_license_type() {
  * @return int|false Unix timestamp. False on failure.
  */
 function charitable_get_activated_timestamp( $type = '' ) {
+
+	$activated = (array) get_option( 'charitable_activated', [] );
+
+	if ( empty( $activated ) ) {
+		return false;
+	}
+
+	// When a passed install type is empty, then get it from a DB.
+	// If it is installed/activated first, it is saved first.
+	$type = empty( $type ) ? (string) array_keys( $activated )[0] : $type;
+
+	if ( ! empty( $activated[ $type ] ) ) {
+		return absint( $activated[ $type ] );
+	}
+
+	// Fallback.
+	$types = array_diff( [ 'lite', 'pro' ], [ $type ] );
+
+	foreach ( $types as $_type ) {
+		if ( ! empty( $activated[ $_type ] ) ) {
+			return absint( $activated[ $_type ] );
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Get when WPCharitable was first installed.
+ *
+ * @since 8.1.x
+ *
+ * @param string $type Specific install type to check for.
+ *
+ * @return int|false Unix timestamp. False on failure.
+ */
+function charitable_get_updated_timestamp( $type = '' ) {
 
 	$activated = (array) get_option( 'charitable_activated', [] );
 
@@ -1349,3 +1385,31 @@ function charitable_disable_dashboard_notification_ajax() {
 }
 
 add_action( 'wp_ajax_charitable_disable_dashboard_notification', 'charitable_disable_dashboard_notification_ajax' );
+
+/**
+ * Get a checkbox wrapped with markup to be displayed as a toggle.
+ *
+ * @param bool       $checked Is it checked or not.
+ * @param string     $name The name for the input.
+ * @param string     $description Field description (optional).
+ * @param string|int $value Field value (optional).
+ * @param string     $label Field label (optional).
+ *
+ * @return string
+ */
+function charitable_get_checkbox_toggle( $checked, $name, $description = '', $value = '', $label = '' ) {
+	$markup = '<label class="wpcode-checkbox-toggle">';
+
+	$markup .= '<input type="checkbox" ' . checked( $checked, true, false ) . ' name="' . esc_attr( $name ) . '" id="' . esc_attr( $name ) . '" value="' . esc_attr( $value ) . '" />';
+	$markup .= '<span class="wpcode-checkbox-toggle-slider"></span>';
+	$markup .= '</label>';
+	if ( ! empty( $label ) ) {
+		$markup .= '<label class="wpcode-checkbox-toggle-label" for="' . esc_attr( $name ) . '">' . esc_html( $label ) . '</label>';
+	}
+
+	if ( ! empty( $description ) ) {
+		$markup .= '<p class="description">' . wp_kses_post( $description ) . '</p>';
+	}
+
+	return $markup;
+}

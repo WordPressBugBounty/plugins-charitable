@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
- * @version   1.8.0
+ * @version   1.8.3
  */
 
 // Exit if accessed directly.
@@ -47,6 +47,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		 * to instantiate this object.
 		 *
 		 * @since  1.0.0
+		 * @version 1.8.3 added third party plugin area.
 		 */
 		protected function __construct() {
 			$this->load_dependencies();
@@ -63,6 +64,9 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 			add_filter( 'preview_post_link', array( $this, 'campaign_preview_link' ), 10, 2 );
 
 			add_filter( 'admin_init', array( $this, 'update_dashboard_url' ), 10 );
+
+			/* third party plugins */
+			add_filter( 'elementor/settings/controls/checkbox_list_cpt/post_type_objects', array( $this, 'elementor_post_types' ), 10, 1 );
 		}
 
 		/**
@@ -174,7 +178,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		 */
 		public function admin_enqueue_scripts() {
 
-			$min     = ''; // charitable_get_min_suffix(); // todo: undo this.
+			$min     = charitable_get_min_suffix(); // 1.8.3
 			$version = charitable()->get_version();
 
 			$assets_dir = charitable()->get_path( 'assets', false );
@@ -184,7 +188,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 			/* Menu styles are loaded everywhere in the WordPress dashboard. */
 			wp_register_style(
 				'charitable-admin-menu',
-				$assets_dir . 'css/charitable-admin-menu' . $min . '.css',
+				$assets_dir . 'css/admin/charitable-admin-menu' . $min . '.css',
 				array(),
 				$version
 			);
@@ -193,7 +197,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 			wp_register_script(
 				'charitable-admin-pages-all',
-				$assets_dir . 'js/charitable-admin-pages' . $min . '.js',
+				$assets_dir . 'js/admin/charitable-admin-pages' . $min . '.js',
 				array( 'jquery' ),
 				$version,
 				false
@@ -204,7 +208,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 			/* Admin page styles are registered but only enqueued when necessary. */
 			wp_register_style(
 				'charitable-admin-pages',
-				$assets_dir . 'css/charitable-admin-pages' . $min . '.css',
+				$assets_dir . 'css/admin/charitable-admin-pages' . $min . '.css',
 				array(),
 				$version
 			);
@@ -217,7 +221,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 				wp_register_style(
 					'charitable-admin',
-					$assets_dir . 'css/charitable-admin' . $min . '.css',
+					$assets_dir . 'css/admin/charitable-admin-legacy' . $min . '.css',
 					array(),
 					$version
 				);
@@ -226,7 +230,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 				wp_register_script(
 					'charitable-admin-notice',
-					$assets_dir . 'js/charitable-admin-notice' . $min . '.js',
+					$assets_dir . 'js/admin/charitable-admin-notice' . $min . '.js',
 					array( 'jquery' ),
 					$version,
 					false
@@ -237,7 +241,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 			// v 1.8.0.
 			wp_register_style(
 				'charitable-admin-2.0',
-				$assets_dir . 'css/charitable-admin-2.0' . $min . '.css',
+				$assets_dir . 'css/admin/charitable-admin' . $min . '.css',
 				array(),
 				$version
 			);
@@ -246,7 +250,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 			wp_register_style(
 				'charitable-admin',
-				$assets_dir . 'css/charitable-admin' . $min . '.css',
+				$assets_dir . 'css/admin/charitable-admin-legacy' . $min . '.css',
 				array(),
 				$version
 			);
@@ -284,7 +288,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 				wp_register_script(
 					'charitable-admin',
-					$assets_dir . 'js/charitable-admin' . $min . '.js',
+					$assets_dir . 'js/admin/charitable-admin' . $min . '.js',
 					$dependencies,
 					$version,
 					false
@@ -318,7 +322,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 				wp_register_script(
 					'charitable-admin-2.0',
-					$assets_dir . 'js/charitable-admin-2.0' . $min . '.js',
+					$assets_dir . 'js/admin/charitable-admin-2.0' . $min . '.js',
 					$dependencies,
 					$version,
 					false
@@ -348,7 +352,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 					wp_enqueue_script(
 						'charitable-admin-utils',
-						charitable()->get_path( 'directory', false ) . "assets/js/charitable-admin-utils{$min}.js",
+						charitable()->get_path( 'directory', false ) . "assets/js/admin/charitable-admin-utils{$min}.js",
 						array( 'jquery' ),
 						charitable()->get_version()
 					);
@@ -382,7 +386,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 					wp_register_script(
 						'charitable-reporting',
-						$assets_dir . 'js/charitable-admin-reporting' . $min . '.js',
+						$assets_dir . 'js/admin/charitable-admin-reporting' . $min . '.js',
 						array( 'jquery', 'charitable-apex-charts', 'charitable-report-date-range-picker' ),
 						$version,
 						true
@@ -416,7 +420,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 				wp_register_script(
 					'charitable-onboarding',
-					$assets_dir . 'js/charitable-admin-onboarding' . $min . '.js',
+					$assets_dir . 'js/admin/charitable-admin-onboarding' . $min . '.js',
 					array( 'jquery' ),
 					$version,
 					true
@@ -438,7 +442,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 			wp_register_script(
 				'charitable-admin-notice',
-				$assets_dir . 'js/charitable-admin-notice' . $min . '.js',
+				$assets_dir . 'js/admin/charitable-admin-notice' . $min . '.js',
 				array( 'jquery' ),
 				$version,
 				false
@@ -446,7 +450,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 			wp_register_script(
 				'charitable-admin-media',
-				$assets_dir . 'js/charitable-admin-media' . $min . '.js',
+				$assets_dir . 'js/admin/charitable-admin-media' . $min . '.js',
 				array( 'jquery' ),
 				$version,
 				false
@@ -469,7 +473,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 			wp_register_script(
 				'charitable-admin-tables',
-				$assets_dir . 'js/charitable-admin-tables' . $min . '.js',
+				$assets_dir . 'js/admin/charitable-admin-tables' . $min . '.js',
 				array( 'jquery', 'lean-modal' ),
 				$version,
 				true
@@ -498,7 +502,8 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		 *
 		 * @since  1.5.0
 		 * @version 1.8.1.6
-		 * @version 1.8.2 Added pro/lite check.
+		 * @version 1.8.1.16 Added pro/lite check.
+		 * @version 1.8.3
 		 *
 		 * @param  string $classes Existing list of classes.
 		 * @return string
@@ -531,14 +536,16 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		 * Add notices to the dashboard.
 		 *
 		 * @since  1.4.0
+		 * @version 1.8.3 Added check for PHP Version deprecation.
 		 *
 		 * @return void
 		 */
 		public function add_notices() {
-			/*
-			Get any version update notices first.
-			*/
-			// $this->add_version_update_notices(); // depreciated
+
+			// We will be deprecating these versions of PHP in the future, so let's let the user know.
+			if ( version_compare( PHP_VERSION, '7.4.0', '<' ) ) {
+				$this->php_notice_deprecated();
+			}
 
 			$this->add_third_party_notices();
 
@@ -586,7 +593,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		/**
 		 * Add version update notices to the dashboard.
 		 *
-		 * @since  1.4.6
+		 * @since  1.4.6 (deprecated in 1.8.0)
 		 *
 		 * @return void
 		 */
@@ -616,6 +623,74 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				}
 
 				$helper->add_version_update( $message, $notice );
+			}
+		}
+
+		/**
+		 * Add php decpreation notices.
+		 *
+		 * @since  1.8.3
+		 *
+		 * @return void
+		 */
+		public function php_notice_deprecated() {
+			$medium = charitable_is_pro() ? 'proplugin' : 'liteplugin';
+			?>
+			<div class="notice notice-error">
+				<p>
+					<?php
+					echo wp_kses(
+						sprintf(
+							// Translators: 1 - Opening HTML bold tag, 2 - Closing HTML bold tag, 3 - Opening HTML link tag, 4 - Closing HTML link tag.
+							__( 'Your site is running an %1$soutdated version%2$s of PHP that is no longer supported and may cause issues with %3$s. Please contact your web hosting provider to update your PHP version or switch to a %4$srecommended WordPress hosting company%5$s.', 'charitable' ), // phpcs:ignore Generic.Files.LineLength.MaxExceeded
+							'<strong>',
+							'</strong>',
+							'<strong>Charitable</strong>',
+							'<a href="https://www.wpbeginner.com/wordpress-hosting/" target="_blank" rel="noopener noreferrer">',
+							'</a>'
+						),
+						array(
+							'a'      => array(
+								'href'   => array(),
+								'target' => array(),
+								'rel'    => array(),
+							),
+							'strong' => array(),
+						)
+					);
+					?>
+					<br><br>
+					<?php
+					echo wp_kses(
+						sprintf(
+							// phpcs:ignore Generic.Files.LineLength.MaxExceeded
+							// Translators: 1 - Opening HTML bold tag, 2 - Closing HTML bold tag, 3 - The PHP version, 4 - The current year, 5 - The short plugin name ("Charitable"), 6 - Opening HTML link tag, 7 - Closing HTML link tag.
+							__( '%1$sNote:%2$s Support for PHP %3$s will be discontinued in %4$s. After this, if no further action is taken, %5$s functionality will be disabled. %6$sRead more for additional information.%7$s', 'charitable' ), // phpcs:ignore Generic.Files.LineLength.MaxExceeded
+							'<strong>',
+							'</strong>',
+							PHP_VERSION,
+							gmdate( 'Y' ),
+							'Charitable',
+							'<a href="https://wpcharitable.com/documentation/supported-php-versions-for-charitable/?utm_source=WordPress&utm_medium=' . $medium . '&utm_campaign=outdated-php-notice" target="_blank" rel="noopener noreferrer">', // phpcs:ignore Generic.Files.LineLength.MaxExceeded
+							'</a>'
+						),
+						array(
+							'a'      => array(
+								'href'   => array(),
+								'target' => array(),
+								'rel'    => array(),
+							),
+							'strong' => array(),
+						)
+					);
+					?>
+				</p>
+			</div>
+
+			<?php
+			// In case this is on plugin activation.
+			if ( isset( $_GET['activate'] ) ) { // phpcs:ignore HM.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Recommended
+				unset( $_GET['activate'] );
 			}
 		}
 
@@ -1132,9 +1207,44 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 			return $preview_link;
 		}
+
+		/**
+		 * Adjustments needed for Elementor.
+		 * Last tested with Elementor Lite 3.24.7.
+		 *
+		 * @since  1.8.3
+		 *
+		 * @param array $post_types_objects The post types.
+		 *
+		 * @return void
+		 */
+		public function elementor_post_types( $post_types_objects = array() ) {
+
+			// If Elementor is not installed, ignore.
+			if ( ! defined( 'ELEMENTOR_VERSION' ) ) {
+				return;
+			}
+
+			// Check for the Charitable Elementor integration override.
+			if ( defined( 'CHARITABLE_ELEMENTOR_ALLOW_POST_TYPE' ) && CHARITABLE_ELEMENTOR_ALLOW_POST_TYPE ) {
+				return;
+			}
+
+			$post_types_to_remove = apply_filters( 'charitable_elementor_post_types_to_remove', array( 'campaign' ) );
+
+			if ( empty( $post_types_to_remove ) || ! is_array( $post_types_to_remove ) ) {
+				return $post_types_objects;
+			}
+
+			// Remove all the post types from the object array.
+			foreach ( $post_types_to_remove as $post_type ) {
+				if ( isset( $post_types_objects[ $post_type ] ) ) {
+					unset( $post_types_objects[ $post_type ] );
+				}
+			}
+
+			return $post_types_objects;
+		}
 	}
-
-
-
 
 endif;

@@ -66,7 +66,7 @@ if ( ! class_exists( 'Charitable_Stripe_Donation_Log' ) ) :
 				$this->donation->update_donation_log(
 					sprintf(
 						/* translators: %s: link to Stripe payment intent details */
-						__( 'Stripe payment intent: %s', 'charitable-stripe' ),
+						__( 'Stripe payment intent: %s', 'charitable' ),
 						'<a href="' . $this->get_resource_link( 'payment', $payment_intent ) . '" target="_blank"><code>' . $payment_intent . '</code></a>'
 					)
 				);
@@ -132,7 +132,7 @@ if ( ! class_exists( 'Charitable_Stripe_Donation_Log' ) ) :
 			$this->donation->update_donation_log(
 				sprintf(
 					/* translators: %s: link to connected account page in Stripe */
-					__( 'Payment made directly on connected account: %s', 'charitable-stripe' ),
+					__( 'Payment made directly on connected account: %s', 'charitable' ),
 					'<a href="' . $this->get_resource_link( 'connect/account', $account ) . '" target="_blank"><code>' . $account . '</code></a>'
 				)
 			);
@@ -209,7 +209,7 @@ if ( ! class_exists( 'Charitable_Stripe_Donation_Log' ) ) :
 			$this->donation->update_donation_log(
 				sprintf(
 					/* translators: %s: link to connected account page in Stripe */
-					__( '%s application fee collected: %s', 'charitable-stripe' ),
+					__( '%s application fee collected: %s', 'charitable' ),
 					charitable_format_money( (string) $application_fee_amount ),
 					'<a href="' . $this->get_resource_link( 'connect/application_fee', $application_fee ) . '" target="_blank"><code>' . $application_fee . '</code></a>'
 				)
@@ -237,7 +237,7 @@ if ( ! class_exists( 'Charitable_Stripe_Donation_Log' ) ) :
 			$this->donation->update_donation_log(
 				sprintf(
 					/* translators: %s: link to connected account page in Stripe */
-					__( 'Transfer to connected account: %s', 'charitable-stripe' ),
+					__( 'Transfer to connected account: %s', 'charitable' ),
 					'<a href="' . $this->get_resource_link( 'connect/transfer', $transfer ) . '" target="_blank"><code>' . $transfer . '</code></a>'
 				)
 			);

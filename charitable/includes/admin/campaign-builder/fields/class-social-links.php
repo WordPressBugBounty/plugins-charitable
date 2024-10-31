@@ -345,7 +345,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 		 */
 		public function settings_section_top( $field_id = false, $campaign_data = false ) {
 
-			$message = '<p>' . esc_html__( 'Include full links urls or profile urls to your social networks.' ) . ' <a class="charitable-field-edit" data-type="' . $this->edit_type . '" data-section="' . $this->edit_section . '" href="http://wpcharitable.com/campaign-builder/fields/social-links">' . esc_html__( 'Learn how to expand the options of this field.', 'charitable' ) . '</a></p>';
+			$message = '<p>' . esc_html__( 'Include full links urls or profile urls to your social networks.', 'charitable' ) . ' <a class="charitable-field-edit" data-type="' . $this->edit_type . '" data-section="' . $this->edit_section . '" href="http://wpcharitable.com/campaign-builder/fields/social-links">' . esc_html__( 'Learn how to expand the options of this field.', 'charitable' ) . '</a></p>';
 
 			echo $message;
 		}

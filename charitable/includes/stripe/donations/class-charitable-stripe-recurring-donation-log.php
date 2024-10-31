@@ -60,11 +60,13 @@ if ( ! class_exists( 'Charitable_Stripe_Recurring_Donation_Log' ) ) :
 			}
 
 			$this->donation->set_gateway_subscription_id( $subscription );
-			$this->donation->update_donation_log( sprintf(
+			$this->donation->update_donation_log(
+				sprintf(
 				/* translators: %s: link to subscription object in Stripe dashboard */
-				__( 'Stripe subscription ID: %s', 'charitable-stripe' ),
-				'<a href="' . $this->get_resource_link( 'subscription', $subscription ) . '" target="_blank"><code>' . $subscription . '</code></a>'
-			) );
+					__( 'Stripe subscription ID: %s', 'charitable' ),
+					'<a href="' . $this->get_resource_link( 'subscription', $subscription ) . '" target="_blank"><code>' . $subscription . '</code></a>'
+				)
+			);
 
 			return true;
 		}
@@ -80,8 +82,8 @@ if ( ! class_exists( 'Charitable_Stripe_Recurring_Donation_Log' ) ) :
 		public function log_new_invoice( $invoice_id ) {
 			$this->donation->update_donation_log(
 				sprintf(
-					__( 'New invoice created for the subscription: %s', 'charitable-stripe' ),
-					'<a href="' . $this->get_resource_link( 'invoice', $invoice_id ) .'" target="_blank"><code>' . $invoice_id . '</code></a>'
+					__( 'New invoice created for the subscription: %s', 'charitable' ),
+					'<a href="' . $this->get_resource_link( 'invoice', $invoice_id ) . '" target="_blank"><code>' . $invoice_id . '</code></a>'
 				)
 			);
 
