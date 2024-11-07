@@ -3,12 +3,12 @@
  * Plugin Name: Charitable
  * Plugin URI: https://www.wpcharitable.com
  * Description: The WordPress fundraising alternative for non-profits, created to help non-profits raise money on their own website.
- * Version: 1.8.3
+ * Version: 1.8.3.1
  * Author: Charitable Donations & Fundraising Team
  * Author URI: https://wpcharitable.com
  * Requires at least: 4.1
  * Tested up to: 6.6.2
- * Stable tag: 1.8.3
+ * Stable tag: 1.8.3.1
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
@@ -40,7 +40,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		const AUTHOR = 'WP Charitable';
 
 		/* Plugin version. */
-		const VERSION = '1.8.3';
+		const VERSION = '1.8.3.1';
 
 		/* Version of database schema. */
 		const DB_VERSION = '20180522';
@@ -125,9 +125,9 @@ if ( ! class_exists( 'Charitable' ) ) :
 			$this->directory_url  = plugin_dir_url( __FILE__ );
 			$this->includes_path  = $this->directory_path . 'includes/';
 
-			define( 'CHARTIABLE_DIRECTORY_PATH', plugin_dir_path( __FILE__ ) );
-			define( 'CHARTIABLE_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
-			define( 'CHARTIABLE_MARKETING_URL', 'https://wpcharitable.com/' );
+			define( 'CHARITABLE_DIRECTORY_PATH', plugin_dir_path( __FILE__ ) );
+			define( 'CHARITABLE_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+			define( 'CHARITABLE_MARKETING_URL', 'https://wpcharitable.com/' );
 
 			define( 'CHARITABLE_BUILDER_SHOW_LEGACY_EDIT_LINKS', true ); // 1.8.0 specific.
 
@@ -138,7 +138,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 			register_activation_hook( __FILE__, array( $this, 'activate' ) );
 			register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
 
-			add_filter( 'plugin_action_links_' . CHARTIABLE_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ), 99, 2 );
+			add_filter( 'plugin_action_links_' . CHARITABLE_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ), 99, 2 );
 			add_action( 'plugins_loaded', array( $this, 'start' ), 3 );
 
 			add_action( 'plugins_loaded', array( $this, 'check_for_version_conflicts' ), 2 );
@@ -1259,7 +1259,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		 */
 		protected function parse_action_links( $actions, $pluginFile, $action_links = [], $position = 'after' ) {
 			if ( empty( $this->plugin ) ) {
-				$this->plugin = CHARTIABLE_PLUGIN_BASENAME;
+				$this->plugin = CHARITABLE_PLUGIN_BASENAME;
 			}
 
 			if ( $this->plugin === $pluginFile && ! empty( $action_links ) ) {
@@ -1312,13 +1312,13 @@ if ( ! class_exists( 'Charitable' ) ) :
 						update_option( 'active_plugins', $current );
 
 						// translators: %s is the version number.
-						$message = sprintf(	__( '<p><strong style="color:red;">NOTICE:</strong> <strong>Charitable</strong> detected an out-of-date and incompatible version of <strong>Charitable Stripe</strong> addon. To avoid issues with Stripe donations, <strong>Charitable Stripe</strong> %s was deactivated. Please update <strong>Charitable Stripe</strong> to version 1.5.0 or higher.</p><p>You can get the latest version of <strong>Charitable Stripe</strong> through your <a href="https://www.wpcharitable.com/account/" target="_blank">Charitable account at wpcharitable.com</a>. All active licenses are accessible in the "My Downloads" tab.</p>', 'charitable' ), Charitable_Stripe::VERSION );
+						$message = sprintf( __( '<p><strong style="color:red;">NOTICE:</strong> <strong>Charitable</strong> detected an out-of-date and incompatible version of <strong>Charitable Stripe</strong> addon. To avoid issues with Stripe donations, <strong>Charitable Stripe</strong> %s was deactivated. Please update <strong>Charitable Stripe</strong> to version 1.5.0 or higher.</p><p>You can get the latest version of <strong>Charitable Stripe</strong> through your <a href="https://www.wpcharitable.com/account/" target="_blank">Charitable account at wpcharitable.com</a>. All active licenses are accessible in the "My Downloads" tab.</p>', 'charitable' ), Charitable_Stripe::VERSION );
 
 						wp_die( $message . ' <a href="' . admin_url( 'plugins.php' ) . '">Click here to return to the plugins screen.</a>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
-					add_option( 'chartiable_version_warning', $message );
+					add_option( 'charitable_version_warning', $message );
 				} else {
-					delete_option( 'chartiable_version_warning' );
+					delete_option( 'charitable_version_warning' );
 				}
 			}
 		}

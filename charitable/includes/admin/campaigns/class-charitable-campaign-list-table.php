@@ -539,7 +539,7 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 						<div class="charitable-blank-slate-buttons-legacy">
 							<div><a target="_blank" href="https://www.wpcharitable.com/documentation/creating-your-first-campaign/?utm_campaign=liteplugin&utm_source=charitableplugin&utm_medium=campaign-page&utm_content=Read%20The%20Full%20Guide"><?php esc_html_e( 'Read The Guide On Creating Your First Campaign', 'charitable' ); ?></a></div>
 							<?php if ( ! charitable_disable_legacy_campaigns() ) : ?>
-								<div><a href="<?php echo admin_url( 'post-new.php?post_type=campaign' ); ?>"><?php esc_html_e( 'Create Campaign (Legacy)', 'charitable' ); ?></a></div>
+								<div><a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=campaign' ) ); ?>"><?php esc_html_e( 'Create Campaign (Legacy)', 'charitable' ); ?></a></div>
 							<?php endif; ?>
 						</div>
 					</div>
@@ -572,8 +572,8 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 						<div class="marketplace-suggestion-container marketplace-suggestion-container-footer">
 							<div class="marketplace-suggestion-container-content"></div>
 							<div class="marketplace-suggestion-container-cta">
-								<a href="<?php echo admin_url( 'admin.php?page=charitable-addons' ); ?>" class="linkout"><?php esc_html_e( 'Browse all addons', 'charitable' ); ?></a>
-								<a href="<?php echo admin_url( 'admin.php?page=charitable-growth-tools' ); ?>" target="_blank" class="linkout"><?php esc_html_e( 'Growth Tools', 'charitable' ); ?></a>
+								<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-addons' ) ); ?>" class="linkout"><?php esc_html_e( 'Browse all addons', 'charitable' ); ?></a>
+								<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-growth-tools' ) ); ?>" target="_blank" class="linkout"><?php esc_html_e( 'Growth Tools', 'charitable' ); ?></a>
 							</div>
 						</div>
 					</div>

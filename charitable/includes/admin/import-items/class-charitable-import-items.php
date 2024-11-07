@@ -149,10 +149,10 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 			if ( isset( $data['campaign_category'] ) && ! empty( $data['campaign_category'] ) ) {
 				foreach ( $data['campaign_category'] as $term_to_import ) {
 					$term = term_exists( $term_to_import['slug'], 'campaign_category' );
-					if ( ! $term ) { // create category }
+					if ( ! $term ) { // create category.
 						$term_id = wp_insert_term(
-							$term_to_import['name'],   // the term
-							'campaign_category', // the taxonomy
+							$term_to_import['name'],   // the term.
+							'campaign_category', // the taxonomy.
 							array(
 								'description' => $term_to_import['description'],
 								'slug'        => $term_to_import['slug'],
@@ -168,10 +168,10 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 			if ( isset( $data['campaign_tag'] ) && ! empty( $data['campaign_tag'] ) ) {
 				foreach ( $data['campaign_tag'] as $term_to_import ) {
 					$term = term_exists( $term_to_import['slug'], 'campaign_tag' );
-					if ( ! $term ) { // create category }
+					if ( ! $term ) { // create category.
 						$term_id = wp_insert_term(
-							$term_to_import['name'],   // the term
-							'campaign_tag', // the taxonomy
+							$term_to_import['name'],   // the term.
+							'campaign_tag', // the taxonomy.
 							array(
 								'description' => $term_to_import['description'],
 								'slug'        => $term_to_import['slug'],
@@ -431,7 +431,8 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 				}
 			}
 
-			$this->add_update_message( __( $donations_added . ' donations imported.', 'charitable' ), 'success' );
+			/* translators: %d is the number of donations imported. */
+			$this->add_update_message( sprintf( __( '%d donations imported.', 'charitable' ), $donations_added ), 'success' );
 
 			$redirect_link = admin_url( 'admin.php?page=charitable-tools&tab=import&status=success+' . $donations_added );
 			wp_safe_redirect( $redirect_link );
@@ -443,11 +444,13 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
+		 * @param  string $import_what The type of import file.
+		 *
 		 * @return bool True if the imported gallery file has a proper file extension, false otherwise.
 		 */
 		public function has_json_extension( $import_what = 'import_campaign' ) {
 
-			$file_array = isset( $_FILES['charitable_settings']['name']['import'][ $import_what ] ) ? explode( '.', $_FILES['charitable_settings']['name']['import'][ $import_what ] ) : null;
+			$file_array = isset( $_FILES['charitable_settings']['name']['import'][ $import_what ] ) ? explode( '.', $_FILES['charitable_settings']['name']['import'][ $import_what ] ) : null; // phpcs:ignore
 			$extension  = end( $file_array );
 			return 'json' === $extension;
 		}
@@ -457,11 +460,13 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
+		 * @param  string $import_what The type of import file.
+		 *
 		 * @return string|bool JSON contents string if successful, false otherwise.
 		 */
 		public function get_file_contents( $import_what = 'import_campaign' ) {
 
-			$file     = isset( $_FILES['charitable_settings']['tmp_name']['import'][ $import_what ] ) ? wp_unslash( $_FILES['charitable_settings']['tmp_name']['import'][ $import_what ] ) : false;
+			$file     = isset( $_FILES['charitable_settings']['tmp_name']['import'][ $import_what ] ) ? wp_unslash( $_FILES['charitable_settings']['tmp_name']['import'][ $import_what ] ) : false; // phpcs:ignore
 			$response = wp_remote_get( $file );
 			if ( is_wp_error( $response ) ) {
 				return false;

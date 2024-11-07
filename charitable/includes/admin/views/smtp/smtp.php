@@ -18,7 +18,7 @@ ob_start();
 
 	<div class="charitable-intergrations-container intergration-smtp">
 
-		<img class="charitable-smtp-logo" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/integrations/smtp.png'; ?>" alt="<?php echo esc_html__( 'Intergrate WP Mail SMTP Into Charitable For Improved Email Reliability', 'charitable' ); ?>">
+		<img class="charitable-smtp-logo" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/integrations/smtp.png'; ?>" alt="<?php echo esc_html__( 'Integrate WP Mail SMTP Into Charitable For Improved Email Reliability', 'charitable' ); ?>">
 
 		<h1><?php echo esc_html__( 'Making Email Deliverability Easy for WordPress', 'charitable' ); ?></h1>
 
@@ -28,7 +28,7 @@ ob_start();
 
 			<div>
 				<div class="charitable-screenshot">
-					<img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/integrations/smtp-screenshot-thumnbail.png'; ?>" alt="<?php echo esc_html__( 'Intergrate WP Mail SMTP Into Charitable For Improved Email Reliability', 'charitable' ); ?>">
+					<img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/integrations/smtp-screenshot-thumnbail.png'; ?>" alt="<?php echo esc_html__( 'Integrate WP Mail SMTP Into Charitable For Improved Email Reliability', 'charitable' ); ?>">
 					<a href="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/zoom.svg'; ?>" class="hover" data-lity=""></a>
 				</div>
 			</div>
@@ -150,7 +150,7 @@ ob_start();
 			<div class="charitable-screenshot-close-icon">×</div>
 
 			<div class="interior">
-				<img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/integrations/smtp-screenshot-full.png'; ?>" alt="<?php echo esc_html__( 'Intergrate WP Mail SMTP Into Charitable For Improved Email Reliability', 'charitable' ); ?>">
+				<img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/integrations/smtp-screenshot-full.png'; ?>" alt="<?php echo esc_html__( 'Integrate WP Mail SMTP Into Charitable For Improved Email Reliability', 'charitable' ); ?>">
 			</div>
 
 		</div>

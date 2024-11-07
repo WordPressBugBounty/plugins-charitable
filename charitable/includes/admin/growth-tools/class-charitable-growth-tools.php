@@ -80,7 +80,7 @@ if ( ! class_exists( 'Charitable_Guide_Tools' ) ) :
 				$this->growth_tools = $growth_tools;
 			}
 
-			return apply_filters( 'chartiable_growth_tools', $this->growth_tools );
+			return apply_filters( 'charitable_growth_tools', $this->growth_tools );
 		}
 
 		/**

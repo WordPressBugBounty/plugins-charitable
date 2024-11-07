@@ -255,9 +255,9 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		public function charitable_remove_dashboard_notification( $notification_id = false ) {
 
 			// check nonce.
-			// if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'charitable_dashboard_notification_nonce' ) ) {
-			// wp_send_json_error( array( 'message' => esc_html__( 'Invalid nonce.', 'charitable' ) ) );
-			// }
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'charitable_dashboard_notification_nonce' ) ) {
+				wp_send_json_error( array( 'message' => esc_html__( 'Invalid nonce.', 'charitable' ) ) );
+			}
 
 			if ( false === $notification_id ) {
 				return false;
@@ -279,23 +279,6 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 				return false;
 			}
 		}
-
-
-
-		// public function add_notification( $notification = array() ) {
-
-		// $notifications = (array) get_option( 'charitable_dashboard_notifications', array() );
-
-
-
-		// $notifications[] = $notification;
-
-		// update_option( 'charitable_dashboard_notifications', $notifications );
-		// }
-
-
-
-
 
 		/**
 		 * Get the donation axis information for the highlight chart.
@@ -735,6 +718,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 													<span class="popular"><?php echo esc_html__( 'Popular', 'charitable' ); ?></span>
 												<?php endif; ?>
 												<a href="<?php echo esc_url( $extension_url ); ?>" target="_blank" rel="noopener">
+													<?php /* translators: %s: extension title */ ?>
 													<img src="<?php echo charitable()->get_path( 'assets', false ); ?>images/extensions/<?php echo esc_attr( $addon_slug ); ?>.png" alt="<?php echo esc_attr( sprintf( _x( '%s banner', 'extension banner', 'charitable' ), $addon_slug ) ); ?>" />
 													<h4><?php echo esc_html( $addon_info['title'] ); ?></h4>
 													<?php echo esc_html( $addon_info['description'] ); ?>
@@ -1350,7 +1334,6 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 			$notifications_html = Charitable_Notifications::get_instance()->output( 'dashboard' );
 
 			return $notifications_html;
-
 		}
 
 		/**
@@ -1457,7 +1440,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 					<ul>
 						<li><?php esc_html_e( 'Automate common tasks with Zapier and smart workflows', 'charitable' ); ?></li>
 						<li><?php esc_html_e( 'Run campaigns with ambassador and team support', 'charitable' ); ?></li>
-						<li><?php esc_html_e( 'Advanced donation management with annual receipts' ); ?></li>
+						<li><?php esc_html_e( 'Advanced donation management with annual receipts', 'charitable' ); ?></li>
 						<li><?php esc_html_e( 'Allow donors to give donations anonymously', 'charitable' ); ?></li>
 						<li><?php esc_html_e( 'Add videos and updates to all campaigns', 'charitable' ); ?></li>
 					</ul>

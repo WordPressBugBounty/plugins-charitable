@@ -25,9 +25,9 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 	<div id="tooltip-content3">
 		<p><?php esc_html_e( 'You can drag additional fields to add to your page. ', 'charitable' ); ?></p>
-		<p><strong><?php esc_html_e( 'Recommended:' ); ?></strong> <?php esc_html_e( 'Usually found on all campaign pages.', 'charitable' ); ?></p>
-		<p><strong><?php esc_html_e( 'Standard:' ); ?></strong> <?php esc_html_e( 'Common fields you can use if you need them.', 'charitable' ); ?></p>
-		<p><strong><?php esc_html_e( 'Pro:' ); ?></strong> <?php esc_html_e( 'Advanced fields or fields offered by extensions.', 'charitable' ); ?></p>
+		<p><strong><?php esc_html_e( 'Recommended:', 'charitable' ); ?></strong> <?php esc_html_e( 'Usually found on all campaign pages.', 'charitable' ); ?></p>
+		<p><strong><?php esc_html_e( 'Standard:', 'charitable' ); ?></strong> <?php esc_html_e( 'Common fields you can use if you need them.', 'charitable' ); ?></p>
+		<p><strong><?php esc_html_e( 'Pro:', 'charitable' ); ?></strong> <?php esc_html_e( 'Advanced fields or fields offered by extensions.', 'charitable' ); ?></p>
 		<button type="button" class="charitable-onboarding-step3-done charitable-onboarding-done-btn"><?php esc_html_e( 'Next', 'charitable' ); ?></button>
 	</div>
 

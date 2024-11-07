@@ -1,7 +1,7 @@
 
 <div class="charitable-analytics-container intergration-monsterinsights">
 
-	<img class="charitable-monsterinsights-logo" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/reports/analytics/logos.png'; ?>" alt="<?php echo esc_html__( 'Intergrate Monster Insights Into Charitable For Analytics', 'charitable' ); ?>">
+	<img class="charitable-monsterinsights-logo" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/reports/analytics/logos.png'; ?>" alt="<?php echo esc_html__( 'Integrate Monster Insights Into Charitable For Analytics', 'charitable' ); ?>">
 
 	<h1><?php echo esc_html__( 'Increase Donations with MonsterInsights', 'charitable' ); ?></h1>
 
@@ -10,7 +10,7 @@
 	<div class="bullets-thumbnail">
 
 		<div>
-			<img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/reports/analytics/monsterinsights.jpg'; ?>" alt="<?php echo esc_html__( 'Intergrate MonsterInsights Into Charitable For Analytics', 'charitable' ); ?>">
+			<img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/reports/analytics/monsterinsights.jpg'; ?>" alt="<?php echo esc_html__( 'Integrate MonsterInsights Into Charitable For Analytics', 'charitable' ); ?>">
 		</div>
 		<div>
 			<div class="vertical-wrapper">

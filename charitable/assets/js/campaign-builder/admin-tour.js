@@ -127,7 +127,7 @@ var CharitableTour =
 
                 // insert HTML into footer that is a progress bar showing % of current/completed steps.
                 footer.after(
-                  '<span class="chartiable-tour-progress-bar"><span class="charitable-tour-progress" style="width: ' +
+                  '<span class="charitable-tour-progress-bar"><span class="charitable-tour-progress" style="width: ' +
                     progressPercentage +
                     '%"></span></span>',
                 );

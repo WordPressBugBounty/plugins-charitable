@@ -405,21 +405,21 @@ if ( ! class_exists( 'Charitable_Tools' ) ) :
 
 			ob_start();
 
-			$categories_css = isset( $_GET['taxonomy'] ) && 'campaign_category' == $_GET['taxonomy'] ? 'nav-tab-active' : '';
-			$tags_css       = isset( $_GET['taxonomy'] ) && 'campaign_tag' == $_GET['taxonomy'] ? 'nav-tab-active' : '';
+			$categories_css = isset( $_GET['taxonomy'] ) && 'campaign_category' == $_GET['taxonomy'] ? 'nav-tab-active' : ''; // phpcs:ignore
+			$tags_css       = isset( $_GET['taxonomy'] ) && 'campaign_tag' == $_GET['taxonomy'] ? 'nav-tab-active' : ''; // phpcs:ignore
 
 			?>
 
 			<div id="charitable-tools-nav">
 				<h1><?php echo esc_html__( 'Charitable Tools', 'charitable' ); ?></h1>
 				<h2 class="nav-tab-wrapper">
-						<a href="<?php echo admin_url( 'edit-tags.php?taxonomy=campaign_category&post_type=campaign' ); ?>" class="nav-tab <?php echo $categories_css; ?>"><?php echo esc_html__( 'Categories', 'charitable' ); ?></a>
-						<a href="<?php echo admin_url( 'edit-tags.php?taxonomy=campaign_tag&post_type=campaign' ); ?>" class="nav-tab <?php echo $tags_css; ?>"><?php echo esc_html__( 'Tags', 'charitable' ); ?></a>
-						<a href="<?php echo admin_url( 'admin.php?page=charitable-tools&tab=customize' ); ?>" class="nav-tab "><?php echo esc_html__( 'Customize', 'charitable' ); ?></a>
-						<a href="<?php echo admin_url( 'admin.php?page=charitable-tools&tab=export' ); ?>" class="nav-tab"><?php echo esc_html__( 'Export', 'charitable' ); ?></a>
-						<a href="<?php echo admin_url( 'admin.php?page=charitable-tools&tab=import' ); ?>" class="nav-tab"><?php echo esc_html__( 'Import', 'charitable' ); ?></a>
-						<a href="<?php echo admin_url( 'admin.php?page=charitable-tools&tab=system-info' ); ?>" class="nav-tab"><?php echo esc_html__( 'System Info', 'charitable' ); ?></a>
-						<a href="<?php echo admin_url( 'admin.php?page=charitable-tools&tab=snippets' ); ?>" class="nav-tab"><?php echo esc_html__( 'Code Snippets', 'charitable' ); ?></a>
+						<a href="<?php echo esc_url( admin_url( 'edit-tags.php?taxonomy=campaign_category&post_type=campaign' ) ); ?>" class="nav-tab <?php echo esc_attr( $categories_css ); ?>"><?php echo esc_html__( 'Categories', 'charitable' ); ?></a>
+						<a href="<?php echo esc_url( admin_url( 'edit-tags.php?taxonomy=campaign_tag&post_type=campaign' ) ); ?>" class="nav-tab <?php echo esc_attr( $tags_css ); ?>"><?php echo esc_html__( 'Tags', 'charitable' ); ?></a>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=customize' ) ); ?>" class="nav-tab "><?php echo esc_html__( 'Customize', 'charitable' ); ?></a>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=export' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'Export', 'charitable' ); ?></a>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=import' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'Import', 'charitable' ); ?></a>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=system-info' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'System Info', 'charitable' ); ?></a>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=snippets' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'Code Snippets', 'charitable' ); ?></a>
 				</h2>
 			</div>
 
@@ -427,7 +427,7 @@ if ( ! class_exists( 'Charitable_Tools' ) ) :
 
 			$content = ob_get_clean();
 
-			echo $content;
+			echo $content; // phpcs:ignore
 		}
 	}
 

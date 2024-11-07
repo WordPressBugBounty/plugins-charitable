@@ -520,7 +520,7 @@ function charitable_help_link( $help_id = false ) {
 		}
 	}
 
-	return 'https://www.wpcharitable.com/documentation/?referrer=' . $help_id;
+	return 'https://www.wpcharitable.com/documentation/?utm_campaign=liteplugin&utm_source=WordPress&utm_medium=help&utm_content=help-' . $help_id;
 }
 
 /**

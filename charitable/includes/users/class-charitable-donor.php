@@ -87,6 +87,15 @@ if ( ! class_exists( 'Charitable_Donor' ) ) :
 		protected $last_donation;
 
 		/**
+		 * Whether the donor is anonymous.
+		 *
+		 * @since 1.8.3.1
+		 *
+		 * @var   boolean
+		 */
+		public $is_anonymous;
+
+		/**
 		 * Donor meta.
 		 *
 		 * @since 1.4.0

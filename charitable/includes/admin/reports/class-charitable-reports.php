@@ -646,13 +646,40 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 								<p>
 									<?php
 
-									$action_label = charitable_is_pro() ? str_replace( '%id', $activity->item_id_prefix . $item_id, $activity->action_label ) : esc_html__( 'Charitable Donor', 'charitable' );
+									/* Determine Label */
+
+									// If the user isn't using pro and is on a page that isn't the report overview, give them a generic label.
+									if ( ! charitable_is_pro() && ( ! isset( $_GET['tab'] ) || ( isset( $_GET['tab'] ) && 'overview' !== $_GET['tab'] ) ) ) { // phpcs:ignore
+										$action_label = esc_html__( 'Charitable Donor', 'charitable' );
+									} else {
+										// If this is a campaign, show the campaign name vs just any number ID.
+										$action_label = isset( $activity->type ) && $activity->type === 'campaign' ? str_replace( '%id', '"' . esc_html( $activity->campaign_title ) . '"', $activity->action_label ) : str_replace( '%id', $activity->item_id_prefix . $item_id, $activity->action_label );
+									}
+
 									echo $action_label; // phpcs:ignore
 
 									?>
 									<span class="badge <?php echo esc_attr( $activity->status ); ?>"><?php echo esc_html( $activity->status_label ); ?></span>
 								</p>
-								<?php echo $this->get_activity_secondary_info( $activity ); // phpcs:ignore ?>
+								<?php
+
+								/* Determine Secondary Info */
+
+								// If this is a campaign, get the created_by value and show a name of who created it.
+								if ( isset( $activity->type ) && $activity->type === 'campaign' && ! empty( $activity->created_by ) ) {
+									$created_by = get_userdata( $activity->created_by );
+									$created_by = $created_by ? $created_by->display_name : '';
+									// get the WordPress user admin url to edit this user.
+									$admin_user_url = get_edit_user_link( $activity->created_by );
+
+									$secondary_info = '<p class="charitable-reports-activity-secondary-info amount">' . esc_html__( 'Created By:', 'charitable' ) . ' <a href="' . esc_url( $admin_user_url ) . '">' . esc_html( $created_by ) . '</a></p>';
+								} else {
+									$secondary_info = $this->get_activity_secondary_info( $activity );
+								}
+
+								echo $secondary_info;
+
+								// phpcs:ignore ?>
 							</div>
 							<?php if ( $time_ago ) : ?>
 							<div class="time-ago">
@@ -4062,7 +4089,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 					<ul>
 						<li><?php esc_html_e( 'Automate common tasks with Zapier and smart workflows', 'charitable' ); ?></li>
 						<li><?php esc_html_e( 'Run campaigns with ambassador and team support', 'charitable' ); ?></li>
-						<li><?php esc_html_e( 'Advanced donation management with annual receipts' ); ?></li>
+						<li><?php esc_html_e( 'Advanced donation management with annual receipts', 'charitable' ); ?></li>
 						<li><?php esc_html_e( 'Allow donors to give donations anonymously', 'charitable' ); ?></li>
 						<li><?php esc_html_e( 'Add videos and updates to all campaigns', 'charitable' ); ?></li>
 					</ul>

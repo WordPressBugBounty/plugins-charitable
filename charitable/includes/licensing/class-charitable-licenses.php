@@ -102,7 +102,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		public function is_pro() {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: is_pro()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: is_pro()' );
 			}
 
 			$registry = charitable()->registry();
@@ -138,7 +138,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		public function check_for_updates( $_transient_data ) {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: check_for_updates()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: check_for_updates()' );
 			}
 
 			$registry = charitable()->registry();
@@ -161,7 +161,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		public function plugins_api_filter( $_data, $_action = '', $_args = null ) {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: plugins_api_filter()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: plugins_api_filter()' );
 			}
 
 			$registry = charitable()->registry();
@@ -180,7 +180,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		public function is_missing_version_info( $product, $update_cache = false ) {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: is_missing_version_info()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: is_missing_version_info()' );
 			}
 
 			$registry = charitable()->registry();
@@ -199,7 +199,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		public function get_version_info( $slug, $update_cache = false ) {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_version_info()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: get_version_info()' );
 			}
 
 			$registry = charitable()->registry();
@@ -218,7 +218,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		protected function able_to_update( $version_info ) {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: able_to_update()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: able_to_update()' );
 			}
 
 			$registry = charitable()->registry();
@@ -236,7 +236,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		public function get_expired_license_package( $plugin ) {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_expired_license_package()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: get_expired_license_package()' );
 			}
 
 			$registry = charitable()->registry();
@@ -255,7 +255,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		public function get_missing_requirements_package( $plugin ) {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_missing_requirements_package()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: get_missing_requirements_package()' );
 			}
 
 			$registry = charitable()->registry();
@@ -277,7 +277,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		public function register_licensed_product( $item_name, $author, $version, $file, $url = false ) {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: register_licensed_product()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: register_licensed_product()' );
 			}
 
 			$registry = charitable()->registry();
@@ -294,7 +294,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		public function get_products() {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_products()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: get_products()' );
 			}
 
 			$registry = charitable()->registry();
@@ -312,7 +312,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		public function get_product_license_details( $item ) {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_product_license_details()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: get_product_license_details()' );
 			}
 
 			$registry = charitable()->registry();
@@ -330,7 +330,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		public function has_valid_license( $item ) {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: has_valid_license()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: has_valid_license()' );
 			}
 
 			$registry = charitable()->registry();
@@ -348,7 +348,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		public function get_license( $item ) {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_license()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: get_license()' );
 			}
 
 			$registry = charitable()->registry();
@@ -366,7 +366,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		public function get_license_details( $item ) {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_license_details()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: get_license_details()' );
 			}
 
 			$registry = charitable()->registry();
@@ -386,7 +386,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		public function get_licenses() {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_licenses()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: get_licenses()' );
 			}
 
 			$registry = charitable()->registry();
@@ -407,7 +407,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		public function verify_license( $item, $license, $force = false, $legacy = false ) {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: verify_license()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: verify_license()' );
 			}
 
 			$registry = charitable()->registry();
@@ -425,7 +425,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		public function get_license_deactivation_url( $item ) {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_license_deactivation_url()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: get_license_deactivation_url()' );
 			}
 
 			$registry = charitable()->registry();
@@ -442,7 +442,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		public function deactivate_license() {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: deactivate_license()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: deactivate_license()' );
 			}
 
 			$registry = charitable()->registry();
@@ -460,7 +460,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		protected function flush_update_cache() {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: flush_update_cache()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: flush_update_cache()' );
 			}
 
 			$registry = charitable()->registry();
@@ -478,7 +478,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		protected function get_item_key( $item_name ) {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_item_key()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: get_item_key()' );
 			}
 
 			$registry = charitable()->registry();
@@ -497,7 +497,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		protected function get_versions() {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: get_versions()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: get_versions()' );
 			}
 
 			$registry = charitable()->registry();
@@ -519,7 +519,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		private function log_failed_request() {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: log_failed_request()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: log_failed_request()' );
 			}
 
 			$registry = charitable()->registry();
@@ -536,7 +536,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		private function request_recently_failed() {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: request_recently_failed()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: request_recently_failed()' );
 			}
 
 			$registry = charitable()->registry();
@@ -554,7 +554,7 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 		public function ajax_license_check() {
 
 			if ( charitable_is_debug( 'vendor' ) ) {
-				error_log( 'CHARTIABLE: NEW VENDOR CALL THROWN: ajax_license_check()' );
+				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: ajax_license_check()' );
 			}
 
 			$registry = charitable()->registry();

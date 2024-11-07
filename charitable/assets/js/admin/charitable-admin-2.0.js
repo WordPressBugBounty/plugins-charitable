@@ -143,7 +143,7 @@ var CharitableAdminUI = window.CharitableAdminUI || ( function( document, window
 
             if ( $('.charitable-notification-inbox').length > 0 ) {
                 // on click add body class charitable-notifications-open.
-                $('body').on( 'click', '.charitable-notification-inbox, .charitable-close, #toplevel_page_charitable li.notifications, .charitable-report-card.charitable-dashboard-notifications .more a, p.chartiable-view-notifications a', function( e ) {
+                $('body').on( 'click', '.charitable-notification-inbox, .charitable-close, #toplevel_page_charitable li.notifications, .charitable-report-card.charitable-dashboard-notifications .more a, p.charitable-view-notifications a', function( e ) {
                     e.preventDefault();
                     $('body').toggleClass('charitable-show-notifications');
                     $("#charitable-plugin-notifications").toggleClass("in");
@@ -152,6 +152,13 @@ var CharitableAdminUI = window.CharitableAdminUI || ( function( document, window
             }
 
             if ( $('.charitable-notifications-overlay').length > 0 ) {
+                // click on overlay, the notifications will close.
+                $('body').on( 'click', '.charitable-notifications-overlay', function( e ) {
+                    e.preventDefault();
+                    $('body').removeClass('charitable-show-notifications');
+                    $("#charitable-plugin-notifications").removeClass("in");
+                    $('body').find('.charitable-notifications-overlay').fadeOut();
+                });
                 // dismiss a single notification.
                 $('.charitable-notification').on( 'click', 'a.dismiss', function( e ) {
                     e.preventDefault();

@@ -1084,10 +1084,12 @@ class Charitable_Notifications {
 	 * This will incercept the request and redirect to the dashboard page.
 	 *
 	 * @since 1.8.3
+	 * @version 1.8.3.1
 	 */
 	public function maybe_redirect_from_notifications() {
 
 		if ( ! empty( $_GET['page'] ) && 'charitable-notifications' === $_GET['page'] ) { // phpcs:ignore
+			delete_transient( 'charitable_autoshow_plugin_notifications' );
 			wp_safe_redirect( admin_url( 'admin.php?page=charitable-dashboard' ) );
 			exit;
 		}

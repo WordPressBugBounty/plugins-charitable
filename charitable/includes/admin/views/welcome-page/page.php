@@ -16,7 +16,7 @@ $gateways        = Charitable_Gateways::get_instance()->get_active_gateways_name
 $campaigns       = wp_count_posts( 'campaign' );
 $campaigns_count = $campaigns->publish + $campaigns->draft + $campaigns->future + $campaigns->pending + $campaigns->private;
 $emails          = charitable_get_helper( 'emails' )->get_enabled_emails_names();
-$install         = isset( $_GET['install'] ) && $_GET['install'];
+$install         = isset( $_GET['install'] ) && $_GET['install']; // phpcs:ignore
 $languages       = wp_get_available_translations();
 $locale          = get_locale();
 $language        = isset( $languages[ $locale ]['native_name'] ) ? $languages[ $locale ]['native_name'] : $locale;
@@ -40,7 +40,7 @@ $all_extensions  = array(
 	'user-avatar'                    => __( 'Let your donors upload their own profile photo', 'charitable' ),
 );
 
-if ( 'en_ZA' == $locale || 'ZAR' == $currency ) {
+if ( 'en_ZA' === $locale || 'ZAR' === $currency ) {
 	$extensions = array_intersect_key(
 		$all_extensions,
 		array(
@@ -50,7 +50,7 @@ if ( 'en_ZA' == $locale || 'ZAR' == $currency ) {
 			'fee-relief'          => '',
 		)
 	);
-} elseif ( 'hi_IN' == $locale || 'INR' == $currency ) {
+} elseif ( 'hi_IN' === $locale || 'INR' === $currency ) {
 	$extensions = array_intersect_key(
 		$all_extensions,
 		array(
@@ -106,7 +106,7 @@ if ( 'en_ZA' == $locale || 'ZAR' == $currency ) {
 <div class="wrap about-wrap charitable-wrap">
 	<h1>
 		<strong><?php esc_html_e( 'Charitable', 'charitable' ); ?></strong>
-		<sup class="version"><?php echo charitable()->get_version(); ?></sup>
+		<sup class="version"><?php echo esc_html( charitable()->get_version() ); ?></sup>
 	</h1>
 	<div class="badge v2">
 		<a href="<?php
@@ -145,6 +145,7 @@ if ( 'en_ZA' == $locale || 'ZAR' == $currency ) {
 						<li class="done">
 						<?php
 							printf(
+								// translators: %1$s is a list of gateways, %2$s is a link to the gateways settings page.
 								_x( 'You have activated %1$s. <a href="%2$s">Change settings</a>', 'You have activated x and y. Change gateway settings.', 'charitable' ),
 								charitable_list_to_sentence_part( $gateways ),
 								admin_url( 'admin.php?page=charitable-settings&tab=gateways' )
@@ -158,6 +159,7 @@ if ( 'en_ZA' == $locale || 'ZAR' == $currency ) {
 						<li class="done">
 						<?php
 							printf(
+								// translators: %s is a link to create a new campaign.
 								__( 'You have created your first campaign. <a href="%s">Create another one.</a>', 'charitable' ),
 								admin_url( 'post-new.php?post_type=campaign' )
 							);
@@ -170,6 +172,7 @@ if ( 'en_ZA' == $locale || 'ZAR' == $currency ) {
 						<li class="done">
 						<?php
 							printf(
+								// translators: %1$s is a list of emails, %2$s is a link to the emails settings page.
 								_x( 'You have turned on the %1$s. <a href="%2$s">Change settings</a>', 'You have activated x and y. Change email settings.', 'charitable' ),
 								charitable_list_to_sentence_part( $emails ),
 								admin_url( 'admin.php?page=charitable-settings&tab=emails' )
@@ -197,6 +200,7 @@ if ( 'en_ZA' == $locale || 'ZAR' == $currency ) {
 				?>
 				<p style="margin-bottom: 0;">
 				<?php
+					/* translators: %1$s is a link to the documentation, %2$s is a link to the support page. */
 					printf(
 						__( 'Need a hand with anything? You might find the answer in <a target="_blank" href="%1$s">our documentation</a>, or you can always get in touch with us via <a target="_blank" href="%2$s">our support page</a>.', 'charitable' ),
 						$doc_url,
@@ -206,12 +210,13 @@ if ( 'en_ZA' == $locale || 'ZAR' == $currency ) {
 				</p>
 			<?php endif ?>
 			<hr />
-			<?php if ( strpos( $locale, 'en' ) !== 0 ) : ?>
+			<?php if ( strpos( $locale, 'en' ) !== 0 ) :
+				// translators: %s is the language name .?>
 				<h3><?php printf( _x( 'Translate Charitable into %s', 'translate Charitable into language', 'charitable' ), $language ); ?></h3>
 				<p>
 				<?php
-				printf(
-					__( 'You can help us translate Charitable into %s by <a target="_blank" href="https://translate.wordpress.org/projects/wp-plugins/charitable">contributing to the translation project</a>.', 'charitable' ),
+				/* translators: %s is the language name */
+				printf(	__( 'You can help us translate Charitable into %s by <a target="_blank" href="https://translate.wordpress.org/projects/wp-plugins/charitable">contributing to the translation project</a>.', 'charitable' ), // phpcs:ignore
 					$language
 				);
 				?>
@@ -241,15 +246,15 @@ if ( 'en_ZA' == $locale || 'ZAR' == $currency ) {
 	</div>
 	<div class="column-right">
 		<div class="bundle-promo">
-			<h2><?php _e( 'Get Charitable Pro', 'charitable' ); ?></h2>
-			<p><?php _e( 'Upgrade to Charitable Pro today and unlock access to powerful features like Fee Relief, Recurring Donations, Crowdfunding, Peer-to-Peer Fundraising Campaigns and more.', 'charitable' ); ?></p>
+			<h2><?php esc_html_e( 'Get Charitable Pro', 'charitable' ); ?></h2>
+			<p><?php esc_html_e( 'Upgrade to Charitable Pro today and unlock access to powerful features like Fee Relief, Recurring Donations, Crowdfunding, Peer-to-Peer Fundraising Campaigns and more.', 'charitable' ); ?></p>
 
-			<p style="text-align: center;"><a href="<?php echo esc_url( $view_pricing_url ); ?>" class="button-primary" target="_blank" rel="noopener"><?php _e( 'Get Started with Charitable Pro', 'charitable' ); ?></a></p>
+			<p style="text-align: center;"><a href="<?php echo esc_url( $view_pricing_url ); ?>" class="button-primary" target="_blank" rel="noopener"><?php esc_html_e( 'Get Started with Charitable Pro', 'charitable' ); ?></a></p>
 
-			<small><em><?php _e( 'Bonus: Charitable Lite users save $300 or more off the regular price, automatically applied at checkout!', 'charitable' ); ?></em></small>
+			<small><em><?php esc_html_e( 'Bonus: Charitable Lite users save $300 or more off the regular price, automatically applied at checkout!', 'charitable' ); ?></em></small>
 		</div>
 		<div class="column-inside">
-			<h3><?php _e( 'Recommended Extensions', 'charitable' ); ?></h3>
+			<h3><?php esc_html_e( 'Recommended Extensions', 'charitable' ); ?></h3>
 			<ul class="extensions">
 				<?php
 				foreach ( $extensions as $extension => $description ) :
@@ -262,6 +267,7 @@ if ( 'en_ZA' == $locale || 'ZAR' == $currency ) {
 
 					?>
 					<li class="<?php echo $extension; ?>">
+						<?php /* translators: %s is the extension name */ ?>
 						<a href="<?php echo $extension_url; ?>" target="_blank" rel="noopener"><img src="<?php echo charitable()->get_path( 'assets', false ); ?>images/extensions/<?php echo $extension; ?>.png" width="640" height="300" alt="<?php echo esc_attr( sprintf( _x( '%s banner', 'extension banner', 'charitable' ), $extension ) ); ?>" /><?php echo $description; ?></a>
 					</li>
 				<?php endforeach ?>

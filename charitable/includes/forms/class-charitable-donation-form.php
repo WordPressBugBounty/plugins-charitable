@@ -128,7 +128,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			/* added in 1.7.0.4 */
 			if ( 'below_donation_title' === charitable_get_option( 'donation_form_minimal_amount_notice_display', false ) ) {
 				add_action( 'charitable_after_donation_amount_wrapper_header', array( $this, 'minimum_donation_amount_notice' ), 10, 2 );
-			} else if ( 'above_donation_title' === charitable_get_option( 'donation_form_minimal_amount_notice_display', false ) || 'after_donation_title' === charitable_get_option( 'donation_form_minimal_amount_notice_display', false ) ) {
+			} elseif ( 'above_donation_title' === charitable_get_option( 'donation_form_minimal_amount_notice_display', false ) || 'after_donation_title' === charitable_get_option( 'donation_form_minimal_amount_notice_display', false ) ) {
 				add_action( 'charitable_before_donation_amount_wrapper_header', array( $this, 'minimum_donation_amount_notice' ), 10, 2 );
 			}
 		}
@@ -293,23 +293,23 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		public function get_user_account_fields() {
 			$account_fields = array(
 				'user_pass' => array(
-					'label'     => __( 'Password', 'charitable' ),
-					'type'      => 'password',
-					'priority'  => 4,
-					'required'  => true,
+					'label'                 => __( 'Password', 'charitable' ),
+					'type'                  => 'password',
+					'priority'              => 4,
+					'required'              => true,
 					'requires_registration' => true,
-					'data_type' => 'user',
+					'data_type'             => 'user',
 				),
 			);
 
 			if ( apply_filters( 'charitable_donor_usernames', false ) ) {
 				$account_fields['user_login'] = array(
-					'label'     => __( 'Username', 'charitable' ),
-					'type'      => 'text',
-					'priority'  => 2,
-					'required'  => true,
+					'label'                 => __( 'Username', 'charitable' ),
+					'type'                  => 'text',
+					'priority'              => 2,
+					'required'              => true,
 					'requires_registration' => true,
-					'data_type' => 'user',
+					'data_type'             => 'user',
 				);
 			}
 
@@ -416,7 +416,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			$has_gateway_fields = false;
 
 			foreach ( $gateways_helper->get_active_gateways() as $gateway_id => $gateway_class ) {
-				$gateway        = new $gateway_class;
+				$gateway        = new $gateway_class();
 				$gateway_fields = $this->add_credit_card_fields( array(), $gateway );
 
 				/**
@@ -690,11 +690,13 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			/* Don't process donations with dummy emails. */
 			$submitted = $this->get_submitted_value( 'email' );
 			if ( ! is_null( $submitted ) && ! is_email( $submitted ) ) {
-				charitable_get_notices()->add_error( sprintf(
+				charitable_get_notices()->add_error(
+					sprintf(
 					/* translators: %s: email address */
-					__( '%s is not a valid email address.', 'charitable' ),
-					$submitted
-				) );
+						__( '%s is not a valid email address.', 'charitable' ),
+						$submitted
+					)
+				);
 
 				$ret = false;
 			}
@@ -735,7 +737,6 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			 * @param Charitable_Donation_Form $form This instance of `Charitable_Donation_Form`.
 			 */
 			return apply_filters( 'charitable_validate_donation_form_submission_gateway_check', $ret, $this );
-
 		}
 
 		/**
@@ -757,6 +758,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			if ( $minimum > 0 && $amount < $minimum ) {
 				charitable_get_notices()->add_error(
 					sprintf(
+						/* translators: %s: minimum donation amount */
 						__( 'You must donate more than %s.', 'charitable' ),
 						charitable_format_money( $minimum, false, true )
 					)
@@ -766,6 +768,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			} elseif ( $maximum && $maximum < $amount ) {
 				charitable_get_notices()->add_error(
 					sprintf(
+						/* translators: %s: maximum donation amount */
 						__( 'The maximum donation amount permitted is %s.', 'charitable' ),
 						charitable_format_money( $maximum, false, true )
 					)
@@ -773,10 +776,13 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 
 				$ret = false;
 			} elseif ( $minimum === 0 && $amount <= 0 && ! apply_filters( 'charitable_permit_0_donation', false ) ) {
-				charitable_get_notices()->add_error( sprintf(
-					__( 'You must donate more than %s.', 'charitable' ),
-					charitable_format_money( $minimum )
-				) );
+				charitable_get_notices()->add_error(
+					sprintf(
+					/* translators: %s: minimum donation amount */
+						__( 'You must donate more than %s.', 'charitable' ),
+						charitable_format_money( $minimum )
+					)
+				);
 
 				$ret = false;
 			}
@@ -790,7 +796,6 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			 * @param Charitable_Donation_Form $form This instance of `Charitable_Donation_Form`.
 			 */
 			return apply_filters( 'charitable_validate_donation_form_submission_amount_check', $ret, $this );
-
 		}
 
 		/**
@@ -1088,14 +1093,17 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 				return $fields;
 			}
 
-			return array_merge( $fields, array(
-				'terms_fields' => array(
-					'legend'   => __( 'Terms and Conditions', 'charitable' ),
-					'type'     => 'fieldset',
-					'fields'   => $terms_fields,
-					'priority' => 80,
-				),
-			) );
+			return array_merge(
+				$fields,
+				array(
+					'terms_fields' => array(
+						'legend'   => __( 'Terms and Conditions', 'charitable' ),
+						'type'     => 'fieldset',
+						'fields'   => $terms_fields,
+						'priority' => 80,
+					),
+				)
+			);
 		}
 
 		/**
@@ -1259,16 +1267,14 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 
 				if ( ! is_null( $submitted ) ) {
 					$field['checked'] = $submitted == $checked_value;
-				} elseif( $donation_id ) {
+				} elseif ( $donation_id ) {
 					$field['checked'] = charitable_get_donation( $donation_id )->get( $key ) == $checked_value;
 				}
-			} else {
-				if ( ! is_null( $submitted ) ) {
+			} elseif ( ! is_null( $submitted ) ) {
 					$field['value'] = $submitted;
-				} elseif ( $donation_id ) {
-					$donation       = charitable_get_donation( $donation_id );
-					$field['value'] = $donation ? $donation->get( $key ) : '';
-				}
+			} elseif ( $donation_id ) {
+				$donation       = charitable_get_donation( $donation_id );
+				$field['value'] = $donation ? $donation->get( $key ) : '';
 			}
 
 			if ( array_key_exists( 'value', $field ) ) {
@@ -1343,7 +1349,8 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		protected function get_test_mode_active_notice() {
 			$notice = $this->get_credentialed_notice(
 				__( 'Test mode is active.', 'charitable' ),
-				sprintf( '<a href="%s">%s</a>.',
+				sprintf(
+					'<a href="%s">%s</a>.',
 					admin_url( 'admin.php?page=charitable-settings&tab=gateways' ),
 					__( 'Disable Test Mode', 'charitable' )
 				)
@@ -1388,7 +1395,6 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			if ( ( ! isset( $keys['public_key'] ) || empty( $keys['public_key'] ) ) && current_user_can( 'manage_charitable_settings' ) ) {
 				charitable_get_notices()->add_error( $this->get_stripe_key_check_notice() );
 			}
-
 		}
 
 		/**
@@ -1401,7 +1407,8 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		protected function get_stripe_key_check_notice() {
 			$notice = $this->get_credentialed_notice(
 				__( 'Stripe is enabled but some keys are missing.', 'charitable' ),
-				sprintf( '<a href="%s">%s</a>.',
+				sprintf(
+					'<a href="%s">%s</a>.',
 					admin_url( 'admin.php?page=charitable-settings&tab=gateways&group=gateways_stripe' ),
 					__( 'View Settings', 'charitable' )
 				)
@@ -1458,7 +1465,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		 *
 		 * @since  1.0.0
 		 *
-		 * @param  array   $required_fields
+		 * @param  array $required_fields
 		 * @return boolean
 		 */
 		protected function is_missing_required_fields( $required_fields ) {
@@ -1467,9 +1474,12 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			}
 
 			if ( is_null( $this->get_submitted_value( 'gateway' ) ) ) {
-				charitable_get_notices()->add_error( sprintf( '<p>%s</p>',
-					__( 'Your donation could not be processed. No payment gateway was selected.', 'charitable' )
-				) );
+				charitable_get_notices()->add_error(
+					sprintf(
+						'<p>%s</p>',
+						__( 'Your donation could not be processed. No payment gateway was selected.', 'charitable' )
+					)
+				);
 
 				return false;
 			}

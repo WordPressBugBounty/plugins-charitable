@@ -569,6 +569,7 @@ if ( ! class_exists( 'Charitable_Admin_Donation_Form' ) ) :
 		protected function sanitize_submitted_log_note( $values ) {
 			if ( ! $values['log_note'] ) {
 				$values['log_note'] = sprintf(
+					/* translators: %1$s: User profile URL, %2$s: User display name */
 					__( 'Donation updated manually by <a href="%1$s">%2$s</a>.', 'charitable' ),
 					admin_url( 'user-edit.php?user_id=' . wp_get_current_user()->ID ),
 					wp_get_current_user()->display_name

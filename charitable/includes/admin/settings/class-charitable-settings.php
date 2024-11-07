@@ -743,7 +743,7 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 		 *
 		 * @param string $view Current view inside the plugin settings page.
 		 */
-		public function settings_cta( $view = false ) {
+		public function settings_cta( $view = false ) { // phpcs:ignore
 
 			if ( charitable_is_pro() ) {
 				// no need to display this cta since they have a valid license.
@@ -775,7 +775,7 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 					<ul>
 						<li><?php esc_html_e( 'Automate common tasks with Zapier and smart workflows', 'charitable' ); ?></li>
 						<li><?php esc_html_e( 'Run campaigns with ambassador and team support', 'charitable' ); ?></li>
-						<li><?php esc_html_e( 'Advanced donation management with annual receipts' ); ?></li>
+						<li><?php esc_html_e( 'Advanced donation management with annual receipts', 'charitable' ); ?></li>
 						<li><?php esc_html_e( 'Allow donors to give donations anonymously', 'charitable' ); ?></li>
 						<li><?php esc_html_e( 'Add videos and updates to all campaigns', 'charitable' ); ?></li>
 					</ul>

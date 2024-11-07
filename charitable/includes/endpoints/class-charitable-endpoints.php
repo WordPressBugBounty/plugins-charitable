@@ -92,6 +92,7 @@ if ( ! class_exists( 'Charitable_Endpoints' ) ) :
 			if ( $this->endpoint_exists( $endpoint_id ) ) {
 				charitable_get_deprecated()->doing_it_wrong(
 					__METHOD__,
+					/* translators: %s: endpoint id */
 					sprintf( __( 'Endpoint %s has already been registered.', 'charitable' ), $endpoint_id ),
 					'1.5.0'
 				);

@@ -34,7 +34,7 @@ $notifications_title    = $active_count > 1 ? esc_html__( 'New Notifications', '
 	<div class="charitable-toggle-container charitable-report-ui">
 		<div class="no-items <?php echo esc_attr( $no_items_css ); ?>">
 			<p><strong><?php echo esc_html__( 'There are currently no active notifications.', 'charitable' ); ?></strong></p>
-			<p class="link chartiable-view-notifications"><a href="#"><?php echo esc_html__( 'View Notifications', 'charitable' ); ?><img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/east.svg'; // phpcs:ignore ?>" /></a></p>
+			<p class="link charitable-view-notifications"><a href="#"><?php echo esc_html__( 'View Notifications', 'charitable' ); ?><img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/east.svg'; // phpcs:ignore ?>" /></a></p>
 		</div>
 		<div class="the-list <?php echo esc_attr( $yes_items_css ); ?>">
 			<?php echo $args['notifications']['active_html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>

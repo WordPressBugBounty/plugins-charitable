@@ -82,6 +82,7 @@ if ( ! class_exists( 'Charitable_Stripe_Recurring_Donation_Log' ) ) :
 		public function log_new_invoice( $invoice_id ) {
 			$this->donation->update_donation_log(
 				sprintf(
+					/* translators: %s: link to invoice object in Stripe dashboard */
 					__( 'New invoice created for the subscription: %s', 'charitable' ),
 					'<a href="' . $this->get_resource_link( 'invoice', $invoice_id ) . '" target="_blank"><code>' . $invoice_id . '</code></a>'
 				)
@@ -96,7 +97,7 @@ if ( ! class_exists( 'Charitable_Stripe_Recurring_Donation_Log' ) ) :
 		 * @since  1.4.0
 		 *
 		 * @param  string $invoice_id The invoice id.
-		 * @param  string $charge     The charge id.
+		 * @param  string $payment_intent The payment intent id.
 		 * @return true
 		 */
 		public function log_failed_renewal_invoice( $invoice_id, $payment_intent ) {
@@ -111,7 +112,7 @@ if ( ! class_exists( 'Charitable_Stripe_Recurring_Donation_Log' ) ) :
 		 * @since  1.4.0
 		 *
 		 * @param  string $invoice_id The invoice id.
-		 * @param  string $charge     The charge id.
+		 * @param  string $payment_intent The payment intent id.
 		 * @return string
 		 */
 		public function get_failed_invoice_log_message( $invoice_id, $payment_intent ) {

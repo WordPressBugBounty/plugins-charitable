@@ -1,3 +1,9 @@
+# 1.8.3.1
+* UPDATED: "Disable Legacy Campaign Mode" is set to on for new installs of the plugin. [More Information](https://www.wpcharitable.com/documentation/legacy-campaigns/)
+* UPDATED: Plugin notification slide out UI can be closed by also clicking outside of the notification area.
+* FIX: Addressed security issue on the donations list screen.
+* FIX: Updated code related to translations, CSS, UI, and PHP standards.
+
 # 1.8.3
 * NEW: WordPress editor block: "Campaigns". Displays multiple Charitable campaigns in a grid.
 * NEW: WordPress editor block: "Donations". Display a simple donation widget for a campaign.
@@ -95,7 +101,7 @@
 * FIX: Dashboard Guide Tools notice no longer displays over populated donation charts when changing days.
 
 # 1.8.1.6
-* NEW: Tools page menu with Export and Import now located here (previously Settings page).
+* NEW: Tools page menu with Export and Import menus (previously located on the Settings page).
 * NEW: "System Info" tab on Tools page.
 * NEW: WPCode Intergration! Browse from all Charitable snippets on WPCode without leaving Charitable (Seen on Tools page and Dashboard page).
 * NEW: Growth Tools page.

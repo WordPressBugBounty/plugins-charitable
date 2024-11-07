@@ -112,7 +112,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 						if ( $link ) {
 
 							$html .= '<div class="charitable-social-field-column charitable-social-linking-' . $mode . '-' . $label . '">
-									<div class="chartiable-campaign-social-link" data-social-network="' . $label . '">
+									<div class="charitable-campaign-social-link" data-social-network="' . $label . '">
 										<a href="' . esc_url( $link ) . '" ' . $new_tab . '>
 											<div><img title="' . $social_networks_template[ $label ]['public_label'] . '"  src="' . $icon_url . '" alt="' . $social_networks_template[ $label ]['public_label'] . '" /></div>
 											<p>' . $social_networks_template[ $label ]['public_label'] . '</p>

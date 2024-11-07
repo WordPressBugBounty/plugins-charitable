@@ -571,6 +571,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 			$notices = array(
 				/* translators: %s: link */
 				'code-snippets/code-snippets.php' => sprintf(
+					// Translators: %s: link.
 					__( "You appear to be using a code snippet plugin. Please <a href='%s' target='_blank'>review best practices</a> when using snippets to avoid problems when upgrading or deactivating Charitable.", 'charitable' ),
 					'https://wpcharitable.com/code-snippet-best-practices/'
 				),
@@ -603,13 +604,13 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 			}
 
 			$notices = array(
-				/* translators: %s: link */
 				'release-150' => sprintf(
+					/* translators: %s: link */
 					__( "Charitable 1.5 is packed with new features and improvements. <a href='%s' target='_blank'>Find out what's new</a>.", 'charitable' ),
 					'https://wpcharitable.com/charitable-1-5-release-notes/?utm_source=WordPress&utm_campaign=WP+Charitable&utm_medium=Admin+Notice&utm_content=Version+One+Five+Whats+New'
 				),
-				/* translators: %s: link */
 				'release-160' => sprintf(
+					/* translators: %s: link */
 					__( 'Charitable 1.6 introduces important new user privacy features and other improvements. <a href="%s" target="_blank">Find out what\'s new</a>.', 'charitable' ),
 					'https://www.wpcharitable.com/charitable-1-6-user-privacy-gdpr-better-refunds-and-a-new-shortcode/?utm_source=WordPress&utm_campaign=WP+Charitable&utm_medium=Admin+Notice&utm_content=Version+One+Six+Whats+New'
 				),

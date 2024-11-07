@@ -148,8 +148,8 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Marketing' ) ) :
 
 			$learn_more_url = charitable_ga_url(
 				'https://wpcharitable.com/lite-vs-pro/', // base url.
-				urlencode( esc_html( $label ) . ' Marketing Page' ), // utm-medium.
-				urlencode( 'Learn More' ) // utm-content.
+				rawurlencode( esc_html( $label ) . ' Marketing Page' ), // utm-medium.
+				rawurlencode( 'Learn More' ) // utm-content.
 			);
 
 			$action_css_class  = '';
@@ -301,56 +301,13 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Marketing' ) ) :
 				</section>
 
 				<?php
-			else : /*
-				?>
 
-				<div class="education-buttons education-buttons-top">
-					<a class="button-link" target="_blank" href="<?php echo esc_url( $learn_more_url ); ?>"><?php echo esc_html__( 'Learn More', 'charitable' ); ?></a> <button type="button" class="btn btn-confirm update-to-pro-link"><?php echo esc_html__( 'Upgrade to PRO', 'charitable' ); ?></button>
-				</div>
-
-				<div class="education-images">
-
-					<img class="charitable-marketing-image charitable-marketing-image-1 charitable-marketing-image-<?php echo esc_attr( $slug ); ?>" src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/campaign-builder/settings/marketing/education/' . esc_attr( $slug ) . '-1.png' ); ?>" alt="<?php echo esc_html( $label ); ?>" />
-					<?php if ( $type !== 'automation' ) : ?>
-					<img class="charitable-marketing-image charitable-marketing-image-2 charitable-marketing-image-<?php echo esc_attr( $slug ); ?>" src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/campaign-builder/settings/marketing/education/' . esc_attr( $slug ) . '-2.png' ); ?>" alt="<?php echo esc_html( $label ); ?>" />
-					<?php endif; ?>
-
-				</div>
-
-				<section class="main-content">
-
-					<p><?php echo esc_html__( 'Upgrading to', 'charitable' ); ?> <strong><?php echo esc_html__( 'Pro', 'charitable' ); ?></strong> <?php echo esc_html__( 'gives you the following capabilities...', 'charitable' ); ?></p>
-
-					<ul>
-						<li><?php echo esc_html__( 'Using more than just ', 'charitable' ); ?><span><?php echo esc_html( $label ); ?></span><?php echo esc_html__( '? Have one or more providers.', 'charitable' ); ?></li>
-						<li><?php echo esc_html__( 'Set a default list, opt-in mode and label that is used for all campaigns.', 'charitable' ); ?></li>
-						<li><?php echo esc_html__( 'Have donors subscribed to multiple lists when they donate.', 'charitable' ); ?></li>
-						<li><?php echo esc_html__( 'Allow donors automatically added to your mailing list when they give their consent.', 'charitable' ); ?></li>
-						<li><?php echo esc_html__( 'Create your own custom / merge fields and map these fields to your donation forms.', 'charitable' ); ?></li>
-						<li><?php echo esc_html__( 'Just add your ', 'charitable' ); ?><span><?php echo esc_html( $label ); ?></span><?php echo esc_html__( ' API Key to your Charitable settings and you’re ready to start.', 'charitable' ); ?></li>
-					</ul>
-
-				</section>
-
-					<?php */ endif;
-			?>
-
-
-
-			<?php
-			/*
-			<div class="education-buttons education-buttons-bottom">
-
-			<h2><?php echo esc_html__( 'Get the most out of your campaigns with ', 'charitable' ); ?><strong><?php echo esc_html__( 'Pro', 'charitable' ); ?></strong>.</h2>
-
-			<a class="button-link" target="_blank" href="<?php echo esc_url( $learn_more_url ); ?>"><?php echo esc_html__( 'Learn More', 'charitable' ); ?></a> <button type="button" class="btn btn-confirm update-to-pro-link"><?php echo esc_html__( 'Upgrade to PRO', 'charitable' ); ?></button>
-
-			</div>*/
+			endif;
 			?>
 
 			<div class="education-buttons education-buttons-bottom">
 				<div class="action-button">
-					<?php echo '<a class="button-link ' . esc_attr( $action_css_class ) . '" data-settings-url="' . esc_url( $settings_url ) . '" data-plugin-url="' . $addon_information['install'] . '" data-name="' . $addon_information['name'] . '" data-plugin-slug="' . $addon_url . '" data-field-icon="">' . $button_label . '</a>'; ?>
+					<?php echo '<a class="button-link ' . esc_attr( $action_css_class ) . '" data-settings-url="' . esc_url( $settings_url ) . '" data-plugin-url="' . esc_attr( $addon_information['install'] ) . '" data-name="' . esc_attr( $addon_information['name'] ) . '" data-plugin-slug="' . esc_url( $addon_url ) . '" data-field-icon="">' . esc_html( $button_label ) . '</a>'; ?>
 				</div>
 			</div>
 
@@ -461,8 +418,8 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Marketing' ) ) :
 
 			$learn_more_url = charitable_ga_url(
 				'https://wpcharitable.com/lite-vs-pro/', // base url.
-				urlencode( esc_html( $marketing_item_label ) . ' Marketing Page' ), // utm-medium.
-				urlencode( 'Learn More' ) // utm-content.
+				rawurlencode( esc_html( $marketing_item_label ) . ' Marketing Page' ), // utm-medium.
+				rawurlencode( 'Learn More' ) // utm-content.
 			);
 
 			echo '<img class="charitable-builder-sidebar-icon" src="' . charitable()->get_path( 'assets', false ) . 'images/campaign-builder/settings/marketing/' . esc_attr( $marketing_item_slug ) . '_big.png" wdith="178" height="178" />'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -604,7 +561,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Marketing' ) ) :
 			<div class="education-buttons education-buttons- bottom">
 
 				<div class="action-button">
-					<?php echo '<a class="button-link ' . esc_attr( $action_css_class ) . '" data-settings-url="' . esc_url( $settings_url ) . '" data-plugin-url="' . $addon_information_install . '" data-name="' . $addon_information_name . '" data-plugin-slug="' . $addon_url . '" data-field-icon="">' . $button_label . '</a>'; ?>
+					<?php echo '<a class="button-link ' . esc_attr( $action_css_class ) . '" data-settings-url="' . esc_url( $settings_url ) . '" data-plugin-url="' . esc_attr( $addon_information_install ) . '" data-name="' . esc_attr( $addon_information_name ) . '" data-plugin-slug="' . $addon_url . '" data-field-icon="">' . $button_label . '</a>'; ?>
 				</div>
 
 			</div>

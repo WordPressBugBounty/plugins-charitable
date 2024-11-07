@@ -188,12 +188,12 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
   float: left;
   margin-right: 20px;
 }
-<?php echo $wrapper; ?> .charitable-field-template-social-linking .charitable-field-row .charitable-field-column .chartiable-campaign-social-link {
+<?php echo $wrapper; ?> .charitable-field-template-social-linking .charitable-field-row .charitable-field-column .charitable-campaign-social-link {
   margin-top: 5px;
   min-height: 20px !important;
 }
 
-<?php echo $wrapper; ?> .charitable-field-template-social-linking .charitable-field-row .chartiable-campaign-social-link a:hover {
+<?php echo $wrapper; ?> .charitable-field-template-social-linking .charitable-field-row .charitable-campaign-social-link a:hover {
   opacity: 0.65;
 }
 
@@ -242,12 +242,12 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
   float: left;
   margin-right: 20px;
 }
-<?php echo $wrapper; ?> .charitable-field-template-social-sharing .charitable-field-row .charitable-field-column .chartiable-campaign-social-link {
+<?php echo $wrapper; ?> .charitable-field-template-social-sharing .charitable-field-row .charitable-field-column .charitable-campaign-social-link {
   margin-top: 5px;
   min-height: 20px !important;
 }
 
-<?php echo $wrapper; ?> .charitable-field-template-social-sharing .charitable-field-row .chartiable-campaign-social-link a:hover {
+<?php echo $wrapper; ?> .charitable-field-template-social-sharing .charitable-field-row .charitable-campaign-social-link a:hover {
   opacity: 0.65;
 }
 

@@ -47,6 +47,7 @@ if ( ! class_exists( 'Charitable_Install' ) ) :
 			$this->setup_roles();
 			$this->create_tables();
 			$this->setup_upgrade_log();
+			$this->setup_initial_settings();
 
 			set_transient( 'charitable_install', 1, 0 );
 		}
@@ -72,7 +73,7 @@ if ( ! class_exists( 'Charitable_Install' ) ) :
 		 * @return void
 		 */
 		protected function setup_roles() {
-			require_once( $this->includes_path . '/users/class-charitable-roles.php' );
+			require_once( $this->includes_path . '/users/class-charitable-roles.php' ); //phpcs:ignore
 			$roles = new Charitable_Roles();
 			$roles->add_roles();
 			$roles->add_caps();
@@ -87,7 +88,7 @@ if ( ! class_exists( 'Charitable_Install' ) ) :
 		 * @return void
 		 */
 		protected function create_tables() {
-			require_once( $this->includes_path . 'abstracts/abstract-class-charitable-db.php' );
+			require_once( $this->includes_path . 'abstracts/abstract-class-charitable-db.php' ); //phpcs:ignore
 
 			$tables = array(
 				$this->includes_path . 'data/class-charitable-donors-db.php'              => 'Charitable_Donors_DB',
@@ -98,8 +99,8 @@ if ( ! class_exists( 'Charitable_Install' ) ) :
 			);
 
 			foreach ( $tables as $file => $class ) {
-				require_once( $file );
-				$table = new $class;
+				require_once( $file ); //phpcs:ignore
+				$table = new $class();
 				$table->create_table();
 			}
 		}
@@ -112,8 +113,59 @@ if ( ! class_exists( 'Charitable_Install' ) ) :
 		 * @return void
 		 */
 		protected function setup_upgrade_log() {
-			require_once( $this->includes_path . '/admin/upgrades/class-charitable-upgrade.php' );
+			require_once( $this->includes_path . '/admin/upgrades/class-charitable-upgrade.php' ); //phpcs:ignore
 			Charitable_Upgrade::get_instance()->populate_upgrade_log_on_install();
+		}
+
+		/**
+		 * Set up initial settings for install.
+		 *
+		 * @since  1.8.3.1
+		 *
+		 * @return void
+		 */
+		protected function setup_initial_settings() {
+
+			$activated = (array) get_option( 'charitable_activated', array() );
+
+			// If no activation date is set, assume it's a new install.
+			if ( false === $activated || empty( $activated ) ) {
+				// Default gateway settings.
+				$this->set_initial_charitable_option( 'test_mode', 1 );
+				$this->set_initial_charitable_option(
+					'active_gateways',
+					array(
+						0        => 'stripe',
+						'stripe' => 'Charitable_Gateway_Stripe_AM',
+					)
+				);
+				$this->set_initial_charitable_option( 'default_gateway', 'stripe' );
+
+				// Default advanced settings.
+				$this->set_initial_charitable_option( 'disable_campaign_legacy_mode', 1 );
+			}
+		}
+
+		/**
+		 * Set an initial Charitable option.
+		 *
+		 * @since 1.8.3.1
+		 *
+		 * @param string $setting The setting key.
+		 * @param mixed  $value   The setting value.
+		 * @return void
+		 */
+		private function set_initial_charitable_option( $setting = '', $value = false ) {
+			$settings = get_option( 'charitable_settings', [] );
+
+			// if the setting somehow already exists, don't overwrite it.
+			if ( '' === $setting || isset( $settings[ $setting ] ) ) {
+				return;
+			}
+
+			$settings[ $setting ] = $value;
+
+			update_option( 'charitable_settings', $settings );
 		}
 	}
 

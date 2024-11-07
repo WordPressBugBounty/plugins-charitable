@@ -182,7 +182,7 @@ if ( ! class_exists( 'Charitable_Donation_Log' ) ) :
 		private function query_email_logs() {
 			global $wpdb;
 
-			$logs = $wpdb->get_results(
+			$logs = $wpdb->get_results( // phpcs:ignore
 				$wpdb->prepare(
 					"SELECT meta_key, meta_value
 					FROM $wpdb->postmeta
@@ -293,7 +293,8 @@ if ( ! class_exists( 'Charitable_Donation_Log' ) ) :
 		 *
 		 * @since  1.5.4
 		 *
-		 * @param  string $email Email ID.         * @return string
+		 * @param  string $email Email ID.
+		 * @return string
 		 */
 		private function get_email_name( $email ) {
 			$class = Charitable_Emails::get_instance()->get_email( $email );
@@ -303,7 +304,7 @@ if ( ! class_exists( 'Charitable_Donation_Log' ) ) :
 				return ucwords( str_replace( '_', ' ', $email ) );
 			}
 
-			$object = new $class;
+			$object = new $class; // phpcs:ignore
 
 			return $object->get_name();
 		}
@@ -355,6 +356,7 @@ if ( ! class_exists( 'Charitable_Donation_Log' ) ) :
 		 * @return string
 		 */
 		private function get_sent_email_log_message( $email_name, $action ) {
+			// translators: %s is the email name.
 			$message = sprintf( __( '%s was sent successfully.', 'charitable' ), $email_name );
 
 			if ( false !== $action ) {
@@ -374,6 +376,7 @@ if ( ! class_exists( 'Charitable_Donation_Log' ) ) :
 		 * @return string
 		 */
 		private function get_unsent_email_log_message( $email_name, $action ) {
+			// translators: %s is the email name.
 			$message = sprintf( __( '%s failed to send.', 'charitable' ), $email_name );
 
 			if ( false !== $action ) {

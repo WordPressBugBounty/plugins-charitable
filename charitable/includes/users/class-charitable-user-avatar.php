@@ -120,8 +120,6 @@ if ( ! class_exists( 'Charitable_User_Avatar' ) ) :
 		 * @since  1.0.0
 		 */
 		private function attach_hooks_and_filters() {
-			// add_action( 'charitable_user_avatar_start',  array( 'Charitable_User_Avatar_Profile_Form', 'start' ) );
-
 			add_filter( 'charitable_user_avatar', array( $this, 'get_user_avatar' ), 10, 3 );
 			add_filter( 'charitable_user_avatar_src', array( $this, 'get_user_avatar_src' ), 10, 3 );
 		}

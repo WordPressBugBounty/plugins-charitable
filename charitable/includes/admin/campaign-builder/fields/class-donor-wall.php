@@ -301,18 +301,6 @@ if ( ! class_exists( 'Charitable_Field_Donation_Wall' ) ) :
 
 			<?php
 
-			// 'number'            => 10,
-			// 'orderby'           => 'date',
-			// 'order'             => 'DESC',
-			// 'campaign'          => 0,
-			// 'distinct_donors'   => 0,
-			// 'orientation'       => 'horizontal',
-			// 'show_name'         => 1,
-			// 'show_location'     => 0,
-			// 'show_amount'       => 1,
-			// 'show_avatar'       => 1,
-			// 'hide_if_no_donors' => 0,
-
 			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore
 				isset( $settings['headline'] ) ? $settings['headline'] : false,
 				esc_html__( 'Headline', 'charitable' ),
@@ -374,8 +362,8 @@ if ( ! class_exists( 'Charitable_Field_Donation_Wall' ) ) :
 			);
 
 			$order_options = array(
-				'DESC' => 'Decending',
-				'ASC'  => 'Ascending',
+				'DESC' => esc_html__( 'Descending', 'charitable' ),
+				'ASC'  => esc_html__( 'Ascending', 'charitable' ),
 			);
 
 			echo $charitable_builder_form_fields->generate_dropdown( // phpcs:ignore

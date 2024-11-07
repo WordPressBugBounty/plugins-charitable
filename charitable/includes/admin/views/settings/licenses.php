@@ -28,7 +28,7 @@ if ( false !== $slug && strtolower( $slug ) !== 'lite' && ! $is_legacy ) {
 	sprintf(
 		wp_kses(
 		/* translators: %s - charitable.com upgrade URL. */
-			__( 'You already have a non-legacy license activate on this install, which you can deactivate <a href="%s">in the "General" tab</a>.', 'charitable' ),
+			__( 'You already have a non-legacy license activated on this install, which you can deactivate <a href="%s">in the "General" tab</a>.', 'charitable' ),
 			[
 				'a'      => [
 					'href'   => [],

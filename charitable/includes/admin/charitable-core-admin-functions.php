@@ -651,7 +651,7 @@ function charitable_theme_template_paths() {
 	$file_paths = array(
 		1   => trailingslashit( get_stylesheet_directory() ) . $template_dir,
 		10  => trailingslashit( get_template_directory() ) . $template_dir,
-		100 => trailingslashit( CHARTIABLE_DIRECTORY_PATH ) . 'includes',
+		100 => trailingslashit( CHARITABLE_DIRECTORY_PATH ) . 'includes',
 	);
 
 	$file_paths = apply_filters( 'charitable_helpers_templates_get_theme_template_paths', $file_paths );
@@ -1052,7 +1052,7 @@ function charitable_ajax_install_addon() {
 
 		// We do not need any extra credentials if we have gotten this far, so let's install the plugin.
 		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
-		require_once plugin_dir_path( CHARTIABLE_DIRECTORY_PATH ) . 'charitable/includes/utilities/Skin.php';
+		require_once plugin_dir_path( CHARITABLE_DIRECTORY_PATH ) . 'charitable/includes/utilities/Skin.php';
 
 		// Create the plugin upgrader with our custom skin.
 		$skin      = new Charitable_Skin();

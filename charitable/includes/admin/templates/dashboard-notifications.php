@@ -75,7 +75,7 @@ $notifications_total = count( $notifications );
 
 		?>
 
-			<div class="charitable-dashboard-notification <?php echo esc_attr( $css_class ); ?>" data-notification-number="<?php echo $notifications_count; ?>" data-notification-id="<?php echo esc_attr( $notification_slug ); ?>" data-notification-type="<?php echo esc_attr( $notification['type'] ); ?>">
+			<div class="charitable-dashboard-notification <?php echo esc_attr( $css_class ); ?>" data-notification-number="<?php echo (int) $notifications_count; ?>" data-notification-id="<?php echo esc_attr( $notification_slug ); ?>" data-notification-type="<?php echo esc_attr( $notification['type'] ); ?>">
 
 				<div class="charitable-dashboard-notification-message">
 				<h4 class="charitable-dashboard-notification-headline"><?php echo esc_html( $message_title ); ?></h4>

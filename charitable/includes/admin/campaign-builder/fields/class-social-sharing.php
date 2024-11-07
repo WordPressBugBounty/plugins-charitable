@@ -156,7 +156,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Sharing' ) ) :
 							if ( $link && $href ) {
 
 								$html .= '<div class="charitable-social-field-column charitable-social-sharing-' . $mode . '-' . esc_attr( $network ) . '">
-										<div class="chartiable-campaign-social-link" data-social-network="' . $label . '">
+										<div class="charitable-campaign-social-link" data-social-network="' . $label . '">
 											' . $href . '
 												<div><img title="' . esc_html__( 'Share On', 'charitable' ) . ' ' . $social_networks_template[ $label ]['public_label'] . '"  src="' . $icon_url . '" alt="' . $social_networks_template[ $label ]['public_label'] . '" /></div>
 												<p>' . $social_networks_template[ $label ]['public_label'] . '</p>
@@ -481,7 +481,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Sharing' ) ) :
 						'label'        => esc_html__( 'LinkedIn', 'charitable' ),
 						'css_class'    => '',
 						'field_id'     => 'linkedin_url',
-						'public_label' => esc_html__( 'Twitter', 'charitable' ),
+						'public_label' => esc_html__( 'LinkedIn', 'charitable' ),
 						'icon_url'     => charitable()->get_path( 'directory', false ) . 'assets/images/campaign-builder/fields/social-sharing/linkedin' . $suffix . '.svg',
 						'share_url'    => 'https://www.linkedin.com/sharing/share-offsite/?url={$url}',
 					),

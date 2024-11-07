@@ -112,7 +112,7 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 						'help'      => /* translators: %1$s: URL to the documentation. */
 										sprintf( __( 'Determines ability for admin users to add new legacy campaigns. <a href="%1$s">Learn More</a>.', 'charitable' ), 'https://www.wpcharitable.com/documentation/legacy-campaigns/' ),
 						'priority'  => 155,
-						'default'   => false,
+						'default'   => true,
 					),
 					'section_hidden_licenses'      => array(
 						'title'    => '',
@@ -165,7 +165,8 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 		 *
 		 * @since   1.7.0.7
 		 * @version 1.8.1.12 Added expiringlicense and expiredlicense.
-		 * @version 1.8.3
+		 * @version 1.8.3 Added charitable_notifications.
+		 * @version 1.8.3.1 Added charitable_cache_cleared.
 		 *
 		 * @param   mixed[] $values The parsed values combining old values & new values.
 		 * @param   mixed[] $new_values The newly submitted values.
@@ -225,6 +226,9 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 			do_action( 'charitable_after_clear_expired_options' );
 
 			charitable_get_admin_notices()->add_notice( 'Charitable cache has been cleared.', 'success', false, true );
+
+			// Document when the cache was cleared last.
+			update_option( 'charitable_cache_cleared', time() );
 
 			$values['clear_expire_options'] = false;
 

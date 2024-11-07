@@ -1653,6 +1653,18 @@ body.charitable_page_charitable-settings {
         padding: 5px;
         margin-right: 20px;
     }
+    a.button.button-primary {
+        background-color: #5AA152;
+        border-color: #5AA152;
+        color: white;
+        border-radius: 5px;
+        font-family: "Inter", sans-serif;
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 14px;
+        padding: 15px 20px;
+        text-transform: capitalize;
+    }
 }
 
 /* tabs */
@@ -4857,15 +4869,40 @@ body {
     }
     .button {
         &.button-primary {
+            padding: 3px 15px !important;
+            border-radius: 5px !important;
+            font-size: 13px !important;
+            line-height: 2.15 !important;
             background-color: #E38632;
             color: #fff;
             border-color: #E38632;
+            &:hover {
+                padding: 3px 16px;
+                border-radius: 5px;
+                background-color: #E38632;
+                border-color: #E38632;
+                /* filter darker */
+                filter: brightness(0.9);
+
+            }
         }
         &.button-secondary {
+            padding: 3px 15px !important;
+            border-radius: 5px !important;
+            font-size: 13px !important;
+            line-height: 2.15 !important;
             margin-left: 15px;
             background-color: #F9F9FA;
             color: #52545F;
             border-color: #E4E4E7;
+            &:hover {
+                padding: 3px 16px;
+                border-radius: 5px;
+                background-color: #F9F9FA;
+                border-color: #E4E4E7;
+                /* filter darker */
+                filter: brightness(0.9);
+            }
         }
     }
 }
@@ -5111,6 +5148,7 @@ body.charitable-show-notifications {
         background-color: #141b38;
         opacity: .5;
         transition: .5s;
+        cursor: pointer;
         right: 0;
         left: 160px;
 

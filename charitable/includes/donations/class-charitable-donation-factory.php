@@ -78,7 +78,7 @@ if ( ! class_exists( 'Charitable_Donation_Factory' ) ) :
 		}
 
 		/**
-		 * Create a class name e.g. Charitable_Donation_Type_Class instead of chartiable_donation_type-class.
+		 * Create a class name e.g. Charitable_Donation_Type_Class instead of charitable_donation_type-class.
 		 *
 		 * @since   1.4.0
 		 *

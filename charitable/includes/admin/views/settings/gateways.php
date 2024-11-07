@@ -28,6 +28,7 @@ if ( class_exists( 'Charitable_Gateway_Stripe_AM' ) ) {
 
 		if ( ! isset( $stripe_keys['public_key'] ) || empty( $stripe_keys['public_key'] ) ) {
 			// Display the warning message HTML.
+			/* translators: %s: URL to the Stripe settings page */
 			echo '<div class="charitable-settings-notice charitable-stripe-key-notice"> ' . ( sprintf( __( '<strong>Note:</strong> Stripe is enabled but it does not appear to be connected or API keys are missing. <a href="%s">Confirm Stripe settings to keep using this gateway</a>.', 'charitable' ), admin_url( 'admin.php?page=charitable-settings&tab=gateways&group=gateways_stripe' ) ) ) . '</div>';
 		}
 

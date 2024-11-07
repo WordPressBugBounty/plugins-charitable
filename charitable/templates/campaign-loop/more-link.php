@@ -21,9 +21,10 @@ $campaign = $view_args['campaign'];
 ?>
 <p>
 	<a class="<?php echo esc_attr( charitable_get_button_class( 'read-more' ) ); ?>"
-		href="<?php echo get_permalink( $campaign->ID ); ?>"
+		href="<?php echo esc_url( get_permalink( $campaign->ID ) ); ?>"
+		<?php /* translators: %s: campaign title */ ?>
 		aria-label="<?php echo esc_attr( sprintf( _x( 'Continue reading about %s', 'Continue reading about campaign', 'charitable' ), get_the_title( $campaign->ID ) ) ); ?>"
 	>
-		<?php _e( 'Read More', 'charitable' ); ?>
+		<?php esc_html_e( 'Read More', 'charitable' ); ?>
 	</a>
 </p>

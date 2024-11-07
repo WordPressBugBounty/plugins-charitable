@@ -899,7 +899,7 @@ if ( ! class_exists( 'Charitable_Abstract_Donation' ) ) :
 				charitable_get_deprecated()->deprecated_argument(
 					__METHOD__,
 					'1.3.0',
-					sprintf( __( '$donation_id is no longer required as get_donation_log() is used in object context. Use $donation->log()->get_meta_log() instead.' ) )
+					sprintf( __( '$donation_id is no longer required as get_donation_log() is used in object context. Use $donation->log()->get_meta_log() instead.', 'charitable' ) )
 				);
 			}
 
@@ -929,11 +929,16 @@ if ( ! class_exists( 'Charitable_Abstract_Donation' ) ) :
 				$original_new_status = $new_status;
 				$new_status          = array_search( $new_status, $statuses );
 
+				/**
+				 * Log a warning if the status is not valid.
+				 */
 				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					// @codingStandardsIgnoreStart
 					error_log('update_status-------');
 					error_log( print_r( $new_status, true ) );
 					error_log( print_r( $original_new_status, true ) );
 					error_log( print_r( $statuses, true ) );
+					// @codingStandardsIgnoreEnd
 				}
 
 				if ( false === $new_status ) {
@@ -1023,7 +1028,7 @@ if ( ! class_exists( 'Charitable_Abstract_Donation' ) ) :
 				charitable_get_deprecated()->deprecated_argument(
 					__METHOD__,
 					'1.3.0',
-					sprintf( __( '$donation_id is no longer required as update_donation_log() is used in object context. Use $donation->update_donation_log($message)' ) )
+					sprintf( __( '$donation_id is no longer required as update_donation_log() is used in object context. Use $donation->update_donation_log($message)', 'charitable' ) )
 				);
 
 				$message = func_get_arg( 1 );

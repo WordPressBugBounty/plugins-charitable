@@ -452,7 +452,7 @@ if ( ! function_exists( 'charitable_template_campaign_modal_donation_window' ) )
 	function charitable_template_campaign_modal_donation_window() {
 		global $wp_query, $post;
 
-		// We need to find the campaign so we can use chartiable_get_current_campaign().
+		// We need to find the campaign so we can use charitable_get_current_campaign().
 		if ( Charitable::CAMPAIGN_POST_TYPE === get_post_type() ) {
 
 			if ( isset( $wp_query->query_vars['donate'] ) ) {

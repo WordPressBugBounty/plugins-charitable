@@ -109,21 +109,6 @@ ob_start();
 
 			<div class="charitable-dashboard-report">
 
-				<?php /* if ( $notices ) : ?>
-
-					<div class="charitable-container charitable-report-card charitable-important" data-notice-ids="donation-security">
-						<div class="header">
-							<h4><img class="charitable-icon" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/sms.svg'; ?>" /><?php echo esc_html__( 'Important', 'charitable' ); ?></h4>
-							<a href="#" class="charitable-remove-dashboard-notice">X</a>
-						</div>
-						<div class="charitable-important-message">
-							<?php echo $notices; ?>
-							<p><a class="charitable-remove-dashboard-notice-link" href="#"><?php echo esc_html__( 'Dismiss this notice', 'charitable' ); ?></a></p>
-						</div>
-					</div>
-
-				<?php endif; */ ?>
-
 				<!--- dashboard welcome start -->
 
 				<?php
@@ -136,73 +121,6 @@ ob_start();
 				?>
 
 				<div class="charitable-dashboard-title-cards">
-
-					<?php /*
-
-					<div class="charitable-container charitable-dashboard-title-card thank-you">
-
-						<div class="charitable-title-card-content">
-
-							<h1><?php echo esc_html__( 'Thank you for installing Charitable!', 'charitable' ); ?></h1>
-
-							<p><?php echo esc_html__( 'Charitable is everything you need to start accepting donations today. Stripe, PayPal and offline donations work right out of the box, and when your organization is ready to grow, our extensions give you the tools you need to move forward.', 'charitable' ); ?></p>
-							<a class="button-link" href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ) ); ?>"><?php echo esc_html__( 'Create Campaign', 'charitable' ); ?></a>
-							<?php if ( ! charitable_is_pro() ) : ?>
-								<a class="button-link charitable-button-link-upgrade" target="_blank" href="https://wpcharitable.com/lite-vs-pro?referrer=chariable-dashboard"><?php echo esc_html__( 'Upgrade To Pro', 'charitable' ); ?></a>
-							<?php endif; ?>
-						</div>
-
-					</div>
-
-					<div class="charitable-container charitable-dashboard-title-card getting-started">
-
-						<div class="charitable-title-card-content">
-
-							<h3><?php echo esc_html__( 'Getting Started', 'charitable' ); ?></h3>
-							<ul class="checklist">
-								<?php if ( count( $gateways ) > 0 ) : ?>
-									<li class="done">
-									<?php
-										printf(
-											_x( 'You have activated %1$s. <a href="%2$s">Change settings</a>', 'You have activated x and y. Change gateway settings.', 'charitable' ), // phpcs:ignore
-											charitable_list_to_sentence_part( $gateways ), // phpcs:ignore
-											admin_url( 'admin.php?page=charitable-settings&tab=gateways' ) // phpcs:ignore
-										);
-									?>
-									</li>
-								<?php else : ?>
-									<li class="not-done"><a href="<?php echo admin_url( 'admin.php?page=charitable-settings&tab=gateways' ); // phpcs:ignore ?>"><?php _e( 'You need to enable a payment gateway', 'charitable' ); // phpcs:ignore ?></a></li>
-								<?php endif ?>
-								<?php if ( $campaigns_count > 0 ) : ?>
-									<li class="done">
-									<?php
-										printf(
-											__( 'You have created your first campaign. <a href="%s">Create another one.</a>', 'charitable' ), // phpcs:ignore
-											admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ) // phpcs:ignore
-										);
-									?>
-									</li>
-								<?php else : ?>
-									<li class="not-done"><a href="<?php echo admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ); // phpcs:ignore ?>"><?php _e( 'Create your first campaign', 'charitable' ); ?></a></li>
-								<?php endif ?>
-								<?php if ( count( $emails ) > 0 ) : ?>
-									<li class="done">
-									<?php
-										printf(
-											_x( 'You have turned on the %1$s. <a href="%2$s">Change settings</a>', 'You have activated x and y. Change email settings.', 'charitable' ), // phpcs:ignore
-											charitable_list_to_sentence_part( $emails ), // phpcs:ignore
-											admin_url( 'admin.php?page=charitable-settings&tab=emails' ) // phpcs:ignore
-										);
-									?>
-									</li>
-								<?php else : ?>
-									<li class="not-done"><a href="<?php echo admin_url( 'admin.php?page=charitable-settings&tab=emails' ); // phpcs:ignore ?>"><?php _e( 'Turn on email notifications', 'charitable' ); // phpcs:ignore ?></a></li>
-								<?php endif ?>
-							</ul>
-
-						</div>
-
-					</div> */ ?>
 
 					<?php
 						/**

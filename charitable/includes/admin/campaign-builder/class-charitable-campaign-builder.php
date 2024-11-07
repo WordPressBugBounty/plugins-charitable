@@ -216,7 +216,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 		 */
 		public function init() {
 
-			if ( isset( $_POST['action'] ) && str_starts_with( $_POST['action'], 'charitable_' ) ) { // ajax.
+			if ( isset( $_POST['action'] ) && str_starts_with( $_POST['action'], 'charitable_' ) ) { // phpcs:ignore
 				$this->load_template_classes();
 				return;
 			}
@@ -227,7 +227,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 			}
 
 			$this->view        = isset( $_GET['view'] ) ? esc_attr( $_GET['view'] ) : false;
-			$this->campaign_id = isset( $_GET['campaign_id'] ) ? intval( $_GET['campaign_id'] ) : false;
+			$this->campaign_id = isset( $_GET['campaign_id'] ) ? intval( $_GET['campaign_id'] ) : false; // phpcs:ignore
 
 			// if no view was past, determine if the new campaign cofmr has been used (check settings) and if not redirect to template screen.
 			if ( $this->campaign_id && ! $this->view ) {
@@ -258,7 +258,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 
 			// Disable displaying errors on this page because it breaks the CSS/Javascript.
 			if ( true === apply_filters( 'charitable_campaign_builder_diable_display_errors', true ) ) :
-				ini_set( 'display_errors', 0 );
+				ini_set( 'display_errors', 0 ); // phpcs:ignore
 			endif;
 		}
 
@@ -752,7 +752,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				'something_went_wrong'              => esc_html__( 'Something went wrong', 'charitable' ),
 				'field_cannot_be_reordered'         => esc_html__( 'This field cannot be moved.', 'charitable' ),
 				'donation_form_donation_button'     => esc_html__( 'You shouldn\'t have a donation form AND a donation button in the same campaign page. Remove the donation button if you wish to add a donation form.', 'charitable' ),
-				'remove_donation_button'            => esc_html__( 'Remove Donation Buttons', 'charitable' ),
+				'remove_donation_button'            => esc_html__( 'Remove Donation Button', 'charitable' ),
 				'donation_button_donation_form'     => esc_html__( 'You shouldn\'t have a donation form AND a donation button in the same campaign page. Remove the donation form if you wish to add a donation button.', 'charitable' ),
 				'remove_donation_form'              => esc_html__( 'Remove Donation Form', 'charitable' ),
 				'only_one_donation_form'            => esc_html__( 'You shouldn\'t have more than one donation form on your campaign page. Move or delete the current donation form.', 'charitable' ),

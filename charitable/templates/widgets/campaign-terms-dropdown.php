@@ -21,6 +21,7 @@ $dropdown_args = array(
 	'hide_empty'       => isset( $view_args['hide_empty'] ) && $view_args['hide_empty'],
 	'id'               => $dropdown_id,
 	'show_option_none' => sprintf(
+		/* translators: %s: taxonomy label */
 		_x( 'Select %s', 'select campaign category/tag', 'charitable' ),
 		$taxonomy[ $taxonomy_name ]->label
 	),
@@ -32,13 +33,13 @@ echo $view_args['before_widget'];
 
 if ( ! empty( $title ) ) :
 
-	echo $view_args['before_title'] . $title . $view_args['after_title'];
+	echo $view_args['before_title'] . esc_html( $title ) . $view_args['after_title'];
 
 endif;
 ?>
-<form action="<?php echo esc_url( home_url() ) ?>" method="get">
-	<label class="screen-reader-text" for="<?php echo esc_attr( $dropdown_id ) ?>"><?php echo $title ?></label>
-	<?php wp_dropdown_categories( $dropdown_args ) ?>
+<form action="<?php echo esc_url( home_url() ); ?>" method="get">
+	<label class="screen-reader-text" for="<?php echo esc_attr( $dropdown_id ); ?>"><?php echo esc_html( $title ); ?></label>
+	<?php wp_dropdown_categories( $dropdown_args ); ?>
 </form>
 <script type='text/javascript'>
 /* <![CDATA[ */

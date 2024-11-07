@@ -1067,7 +1067,6 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 
 			$total_campaigns = wp_count_posts( 'campaign' );
 			$count_campaigns = ! empty( $total_campaigns->publish ) ? $total_campaigns->publish : 0;
-
 			// if there is a campaign created (but the checklist hasn't been skipped or completed) AND the activation has been past 7 days, then do not load the checklist assets.
 			if ( intval( $count_campaigns ) > 0 && ( ! $this->is_checklist_skipped() && ! $this->is_checklist_completed() ) ) {
 				$activation_date = get_option( 'wpcharitable_activated_datetime', false );
@@ -1088,7 +1087,11 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 					$difference = time() - $activation_date;
 					// Determine if more than 14 days have passed (14 days * 24 hours * 60 minutes * 60 seconds).
 					if ( $difference > ( 14 * 24 * 60 * 60 ) ) {
-						return false;
+
+						$cache_last_cleared = get_option( 'charitable_cache_cleared', false );
+						if ( false !== $cache_last_cleared && ( time() - $cache_last_cleared ) > 3600 ) {
+							return false;
+						}
 					}
 				}
 			}

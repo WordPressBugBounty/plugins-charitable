@@ -1109,6 +1109,23 @@ select.charitable-settings-field {
   min-width: 300px;
 }
 
+input#charitable_settings_import_campaign,
+input#charitable_settings_import_donations {
+  display: table;
+  margin: 0 0 10px 0;
+  width: 100%;
+}
+
+select#charitable_settings_import_donations,
+select#charitable_settings_export_campaign,
+select#charitable_settings_export_donations {
+  padding: 0 24px 0 10px;
+  min-height: 45px;
+  display: table;
+  margin: 0 0 10px 0;
+  width: 100%;
+}
+
 .charitable-settings-object {
   max-width: 860px;
   padding: 10px 20px;
@@ -2171,10 +2188,15 @@ body.post-type-charitable .postbox h2 .badge.beta {
 .charitable-setting-dropdown-container,
 .charitable-setting-file-container {
   margin-bottom: 10px;
+  margin-top: 5px;
+}
+
+form.form-contains-file.charitable-import-campaign-donations-form {
+  margin-top: 5px;
 }
 
 form.form-contains-file {
-  margin-top: -10px;
+  margin-top: 15px;
 }
 form.form-contains-file input[type=file].charitable-settings-field {
   font-size: 14px;

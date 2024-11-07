@@ -235,7 +235,7 @@ if ( ! class_exists( 'Charitable_Admin_Plugins_Third_Party' ) ) :
 
 			// We do not need any extra credentials if we have gotten this far, so let's install the plugin.
 			require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
-			require_once plugin_dir_path( CHARTIABLE_DIRECTORY_PATH ) . 'charitable/includes/utilities/Skin.php';
+			require_once plugin_dir_path( CHARITABLE_DIRECTORY_PATH ) . 'charitable/includes/utilities/Skin.php';
 
 			// Create the plugin upgrader with our custom skin.
 			$skin      = new Charitable_Skin();

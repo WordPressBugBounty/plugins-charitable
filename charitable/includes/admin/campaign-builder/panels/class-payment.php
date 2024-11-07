@@ -147,8 +147,8 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 
 			$learn_more_url = charitable_ga_url(
 				'https://wpcharitable.com/lite-vs-pro/', // base url.
-				urlencode( esc_html( $label ) . ' Payment Page' ), // utm-medium.
-				urlencode( 'Learn More' ) // utm-content.
+				rawurlencode( esc_html( $label ) . ' Payment Page' ), // utm-medium.
+				rawurlencode( 'Learn More' ) // utm-content.
 			);
 
 			$big_icon = apply_filters( 'charitable_campaign_builder_payment_icon_url', charitable()->get_path( 'assets', false ) . 'images/campaign-builder/settings/payment/' . esc_attr( $slug ) . '_big.png', $slug );
@@ -263,7 +263,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 				<p><?php echo esc_html__( 'Upgrading to ', 'charitable' ); ?><strong><?php echo esc_html__( 'Pro', 'charitable' ); ?></strong> <?php echo esc_html__( 'gives you the following capabilities...', 'charitable' ); ?></p>
 
 				<ul>
-					<li><?php echo esc_html__( 'Intergrate with a wide variety of gateways including', 'charitable' ); ?> <strong><?php echo esc_html__( 'Payfast', 'charitable' ); ?></strong>, <strong><?php echo esc_html__( 'Mollie', 'charitable' ); ?></strong>, <strong><?php echo esc_html__( 'Authorize.Net', 'charitable' ); ?></strong> <?php echo esc_html__( 'and more.', 'charitable' ); ?></li>
+					<li><?php echo esc_html__( 'Integrate with a wide variety of gateways including', 'charitable' ); ?> <strong><?php echo esc_html__( 'Payfast', 'charitable' ); ?></strong>, <strong><?php echo esc_html__( 'Mollie', 'charitable' ); ?></strong>, <strong><?php echo esc_html__( 'Authorize.Net', 'charitable' ); ?></strong> <?php echo esc_html__( 'and more.', 'charitable' ); ?></li>
 					<li>
 							<?php
 							// translators: %s is the name of the addon.
@@ -294,7 +294,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 				<p><?php echo esc_html__( 'Upgrading to ', 'charitable' ); ?><strong><?php echo esc_html__( 'Pro', 'charitable' ); ?></strong> <?php echo esc_html__( 'gives you the following capabilities...', 'charitable' ); ?></p>
 
 				<ul>
-					<li><?php echo esc_html__( 'Intergrate with a wide variety of gateways including', 'charitable' ); ?> <strong><?php echo esc_html__( 'Payfast', 'charitable' ); ?></strong>, <strong><?php echo esc_html__( 'Mollie', 'charitable' ); ?></strong>, <strong><?php echo esc_html__( 'Authorize.Net', 'charitable' ); ?></strong> <?php echo esc_html__( 'and more.', 'charitable' ); ?></li>
+					<li><?php echo esc_html__( 'Integrate with a wide variety of gateways including', 'charitable' ); ?> <strong><?php echo esc_html__( 'Payfast', 'charitable' ); ?></strong>, <strong><?php echo esc_html__( 'Mollie', 'charitable' ); ?></strong>, <strong><?php echo esc_html__( 'Authorize.Net', 'charitable' ); ?></strong> <?php echo esc_html__( 'and more.', 'charitable' ); ?></li>
 					<li>
 					<?php
 					// translators: %s is the name of the addon.
@@ -445,7 +445,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 						if ( empty( $version['slug'] ) || $version['slug'] !== $plugin_version_slug_string || empty( $version['sections'] ) ) {
 							continue;
 						}
-						$section           = unserialize( $version['sections'] );
+						$section           = rawurlencode( $version['sections'] );
 						$addon_description = ! empty( $section ) ? wp_strip_all_tags( $section['description'] ) : $addon_description;
 					endforeach;
 				endif;

@@ -44,7 +44,7 @@ if ( ! isset( $url ) || false === $url ) {
 	$url = home_url();
 }
 
-$customize_link = urlencode( $url );
+$customize_link = rawurlencode( $url );
 ?>
 <div class="charitable-customizer">
 	<div class="charitable-customizer-section">
@@ -54,7 +54,7 @@ $customize_link = urlencode( $url );
 			<?php
 			printf(
 				'<p>%s <a target="_blank" href="%s">%s</a> %s</p>',
-				__( 'Previous verisons of Charitable had an option in the menu that linked to the ', 'charitable' ),
+				__( 'Previously Charitable had an option in the menu that linked to the ', 'charitable' ),
 				'https://www.wpcharitable.com/documentation/customizer-settings/',
 				__( 'WordPress Customizer', 'charitable' ),
 				__( 'for a few select settings. That menu link has been moved here.', 'charitable' ),
@@ -62,6 +62,6 @@ $customize_link = urlencode( $url );
 			?>
 		</p>
 		<p><?php esc_html_e( 'This link will be depreciated in an upcoming Charitable release.', 'charitable' ); ?></p>
-		<p><a href="<?php echo admin_url( 'customize.php?autofocus[panel]=charitable&url=' . $customize_link ); ?>" class="button button-primary"><?php esc_html_e( 'Open WordPress Customizer', 'charitable' ); ?></a></p>
+		<p><a href="<?php echo esc_url( admin_url( 'customize.php?autofocus[panel]=charitable&url=' . $customize_link ) ); ?>" class="button button-primary"><?php esc_html_e( 'Open WordPress Customizer', 'charitable' ); ?></a></p>
 	</div>
 </div>

@@ -281,8 +281,8 @@ margin-top: -10px;
 
 /* field: social sharing AND linking */
 
-<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-social-links .charitable-field-row .chartiable-campaign-social-link,
-<?php echo $wrapper; ?> .charitable-field-preview-social-sharing .charitable-field-row .chartiable-campaign-social-link {
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-social-links .charitable-field-row .charitable-campaign-social-link,
+<?php echo $wrapper; ?> .charitable-field-preview-social-sharing .charitable-field-row .charitable-campaign-social-link {
 
 }
 <?php echo $wrapper; ?> .charitable-field-preview-social-linking h5,

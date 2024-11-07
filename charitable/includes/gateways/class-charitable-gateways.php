@@ -121,20 +121,20 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 		 * @return void
 		 */
 		public function handle_gateway_settings_request() {
-			if ( ! wp_verify_nonce( $_REQUEST['_nonce'], 'gateway' ) ) {
-				wp_die( __( 'Cheatin\' eh?!', 'charitable' ) );
+			if ( ! wp_verify_nonce( $_REQUEST['_nonce'], 'gateway' ) ) { // phpcs:ignore
+				wp_die( __( 'Cheatin\' eh?!', 'charitable' ) ); // phpcs:ignore
 			}
 
 			$gateway = isset( $_REQUEST['gateway_id'] ) ? $_REQUEST['gateway_id'] : false;
 
 			/* Gateway must be set */
 			if ( false === $gateway ) {
-				wp_die( __( 'Missing gateway.', 'charitable' ) );
+				wp_die( __( 'Missing gateway.', 'charitable' ) ); // phpcs:ignore
 			}
 
 			/* Validate gateway. */
 			if ( ! isset( $this->gateways[ $gateway ] ) ) {
-				wp_die( __( 'Invalid gateway.', 'charitable' ) );
+				wp_die( __( 'Invalid gateway.', 'charitable' ) ); // phpcs:ignore
 			}
 
 			switch ( $_REQUEST['charitable_action'] ) {
@@ -159,7 +159,6 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 					 */
 					do_action( 'charitable_gateway_settings_request', $_REQUEST['charitable_action'], $gateway );
 			}
-
 		}
 
 		/**
@@ -859,7 +858,7 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 		 */
 		public function check_settings() {
 
-			if ( isset( $_GET['page'] ) && 'charitable-settings' !== $_GET['page'] ) {
+			if ( isset( $_GET['page'] ) && 'charitable-settings' !== $_GET['page'] ) { // phpcs:ignore
 				return;
 			}
 
@@ -867,7 +866,7 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 
 			// attach this to CHARITABLE_DEBUG constant.
 			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG && defined( 'CHARITABLE_DEBUG_SETTINGS' ) && CHARITABLE_DEBUG_SETTINGS ) {
-				error_log( 'checking_settings');
+				error_log( 'checking_settings' );
 				error_log( print_r( $settings, true ) );
 			}
 
@@ -885,16 +884,15 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 		 * Display the test and live fields that represent the manual keys for Stripe that users might be already using prior to 1.7.0.
 		 *
 		 * @since  1.7.0
-		 *
 		 */
 		public function show_stripe_manual_keys_ajax() {
 
-			if ( ! isset( $_POST ) || 'charitable-show-stripe-keys' !== $_POST['action'] ) {
+			if ( ! isset( $_POST ) || 'charitable-show-stripe-keys' !== $_POST['action'] ) { // phpcs:ignore
 				return;
 			}
 
 			// Invalid nonce, bail.
-			if ( ! wp_verify_nonce( $_GET['_wpnonce'], 'charitable-show-stripe-keys' ) ) {
+			if ( ! wp_verify_nonce( $_GET['_wpnonce'], 'charitable-show-stripe-keys' ) ) { // phpcs:ignore
 				return;
 			}
 

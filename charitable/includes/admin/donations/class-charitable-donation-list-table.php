@@ -122,18 +122,21 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 
 					if ( $name ) {
 						$text = sprintf(
+							/* translators: %1$d is the donation ID, %2$s is the donor name */
 							_x( '#%1$d by %2$s', 'number symbol', 'charitable' ),
 							$post_id,
 							$name
 						);
 						if ( $email ) {
 							$text .= '<br/>' . sprintf(
-								_x( '%1$s', 'email', 'charitable' ),
+								/* translators: %s is the donor email */
+								_x( '%1$s', 'email', 'charitable' ), // phpcs:ignore
 								$email
 							);
 						}
 					} else {
 						$text = sprintf(
+							/* translators: %d is the donation ID */
 							_x( '#%d', 'number symbol', 'charitable' ),
 							$post_id
 						);
@@ -161,7 +164,8 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 					break;
 
 				case 'amount':
-					$display  = charitable_format_money( $donation->get_total_donation_amount(), false, false, $donation->get_currency() );
+					$display = charitable_format_money( $donation->get_total_donation_amount(), false, false, $donation->get_currency() );
+					// translators: %s is the gateway label.
 					$display .= '<span class="meta">' . sprintf( _x( 'via %s', 'charitable' ), $donation->get_gateway_label() ) . '</span>';
 					break;
 
@@ -203,7 +207,7 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 			 * @param int                 $post_id     The ID of the donation being shown.
 			 * @param Charitable_Donation $donation    The Charitable_Donation object.
 			 */
-			echo apply_filters( 'charitable_donation_column_display', $display, $column_name, $post_id, $donation );
+			echo apply_filters( 'charitable_donation_column_display', $display, $column_name, $post_id, $donation ); // phpcs:ignore
 		}
 
 		/**
@@ -231,11 +235,11 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 		 *
 		 * @since  1.5.0
 		 *
-		 * @param  string $default
-		 * @param  string $screen_id
+		 * @param  string $default  Default primary column.
+		 * @param  string $screen_id The current screen ID.
 		 * @return string
 		 */
-		public function primary_column( $default, $screen_id ) {
+		public function primary_column( $default, $screen_id ) { // phpcs:ignore
 			if ( 'edit-donation' === $screen_id ) {
 				return 'id';
 			}
@@ -248,8 +252,8 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 		 *
 		 * @since  1.5.0
 		 *
-		 * @param  array   $actions
-		 * @param  WP_Post $post
+		 * @param  array   $actions List of row actions.
+		 * @param  WP_Post $post   The current post object.
 		 * @return array
 		 */
 		public function row_actions( $actions, $post ) {
@@ -310,15 +314,17 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 		 */
 		public function set_status_views( $views ) {
 			$counts  = $this->get_status_counts();
-			$current = array_key_exists( 'post_status', $_GET ) ? $_GET['post_status'] : '';
+			$current = array_key_exists( 'post_status', $_GET ) ? esc_html( $_GET['post_status'] ) : ''; // phpcs:ignore
 
 			foreach ( charitable_get_valid_donation_statuses() as $key => $label ) {
 				$views[ $key ] = sprintf(
 					'<a href="%s"%s>%s <span class="count">(%d)</span></a>',
-					add_query_arg(
-						array(
-							'post_status' => $key,
-							'paged'       => false,
+					esc_url(
+						add_query_arg(
+							array(
+								'post_status' => $key,
+								'paged'       => false,
+							)
 						)
 					),
 					$current === $key ? ' class="current"' : '',
@@ -329,7 +335,7 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 
 			$views['all'] = sprintf(
 				'<a href="%s"%s>%s <span class="count">(%d)</span></a>',
-				remove_query_arg( array( 'post_status', 'paged' ) ),
+				esc_url( remove_query_arg( array( 'post_status', 'paged' ) ) ),
 				'all' === $current || '' === $current ? ' class="current"' : '',
 				__( 'All', 'charitable' ),
 				array_sum( $counts )
@@ -358,9 +364,9 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 		/**
 		 * Process bulk actions
 		 *
-		 * @param   int    $redirect_to
-		 * @param   string $action
-		 * @param   int[]  $post_ids
+		 * @param   int    $redirect_to The URL to redirect to.
+		 * @param   string $action  The action being performed.
+		 * @param   int[]  $post_ids    The list of post IDs.
 		 * @return  string
 		 * @since   1.5.0
 		 */
@@ -426,6 +432,7 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 			$actions = array();
 
 			foreach ( charitable_get_valid_donation_statuses() as $status_key => $label ) {
+				/* translators: %s is the status label */
 				$actions[ 'set-' . $status_key ] = sprintf( _x( 'Set to %s', 'set donation status to x', 'charitable' ), $label );
 			}
 
@@ -453,7 +460,7 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 		public function bulk_admin_footer() {
 			global $post_type;
 
-			if ( Charitable::DONATION_POST_TYPE == $post_type ) {
+			if ( Charitable::DONATION_POST_TYPE === $post_type ) {
 
 				$js  = '<script type="text/javascript">';
 				$js .= '(function($) {';
@@ -463,7 +470,7 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 				$js .= '})(jQuery);';
 				$js .= '</script>';
 
-				echo $js;
+				echo $js; // phpcs:ignore
 			}
 		}
 
@@ -486,9 +493,9 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 			$action = '';
 
 			if ( isset( $_REQUEST['action'] ) && -1 != $_REQUEST['action'] ) {
-				$action = $_REQUEST['action'];
+				$action = sanitize_text_field( wp_unslash( $_REQUEST['action'] ) );
 			} elseif ( isset( $_REQUEST['action2'] ) && -1 != $_REQUEST['action2'] ) {
-				$action = $_REQUEST['action2'];
+				$action = sanitize_text_field( wp_unslash( $_REQUEST['action2'] ) );
 			}
 
 			$post_ids    = array_map( 'absint', (array) $_REQUEST['post'] );
@@ -500,7 +507,7 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 			);
 			$redirect_to = $this->bulk_action_handler( $redirect_to, $action, $post_ids );
 
-			wp_redirect( esc_url_raw( $redirect_to ) );
+			wp_safe_redirect( esc_url_raw( $redirect_to ) );
 
 			exit();
 		}
@@ -526,10 +533,11 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 			/* Check if any status changes happened. */
 			$report_action = 'bulk_' . Charitable::DONATION_POST_TYPE . '_status_update';
 
-			if ( ! empty( $_REQUEST[ $report_action ] ) ) {
-				$number  = absint( $_REQUEST[ $report_action ] );
-				$message = sprintf( _n( 'Donation status changed.', '%s donation statuses changed.', $number, 'charitable' ), number_format_i18n( $number ) );
-				echo '<div class="updated"><p>' . $message . '</p></div>';
+			if ( ! empty( $_REQUEST[ $report_action ] ) ) { // phpcs:ignore
+				$number  = absint( $_REQUEST[ $report_action ] ); // phpcs:ignore
+				// translators: %s is the number of orders.
+				$message = sprintf( _n( '%s donation status changed.', '%s donation statuses changed.', $number, 'charitable' ), number_format_i18n( $number ) );
+				echo '<div class="updated"><p>' . esc_html( $message ) . '</p></div>';
 			}
 		}
 
@@ -549,23 +557,29 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 
 			$messages[ Charitable::DONATION_POST_TYPE ] = array(
 				0  => '', // Unused. Messages start at index 1.
+				// translators: %s: the URL.
 				1  => sprintf( __( 'Donation updated. <a href="%s">View Donation</a>', 'charitable' ), esc_url( get_permalink( $post_ID ) ) ),
 				2  => __( 'Custom field updated.', 'charitable' ),
 				3  => __( 'Custom field deleted.', 'charitable' ),
 				4  => __( 'Donation updated.', 'charitable' ),
+				// translators: %s: post title.
 				5  => isset( $_GET['revision'] ) ? sprintf( __( 'Donation restored to revision from %s', 'charitable' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+				// translators: %s: the URL.
 				6  => sprintf( __( 'Donation published. <a href="%s">View Donation</a>', 'charitable' ), esc_url( get_permalink( $post_ID ) ) ),
 				7  => __( 'Donation saved.', 'charitable' ),
 				8  => sprintf(
+					// translators: %s: the URL.
 					__( 'Donation submitted. <a target="_blank" href="%s">Preview Donation</a>', 'charitable' ),
 					esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) )
 				),
 				9  => sprintf(
+					// translators: %1$s is the date, %2$s is the preview link.
 					__( 'Donation scheduled for: <strong>%1$s</strong>. <a target="_blank" href="%2$s">Preview Donation</a>', 'charitable' ),
 					date_i18n( 'M j, Y @ G:i', strtotime( $post->post_date ) ),
 					esc_url( get_permalink( $post_ID ) )
 				),
 				10 => sprintf(
+					// translators: %s is the preview link.
 					__( 'Donation draft updated. <a target="_blank" href="%s">Preview Donation</a>', 'charitable' ),
 					esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) )
 				),
@@ -587,11 +601,16 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 		 */
 		public function bulk_messages( $bulk_messages, $bulk_counts ) {
 			$bulk_messages[ Charitable::DONATION_POST_TYPE ] = array(
+				// translators: %d: number of items.
 				'updated'   => _n( '%d donation updated.', '%d donations updated.', $bulk_counts['updated'], 'charitable' ),
-				'locked'    => ( 1 == $bulk_counts['locked'] ) ? __( '1 donation not updated, somebody is editing it.' ) :
+				'locked'    => ( 1 == $bulk_counts['locked'] ) ? __( '1 donation not updated, somebody is editing it.', 'charitable' ) :
+									// translators: %d: number of items.
 									_n( '%s donation not updated, somebody is editing it.', '%s donations not updated, somebody is editing them.', $bulk_counts['locked'], 'charitable' ),
+				// translators: %s: number of items.
 				'deleted'   => _n( '%s donation permanently deleted.', '%s donations permanently deleted.', $bulk_counts['deleted'], 'charitable' ),
+				// translators: %s: number of items.
 				'trashed'   => _n( '%s donation moved to the Trash.', '%s donations moved to the Trash.', $bulk_counts['trashed'], 'charitable' ),
+				// translators: %s: number of items.
 				'untrashed' => _n( '%s donation restored from the Trash.', '%s donations restored from the Trash.', $bulk_counts['untrashed'], 'charitable' ),
 			);
 
@@ -603,7 +622,7 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 		 *
 		 * @since  1.5.0
 		 *
-		 * @param  mixed  $public_query_vars Public query vars. Unused.
+		 * @param  mixed  $disable           Whether to disable the dropdown.
 		 * @param  string $post_type         The current post type.
 		 * @return boolean
 		 */
