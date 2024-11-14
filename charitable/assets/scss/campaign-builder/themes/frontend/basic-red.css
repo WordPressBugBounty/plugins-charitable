@@ -1,7 +1,7 @@
 .charitable-campaign-field_social-sharing {
   max-width: 100%;
 }
-.charitable-campaign-field_social-sharing ul.chartiable-campaign-social-networks {
+.charitable-campaign-field_social-sharing ul.charitable-campaign-social-networks {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -9,7 +9,7 @@
   padding: 0;
   margin: 20px auto;
 }
-.charitable-campaign-field_social-sharing ul.chartiable-campaign-social-networks li.chartiable-campaign-social-network {
+.charitable-campaign-field_social-sharing ul.charitable-campaign-social-networks li.charitable-campaign-social-network {
   display: flex;
   flex: 4;
   margin: 0;
@@ -18,26 +18,26 @@
   font-size: 16px;
   line-height: 21px;
 }
-.charitable-campaign-field_social-sharing ul.chartiable-campaign-social-networks li.chartiable-campaign-social-network img {
+.charitable-campaign-field_social-sharing ul.charitable-campaign-social-networks li.charitable-campaign-social-network img {
   max-width: 100%;
   max-height: 30px;
   min-height: 30px;
   margin: 0 auto;
   display: block;
 }
-.charitable-campaign-field_social-sharing ul.chartiable-campaign-social-networks li.chartiable-campaign-social-network p {
+.charitable-campaign-field_social-sharing ul.charitable-campaign-social-networks li.charitable-campaign-social-network p {
   display: none;
 }
-.charitable-campaign-field_social-sharing ul.chartiable-campaign-social-networks li.chartiable-campaign-social-network a {
+.charitable-campaign-field_social-sharing ul.charitable-campaign-social-networks li.charitable-campaign-social-network a {
   text-decoration: none;
   color: black;
   display: block;
   margin: 0 auto;
 }
-.charitable-campaign-field_social-sharing ul.chartiable-campaign-social-networks li.chartiable-campaign-social-network a:hover {
+.charitable-campaign-field_social-sharing ul.charitable-campaign-social-networks li.charitable-campaign-social-network a:hover {
   text-decoration: underline;
 }
-.charitable-campaign-field_social-sharing ul.chartiable-campaign-social-networks li.chartiable-campaign-social-network a:hover img, .charitable-campaign-field_social-sharing ul.chartiable-campaign-social-networks li.chartiable-campaign-social-network a:hover p {
+.charitable-campaign-field_social-sharing ul.charitable-campaign-social-networks li.charitable-campaign-social-network a:hover img, .charitable-campaign-field_social-sharing ul.charitable-campaign-social-networks li.charitable-campaign-social-network a:hover p {
   opacity: 0.5;
 }
 
@@ -182,12 +182,12 @@
   margin-right: 0;
 }
 
-.chartiable-campaign-builder-field-no-preview {
+.charitable-campaign-builder-field-no-preview {
   font-size: 14px;
   border: 1px solid #ccc;
   font-style: italic;
 }
-.chartiable-campaign-builder-field-no-preview p {
+.charitable-campaign-builder-field-no-preview p {
   opacity: 0.65;
   margin: 5px;
   padding: 10px;
@@ -298,8 +298,8 @@
   margin-bottom: 25px;
 }
 .charitable-campaign-wrap.template-basic .charitable-campaign-container .charitable-campaign-field.charitable-campaign-field_social-sharing ul.charitable-campaign-social-links,
-.charitable-campaign-wrap.template-basic .charitable-campaign-container .charitable-campaign-field.charitable-campaign-field_social-sharing ul.chartiable-campaign-social-networks, .charitable-campaign-wrap.template-basic .charitable-campaign-container .charitable-campaign-field.charitable-campaign-field_social-links ul.charitable-campaign-social-links,
-.charitable-campaign-wrap.template-basic .charitable-campaign-container .charitable-campaign-field.charitable-campaign-field_social-links ul.chartiable-campaign-social-networks {
+.charitable-campaign-wrap.template-basic .charitable-campaign-container .charitable-campaign-field.charitable-campaign-field_social-sharing ul.charitable-campaign-social-networks, .charitable-campaign-wrap.template-basic .charitable-campaign-container .charitable-campaign-field.charitable-campaign-field_social-links ul.charitable-campaign-social-links,
+.charitable-campaign-wrap.template-basic .charitable-campaign-container .charitable-campaign-field.charitable-campaign-field_social-links ul.charitable-campaign-social-networks {
   margin-top: 0;
   margin-bottom: 0;
 }

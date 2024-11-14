@@ -121,10 +121,11 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor_Checkout' ) ) :
 		public function get_line_items() {
 			return array_values(
 				array_map(
-					function( $campaign_donation ) {
+					function ( $campaign_donation ) {
 						$item = $campaign_donation->campaign_name;
 
 						if ( empty( $item ) ) {
+							// translators: %d is the campaign ID.
 							$item = sprintf( __( 'Donation to campaign %d', 'charitable' ), $campaign_donation->campaign_id );
 						}
 
@@ -152,7 +153,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor_Checkout' ) ) :
 				'metadata' => $this->get_charge_metadata(),
 				'items'    => array_values(
 					array_map(
-						function( $campaign_donation ) {
+						function ( $campaign_donation ) {
 							$plan    = new Charitable_Stripe_Plan( $campaign_donation->campaign_id, [ 'processor' => $this->processor ], $this->options );
 							$plan_id = $plan->get_plan( true );
 

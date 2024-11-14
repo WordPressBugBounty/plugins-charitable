@@ -154,18 +154,21 @@ if ( ! class_exists( 'Charitable_Field_Donate_Button' ) ) :
 						data-campaign-id="<?php echo intval( $campaign->ID ); ?>"
 						class="<?php echo esc_attr( charitable_get_button_class( 'donate' ) ); ?>"
 						href="<?php echo esc_url( charitable_get_permalink( 'campaign_donation_page', array( 'campaign_id' => $campaign->ID ) ) ); ?>"
-						aria-label="<?php esc_attr_e( sprintf( _x( 'Make a donation to %s', 'make a donation to campaign', 'charitable' ), get_the_title( $campaign->ID ) ) ); ?>">
+						<?php // translators: %s is the campaign title. ?>
+						aria-label="<?php echo esc_attr( sprintf( _x( 'Make a donation to %s', 'make a donation to campaign', 'charitable' ), get_the_title( $campaign->ID ) ) ); ?>">
 						<?php echo wp_strip_all_tags( $button_label ); ?>
 					</a>
 				</div>
 
 
-			<?php } elseif ( 'same_page' === $donation_form_display ) {
+				<?php
+			} elseif ( 'same_page' === $donation_form_display ) {
 
 				?>
 
 				<a class="<?php echo esc_attr( charitable_get_button_class( 'donate' ) ); ?>"
 					href="#charitable-donation-form"
+					<?php // translators: %s is the campaign title. ?>
 					aria-label="<?php echo esc_attr( sprintf( _x( 'Make a donation to %s', 'make a donation to campaign', 'charitable' ), get_the_title( $campaign->ID ) ) ); ?>"
 				>
 					<?php echo wp_strip_all_tags( $button_label ); ?>
@@ -177,7 +180,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Button' ) ) :
 				<form class="campaign-donation" method="post">
 					<?php wp_nonce_field( 'charitable-donate', 'charitable-donate-now' ); ?>
 					<input type="hidden" name="charitable_action" value="start_donation" />
-					<input type="hidden" name="campaign_id" value="<?php echo $campaign->ID; ?>" />
+					<input type="hidden" name="campaign_id" value="<?php echo esc_html( $campaign->ID ); ?>" />
 					<input type="hidden" name="charitable_donation_amount" value="<?php $donation_amount; ?>" />
 					<input type="hidden" name="charitable_builder" value="true" />
 					<button type="submit" name="charitable_submit" class="<?php echo esc_attr( charitable_get_button_class( 'donate' ) ); ?>"><?php echo wp_strip_all_tags( $button_label ); ?></button>
@@ -195,7 +198,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Button' ) ) :
 
 			$html = $this->field_display_wrapper( $html, $field_data );
 
-			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data );
+			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data ); // phpcs:ignore
 		}
 
 		/**
@@ -203,7 +206,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Button' ) ) :
 		 *
 		 * @since 1.8.0
 		 *
-		 * @param array $field          Social Sharing settings.
+		 * @param array $field_id       Field ID.
 		 * @param array $campaign_data  Campaign data and settings.
 		 */
 		public function settings_display( $field_id = false, $campaign_data = false ) {

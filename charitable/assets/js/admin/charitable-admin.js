@@ -209,11 +209,11 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 					action 			    : 'charitable_license_check',
 					'license' 	        : $('input[name="license-key"]').val(), // 022effc6d03bdda601503a1dc13672fd
 					'nonce'			    : $('input[name="_wpnonce"]').val(),
-					'chartiable_action' : $(this).data('action'),
+					'charitable_action' : $(this).data('action'),
 				};
 
 
-			if ( data.chartiable_action === 'verify' ) {
+			if ( data.charitable_action === 'verify' ) {
 				$(this).html('Verifying...');
 			} else {
 				$(this).html('Deactivating...');
@@ -249,7 +249,7 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 									window.location.href = charitable_admin.admin_url + 'admin.php?page=charitable-settings&tab=general&valid=invalid&license_limit=true';
 								} else if ( response.data.comm_success === false ) {
 									window.location.href = charitable_admin.admin_url + 'admin.php?page=charitable-settings&tab=general&valid=invalid&comm_success=false';
-								} else if ( data.chartiable_action === 'verify' ) {
+								} else if ( data.charitable_action === 'verify' ) {
 									window.location.href = charitable_admin.admin_url + 'admin.php?page=charitable-settings&tab=general&valid=invalid';
 								} else {
 									window.location.href = charitable_admin.admin_url + 'admin.php?page=charitable-settings&tab=general&valid=success';

@@ -461,6 +461,7 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 				$minutes_remaining = ceil( $seconds_left / 60 );
 				$time_left         = apply_filters(
 					'charitabile_campaign_minutes_left',
+					// translators: %s is the number of minutes left.
 					sprintf( _n( '%s Minute Left', '%s Minutes Left', $minutes_remaining, 'charitable' ), '<span class="amount time-left minutes-left">' . $minutes_remaining . '</span>' ),
 					$this
 				);
@@ -472,6 +473,7 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 				$hours_remaining = floor( $seconds_left / 3600 );
 				$time_left       = apply_filters(
 					'charitabile_campaign_hours_left',
+					// translators: %s is the number of hours left.
 					sprintf( _n( '%s Hour Left', '%s Hours Left', $hours_remaining, 'charitable' ), '<span class="amount time-left hours-left">' . $hours_remaining . '</span>' ),
 					$this
 				);
@@ -483,6 +485,7 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 				$days_remaining = floor( $seconds_left / 86400 );
 				$time_left      = apply_filters(
 					'charitabile_campaign_days_left',
+					// translators: %s is the number of days left.
 					sprintf( _n( '%s Day Left', '%s Days Left', $days_remaining, 'charitable' ), '<span class="amount time-left days-left">' . $days_remaining . '</span>' ),
 					$this
 				);
@@ -537,10 +540,13 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 			}
 
 			if ( ! $this->has_goal() ) {
+				// translators: %s is the time since the campaign ended.
 				$message = __( 'This campaign ended %s ago', 'charitable' );
 			} elseif ( $this->has_achieved_goal() ) {
+				// translators: %s is the time since the campaign ended.
 				$message = __( 'This campaign successfully reached its funding goal and ended %s ago', 'charitable' );
 			} else {
+				// translators: %s is the time since the campaign ended.
 				$message = __( 'This campaign failed to reach its funding goal %s ago', 'charitable' );
 			}
 
@@ -938,12 +944,14 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 
 			if ( $goal ) {
 				$ret = sprintf(
+					// translators: %1$s is the amount donated, %2$s is the goal amount.
 					_x( '%1$s donated of %2$s goal', 'amount donated of goal', 'charitable' ),
 					'<span class="amount">' . $currency_helper->get_monetary_amount( $amount ) . '</span>',
 					'<span class="goal-amount">' . $currency_helper->get_monetary_amount( $goal ) . '</span>'
 				);
 			} else {
 				$ret = sprintf(
+					// translators: %s is the amount donated.
 					_x( '%s donated', 'amount donated', 'charitable' ),
 					'<span class="amount">' . $currency_helper->get_monetary_amount( $amount ) . '</span>'
 				);
@@ -977,6 +985,7 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 			$goal            = $this->get_meta( '_campaign_goal' );
 
 			$ret = sprintf(
+				// translators: %s is the amount donated.
 				_x( '%s donated', 'amount donated', 'charitable' ),
 				'<span class="amount">' . $currency_helper->get_monetary_amount( $amount ) . '</span>'
 			);

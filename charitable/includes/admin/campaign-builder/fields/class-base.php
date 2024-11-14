@@ -599,7 +599,7 @@ if ( ! class_exists( 'Charitable_Builder_Field' ) ) :
 
 			$field_label = ucwords( str_replace( '-', ' ', $field_type ) );
 
-			$html = '<div class="chartiable-campaign-builder-field-no-preview">';
+			$html = '<div class="charitable-campaign-builder-field-no-preview">';
 			/* translators: %s is the field label */
 			$html .= '<p>' . sprintf( esc_html__( 'The %s field cannot be rendered in preview mode.', 'charitable' ), $field_label ) . '</p></div>';
 

@@ -396,8 +396,8 @@ line-height: 50px;
 <?php echo $wrapper; ?> .charitable-field-charitable-videos .charitable-missing-addon-content h2 {
     line-height: 32px;
 }
-<?php echo $wrapper; ?> .charitable-field-video .chartiable-missing-addon-bg,
-<?php echo $wrapper; ?> .charitable-field-charitable-videos .chartiable-missing-addon-bg {
+<?php echo $wrapper; ?> .charitable-field-video .charitable-missing-addon-bg,
+<?php echo $wrapper; ?> .charitable-field-charitable-videos .charitable-missing-addon-bg {
     background-size: cover;
 }
 

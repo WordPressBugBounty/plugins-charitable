@@ -421,7 +421,7 @@ class Charitable_Builder_Form_Fields {
 		foreach ( $params['options'] as $text => $box_id ) {
 
 			$checked = ( empty( $value ) && ! empty( $defaults ) && in_array( $box_id, $params['defaults'] ) )
-					   || ( $value !== false && key_exists( $box_id, $value ) && $value[ $box_id ] !== false ) ? 'checked="checked"' : false;
+						|| ( $value !== false && key_exists( $box_id, $value ) && $value[ $box_id ] !== false ) ? 'checked="checked"' : false;
 
 			$html .= '<p ' . $field_id_attr . '><input id="' . $params['name'] . '-' . $box_id . '" type="checkbox" ' . $checked . ' name="' . $params['name'] . '[' . $box_id . ']" value="1" /><label for="' . $params['name'] . '-' . $box_id . '">' . $text . '</label></p>';
 
@@ -1084,7 +1084,7 @@ class Charitable_Builder_Form_Fields {
 		$field_id_attr            .= isset( $toggle_value ) && '' !== $toggle_value ? ' data-ajax-label="' . $toggle_value . '"' : false;
 		$selected_value            = isset( $params['selected_value'] ) ? esc_html( $params['selected_value'] ) : $value;
 		$default_value             = isset( $params['default'] ) && false !== $params['default'] ? esc_html( $params['default'] ) : false;
-		$tooltip_html              = ( isset( $params['tooltip'] ) && false !== $params['tooltip'] ) ? $this->get_tooltip_html( $params['tooltip'] ) : false;
+		$tooltip_html              = ( isset( $params['tooltip'] ) && false !== $params['tooltip'] ) ? $this->get_tooltip_html( wp_strip_all_tags( $params['tooltip'] ) ) : false;
 		$params['container_class'] = $this->maybe_add_visibility_classes( $params['class'], $params['visibility'] );
 
 		$css_classes     = explode( ' ', $params['class'] );
@@ -1260,7 +1260,7 @@ class Charitable_Builder_Form_Fields {
 			)
 		);
 
-		$tooltip_html = ( isset( $params['tooltip'] ) && false !== $params['tooltip'] ) ? $this->get_tooltip_html( $params['tooltip'] ) : false;
+		$tooltip_html = ( isset( $params['tooltip'] ) && false !== $params['tooltip'] ) ? $this->get_tooltip_html( wp_strip_all_tags( $params['tooltip'] ) ) : false;
 
 		$html = '<div id="' . $this->id_slug . '-' . $params['id'] . '-wrap" class="charitable-panel-field charitable-panel-field-categories">
 				 <label for="' . $this->id_slug . '-' . $params['id'] . '">' . $label . ' ' . $tooltip_html . '</label>';
@@ -1483,7 +1483,7 @@ class Charitable_Builder_Form_Fields {
                     <td class="description-col"><input type="text" class="campaign_suggested_donations" name="' . $name . '[0][description]" value="" placeholder="Optional Description">
                     </td>
 
-                    <td class="remove-col"><span class="dashicons-before dashicons-dismiss charitable-delete-row" data-chartiable-delete-row="' . $params['data_delete_row'] . '"></span></td>
+                    <td class="remove-col"><span class="dashicons-before dashicons-dismiss charitable-delete-row" data-charitable-delete-row="' . $params['data_delete_row'] . '"></span></td>
             </tr>';
 
 		if ( false === $value ) { // used to have || $index === 0.

@@ -2319,10 +2319,10 @@ body.charitable_page_charitable-reports .charitable-section-grid.one-third {
   display: flex;
   flex-direction: row;
 }
-body.charitable_page_charitable-reports .charitable-section-grid.chartiable-section-grid-column-flexible {
+body.charitable_page_charitable-reports .charitable-section-grid.charitable-section-grid-column-flexible {
   align-items: flex-start;
 }
-body.charitable_page_charitable-reports .charitable-section-grid.chartiable-section-grid-column-single {
+body.charitable_page_charitable-reports .charitable-section-grid.charitable-section-grid-column-single {
   columns: 1;
   column-gap: none;
   display: block;
@@ -3099,10 +3099,10 @@ body.charitable_page_charitable-dashboard .charitable-section-grid.one-third {
   display: flex;
   flex-direction: row;
 }
-body.charitable_page_charitable-dashboard .charitable-section-grid.chartiable-section-grid-column-flexible {
+body.charitable_page_charitable-dashboard .charitable-section-grid.charitable-section-grid-column-flexible {
   align-items: flex-start;
 }
-body.charitable_page_charitable-dashboard .charitable-section-grid.chartiable-section-grid-column-single {
+body.charitable_page_charitable-dashboard .charitable-section-grid.charitable-section-grid-column-single {
   columns: 1;
   column-gap: none;
   display: block;

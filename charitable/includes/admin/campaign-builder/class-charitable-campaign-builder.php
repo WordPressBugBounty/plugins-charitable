@@ -782,6 +782,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 							esc_html__( 'Already purchased?', 'charitable' )
 						),
 						'type'         => 'pro-upgrade',
+						// translators: %1$s - plan name, %2$s - addon name.
 						'button'       => esc_html( sprintf( __( 'Upgrade to %1$s And Unlock %2$s', 'charitable' ), '%plan%', '%name%' ) ),
 						'url'          => charitable_admin_upgrade_link( 'Action+Link+Campaign+Builder+Modal' ),
 						'url_template' => false,
@@ -798,6 +799,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 							esc_html__( 'Already purchased?', 'charitable' )
 						),
 						'type'         => 'pro-upgrade',
+						// translators: %1$s - plan name, %2$s - addon name.
 						'button'       => esc_html( sprintf( __( 'Upgrade to %1$s And Unlock %2$s', 'charitable' ), '%plan%', '%name%' ) ),
 						'url'          => charitable_admin_upgrade_link( 'Action+Link+Campaign+Builder+Modal' ),
 						'url_template' => false,
@@ -814,6 +816,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 							esc_html__( 'Already purchased?', 'charitable' )
 						),
 						'type'         => 'pro-upgrade',
+						// translators: %1$s - plan name, %2$s - addon name.
 						'button'       => esc_html( sprintf( __( 'Upgrade to %1$s And Unlock %2$s', 'charitable' ), '%plan%', '%name%' ) ),
 						'url'          => charitable_admin_upgrade_link( 'Action+Link+Campaign+Builder+Modal' ),
 						'url_template' => false,
@@ -829,6 +832,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 							esc_html__( 'Already purchased?', 'charitable' )
 						),
 						'type'         => 'pro-upgrade',
+						// translators: %1$s - plan name, %2$s - addon name.
 						'button'       => esc_html( sprintf( __( 'Upgrade to %1$s And Unlock %2$s', 'charitable' ), '%plan%', '%name%' ) ),
 						'url'          => charitable_admin_upgrade_link( 'Action+Link+Campaign+Builder+Modal' ),
 						'url_template' => false,
@@ -1006,6 +1010,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 					'step_13_title'     => esc_html__( 'We hope you enjoyed the tour!', 'charitable' ),
 					'step_13_text'      => sprintf(
 						'<p>%1$s</p>',
+						// translators: %s - getting started guide link.
 						sprintf( __( 'Remember that you can view our <a href="%1$s" target="_blank">getting started guide</a>, read our <a href="%2$s" target="_blank">documentation</a>, or <a href="%3$s" target="_blank">reach out to us</a> for support if you have any questions.', 'charitable' ), 'https://wpcharitable.com/getting-started', 'https://wpcharitable.com/documentation', 'https://wpcharitable.com/support' )
 					),
 				);
@@ -1016,7 +1021,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 			// phpcs:disable WordPress.Security.NonceVerification.Recommended
 			if ( ! empty( $_GET['campaign_id'] ) ) {
 				$campaign_id            = (int) $_GET['campaign_id'];
-				$strings['preview_url'] = false; // esc_url( add_query_arg( 'new_window', 1, charitable_get_form_preview_url( $campaign_id ) ) );
+				$strings['preview_url'] = false;
 				$strings['entries_url'] = esc_url( admin_url( 'admin.php?page=charitable-entries&view=list&campaign_id=' . $campaign_id ) );
 			}
 			// phpcs:enable
@@ -1240,8 +1245,8 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				return;
 			}
 
-			if ( ! $this->campaign_data && intval( $_GET['campaign_id'] ) > 0 ) {
-				$this->campaign_data = $this->get_campaign_settings( intval( $_GET['campaign_id'] ) );
+			if ( ! $this->campaign_data && intval( $_GET['campaign_id'] ) > 0 ) { // phpcs:ignore
+				$this->campaign_data = $this->get_campaign_settings( intval( $_GET['campaign_id'] ) ); // phpcs:ignore
 			}
 
 			$builder_template      = new Charitable_Campaign_Builder_Templates();
@@ -1362,7 +1367,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 
 							<span class="charitable-edit-campaign-title-area">
 								<input id="charitable_settings_title" name="title" placeholder="<?php echo esc_html__( 'Enter Your Campaign Name Here...', 'charitable' ); ?>" class="charitable-center-form-name charitable-form-name" value="<?php echo esc_html( isset( $this->campaign_data['title'] ) ? $this->campaign_data['title'] : '' ); ?>" />
-								<!--<a href="#" class="charitable-title-edit" title="<?php echo esc_html__( 'Edit Campaign Title', 'charitable' ); ?>"><img class="chartiable-edit-campaign-title-icon" width="18" height="18" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/edit.png'; ?>" /></a>-->
+								<!--<a href="#" class="charitable-title-edit" title="<?php echo esc_html__( 'Edit Campaign Title', 'charitable' ); ?>"><img class="charitable-edit-campaign-title-icon" width="18" height="18" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/edit.png'; ?>" /></a>-->
 
 							</span>
 

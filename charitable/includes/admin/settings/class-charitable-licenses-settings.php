@@ -169,7 +169,7 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 				return true;
 			}
 
-			$expire_date  = $this->get_license_expire_date( 'timestamp' );
+			$expire_date = $this->get_license_expire_date( 'timestamp' );
 
 			if ( false === $expire_date ) {
 				return false;
@@ -222,6 +222,142 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 		}
 
 		/**
+		 * If a license has expired, do a license request (to make sure we have the most updated informatino, especially when it comes to license renewals).
+		 *
+		 * @since 1.8.3.2
+		 *
+		 * @return void
+		 */
+		public function maybe_check_if_license_expired() {
+
+			// We need to be on the settings general page, otherwise bail.
+			if ( ! charitable_is_settings_view( 'general' ) ) {
+				return;
+			}
+
+			// Determine if the license is expired.
+			if ( ! $this->is_license_expired() ) {
+				return;
+			}
+
+			// Determine when (if ever) we last checked.
+
+			$settings         = get_option( 'charitable_settings' );
+			$license_settings = $settings['licenses'];
+
+			if ( false === $license_settings || false === $license_settings['charitable-v2'] || ! isset( $license_settings['checked'] ) || time() > $license_settings['checked'] ) {
+				/*
+				* Check and see if this check recently happened.
+				* If it has within the last day (and the license is still expired) then try again for a while.
+				*/
+
+				if ( ! empty( $license_settings['charitable-v2']['license'] ) ) :
+
+					$license_data = charitable_get_helper( 'licenses' )->verify_license( 'charitable', esc_html( $license_settings['charitable-v2']['license'] ), true, false );
+
+					// if the license "keys" don't match, abort.
+					if ( empty( $license_data ) || ! isset( $license_data['license'] ) || $license_data['license'] !== $license_settings['charitable-v2']['license'] ) { // phpcs:ignore
+						// do nothing.
+					} else {
+						// Check the expiration_date in the license data - if it's not the same as the current expiration date, update it.
+						if ( isset( $license_data['expiration_date'] ) && $license_data['expiration_date'] !== $license_settings['charitable-v2']['expiration_date'] ) {
+							$license_settings['charitable-v2']['expiration_date'] = $license_data['expiration_date'];
+						}
+					}
+
+				endif;
+
+				// We've done the check, so update the updated time for one day in the future.
+				$license_settings['checked'] = strtotime( '+1 day' );
+				$settings['licenses']        = $license_settings;
+
+				global $wpdb;
+				// manually update the 'charitable_settings' option.
+				$wpdb->update( // phpcs:ignore
+					$wpdb->options,
+					array(
+						'option_value' => maybe_serialize( $settings ),
+					),
+					array(
+						'option_name' => 'charitable_settings',
+					)
+				);
+
+				// redirect to the settings page.
+				wp_safe_redirect( admin_url( 'admin.php?page=charitable-settings' ) );
+				exit;
+			}
+		}
+
+		/**
+		 * If a license has expired, do a license request (to make sure we have the most updated informatino, especially when it comes to license renewals).
+		 *
+		 * @since 1.8.3.2
+		 *
+		 * @return void
+		 */
+		public function maybe_check_if_license_expiring() {
+
+			// We need to be on the settings general page, otherwise bail.
+			if ( ! charitable_is_settings_view( 'general' ) ) {
+				return;
+			}
+
+			// Determine if the license is expired.
+			if ( ! $this->is_license_expiring() ) {
+				return;
+			}
+
+			// Determine when (if ever) we last checked.
+
+			$settings         = get_option( 'charitable_settings' );
+			$license_settings = $settings['licenses'];
+
+			if ( false === $license_settings || false === $license_settings['charitable-v2'] || ! isset( $license_settings['checked'] ) || time() > $license_settings['checked'] ) {
+				/*
+				* Check and see if this check recently happened.
+				* If it has within the last day (and the license is still expired) then try again for a while.
+				*/
+
+				if ( ! empty( $license_settings['charitable-v2']['license'] ) ) :
+
+					$license_data = charitable_get_helper( 'licenses' )->verify_license( 'charitable', esc_html( $license_settings['charitable-v2']['license'] ), true, false );
+
+					// if the license "keys" don't match, abort.
+					if ( empty( $license_data ) || ! isset( $license_data['license'] ) || $license_data['license'] !== $license_settings['charitable-v2']['license'] ) { // phpcs:ignore
+						// do nothing.
+					} else {
+						// Check the expiration_date in the license data - if it's not the same as the current expiration date, update it.
+						if ( isset( $license_data['expiration_date'] ) && $license_data['expiration_date'] !== $license_settings['charitable-v2']['expiration_date'] ) {
+							$license_settings['charitable-v2']['expiration_date'] = $license_data['expiration_date'];
+						}
+					}
+
+				endif;
+
+				// We've done the check, so update the updated time for one day in the future.
+				$license_settings['checked'] = strtotime( '+1 day' );
+				$settings['licenses']        = $license_settings;
+
+				global $wpdb;
+				// manually update the 'charitable_settings' option.
+				$wpdb->update( // phpcs:ignore
+					$wpdb->options,
+					array(
+						'option_value' => maybe_serialize( $settings ),
+					),
+					array(
+						'option_name' => 'charitable_settings',
+					)
+				);
+
+				// redirect to the settings page.
+				wp_safe_redirect( admin_url( 'admin.php?page=charitable-settings' ) );
+				exit;
+			}
+		}
+
+		/**
 		 * Get the expire data of a current license (checks for "is_pro" happen before this function).
 		 *
 		 * @since   1.8.1.12
@@ -232,6 +368,15 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 		 * @return  mixed[]
 		 */
 		public function get_license_expire_date( $timestamp = false ) {
+
+			// $settings = get_option( 'charitable_settings' );
+			// $expire_date =  $settings['licenses']['charitable-v2']['expiration_date']; // format is 2025-07-08 23:59:59
+			// // add a year.
+			// $expire_date = strtotime( $expire_date );
+			// $expire_date = strtotime( '-1 year', $expire_date );
+			// // save back into settings with the new date but with the format.
+			// // print_r( $settings ); exit;
+			// $settings['licenses']['charitable-v2']['expiration_date'] = date( 'Y-m-d H:i:s', $expire_date );
 
 			$settings = get_option( 'charitable_settings' );
 
@@ -396,7 +541,7 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 		 * @param   array   $license_data Available license information.
 		 * @return  string
 		 */
-		public function get_unlicensed_message( $valid = false, $license_data = false ) {
+		public function get_unlicensed_message( $valid = false, $license_data = false, $error = true ) {
 
 			$output  = '<p>' . esc_html__( 'You\'re using ', 'charitable' );
 			$output .= '<strong>Charitable Lite</strong>';
@@ -476,7 +621,7 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 				if ( $license_expires ) :
 					if ( 'lifetime' === $license_expires ) :
 						$output .= esc_html__( '. You have a lifetime license', 'charitable' );
-					else:
+					else :
 						$output .= esc_html__( '. Your license expires on ', 'charitable' );
 						$output .= gmdate( 'M d, Y', strtotime( $license_expires ) );
 					endif;
@@ -502,6 +647,7 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 						'https://wpcharitable.com/documentation/expired-expiring-license'
 					) . '</p>';
 				} elseif ( $this->is_license_expired() ) {
+
 					$output .= '<p style="color:red;">' . sprintf(
 						wp_kses(
 							/* translators: %s - charitable.com upgrade URL. */
@@ -580,6 +726,7 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 		 * Outputs a message for unlicnensed users for the general settings tab.
 		 *
 		 * @since   1.7.0.4
+		 * @version 1.8.3.2 remove upsell message.
 		 * @return  string
 		 */
 		public function get_legacy_licensed_message() {
@@ -604,49 +751,6 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 					esc_url( admin_url( 'admin.php?page=charitable-settings&tab=advanced' ) )
 				) .
 				'</p>';
-
-			// display a potential upsell.
-			$licenses = array_filter( charitable_get_helper( 'licenses' )->get_licenses(), 'is_array' );
-			// remove the two charitable 'keys' so we can see if anything licensed is left (say for example someone only has recurring donations licensed/activated ).
-			if ( isset( $licenses['charitable'] ) ) {
-				unset( $licenses['charitable'] );
-			}
-			if ( isset( $licenses['charitable-v2'] ) ) {
-				unset( $licenses['charitable-v2'] );
-			}
-			// todo: perhaps a better/more effective check for this.
-			if ( count( $licenses ) > 0 ) {
-				$output .=
-				'<p>' .
-				sprintf(
-					wp_kses(
-						/* translators: %s - charitable.com upgrade URL. */
-						__( 'To unlock more features consider <strong><a href="%s" target="_blank" rel="noopener noreferrer" class="charitable-upgrade-modal">upgrading to PRO</a></strong>.', 'charitable' ),
-						[
-							'a'      => [
-								'href'   => [],
-								'class'  => [],
-								'target' => [],
-								'rel'    => [],
-							],
-							'strong' => [],
-						]
-					),
-					esc_url( charitable_pro_upgrade_url( 'settings-upgrade' ) )
-				) .
-				'</p>';
-				$output .=
-				'<p class="discount-note">' .
-					wp_kses(
-						__( 'As a valued Charitable user, you receive up to <strong>$300 off</strong>, automatically applied at checkout!', 'charitable' ),
-						[
-							'strong' => [],
-							'br'     => [],
-						]
-					) .
-				'</p>';
-
-			}
 
 			return $output;
 		}

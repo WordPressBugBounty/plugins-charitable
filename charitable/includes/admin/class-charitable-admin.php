@@ -489,7 +489,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 			wp_register_style(
 				'select2-css',
-				$assets_dir . 'css/libraries/select2' . $min . '.css',
+				$assets_dir . 'css/libraries/select2.css',
 				array(),
 				'4.0.12'
 			);
@@ -857,7 +857,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		 * @return void
 		 */
 		public function dismiss_lite_cta() {
-			if ( ! isset( $_POST['chartiable_action'] ) ) { // phpcs:ignore.
+			if ( ! isset( $_POST['charitable_action'] ) ) { // phpcs:ignore.
 				wp_send_json_error();
 			}
 
@@ -878,7 +878,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		 * @return void
 		 */
 		public function dismiss_lite_reports_cta() {
-			if ( ! isset( $_POST['chartiable_action'] ) ) { // phpcs:ignore.
+			if ( ! isset( $_POST['charitable_action'] ) ) { // phpcs:ignore.
 				wp_send_json_error();
 			}
 
@@ -1163,7 +1163,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		public function campaign_link( $link, $post_id, $context ) { // phpcs:ignore
 
 			if ( ! function_exists( 'get_current_screen' ) ) {
-				return false;
+				return $link;
 			}
 
 			$screen  = get_current_screen();

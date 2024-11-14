@@ -86,6 +86,7 @@ class Charitable_Extension_Activation {
 			$link = '<a href="' . $url . '">' . __( 'install it', 'charitable' ) . '</a>';
 		}
 
-		echo '<div class="error"><p>' . $this->plugin_name . sprintf( __( ' requires Charitable! Please %s to continue!', 'charitable' ), $link ) . '</p></div>';
+		// translators: %s is a link to the Charitable plugin.
+		echo '<div class="error"><p>' . esc_html( $this->plugin_name ) . sprintf( __( ' requires Charitable! Please %s to continue!', 'charitable' ), $link ) . '</p></div>';
 	}
 }

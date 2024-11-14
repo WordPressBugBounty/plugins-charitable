@@ -91,12 +91,14 @@ if ( ! class_exists( 'Charitable_Deprecated' ) ) :
 			}
 
 			if ( ! is_null( $extra_message ) ) {
+				// translators: 1: function name, 2: version number, 3: extra message, 4: plugin name.
 				$message = sprintf( __( '%1$s was called with an argument that is <strong>deprecated</strong> since version %2$s of %4$s! %3$s', 'charitable' ), $function, $version, $extra_message, $this->context );
 			} else {
+				// translators: 1: function name, 2: version number, 3: plugin name.
 				$message = sprintf( __( '%1$s was called with an argument that is <strong>deprecated</strong> since version %2$s of %3$s with no alternatives available.', 'charitable' ), $function, $version, $this->context );
 			}
 
-			trigger_error( $message );
+			trigger_error( $message ); // phpcs:ignore
 
 			return true;
 		}
@@ -117,12 +119,14 @@ if ( ! class_exists( 'Charitable_Deprecated' ) ) :
 			}
 
 			if ( ! is_null( $replacement ) ) {
+				// translators: 1: function name, 2: version number, 3: replacement function name, 4: plugin name.
 				$message = sprintf( __( '%1$s is <strong>deprecated</strong> since version %2$s of %4$s! Use %3$s instead.', 'charitable' ), $function, $version, $replacement, $this->context );
 			} else {
+				// translators: 1: function name, 2: version number, 3: plugin name.
 				$message = sprintf( __( '%1$s is <strong>deprecated</strong> since version %2$s of %3$s with no alternatives available.', 'charitable' ), $function, $version, $this->context );
 			}
 
-			trigger_error( $message );
+			trigger_error( $message ); // phpcs:ignore
 
 			return true;
 		}
@@ -142,11 +146,13 @@ if ( ! class_exists( 'Charitable_Deprecated' ) ) :
 				return false;
 			}
 
-			$version = is_null( $version ) ? '' : sprintf( __( '(This message was added in %s version %s.)', 'charitable' ), $this->context, $version );
+			// translators: 1: function name, 2: error message, 3: version number.
+			$version = is_null( $version ) ? '' : sprintf( __( '(This message was added in %1$s version %2$s.)', 'charitable' ), $this->context, $version );
 
+			// translators: 1: function name, 2: error message, 3: version number.
 			$message = sprintf( __( '%1$s was called <strong>incorrectly</strong>. %2$s %3$s', 'charitable' ), $function, $message, $version );
 
-			trigger_error( $message );
+			trigger_error( $message ); // phpcs:ignore
 
 			return true;
 		}

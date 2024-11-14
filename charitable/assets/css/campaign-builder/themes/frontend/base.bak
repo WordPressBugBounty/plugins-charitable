@@ -101,7 +101,7 @@
 .charitable-campaign-wrap.template-basic .charitable-campaign-field_social-sharing {
   background-color: black;
 }
-.charitable-campaign-wrap.template-basic .charitable-campaign-field_social-sharing ul.chartiable-campaign-social-networks li.chartiable-campaign-social-network {
+.charitable-campaign-wrap.template-basic .charitable-campaign-field_social-sharing ul.charitable-campaign-social-networks li.charitable-campaign-social-network {
   display: flex;
   flex-direction: column;
 }

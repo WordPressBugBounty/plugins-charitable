@@ -203,6 +203,11 @@ if ( ! class_exists( 'Charitable_Currency' ) ) :
 		 * @return string
 		 */
 		public function cast_to_decimal_format( $amount ) {
+
+			if ( is_wp_error( $amount ) ) {
+				return $amount;
+			}
+
 			if ( $this->is_comma_decimal() ) {
 				$amount = str_replace( ',', '.', $amount );
 			} else {

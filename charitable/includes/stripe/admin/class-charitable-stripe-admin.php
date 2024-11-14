@@ -184,24 +184,23 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 		 *
 		 * @since  1.3.0
 		 *
-		 * @param  array $values     The submitted values.
-		 * @param  array $new_values The new settings.
-		 * @param  array $old_values The previous settings.
-		 * @return array
+		 * @param  array $account_data The account data.
 		 */
 		public function update_webhook_upon_connection( $account_data ) {
 
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-				error_log( 'update_webhook_upon_connection 0');
-				error_log( print_r( charitable_stripe_should_setup_webhooks(), true ) );
-				error_log( print_r( charitable_using_stripe_connect(), true ) );
+			if ( function_exists( 'charitable_stripe_should_setup_webhooks' ) && charitable_stripe_should_setup_webhooks() ) {
+				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					error_log( 'update_webhook_upon_connection 0');
+					error_log( print_r( charitable_stripe_should_setup_webhooks(), true ) );
+					error_log( print_r( charitable_using_stripe_connect(), true ) );
+				}
 			}
 
 			// a reminder on the charitable_using_stripe_connect check:
 			// the option gets written when the stripe connect in the core plugin (starting in v1.7.0) is connected in gateway settings in the admin.
 			// the option is removed when, after the stripe connect is connected, the user clicks on the "disconnect" link is clicked in the settings.
 			if ( function_exists( 'charitable_stripe_should_setup_webhooks' ) && function_exists( 'charitable_using_stripe_connect' ) && charitable_stripe_should_setup_webhooks() && charitable_using_stripe_connect() ) {
-				// going to "simulate" a save settings so we can use re-use the setup_webhooks function
+				// going to "simulate" a save settings so we can use re-use the setup_webhooks function.
 				$values = $new_values = $old_values = get_option( 'charitable_settings', array() );
 
 				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
@@ -217,7 +216,7 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 					error_log( print_r( $values, true ) );
 				}
 
-				// update the settings
+				// update the settings.
 				update_option( 'charitable_settings', $values );
 
 			}

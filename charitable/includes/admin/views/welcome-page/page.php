@@ -109,13 +109,15 @@ if ( 'en_ZA' === $locale || 'ZAR' === $currency ) {
 		<sup class="version"><?php echo esc_html( charitable()->get_version() ); ?></sup>
 	</h1>
 	<div class="badge v2">
-		<a href="<?php
+		<a href="
+		<?php
 		echo charitable_ga_url(
 			'https://www.wpcharitable.com',
 			rawurlencode( 'Welcome Page Icon' ),
 			rawurlencode( 'Icon' )
 		)
-		?>" target="_blank"><div class="mascot"></div></a>
+		?>
+		" target="_blank"><div class="mascot"></div></a>
 	</div>
 	<div class="intro">
 		<?php
@@ -148,7 +150,7 @@ if ( 'en_ZA' === $locale || 'ZAR' === $currency ) {
 								// translators: %1$s is a list of gateways, %2$s is a link to the gateways settings page.
 								_x( 'You have activated %1$s. <a href="%2$s">Change settings</a>', 'You have activated x and y. Change gateway settings.', 'charitable' ),
 								charitable_list_to_sentence_part( $gateways ),
-								admin_url( 'admin.php?page=charitable-settings&tab=gateways' )
+								esc_url( admin_url( 'admin.php?page=charitable-settings&tab=gateways' ) )
 							);
 						?>
 						</li>
@@ -161,7 +163,7 @@ if ( 'en_ZA' === $locale || 'ZAR' === $currency ) {
 							printf(
 								// translators: %s is a link to create a new campaign.
 								__( 'You have created your first campaign. <a href="%s">Create another one.</a>', 'charitable' ),
-								admin_url( 'post-new.php?post_type=campaign' )
+								esc_url( admin_url( 'post-new.php?post_type=campaign' ) )
 							);
 						?>
 						</li>
@@ -175,12 +177,12 @@ if ( 'en_ZA' === $locale || 'ZAR' === $currency ) {
 								// translators: %1$s is a list of emails, %2$s is a link to the emails settings page.
 								_x( 'You have turned on the %1$s. <a href="%2$s">Change settings</a>', 'You have activated x and y. Change email settings.', 'charitable' ),
 								charitable_list_to_sentence_part( $emails ),
-								admin_url( 'admin.php?page=charitable-settings&tab=emails' )
+								esc_url( admin_url( 'admin.php?page=charitable-settings&tab=emails' ) )
 							);
 						?>
 						</li>
 					<?php else : ?>
-						<li class="not-done"><a href="<?php echo admin_url( 'admin.php?page=charitable-settings&tab=emails' ); ?>"><?php _e( 'Turn on email notifications', 'charitable' ); ?></a></li>
+						<li class="not-done"><a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-settings&tab=emails' ) ); ?>"><?php esc_html_e( 'Turn on email notifications', 'charitable' ); ?></a></li>
 					<?php endif ?>
 				</ul>
 				<?php
@@ -200,8 +202,8 @@ if ( 'en_ZA' === $locale || 'ZAR' === $currency ) {
 				?>
 				<p style="margin-bottom: 0;">
 				<?php
-					/* translators: %1$s is a link to the documentation, %2$s is a link to the support page. */
 					printf(
+						/* translators: %1$s is a link to the documentation, %2$s is a link to the support page. */
 						__( 'Need a hand with anything? You might find the answer in <a target="_blank" href="%1$s">our documentation</a>, or you can always get in touch with us via <a target="_blank" href="%2$s">our support page</a>.', 'charitable' ),
 						$doc_url,
 						$support_url
@@ -210,9 +212,15 @@ if ( 'en_ZA' === $locale || 'ZAR' === $currency ) {
 				</p>
 			<?php endif ?>
 			<hr />
-			<?php if ( strpos( $locale, 'en' ) !== 0 ) :
-				// translators: %s is the language name .?>
-				<h3><?php printf( _x( 'Translate Charitable into %s', 'translate Charitable into language', 'charitable' ), $language ); ?></h3>
+			<?php
+			if ( strpos( $locale, 'en' ) !== 0 ) :
+				?>
+				<h3>
+				<?php
+				// translators: %s is the language name.
+				printf( esc_html_x( 'Translate Charitable into %s', 'translate Charitable into language', 'charitable' ), esc_html( $language ) );
+				?>
+				</h3>
 				<p>
 				<?php
 				/* translators: %s is the language name */
@@ -241,7 +249,7 @@ if ( 'en_ZA' === $locale || 'ZAR' === $currency ) {
 				);
 
 				?>
-			<p><a href="<?php echo esc_url( $download_url ); ?>" class="button-primary" style="margin-right: 8px;" target="_blank"><?php _e( 'Download it free', 'charitable' ); ?></a><a href="<?php echo $view_demo; ?>" class="button-secondary" target="_blank"><?php _e( 'View demo', 'charitable' ); ?></a></p>
+			<p><a href="<?php echo esc_url( $download_url ); ?>" class="button-primary" style="margin-right: 8px;" target="_blank"><?php _e( 'Download it free', 'charitable' ); ?></a><a href="<?php echo esc_url( $view_demo ); ?>" class="button-secondary" target="_blank"><?php _e( 'View demo', 'charitable' ); ?></a></p>
 		</div>
 	</div>
 	<div class="column-right">

@@ -238,7 +238,7 @@ x
 <?php echo $wrapper; ?> .charitable-field-charitable-videos .charitable-missing-addon-content h2 {
     color: white;
 }
-<?php echo $wrapper; ?> .charitable-field-charitable-videos .chartiable-missing-addon-bg {
+<?php echo $wrapper; ?> .charitable-field-charitable-videos .charitable-missing-addon-bg {
     background-size: cover;
 }
 

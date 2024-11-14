@@ -45,7 +45,7 @@ $closed_css = $checklist_class->get_checklist_option( 'window_closed' ) ? 'close
 				sprintf(
 					/* translators: %1$d - number of minutes, %2$s - singular or plural form of 'minute'. */
 					__( 'Complete the <b>Charitable Checklist</b> and get up and running within %1$s.', 'charitable' ),
-					__( 'minutes', 'charitable' ),
+					__( 'minutes', 'charitable' )
 				),
 				[ 'b' => [] ]
 			);

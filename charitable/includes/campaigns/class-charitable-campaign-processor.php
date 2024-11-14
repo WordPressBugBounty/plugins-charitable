@@ -550,6 +550,7 @@ if ( ! class_exists( 'Charitable_Campaign_Processor' ) ) :
 			if ( ! $this->is_mysql_date_format( $value ) ) {
 				charitable_get_deprecated()->doing_it_wrong(
 					__METHOD__,
+					// Translators: %s is the date passed.
 					sprintf( __( 'Campaign processor requires date in YYYY-MM-DD format. Date passed as %s. This message was added in Charitable version 1.5.9.', 'charitable' ), $value ),
 					null
 				);
@@ -709,6 +710,7 @@ if ( ! class_exists( 'Charitable_Campaign_Processor' ) ) :
 			charitable_get_deprecated()->doing_it_wrong(
 				$tag,
 				sprintf(
+					// Translators: %1$s is the method, %2$s is the tag, %3$s is the key.
 					__( '%1$s is deprecated as a sanitizer on the %2$s hook. To prevent sanitization, use add_filter( \'charitable_campaign_processor_disable_sanitizer_%3$s\', \'__return_true\' ) instead.', 'charitable' ),
 					$method,
 					$tag,

@@ -60,7 +60,7 @@ if ( false !== $slug && strtolower( $slug ) !== 'lite' && ! $is_legacy ) {
 	sprintf(
 		wp_kses(
 		/* translators: %s - charitable.com upgrade URL. */
-			__( 'If you have purchased your license key for <strong>Basic</strong>, <strong>Plus</strong>, <strong>Pro</strong>, or <strong>Agency / Elite</strong> recently, please enter your chartiable license key <a href="%s">in the "General" tab</a>.', 'charitable' ),
+			__( 'If you have purchased your license key for <strong>Basic</strong>, <strong>Plus</strong>, <strong>Pro</strong>, or <strong>Agency / Elite</strong> recently, please enter your charitable license key <a href="%s">in the "General" tab</a>.', 'charitable' ),
 			[
 				'a'      => [
 					'href'   => [],

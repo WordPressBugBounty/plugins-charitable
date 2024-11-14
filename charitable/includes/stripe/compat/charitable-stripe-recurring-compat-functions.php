@@ -30,10 +30,14 @@ if ( ! function_exists( 'charitable_recurring_get_donation_periods_i18n' ) ) :
 		$translated_periods = apply_filters(
 			'charitable_recurring_periods',
 			[
-				'month'      => sprintf( _n( 'month', '%s months', $number, 'charitable' ), $number ),
-				'quarter'    => sprintf( _n( 'quarter', '%s quarters', $number, 'charitable' ), $number ),
-				'semiannual' => sprintf( _n( 'semiannual', '%s semiannuals', $number, 'charitable' ), $number ),
-				'year'       => sprintf( _n( 'year', '%s years', $number, 'charitable' ), $number ),
+				// translators: %s: number of periods.
+				'month'      => sprintf( _n( '%s month', '%s months', $number, 'charitable' ), $number ),
+				// translators: %s: number of periods.
+				'quarter'    => sprintf( _n( '%s quarter', '%s quarters', $number, 'charitable' ), $number ),
+				// translators: %s: number of periods.
+				'semiannual' => sprintf( _n( '%s semiannual', '%s semiannuals', $number, 'charitable' ), $number ),
+				// translators: %s: number of periods.
+				'year'       => sprintf( _n( '%s year', '%s years', $number, 'charitable' ), $number ),
 			]
 		);
 

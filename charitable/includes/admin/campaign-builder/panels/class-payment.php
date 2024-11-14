@@ -166,7 +166,15 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 
 				<?php if ( $slug === 'stripe' || $slug === 'paypal' ) : ?>
 
-				<h2><?php echo esc_html__( 'Charitable has ', 'charitable' ); ?><span><?php echo esc_html( $label ); ?></span> <?php echo esc_html__( 'built in.', 'charitable' ); ?></h2>
+				<h2>
+					<?php
+						printf(
+							// translators: %s is the name of the addon.
+							esc_html__( 'Charitable has %s built in.', 'charitable' ),
+							'<span>' . esc_html( $label ) . '</span>'
+						);
+					?>
+				</h2>
 
 				<p><?php echo esc_html( $label ); ?> <?php echo esc_html__( 'allows you to easily reach more supporters and increase donations with payment platforms including PayPal, Venmo, Apple Pay and Google Pay.', 'charitable' ); ?></p>
 
@@ -697,7 +705,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 			<div class="education-buttons education-buttons-bottom">
 
 				<div class="action-button">
-					<?php echo '<a class="button-link ' . esc_attr( $action_css_class ) . '" data-enable-url="' . esc_url( $enable_url ) . '" data-settings-url="' . esc_url( $settings_url ) . '" data-plugin-url="' . $addon_information_install . '" data-name="' . $addon_information_name . '" data-plugin-slug="' . esc_html( $addon_url ) . '" data-field-icon="">' . esc_html( $button_label ) . '</a>'; ?>
+					<?php echo '<a class="button-link ' . esc_attr( $action_css_class ) . '" data-enable-url="' . esc_url( $enable_url ) . '" data-settings-url="' . esc_url( $settings_url ) . '" data-plugin-url="' . esc_url( $addon_information_install ) . '" data-name="' . esc_html( $addon_information_name ) . '" data-plugin-slug="' . esc_html( $addon_url ) . '" data-field-icon="">' . esc_html( $button_label ) . '</a>'; ?>
 				</div>
 
 			</div>

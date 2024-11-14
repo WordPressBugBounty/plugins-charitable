@@ -26,7 +26,7 @@ var __webpack_exports__ = {};
  */
 
 /* eslint-disable no-console */
-console.log('Hello World! (from create-block-campaignblock block)');
+
 /* eslint-enable no-console */
 /******/ })()
 ;

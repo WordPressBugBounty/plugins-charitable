@@ -243,7 +243,7 @@ $campaign_category_id = 0;
 
 	</div>
 
-	<div class="charitable-section-grid chartiable-section-grid-column-flexible">
+	<div class="charitable-section-grid charitable-section-grid-column-flexible">
 
 		<div class="charitable-container charitable-report-card charitable-activity-report" data-section-name="activity">
 			<div class="header">
@@ -269,7 +269,7 @@ $campaign_category_id = 0;
 
 	</div>
 
-	<div class="charitable-section-grid one-third chartiable-section-grid-column-flexible">
+	<div class="charitable-section-grid one-third charitable-section-grid-column-flexible">
 
 		<div class="charitable-container charitable-report-card charitable-top-campaigns-report">
 			<div class="header">

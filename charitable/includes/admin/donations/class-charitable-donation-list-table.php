@@ -166,7 +166,7 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 				case 'amount':
 					$display = charitable_format_money( $donation->get_total_donation_amount(), false, false, $donation->get_currency() );
 					// translators: %s is the gateway label.
-					$display .= '<span class="meta">' . sprintf( _x( 'via %s', 'charitable' ), $donation->get_gateway_label() ) . '</span>';
+					$display .= '<span class="meta">' . sprintf( _x( 'via %s', 'gateway label in donations', 'charitable' ), $donation->get_gateway_label() ) . '</span>';
 					break;
 
 				case 'campaigns':

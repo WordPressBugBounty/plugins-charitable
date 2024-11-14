@@ -221,12 +221,17 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 		 */
 		public function bulk_messages( $bulk_messages, $bulk_counts ) {
 			$bulk_messages[ Charitable::CAMPAIGN_POST_TYPE ] = array(
+				/* translators: %s: number of items */
 				'updated'   => _n( '%d campaign updated.', '%d campaigns updated.', $bulk_counts['updated'], 'charitable' ),
 				'locked'    => ( 1 == $bulk_counts['locked'] )
-								? __( '1 campaign not updated, somebody is editing it.' )
+								? __( '1 campaign not updated, somebody is editing it.', 'charitable' )
+								/* translators: %s: number of items */
 								: _n( '%s campaign not updated, somebody is editing it.', '%s campaigns not updated, somebody is editing them.', $bulk_counts['locked'], 'charitable' ),
+				/* translators: %s: number of items */
 				'deleted'   => _n( '%s campaign permanently deleted.', '%s campaigns permanently deleted.', $bulk_counts['deleted'], 'charitable' ),
+				/* translators: %s: number of items */
 				'trashed'   => _n( '%s campaign moved to the Trash.', '%s campaigns moved to the Trash.', $bulk_counts['trashed'], 'charitable' ),
+				/* translators: %s: number of items */
 				'untrashed' => _n( '%s campaign restored from the Trash.', '%s campaigns restored from the Trash.', $bulk_counts['untrashed'], 'charitable' ),
 			);
 

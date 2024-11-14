@@ -1135,7 +1135,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 										$( this ).parent().find('.template-buttons').removeClass('charitable-hidden');
 									});
 									theButton.closest('.charitable-template').addClass('active');
-									theButton.closest('.charitable-template').find('.template-buttons').addClass('chartiable-hidden');
+									theButton.closest('.charitable-template').find('.template-buttons').addClass('charitable-hidden');
 									theButton.closest('.charitable-template').find('.charitable-banner-container').removeClass('charitable-hidden');
 
 									// Update the text.
@@ -1187,7 +1187,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 			templateList.find('.template-buttons').remove('.preview-campaign');
 			// replace the "create campaign" buttons with the "update campaign" buttons.
 			templateList.find('.button.create-campaign').removeClass('create-campaign').addClass('update-campaign').html( charitable_builder.update_campaign );
-			// remove any active chartiable-templates so we can reset things.
+			// remove any active charitable-templates so we can reset things.
 			templateList.find('.charitable-template').removeClass('active');
 			templateList.find('.charitable-template .charitable-banner-container').addClass('charitable-hidden');
 			// now find the charitable-template with a data attr "template code" that matches the templateID.

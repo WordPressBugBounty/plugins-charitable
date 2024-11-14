@@ -342,9 +342,10 @@ class Charitable_Notifications {
 
 		// Update notifications using async task.
 		if ( empty( $option['update'] ) || time() > $option['update'] + DAY_IN_SECONDS ) {
-
 			$option = $this->update();
-
+		} else if ( empty( $option['feed'] ) && empty( $option['events'] ) ) {
+			// regardless of the update time, if there are no notifications, update attempt.
+			$option = $this->update();
 		}
 
 		$feed   = ! empty( $option['feed'] ) ? $this->verify_active( $option['feed'] ) : [];
@@ -617,10 +618,6 @@ class Charitable_Notifications {
 
 		$notifications = $this->get();
 
-		if ( empty( $notifications ) ) {
-			return;
-		}
-
 		$active_notifications_html     = '';
 		$dismissed_notifications_html  = '';
 		$active_notifications_count    = 0;
@@ -638,6 +635,25 @@ class Charitable_Notifications {
 				'rel'    => [],
 			],
 		];
+		$template_location = $location === 'dashboard' ? '/admin/templates/notifications-dashboard' : '/admin/templates/notifications';
+		$template_location = apply_filters( 'charitable_admin_notifications_template_location', $template_location, $location );
+
+		if ( empty( $notifications ) ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo charitable_render(
+				$template_location,
+				[
+					'notifications' => [
+						'active_count'    => $active_notifications_count,
+						'dismissed_count' => $dismissed_notifications_count,
+						'active_html'     => $active_notifications_html,
+						'dismissed_html'  => $dismissed_notifications_html,
+					],
+				],
+				true
+			);
+			return;
+		}
 
 		// Get active notifications.
 		foreach ( $notifications as $notification ) {
@@ -769,9 +785,6 @@ class Charitable_Notifications {
 				break;
 			}
 		}
-
-		$template_location = $location === 'dashboard' ? '/admin/templates/notifications-dashboard' : '/admin/templates/notifications';
-		$template_location = apply_filters( 'charitable_admin_notifications_template_location', $template_location, $location );
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo charitable_render(

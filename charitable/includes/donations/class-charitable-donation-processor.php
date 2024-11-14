@@ -130,7 +130,7 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 		 * Executed when a user first clicks the Donate button on a campaign.
 		 *
 		 * @since  1.0.0
-		 * @since  1.8.0
+		 * @version  1.8.3.2
 		 *
 		 * @return void
 		 */
@@ -141,7 +141,11 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 				return;
 			}
 
-			$nonce = $_POST['charitable-donate-now'];
+			if ( ! isset( $_POST['charitable-donate-now'] ) ) {
+				return;
+			}
+
+			$nonce = sanitize_text_field( wp_unslash( $_POST['charitable-donate-now'] ) );
 
 			if ( ! wp_verify_nonce( $nonce, 'charitable-donate' ) ) {
 
@@ -152,16 +156,18 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 			}
 
 			/* Possibly add a donation amount if user clicked on a campaign builder donate button */
-			$donation_amount = ! empty( $_POST['charitable_donation_amount'] ) && ! empty( $_POST['charitable_builder'] ) ? esc_html( $_POST['charitable_donation_amount'] ) : 0;
+			$donation_amount = ! empty( $_POST['charitable_donation_amount'] ) && ! empty( $_POST['charitable_builder'] ) ? esc_html( $_POST['charitable_donation_amount'] ) : 0; // phpcs:ignore
+
+			/* Strip any currency symbols and make sure $donation_amount is a float. */
+			$donation_amount = charitable_sanitize_amount( (string) $donation_amount );
 
 			/* Save the donation in the session */
 			charitable_get_session()->add_donation( $processor->get_campaign()->ID, $donation_amount );
 
 			$donations_url = charitable_get_permalink( 'campaign_donation_page', array( 'campaign_id' => $processor->get_campaign()->ID ) );
 
-			wp_redirect( $donations_url );
-
-			die();
+			wp_safe_redirect( $donations_url );
+			exit();
 		}
 
 		/**
@@ -230,9 +236,11 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 			 */
 			if ( ! apply_filters( 'charitable_validate_donation_form_submission_gateway', true, $gateway, $values ) ) {
 				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					// phpcs:disable
 					error_log( 'process_donation not valid' );
 					error_log( print_r( $gateway, true ) );
 					error_log( print_r( $values, true ) );
+					// phpcs:enable
 				}
 				return false;
 			}
@@ -272,10 +280,12 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 				 * @return mixed
 				 */
 				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					// phpcs:disable
 					error_log( 'gateway_is_130_compatible' );
 					error_log( print_r( $gateway, true ) );
 					error_log( print_r( $this->donation_id, true ) );
 					error_log( print_r( $processor, true ) );
+					// phpcs:enable
 				}
 				return apply_filters( 'charitable_process_donation_' . $gateway, true, $this->donation_id, $processor );
 
@@ -325,13 +335,13 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 		 */
 		public static function ajax_process_donation_form_submission() {
 			/* Prevent any displayed errors from messing with the AJAX response. */
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) { // phpcs:ignore
 				// do nothing, allow php/server settings to determine php logging.
 			} else {
 				ini_set( 'display_errors', 0 ); // phpcs:ignore
 			}
 
-			if ( ! isset( $_POST['campaign_id'] ) ) {
+			if ( ! isset( $_POST['campaign_id'] ) ) { // @codingStandardsIgnoreLine
 				wp_send_json_error( new WP_Error( 'missing_campaign_id', __( 'Campaign ID was not found. Unable to create donation.', 'charitable' ) ) );
 			}
 
@@ -391,6 +401,8 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 			$form = new Charitable_Donation_Amount_Form( $campaign );
 
 			/**
+			 * Do something before the donation amount form is processed.
+			 *
 			 * @hook charitable_before_process_donation_amount_form
 			 */
 			do_action( 'charitable_before_process_donation_amount_form', $processor, $form );
@@ -405,6 +417,8 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 				charitable_get_session()->add_donation( $submitted['campaign_id'], $submitted['amount'], $period );
 
 				/**
+				 * Do something after the donation amount form is processed.
+				 *
 				 * @hook charitable_after_process_donation_amount_form
 				 */
 				do_action( 'charitable_after_process_donation_amount_form', $processor, $submitted );

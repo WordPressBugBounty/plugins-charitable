@@ -113,7 +113,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 						],
 						'section_statement_descriptor' => [
 							'type'     => 'heading',
-							'title'    => __( 'Statement Descriptor' ),
+							'title'    => __( 'Statement Descriptor', 'charitable' ),
 							'priority' => 25,
 						],
 						'statement_descriptor'         => [
@@ -239,7 +239,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 						],
 						'section_statement_descriptor' => [
 							'type'     => 'heading',
-							'title'    => __( 'Statement Descriptor' ),
+							'title'    => __( 'Statement Descriptor', 'charitable' ),
 							'priority' => 20,
 						],
 						'statement_descriptor'         => [

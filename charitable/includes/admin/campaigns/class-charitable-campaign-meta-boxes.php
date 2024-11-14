@@ -304,32 +304,38 @@ if ( ! class_exists( 'Charitable_Campaign_Meta_Boxes' ) ) :
 
 			$messages[ Charitable::CAMPAIGN_POST_TYPE ] = array(
 				// Unused. Messages start at index 1.
-				0 => '',
-				1 => sprintf(
+				0  => '',
+				1  => sprintf(
+					// Translators: %s is the permalink to the campaign.
 					__( 'Campaign updated. <a href="%s">View Campaign</a>', 'charitable' ),
 					esc_url( get_permalink( $post_ID ) )
 				),
-				2 => __( 'Custom field updated.', 'charitable' ),
-				3 => __( 'Custom field deleted.', 'charitable' ),
-				4 => __( 'Campaign updated.', 'charitable' ),
-				5 => isset( $_GET['revision'] )
+				2  => __( 'Custom field updated.', 'charitable' ),
+				3  => __( 'Custom field deleted.', 'charitable' ),
+				4  => __( 'Campaign updated.', 'charitable' ),
+				5  => isset( $_GET['revision'] )
+					// Translators: %s is the revision date.
 					? sprintf( __( 'Campaign restored to revision from %s', 'charitable' ), wp_post_revision_title( (int) $_GET['revision'], false ) )
 					: false,
-				6 => sprintf(
+				6  => sprintf(
+					// Translators: %s is the permalink to the campaign.
 					__( 'Campaign published. <a href="%s">View Campaign</a>', 'charitable' ),
 					esc_url( get_permalink( $post_ID ) )
 				),
-				7 => __( 'Campaign saved.', 'charitable' ),
-				8 => sprintf(
+				7  => __( 'Campaign saved.', 'charitable' ),
+				8  => sprintf(
+					// Translators: %s is the preview link to the campaign.
 					__( 'Campaign submitted. <a target="_blank" href="%s">Preview Campaign</a>', 'charitable' ),
 					esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) )
 				),
-				9 => sprintf(
+				9  => sprintf(
+					// Translators: %1$s is the date the campaign is scheduled for, %2$s is the preview link to the campaign.
 					__( 'Campaign scheduled for: <strong>%1$s</strong>. <a target="_blank" href="%2$s">Preview Campaign</a>', 'charitable' ),
 					date_i18n( 'M j, Y @ G:i', strtotime( $post->post_date ) ),
 					esc_url( get_permalink( $post_ID ) )
 				),
 				10 => sprintf(
+					// Translators: %s is the preview link to the campaign.
 					__( 'Campaign draft updated. <a target="_blank" href="%s">Preview Campaign</a>', 'charitable' ),
 					esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) )
 				),
@@ -395,12 +401,12 @@ if ( ! class_exists( 'Charitable_Campaign_Meta_Boxes' ) ) :
 			$registry = charitable()->campaign_fields();
 			$keys     = $registry->get_sanitized_keys( $registry->get_admin_form_fields() );
 
-			$keys[]   = '_campaign_suggested_donations_default';
-			$keys[]   = '_campaign_hide_amount_donated';
-			$keys[]   = '_campaign_hide_number_of_donors';
-			$keys[]   = '_campaign_hide_percent_raised';
-			$keys[]   = '_campaign_hide_time_remaining';
-			$keys[]   = '_campaign_donate_button_text';
+			$keys[] = '_campaign_suggested_donations_default';
+			$keys[] = '_campaign_hide_amount_donated';
+			$keys[] = '_campaign_hide_number_of_donors';
+			$keys[] = '_campaign_hide_percent_raised';
+			$keys[] = '_campaign_hide_time_remaining';
+			$keys[] = '_campaign_donate_button_text';
 
 			/**
 			 * Filter the set of meta keys to be saved.

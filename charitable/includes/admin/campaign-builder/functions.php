@@ -148,9 +148,9 @@ function charitable_get_template_data_from_campaign( $campaign_id = false ) {
  */
 function charitable_show_field_names_by_default( $template_id = false ) { // phpcs:ignore
 
-	// if ( charitable_is_debug() || ( defined( 'CHARITABLE_BUILDER_SHOW_FIELD_NAMES' ) && CHARITABLE_BUILDER_SHOW_FIELD_NAMES ) ) {
-	// return apply_filters( 'chartiable_builder_show_field_names_default', true, $template_id );
-	// }
+	if ( charitable_is_debug() || ( defined( 'CHARITABLE_BUILDER_SHOW_FIELD_NAMES' ) && CHARITABLE_BUILDER_SHOW_FIELD_NAMES ) ) {
+		return apply_filters( 'charitable_builder_show_field_names_default', true, $template_id );
+	}
 
 	return false;
 }
@@ -164,7 +164,7 @@ function charitable_show_field_names_by_default( $template_id = false ) { // php
  */
 function charitable_show_preview_mode_by_default( $template_id = false ) {
 
-	return apply_filters( 'chartiable_builder_show_preview_mode_default', false, $template_id );
+	return apply_filters( 'charitable_builder_show_preview_mode_default', false, $template_id );
 }
 
 /**
@@ -181,8 +181,57 @@ function charitable_get_tooltip_html( $tooltip_text = false, $extra_css = '' ) {
 		return false;
 	}
 
-	$html = sprintf( '<span class="charitable-help-tooltip-container"><img src="' . charitable()->get_path( 'assets', false ) . 'images/icons/info.svg" alt="" class="charitable-help-tooltip ' . esc_attr( $extra_css ) . '" title="%s"></i></span>', esc_attr( $tooltip_text ) );
+	$html = sprintf( '<span class="charitable-help-tooltip-container"><img src="' . charitable()->get_path( 'assets', false ) . 'images/icons/info.svg" alt="" class="charitable-help-tooltip ' . esc_attr( $extra_css ) . '" title="%s"></i></span>', esc_html( $tooltip_text ) );
 
 	return $html;
 }
 
+/**
+ * Get the list of allowed users who can create and/or edit campaigns.
+ *
+ * @since 1.8.3.2
+ *
+ * @param string $by 'permissions' or 'roles'.
+ * @param array  $additional_allowed_users_id Additional users to add to the list.
+ *
+ * @return array Allowed Tags.
+ */
+function charitable_get_users_as_campaign_creators( $by = 'permissions', $additional_allowed_users_id = [] ) {
+
+	// Check the transient first.
+	$allowed_users = get_transient( 'charitable_allowed_campaign_creators_by_' . $by );
+
+	if ( false !== $allowed_users ) {
+		return $allowed_users;
+	}
+
+	if ( 'roles' === $by ) {
+
+		$allowed_users = get_users( [ 'role__in' => [ 'administrator', 'campaign_manager' ] ] );
+
+	} elseif ( 'permissions' === $by ) {
+
+		$all_users = get_users();
+
+		$users_with_permissions = [];
+
+		foreach ( $all_users as $user ) {
+
+			if ( user_can( $user->ID, 'create_campaigns' ) || user_can( $user->ID, 'edit_campaigns' ) ) {
+				$allowed_users[] = $user;
+			}
+
+		}
+	}
+
+	// If there was any additional users passed in, add them to the list.
+	if ( $additional_allowed_users_id ) {
+		$users         = get_users( [ 'include' => $additional_allowed_users_id ] );
+		$allowed_users = array_merge( $users, $allowed_users );
+	}
+
+	// Add this to a transient that expires in one hour.
+	set_transient( 'charitable_allowed_campaign_creators_by_' . $by, $allowed_users, HOUR_IN_SECONDS );
+
+	return $allowed_users;
+}

@@ -500,7 +500,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			/* Mark the donation as Failed. */
 			$donation->update_status( 'charitable-failed' );
 
-			return __( 'Donation Webhook: Recurring donation and initial payment for payment intent marked as failed'. 'charitable' );
+			return __( 'Donation Webhook: Recurring donation and initial payment for payment intent marked as failed', 'charitable' );
 		}
 
 		/**
@@ -514,7 +514,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 		public function process_payment_intent_succeeded( $event ) {
 
 			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-				error_log('process_payment_intent_succeeded');
+				error_log( 'process_payment_intent_succeeded' );
 			}
 
 			$payment_intent = $event->data->object;
@@ -749,6 +749,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			$invoice = $event->data->object;
 
 			if ( ! in_array( $invoice->status, [ 'void', 'uncollectible' ] ) ) {
+				// translators: %s is the invoice status.
 				return sprintf( __( 'Subscription Webhook: Not processing invoice with a status of %s.', 'charitable' ), $invoice->status );
 			}
 
@@ -782,7 +783,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			$invoice      = $event->data->object;
 			$subscription = $this->get_subscription_for_webhook_object( $invoice );
 
-			if ( empty( $subscription ) || ! is_a( $subscription, 'Charitable_Recurring_Donation' )  ) {
+			if ( empty( $subscription ) || ! is_a( $subscription, 'Charitable_Recurring_Donation' ) ) {
 				return __( 'Subscription Webhook: Missing subscription', 'charitable' );
 			}
 

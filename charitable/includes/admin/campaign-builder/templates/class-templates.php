@@ -1544,7 +1544,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 							/* translators: 1: Template ID */
 							'<a href="#" class="send-feedback">%1$s</a> %2$s',
 							esc_html__( 'Let us know', 'charitable' ),
-							esc_html__( 'what templates to add in the future.', 'charitable' ),
+							esc_html__( 'what templates to add in the future.', 'charitable' )
 						);
 						?>
 						</p>
@@ -1823,7 +1823,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 			$generic_categories['single']       = esc_html__( 'Single', 'charitable' );
 			$generic_categories['peer-to-peer'] = esc_html__( 'Peer-to-Peer', 'charitable' );
 
-			$generic_categories = apply_filters( 'chartiable_campaign_builder_template_generic_categories', $generic_categories );
+			$generic_categories = apply_filters( 'charitable_campaign_builder_template_generic_categories', $generic_categories );
 
 			$this->output_categories( $generic_categories, $templates_count );
 
@@ -3522,7 +3522,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 				return;
 			}
 
-			$medium = esc_html__( 'Campaign Builder Templates' );
+			$medium = esc_html__( 'Campaign Builder Templates', 'charitable' );
 
 			?>
 			<script type="text/html" id="tmpl-charitable-templates-upgrade-banner">
@@ -3536,6 +3536,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 
 						<p>
 							<?php
+							// translators: %s is the amount saved.
 							printf( esc_html__( 'With Charitable addons you can enable crowdfunding, provide additional payment methods, add videos, offer recurring donations, and more. As thanks to you for being a lite user you can unlock access and save up to $%s, automatically applied at checkout! ', 'charitable' ), '<strong>300.00</strong>' );
 							?>
 						</p>

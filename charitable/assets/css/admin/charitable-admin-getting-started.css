@@ -134,11 +134,11 @@ body div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-default {
   border-color: #ccc !important;
   color: #444 !important;
 }
-#charitable-welcome .chartiable-clear:before {
+#charitable-welcome .charitable-clear:before {
   content: " ";
   display: table;
 }
-#charitable-welcome .chartiable-clear:after {
+#charitable-welcome .charitable-clear:after {
   clear: both;
   content: " ";
   display: table;
@@ -361,7 +361,7 @@ body div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-default {
 #charitable-welcome .testimonials .testimonial-block p:last-of-type {
   margin-bottom: 0;
 }
-#charitable-welcome .testimonials .chartiable-cerified-user svg {
+#charitable-welcome .testimonials .charitable-cerified-user svg {
   position: relative;
   top: 6px;
   left: 6px;

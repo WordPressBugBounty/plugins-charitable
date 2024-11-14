@@ -620,9 +620,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 			if ( empty( $activities ) ) {
 				?>
 
-
 					<p><strong><?php echo esc_html__( 'There are no activity within the date range.', 'charitable' ); ?></strong></p>
-
 
 			<?php } else { ?>
 
@@ -649,7 +647,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 									/* Determine Label */
 
 									// If the user isn't using pro and is on a page that isn't the report overview, give them a generic label.
-									if ( ! charitable_is_pro() && ( ! isset( $_GET['tab'] ) || ( isset( $_GET['tab'] ) && 'overview' !== $_GET['tab'] ) ) ) { // phpcs:ignore
+									if ( ( ! charitable_is_pro() && isset( $_GET['tab'] ) && 'overview' !== $_GET['tab'] ) ) { // phpcs:ignore
 										$action_label = esc_html__( 'Charitable Donor', 'charitable' );
 									} else {
 										// If this is a campaign, show the campaign name vs just any number ID.
@@ -677,7 +675,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 									$secondary_info = $this->get_activity_secondary_info( $activity );
 								}
 
-								echo $secondary_info;
+								echo $secondary_info; // phpcs:ignore
 
 								// phpcs:ignore ?>
 							</div>
@@ -3096,8 +3094,6 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 					$to_date_range               = '2023/01/01 - 2023/12/31';
 
 				endif;
-
-
 				?>
 
 				<div class="charitable-cards">
@@ -4119,7 +4115,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 						event.preventDefault();
 						$.post( ajaxurl, {
 							action: 'charitable_lite_reports_upgrade',
-							chartiable_action: 'remove_lite_cta'
+							charitable_action: 'remove_lite_cta'
 						} );
 						$( '.reports-lite-cta' ).remove();
 					} );

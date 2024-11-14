@@ -239,3 +239,11 @@ add_action( 'admin_init', array( Charitable_Notifications::get_instance(), 'mayb
  */
 add_action( 'plugins_loaded', array( Charitable_EventDriven::get_instance(), 'init' ), 999 );
 add_filter( 'charitable_admin_notifications_update_data', array( Charitable_EventDriven::get_instance(), 'update_events' ), 9 );
+
+/**
+ * License checks.
+ *
+ * @see Charitable_Admin_Pages::add_menu()
+ */
+add_action( 'admin_init', array( Charitable_Licenses_Settings::get_instance(), 'maybe_check_if_license_expired' ), 9999 );
+add_action( 'admin_init', array( Charitable_Licenses_Settings::get_instance(), 'maybe_check_if_license_expiring' ), 9998 );

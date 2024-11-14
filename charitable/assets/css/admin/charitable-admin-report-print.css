@@ -101,10 +101,10 @@ table.wp-list-table th {
   display: flex;
   flex-direction: row;
 }
-.charitable-section-grid.chartiable-section-grid-column-flexible {
+.charitable-section-grid.charitable-section-grid-column-flexible {
   align-items: flex-start;
 }
-.charitable-section-grid.chartiable-section-grid-column-single {
+.charitable-section-grid.charitable-section-grid-column-single {
   columns: 1;
   column-gap: none;
   display: block;

@@ -529,8 +529,17 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 		protected function enable_gateway( $gateway, $show_update_message = true ) {
 			$settings = get_option( 'charitable_settings' );
 
+			if ( false === $settings ) {
+				$settings = array();
+			}
+
 			$active_gateways             = isset( $settings['active_gateways'] ) ? $settings['active_gateways'] : array();
 			$active_gateways[ $gateway ] = $this->gateways[ $gateway ];
+
+			if ( ! isset( $settings['active_gateways'] ) ) {
+				$settings['active_gateways'] = array();
+			}
+
 			$settings['active_gateways'] = $active_gateways;
 
 			/* If this is the only gateway, make it the default gateway */

@@ -805,7 +805,7 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 						event.preventDefault();
 						$.post( ajaxurl, {
 							action: 'charitable_lite_settings_upgrade',
-							chartiable_action: 'remove_lite_cta'
+							charitable_action: 'remove_lite_cta'
 						} );
 						$( '.settings-lite-cta' ).remove();
 					} );

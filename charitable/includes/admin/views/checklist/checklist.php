@@ -71,18 +71,24 @@ ob_start();
 					</p>
 
 					<ul class="charitable-more-links">
-						<li><span class="dashicons dashicons-yes"></span><?php
+						<li><span class="dashicons dashicons-yes"></span>
+						<?php
 
-						/* translators: Suggestion on completion of checklist on checklist page. */
-						printf( __( 'Don\'t forget to visit the <a href="%1$s" target="_blank">%2$s</a> and <a href="%3$s" target="_blank">%4$s</a> to see your fundraising stats and grow your campaigns.', 'charitable' ),
+
+						printf(
+							/* translators: Suggestion on completion of checklist on checklist page. */
+							__( 'Don\'t forget to visit the <a href="%1$s" target="_blank">%2$s</a> and <a href="%3$s" target="_blank">%4$s</a> to see your fundraising stats and grow your campaigns.', 'charitable' ),
 							admin_url( 'admin.php?page=charitable-dashboard' ),
 							esc_html__( 'dashboard', 'charitable' ),
-							admin_url( 'admin.php?page=charitable-reports' ),
+							esc_url( admin_url( 'admin.php?page=charitable-reports' ) ),
 							esc_html__( 'view reports', 'charitable' ),
-						);?>
+						);
+						?>
 						</li>
-						<li><span class="dashicons dashicons-yes"></span><?php
+						<li><span class="dashicons dashicons-yes"></span>
+						<?php
 						printf(
+							// translators: Suggestion on completion of checklist on checklist page.
 							__( '%1$s <a href="https://www.wpcharitable.com/documentation/" target="_blank">%2$s</a> %3$s <a href="https://www.wpcharitable.com/support/" target="_blank">%4$s</a>.', 'charitable' ),
 							esc_html__( 'Need help? Visit our', 'charitable' ),
 							esc_html__( 'documentation', 'charitable' ),
@@ -91,14 +97,24 @@ ob_start();
 						);
 						?>
 							</li>
-						<li><span class="dashicons dashicons-yes"></span><?php printf( __( '<a href="%1$s">%2$s</a> to unlock more features, get priority support, and take your campaigns to the next level!', 'charitable' ), esc_url( charitable_admin_upgrade_link( 'welcome', 'Upgrade Now CTA Section' ) ), esc_html__( 'Upgrade to Pro', 'charitable' ) ); ?></li>
+						<li><span class="dashicons dashicons-yes"></span>
+						<?php
+						// translators: Suggestion on completion of checklist on checklist page.
+						printf( __( '<a href="%1$s">%2$s</a> to unlock more features, get priority support, and take your campaigns to the next level!', 'charitable' ), esc_url( charitable_admin_upgrade_link( 'welcome', 'Upgrade Now CTA Section' ) ), esc_html__( 'Upgrade to Pro', 'charitable' ) );
+						?>
+						</li>
 					</ul>
 
 				<?php else : ?>
 
 					<h1><?php esc_html_e( 'Welcome Aboard', 'charitable' ); ?><?php echo esc_html( $first_name ); ?>!</h1>
 
-					<p><?php printf( __( '<strong>%1$s</strong> Follow these steps to start fundraising quickly.', 'charitable' ), esc_html__( 'Thanks for installing Charitable! ', 'charitable' ) ); ?></p>
+					<p>
+					<?php
+					// translators: Suggestion on completion of checklist on checklist page.
+					printf( __( '<strong>%1$s</strong> Follow these steps to start fundraising quickly.', 'charitable' ), esc_html__( 'Thanks for installing Charitable! ', 'charitable' ) );
+					?>
+					</p>
 
 				<?php endif; ?>
 
@@ -151,7 +167,8 @@ endif;
 					<div class="charitable-sub-container charitable-step-one-col-content charitable-column">
 						<?php if ( ! $stripe_connected ) : ?>
 						<div class="charitable-sub-container-row">
-							<p><?php printf( __( '<strong>Stripe not available in your country?</strong> Charitable works with payment gateways like PayPal, Authorize.net, Braintree, Payrexx, PayUMoney, GoCardless, and others. <a target="_blank" href="%s">View additional payment options</a> available with PRO extensions.', 'charitable' ), admin_url( 'admin.php?page=charitable-addons' ) ); ?></p>
+							<?php // translators: Suggestion on completion of checklist on checklist page. ?>
+							<p><?php printf( __( '<strong>Stripe not available in your country?</strong> Charitable works with payment gateways like PayPal, Authorize.net, Braintree, Payrexx, PayUMoney, GoCardless, and others. <a target="_blank" href="%s">View additional payment options</a> available with PRO extensions.', 'charitable' ), esc_url( admin_url( 'admin.php?page=charitable-addons' ) ) ); ?></p>
 						</div>
 						<?php else : ?>
 						<?php endif; ?>

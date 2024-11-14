@@ -366,7 +366,7 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 		}
 
 		/**
-		 * Render a lite to pro banner in campaign lists, add it to the chartiable admin vars so it can be injected via JS.
+		 * Render a lite to pro banner in campaign lists, add it to the charitable admin vars so it can be injected via JS.
 		 *
 		 * @param array $strings The localized strings.
 		 *

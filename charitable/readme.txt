@@ -2,9 +2,9 @@
 Contributors: WPCharitable, griffinjt, smub, dimensionmedia
 Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
-Tested up to: 6.6.2
+Tested up to: 6.7
 Requires PHP: 7.2
-Stable tag: 1.8.3.1
+Stable tag: 1.8.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -257,6 +257,15 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.3.2 =
+* UPDATED: To improve performance and security, user list for assigning campaign ownership in campaign settings checks for users with proper permissions.
+* UPDATED: New filter 'charitable_campaign_builder_settings_general_users' to customize the updated user list.
+* FIX: campaign_link() function returns $link rather than false.
+* FIX: Visiting the settings page will attempt to double check licenses for any expiring or expired subscriptions.
+* FIX: Notification tweaks including upgrading from older versions and showing UI even if feed is empty.
+* FIX: Donation amount from custom donation field in a campaign page should now be carried to the donation page even with currency symbols included.
+* FIX: Updated code related to translations, CSS, UI, and PHP standards.
 
 = Donation Form & Fundraising Campaigns v1.8.3.1 =
 * UPDATED: "Disable Legacy Campaign Mode" is set to on for new installs of the plugin. [More Information](https://www.wpcharitable.com/documentation/legacy-campaigns/)

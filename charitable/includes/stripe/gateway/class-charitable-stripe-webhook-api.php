@@ -194,6 +194,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 					if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
 						error_log(
 							sprintf(
+								// translators: %s is the error message.
 								__( 'Error creating Stripe webhook: %s', 'charitable' ),
 								$e->getMessage()
 							)

@@ -141,18 +141,18 @@ if ( ! class_exists( 'Charitable_User_Management' ) ) :
 					case 'invalid_email':
 						$error = __( '<strong>ERROR</strong>: Invalid email address.', 'charitable' ) .
 							' <a href="' . esc_url( charitable_get_permalink( 'forgot_password_page' ) ) . '">' .
-							__( 'Lost your password?' ) .
+							__( 'Lost your password?', 'charitable' ) .
 							'</a>';
 						break;
 
 					case 'incorrect_password':
 						$error = sprintf(
 							/* translators: %s: email address */
-							__( '<strong>ERROR</strong>: The password you entered for %s is incorrect.' ),
+							__( '<strong>ERROR</strong>: The password you entered for %s is incorrect.', 'charitable' ),
 							'<strong>' . $username . '</strong>'
 						) .
 						' <a href="' . esc_url( charitable_get_permalink( 'forgot_password_page' ) ) . '">' .
-						__( 'Lost your password?' ) .
+						__( 'Lost your password?', 'charitable' ) .
 						'</a>';
 						break;
 

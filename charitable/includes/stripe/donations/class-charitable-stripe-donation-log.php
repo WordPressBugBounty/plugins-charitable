@@ -209,7 +209,7 @@ if ( ! class_exists( 'Charitable_Stripe_Donation_Log' ) ) :
 			$this->donation->update_donation_log(
 				sprintf(
 					/* translators: %s: link to connected account page in Stripe */
-					__( '%s application fee collected: %s', 'charitable' ),
+					__( '%1$s application fee collected: %2$s', 'charitable' ),
 					charitable_format_money( (string) $application_fee_amount ),
 					'<a href="' . $this->get_resource_link( 'connect/application_fee', $application_fee ) . '" target="_blank"><code>' . $application_fee . '</code></a>'
 				)

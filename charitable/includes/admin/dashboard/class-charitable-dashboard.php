@@ -1470,7 +1470,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 						event.preventDefault();
 						$.post( ajaxurl, {
 							action: 'charitable_lite_reports_upgrade',
-							chartiable_action: 'remove_lite_cta'
+							charitable_action: 'remove_lite_cta'
 						} );
 						$( '.reports-lite-cta' ).remove();
 					} );

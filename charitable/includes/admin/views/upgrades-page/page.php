@@ -47,12 +47,13 @@ if ( $step > $steps ) {
 	<h2><?php _e( 'Charitable - Upgrades', 'charitable' ); ?></h2>
 
 	<div id="charitable-upgrade-status">
-		<p><?php _e( 'The upgrade process has started, please be patient. This could take several minutes. You will be automatically redirected when the upgrade is finished.', 'charitable' ); ?></p>
+		<p><?php esc_html_e( 'The upgrade process has started, please be patient. This could take several minutes. You will be automatically redirected when the upgrade is finished.', 'charitable' ); ?></p>
 		<?php if ( ! empty( $total ) ) : ?>
-			<p><strong><?php printf( __( 'Step %d of approximately %d running', 'charitable' ), $step, $steps ); ?></strong></p>
+			<?php // Translators: %1$s is the current step, %2$s is the total number of steps. ?>
+			<p><strong><?php printf( esc_html__( 'Step %1$d of approximately %2$d running', 'charitable' ), esc_html( $step ), esc_html( $steps ) ); ?></strong></p>
 		<?php endif; ?>
 	</div>
 	<script type="text/javascript">
-		setTimeout(function() { document.location.href = "<?php echo $timeout_url; ?>"; }, 250);
+		setTimeout(function() { document.location.href = "<?php echo esc_html( $timeout_url ); ?>"; }, 250);
 	</script>
 </div>

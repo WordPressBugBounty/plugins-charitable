@@ -502,7 +502,7 @@ function charitable_save_campaign() {
 		'donate_button_text'          => '',
 	); // taken from class-charitable-campaign-processor.php.
 	foreach ( $base_meta_keys as $base_meta_key => $base_meta_value ) {
-		$value = chartiable_search_settings( $campaign_settings_v2['settings'], $base_meta_key );
+		$value = charitable_search_settings( $campaign_settings_v2['settings'], $base_meta_key );
 		if ( $value ) {
 			$processor->save_meta_field( $value, $base_meta_key );
 		} else {
@@ -802,7 +802,7 @@ function charitable_template_layout_to_campaign_layout( $campaign_settings_v2, $
  * @param mixed $key The key to search for.
  * @return mixed|null The value of the key if found, null otherwise.
  */
-function chartiable_search_settings( $array, $key ) {
+function charitable_search_settings( $array, $key ) {
 	// If the key exists in the current level of the array, return its value.
 	if ( array_key_exists( $key, $array ) ) {
 		return $array[ $key ];
@@ -812,7 +812,7 @@ function chartiable_search_settings( $array, $key ) {
 	foreach ( $array as $value ) {
 		// If the element is an array, recursively search it for the key.
 		if ( is_array( $value ) ) {
-			$result = chartiable_search_settings( $value, $key );
+			$result = charitable_search_settings( $value, $key );
 
 			// If the key is found in the nested array, return its value.
 			if ( $result !== null ) {
