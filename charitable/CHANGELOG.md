@@ -1,3 +1,8 @@
+# 1.8.3.3
+* FIX: Resolved an issue when a button appeared unresponsive when verifying/disconnecting a license on the general settings tab.
+* FIX: Updated translation strings and improved string output for email password reset email body.
+* FIX: Resolved incorrect form field name on the privacy page for contact consent.
+
 # 1.8.3.2
 * UPDATED: To improve performance and security, user list for assigning campaign ownership in campaign settings checks for users with proper permissions.
 * UPDATED: New filter 'charitable_campaign_builder_settings_general_users' to customize the updated user list.

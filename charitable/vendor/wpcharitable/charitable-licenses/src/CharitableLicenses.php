@@ -355,6 +355,7 @@ class CharitableLicenses {
 				return array(
 					'reason_code' => 'missing_license',
 					'description' => sprintf(
+						// translators: %1$s is the plugin name, %2$s is the URL to activate the license, %3$s is the URL to view the changelog, %4$s is the new version number.
 						__( '<p>There is a new version of %1$s available but you have not activated your license. <a target="_top" href="%2$s">Activate your license</a> or <a target="_blank" class="thickbox" href="%3$s">view version %4$s details</a>.</p>', 'charitable' ),
 						esc_html( $version_info['name'] ),
 						admin_url( 'admin.php?page=charitable-settings&tab=general' ),
@@ -370,6 +371,7 @@ class CharitableLicenses {
 				return array(
 					'reason_code' => 'expired_license',
 					'description' => sprintf(
+						// translators: %1$s is the plugin name, %2$s is the URL to renew the license, %3$s is the URL to view the changelog, %4$s is the new version number.
 						__( '<p>There is a new version of %1$s available but your license has expired. <a target="_blank" href="%2$s">Renew your license</a> or <a target="_blank" class="thickbox" href="%3$s">view version %4$s details</a>.</p>', 'charitable' ),
 						esc_html( $version_info['name'] ),
 						$base_renewal_url,
@@ -1010,7 +1012,7 @@ class CharitableLicenses {
 	public function ajax_license_check() {
 
 		if ( charitable_is_debug( 'vendor' ) ) {
-			error_log( 'CHARITABLE: NEW VENDOR CALL RECEIVED: ajax_license_check()' );
+			error_log( 'CHARITABLE: NEW VENDOR CALL RECEIVED: ajax_license_check()' ); // phpcs:ignore
 		}
 
 		if ( ! is_admin() ) {
@@ -1018,7 +1020,7 @@ class CharitableLicenses {
 		}
 
 		// check for nonce.
-		if ( ! isset( $_REQUEST['nonce'] ) || ! wp_verify_nonce( $_REQUEST['nonce'], 'charitable_settings-options' ) ) {
+		if ( ! isset( $_REQUEST['nonce'] ) || ! wp_verify_nonce( $_REQUEST['nonce'], 'charitable_settings-options' ) ) { // phpcs:ignore
 			return;
 		}
 
@@ -1035,15 +1037,15 @@ class CharitableLicenses {
 			return;
 		}
 
-		if ( ! isset( $_REQUEST['chartiable_action'] ) && 'verify' !== $_REQUEST['chartiable_action'] ) {
+		if ( ! isset( $_REQUEST['charitable_action'] ) && 'verify' !== $_REQUEST['charitable_action'] ) {
 			return;
 		}
 
-		// to-do: adjust spelling of chartiable_action?
+		// to-do: adjust spelling of charitable_action?
 
 		$product_key  = 'charitable';
 		$re_check     = true;
-		$license      = trim( esc_html( $_REQUEST['license'] ) );
+		$license      = trim( esc_html( $_REQUEST['license'] ) ); // phpcs:ignore
 		$license_data = $this->verify_license( $product_key, $license, $re_check );
 
 		$this->flush_update_cache();

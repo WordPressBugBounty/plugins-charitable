@@ -760,8 +760,8 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				'feedback_form_fields_required'     => esc_html__( 'Some fields of this form are required. Please update the form and try submiting again. Thanks!', 'charitable' ),
 				'empty_label'                       => esc_html__( 'Empty Label', 'charitable' ),
 				'no_pages_found'                    => esc_html__( 'No results found', 'charitable' ),
-				'empty_tab'                         => esc_html__( 'This tab is empty. Drag a block from the left into this area or<br/><strong><a href="#" class="charitable-configure-tab-settings">' . __( 'configure tab settings', 'charitable' ) . '</a></strong>', 'charitable' ),
-				'no_tabs'                           => esc_html__( 'There are no tabs yet for this template. You can <br/><strong><a href="#" class="charitable-configure-tab-settings">' . __( 'configure tab settings', 'charitable' ) . '</a> to add a tab.</strong>', 'charitable' ),
+				'empty_tab'                         => esc_html__( 'This tab is empty. Drag a block from the left into this area or', 'charitable' ) . '<br/><strong><a href="#" class="charitable-configure-tab-settings">' . __( 'configure tab settings', 'charitable' ) . '</a></strong>',
+				'no_tabs'                           => esc_html__( 'There are no tabs yet for this template.', 'charitable' ) . __( 'You can', 'charitable' ) . '<br/><strong><a href="#" class="charitable-configure-tab-settings">' . __( 'configure tab settings', 'charitable' ) . '</a>' . __( 'to add a tab', 'charitable' ) . '.</strong>',
 				'new_tab'                           => esc_html__( 'New Tab', 'charitable' ),
 				'default_campaign_title'            => esc_html__( 'My New Campaign', 'charitable' ),
 				'field_disabled_due_to_modal'       => esc_html__( 'We\'re sorry, the %name% is not available because you have the display settings for donation form set to \'modal\' in Charitable general settings.', 'charitable' ),
@@ -1303,7 +1303,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 			$before_toolbar = apply_filters( 'charitable_builder_output_before_toolbar', '' );
 			?>
 
-			<div id="charitable-builder" class="<?php echo charitable_sanitize_classes( $builder_classes, true ); ?>">
+			<div id="charitable-builder" class="<?php echo charitable_sanitize_classes( $builder_classes, true ); // phpcs:ignore ?>">
 
 				<?php
 
@@ -1367,8 +1367,6 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 
 							<span class="charitable-edit-campaign-title-area">
 								<input id="charitable_settings_title" name="title" placeholder="<?php echo esc_html__( 'Enter Your Campaign Name Here...', 'charitable' ); ?>" class="charitable-center-form-name charitable-form-name" value="<?php echo esc_html( isset( $this->campaign_data['title'] ) ? $this->campaign_data['title'] : '' ); ?>" />
-								<!--<a href="#" class="charitable-title-edit" title="<?php echo esc_html__( 'Edit Campaign Title', 'charitable' ); ?>"><img class="charitable-edit-campaign-title-icon" width="18" height="18" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/edit.png'; ?>" /></a>-->
-
 							</span>
 
 						</div>
@@ -1486,7 +1484,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 							</div>
 
 							<div class="charitable-form-row charitable-feedback-form-row charitable-feedback-form-row-button">
-								<a class="button-link button-preview-<?php echo $create_update_css; ?>" data-template-id=""><?php echo esc_html__( 'Use This Template', 'charitable' ); ?></a>
+								<a class="button-link button-preview-<?php echo esc_attr( $create_update_css ); ?>" data-template-id=""><?php echo esc_html__( 'Use This Template', 'charitable' ); ?></a>
 							</div>
 
 						</div>
@@ -1717,7 +1715,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				$replace[ $key ] = sanitize_text_field( $value );
 			}
 
-			$option      = $this->get_onboarding_options(); // get_option( 'charitable_builder_onboarding' );
+			$option      = $this->get_onboarding_options();
 			$option_tour = empty( $option['tour'] ) || ! $option['tour'] || ! is_array( $option['tour'] ) ? $schema_tour : $option['tour'];
 			$option_tour = array_merge( $option_tour, $replace );
 
@@ -1842,59 +1840,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 			return $option;
 		}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 		/* ONBOARDING */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 		/**
 		 * Save onboarding option via AJAX.
