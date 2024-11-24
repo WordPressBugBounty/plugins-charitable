@@ -165,24 +165,24 @@ if ( ! class_exists( 'Charitable_Emails' ) ) :
 		 * @return void
 		 */
 		public function handle_email_settings_request() {
-			if ( ! wp_verify_nonce( $_REQUEST['_nonce'], 'email' ) ) {
-				wp_die( __( 'Cheatin\' eh?!', 'charitable' ) );
+			if ( ! isset( $_REQUEST['_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_nonce'] ) ), 'email' ) ) {
+				wp_die( esc_html__( 'Cheatin\' eh?!', 'charitable' ) );
 			}
 
-			$email = isset( $_REQUEST['email_id'] ) ? $_REQUEST['email_id'] : false;
+			$email = isset( $_REQUEST['email_id'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['email_id'] ) ) : false;
 
 			/* Gateway must be set */
 			if ( false === $email ) {
-				wp_die( __( 'Missing email.', 'charitable' ) );
+				wp_die( esc_html__( 'Missing email.', 'charitable' ) );
 			}
 
 			/* Validate email. */
 			if ( ! isset( $this->emails[ $email ] ) ) {
-				wp_die( __( 'Invalid email.', 'charitable' ) );
+				wp_die( esc_html__( 'Invalid email.', 'charitable' ) );
 			}
 
 			/* All good, so disable or enable the email */
-			if ( 'charitable_disable_email' == current_filter() ) {
+			if ( 'charitable_disable_email' === current_filter() ) {
 				$this->disable_email( $email );
 			} else {
 				$this->enable_email( $email );

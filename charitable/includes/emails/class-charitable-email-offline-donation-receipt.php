@@ -92,12 +92,12 @@ if ( ! class_exists( 'Charitable_Email_Offline_Donation_Receipt' ) && class_exis
 			}
 
 			/* If the donation is not pending, stop here. */
-			if ( 'charitable-pending' != get_post_status( $donation_id ) ) {
+			if ( 'charitable-pending' !== get_post_status( $donation_id ) ) {
 				return false;
 			}
 
 			/* If the donation was not made with the offline payment option, stop here. */
-			if ( 'offline' != get_post_meta( $donation_id, 'donation_gateway', true ) ) {
+			if ( 'offline' !== get_post_meta( $donation_id, 'donation_gateway', true ) ) {
 				return false;
 			}
 
@@ -112,9 +112,11 @@ if ( ! class_exists( 'Charitable_Email_Offline_Donation_Receipt' ) && class_exis
 			}
 
 			/* All three of those checks passed, so proceed with sending the email. */
-			$email = new Charitable_Email_Offline_Donation_Receipt( array(
-				'donation' => new Charitable_Donation( $donation_id ),
-			) );
+			$email = new Charitable_Email_Offline_Donation_Receipt(
+				array(
+					'donation' => new Charitable_Donation( $donation_id ),
+				)
+			);
 
 			/**
 			 * Don't resend the email.
@@ -147,13 +149,15 @@ if ( ! class_exists( 'Charitable_Email_Offline_Donation_Receipt' ) && class_exis
 		public static function resend( $object_id, $args = array() ) {
 			$donation = charitable_get_donation( $object_id );
 
-			if ( ! is_object( $donation ) || 0 == count( $donation->get_campaign_donations() ) ) {
+			if ( ! is_object( $donation ) || 0 === count( $donation->get_campaign_donations() ) ) {
 				return false;
 			}
 
-			$email = new Charitable_Email_Offline_Donation_Receipt( array(
-				'donation' => $donation,
-			) );
+			$email = new Charitable_Email_Offline_Donation_Receipt(
+				array(
+					'donation' => $donation,
+				)
+			);
 
 			$success = $email->send();
 
@@ -180,8 +184,8 @@ if ( ! class_exists( 'Charitable_Email_Offline_Donation_Receipt' ) && class_exis
 			$donation   = charitable_get_donation( $object_id );
 			$resendable = is_object( $donation )
 				&& $donation->has_valid_email()
-				&& 'charitable-pending' == $donation->get_status()
-				&& 'offline' == $donation->get_gateway();
+				&& 'charitable-pending' === $donation->get_status()
+				&& 'offline' === $donation->get_gateway();
 
 			/**
 			 * Filter whether the email can be resent.
@@ -241,15 +245,15 @@ if ( ! class_exists( 'Charitable_Email_Offline_Donation_Receipt' ) && class_exis
 		 */
 		protected function get_default_body() {
 			ob_start();
-?>
-<p><?php _e( 'Dear [charitable_email show=donor_first_name],', 'charitable' ) ?></p>
-<p><?php _e( 'Thank you so much for your generous donation.', 'charitable' ) ?></p>
-<p><strong><?php _e( 'Your donation details', 'charitable' ) ?></strong></p>
+			?>
+<p><?php esc_html_e( 'Dear [charitable_email show=donor_first_name],', 'charitable' ); ?></p>
+<p><?php esc_html_e( 'Thank you so much for your generous donation.', 'charitable' ); ?></p>
+<p><strong><?php esc_html_e( 'Your donation details', 'charitable' ); ?></strong></p>
 <p>[charitable_email show=donation_summary]</p>
-<p><strong><?php _e( 'Complete your donation', 'charitable' ) ?></strong></p>
+<p><strong><?php esc_html_e( 'Complete your donation', 'charitable' ); ?></strong></p>
 <p>[charitable_email show=offline_instructions]</p>
-<p><?php _e( 'With thanks, [charitable_email show=site_name]', 'charitable' ) ?></p>
-<?php
+<p><?php esc_html_e( 'With thanks, [charitable_email show=site_name]', 'charitable' ); ?></p>
+			<?php
 			/**
 			 * Filter the default body content.
 			 *

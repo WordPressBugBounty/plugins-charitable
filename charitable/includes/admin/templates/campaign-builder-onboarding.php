@@ -77,8 +77,21 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			<h3><?php esc_html_e( 'We hope you enjoyed the tour!', 'charitable' ); ?></h3>
 			<p>
 				<?php
-				// translators: %1$s is the link to the getting started guide, %2$s is the link to the documentation, %3$s is the link to the support page.
-				printf( __( 'Remember that you can view our <a href="%1$s" target="_blank">getting started guide</a>, read our <a href="%2$s" target="_blank">documentation</a>, or <a href="%3$s" target="_blank">reach out to us</a> for support if you have any questions.', 'charitable' ), 'https://wpcharitable.com/getting-started', 'https://wpcharitable.com/documentation', 'https://wpcharitable.com/support' );
+				printf(
+					wp_kses(
+						/* translators: %1$s is the link to the getting started guide, %2$s is the link to the documentation, %3$s is the link to the support page. */
+						__( 'Remember that you can view our <a href="%1$s" target="_blank">getting started guide</a>, read our <a href="%2$s" target="_blank">documentation</a>, or <a href="%3$s" target="_blank">reach out to us</a> for support if you have any questions.', 'charitable' ),
+						array(
+							'a' => array(
+								'href'   => array(),
+								'target' => array(),
+							),
+						)
+					),
+					esc_url( 'https://wpcharitable.com/getting-started' ),
+					esc_url( 'https://wpcharitable.com/documentation' ),
+					esc_url( 'https://wpcharitable.com/support' )
+				);
 				?>
 			</p>
 			<button type="button" class="charitable-onboarding-popup-btn"><?php esc_html_e( 'Get Started!', 'charitable' ); ?></button>

@@ -905,12 +905,13 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 		 * Return the URL that the donor should be redirected to.
 		 *
 		 * @since  1.3.0
+		 * @version 1.8.3.x added filter.
 		 *
 		 * @param  mixed $gateway_processing The result of the gateway processing.
 		 * @return string
 		 */
 		private function get_redirection_after_gateway_processing( $gateway_processing ) {
-			if ( false == $gateway_processing ) {
+			if ( false === $gateway_processing ) {
 				$redirect_url = esc_url( add_query_arg( array( 'donation_id' => $this->donation_id ), wp_get_referer() ) );
 			} elseif ( is_array( $gateway_processing ) && isset( $gateway_processing['redirect'] ) ) {
 				$redirect_url = $gateway_processing['redirect'];
@@ -919,7 +920,7 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 				$redirect_url = charitable_get_permalink( 'donation_receipt_page', array( 'donation_id' => $this->donation_id ) );
 			}
 
-			return $redirect_url;
+			return apply_filters( 'charitable_redirection_after_gateway_processing', $redirect_url, $gateway_processing, $this );
 		}
 
 		/**

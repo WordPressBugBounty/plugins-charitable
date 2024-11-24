@@ -2,9 +2,9 @@
 Contributors: WPCharitable, griffinjt, smub, dimensionmedia
 Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
-Tested up to: 6.7
+Tested up to: 6.7.1
 Requires PHP: 7.2
-Stable tag: 1.8.3.3
+Stable tag: 1.8.3.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -257,6 +257,12 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.3.4 =
+* NEW: Added a new setting on privacy screen to allow thee consent field to be required before submitting a donation.
+* NEW: Added a 'charitable_redirection_after_gateway_processing' filter which helps override the URL that the donor should be redirected to after a donation in certain scenarios.
+* FIX: Resolved an issue involving formatting a donation amount in non-English languages on the Charitable dashboard.
+* UPDATED: Compatibility with WordPress 6.7.1.
 
 = Donation Form & Fundraising Campaigns v1.8.3.3 =
 * FIX: Resolved an issue when a button appeared unresponsive when verifying/disconnecting a license on the general settings tab.

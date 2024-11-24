@@ -245,7 +245,7 @@ class Charitable_Admin_Getting_Started {
 
 		?>
 
-		<div id="charitable-welcome" class="<?php echo sanitize_html_class( $class ); ?>">
+		<div id="charitable-welcome" class="<?php echo esc_attr( sanitize_html_class( $class ) ); ?>">
 
 			<div class="container">
 
@@ -259,7 +259,7 @@ class Charitable_Admin_Getting_Started {
 					</div>
 
 					<a href="#" class="play-video" title="<?php esc_attr_e( 'Watch to learn more about Charitable', 'charitable' ); ?>">
-						<img src="<?php echo charitable()->get_path( 'assets', false ); // phpcs:ignore ?>images/onboarding/getting-started/video-poster.jpg" width="100%" alt="<?php esc_attr_e( 'Watch how to create your first campaign', 'charitable' ); ?>" class="video-thumbnail">
+						<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/onboarding/getting-started/video-poster.jpg" width="100%" alt="<?php esc_attr_e( 'Watch how to create your first campaign', 'charitable' ); ?>" class="video-thumbnail">
 					</a>
 
 					<div class="block">
@@ -327,7 +327,24 @@ class Charitable_Admin_Getting_Started {
 								?>
 							<div class="charitable-gateway-footer">
 								<?php // translators: %s is the URL. ?>
-								<p><?php printf( __( '<strong>Stripe not available in your country?</strong> Charitable works with payment gateways like PayPal, Authorize.net, Braintree, Payrexx, PayUMoney, GoCardless, and others. <a target="_blank" href="%s">View additional payment options</a> available with PRO extensions.', 'charitable' ), esc_url( admin_url( 'admin.php?page=charitable-addons' ) ) ); ?></p>
+								<p>
+								<?php
+								printf(
+									wp_kses(
+										/* translators: %s is the URL. */
+										__( '<strong>Stripe not available in your country?</strong> Charitable works with payment gateways like PayPal, Authorize.net, Braintree, Payrexx, PayUMoney, GoCardless, and others. <a target="_blank" href="%s">View additional payment options</a> available with PRO extensions.', 'charitable' ),
+										array(
+											'strong' => array(),
+											'a'      => array(
+												'href'   => array(),
+												'target' => array(),
+											),
+										)
+									),
+									esc_url( admin_url( 'admin.php?page=charitable-addons' ) )
+								);
+								?>
+									</p>
 							</div>
 							<?php endif; ?>
 						<?php endif; ?>

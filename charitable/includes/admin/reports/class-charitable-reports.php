@@ -541,7 +541,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 					<div class="info">
 						<p class="donor-id-name">#<?php echo esc_html( $donation_id ); ?> <?php echo esc_html__( 'by', 'charitable' ); ?> <?php echo esc_html( $donor_name ); ?></p>
 						<div class="info-summary">
-							<p class="amount-donated"><?php echo esc_html__( 'Amount Donated', 'charitable' ); ?>: <strong><?php echo charitable_format_money( $donation->amount ); // phpcs:ignore ?></strong></p>
+							<p class="amount-donated"><?php echo esc_html__( 'Amount Donated', 'charitable' ); ?>: <strong><?php echo charitable_format_money( $donation->amount, 2, true ); // phpcs:ignore ?></strong></p>
 							<p class="amount-donated"><?php echo esc_html__( 'Method', 'charitable' ); ?>: <strong><?php echo esc_html( ucwords( $payment_method ) ); ?></strong></p>
 						</div>
 					</div>

@@ -1058,7 +1058,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 					'type'      => 'checkbox',
 					'label'     => charitable_get_option( 'contact_consent_label', __( 'Yes, I am happy for you to contact me via email or phone.', 'charitable' ) ),
 					'priority'  => 8,
-					'required'  => false,
+					'required'  => charitable_get_option( 'contact_consent_required', false ),
 					'data_type' => 'meta',
 				);
 			}

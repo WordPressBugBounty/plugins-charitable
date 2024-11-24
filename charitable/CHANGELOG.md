@@ -1,3 +1,9 @@
+# 1.8.3.4
+* NEW: Added a new setting on privacy screen to allow thee consent field to be required before submitting a donation.
+* NEW: Added a 'charitable_redirection_after_gateway_processing' filter which helps override the URL that the donor should be redirected to after a donation in certain scenarios.
+* FIX: Resolved an issue involving formatting a donation amount in non-English languages on the Charitable dashboard.
+* UPDATED: Compatibility with WordPress 6.7.1.
+
 # 1.8.3.3
 * FIX: Resolved an issue when a button appeared unresponsive when verifying/disconnecting a license on the general settings tab.
 * FIX: Updated translation strings and improved string output for email password reset email body.
