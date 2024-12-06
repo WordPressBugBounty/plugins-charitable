@@ -260,8 +260,8 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 <?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-social-sharing .charitable-field-template-social-sharing {
 	border: 1px solid rgba(0, 0, 0, 0.20);
 	border-radius: 10px;
-	display: table;
-	width: 100%;
+	display: flex;
+	flex-direction: column;
 	padding: 15px;
 }
 

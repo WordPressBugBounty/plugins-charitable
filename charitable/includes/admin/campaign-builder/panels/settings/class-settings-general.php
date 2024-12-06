@@ -258,7 +258,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_General' ) ) :
 					)
 				);
 
-				$users    = apply_filters( 'charitable_campaign_builder_settings_general_users', charitable_get_users_as_campaign_creators( 'permissions', $user->ID ) );
+				$users    = apply_filters( 'charitable_campaign_builder_settings_general_users', charitable_get_users_as_campaign_creators( 'permissions', get_current_user_id() ) );
 				$campaign = isset( $campaign_id ) && 0 !== $campaign_id ? get_post( $campaign_id ) : false;
 
 				if ( ! empty( $users ) ) {

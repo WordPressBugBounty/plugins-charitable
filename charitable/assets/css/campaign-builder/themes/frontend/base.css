@@ -295,6 +295,11 @@
   padding-left: 0;
   padding-right: 0;
 }
+.charitable-campaign-field.charitable-campaign-field-donate-button a.charitable-button {
+  display: inline-block !important;
+  text-align: center;
+  text-decoration: none;
+}
 .charitable-campaign-field.charitable-campaign-field-donate-button button.charitable-button:hover {
   text-decoration: none;
   filter: brightness(150%);

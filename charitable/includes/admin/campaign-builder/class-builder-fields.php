@@ -60,8 +60,7 @@ class Charitable_Builder_Fields {
 
 		add_filter( 'charitable_builder_design_buttons', [ $this, 'pro_field_buttons' ], 15 );
 
-		add_action( 'charitable_start', array( $this, 'setup_pro_addons' ), 999 );
-
+		add_action( 'init', array( $this, 'setup_pro_addons' ), 999 ); // 1.8.3.5
 	}
 
 	/**
@@ -155,7 +154,6 @@ class Charitable_Builder_Fields {
 			}
 
 		endif;
-
 	}
 
 	/**

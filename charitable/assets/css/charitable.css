@@ -181,19 +181,21 @@
 .charitable-donation-form {
   padding-top: 1em; }
   .charitable-donation-form .donation-amounts {
-    *zoom: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     margin: 0 0 1em;
     padding: 0;
     list-style: none; }
     .charitable-donation-form .donation-amounts:before, .charitable-donation-form .donation-amounts:after {
-      content: " ";
-      display: table; }
+      /* content: " ";
+      display: table;  */
+    }
     .charitable-donation-form .donation-amounts:after {
       clear: both; }
     .charitable-donation-form .donation-amounts .donation-amount {
       position: relative;
-      float: left;
-      width: 49%;
+      float: auto;
+      width: auto;
       margin: 0 2% 0.5em 0;
       border: 1px solid #ddd;
       background-color: transparent;
@@ -201,7 +203,7 @@
       .charitable-donation-form .donation-amounts .donation-amount .custom-donation-amount-wrapper,
       .charitable-donation-form .donation-amounts .donation-amount > label {
         display: block;
-        width: 100%;
+        width: auto;
         padding: 0.5em 1em;
         margin: 0;
         font-size: 1em;
@@ -249,6 +251,8 @@
   padding: 1.5em 0 0.5em; }
   #charitable-donor-fields .charitable-form-header {
     padding: 0 20px; }
+    .charitable-modal #charitable-donor-fields .charitable-form-header {
+      padding-left: 0; }
 
 .charitable-donor-details {
   padding: 0 20px 1em; }
@@ -262,6 +266,9 @@
 #charitable-user-fields,
 #charitable-meta-fields {
   padding: 0 20px; }
+  .charitable-modal #charitable-user-fields,
+  .charitable-modal #charitable-meta-fields {
+    padding: 0; }
 
 #charitable-meta-fields {
   padding-top: 1.5em;
@@ -319,6 +326,24 @@
     content: " ";
     display: block;
     clear: left; }
+    .charitable-table.donation-details {
+      width: 100%;
+      text-align: left;
+    }
+    .charitable-table.donation-details td {
+      padding: 15px 0;
+    }
+    .charitable-table.donation-details tfoot td {
+border-top: 1px solid #e6e6e6;
+padding-top: 15px;
+font-weight: 500;
+    }
+    h3.charitable-header {
+      font-weight: 800;
+      border-bottom: 1px solid black;
+      padding-bottom: 10px;
+      margin-top: 50px;
+    }
 
 .charitable-table tr, .charitable-table td {
   padding-right: 1.5em; }

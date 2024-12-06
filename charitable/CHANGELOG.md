@@ -1,5 +1,13 @@
+# 1.8.3.5
+* NEW: Added a 'charitable_gateway_fields_after_selector' action hook to insert content between gateway selectors and gateway fields on donation forms.
+* UPDATED: Provided a 'campaign_categories' attribute to stat and donor shortcodes to help filter by Charitable campaign categories.
+* FIX: Resolves PHP notices that appeared after WordPress 6.7.0 was released.
+* FIX: Improved front-end buttons and CSS of several campaign tempalates.
+* FIX: Remove notifications HTML when printing from a browser in the WordPress admin.
+* FIX: Updated code related to translations and PHP standards.
+
 # 1.8.3.4
-* NEW: Added a new setting on privacy screen to allow thee consent field to be required before submitting a donation.
+* NEW: Added a new setting on privacy screen to allow the consent field to be required before submitting a donation.
 * NEW: Added a 'charitable_redirection_after_gateway_processing' filter which helps override the URL that the donor should be redirected to after a donation in certain scenarios.
 * FIX: Resolved an issue involving formatting a donation amount in non-English languages on the Charitable dashboard.
 * UPDATED: Compatibility with WordPress 6.7.1.

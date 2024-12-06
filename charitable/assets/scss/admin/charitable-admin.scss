@@ -5189,6 +5189,13 @@ body.charitable-show-notifications {
     }
 }
 
+/* for print */
+@media print {
+    .charitable-plugin-notifications {
+        display: none;
+    }
+}
+
 /* notifications AM END */
 
 /* notifications */

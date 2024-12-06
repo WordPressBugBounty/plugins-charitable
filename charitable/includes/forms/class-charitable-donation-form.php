@@ -529,9 +529,9 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		 */
 		public function get_validated_donation_id() {
 			if ( array_key_exists( 'donation_id', $_GET ) ) {
-				$donation_id = $_GET['donation_id'];
-			} elseif ( array_key_exists( 'ID', $_POST ) ) {
-				$donation_id = $_POST['ID'];
+				$donation_id = intval( $_GET['donation_id'] );
+			} elseif ( array_key_exists( 'ID', $_POST ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				$donation_id = intval( $_POST['ID'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			} else {
 				return 0;
 			}
@@ -1012,7 +1012,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		 * @param  string $minimum_amount Minimum amount likely set by user in admin settings.
 		 * @return array
 		 */
-		public function minimum_donation_amount_notice( $return = true, $minimum_amount = false ) {
+		public function minimum_donation_amount_notice( $return = true, $minimum_amount = false ) { // phpcs:ignore
 
 			if ( false === $minimum_amount ) {
 				$minimum_amount = get_post_meta( $this->get_campaign()->ID, '_campaign_minimum_donation_amount', true );
@@ -1028,7 +1028,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			if ( $return ) {
 				return $message;
 			} else {
-				echo $message;
+				echo $message; // phpcs:ignore
 			}
 		}
 

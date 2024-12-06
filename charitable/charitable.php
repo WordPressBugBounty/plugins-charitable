@@ -3,12 +3,11 @@
  * Plugin Name: Charitable
  * Plugin URI: https://www.wpcharitable.com
  * Description: The WordPress fundraising alternative for non-profits, created to help non-profits raise money on their own website.
- * Version: 1.8.3.4
+ * Version: 1.8.3.5
  * Author: Charitable Donations & Fundraising Team
  * Author URI: https://wpcharitable.com
  * Requires at least: 4.1
- * Tested up to: 6.7.1
- * Stable tag: 1.8.3.4
+ * Stable tag: 1.8.3.5
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
@@ -40,7 +39,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		const AUTHOR = 'WP Charitable';
 
 		/* Plugin version. */
-		const VERSION = '1.8.3.4';
+		const VERSION = '1.8.3.5';
 
 		/* Version of database schema. */
 		const DB_VERSION = '20180522';
@@ -355,8 +354,8 @@ if ( ! class_exists( 'Charitable' ) ) :
 			add_action( 'plugins_loaded', array( $this, 'charitable_install' ), 100 );
 			add_action( 'plugins_loaded', array( $this, 'charitable_start' ), 100 );
 			add_action( 'plugins_loaded', array( $this, 'endpoints' ), 100 );
-			add_action( 'plugins_loaded', array( $this, 'donation_fields' ), 100 );
-			add_action( 'plugins_loaded', array( $this, 'campaign_fields' ), 100 );
+			add_action( 'init', array( $this, 'donation_fields' ), 100 );
+			add_action( 'init', array( $this, 'campaign_fields' ), 100 );
 			add_action( 'plugins_loaded', array( $this, 'register_donormeta_table' ) );
 			add_action( 'plugins_loaded', 'charitable_load_compat_functions' );
 			add_action( 'setup_theme', array( 'Charitable_Customizer', 'start' ) );

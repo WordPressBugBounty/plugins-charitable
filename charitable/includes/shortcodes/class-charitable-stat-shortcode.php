@@ -103,19 +103,44 @@ if ( ! class_exists( 'Charitable_Stat_Shortcode' ) ) :
 		/**
 		 * Parse shortcode attributes.
 		 *
-		 * @since  1.6.0
+		 * @since   1.6.0
+		 * @version 1.8.3.5 added 'campaign_categories' to the shortcode attributes.
 		 *
 		 * @param  array $atts User-defined attributes.
 		 * @return array
 		 */
 		private function parse_args( $atts ) {
 			$defaults = array(
-				'display'   => 'total',
-				'campaigns' => '',
-				'goal'      => false,
+				'display'             => 'total',
+				'campaigns'           => '',
+				'goal'                => false,
+				'campaign_categories' => '',
 			);
 
-			$args              = shortcode_atts( $defaults, $atts, 'charitable_stat' );
+			$args = shortcode_atts( $defaults, $atts, 'charitable_stat' );
+
+			if ( '' !== $args['campaign_categories'] ) {
+				$campaign_categories = str_replace( ', ', ',', $args['campaign_categories'] );
+				$campaign_categories = explode( ',', $args['campaign_categories'] );
+				$cat_args            = [
+					'post_type'      => 'campaign',
+					'posts_per_page' => -1,
+					'fields'         => 'ids',
+					'tax_query'      => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+						[
+							'taxonomy' => 'campaign_category',
+							'field'    => 'slug',
+							'terms'    => $campaign_categories,
+						],
+					],
+				];
+				$cat_query           = new WP_Query( $cat_args );
+				if ( ! empty( $cat_query->posts ) ) {
+					$campaigns         = $cat_query->posts;
+					$args['campaigns'] = implode( ',', $campaigns );
+				}
+			}
+
 			$args['campaigns'] = strlen( $args['campaigns'] ) ? explode( ',', $args['campaigns'] ) : array();
 
 			return $args;

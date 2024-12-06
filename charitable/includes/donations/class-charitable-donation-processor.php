@@ -905,7 +905,7 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 		 * Return the URL that the donor should be redirected to.
 		 *
 		 * @since  1.3.0
-		 * @version 1.8.3.x added filter.
+		 * @version 1.8.3.5 added filter.
 		 *
 		 * @param  mixed $gateway_processing The result of the gateway processing.
 		 * @return string

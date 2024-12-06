@@ -7,7 +7,7 @@
  * @package Charitable/Templates/Donor
  * @author  WP Charitable LLC
  * @since   1.5.0
- * @version 1.5.0
+ * @version 1.8.3.5
  */
 
 // Exit if accessed directly.
@@ -40,11 +40,11 @@ $campaign_id = $view_args['campaign'];
 	do_action( 'charitable_donor_loop_before_donor', $donor, $view_args );
 
 	if ( $view_args['show_avatar'] ) :
-		echo $donor->get_avatar();
+		echo $donor->get_avatar(); // phpcs:ignore
 	endif;
 
 	if ( $view_args['show_name'] ) :
-	?>
+		?>
 		<p class="donor-name">
 		<?php
 			/**
@@ -55,14 +55,14 @@ $campaign_id = $view_args['campaign'];
 			 * @param string $name      The name to be displayed.
 			 * @param array  $view_args View arguments.
 			 */
-			echo apply_filters( 'charitable_donor_loop_donor_name', $donor->get_name(), $view_args );
+			echo apply_filters( 'charitable_donor_loop_donor_name', $donor->get_name(), $view_args ); // phpcs:ignore
 		?>
 		</p>
 		<?php
 	endif;
 
 	if ( $view_args['show_location'] && strlen( $donor->get_location() ) ) :
-	?>
+		?>
 		<div class="donor-location">
 		<?php
 			/**
@@ -73,13 +73,24 @@ $campaign_id = $view_args['campaign'];
 			 * @param string $location  The location to be displayed.
 			 * @param array  $view_args View arguments.
 			 */
-			echo apply_filters( 'charitable_donor_loop_donor_location', $donor->get_location(), $view_args );
+			echo apply_filters( 'charitable_donor_loop_donor_location', $donor->get_location(), $view_args ); // phpcs:ignore
 		?>
 		</div>
 		<?php
 	endif;
 
 	if ( $view_args['show_amount'] ) :
+
+		$amount = 0;
+		if ( is_array( $campaign_id ) ) {
+			foreach ( $campaign_id as $key => $the_id ) {
+				$amount += $donor->get_amount( $the_id );
+			}
+			$amount = charitable_format_money( $amount );
+		} else {
+			$amount = charitable_format_money( $donor->get_amount( $campaign_id ) );
+		}
+
 		?>
 		<div class="donor-donation-amount">
 		<?php
@@ -91,10 +102,10 @@ $campaign_id = $view_args['campaign'];
 			 * @param string $amount    The amount to be displayed.
 			 * @param array  $view_args View arguments.
 			 */
-			echo apply_filters( 'charitable_donor_loop_donor_amount', charitable_format_money( $donor->get_amount( $campaign_id ) ), $view_args );
+			echo apply_filters( 'charitable_donor_loop_donor_amount', $amount, $view_args ); // phpcs:ignore
 		?>
 		</div>
-	<?php
+		<?php
 	endif;
 
 	/**
@@ -107,4 +118,4 @@ $campaign_id = $view_args['campaign'];
 	 */
 	do_action( 'charitable_donor_loop_after_donor', $donor, $view_args );
 	?>
-</li><!-- .donor-<?php echo $donor->donor_id; ?> -->
+</li><!-- .donor-<?php echo esc_html( $donor->donor_id ); ?> -->
