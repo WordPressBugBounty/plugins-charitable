@@ -343,7 +343,7 @@ class Charitable_Notifications {
 		// Update notifications using async task.
 		if ( empty( $option['update'] ) || time() > $option['update'] + DAY_IN_SECONDS ) {
 			$option = $this->update();
-		} else if ( empty( $option['feed'] ) && empty( $option['events'] ) ) {
+		} elseif ( empty( $option['feed'] ) && empty( $option['events'] ) ) {
 			// regardless of the update time, if there are no notifications, update attempt.
 			$option = $this->update();
 		}
@@ -495,17 +495,17 @@ class Charitable_Notifications {
 			return false;
 		}
 
-		// Set default timezone to Eastern Time Zone (New York).
-		date_default_timezone_set( 'America/New_York' );
+		// Get the WordPress timezone.
+		$timezone = wp_timezone();
 
-		// Convert the notification end date to a DateTime object in the Eastern timezone.
-		$endTime = new DateTime( $notification['end'], new DateTimeZone( 'America/New_York' ) );
+		// Convert the notification end date to a DateTime object in the WordPress timezone.
+		$end_time = new DateTime( $notification['end'], $timezone );
 
-		// Get the current server time as a DateTime object in the Eastern timezone.
-		$currentTime = new DateTime( 'now', new DateTimeZone( 'America/New_York' ) );
+		// Get the current server time as a DateTime object in the WordPress timezone.
+		$current_time = new DateTime( 'now', $timezone );
 
 		// Compare the current time with the notification end time.
-		return $currentTime > $endTime;
+		return $current_time > $end_time;
 	}
 
 	/**
@@ -635,8 +635,8 @@ class Charitable_Notifications {
 				'rel'    => [],
 			],
 		];
-		$template_location = $location === 'dashboard' ? '/admin/templates/notifications-dashboard' : '/admin/templates/notifications';
-		$template_location = apply_filters( 'charitable_admin_notifications_template_location', $template_location, $location );
+		$template_location             = $location === 'dashboard' ? '/admin/templates/notifications-dashboard' : '/admin/templates/notifications';
+		$template_location             = apply_filters( 'charitable_admin_notifications_template_location', $template_location, $location );
 
 		if ( empty( $notifications ) ) {
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -1007,16 +1007,6 @@ class Charitable_Notifications {
 			$option['dismissed'][] = $id;
 			$option['dismissed']   = array_unique( $option['dismissed'] );
 
-			// Remove notification.
-			// if ( is_array( $option[ $type ] ) && ! empty( $option[ $type ] ) ) {
-			// 	foreach ( $option[ $type ] as $key => $notification ) {
-			// 		if ( (string) $notification['id'] === (string) $id ) {
-			// 			unset( $option[ $type ][ $key ] );
-
-			// 			break;
-			// 		}
-			// 	}
-			// }
 		}
 
 		update_option( 'charitable_notifications', $option );

@@ -892,6 +892,7 @@ body.et_divi_theme .et-l--header .charitable-campaign-field.charitable-campaign-
 }
 
 .charitable-campaign-wrap {
+  width: 100% !important;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
 .charitable-campaign-wrap .charitable-campaign-container .charitable-notice {

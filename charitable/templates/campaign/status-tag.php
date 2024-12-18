@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $campaign = $view_args['campaign'];
-$tag      = $campaign->get_status_tag();
+$tag      = $campaign->get_status_tag(); // phpcs:ignore
 
 if ( empty( $tag ) ) {
 	return;
@@ -24,5 +24,5 @@ if ( empty( $tag ) ) {
 
 ?>
 <div class="campaign-status-tag campaign-status-tag-<?php echo esc_attr( strtolower( str_replace( ' ', '-', $campaign->get_status_key() ) ) ); ?>">
-	<?php echo $tag; ?>
+	<?php echo esc_html( $tag ); ?>
 </div>

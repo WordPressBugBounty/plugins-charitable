@@ -1,3 +1,15 @@
+# 1.8.3.6
+* NEW: Form templates - standard/default and "minimal", selectable in donation form settings in the "general" settings tab. Beta. [More Information](https://www.wpcharitable.com/documentation/donation-form-templates/)
+* NEW: Added 'charitable_donation_amount_legend' filter to allow easier customization of "Your Donations" on donation form.
+* NEW: Added beta global 'CHARITABLE_DISABLE_SHOW_CURRENT_DONATION_AMOUNT' to change behavior of showing a donation already "in session" on donation form.
+* UPDATED: Turning off 'disable legacy mode' will now make more "add new" link for campaigns default to making new legacy campaigns.
+* UPDATED: Donation buttons in visual campaign for campaigns that no longer accept donations will show a 'no longer accepting donations message' while button is disabled.
+* FIX: Changed santitization of a url in Charitable upgrades which should allow upgrade to complete and prevent notice from appearing.
+* FIX: Improved notifications and dashboard display in the admin for ltr displays.
+* FIX: Resolved issue when donation module in campaign wasn't matching donation amount in modal triggered by donation button on same page.
+* FIX: CSS adjustments to campaign templates: wrapper element, donation buttons, and tweaks to donation suggested amounts.
+* FIX: Updated code related to translations and PHP standards.
+
 # 1.8.3.5
 * NEW: Added a 'charitable_gateway_fields_after_selector' action hook to insert content between gateway selectors and gateway fields on donation forms.
 * UPDATED: Provided a 'campaign_categories' attribute to stat and donor shortcodes to help filter by Charitable campaign categories.

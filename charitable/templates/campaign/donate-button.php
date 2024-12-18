@@ -22,6 +22,6 @@ $button_text       = false === $button_text || '' === trim( $button_text ) ? __(
 <form class="campaign-donation" method="post">
 	<?php wp_nonce_field( 'charitable-donate', 'charitable-donate-now' ); ?>
 	<input type="hidden" name="charitable_action" value="start_donation" />
-	<input type="hidden" name="campaign_id" value="<?php echo $campaign->ID; ?>" />
-	<button type="submit" name="charitable_submit" class="<?php echo esc_attr( charitable_get_button_class( 'donate' ) ); ?>"><?php echo wp_strip_all_tags( $button_text ); ?></button>
+	<input type="hidden" name="campaign_id" value="<?php echo esc_attr( $campaign->ID ); ?>" />
+	<button type="submit" name="charitable_submit" class="<?php echo esc_attr( charitable_get_button_class( 'donate' ) ); ?>"><?php echo esc_html( wp_strip_all_tags( $button_text ) ); ?></button>
 </form>

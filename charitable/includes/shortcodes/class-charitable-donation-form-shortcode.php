@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.5.0
- * @version   1.5.14
+ * @version   1.8.3.5
  */
 
 // Exit if accessed directly.
@@ -37,6 +37,7 @@ if ( ! class_exists( 'Charitable_Donation_Form_Shortcode' ) ) :
 		public static function display( $atts ) {
 			$defaults = array(
 				'campaign_id' => 0,
+				'type'        => 'full',
 			);
 
 			/* Parse incoming $atts into an array and merge it with $defaults. */

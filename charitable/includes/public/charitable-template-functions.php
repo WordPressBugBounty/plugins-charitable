@@ -680,6 +680,7 @@ if ( ! function_exists( 'charitable_template_donation_form' ) ) :
 	 * Display a campaign's donation form.
 	 *
 	 * @since  1.6.55
+	 * @since  1.8.3.5 Added get_form_template().
 	 *
 	 * @param  int   $campaign_id The campaign ID.
 	 * @param  array $args        Args to pass to the view.
@@ -720,8 +721,9 @@ if ( ! function_exists( 'charitable_template_donation_form' ) ) :
 		 */
 		do_action( 'charitable_donation_form_before', $form );
 
-		$args['form']     = $form;
-		$args['campaign'] = $form->get_campaign();
+		$args['form']          = $form;
+		$args['form_template'] = $form->get_form_template();
+		$args['campaign']      = $form->get_campaign();
 
 		charitable_template( 'donation-form/form-donation.php', $args );
 
@@ -1020,6 +1022,7 @@ if ( ! function_exists( 'charitable_template_donation_form_current_amount_text' 
 		 * @since 1.4.14
 		 * @since 1.5.0 Third parameter has been changed from an instance of
 		 *              `Charitable_Donation_Form` to a campaign ID.
+		 * @since 1.8.3.6 Added <div> wrapper.
 		 *
 		 * @param string    $amount_formatted The formatted amount.
 		 * @param int|float $amount           The raw amount.
@@ -1027,11 +1030,11 @@ if ( ! function_exists( 'charitable_template_donation_form_current_amount_text' 
 		 */
 		$amount_formatted = apply_filters( 'charitable_session_donation_amount_formatted', charitable_format_money( $amount, false, true ), $amount, $campaign_id );
 
-		$content = '<p>';
+		$content = '<div class="charitable-your-donation-amount"><p>';
 		/* translators: %s: donation amount */
 		$content .= sprintf( __( 'Your Donation Amount: %s.', 'charitable' ), '<strong>' . $amount_formatted . '</strong>' );
 		$content .= '&nbsp;<a href="#" class="change-donation" data-charitable-toggle="charitable-donation-options-' . esc_attr( $form_id ) . '">' . __( 'Change', 'charitable' ) . '</a>';
-		$content .= '</p>';
+		$content .= '</div></p>';
 
 		return $content;
 	}

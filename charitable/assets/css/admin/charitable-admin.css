@@ -95,6 +95,9 @@
   border-left: 0;
   border-right: 0;
 }
+[dir=rtl] #charitable-admin-header {
+  margin: 0 -20px 0 0px;
+}
 #charitable-admin-header .charitable-admin-header-interior {
   padding: 0px 30px;
   display: flex;
@@ -104,6 +107,9 @@
 #charitable-admin-header h1 {
   flex: 1;
   text-align: left;
+}
+[dir=rtl] #charitable-admin-header h1 {
+  text-align: right;
 }
 #charitable-admin-header .round {
   border-radius: 50%;
@@ -290,7 +296,7 @@ body.post-type-campaign .charitable-campaign-filter-actions a {
   color: #2B66D1;
   font-weight: 500;
   display: inline-block;
-  padding-top: 7px;
+  padding-top: 12px;
 }
 body.post-type-campaign .charitable-campaign-legacy-actions a label,
 body.post-type-campaign .charitable-campaign-export-actions a label,
@@ -3795,6 +3801,10 @@ body.modal-open {
   display: flex;
   align-items: baseline;
 }
+[dir=rtl] .charitable-notification > div .body .actions {
+  flex-direction: row-reverse;
+  justify-content: right;
+}
 .charitable-notification > div .body .actions > * {
   margin-bottom: 12px;
 }
@@ -3941,17 +3951,29 @@ body.charitable-show-notifications .charitable-main {
   margin-top: 32px;
   position: fixed;
   top: 0;
+  z-index: 999992;
   width: 570px; /*modify this value to fit your needs*/
-  right: -570px; /*modify this value to fit your needs*/
+  right: -570px;
   /*css transition*/
   -webkit-transition: right 500ms ease-out;
   -moz-transition: right 500ms ease-out;
   -o-transition: right 500ms ease-out;
   transition: right 500ms ease-out;
-  z-index: 999992;
+  /* override for right-to-left languages */
 }
 .charitable-plugin-notifications.in {
   right: 0;
+}
+[dir=rtl] .charitable-plugin-notifications {
+  left: -570px;
+  /*css transition*/
+  -webkit-transition: left 500ms ease-out;
+  -moz-transition: left 500ms ease-out;
+  -o-transition: left 500ms ease-out;
+  transition: left 500ms ease-out;
+}
+[dir=rtl] .charitable-plugin-notifications.in {
+  left: 0;
 }
 .charitable-plugin-notifications a.dismiss {
   color: #8c8f9a;
@@ -3995,12 +4017,9 @@ body.charitable-show-notifications .charitable-main {
   z-index: 1053;
   top: 32px;
   bottom: 0;
-  background-color: #fff;
+  background-color: white;
   overflow-x: hidden;
   transition: 0.5s;
-}
-[dir=rtl] .charitable-plugin-notifications .notification-menu {
-  left: 0;
 }
 .charitable-plugin-notifications .notification-menu .notification-header {
   height: 64px;

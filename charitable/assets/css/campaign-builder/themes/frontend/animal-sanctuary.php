@@ -24,7 +24,7 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 /* this narrows things down a little to the preview area header/tabs */
 
 <?php echo $wrapper; ?> {
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* aligns */
@@ -44,8 +44,8 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 }
 
 <?php echo $wrapper; ?> .charitable-campaign-column:nth-child(even) .charitable-campaign-field {
-  margin-top: 0;
-  margin-bottom: 0;
+	margin-top: 0;
+	margin-bottom: 0;
 }
 
 
@@ -54,7 +54,7 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 <?php echo $wrapper; ?> h5.charitable-field-template-headline,
 <?php echo $wrapper; ?> .charitable-campaign-title,
 <?php echo $wrapper; ?> .charitable-field-template-headline {
-    color: <?php echo $primary; ?>;
+	color: <?php echo $primary; ?>;
 }
 
 /* field: campaign title */
@@ -80,7 +80,8 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 
 /* field: button */
 
-<?php echo $wrapper; ?> .charitable-campaign-field-donate-button button.button {
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-button button.button,
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-button a.button {
 	background-color: <?php echo $button; ?> !important;
 	border-color: <?php echo $button; ?> !important;
 	text-transform: uppercase;
@@ -93,9 +94,18 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 	height: 50px;
 	font-size: 16px;
 	line-height: 16px;
-}
-<?php echo $wrapper; ?> .charitable-campaign-field-donate-button button.button {
+	display: flex; /* Changed from block to flex */
+	align-items: center; /* Vertically centers the text */
+	justify-content: center; /* Optionally centers the text horizontally too */
+	padding: 0;
+	text-align: center !important;
+	text-decoration: none !important;
 	color: white;
+	transition: filter 0.3s; /* Smooth transition */
+}
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-button button.button:hover,
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-button a.button:hover {
+	filter: brightness(0.8);
 }
 
 /* field: photo */
@@ -306,27 +316,27 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 	width: 100%;
 }
 <?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-campaign-summary  div.campaign-summary-item {
-  color: <?php echo $primary; ?>;
+	color: <?php echo $primary; ?>;
 }
 <?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-campaign-summary  div.campaign-summary-item span {
-  color: <?php echo $secondary; ?>;
+	color: <?php echo $secondary; ?>;
 }
 
 /* field: donate amount */
 
 <?php echo $wrapper; ?>  .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-amount.selected {
-    border-color: <?php echo $tertiary; ?> !important;
+	border-color: <?php echo $tertiary; ?> !important;
 }
 <?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-amount label,
 <?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-amount input.custom-donation-input[type="text"] {
-  color: <?php echo $primary; ?>;
-  border-color: <?php echo $primary; ?> !important;
+	color: <?php echo $primary; ?>;
+	border-color: <?php echo $primary; ?> !important;
 }
 <?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-amount ul li.suggested-donation-amount.selected {
-  border-color: <?php echo $tertiary; ?>;
+	border-color: <?php echo $tertiary; ?>;
 }
 <?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-amount ul li.suggested-donation-amount.selected span.amount {
-  color: <?php echo $primary; ?>;
+	color: <?php echo $primary; ?>;
 }
 
 /* field: donate form */
@@ -344,10 +354,10 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 /* tabs: style */
 
 <?php echo $wrapper; ?> .charitable-campaign-container .section[data-section-type="tabs"] article nav.charitable-tab-style-boxed li {
-  background-color: <?php echo $primary; ?>;
+	background-color: <?php echo $primary; ?>;
 }
 <?php echo $wrapper; ?> .charitable-campaign-container .section[data-section-type="tabs"] article nav.charitable-tab-style-boxed li a {
-  color: white;
+	color: white;
 }
 <?php echo $wrapper; ?> .charitable-campaign-container .section[data-section-type="tabs"] article nav.charitable-tab-style-rounded li {
 

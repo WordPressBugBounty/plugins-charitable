@@ -941,7 +941,15 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 							<?php esc_html_e( 'Create A Campaign To Start Accepting Donations!', 'charitable' ); ?>
 						</h2>
 						<div class="charitable-blank-slate-buttons">
-							<a class="charitable-blank-slate-cta charitable-button" target="_blank" href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ) ); ?>"><?php esc_html_e( 'Create Campaign', 'charitable' ); ?></a>
+							<a class="charitable-blank-slate-cta charitable-button" target="_blank" href="<?php
+
+							if ( charitable_disable_legacy_campaigns() ) :
+								echo esc_url( admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ) );
+							else :
+								echo esc_url( admin_url( 'post-new.php?post_type=campaign' ) );
+							endif;
+
+							?>"><?php esc_html_e( 'Create Campaign', 'charitable' ); ?></a>
 							<div class="charitable-blank-slate-buttons-legacy">
 								<div><a target="_blank" href="https://www.wpcharitable.com/documentation/learn-more-donations/"><?php esc_html_e( 'Learn More About Donations', 'charitable' ); ?></a></div>
 							</div>

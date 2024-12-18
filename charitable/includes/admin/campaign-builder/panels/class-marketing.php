@@ -289,6 +289,8 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Marketing' ) ) :
 
 				<section class="main-content">
 
+					<?php if ( ! charitable_is_pro() ) { ?>
+
 					<p><?php echo esc_html__( 'Upgrading to', 'charitable' ); ?> <strong><?php echo esc_html__( 'Pro', 'charitable' ); ?></strong> <?php echo esc_html__( 'gives you the following capabilities...', 'charitable' ); ?></p>
 
 					<ul>
@@ -298,6 +300,12 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Marketing' ) ) :
 						<li><?php echo esc_html__( 'Create your own custom / merge fields and map these fields to your donation forms.', 'charitable' ); ?></li>
 					</ul>
 
+					<h2><?php echo esc_html__( 'Get the most out of your campaigns with ', 'charitable' ); ?><strong><?php echo esc_html__( 'Pro', 'charitable' ); ?></strong>.</h2>
+
+						<p style="margin-top: 20px;"><a class="button-link" href="<?php echo esc_url( $learn_more_url ); ?>"><?php echo esc_html__( 'Learn More', 'charitable' ); ?></a></p>
+
+					<?php } ?>
+
 				</section>
 
 				<?php
@@ -305,11 +313,15 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Marketing' ) ) :
 			endif;
 			?>
 
+			<?php if ( $button_label ) : ?>
+
 			<div class="education-buttons education-buttons-bottom">
 				<div class="action-button">
 					<?php echo '<a class="button-link ' . esc_attr( $action_css_class ) . '" data-settings-url="' . esc_url( $settings_url ) . '" data-plugin-url="' . esc_attr( $addon_information['install'] ) . '" data-name="' . esc_attr( $addon_information['name'] ) . '" data-plugin-slug="' . esc_url( $addon_url ) . '" data-field-icon="">' . esc_html( $button_label ) . '</a>'; ?>
 				</div>
 			</div>
+
+			<?php endif; ?>
 
 
 

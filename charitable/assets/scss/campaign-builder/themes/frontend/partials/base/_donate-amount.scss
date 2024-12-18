@@ -12,16 +12,18 @@
             justify-content: space-between;
             margin: 0;
             padding: 0;
+            flex-direction: row;
 
             .charitable-template-donation-amount {
                 color: $color_theme_base_primary;
-                flex: 0 0 25%;
                 background-color: transparent;
-                padding: 5px;
                 text-align: center;
                 display: table;
                 min-height: 75px;
-                margin: 0;
+                flex: 1 1 30%;
+                max-width: 33.33%;
+                box-sizing: border-box;
+                padding: 5px;
 
                 input[type="radio"] {
                     display: none;

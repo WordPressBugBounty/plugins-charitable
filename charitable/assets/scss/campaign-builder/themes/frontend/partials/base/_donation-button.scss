@@ -14,6 +14,9 @@
         font-weight: 400;
         font-size: 16px;
         line-height: 25px;
+        &.charitable-disabled {
+            opacity: 0.5;
+        }
     }
     button.charitable-button:hover {
         text-decoration: none;

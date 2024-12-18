@@ -216,7 +216,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
                     ON p.ID = cd.donation_id
                     $where_sql";
 
-			$total = $wpdb->get_var( $wpdb->prepare( $sql, $parameters ) );
+			$total = $wpdb->get_var( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore
 
 			if ( $this->is_comma_decimal() ) {
 				$total = Charitable_Currency::get_instance()->sanitize_database_amount( $total );
@@ -247,7 +247,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
                     FROM $this->table_name
                     WHERE $column IN ( $in );";
 
-			$records = $wpdb->get_results( $wpdb->prepare( $sql, $parameters ), OBJECT_K );
+			$records = $wpdb->get_results( $wpdb->prepare( $sql, $parameters ), OBJECT_K ); // phpcs:ignore
 
 			if ( $this->is_comma_decimal() ) {
 				$records = array_map( array( $this, 'sanitize_amounts' ), $records );

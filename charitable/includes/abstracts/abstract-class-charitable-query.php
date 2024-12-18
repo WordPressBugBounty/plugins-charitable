@@ -193,7 +193,7 @@ if ( ! class_exists( 'Charitable_Query' ) ) :
 
 			$sql = "SELECT {$this->fields()} {$this->from()} {$this->join()} {$this->where()} {$this->groupby()} {$this->orderby()} {$this->order()} {$this->limit()} {$this->offset()};";
 
-			return $wpdb->get_results( $this->get_prepared_sql( $sql ) );
+			return $wpdb->get_results( $this->get_prepared_sql( $sql ) ); // phpcs:ignore
 		}
 
 		/**
@@ -210,7 +210,7 @@ if ( ! class_exists( 'Charitable_Query' ) ) :
 
 			$sql = "SELECT {$this->select_count()} {$this->from()} {$this->join()} {$this->where()};";
 
-			return array( $wpdb->get_var( $this->get_prepared_sql( $sql ) ) );
+			return array( $wpdb->get_var( $this->get_prepared_sql( $sql ) ) ); // phpcs:ignore
 		}
 
 		/**
@@ -230,7 +230,7 @@ if ( ! class_exists( 'Charitable_Query' ) ) :
 				return $sql;
 			}
 
-			return $wpdb->prepare( $sql, $this->parameters );
+			return $wpdb->prepare( $sql, $this->parameters ); // phpcs:ignore
 		}
 
 		/**
@@ -267,7 +267,7 @@ if ( ! class_exists( 'Charitable_Query' ) ) :
 			 */
 			$found_items_query = apply_filters( 'charitable_found_items_query', 'SELECT FOUND_ROWS()', $this );
 
-			return (int) $wpdb->get_var( $found_items_query );
+			return (int) $wpdb->get_var( $found_items_query ); // phpcs:ignore
 		}
 
 		/**
@@ -673,8 +673,8 @@ if ( ! class_exists( 'Charitable_Query' ) ) :
 		 */
 		public function where_donor_id_is_in( $where_statement ) {
 
-			$donor_email_passed = isset( $_GET['donor_email'] ) ? esc_html( $_GET['donor_email' ] ) : false;
-			$donor_email = $this->get( 'email', $donor_email_passed );
+			$donor_email_passed = isset( $_GET['donor_email'] ) ? esc_html( $_GET['donor_email'] ) : false; // phpcs:ignore
+			$donor_email        = $this->get( 'email', $donor_email_passed );
 
 			if ( $donor_email ) { // stop searching by ID, we will search by email that was supplied.
 				return $where_statement;
@@ -739,7 +739,7 @@ if ( ! class_exists( 'Charitable_Query' ) ) :
 		public function where_donation_id_is_in( $where_statement ) {
 			global $wpdb;
 
-			$donation_ids_passed = isset( $_GET['donation_ids'] ) ? esc_html( $_GET['donation_ids' ] ) : false;
+			$donation_ids_passed = isset( $_GET['donation_ids'] ) ? esc_html( $_GET['donation_ids'] ) : false; // phpcs:ignore
 
 			if ( $donation_ids_passed === false ) {
 				return $where_statement;

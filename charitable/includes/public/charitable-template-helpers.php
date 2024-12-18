@@ -358,11 +358,12 @@ function charitable_get_email_verification_link( WP_User $user, $redirect_url = 
  * Get the button classes for a Charitable button.
  *
  * @since  1.6.29
+ * @version 1.8.3.6 Added $disabled parameter.
  *
  * @param  string $button Which button we're showing.
  * @return string
  */
-function charitable_get_button_class( $button ) {
+function charitable_get_button_class( $button, $disabled = false ) {
 	$classes = [ 'button', 'charitable-button' ];
 
 	switch ( $button ) {
@@ -373,6 +374,10 @@ function charitable_get_button_class( $button ) {
 
 		default:
 			$classes[] = $button . '-button';
+	}
+
+	if ( $disabled ) {
+		$classes[] = 'charitable-disabled';
 	}
 
 	/**

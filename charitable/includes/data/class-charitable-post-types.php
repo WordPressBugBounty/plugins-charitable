@@ -126,7 +126,14 @@ if ( ! class_exists( 'Charitable_Post_Types' ) ) :
 					$post_type_object->labels->add_new = 'Add New Legacy Campaign';
 				}
 			} else {
-				$post_new_file = 'admin.php?page=charitable-campaign-builder&view=template';
+				if ( charitable_disable_legacy_campaigns() ) :
+					$post_new_file = 'admin.php?page=charitable-campaign-builder&view=template';
+				else :
+					$post_new_file = 'post-new.php?post_type=campaign';
+					if ( isset( $post_type_object->labels ) && isset( $post_type_object->labels->add_new ) ) :
+						$post_type_object->labels->add_new_item = 'Add New Legacy Campaign';
+					endif;
+				endif;
 			}
 		}
 
@@ -159,7 +166,13 @@ if ( ! class_exists( 'Charitable_Post_Types' ) ) :
 				// Find the "Add New" link.
 				foreach ( $submenu['charitable'] as $key => $value ) {
 					if ( 0 === strpos( $value[0], 'Add New' ) ) {
-						$submenu['charitable'][ $key ][2] = 'admin.php?page=charitable-campaign-builder&view=template'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+						// The link depends if the disable legacy campaigns is enabled.
+						$disable_legacy_campaign = charitable_get_option( 'disable_campaign_legacy_mode', false ) ? true : false;
+						if ( charitable_disable_legacy_campaigns() ) {
+							$submenu['charitable'][ $key ][2] = 'admin.php?page=charitable-campaign-builder&view=template'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+						} else {
+							$submenu['charitable'][ $key ][2] = 'post-new.php?post_type=campaign'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+						}
 					}
 				}
 			}

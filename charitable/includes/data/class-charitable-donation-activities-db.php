@@ -117,7 +117,7 @@ if ( ! class_exists( 'Charitable_Donation_Activities_DB' ) ) :
 
 			$sql = "DROP TABLE IF EXISTS {$this->table_name};";
 
-			$wpdb->query( $wpdb->prepare( $sql ) );
+			$wpdb->query( $wpdb->prepare( $sql ) ); // phpcs:ignore
 		}
 
 		/**

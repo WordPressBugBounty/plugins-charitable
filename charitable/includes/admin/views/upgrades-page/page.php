@@ -44,7 +44,7 @@ if ( $step > $steps ) {
 }
 ?>
 <div class="wrap">
-	<h2><?php _e( 'Charitable - Upgrades', 'charitable' ); ?></h2>
+	<h2><?php esc_html_e( 'Charitable - Upgrades', 'charitable' ); ?></h2>
 
 	<div id="charitable-upgrade-status">
 		<p><?php esc_html_e( 'The upgrade process has started, please be patient. This could take several minutes. You will be automatically redirected when the upgrade is finished.', 'charitable' ); ?></p>
@@ -54,6 +54,6 @@ if ( $step > $steps ) {
 		<?php endif; ?>
 	</div>
 	<script type="text/javascript">
-		setTimeout(function() { document.location.href = "<?php echo esc_html( $timeout_url ); ?>"; }, 250);
+		setTimeout(function() { document.location.href = "<?php echo esc_url_raw( $timeout_url ); ?>"; }, 250);
 	</script>
 </div>

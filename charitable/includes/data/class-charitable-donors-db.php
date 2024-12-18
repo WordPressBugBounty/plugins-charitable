@@ -111,7 +111,7 @@ if ( ! class_exists( 'Charitable_Donors_DB' ) ) :
 			if ( ! isset( $this->db_columns ) ) {
 				global $wpdb;
 
-				$columns          = $wpdb->get_results( "SHOW COLUMNS FROM $this->table_name" );
+				$columns          = $wpdb->get_results( "SHOW COLUMNS FROM $this->table_name" ); // phpcs:ignore
 				$this->db_columns = $columns ? wp_list_pluck( $columns, 'Field' ) : array();
 			}
 
@@ -322,9 +322,9 @@ if ( ! class_exists( 'Charitable_Donors_DB' ) ) :
 		public function get_personal_data( $email ) {
 			global $wpdb;
 
-			return $wpdb->get_results(
+			return $wpdb->get_results( // phpcs:ignore
 				$wpdb->prepare(
-					"SELECT donor_id, email, first_name, last_name FROM {$this->table_name} WHERE email = %s;",
+					"SELECT donor_id, email, first_name, last_name FROM {$this->table_name} WHERE email = %s;", // phpcs:ignore
 					$email
 				)
 			);
@@ -336,7 +336,7 @@ if ( ! class_exists( 'Charitable_Donors_DB' ) ) :
 		 * @since  1.8.1
 		 *
 		 * @global $wpdb WPDB
-		 * @param  string $email Donor email address.
+		 * @param  int $donor_id Donor ID.
 		 * @return array|object|null Database query results
 		 */
 		public function get_personal_data_by_donor_id( $donor_id = 0 ) {
@@ -346,9 +346,9 @@ if ( ! class_exists( 'Charitable_Donors_DB' ) ) :
 				return array();
 			}
 
-			return $wpdb->get_results(
+			return $wpdb->get_results( // phpcs:ignore
 				$wpdb->prepare(
-					"SELECT donor_id, email, first_name, last_name, user_id FROM {$this->table_name} WHERE donor_id = %d;",
+					"SELECT donor_id, email, first_name, last_name, user_id FROM {$this->table_name} WHERE donor_id = %d;", // phpcs:ignore
 					$donor_id
 				)
 			);
@@ -373,9 +373,9 @@ if ( ! class_exists( 'Charitable_Donors_DB' ) ) :
 			if ( empty( $statuses ) ) {
 				$status_clause = '';
 			} else {
-				$statuses 	   = array_filter( $statuses, 'charitable_is_valid_donation_status' );
+				$statuses      = array_filter( $statuses, 'charitable_is_valid_donation_status' );
 				$placeholders  = array_fill( 0, count( $statuses ), '%s' );
-				$in 		   = implode( ', ', $placeholders );
+				$in            = implode( ', ', $placeholders );
 				$status_clause = "AND p.post_status IN ( $in )";
 			}
 
@@ -386,7 +386,7 @@ if ( ! class_exists( 'Charitable_Donors_DB' ) ) :
 				WHERE 1 = 1
 				$status_clause;";
 
-			return $wpdb->get_var( $wpdb->prepare( $sql, $statuses ) );
+			return $wpdb->get_var( $wpdb->prepare( $sql, $statuses ) ); // phpcs:ignore
 		}
 
 		/**
@@ -442,7 +442,7 @@ if ( ! class_exists( 'Charitable_Donors_DB' ) ) :
 
 			}
 
-			return $wpdb->query( $wpdb->prepare( $sql, $parameters ) );
+			return $wpdb->query( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore
 		}
 
 		/**
@@ -454,7 +454,7 @@ if ( ! class_exists( 'Charitable_Donors_DB' ) ) :
 		 * @return boolean
 		 */
 		private function is_anonymized_email( $email ) {
-			return function_exists( 'wp_privacy_anonymize_data' ) && wp_privacy_anonymize_data( 'email' ) == $email;
+			return function_exists( 'wp_privacy_anonymize_data' ) && wp_privacy_anonymize_data( 'email' ) === $email;
 		}
 	}
 

@@ -571,7 +571,13 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 							<div class="no-items">
 								<p><strong><?php echo esc_html__( 'There are no campaigns at the moment.', 'charitable' ); ?></strong></p>
 								<?php if ( false === $action ) : ?>
-								<p class="link"><a href="<?php echo admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ); // phpcs:ignore ?>"><?php echo esc_html__( 'Add New Campaign', 'charitable' ); ?>
+									<?php if ( charitable_disable_legacy_campaigns() ) : ?>
+									<p class="link"><a href="<?php echo admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ); // phpcs:ignore ?>"><?php echo esc_html__( 'Add New Campaign', 'charitable' ); ?>
+										<?php else : ?>
+										<p class="link"><a href="<?php echo admin_url( 'post-new.php?post_type=campaign' ); // phpcs:ignore ?>"><?php echo esc_html__( 'Add New Campaign', 'charitable' ); ?>
+									<?php endif; ?>
+
+
 																	<?php
 																	if ( $include_icons ) :
 																		?>
@@ -582,7 +588,11 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 						</div>
 						<div class="more">
 							<?php if ( ! empty( $top_campaigns->posts ) && false === $action ) : ?>
-								<a href="<?php echo admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ); // phpcs:ignore ?>"><?php echo esc_html__( 'Add New Campaign', 'charitable' ); ?> <img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/east.svg'; // phpcs:ignore ?>" /></a>
+								<?php if ( charitable_disable_legacy_campaigns() ) : ?>
+									<a href="<?php echo admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ); // phpcs:ignore ?>"><?php echo esc_html__( 'Add New Campaign', 'charitable' ); ?> <img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/east.svg'; // phpcs:ignore ?>" /></a>
+								<?php else : ?>
+									<a href="<?php echo admin_url( 'post-new.php?post_type=campaign' ); // phpcs:ignore ?>"><?php echo esc_html__( 'Add New Campaign', 'charitable' ); ?> <img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/east.svg'; // phpcs:ignore ?>" /></a>
+								<?php endif; ?>
 							<?php endif; ?>
 						</div>
 					</div>

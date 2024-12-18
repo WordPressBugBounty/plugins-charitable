@@ -129,12 +129,13 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 		 *
 		 * @since  1.7.0.4
 		 *
-		 * @param  string $key The key of the field to get.
+		 * @param  string $content  The content.
+		 * @param  object $campaign The campaign object.
 		 * @return mixed
 		 */
 		public function description_content( $content = false, $campaign = false ) {
 
-			// search for YouTube and Vimeo video urls by default and attempt to convert them to oembed
+			// search for YouTube and Vimeo video urls by default and attempt to convert them to oembed.
 
 			preg_match_all( '#(?<=v=|v\/|vi=|vi\/|youtu.be\/)[a-zA-Z0-9_-]{11}#', $content, $matches );
 
@@ -689,7 +690,7 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 		 */
 		public function get_status() {
 
-			$status = $post_status = isset( $this->post ) && ! empty( $this->post->post_status ) ? $this->post->post_status : false;
+			$status = $post_status = isset( $this->post ) && ! empty( $this->post->post_status ) ? $this->post->post_status : false; // phpcs:ignore
 
 			if ( 'publish' == $status ) {
 				$status = $this->has_ended() ? 'finished' : 'active';
@@ -761,6 +762,9 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 		 * Return the campaign status tag.
 		 *
 		 * @since  1.0.0
+		 *
+		 * @param  boolean $show_achievement Whether to show the achievement status tag.
+		 * @param  boolean $show_active_tag  Whether to show the active status tag.
 		 *
 		 * @return string
 		 */
@@ -1357,9 +1361,11 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 		 * @since  1.0.0
 		 *
 		 * @param  array $value Current suggested donations value.
+		 * @param  bool  $submitted Whether the value was submitted.
+		 * @param  int   $campaign_id The campaign ID.
 		 * @return array
 		 */
-		public static function sanitize_campaign_suggested_donations( $value, $submitted = false, $campaign_id = false ) {
+		public static function sanitize_campaign_suggested_donations( $value, $submitted = false, $campaign_id = false ) { // phpcs:ignore
 			if ( ! is_array( $value ) ) {
 				return array();
 			}

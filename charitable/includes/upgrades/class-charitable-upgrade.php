@@ -349,10 +349,10 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 					<?php
 					printf(
 						'%s %s',
-						$upgrade['message'],
+						$upgrade['message'], // phpcs:ignore
 						sprintf(
 							/* translators: %s: upgrade link */
-							__( 'Click <a href="%s">here</a> to start the upgrade.', 'charitable' ),
+							__( 'Click <a href="%s">here</a> to start the upgrade.', 'charitable' ), // phpcs:ignore
 							esc_url( admin_url( 'index.php?page=charitable-upgrades&charitable-upgrade=' . $action ) )
 						)
 					);
@@ -473,7 +473,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 					<?php
 						printf(
 							/* translators: %s: upgrade link */
-							__( 'Charitable needs to complete an upgrade that was started earlier. Click <a href="%s">here</a> to continue the upgrade.', 'charitable' ),
+							__( 'Charitable needs to complete an upgrade that was started earlier. Click <a href="%s">here</a> to continue the upgrade.', 'charitable' ), // phpcs:ignore
 							esc_url( add_query_arg( $upgrade_progress, admin_url( 'index.php' ) ) )
 						);
 					?>
@@ -551,7 +551,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 		 */
 		public function update_upgrade_system() {
 			if ( ! current_user_can( 'manage_charitable_settings' ) ) {
-				wp_die( __( 'You do not have permission to do Charitable upgrades', 'charitable' ), __( 'Error', 'charitable' ), array( 'response' => 403 ) );
+				wp_die( __( 'You do not have permission to do Charitable upgrades', 'charitable' ), __( 'Error', 'charitable' ), array( 'response' => 403 ) ); // phpcs:ignore
 			}
 
 			ignore_user_abort( true );
@@ -586,7 +586,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 		 */
 		public function fix_donation_dates() {
 			if ( ! current_user_can( 'manage_charitable_settings' ) ) {
-				wp_die( __( 'You do not have permission to do Charitable upgrades', 'charitable' ), __( 'Error', 'charitable' ), array( 'response' => 403 ) );
+				wp_die( __( 'You do not have permission to do Charitable upgrades', 'charitable' ), __( 'Error', 'charitable' ), array( 'response' => 403 ) ); // phpcs:ignore
 			}
 
 			ignore_user_abort( true );
@@ -695,7 +695,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 			global $wpdb;
 
 			if ( ! current_user_can( 'manage_charitable_settings' ) ) {
-				wp_die( __( 'You do not have permission to do Charitable upgrades', 'charitable' ), __( 'Error', 'charitable' ), array( 'response' => 403 ) );
+				wp_die( __( 'You do not have permission to do Charitable upgrades', 'charitable' ), __( 'Error', 'charitable' ), array( 'response' => 403 ) ); // phpcs:ignore
 			}
 
 			ignore_user_abort( true );
@@ -709,7 +709,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 			$subquery = "SELECT GROUP_CONCAT(donor_id, ':', user_id) AS donor, COUNT(*) AS count
 				FROM {$wpdb->prefix}charitable_donors
 				GROUP BY email";
-			$total    = $wpdb->get_var( "SELECT COUNT( d.donor ) FROM ( {$subquery} ) AS d WHERE d.count > 1" );
+			$total    = $wpdb->get_var( "SELECT COUNT( d.donor ) FROM ( {$subquery} ) AS d WHERE d.count > 1" ); // phpcs:ignore
 
 			/**
 			 * If there are no donors left to remove, go ahead and wrap it up right now.
@@ -718,7 +718,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 				$this->finish_upgrade( 'remove_duplicate_donors' );
 			}
 
-			$donors = $wpdb->get_col( "SELECT d.donor FROM ( {$subquery} ) AS d WHERE d.count > 1" );
+			$donors = $wpdb->get_col( "SELECT d.donor FROM ( {$subquery} ) AS d WHERE d.count > 1" ); // phpcs:ignore
 
 			if ( count( $donors ) ) {
 
@@ -760,11 +760,11 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 						WHERE donor_id IN ( {$donor_id_placeholders} )";
 
 					$parameters = array_merge( array( $canonical ), $duplicates );
-					$updated    = $wpdb->query( $wpdb->prepare( $sql, array_merge( array( $canonical ), $duplicates ) ) );
+					$updated    = $wpdb->query( $wpdb->prepare( $sql, array_merge( array( $canonical ), $duplicates ) ) ); // phpcs:ignore
 
 					if ( false !== $updated ) {
 						$sql     = "DELETE FROM {$wpdb->prefix}charitable_donors WHERE donor_id IN ( {$donor_id_placeholders} );";
-						$deleted = $wpdb->query( $wpdb->prepare( $sql, $duplicates ) );
+						$deleted = $wpdb->query( $wpdb->prepare( $sql, $duplicates ) ); // phpcs:ignore
 					}
 				}//end foreach
 
@@ -854,12 +854,12 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 		 * @param  string $action The upgrade action.
 		 * @return true Will always return true.
 		 */
-		public function remove_campaign_manager_cap( $action ) {
+		public function remove_campaign_manager_cap( $action ) { // phpcs:ignore
 			global $wp_roles;
 
 			if ( class_exists( 'WP_Roles' ) ) {
 				if ( ! isset( $wp_roles ) ) {
-					$wp_roles = new WP_Roles();
+					$wp_roles = new WP_Roles(); // phpcs:ignore
 				}
 			}
 
@@ -879,7 +879,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 		 * @param  string $action The upgrade action.
 		 * @return boolean Whether the query was successfully executed.
 		 */
-		public function fix_empty_campaign_end_date_meta( $action ) {
+		public function fix_empty_campaign_end_date_meta( $action ) { // phpcs:ignore
 			global $wpdb;
 
 			$sql = "UPDATE $wpdb->postmeta
@@ -890,7 +890,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 					AND $wpdb->postmeta.meta_value = ''
 					AND $wpdb->posts.post_type = 'campaign';";
 
-			$ret = $wpdb->query( $sql );
+			$ret = $wpdb->query( $sql ); // phpcs:ignore
 
 			return false !== $ret;
 		}
@@ -904,13 +904,13 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 		 * @param  string $action The upgrade action.
 		 * @return boolean Whether the event was scheduled.
 		 */
-		public function clear_campaign_amount_donated_transient( $action ) {
+		public function clear_campaign_amount_donated_transient( $action ) { // phpcs:ignore
 			global $wpdb;
 
 			$sql = "DELETE FROM $wpdb->options
 					WHERE option_name LIKE '_transient_charitable_campaign_%_donation_amount'";
 
-			$ret = $wpdb->query( $sql );
+			$ret = $wpdb->query( $sql ); // phpcs:ignore
 
 			return false !== $ret;
 		}
@@ -1119,7 +1119,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 
 			if ( class_exists( 'WP_Roles' ) ) {
 				if ( ! isset( $wp_roles ) ) {
-					$wp_roles = new WP_Roles();
+					$wp_roles = new WP_Roles(); // phpcs:ignore
 				}
 			}
 
@@ -1162,7 +1162,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
             				 WHERE donor_id = 0
             		       	 AND donation_id NOT IN ( $placeholders )";
 
-			return $wpdb->get_var( $wpdb->prepare( $sql, $skipped ) );
+			return $wpdb->get_var( $wpdb->prepare( $sql, $skipped ) ); // phpcs:ignore
 		}
 
 		/**
@@ -1178,11 +1178,11 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 			global $wpdb;
 
 			if ( empty( $skipped ) ) {
-				return $wpdb->get_col(
+				return $wpdb->get_col( // phpcs:ignore
 					"SELECT DISTINCT donation_id
 					FROM {$wpdb->prefix}charitable_campaign_donations
 					WHERE donor_id = 0
-					LIMIT $number;"
+					LIMIT $number;" // phpcs:ignore
 				);
 			}
 
@@ -1194,7 +1194,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 				FROM {$wpdb->prefix}charitable_campaign_donations
 				WHERE donor_id = 0
 				AND donation_id NOT IN ( $placeholders )
-				LIMIT $number;",
+				LIMIT $number;", // phpcs:ignore
 					$skipped
 				)
 			);
@@ -1210,8 +1210,8 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 		public function fix_empty_donor_ids() {
 			global $wpdb;
 
-			if ( ! current_user_can( 'manage_charitable_settings' ) ) {
-				wp_die( __( 'You do not have permission to do Charitable upgrades', 'charitable' ), __( 'Error', 'charitable' ), array( 'response' => 403 ) );
+			if ( ! current_user_can( 'manage_charitable_settings' ) ) { // phpcs:ignore
+				wp_die( __( 'You do not have permission to do Charitable upgrades', 'charitable' ), __( 'Error', 'charitable' ), array( 'response' => 403 ) ); // phpcs:ignore
 			}
 
 			ignore_user_abort( true );
@@ -1310,7 +1310,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 			try {
 
 				// test and verify nonce in the $_GET array.
-				if ( ! isset( $_GET['nonce'] ) || ! wp_verify_nonce( $_GET['nonce'], 'charitable-upgrade' ) ) {
+				if ( ! isset( $_GET['nonce'] ) || ! wp_verify_nonce( $_GET['nonce'], 'charitable-upgrade' ) ) { // phpcs:ignore
 					return false;
 				}
 

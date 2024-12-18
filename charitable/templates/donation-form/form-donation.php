@@ -8,6 +8,7 @@
  * @package Charitable/Templates/Donation Form
  * @since   1.0.0
  * @version 1.6.57
+ * @version 1.8.3.5 Added $form_class to allow for charitable-minimal beta.
  */
 
 // Exit if accessed directly.
@@ -15,16 +16,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$form     = $view_args['form'];
-$user     = wp_get_current_user();
-$use_ajax = 'make_donation' == $form->get_form_action() && (int) Charitable_Gateways::get_instance()->gateways_support_ajax();
-$form_id  = isset( $view_args['form_id'] ) ? $view_args['form_id'] : charitable_get_donation_form_id();
+$form       = $view_args['form'];
+$user       = wp_get_current_user();
+$use_ajax   = 'make_donation' == $form->get_form_action() && (int) Charitable_Gateways::get_instance()->gateways_support_ajax();
+$form_id    = isset( $view_args['form_id'] ) ? $view_args['form_id'] : charitable_get_donation_form_id();
+$form_class = ! empty( $view_args['form_template'] ) ? apply_filters( 'charitable_donation_form_class', 'charitable-form charitable-donation-form charitable-template-' . esc_attr( $view_args['form_template'] ), $form ) : apply_filters( 'charitable_donation_form_class', 'charitable-form charitable-donation-form charitable-template-standard', $form ); // allows for charitable-minimal.
 
 if ( ! $form ) {
 	return;
 }
+
 ?>
-<form method="post" id="<?php echo esc_attr( $form_id ); ?>" class="charitable-donation-form charitable-form" data-use-ajax="<?php echo esc_attr( $use_ajax ); ?>">
+<form method="post" id="<?php echo esc_attr( $form_id ); ?>" class="<?php echo esc_attr( $form_class ); ?>" data-use-ajax="<?php echo esc_attr( $use_ajax ); ?>">
 	<?php
 	/**
 	 * Do something before rendering the form fields.

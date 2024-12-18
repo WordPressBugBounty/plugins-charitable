@@ -61,8 +61,6 @@ $charitable_report_overview_args = apply_filters(
 	)
 );
 
-// set_transient( 'charitable-report-overview-args', $charitable_report_overview_args, MINUTE_IN_SECONDS );
-
 $charitable_reports->init_with_array( 'overview', $charitable_report_overview_args );
 
 // main activity.

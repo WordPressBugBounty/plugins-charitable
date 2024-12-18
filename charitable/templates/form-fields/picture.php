@@ -73,35 +73,35 @@ wp_enqueue_script( 'charitable-plup-fields' );
 wp_enqueue_style( 'charitable-plup-styles' );
 
 ?>
-<div id="charitable_field_<?php echo $field['key']; ?>" class="<?php echo $classes; ?>">
+<div id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>" class="<?php echo esc_attr( $classes ); ?>">
 	<?php if ( isset( $field['label'] ) ) : ?>
 		<label>
-			<?php echo $field['label']; ?>
+			<?php echo esc_html( $field['label'] ); ?>
 			<?php if ( $is_required ) : ?>
 				<abbr class="required" title="required">*</abbr>
 			<?php endif ?>
 		</label>
 	<?php endif ?>
 	<?php if ( isset( $field['help'] ) ) : ?>
-		<p class="charitable-field-help"><?php echo $field['help']; ?></p>
+		<p class="charitable-field-help"><?php echo $field['help']; // phpcs:ignore  ?></p>
 	<?php endif ?>
-	<div id="<?php echo $field['key']; ?>-dragdrop"
+	<div id="<?php echo esc_attr( $field['key'] ); ?>-dragdrop"
 		class="charitable-drag-drop"
-		data-max-size="<?php echo $max_file_size; ?>"
-		data-images="<?php echo $field['key']; ?>-dragdrop-images"
+		data-max-size="<?php echo esc_attr( $max_file_size ); ?>"
+		data-images="<?php echo esc_attr( $field['key'] ); ?>-dragdrop-images"
 		data-params="<?php echo esc_attr( wp_json_encode( $params ) ); ?>">
-		<div id="<?php echo $field['key']; ?>-dragdrop-dropzone" class="charitable-drag-drop-dropzone" <?php echo $has_max_uploads ? 'style="display:none;"' : ''; ?>>
-			<p class="charitable-drag-drop-info"><?php echo 1 == $max_uploads ? _x( 'Drop image here', 'image upload', 'charitable' ) : _x( 'Drop images here', 'image upload plural', 'charitable' ); ?></p>
-			<p><?php _ex( 'or', 'image upload', 'charitable' ); ?></p>
+		<div id="<?php echo esc_attr( $field['key'] ); ?>-dragdrop-dropzone" class="charitable-drag-drop-dropzone" <?php echo $has_max_uploads ? 'style="display:none;"' : ''; ?>>
+			<p class="charitable-drag-drop-info"><?php echo esc_html( 1 === $max_uploads ? _x( 'Drop image here', 'image upload', 'charitable' ) : _x( 'Drop images here', 'image upload plural', 'charitable' ) ); ?></p>
+			<p><?php echo esc_html_x( 'or', 'image upload', 'charitable' ); ?></p>
 			<p class="charitable-drag-drop-buttons">
-				<button id="<?php echo $field['key']; ?>-browse-button" class="button" type="button"><?php _ex( 'Select Files', 'image upload', 'charitable' ); ?></button>
+				<button id="<?php echo esc_attr( $field['key'] ); ?>-browse-button" class="button" type="button"><?php echo esc_html_x( 'Select Files', 'image upload', 'charitable' ); ?></button>
 			</p>
 		</div>
 		<div class="charitable-drag-drop-image-loader" style="display: none;">
-			<p class="loader-title"><?php _e( 'Uploading...', 'charitable' ); ?></p>
+			<p class="loader-title"><?php esc_html_e( 'Uploading...', 'charitable' ); ?></p>
 			<ul class="images"></ul>
 		</div>
-		<ul id="<?php echo $field['key']; ?>-dragdrop-images" class="charitable-drag-drop-images charitable-drag-drop-images-<?php echo $max_uploads; ?>">
+		<ul id="<?php echo esc_attr( $field['key'] ); ?>-dragdrop-images" class="charitable-drag-drop-images charitable-drag-drop-images-<?php echo esc_attr( $max_uploads ); ?>">
 			<?php
 			foreach ( $pictures as $image ) :
 				charitable_template(

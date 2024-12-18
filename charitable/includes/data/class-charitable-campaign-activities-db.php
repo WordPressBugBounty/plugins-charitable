@@ -116,7 +116,7 @@ if ( ! class_exists( 'Charitable_Campaign_Activities_DB' ) ) :
 
 			$sql = "DROP TABLE IF EXISTS {$this->table_name};";
 
-			$wpdb->query( $sql );
+			$wpdb->query( $sql ); // phpcs:ignore
 		}
 
 		/**
@@ -132,7 +132,7 @@ if ( ! class_exists( 'Charitable_Campaign_Activities_DB' ) ) :
 
 			$sql = "TRUNCATE TABLE {$this->table_name};";
 
-			$wpdb->query( $sql );
+			$wpdb->query( $sql ); // phpcs:ignore
 		}
 
 		/**

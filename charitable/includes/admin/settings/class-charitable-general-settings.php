@@ -177,6 +177,18 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 					),
 					'help'     => __( 'Choose how you want a campaign\'s donation form to show.', 'charitable' ),
 				),
+				'donation_form_template'                 => array(
+					'title'    => __( 'Form Template <span class="badge beta">Beta</span>', 'charitable' ),
+					'type'     => 'select',
+					'priority' => 23,
+					'default'  => '',
+					'class'    => 'general-settings',
+					'options'  => array(
+						''        => __( 'Standard', 'charitable' ),
+						'minimal' => __( 'Minimal', 'charitable' ),
+					),
+					'help'     => __( 'The minimal template has a more compact and simplified layout. It is most effective with "only show required fields" set to "Yes".', 'charitable' ),
+				),
 				'donation_form_minimal_fields'           => array(
 					'title'    => __( 'Only show required fields', 'charitable' ),
 					'type'     => 'radio',
@@ -189,7 +201,7 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 					),
 					'help'     => __( 'Choose if you wish fields not required on the donation form to be hidden.', 'charitable' ),
 				),
-				'donation_form_show_login_message' => array(
+				'donation_form_show_login_message'       => array(
 					'title'    => __( 'Show login form <span class="badge beta">Beta</span>', 'charitable' ),
 					'type'     => 'radio',
 					'priority' => 25,

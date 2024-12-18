@@ -58,7 +58,7 @@ if ( ! class_exists( 'Charitable_Donations' ) ) :
 					FROM $wpdb->posts
 					WHERE post_type = %s";
 
-			return $wpdb->get_var( $wpdb->prepare( $sql, $post_type ) );
+			return $wpdb->get_var( $wpdb->prepare( $sql, $post_type ) ); // phpcs:ignore
 		}
 
 		/**
@@ -95,7 +95,7 @@ if ( ! class_exists( 'Charitable_Donations' ) ) :
 				$day   = $args['start_date']['day'];
 
 				if ( false !== checkdate( $month, $day, $year ) ) {
-					$where_clause .= $wpdb->prepare( " AND post_date >= '%s'", date( 'Y-m-d', mktime( 0, 0, 0, $month, $day, $year ) ) );
+					$where_clause .= $wpdb->prepare( " AND post_date >= '%s'", date( 'Y-m-d', mktime( 0, 0, 0, $month, $day, $year ) ) ); // phpcs:ignore
 				}
 			}
 
@@ -105,12 +105,12 @@ if ( ! class_exists( 'Charitable_Donations' ) ) :
 				$day   = $args['end_date']['day'];
 
 				if ( false !== checkdate( $month, $day, $year ) ) {
-					$where_clause .= $wpdb->prepare( " AND post_date <= '%s'", date( 'Y-m-d', mktime( 0, 0, 0, $month, $day, $year ) ) );
+					$where_clause .= $wpdb->prepare( " AND post_date <= '%s'", date( 'Y-m-d', mktime( 0, 0, 0, $month, $day, $year ) ) ); // phpcs:ignore
 				}
 			}
 
 			if ( ! is_null( $args['author'] ) ) {
-				$where_clause .= $wpdb->prepare( " AND post_author = %d", $args['author'] );
+				$where_clause .= $wpdb->prepare( " AND post_author = %d", $args['author'] ); // phpcs:ignore
 			}
 
 			$sql = "SELECT post_status, COUNT( * ) AS num_donations
@@ -118,7 +118,7 @@ if ( ! class_exists( 'Charitable_Donations' ) ) :
 				WHERE $where_clause
 				GROUP BY post_status";
 
-			return $wpdb->get_results( $sql, OBJECT_K );
+			return $wpdb->get_results( $sql, OBJECT_K ); // phpcs:ignore
 		}
 	}
 

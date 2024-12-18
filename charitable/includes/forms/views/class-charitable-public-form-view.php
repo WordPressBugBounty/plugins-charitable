@@ -235,7 +235,13 @@ if ( ! class_exists( 'Charitable_Public_Form_View' ) ) :
 
 			$i = 1;
 
+			$form_template = charitable_get_option( 'donation_form_template', false );
+
 			foreach ( $fields as $key => $field ) {
+				// insert div group for certain fields.
+				if ( $i === 1 && ( 'minimal' === $form_template && ( 'title' === strtolower( $key ) || 'first_name' === strtolower( $key ) ) ) ) {
+					echo '<div class="charitable-form-group charitable-form-group-number-' . $i . '" charitable-form-group-' . $key . '">';
+				}
 				$this->render_field(
 					$field,
 					$key,
@@ -243,6 +249,9 @@ if ( ! class_exists( 'Charitable_Public_Form_View' ) ) :
 						'index' => $i,
 					)
 				);
+				if ( 'minimal' === $form_template && 'last_name' === strtolower( $key ) ) {
+					echo '</div>';
+				}
 
 				$i += $this->increment_index( $field, $key, $i );
 			}

@@ -35,11 +35,10 @@ if ( ! class_exists( 'Charitable_Donate_Widget' ) ) :
 				'charitable_donate_widget',
 				__( 'Campaign Donation', 'charitable' ),
 				array(
-					'description' => __( 'Display a donation widget.', 'charitable' ),
+					'description'                 => __( 'Display a donation widget.', 'charitable' ),
 					'customize_selective_refresh' => true,
 				)
 			);
-
 		}
 
 		/**
@@ -47,12 +46,12 @@ if ( ! class_exists( 'Charitable_Donate_Widget' ) ) :
 		 *
 		 * @since   1.0.0
 		 *
-		 * @param   array $args 	Widget args.
+		 * @param   array $args     Widget args.
 		 * @param   array $instance Widget instance.
 		 * @return  void
 		 */
 		public function widget( $args, $instance ) {
-			if ( ! array_key_exists( 'campaign_id', $instance ) || '' == $instance['campaign_id'] ) {
+			if ( ! array_key_exists( 'campaign_id', $instance ) || '' === $instance['campaign_id'] ) {
 				return;
 			}
 
@@ -80,17 +79,17 @@ if ( ! class_exists( 'Charitable_Donate_Widget' ) ) :
 			$campaigns   = Charitable_Campaigns::query( array( 'posts_per_page' => -1 ) );
 			?>
 			<p>
-				<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:', 'charitable' ) ?>
-					<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
+				<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Title:', 'charitable' ); ?>
+					<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
 				</label>
 			</p>
 			<p>
-				<label for="<?php echo $this->get_field_id( 'campaign_id' ); ?>"><?php _e( 'Campaign:', 'charitable' ) ?>
-					<select name="<?php echo $this->get_field_name( 'campaign_id' ) ?>">
-						<option value="current"><?php _e( 'Campaign currently viewed', 'charitable' ) ?></option>
-						<optgroup label="<?php _e( 'Specific campaigns', 'charitable' ) ?>">
+				<label for="<?php echo esc_attr( $this->get_field_id( 'campaign_id' ) ); ?>"><?php esc_html_e( 'Campaign:', 'charitable' ); ?>
+					<select name="<?php echo esc_attr( $this->get_field_name( 'campaign_id' ) ); ?>">
+						<option value="current"><?php esc_html_e( 'Campaign currently viewed', 'charitable' ); ?></option>
+						<optgroup label="<?php esc_html_e( 'Specific campaigns', 'charitable' ); ?>">
 							<?php foreach ( $campaigns->posts as $campaign ) : ?>
-								<option value="<?php echo $campaign->ID ?>" <?php selected( $campaign->ID, $campaign_id ) ?>><?php echo $campaign->post_title ?></option>
+								<option value="<?php echo esc_attr( $campaign->ID ); ?>" <?php selected( $campaign->ID, $campaign_id ); ?>><?php echo esc_html( $campaign->post_title ); ?></option>
 							<?php endforeach ?>
 						</optgroup>
 					</select>

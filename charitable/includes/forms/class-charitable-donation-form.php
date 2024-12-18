@@ -146,6 +146,17 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		}
 
 		/**
+		 * Return the form template, which is the look. Right now, the default is false with "minimal as the beta.
+		 *
+		 * @since  1.8.3.5
+		 *
+		 * @return string
+		 */
+		public function get_form_template() {
+			return charitable_get_option( 'donation_form_template', false );
+		}
+
+		/**
 		 * Return the current user.
 		 *
 		 * @since  1.0.0
@@ -351,6 +362,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		 * Return the donation form fields.
 		 *
 		 * @since  1.0.0
+		 * @version 1.8.3.5
 		 *
 		 * @return array[]
 		 */
@@ -361,6 +373,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 					'type'     => 'donation-amount-wrapper',
 					'fields'   => $this->get_donation_fields(),
 					'priority' => 20,
+					'multi_currency' => true,
 				),
 				'details_fields'  => array(
 					'legend'   => __( 'Details', 'charitable' ),
@@ -476,7 +489,18 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 					''
 				);
 			} else {
-				$content = charitable_template_donation_form_current_amount_text( $amount, $this->get_form_identifier(), $this->get_campaign()->ID );
+				if ( defined( 'CHARITABLE_DISABLE_SHOW_CURRENT_DONATION_AMOUNT' ) && CHARITABLE_DISABLE_SHOW_CURRENT_DONATION_AMOUNT ) {
+					$content = charitable_template_from_session_content(
+						'donation_form_current_amount_text',
+						array(
+							'campaign_id' => $this->get_campaign()->ID,
+							'form_id'     => $this->get_form_identifier(),
+						),
+						''
+					);
+				} else {
+					$content = charitable_template_donation_form_current_amount_text( $amount, $this->get_form_identifier(), $this->get_campaign()->ID );
+				}
 			}
 
 			return $content;
@@ -502,7 +526,8 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		/**
 		 * Render the donation form.
 		 *
-		 * @since  1.0.0
+		 * @since   1.0.0
+		 * @version 1.8.3.6 added get_form_template()
 		 *
 		 * @return void
 		 */
@@ -511,6 +536,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 				'donation-form/form-donation.php',
 				array(
 					'campaign' => $this->get_campaign(),
+					'form_template' => $this->get_form_template(),
 					'form'     => $this,
 				)
 			);

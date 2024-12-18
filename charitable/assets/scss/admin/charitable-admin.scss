@@ -24,6 +24,10 @@
     border-left: 0;
     border-right: 0;
 
+    [dir='rtl'] & {
+        margin: 0 -20px 0 0px;
+    }
+
     .charitable-admin-header-interior {
         padding: 0px 30px;
         display: flex;
@@ -34,6 +38,10 @@
     h1 {
         flex: 1;
         text-align: left;
+        [dir=rtl] & {
+            text-align: right;
+        }
+
     }
 
     .round {
@@ -252,7 +260,7 @@ body.post-type-campaign {
             color: #2B66D1;
             font-weight: 500;
             display: inline-block;
-            padding-top: 7px;
+            padding-top: 12px;
 
             label {
                 display: block;
@@ -4788,6 +4796,10 @@ body {
                 flex-wrap: wrap;
                 display: flex;
                 align-items: baseline;
+                [dir='rtl'] & {
+                    flex-direction: row-reverse;
+                    justify-content: right;
+                }
 
                 >* {
                     margin-bottom: 12px;
@@ -4961,18 +4973,33 @@ body.charitable-show-notifications {
     margin-top: 32px;
     position: fixed;
     top: 0;
+    z-index: 999992;
     width: 570px; /*modify this value to fit your needs*/
-    right: -570px; /*modify this value to fit your needs*/
-
+    right: -570px;
     /*css transition*/
     -webkit-transition: right 500ms ease-out;
     -moz-transition: right 500ms ease-out;
     -o-transition: right 500ms ease-out;
     transition: right 500ms ease-out;
-    z-index: 999992;
-
     &.in {
         right: 0;
+    }
+
+    /* override for right-to-left languages */
+    [dir=rtl] & {
+        left: -570px;
+        /*css transition*/
+        -webkit-transition: left 500ms ease-out;
+        -moz-transition: left 500ms ease-out;
+        -o-transition: left 500ms ease-out;
+        transition: left 500ms ease-out;
+        &.in {
+            left: 0;
+        }
+    }
+
+    [dir=ltr] & {
+
     }
 
     a.dismiss {
@@ -5020,17 +5047,9 @@ body.charitable-show-notifications {
         z-index: 1053;
         top: 32px;
         bottom: 0;
-        background-color: #fff;
+        background-color: white;
         overflow-x: hidden;
         transition: 0.5s;
-
-        // [dir=ltr] & {
-        //     right: 0;
-        // }
-
-        [dir=rtl] & {
-            left: 0;
-        }
 
         .notification-header {
             height: 64px;

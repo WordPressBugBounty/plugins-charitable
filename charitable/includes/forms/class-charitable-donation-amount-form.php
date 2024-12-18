@@ -161,9 +161,10 @@ if ( ! class_exists( 'Charitable_Donation_Amount_Form' ) ) :
 			charitable_template(
 				'donation-form/form-donation.php',
 				array(
-					'campaign' => $this->get_campaign(),
-					'form'     => $this,
-					'form_id'  => 'charitable-donation-amount-form',
+					'campaign'      => $this->get_campaign(),
+					'form_template' => $this->get_form_template(),
+					'form'          => $this,
+					'form_id'       => 'charitable-donation-amount-form',
 				)
 			);
 		}

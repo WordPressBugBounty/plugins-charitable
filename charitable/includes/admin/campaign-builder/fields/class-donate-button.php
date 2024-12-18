@@ -143,9 +143,17 @@ if ( ! class_exists( 'Charitable_Field_Donate_Button' ) ) :
 
 			<div <?php echo esc_attr( $css_class ); ?>>
 
-			<?php if ( ! $campaign->can_receive_donations() && ! $is_preview_page ) { ?>
+			<?php
 
-			<button type="submit" name="charitable_submit" disabled class="<?php echo esc_attr( charitable_get_button_class( 'donate' ) ); ?>"><?php echo wp_strip_all_tags( $button_label ); ?></button>
+			if ( ! $campaign->can_receive_donations() && ! $is_preview_page ) {
+
+				$charitable_campaign_button_closed_message = apply_filters( 'charitable_campaign_button_closed_message', esc_html__( 'This campaign is closed or goal has been reached.', 'charitable' ), $campaign );
+
+				?>
+
+			<button type="submit" name="charitable_submit" disabled class="<?php echo esc_attr( charitable_get_button_class( 'donate', true ) ); ?>">
+				<?php echo esc_html( $charitable_campaign_button_closed_message ); ?>
+			</button>
 
 			<?php } elseif ( 'modal' === $donation_form_display ) { ?>
 

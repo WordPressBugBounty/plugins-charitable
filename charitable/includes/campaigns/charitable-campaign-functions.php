@@ -359,7 +359,7 @@ function chartitable_get_image_attached_id_from_url( $image_url = false ) {
 	if ( ! $image_url ) {
 		return false;
 	}
-	$attachment = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE guid='%s';", $image_url ) );
+	$attachment = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE guid='%s';", $image_url ) ); // phpcs:ignore
 	if ( ! empty( $attachment[0] ) ) {
 		return $attachment[0];
 	}

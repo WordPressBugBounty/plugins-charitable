@@ -28,7 +28,7 @@ $form = $view_args['form'];
 	do_action( 'charitable_forgot_password_before', $view_args );
 
 	?>
-	<form id="lostpasswordform" class="charitable-form" action="<?php echo wp_lostpassword_url(); ?>" method="post">
+	<form id="lostpasswordform" class="charitable-form" action="<?php echo esc_url( wp_lostpassword_url() ); ?>" method="post">
 		<?php
 		/**
 		 * Do something before rendering the form fields.

@@ -1124,6 +1124,7 @@ select#charitable_settings_export_donations {
   display: table;
   margin: 0 0 10px 0;
   width: 100%;
+  text-indent: 10px;
 }
 
 .charitable-settings-object {
@@ -1544,6 +1545,10 @@ select#charitable_settings_export_donations {
   }
   .charitable-admin-banner-top-of-page a {
     color: white;
+  }
+  [dir=rtl] .charitable-admin-banner-top-of-page {
+    margin-left: 0;
+    margin-right: -20px;
   }
   .charitable-license-expiring-banner.charitable-admin-banner-top-of-page {
     background: #e84040;
