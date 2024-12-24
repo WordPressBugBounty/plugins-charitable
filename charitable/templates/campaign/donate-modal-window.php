@@ -8,6 +8,7 @@
  * @package Charitable/Templates/Campaign Page
  * @since   1.0.0
  * @version 1.6.57
+ * @version 1.8.3.7
  */
 
 $campaign = $view_args['campaign'];
@@ -16,7 +17,7 @@ if ( ! $campaign->can_receive_donations() ) :
 	return;
 endif;
 
-$modal_class = apply_filters( 'charitable_modal_window_class', 'charitable-modal' );
+$modal_class = apply_filters( 'charitable_modal_window_class', 'charitable-modal charitable-modal-donation' );
 
 wp_enqueue_script( 'lean-modal' );
 wp_enqueue_style( 'lean-modal-css' );

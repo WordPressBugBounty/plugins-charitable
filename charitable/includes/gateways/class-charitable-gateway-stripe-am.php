@@ -32,8 +32,10 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 
 		/**
 		 * Gateway badge.
+		 *
+		 * @var string
 		 */
-		var $badge = '';
+		protected $badge = '';
 
 		/**
 		 * Instantiate the gateway class, defining its key values.
@@ -99,6 +101,21 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 		 * @since  1.7.0
 		 */
 		public function gateway_settings( $settings ) {
+
+			$settings = $settings + array(
+				'cc_fields_format' => [
+					'title'    => __( 'Credit Card Fields Format <span class="badge beta">Beta</span>', 'charitable' ),
+					'type'     => 'select',
+					'priority' => 4,
+					'class'    => 'general-settings',
+					'default'  => 'below_amount_selection',
+					'options'  => array(
+						''         => __( 'Single field', 'charitable' ),
+						'multiple' => __( 'Multiple fields', 'charitable' ),
+					),
+					'help'     => __( 'Single field (default) provides the card, expiration data, zip code, and CVC fields in one field. Multiple fields (beta) are seperated.', 'charitable' ),
+				],
+			);
 
 			if ( ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) || charitable_is_admin_debug() ) {
 
@@ -206,7 +223,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 				}
 
 				if ( $this->check_keys_exist( $mode ) && false === charitable_using_stripe_connect() && charitable()->is_stripe_connect_addon() ) {
-					// if there ARE keys and the Stripe addon is active... BUT WE ARE NOT USING 1.70 Stripe Connect... so this is most likely previous stripe addon keys
+					// if there ARE keys and the Stripe addon is active... BUT WE ARE NOT USING 1.70 Stripe Connect... so this is most likely previous stripe addon keys.
 					$stripe_settings = $stripe_settings + array(
 						'stripe_modify_keys' => [
 							'title'    => '',
@@ -471,7 +488,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 					'state'             => str_pad( wp_rand( wp_rand(), PHP_INT_MAX ), 100, wp_rand(), STR_PAD_BOTH ),
 					'customer_site_url' => urlencode( $redirect_url ),
 				),
-				'https://wpcharitable.com/stripe-connect/?wpcharitable_gateway_connect_init=stripe_connect' // todo: filter market site url
+				'https://wpcharitable.com/stripe-connect/?wpcharitable_gateway_connect_init=stripe_connect' // todo: filter market site url.
 			);
 		}
 
@@ -623,46 +640,108 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 
 			$fields = parent::get_credit_card_fields();
 
-			/* Remove all fields except for the cc_name field. */
-			unset(
-				$fields['cc_number'],
-				$fields['cc_cvc'],
-				$fields['cc_expiration']
-			);
+			$cc_fields_format = empty( $this->get_value( 'cc_fields_format' ) ) ? 'standard' : $this->get_value( 'cc_fields_format' );
 
-			/* Check for an existing payment intent. */
-			$intent = Charitable_Stripe_Payment_Intent::init_from_session();
-			$intent = false;
+			if ( 'multiple' === $cc_fields_format ) {
+				/* Remove all fields except for the cc_name field. */
+				unset(
+					$fields['cc_number'],
+					$fields['cc_cvc'],
+					$fields['cc_expiration']
+				);
 
-			ob_start();
+				/* Check for an existing payment intent. */
+				$intent = Charitable_Stripe_Payment_Intent::init_from_session();
+				$intent = false;
 
-			/**
-			 * Render a template with our custom CSS. NOTE: We pass a non-empty array
-			 * as the second parameter to ensure that the template is rendered immediately.
-			 *
-			 * @see charitable_template
-			 */
-			charitable_template(
-				'stripe-elements.css.php',
-				[ 1 ],
-				'Charitable_Stripe_Template'
-			);
-			?>
-			<label for="charitable_stripe_card_field"><?php _e( 'Credit/Debit Card', 'charitable' ); ?></label>
-			<div id="charitable_stripe_card_field" data-secret="<?php echo $intent ? $intent->get( 'client_secret' ) : ''; ?>" data-intent="<?php echo $intent ? $intent->get( 'id' ) : ''; ?>"></div>
-			<div id="charitable_stripe_card_errors" role="alert"></div>
-			<input type="hidden" name="stripe_payment_method" />
-			<?php
+				ob_start();
 
-			$fields['cc_element'] = [
-				'type'     => 'content',
-				'content'  => ob_get_clean(),
-				'priority' => 2,
-			];
+				/**
+				 * Render a template with our custom CSS. NOTE: We pass a non-empty array
+				 * as the second parameter to ensure that the template is rendered immediately.
+				 *
+				 * @see charitable_template
+				 */
+				charitable_template(
+					'stripe-elements.css.php',
+					[ 1 ],
+					'Charitable_Stripe_Template'
+				);
+				?>
 
-			$fields['cc_name']['attrs'] = [
-				'data-input' => 'cc_name',
-			];
+				<div class="charitable_stripe_multiple_field">
+					<label for="charitable_stripe_card_expiration_field"><?php esc_html_e( 'Expiration Date', 'charitable' ); ?></label>
+					<div id="charitable_stripe_card_expiration_field">
+						<!-- A Stripe Element will be inserted here -->
+					</div>
+				</div>
+				<div class="charitable_stripe_multiple_field">
+					<label for="charitable_stripe_card_number_field"><?php esc_html_e( 'Credit/Debit Number', 'charitable' ); ?></label>
+					<div id="charitable_stripe_card_number_field">
+						<!-- A Stripe Element will be inserted here -->
+					</div>
+				</div>
+				<div class="charitable_stripe_multiple_field">
+					<label for="charitable_stripe_card_cvc_field"><?php esc_html_e( 'CVC', 'charitable' ); ?></label>
+					<div id="charitable_stripe_card_cvc_field">
+						<!-- A Stripe Element will be inserted here -->
+					</div>
+				</div>
+
+
+				<div id="charitable_stripe_card_errors" role="alert"></div>
+				<input type="hidden" name="stripe_payment_method" />
+
+				<?php
+
+				$fields['cc_element'] = [
+					'type'     => 'content',
+					'content'  => ob_get_clean(),
+					'priority' => 2,
+				];
+
+			} else {
+				/* Remove all fields except for the cc_name field. */
+				unset(
+					$fields['cc_number'],
+					$fields['cc_cvc'],
+					$fields['cc_expiration']
+				);
+
+				/* Check for an existing payment intent. */
+				$intent = Charitable_Stripe_Payment_Intent::init_from_session();
+				$intent = false;
+
+				ob_start();
+
+				/**
+				 * Render a template with our custom CSS. NOTE: We pass a non-empty array
+				 * as the second parameter to ensure that the template is rendered immediately.
+				 *
+				 * @see charitable_template
+				 */
+				charitable_template(
+					'stripe-elements.css.php',
+					[ 1 ],
+					'Charitable_Stripe_Template'
+				);
+				?>
+				<label for="charitable_stripe_card_field"><?php esc_html_e( 'Credit/Debit Card', 'charitable' ); ?></label>
+				<div id="charitable_stripe_card_field" data-secret="<?php echo $intent ? $intent->get( 'client_secret' ) : ''; ?>" data-intent="<?php echo $intent ? $intent->get( 'id' ) : ''; ?>"></div>
+				<div id="charitable_stripe_card_errors" role="alert"></div>
+				<input type="hidden" name="stripe_payment_method" />
+				<?php
+
+				$fields['cc_element'] = [
+					'type'     => 'content',
+					'content'  => ob_get_clean(),
+					'priority' => 2,
+				];
+
+				$fields['cc_name']['attrs'] = [
+					'data-input' => 'cc_name',
+				];
+			}
 
 			return $fields;
 		}
@@ -737,7 +816,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 
 			/* If we're using Payment Intents, make sure we have a payment method. */
 			if ( ! $gateway->get_value( 'enable_stripe_checkout' ) ) {
-				if ( ! array_key_exists( 'stripe_payment_method', $_POST ) || ! $_POST['stripe_payment_method'] ) {
+				if ( ! array_key_exists( 'stripe_payment_method', $_POST ) || ! $_POST['stripe_payment_method'] ) { // phpcs:ignore WordPress.Security.NonceVerification
 					charitable_get_notices()->add_error(
 						__( '<strong>Missing payment details.</strong> <a href="#charitable-gateway-fields">Click here to double-check that all required payment fields are completed.</a>', 'charitable' )
 					);
@@ -1028,7 +1107,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 		 *
 		 * @since  1.4.9
 		 *
-		 * @param  Charitable_Recurring_Donation $donation  The recurring donation object.
+		 * @param  Charitable_Recurring_Donation $recurring_donation  The recurring donation object.
 		 * @return boolean
 		 */
 		public function process_completed_subscription( $recurring_donation ) {
@@ -1082,7 +1161,6 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 		 * @param  array                         $charge_args The arguments for the charge API request.
 		 * @param  Charitable_Donor              $donor       The current user.
 		 * @param  Charitable_Donation_Processor $processor   The Donation Processor helper object.
-		 * @return string
 		 */
 		public function make_charge( $charge_args, $donor, $processor ) {
 			charitable_stripe_get_deprecated()->deprecated_function( __METHOD__, '1.3.0' );
@@ -1109,8 +1187,6 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 		 *
 		 * @since  1.1.0
 		 * @since  1.3.0 Deprecated.
-		 *
-		 * @return array
 		 */
 		public function get_charges() {
 			charitable_stripe_get_deprecated()->deprecated_function( __METHOD__, '1.3.0' );
@@ -1123,6 +1199,9 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 		 *
 		 * @since  1.1.0
 		 * @since  1.3.0 Deprecated.
+		 *
+		 * @param  array  $result The result of the charge.
+		 * @param  string $status The status of the charge.
 		 *
 		 * @return void
 		 */
@@ -1392,7 +1471,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 		/**
 		 * Determine if the Stripe addon should be shown on the frontend if no keys are found
 		 *
-		 * @param  array[] $gateways The list of registered gateways.
+		 * @param  array[] $active_gateways The list of registered gateways.
 		 * @return string[]
 		 * @since  1.7.0
 		 */
@@ -1428,7 +1507,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 		/**
 		 * Register the Stripe payment gateway class.
 		 *
-		 * @param  string $settings Setting, which might have been stored in the database by an addon.
+		 * @param  string $setting Setting, which might have been stored in the database by an addon.
 		 * @param  string $original_key Oringial key.
 		 * @param  string $default Default setting.
 		 * @return string
@@ -1448,13 +1527,15 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 		/**
 		 * Stripe shows errors for amounts less tha $1, so set the min. amount to 1. This filter catches the ajax request.
 		 *
+		 * @param  integer $minimum_amount The minimum donation amount.
+		 *
 		 * @return integer
 		 * @since  1.7.0.2
 		 */
 		public function set_minimum_donation_amount( $minimum_amount ) {
 
-			if ( isset( $_POST['gateway'] ) && false !== strpos( $_POST['gateway'], 'stripe' ) ) {
-					// Stripe gateway detected - make sure the minimum aount is at least 1 (logic revised in 1.7.0.9)
+			if ( isset( $_POST['gateway'] ) && false !== strpos( $_POST['gateway'], 'stripe' ) ) { // phpcs:ignore
+					// Stripe gateway detected - make sure the minimum aount is at least 1 (logic revised in 1.7.0.9).
 				if ( intval( $minimum_amount ) < 1 ) {
 					$minimum_amount = 1;
 				}
@@ -1465,6 +1546,9 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 
 		/**
 		 * Use existing pre-1.7.0 hook to process webhooks that are for Stripe Connect AM accounts.
+		 *
+		 * @param  string $event_type The type of event.
+		 * @param  object $event The event object.
 		 *
 		 * @since  1.7.0
 		 */
@@ -1477,9 +1561,11 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 				return;
 			}
 
-			error_log( 'maybe_process_webhook_with_stripe_connect' );
-			error_log( print_r( $event_type, true ) );
-			error_log( print_r( $event, true ) );
+			if ( ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) ) {
+				error_log( 'maybe_process_webhook_with_stripe_connect' ); // phpcs:ignore
+				error_log( print_r( $event_type, true ) ); // phpcs:ignore
+				error_log( print_r( $event, true ) ); // phpcs:ignore
+			}
 
 			$processor = new Charitable_Stripe_Webhook_Processor( $event );
 
@@ -1501,7 +1587,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 			if ( array_key_exists( $event_type, $default_processors ) ) {
 				$message = call_user_func( $default_processors[ $event_type ], $event );
 				/* Kill processing with a message returned by the event processor. */
-				die( $message );
+				die( $message ); // phpcs:ignore
 			}
 		}
 	}

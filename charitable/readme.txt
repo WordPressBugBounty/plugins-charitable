@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.7.1
 Requires PHP: 7.2
-Stable tag: 1.8.3.6
+Stable tag: 1.8.3.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -124,7 +124,7 @@ We also know that our developer friends may want more control, so we have added 
 Allow your users to donate with the payment solution of their choice to reach your donation goals faster.
 
 * [Stripe](https://www.wpcharitable.com/integrations/stripe/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - We're a Stripe Verified Partner for Stripe Donation payments. Easily accept credit card donations on your website with Stripe.
-* PayPal - Easily accept PayPal donations on your website.
+* [PayPal](https://www.wpcharitable.com/integrations/paypal/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - Easily accept PayPal donations on your website.
 * [Square](https://www.wpcharitable.com/extensions/charitable-square/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - Accept credit card donations with Square.
 * [Braintree](https://www.wpcharitable.com/extensions/charitable-braintree/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin)
 * [Authorize.net](https://www.wpcharitable.com/extensions/charitable-authorize-net/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin)
@@ -258,8 +258,12 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 
 == Changelog ==
 
+= Donation Form & Fundraising Campaigns v1.8.3.7 =
+* NEW: Stripe Gateway allows single or multiple credit card field layout (beta). [More Information](https://www.wpcharitable.com/documentation/credit-card-multiple-fields/)
+* FIX: Ensured some additional settings are added to the database upon a new install.
+
 = Donation Form & Fundraising Campaigns v1.8.3.6 =
-* NEW: Form templates - standard/default and "minimal", selectable in donation form settings in the "general" settings tab. Beta. [More Information](https://www.wpcharitable.com/documentation/donation-form-templates/)
+* NEW: Form templates (beta) - standard/default and "minimal" - selectable in donation form settings in the "general" settings tab. [More Information](https://www.wpcharitable.com/documentation/donation-form-templates/)
 * NEW: Added 'charitable_donation_amount_legend' filter to allow easier customization of "Your Donations" on donation form.
 * NEW: Added beta global 'CHARITABLE_DISABLE_SHOW_CURRENT_DONATION_AMOUNT' to change behavior of showing a donation already "in session" on donation form.
 * UPDATED: Turning off 'disable legacy mode' will now make more "add new" link for campaigns default to making new legacy campaigns.
@@ -443,29 +447,5 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 * FIX: Improved communication with Charitable server and caching of failed API attempts for licenses.
 * FIX: Added additional checks for activities database tables.
 * FIX: Resolved a few PHP warnings and notices.
-
-= Donation Form & Fundraising Campaigns v1.8.1.2 =
-* FIX: Resolved a PHP fatal error for older PHP versions when checking license information for addons.
-
-= Donation Form & Fundraising Campaigns v1.8.1.1 =
-* FIX: Resolved a PHP 8.x fatal error in getting sample donors for Lite users on donor report page.
-* FIX: Better results for activities on activity page when "donations (paid)" filter is selected.
-* FIX: Improved communication with Charitable server and caching of API data when confirming addon and license information.
-* FIX: Adjusted CSS for a call to action button for lite users on campaign page.
-* FIX: Resolved an issue where sample activity data was appearing for lite users in certain scenarios.
-* FIX: Minor cleanup of activity HTML on overview reporting page when no activities are available to display.
-
-= Donation Form & Fundraising Campaigns v1.8.1 =
-* NEW: New dashboard showing new data and reports related to campaigns, donations, and donors over last 7, 14, and 30 days. [More information](https://www.wpcharitable.com/dashboard-reporting?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin).
-* NEW: Introducing a new reporting tab that (among other reports) includes an overview showing donation breakdown, report filtering, payment breakdown, and more. [More information](https://www.wpcharitable.com/dashboard-reporting?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin).
-* NEW: Clear activity database option in Charitable settings->advanced tab.
-* NEW: Addition of 'charitable_is_main_loop' filter which is involved in checking whether Charitable is currently in the main loop on a singular page.
-* NEW: Updated CSS of frontend campaign visual templates, including adding word wrap CSS to campaign title headlines.
-* FIX: Resolved fatal error in certain scenarios when 'donation form on page' was in set in general settings and a shortcode was used to add a single campaign.
-* FIX: In Stripe gateway settings: card descriptor field for Stripe (with Stripe Connect) appears in both CHARITABLE_DEBUG mode true and false.
-* FIX: Resolved issues related to embedding campaigns in the visual builder.
-* FIX: Added checks for get_current_screen() to resolve a fatal error in some scenarios on an admin screen.
-* FIX: Auto setting for donation receipt pages should work better for block themes, including Twenty Twenty-Three and Twenty Twenty-Four.
-* FIX: Adjusting allowed HTML in the text block for campaign visual builder.
 
 **[View entire donation form and fundraising platform changelog](https://plugins.svn.wordpress.org/charitable/trunk/CHANGELOG.md)**

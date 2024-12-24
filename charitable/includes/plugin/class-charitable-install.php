@@ -120,7 +120,8 @@ if ( ! class_exists( 'Charitable_Install' ) ) :
 		/**
 		 * Set up initial settings for install.
 		 *
-		 * @since  1.8.3.1
+		 * @since   1.8.3.1
+		 * @version 1.8.3.7 - Added general default settings.
 		 *
 		 * @return void
 		 */
@@ -130,6 +131,16 @@ if ( ! class_exists( 'Charitable_Install' ) ) :
 
 			// If no activation date is set, assume it's a new install.
 			if ( false === $activated || empty( $activated ) ) {
+
+				// Default general settings.
+				$this->set_initial_charitable_option( 'donation_form_display', 'modal' );
+				$this->set_initial_charitable_option( 'country', 'US' );
+				$this->set_initial_charitable_option( 'currency', 'USD' );
+				$this->set_initial_charitable_option( 'currency_format', 'left' );
+				$this->set_initial_charitable_option( 'decimal_separator', '.' );
+				$this->set_initial_charitable_option( 'thousands_separator', ',' );
+				$this->set_initial_charitable_option( 'decimal_count', '2' );
+
 				// Default gateway settings.
 				$this->set_initial_charitable_option( 'test_mode', 1 );
 				$this->set_initial_charitable_option(

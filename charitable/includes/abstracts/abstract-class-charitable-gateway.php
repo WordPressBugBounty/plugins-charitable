@@ -25,35 +25,47 @@ if ( ! class_exists( 'Charitable_Gateway' ) ) :
 	abstract class Charitable_Gateway implements Charitable_Gateway_Interface {
 
 		/**
+		 * The gateway's unique identifier.
+		 *
 		 * @var     string The gateway's unique identifier.
 		 */
 		const ID = '';
 
 		/**
+		 * The gateway's name.
+		 *
 		 * @var     string Name of the payment gateway.
 		 * @since   1.0.0
 		 */
 		protected $name;
 
 		/**
+		 * Credit card form.
+		 *
 		 * @var     string Credit card form.
 		 * @since   1.8.0
 		 */
 		protected $credit_card_form;
 
 		/**
+		 * The gateway's badge.
+		 *
 		 * @var     string Name of the payment gateway.
 		 * @since   1.0.0
 		 */
 		protected $badge;
 
 		/**
+		 * The recommended status.
+		 *
 		 * @var     string Recommended status.
 		 * @since   1.8.1.10
 		 */
 		protected $recommended;
 
 		/**
+		 * The gateway's default settings.
+		 *
 		 * @var     array The default values for all settings added by the gateway.
 		 * @since   1.0.0
 		 */
@@ -132,18 +144,18 @@ if ( ! class_exists( 'Charitable_Gateway' ) ) :
 		 */
 		public function default_gateway_settings() {
 			return array(
-				'section_gateway' => array(
+				'section_gateway'  => array(
 					'type'        => 'heading',
 					'title'       => $this->get_name(),
 					'badge'       => $this->get_badge(),
 					'priority'    => 2,
 					'recommended' => false,
 				),
-				'label'           => array(
+				'label'            => array(
 					'type'        => 'text',
 					'title'       => __( 'Gateway Label', 'charitable' ),
 					'help'        => __( 'The label that will be shown to donors on the donation form.', 'charitable' ),
-					'priority'    => 4,
+					'priority'    => 3,
 					'default'     => $this->get_default_label(),
 					'recommended' => false,
 				),
@@ -177,7 +189,7 @@ if ( ! class_exists( 'Charitable_Gateway' ) ) :
 		 *
 		 * @since  1.0.0
 		 *
-		 * @param  string $setting
+		 * @param  string $setting The setting key.
 		 * @return mixed
 		 */
 		public function get_value( $setting ) {
@@ -312,7 +324,7 @@ if ( ! class_exists( 'Charitable_Gateway' ) ) :
 		 *
 		 * @since   1.0.0
 		 *
-		 * @param   array $settings
+		 * @param   array $settings The existing gateway settings.
 		 * @return  array
 		 */
 		abstract public function gateway_settings( $settings );

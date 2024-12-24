@@ -1,5 +1,9 @@
+# 1.8.3.7
+* NEW: Stripe Gateway allows single or multiple credit card field layout (beta). [More Information](https://www.wpcharitable.com/documentation/credit-card-multiple-fields/)
+* FIX: Ensured some additional settings are added to the database upon a new install.
+
 # 1.8.3.6
-* NEW: Form templates - standard/default and "minimal", selectable in donation form settings in the "general" settings tab. Beta. [More Information](https://www.wpcharitable.com/documentation/donation-form-templates/)
+* NEW: Form templates (beta) - standard/default and "minimal" - selectable in donation form settings in the "general" settings tab. [More Information](https://www.wpcharitable.com/documentation/donation-form-templates/)
 * NEW: Added 'charitable_donation_amount_legend' filter to allow easier customization of "Your Donations" on donation form.
 * NEW: Added beta global 'CHARITABLE_DISABLE_SHOW_CURRENT_DONATION_AMOUNT' to change behavior of showing a donation already "in session" on donation form.
 * UPDATED: Turning off 'disable legacy mode' will now make more "add new" link for campaigns default to making new legacy campaigns.

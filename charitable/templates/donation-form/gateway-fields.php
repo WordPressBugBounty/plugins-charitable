@@ -6,6 +6,7 @@
  * @package Charitable/Templates/Donation Form
  * @since   1.0.0
  * @version 1.8.3.1 Cleanup.
+ * @version 1.8.3.7 Added support for cc_fields_format.
  */
 
 // Exit if accessed directly.
@@ -17,11 +18,17 @@ if ( ! isset( $view_args['form'] ) || ! isset( $view_args['field'] ) ) {
 	return;
 }
 
-$form     = $view_args['form'];
-$field    = $view_args['field'];
-$classes  = $view_args['classes'];
-$gateways = $field['gateways'];
-$default  = isset( $field['default'] ) && isset( $gateways[ $field['default'] ] ) ? $field['default'] : key( $gateways );
+$form             = $view_args['form'];
+$field            = $view_args['field'];
+$classes          = $view_args['classes'];
+$gateways         = $field['gateways'];
+$default          = isset( $field['default'] ) && isset( $gateways[ $field['default'] ] ) ? $field['default'] : key( $gateways );
+$cc_fields_format = '';
+
+if ( charitable()->load_core_stripe() && class_exists( 'Charitable_Gateway_Stripe_AM' ) ) {
+	$settings         = get_option( 'charitable_settings' );
+	$cc_fields_format = ( ! empty( $settings['gateways_stripe']['cc_fields_format'] ) && '' !== $settings['gateways_stripe']['cc_fields_format'] ) ? $settings['gateways_stripe']['cc_fields_format'] : '';
+}
 
 ?>
 <fieldset id="charitable-gateway-fields" class="charitable-fieldset">
@@ -65,8 +72,11 @@ $default  = isset( $field['default'] ) && isset( $gateways[ $field['default'] ] 
 			continue;
 		endif;
 
+		$gateway_fields_classes  = 'charitable-gateway-fields charitable-form-fields cf';
+		$gateway_fields_classes .= ( 'stripe' === $gateway_id && ! empty( $cc_fields_format ) ) ? ' charitable-cc-fields-' . esc_attr( $cc_fields_format ) : 'standard';
+
 		?>
-		<div id="charitable-gateway-fields-<?php echo esc_html( $gateway_id ); ?>" class="charitable-gateway-fields charitable-form-fields cf" data-gateway="<?php echo esc_html( $gateway_id ); ?>">
+		<div id="charitable-gateway-fields-<?php echo esc_html( $gateway_id ); ?>" class="<?php echo esc_attr( $gateway_fields_classes ); ?>" data-gateway="<?php echo esc_html( $gateway_id ); ?>">
 			<?php $form->view()->render_fields( $details['fields'] ); ?>
 		</div><!-- #charitable-gateway-fields-<?php echo esc_html( $gateway_id ); ?> -->
 	<?php endforeach ?>

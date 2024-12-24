@@ -271,19 +271,23 @@ if ( ! class_exists( 'Charitable_Public' ) ) :
 
 			if ( charitable()->load_core_stripe() && class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 
-				$gateway = new Charitable_Gateway_Stripe_AM();
-				$keys    = $gateway->get_keys();
+				$gateway  = new Charitable_Gateway_Stripe_AM();
+				$keys     = $gateway->get_keys();
+				$settings = get_option( 'charitable_settings' );
 
 				// If there is no public key, do not load the scripts. Added in 1.8.2.
 				if ( ! isset( $keys['public_key'] ) || empty( $keys['public_key'] ) ) {
 					return;
 				}
 
+				$cc_fields_format = ( ! empty( $settings['gateways_stripe']['cc_fields_format'] ) && '' !== $settings['gateways_stripe']['cc_fields_format'] ) ? $settings['gateways_stripe']['cc_fields_format'] : '';
+
 				$stripe_vars = array(
-					'key'          => $keys['public_key'],
-					'currency'     => charitable_get_currency(),
-					'site_name'    => get_option( 'blogname' ),
-					'zero_decimal' => Charitable_Gateway_Stripe_AM::is_zero_decimal_currency(),
+					'key'              => $keys['public_key'],
+					'currency'         => charitable_get_currency(),
+					'site_name'        => get_option( 'blogname' ),
+					'zero_decimal'     => Charitable_Gateway_Stripe_AM::is_zero_decimal_currency(),
+					'cc_fields_format' => esc_attr( $cc_fields_format ),
 				);
 
 				/* Register Stripe JS script. */

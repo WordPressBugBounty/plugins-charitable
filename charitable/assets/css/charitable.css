@@ -23,7 +23,8 @@
   flex-direction: row;
 }
 
-.campaign-summary:before, .campaign-summary:after {
+.campaign-summary:before,
+.campaign-summary:after {
   content: " ";
   display: table;
 }
@@ -272,9 +273,10 @@
   /* width: 100%; */
 }
 
-.charitable-donation-form .donation-amounts:before, .charitable-donation-form .donation-amounts:after {
+.charitable-donation-form .donation-amounts:before,
+.charitable-donation-form .donation-amounts:after {
   /* content: " ";
-  display: table;  */
+        display: table;  */
 }
 
 .charitable-donation-form .donation-amounts:after {
@@ -466,7 +468,8 @@
   padding-bottom: 0;
 }
 
-.donation-summary dd, .donation-summary dt {
+.donation-summary dd,
+.donation-summary dt {
   margin-top: 0;
 }
 
@@ -509,7 +512,8 @@ h3.charitable-header {
   margin-top: 50px;
 }
 
-.charitable-table tr, .charitable-table td {
+.charitable-table tr,
+.charitable-table td {
   padding-right: 1.5em;
 }
 
@@ -581,7 +585,8 @@ h3.charitable-header {
   *zoom: 1;
 }
 
-.campaign-loop.campaign-grid:before, .campaign-loop.campaign-grid:after {
+.campaign-loop.campaign-grid:before,
+.campaign-loop.campaign-grid:after {
   content: " ";
   display: table;
 }
@@ -683,7 +688,8 @@ h3.charitable-header {
   padding: 1em 0;
 }
 
-.donors-list .donor:before, .donors-list .donor:after {
+.donors-list .donor:before,
+.donors-list .donor:after {
   content: " ";
   display: table;
 }
@@ -773,6 +779,20 @@ h3.charitable-header {
 .charitable-notice a {
   text-decoration: underline;
 }
+
+/* modal donation */
+.charitable-modal.charitable-modal-donation {
+  width: 80%;
+  max-width: 800px;
+  padding: 1em;
+  background-color: #fff;
+  overflow-y: auto;
+}
+
+.charitable-modal.charitable-modal-donation .charitable-submit-field {
+  margin-bottom: 0;
+}
+
 
 /* donation form templates */
 .charitable-donation-form.charitable-template-standard .charitable-fieldset {
@@ -869,7 +889,8 @@ h3.charitable-header {
   padding-left: 0;
   padding-right: 0;
 }
-.charitable-donation-form.charitable-template-standard #charitable-donor-fields #charitable-user-fields input, .charitable-donation-form.charitable-template-standard #charitable-donor-fields #charitable-user-fields select {
+.charitable-donation-form.charitable-template-standard #charitable-donor-fields #charitable-user-fields input,
+.charitable-donation-form.charitable-template-standard #charitable-donor-fields #charitable-user-fields select {
   font-size: 16px;
   line-height: 16px;
 }
@@ -951,7 +972,8 @@ h3.charitable-header {
   border-width: 0.078rem;
   border-style: solid;
   border-radius: 0.25rem;
-  padding: 0.8rem 1rem;
+  /* padding: 0.8rem 1rem; */
+  min-height: 35px;
   background-color: #fff;
   color: #4d4d4d;
   font-size: 1rem;
@@ -1139,7 +1161,8 @@ h3.charitable-header {
   padding-left: 0;
   padding-right: 0;
 }
-.charitable-donation-form.charitable-template-minimal #charitable-donor-fields #charitable-user-fields input, .charitable-donation-form.charitable-template-minimal #charitable-donor-fields #charitable-user-fields select {
+.charitable-donation-form.charitable-template-minimal #charitable-donor-fields #charitable-user-fields input,
+.charitable-donation-form.charitable-template-minimal #charitable-donor-fields #charitable-user-fields select {
   font-size: 16px;
   line-height: 16px;
 }
@@ -1219,7 +1242,8 @@ h3.charitable-header {
   line-height: 16px;
   font-weight: 500;
   padding: 10px 20px;
-  margin-right: -1px; /* Overlap bordering */
+  margin-right: -1px;
+  /* Overlap bordering */
   border: 1px solid #ccc;
   cursor: pointer;
   background-color: #f1f1f1;
@@ -1285,4 +1309,36 @@ h3.charitable-header {
 }
 .charitable-donation-form.charitable-template-minimal .charitable-notice li {
   margin: 10px 0;
+}
+
+#charitable-gateway-fields-stripe.charitable-cc-fields-multiple {
+  display: grid;
+  grid-template-columns: 75% 25%;
+  grid-template-rows: auto auto; /* This creates the equivalent of a 2x2 grid */
+  gap: 10px; /* Optional: Sets the gap between grid items */
+}
+#charitable-gateway-fields-stripe.charitable-cc-fields-multiple > div.charitable_stripe_multiple_field:nth-child(even) input,
+#charitable-gateway-fields-stripe.charitable-cc-fields-multiple > div:first-child input {
+  font-family: sans-serif !important;
+  font-size: 16px !important;
+  padding: 15px 10px !important;
+  min-height: 15px !important;
+  font-weight: 500 !important;
+}
+#charitable-gateway-fields-stripe.charitable-cc-fields-multiple > div.charitable_stripe_multiple_field:nth-child(odd) { /* Target every even div (2nd, 4th, 6th, etc.) */ }
+#charitable-gateway-fields-stripe.charitable-cc-fields-multiple > div > div,
+#charitable-gateway-fields-stripe.charitable-cc-fields-multiple > div input {
+  width: auto !important;
+  border-width: 0.078rem !important;
+  border-style: solid !important;
+  border-radius: 0.25rem !important;
+  padding: 15px 10px !important;
+  background-color: #fff !important;
+  color: #4d4d4d !important;
+  font-size: 1rem !important;
+  font-family: inherit !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  min-height: 15px;
+  font-size: 16px !important;
 }
