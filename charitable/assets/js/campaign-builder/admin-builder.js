@@ -297,9 +297,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 			// Refresh so that the campaign input box at the top can resize upon load of page.
 			app.resizeTopCampaignTitleInputBox();
-
 			if ( false !== app.hasTemplate() ) {
-
 				var panel = ( null !== wpCookies.get( 'charitable_panel' ) ) ? wpCookies.get( 'charitable_panel' ).trim() : false;
 
 				// if there is a cookie saved with a particular panel, go to that by default.

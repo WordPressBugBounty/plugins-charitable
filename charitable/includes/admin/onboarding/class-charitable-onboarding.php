@@ -1,6 +1,6 @@
 <?php
 /**
- * Charitable Growth Tools.
+ * Charitable Onboarding.
  *
  * @package   Charitable/Classes/Charitable_Onboarding
  * @author    David Bisset
@@ -202,6 +202,8 @@ if ( ! class_exists( 'Charitable_Onboarding' ) ) :
 
 			return true;
 		}
+
+
 
 		/**
 		 * Returns and/or create the single instance of this class.

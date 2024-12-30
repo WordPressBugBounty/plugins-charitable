@@ -567,7 +567,7 @@ if ( ! class_exists( 'Charitable_Endpoints' ) ) :
 							)
 						);
 						?>
-									#charitable" class="select-all"><?php esc_html_e( 'Select All', 'charitable' ); ?></a>
+									#charitable" class="select-all"><?php _e( 'Select All', 'charitable' ); ?></a>
 					</span>
 					<span class="add-to-menu">
 						<input type="submit"<?php wp_nav_menu_disabled_check( $nav_menu_selected_id ); ?> class="button-secondary submit-add-to-menu right" value="<?php esc_attr_e( 'Add to Menu', 'charitable' ); ?>" name="add-charitable-menu-item" id="submit-charitable" />

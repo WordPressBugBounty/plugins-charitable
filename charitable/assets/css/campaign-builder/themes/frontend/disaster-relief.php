@@ -47,6 +47,7 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 	font-size: 16px;
 	line-height: 16px;
 	font-weight: 700;
+	word-wrap: break-word;
 }
 <?php echo $wrapper; ?> #charitable-template-row-1 {
 	background-color: <?php echo $tertiary; ?>;
@@ -57,10 +58,12 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 <?php echo $wrapper; ?> #charitable-template-row-0 .charitable-campaign-column:nth-child(even) {
 	border: 1px solid #ECECEC;
 	padding: 25px;
+	max-width: calc(100% - 50px);
 }
 <?php echo $wrapper; ?> #charitable-template-row-0 .charitable-campaign-column:nth-child(odd) {
 	flex: 0 0 66%;
 	padding: 25px;
+	max-width: calc(100% - 50px);
 }
 <?php echo $wrapper; ?> #charitable-template-row-0 .charitable-campaign-column:nth-child(even) .charitable-campaign-field {
 	margin-top: 5px;
@@ -83,11 +86,20 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 
 /* field: button */
 
-<?php echo $wrapper; ?> .charitable-campaign-field-donate-button button.button {
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-button button.button,
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-button a.donate-button {
 	border-radius: 35px;
 	background-color: <?php echo $button; ?> !important;
 	border-color: <?php echo $button; ?> !important;
+	display: flex; /* Changed from block to flex */
+	align-items: center; /* Vertically centers the text */
+	justify-content: center; /* Optionally centers the text horizontally too */
+	text-align: center !important;
+	text-decoration: none !important;
+	transition: filter 0.3s; /* Smooth transition */
 }
+
+
 
 /* field: progress bar */
 
@@ -192,7 +204,7 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 
 }
 <?php echo $wrapper; ?> .charitable-field-template-social-linking .charitable-placeholder {
-	padding: 10px;
+	padding: 0px 0px 10px 0;
 }
 <?php echo $wrapper; ?> .charitable-field-template-social-linking .charitable-field-row .charitable-field-column {
 	float: left;

@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
- * @version   1.8.3
+ * @version   1.8.4
  */
 
 // Exit if accessed directly.
@@ -72,7 +72,8 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		/**
 		 * Redirect from the old dashboard to the new, unless legacy campaigns are being used and defined.
 		 *
-		 * @since  1.8.1
+		 * @since   1.8.1
+		 * @version 1.8.4
 		 *
 		 * @return void
 		 */
@@ -83,10 +84,148 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				return;
 			}
 
-			if ( $pagenow === 'admin.php' && isset( $_GET['page'] ) && $_GET['page'] === 'charitable' ) {
+			if ( $pagenow === 'admin.php' && isset( $_GET['page'] ) && $_GET['page'] === 'charitable' ) { // phpcs:ignore
 
-				wp_redirect( admin_url( 'admin.php?page=charitable-dashboard' ) );
-				exit;
+				// Check and see if this has to do with onboarding.
+
+				if ( isset( $_GET['wpchar_lite'] ) && isset( $_GET['setup'] ) ) {  // phpcs:ignore
+
+					switch ( sanitize_text_field( wp_unslash( $_GET['setup'] ) ) ) {  // phpcs:ignore
+
+						case 'welcome':
+							if ( empty( $_GET['wpchar_lite'] ) || 'lite' !== $_GET['wpchar_lite'] ) { // phpcs:ignore
+								wp_safe_redirect( admin_url( 'admin.php?page=charitable-dashboard' ) );
+								exit;
+							}
+
+							break;
+
+						case 'return':
+							// if the user is returning from a redirect from a login or back link detect that and redirect them to the welcome/continue page.
+							// Only good way so far would be to detect POST data.
+							if ( empty( $_POST ) && is_admin() ) { // phpcs:ignore
+								wp_safe_redirect( admin_url( 'admin.php?page=charitable&wpchar_lite=lite&setup=welcome&resume=true&lostconnection=1' ) );
+								exit;
+							}
+
+							$plugins     = isset( $_POST['plugins'] )     ? base64_decode( sanitize_text_field( wp_unslash( $_POST['plugins'] ) ) ) : ''; // phpcs:ignore
+							$features    = isset( $_POST['features'] )    ? base64_decode( sanitize_text_field( wp_unslash( $_POST['features'] ) ) ) : ''; // phpcs:ignore
+							$meta        = isset( $_POST['meta'] )        ? base64_decode( sanitize_text_field( wp_unslash( $_POST['meta'] ) ) ) : ''; // phpcs:ignore
+							$pm	   	     = isset( $_POST['pm'] )          ? base64_decode( sanitize_text_field( wp_unslash( $_POST['pm'] ) ) ) : ''; // phpcs:ignore
+							$license_key = isset( $_POST['license_key'] ) ? base64_decode( sanitize_text_field( wp_unslash( $_POST['license_key'] ) ) ) : ''; // phpcs:ignore
+
+							// process meta.
+							if ( ! empty( $meta ) ) {
+								$meta = str_replace( '\"', '"', $meta );
+								if ( ! empty( $meta ) ) {
+									$meta = json_decode( $meta, true );
+								}
+							}
+							// process payment methods.
+							if ( ! empty( $plugins ) ) {
+								$plugins = json_decode( $plugins );
+								$plugins = str_replace( array( '"', '[', ']' ), '', $plugins );
+								if ( ! empty( $plugins ) ) {
+									$plugins = explode( ',', $plugins );
+								}
+							}
+
+							// process plugins.
+							if ( ! empty( $pm ) ) {
+								$pm = json_decode( $pm );
+								if ( $pm ) {
+									$pm = str_replace( array( '"', '[', ']' ), '', $pm );
+									if ( ! empty( $plugins ) ) {
+										$pm = explode( ',', $pm );
+									}
+								}
+							}
+
+							// process features.
+							if ( ! empty( $features ) ) {
+								$features = json_decode( $features );
+								$features = str_replace( array( '"', '[', ']' ), '', $features );
+								if ( ! empty( $features ) ) {
+									$features = explode( ',', $features );
+								}
+							}
+
+							// clean license (remove quotes).
+							$license_key = str_replace( '"', '', $license_key );
+
+							// process campaign.
+							$campaign_template    = isset( $_POST['template'] ) && ! empty( $_POST['template'] ) ? sanitize_text_field( wp_unslash( $_POST['template'] ) ) : ''; // phpcs:ignore
+							$campaign_title       = isset( $_POST['campaign_title'] ) && ! empty( $_POST['campaign_title'] ) ? sanitize_text_field( wp_unslash( $_POST['campaign_title'] ) ) : ''; // phpcs:ignore
+							$campaign_description = isset( $_POST['campaign_description'] ) && ! empty( $_POST['campaign_description'] ) ? sanitize_text_field( wp_unslash( $_POST['campaign_description'] ) ) : ''; // phpcs:ignore
+							$campaign_goal        = isset( $_POST['campaign_goal'] ) && ! empty( $_POST['campaign_goal'] ) ? sanitize_text_field( wp_unslash( $_POST['campaign_goal'] ) ) : ''; // phpcs:ignore
+							$campaign_end_date    = isset( $_POST['campaign_end_date'] ) && ! empty( $_POST['campaign_end_date'] ) ? sanitize_text_field( wp_unslash( $_POST['campaign_end_date'] ) ) : ''; // phpcs:ignore
+							$campaign             = array(
+								'template'    => $campaign_template,
+								'title'       => $campaign_title,
+								'description' => $campaign_description,
+								'goal'        => $campaign_goal,
+								'end_date'    => $campaign_end_date,
+							);
+
+							// store server side setups.
+							$serverside = new Charitable_Setup();
+
+							$serverside->store_meta( $meta );
+							$serverside->store_plugins( $plugins );
+							$serverside->store_features( $features );
+							$serverside->store_payment_methods( $pm );
+							$serverside->store_campaign( $campaign );
+							if ( $license_key ) {
+								$serverside->store_license_key( $license_key );
+							}
+
+							// If this is a select few addons that we need to disable their auto-activation, do so.
+							if ( ! empty( $plugins ) ) {
+								foreach ( $plugins as $plugin ) {
+									if ( $plugin === 'all-in-one-seo-pack' ) {
+										update_option( 'aioseo_activation_redirect', true );
+									} elseif ( $plugin === 'wp-mail-smtp' ) {
+										update_option( 'wp_mail_smtp_activation_prevent_redirect', true );
+									}
+								}
+							}
+
+							// add a transient to indicate that the server side onboarding has moved to the plugin.
+							set_transient( 'charitable_ss_onboarding', 1, 0 );
+
+							delete_option( 'charitable_started_onboarding' );
+
+							wp_safe_redirect( admin_url( 'admin.php?page=charitable-setup&setup=1' ) );
+							exit;
+
+						case 'cancelled':
+							// Either user is going "back" to the checklist page or (if the checklist is disabled) the welcome page.
+							// https://mydomain.com/wp-admin/admin.php?page=charitable&wpchar_lite=lite&setup=cancelled.
+							$checklist_class     = Charitable_Checklist::get_instance();
+							$checklist_possible  = $checklist_class->is_checklist_skipped() || $checklist_class->is_checklist_completed();
+							$welcome_go_back_url = $checklist_possible ? admin_url( 'admin.php?page=charitable-dashboard' ) : admin_url( 'admin.php?page=charitable-setup-checklist' );
+
+							// Clear the transient.
+							delete_transient( 'charitable_activation_redirect' );
+
+							// Clear the option.
+							delete_option( 'charitable_started_onboarding' );
+
+							wp_safe_redirect( $welcome_go_back_url );
+							exit;
+
+						default:
+							wp_safe_redirect( admin_url( 'admin.php?page=charitable-dashboard' ) );
+							exit;
+
+					}
+
+				} else {
+
+					wp_safe_redirect( admin_url( 'admin.php?page=charitable-dashboard' ) );
+					exit;
+
+				}
 
 			}
 		}
@@ -128,6 +267,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 			require_once $admin_dir . 'tools/charitable-tools-admin-hooks.php';
 			require_once $admin_dir . 'growth-tools/charitable-growth-tools-admin-hooks.php';
 			require_once $admin_dir . 'onboarding/charitable-onboarding-admin-hooks.php';
+			require_once $admin_dir . 'tracking/charitable-tracking-admin-hooks.php';
 			require_once $admin_dir . 'smtp/charitable-smtp-admin-hooks.php';
 		}
 
@@ -347,15 +487,16 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 			} // end if
 
+			wp_enqueue_script(
+				'charitable-admin-utils',
+				charitable()->get_path( 'directory', false ) . "assets/js/admin/charitable-admin-utils{$min}.js",
+				array( 'jquery' ),
+				charitable()->get_version(),
+				false
+			);
+
 			// Register these scripts only for reports and dashboard pages.
 			if ( ! is_null( $screen ) && ( $screen->id === 'charitable_page_charitable-reports' || $screen->id === 'charitable_page_charitable-dashboard' ) ) {
-
-					wp_enqueue_script(
-						'charitable-admin-utils',
-						charitable()->get_path( 'directory', false ) . "assets/js/admin/charitable-admin-utils{$min}.js",
-						array( 'jquery' ),
-						charitable()->get_version()
-					);
 
 				// Specific styles for the "overview" and main reporting tabs.
 				if ( empty( $_GET['tab'] ) || ( ! empty( $_GET['tab'] && charitable_reports_allow_tab_load_scripts( strtolower( $_GET['tab'] ) ) ) ) ) { // phpcs:ignore
@@ -489,7 +630,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 			wp_register_style(
 				'select2-css',
-				$assets_dir . 'css/libraries/select2.css',
+				$assets_dir . 'css/libraries/select2' . $min . '.css',
 				array(),
 				'4.0.12'
 			);

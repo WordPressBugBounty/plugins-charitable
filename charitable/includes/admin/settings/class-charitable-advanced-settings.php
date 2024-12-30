@@ -114,6 +114,14 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 						'priority'  => 155,
 						'default'   => true,
 					),
+					'charitable_usage_tracking' => array(
+						'label_for' => __( 'Usage Tracking', 'charitable' ),
+						'type'      => 'checkbox',
+						'help'      => /* translators: %1$s: URL to the documentation. */
+										sprintf( __( 'Allows us to better help you as we know which WordPress configurations, themes and plugins we should test. <a href="%1$s">Learn More</a>.', 'charitable' ), 'https://www.wpcharitable.com/documentation/usage-tracking/' ),
+						'priority'  => 155,
+						'default'   => false,
+					),
 					'section_hidden_licenses'      => array(
 						'title'    => '',
 						'type'     => 'hidden',
@@ -189,6 +197,8 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 			delete_option( 'charitable_builder_onboarding' ); // v1.8.1.12.
 			delete_option( 'charitable_onboarding_checklist' ); // v1.8.2.
 			delete_option( 'charitable_notifications' ); // v1.8.3.
+			delete_option( 'charitable_usage_tracking_last_checkin' ); // v1.8.4.
+			delete_option( 'charitable_tracking_last_checkin' ); // v1.8.4.
 
 			// Delete transients (related to notices).
 			$notice_slugs = array( 'campaign-builder', 'dashboard-reporting', 'five-star-review', 'expiringlicense', 'expiredlicense' );
@@ -382,6 +392,30 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 				}
 
 				$values['licenses'][ $product_key ] = $license_data;
+			}
+
+			return $values;
+		}
+
+		/**
+		 * Enables/disables usage tracking, used for testing and debugging.
+		 *
+		 * @since   1.8.4
+		 *
+		 * @param   mixed[] $values The parsed values combining old values & new values.
+		 * @param   mixed[] $new_values The newly submitted values.
+		 */
+		public function update_user_tracking_option( $values, $new_values ) {
+
+			/* If this option isn't in the return values or isn't checked off then the user has opted out, leave. */
+			if ( ! isset( $new_values['charitable_usage_tracking'] ) || 0 === intval( $new_values['charitable_usage_tracking'] ) || '' === trim( $new_values['charitable_usage_tracking'] ) ) {
+				// remove the option.
+				$values['charitable_usage_tracking'] = false;
+				delete_option( 'charitable_usage_tracking' );
+			} else {
+				// add the option.
+				$values['charitable_usage_tracking'] = true;
+				update_option( 'charitable_usage_tracking', 1 );
 			}
 
 			return $values;

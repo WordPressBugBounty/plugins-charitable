@@ -1544,7 +1544,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 							/* translators: 1: Template ID */
 							'<a href="#" class="send-feedback">%1$s</a> %2$s',
 							esc_html__( 'Let us know', 'charitable' ),
-							esc_html__( 'what templates to add in the future.', 'charitable' )
+							esc_html__( 'what templates to add in the future.', 'charitable' ),
 						);
 						?>
 						</p>
@@ -2694,8 +2694,9 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 												array(
 													'type' => 'campaign-title',
 												),
-												'progress-bar' => array(
-													'show_hide'     => array(
+												array(
+													'type' => 'progress-bar',
+													'show_hide' => array(
 														'show_donated' => true,
 														'show_goal' => false,
 													),
@@ -2962,14 +2963,15 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 													'type' => 'photo',
 													'default' => 'photo-1.jpg',
 												),
-												'progress-bar' => array(
-													'show_hide'     => array(
+												array(
+													'type' => 'progress-bar',
+													'show_hide' => array(
 														'show_donated' => true,
 														'show_goal' => true,
 													),
-													'css_class'     => 'sample-css-class',
-													'label_donate'  => ' ',
-													'label_goal'    => 'Goal ',
+													'css_class' => 'sample-css-class',
+													'label_donate' => ' ',
+													'label_goal' => 'Goal USD: ',
 													'meta_position' => 'top',
 												),
 											),

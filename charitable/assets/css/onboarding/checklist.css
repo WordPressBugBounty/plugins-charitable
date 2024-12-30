@@ -40,17 +40,15 @@ section.charitable-step {
   /* animation for background color */
   transition: background-color 0.5s;
 }
-
 section.charitable-step header {
-  padding: 30px;
+  padding: 20px;
   border-bottom: 1px solid rgb(235, 235, 235);
 }
-
 section.charitable-step h2 {
   color: rgba(25, 29, 45, 0.9);
   font-weight: 600;
   font-size: 17px;
-  line-height: 22px;
+  line-height: 20px;
   display: inline-block;
   margin: 0;
   padding: 0;
@@ -369,9 +367,46 @@ section.charitable-step p {
 body.charitable-checklist-page .charitable-toggle-container {
   display: flex;
   justify-content: space-between;
-  padding: 20px 30px;
+  padding: 10px 20px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
   align-items: center;
+}
+body.charitable-checklist-page .charitable-toggle-container .charitable-bonus-step-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(25, 29, 45, 0.14);
+  padding-bottom: 20px;
+}
+body.charitable-checklist-page .charitable-toggle-container .charitable-bonus-step-container:first-child {
+  margin-top: 0;
+}
+body.charitable-checklist-page .charitable-toggle-container .charitable-bonus-step-container:last-child {
+  margin-bottom: 0;
+  border-bottom: 0;
+  padding-bottom: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+body.charitable-checklist-page .charitable-toggle-container .charitable-bonus-step-container a.charitable-button {
+  margin-left: 25px;
+  margin-top: 15px;
+}
+body.charitable-checklist-page .charitable-toggle-container .charitable-bonus-step-container a.charitable-button i {
+  font-weight: 100;
+  margin-left: 6px;
+}
+body.charitable-checklist-page .charitable-toggle-container .charitable-bonus-step-container p:first-child {
+  margin-top: 0;
+}
+body.charitable-checklist-page .charitable-toggle-container input[type=text],
+body.charitable-checklist-page .charitable-toggle-container input[type=email] {
+  border: 1px solid rgba(25, 29, 45, 0.14);
+  width: 80%;
 }
 body.charitable-checklist-page section.charitable-step-opt-in .charitable-toggle-container {
   align-items: baseline;
@@ -435,8 +470,8 @@ body.charitable-checklist-page .charitable-toggle-container.charitable-step-one-
   width: 100%;
   align-items: center;
   border-bottom: 1px solid rgb(235, 235, 235);
-  padding-bottom: 20px;
-  margin-bottom: 20px;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
 }
 body.charitable-checklist-page .charitable-toggle-container.charitable-step-one-col-content .charitable-sub-container.charitable-column {
   flex-direction: column;

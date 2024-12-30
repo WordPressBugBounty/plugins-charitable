@@ -60,6 +60,7 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 <?php echo $wrapper; ?> .charitable-campaign-column:nth-child(even) {
 	flex: 1;
 	padding: 0 25px 0 25px;
+	max-width: calc(100% - 50px);
 }
 <?php echo $wrapper; ?> .charitable-campaign-column:nth-child(odd) {
 	flex: 1;
@@ -100,10 +101,19 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 
 /* field: button */
 
-<?php echo $wrapper; ?> .charitable-campaign-field-donate-button button.button {
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-button button.button,
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-button a.donate-button {
+	border-radius: 35px;
 	background-color: <?php echo $button; ?> !important;
 	border-color: <?php echo $button; ?> !important;
+	display: flex; /* Changed from block to flex */
+	align-items: center; /* Vertically centers the text */
+	justify-content: center; /* Optionally centers the text horizontally too */
+	text-align: center !important;
+	text-decoration: none !important;
+	transition: filter 0.3s; /* Smooth transition */
 }
+
 
 <?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-progress-bar .progress-bar-info-row div.campaign-percent-raised {
 	color: #202020;

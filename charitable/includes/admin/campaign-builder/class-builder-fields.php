@@ -154,6 +154,7 @@ class Charitable_Builder_Fields {
 			}
 
 		endif;
+
 	}
 
 	/**

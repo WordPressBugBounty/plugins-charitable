@@ -94,19 +94,23 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 
 /* field: button */
 
-<?php echo $wrapper; ?> .charitable-campaign-field-donate-button button.button {
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-button button.button,
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-button a.donate-button {
+	border-radius: 0px;
   background-color: transparent !important;
   border: 1px solid black !important;
-  text-transform: uppercase;
-  border-radius: 0px;
-  margin-top: 0;
-  margin-bottom: 0;
+  color: black !important;
+	display: flex; /* Changed from block to flex */
+	align-items: center; /* Vertically centers the text */
+	justify-content: center; /* Optionally centers the text horizontally too */
+	text-align: center !important;
+	text-decoration: none !important;
+	transition: filter 0.3s; /* Smooth transition */
   width: 100%;
   font-weight: 400;
   min-height: 50px;
   font-size: 16px;
   line-height: 15px;
-  color: black;
 }
 
 /* field: progress bar */

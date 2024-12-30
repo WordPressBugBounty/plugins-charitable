@@ -73,7 +73,7 @@ if ( ! class_exists( 'Charitable_Email_Offline_Donation_Notification' ) && class
 		 */
 		public static function send_with_donation_id( $donation_id ) {
 			/* Verify that the email is enabled. */
-			if ( ! charitable_get_helper( 'emails' )->is_enabled_email( self::get_email_id() ) ) {
+			if ( ! charitable_get_helper( 'emails' )->is_enabled_email( Charitable_Email_Offline_Donation_Notification::get_email_id() ) ) {
 				return false;
 			}
 
@@ -92,11 +92,9 @@ if ( ! class_exists( 'Charitable_Email_Offline_Donation_Notification' ) && class
 			}
 
 			/* All three of those checks passed, so proceed with sending the email. */
-			$email = new Charitable_Email_Offline_Donation_Notification(
-				array(
-					'donation' => new Charitable_Donation( $donation_id ),
-				)
-			);
+			$email = new Charitable_Email_Offline_Donation_Notification( array(
+				'donation' => new Charitable_Donation( $donation_id )
+			) );
 
 			/**
 			 * Don't resend the email.
@@ -133,11 +131,9 @@ if ( ! class_exists( 'Charitable_Email_Offline_Donation_Notification' ) && class
 				return false;
 			}
 
-			$email = new Charitable_Email_Offline_Donation_Notification(
-				array(
-					'donation' => $donation,
-				)
-			);
+			$email = new Charitable_Email_Offline_Donation_Notification( array(
+				'donation' => $donation,
+			) );
 
 			$success = $email->send();
 
@@ -217,10 +213,10 @@ if ( ! class_exists( 'Charitable_Email_Offline_Donation_Notification' ) && class
 		protected function get_default_body() {
 			ob_start();
 			?>
-<p><?php esc_html_e( '[charitable_email show=donor] ([charitable_email show=donor_email]) has just made an offline donation!', 'charitable' ); ?></p>
-<p><strong><?php esc_html_e( 'Summary', 'charitable' ); ?></strong></p>
+<p><?php _e( '[charitable_email show=donor] ([charitable_email show=donor_email]) has just made an offline donation!', 'charitable' ); ?></p>
+<p><strong><?php _e( 'Summary', 'charitable' ); ?></strong></p>
 <p>[charitable_email show=donation_summary]</p>
-			<?php
+		<?php
 			/**
 			 * Filter the default body content.
 			 *

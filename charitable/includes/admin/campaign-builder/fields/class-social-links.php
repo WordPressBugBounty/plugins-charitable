@@ -86,15 +86,8 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 			$open_new_tab             = ! empty( $field_data['open_new_tab'] ) ? esc_html( $field_data['open_new_tab'] ) : false;
 			$new_tab                  = ( 1 === intval( $open_new_tab ) ) ? 'target="_blank"' : false;
 
-			$html = '<div class="charitable-field-' . $mode . '-social-linking">';
-
-			if ( 'template' === $mode ) {
-				$html .= '<div class="charitable-field-' . $mode . '-social-linking-headline-container">';
-			} else {
-				$html .= '<div class="charitable-field-' . $mode . '-social-linking-headline-container charitable-placeholder">';
-			}
-
-			$html .= '<h5 class="charitable-field-' . $mode . '-headline">' . trim( $headline ) . '</h5></div>
+			$html = '<div class="charitable-field-' . $mode . '-social-linking">
+					<div class="charitable-field-' . $mode . '-social-linking-headline-container charitable-placeholder"><h5 class="charitable-field-' . $mode . '-headline">' . trim( $headline ) . '</h5></div>
 						<div class="charitable-field-row">';
 
 			$social_networks_settings = $this->custom_sort_social_network_preview( $social_networks_settings );
@@ -172,7 +165,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 			$html  = $this->field_title( $this->name );
 			$html .= $this->field_wrapper( $this->render( $field_data, $campaign_data, $field_id, 'preview', $theme ), $field_data );
 
-			echo $html; // phpcs:ignore
+			echo $html;
 		}
 
 		/**
@@ -183,15 +176,12 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 		 * @param string $field_type     The passed field type.
 		 * @param array  $field_data     Any field data.
 		 * @param array  $campaign_data  Amount data and settings.
-		 * @param bool   $is_preview_page If the page is a preview page.
-		 * @param int    $field_id       The field ID.
-		 * @param array  $template_data  Template data.
 		 */
 		public function field_display( $field_type = '', $field_data = false, $campaign_data = false, $is_preview_page = false, $field_id = false, $template_data = false ) {
 
 			$html = $this->field_display_wrapper( $this->render( $field_data, $campaign_data, $field_id, 'template', $template_data ), $field_data );
 
-			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data );  // phpcs:ignore
+			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data );
 		}
 
 		/**
@@ -199,7 +189,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 		 *
 		 * @since 1.8.0
 		 *
-		 * @param array $field_id       Field ID.
+		 * @param array $field          Social Links settings.
 		 * @param array $campaign_data  Campaign data and settings.
 		 */
 		public function settings_display( $field_id = false, $campaign_data = false ) {
@@ -235,7 +225,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore
+			echo $charitable_builder_form_fields->generate_text(
 				isset( $settings['headline'] ) ? $settings['headline'] : esc_html__( 'Learn More:', 'charitable' ),
 				esc_html__( 'Headline', 'charitable' ),
 				array(
@@ -272,10 +262,10 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 			}
 
 			foreach ( $social_html as $html ) {
-				echo $html; // phpcs:ignore
+				echo $html;
 			}
 
-			echo $charitable_builder_form_fields->generate_toggle( // phpcs:ignore
+			echo $charitable_builder_form_fields->generate_toggle(
 				isset( $settings['open_new_tab'] ) ? $settings['open_new_tab'] : false,
 				esc_html__( 'Open Links In New Tab', 'charitable' ),
 				array(
@@ -285,9 +275,9 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_divider( false, false, array( 'field_id' => $field_id ) ); // phpcs:ignore
+			echo $charitable_builder_form_fields->generate_divider( false, false, array( 'field_id' => $field_id ) );
 
-			echo $charitable_builder_form_fields->generate_number_slider( // phpcs:ignore
+			echo $charitable_builder_form_fields->generate_number_slider(
 				isset( $settings['width_percentage'] ) ? $settings['width_percentage'] : 100,
 				esc_html__( 'Width', 'charitable' ),
 				array(
@@ -303,7 +293,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_align( // phpcs:ignore
+			echo $charitable_builder_form_fields->generate_align(
 				isset( $settings['align'] ) ? $settings['align'] : esc_attr( $this->align_default ),
 				esc_html__( 'Align', 'charitable' ),
 				array(
@@ -316,11 +306,11 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 
 			/* CSS CLASS */
 
-			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore
+			echo $charitable_builder_form_fields->generate_text(
 				isset( $settings['css_class'] ) ? $settings['css_class'] : false,
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(
-					'id'       => 'field_' . esc_attr( $this->type ) . '_css_class' . '_' . intval( $field_id ), // phpcs:ignore
+					'id'       => 'field_' . esc_attr( $this->type ) . '_css_class' . '_' . intval( $field_id ),
 					'name'     => array( '_fields', intval( $field_id ), 'css_class' ),
 					'field_id' => intval( $field_id ),
 					'tooltip'  => esc_html__( 'Add CSS classes (seperated by a space) for this field to customize it\'s appearance in your theme.', 'charitable' ),
@@ -357,7 +347,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 
 			$message = '<p>' . esc_html__( 'Include full links urls or profile urls to your social networks.', 'charitable' ) . ' <a class="charitable-field-edit" data-type="' . $this->edit_type . '" data-section="' . $this->edit_section . '" href="http://wpcharitable.com/campaign-builder/fields/social-links">' . esc_html__( 'Learn how to expand the options of this field.', 'charitable' ) . '</a></p>';
 
-			echo $message; // phpcs:ignore
+			echo $message;
 		}
 
 		/**
@@ -479,11 +469,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 		 *
 		 * @since 1.8.0
 		 *
-		 * @param array  $campaign_data    Form data and settings.
-		 * @param string $mode           Where the field is being displayed ("preview" or "template").
-		 * @param string $suffix         Suffix for the icon.
-		 *
-		 * @return array
+		 * @param array $campaign_data    Form data and settings.
 		 */
 		public function get_social_networks( $campaign_data = false, $mode = 'preview', $suffix = '' ) {
 

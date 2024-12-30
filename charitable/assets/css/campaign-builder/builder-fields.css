@@ -544,7 +544,6 @@
 }
 .charitable-panel-fields .charitable-field.charitable-field-missing .charitable-missing-addon-content {
   position: relative;
-  background-color: rgba(0, 0, 0, 0.4);
   padding: 10px;
   display: table;
   margin-left: auto;

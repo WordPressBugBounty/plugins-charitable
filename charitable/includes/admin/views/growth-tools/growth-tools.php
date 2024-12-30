@@ -51,7 +51,7 @@ ob_start();
 			}
 
 			?>
-		<a href="#<?php echo esc_attr( $section_slug ); ?>" class="nav-tab <?php echo $active_tab === $section_slug ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( $section_title ); ?></a>
+		<a href="#<?php echo sanitize_title( $section_slug ); ?>" class="nav-tab <?php echo $active_tab === $section_slug ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( $section_title ); ?></a>
 		<?php endforeach; ?>
 
 	</h2>
@@ -166,4 +166,4 @@ ob_start();
 
 </div>
 <?php
-echo ob_get_clean(); // phpcs:ignore/
+echo ob_get_clean();

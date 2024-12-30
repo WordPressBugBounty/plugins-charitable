@@ -369,15 +369,6 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 		 */
 		public function get_license_expire_date( $timestamp = false ) {
 
-			// $settings = get_option( 'charitable_settings' );
-			// $expire_date =  $settings['licenses']['charitable-v2']['expiration_date']; // format is 2025-07-08 23:59:59
-			// // add a year.
-			// $expire_date = strtotime( $expire_date );
-			// $expire_date = strtotime( '-1 year', $expire_date );
-			// // save back into settings with the new date but with the format.
-			// // print_r( $settings ); exit;
-			// $settings['licenses']['charitable-v2']['expiration_date'] = date( 'Y-m-d H:i:s', $expire_date );
-
 			$settings = get_option( 'charitable_settings' );
 
 			if ( false === $settings ) {

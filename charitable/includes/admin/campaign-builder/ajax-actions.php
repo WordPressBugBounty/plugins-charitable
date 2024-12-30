@@ -467,6 +467,8 @@ function charitable_save_campaign() {
 
 	$campaign_settings_v2['field_id'] = charitable_find_highest_field_key( $campaign_settings_v2 );
 
+	update_option( 'david_test_2', $campaign_settings_v2 );
+
 	// Update OLD v1 campaign data.
 	if ( intval( $campaign_post['id']['value'] ) === 0 ) {
 		// new campaign.
@@ -728,6 +730,8 @@ add_action( 'wp_ajax_charitable_save_campaign', 'charitable_save_campaign' );
  * @return array The updated campaign settings.
  */
 function charitable_template_layout_to_campaign_layout( $campaign_settings_v2, $campaign_post ) {
+
+	update_option('david_test', $campaign_post);
 
 	$builder_template = new Charitable_Campaign_Builder_Templates();
 	$template_id      = ! empty( $campaign_post['template_id']['value'] ) ? esc_attr( $campaign_post['template_id']['value'] ) : false;

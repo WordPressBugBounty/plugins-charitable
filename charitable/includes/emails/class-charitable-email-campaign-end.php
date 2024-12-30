@@ -88,11 +88,9 @@ if ( ! class_exists( 'Charitable_Email_Campaign_End' ) ) :
 				return false;
 			}
 
-			$email = new Charitable_Email_Campaign_End(
-				array(
-					'campaign' => new Charitable_Campaign( $campaign_id ),
-				)
-			);
+			$email = new Charitable_Email_Campaign_End( array(
+				'campaign' => new Charitable_Campaign( $campaign_id ),
+			) );
 
 			/**
 			 * Don't resend the email.
@@ -184,36 +182,36 @@ if ( ! class_exists( 'Charitable_Email_Campaign_End' ) ) :
 		 */
 		protected function get_default_body() {
 			ob_start();
-			?>
+?>
 <p>
-			<?php
-			sprintf(
+	<?php
+		sprintf(
 			/* translators: %1$s: campaign title; %2$s: campaign creator; %3$s: campaign end date */
-				__( '%1$s by %2$s finished on %3$s.', 'charitable' ),
-				'[charitable_email show=campaign_title]',
-				'[charitable_email show=campaign_creator]',
-				'[charitable_email show=campaign_end_date]'
-			);
-			?>
+			__( '%1$s by %2$s finished on %3$s.', 'charitable' ),
+			'[charitable_email show=campaign_title]',
+			'[charitable_email show=campaign_creator]',
+			'[charitable_email show=campaign_end_date]'
+		);
+	?>
 </p>
-<p>[charitable_email show=campaign_achieved_goal success="<?php esc_html_e( 'The campaign achieved its fundraising goal.', 'charitable' ); ?>" failure="<?php esc_html_e( 'The campaign did not reach its fundraising goal.', 'charitable' ); ?>"]</p>
+<p>[charitable_email show=campaign_achieved_goal success="<?php _e( 'The campaign achieved its fundraising goal.', 'charitable' ); ?>" failure="<?php _e( 'The campaign did not reach its fundraising goal.', 'charitable' ); ?>"]</p>
 <table>
 <tbody>
 <tr>
-	<th><?php esc_html_e( 'Amount raised', 'charitable' ); ?></th>
+	<th><?php _e( 'Amount raised', 'charitable' ); ?></th>
 	<td>[charitable_email show=campaign_donated_amount]</td>
 </tr>
 <tr>
-	<th><?php esc_html_e( 'Number of donors', 'charitable' ); ?></th>
+	<th><?php _e( 'Number of donors', 'charitable' ); ?></th>
 	<td>[charitable_email show=campaign_donor_count]</td>
 </tr>
 <tr>
-	<th><?php esc_html_e( 'Fundraising goal', 'charitable' ); ?></th>
+	<th><?php _e( 'Fundraising goal', 'charitable' ); ?></th>
 	<td>[charitable_email show=campaign_goal]</td>
 </tr>
 </tbody>
 </table>
-			<?php
+<?php
 			$body = ob_get_clean();
 
 			/**

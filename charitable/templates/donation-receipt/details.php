@@ -20,12 +20,12 @@ $donation = $view_args['donation'];
 $amount   = $donation->get_total();
 
 ?>
-<h3 class="charitable-header"><?php _ex( 'Your Donation', 'donation receipt header', 'charitable' ); ?></h3>
+<h3 class="charitable-header"><?php echo esc_html_x( 'Your Donation', 'donation receipt header', 'charitable' ); ?></h3>
 <table class="donation-details charitable-table">
 	<thead>
 		<tr>
-			<th><?php _e( 'Campaign', 'charitable' ); ?></th>
-			<th><?php _e( 'Total', 'charitable' ); ?></th>
+			<th><?php esc_html_e( 'Campaign', 'charitable' ); ?></th>
+			<th><?php esc_html_e( 'Total', 'charitable' ); ?></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -33,7 +33,7 @@ $amount   = $donation->get_total();
 		<tr>
 			<td class="campaign-name">
 				<?php
-					echo $campaign_donation->campaign_name;
+					echo esc_html( $campaign_donation->campaign_name );
 
 					/**
 					 * Do something after displaying the campaign name.
@@ -46,7 +46,7 @@ $amount   = $donation->get_total();
 					do_action( 'charitable_donation_receipt_after_campaign_name', $campaign_donation, $donation );
 				?>
 			</td>
-			<td class="donation-amount"><?php echo charitable_format_money( $campaign_donation->amount, false, false, $donation->get_currency() ); ?></td>
+			<td class="donation-amount"><?php echo charitable_format_money( $campaign_donation->amount, false, false, $donation->get_currency() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
 		</tr>
 	<?php endforeach ?>
 	</tbody>
@@ -64,7 +64,7 @@ $amount   = $donation->get_total();
 			do_action( 'charitable_donation_receipt_before_donation_total', $donation );
 		?>
 		<tr>
-			<td><?php _e( 'Total', 'charitable' ); ?></td>
+			<td><?php esc_html_e( 'Total', 'charitable' ); ?></td>
 			<td>
 				<?php
 					/**
@@ -78,7 +78,7 @@ $amount   = $donation->get_total();
 					 * @param  string              $context  The context in which this is being shown.
 					 * @return string
 					 */
-					echo apply_filters( 'charitable_donation_receipt_donation_amount', charitable_format_money( $amount, false, true, $donation->get_currency() ), $amount, $donation, 'details' )
+					echo apply_filters( 'charitable_donation_receipt_donation_amount', charitable_format_money( $amount, false, true, $donation->get_currency() ), $amount, $donation, 'details' ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				?>
 			</td>
 		</tr>

@@ -177,7 +177,7 @@ $array_to_return = array(
 	'Charitable_Donors_Widget'                       => 'widgets/class-charitable-donors-widget.php',
 	'Charitable_Widgets'                             => 'widgets/class-charitable-widgets.php',
 	'Charitable_Notifications'                       => 'admin/notifications/class-charitable-notifications.php',
-	'Charitable_EventDriven' 						 => 'admin/notifications/class-charitable-eventdriven.php',
+	'Charitable_EventDriven'                         => 'admin/notifications/class-charitable-eventdriven.php',
 	'Charitable_Export_Items'                        => 'admin/export-items/class-charitable-export-items.php',
 	'Charitable_Addons_Directory'                    => 'admin/addons-directory/class-charitable-addons-directory.php',
 	'Charitable_Import_Items'                        => 'admin/import-items/class-charitable-import-items.php',
@@ -207,6 +207,9 @@ $array_to_return = array(
 	'Charitable_Admin_Getting_Started'               => 'admin/class-charitable-admin-getting-started.php', // v1.8.1.12.
 	'Charitable_Checklist'                           => 'admin/onboarding/class-charitable-checklist.php', // v1.8.1.15.
 	'Charitable_Donate_Button_Shortcode'             => 'shortcodes/class-charitable-donate-button-shortcode.php', // v1.8.2.
+	'Charitable_User_Onboarding'                     => 'admin/class-charitable-user-onboarding.php', // v1.8.4.
+	'Charitable_Setup'                               => 'admin/onboarding/class-charitable-setup.php', // v1.8.4.
+	'Charitable_Tracking'                            => 'admin/tracking/class-charitable-tracking.php', // v1.8.4.
 );
 
 return $array_to_return;

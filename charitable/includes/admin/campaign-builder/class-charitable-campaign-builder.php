@@ -528,6 +528,10 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				'1.0.0'
 			);
 
+			// if 'charitable-admin-utils' is already registered, deregister it and re-register it with this version.
+			if ( wp_script_is( 'charitable-admin-utils', 'registered' ) ) {
+				wp_deregister_script( 'charitable-admin-utils' );
+			}
 			wp_enqueue_script(
 				'charitable-admin-utils',
 				charitable()->get_path( 'directory', false ) . "assets/js/campaign-builder/admin-utils{$min}.js",
@@ -760,8 +764,8 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				'feedback_form_fields_required'     => esc_html__( 'Some fields of this form are required. Please update the form and try submiting again. Thanks!', 'charitable' ),
 				'empty_label'                       => esc_html__( 'Empty Label', 'charitable' ),
 				'no_pages_found'                    => esc_html__( 'No results found', 'charitable' ),
-				'empty_tab'                         => esc_html__( 'This tab is empty. Drag a block from the left into this area or', 'charitable' ) . '<br/><strong><a href="#" class="charitable-configure-tab-settings">' . __( 'configure tab settings', 'charitable' ) . '</a></strong>',
-				'no_tabs'                           => esc_html__( 'There are no tabs yet for this template.', 'charitable' ) . __( 'You can', 'charitable' ) . '<br/><strong><a href="#" class="charitable-configure-tab-settings">' . __( 'configure tab settings', 'charitable' ) . '</a>' . __( 'to add a tab', 'charitable' ) . '.</strong>',
+				'empty_tab'                         => esc_html__( 'This tab is empty. Drag a block from the left into this area or<br/><strong><a href="#" class="charitable-configure-tab-settings">' . __( 'configure tab settings', 'charitable' ) . '</a></strong>', 'charitable' ),
+				'no_tabs'                           => esc_html__( 'There are no tabs yet for this template. You can <br/><strong><a href="#" class="charitable-configure-tab-settings">' . __( 'configure tab settings', 'charitable' ) . '</a> to add a tab.</strong>', 'charitable' ),
 				'new_tab'                           => esc_html__( 'New Tab', 'charitable' ),
 				'default_campaign_title'            => esc_html__( 'My New Campaign', 'charitable' ),
 				'field_disabled_due_to_modal'       => esc_html__( 'We\'re sorry, the %name% is not available because you have the display settings for donation form set to \'modal\' in Charitable general settings.', 'charitable' ),
@@ -931,21 +935,21 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 
 			if ( $this->is_tour_active() ) {
 				$strings['onboarding_tour'] = array(
-					'next'              => esc_html__( 'Next', 'charitable' ),
-					'start_tour'        => esc_html__( 'Start Tour', 'charitable' ),
-					'watch_video'       => esc_html__( 'Watch Video', 'charitable' ),
-					'choose_a_template' => esc_html__( 'Choose a Template', 'charitable' ),
-					'lets_get_started'  => esc_html__( 'Get Started', 'charitable' ),
-					'step_0_text'       => '<h2>' . esc_html__( 'Welcome to the Campaign Builder!', 'charitable' ) . '</h2><p>' . esc_html__( 'This is where you build, manage, and add features to your campaigns. The following steps will walk you through essential areas.', 'charitable' ) . '</p><div id="charitable-tour-video"></div>',
-					'step_1_title'      => esc_html__( 'Name Your Campaign', 'charitable' ),
-					'step_1_text'       => sprintf(
+					'next'                    => esc_html__( 'Next', 'charitable' ),
+					'start_tour'              => esc_html__( 'Start Tour', 'charitable' ),
+					'watch_video'             => esc_html__( 'Watch Video', 'charitable' ),
+					'choose_a_template'       => esc_html__( 'Choose a Template', 'charitable' ),
+					'lets_get_started'        => esc_html__( 'Get Started', 'charitable' ),
+					'step_0_text'             => '<h2>' . esc_html__( 'Welcome to the Campaign Builder!', 'charitable' ) . '</h2><p>' . esc_html__( 'This is where you build, manage, and add features to your campaigns. The following steps will walk you through essential areas.', 'charitable' ) . '</p><div id="charitable-tour-video"></div>',
+					'step_1_title'            => esc_html__( 'Name Your Campaign', 'charitable' ),
+					'step_1_text'             => sprintf(
 						'<p>%1$s <strong>%2$s</strong> %3$s.</p>',
 						esc_html__( 'Give your campaign a name so you can easily identify it. Once you have entered a name, click', 'charitable' ),
 						esc_html__( 'Next', 'charitable' ),
 						esc_html__( 'to continue', 'charitable' )
 					),
-					'step_2_title'      => esc_html__( 'Select A Template', 'charitable' ),
-					'step_2_text'       => sprintf(
+					'step_2_title'            => esc_html__( 'Select A Template', 'charitable' ),
+					'step_2_text'             => sprintf(
 						'<p>%1$s <strong>%2$s</strong> %3$s.</p><p class="charitable-tour-tip"><strong>%4$s</strong> %5$s <strong>%6$s</strong> %7$s.</p>',
 						esc_html__( 'Build your campaign from scratch or use one of our pre-made templates. Hover over a thumbnail and select', 'charitable' ),
 						esc_html__( 'Create Campaign', 'charitable' ),
@@ -955,63 +959,69 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 						esc_html__( 'Animal Sanctuary', 'charitable' ),
 						esc_html__( 'template is perfect for animal rescue organizations', 'charitable' )
 					),
-					'step_3_title'      => esc_html__( 'Campaign Fields', 'charitable' ),
-					'step_3_text'       => sprintf(
+					'step_3_title'            => esc_html__( 'Campaign Fields', 'charitable' ),
+					'step_3_text'             => sprintf(
 						'<p>%1$s</p>',
 						esc_html__( 'Clicking on this tab shows you the available fields for your campaign. You can drag additional fields to add to your page.', 'charitable' )
 					),
-					'step_4_title'      => esc_html__( 'Recommended Fields', 'charitable' ),
-					'step_4_text'       => sprintf(
+					'step_4_title'            => esc_html__( 'Recommended Fields', 'charitable' ),
+					'step_4_text'             => sprintf(
 						'<p>%1$s <span class="charitable-tour-check"></span> %2$s.</p>',
 						esc_html__( 'These fields are usually found on all campaign pages. A', 'charitable' ),
 						esc_html__( 'means that the field already is on your campaign page', 'charitable' )
 					),
-					'step_5_title'      => esc_html__( 'Standard Fields', 'charitable' ),
-					'step_5_text'       => sprintf(
+					'step_5_title'            => esc_html__( 'Standard Fields', 'charitable' ),
+					'step_5_text'             => sprintf(
 						'<p>%1$s</p>',
 						esc_html__( 'These are common fields you can use when you need them.', 'charitable' )
 					),
-					'step_6_title'      => esc_html__( 'Pro Fields', 'charitable' ),
-					'step_6_text'       => sprintf(
+					'step_6_title'            => esc_html__( 'Pro Fields', 'charitable' ),
+					'step_6_text'             => sprintf(
 						'<p>%1$s</p>',
 						esc_html__( 'Fields that offer advanced features offered by addons or third-party integrations.', 'charitable' )
 					),
-					'step_7_title'      => esc_html__( 'Save', 'charitable' ),
-					'step_7_text'       => sprintf(
+					'step_7_title'            => esc_html__( 'Save', 'charitable' ),
+					'step_7_text'             => sprintf(
 						'<p>%1$s</p>',
 						esc_html__( 'Save your campaign progress at any time.', 'charitable' )
 					),
-					'step_8_title'      => esc_html__( 'Publish Your Campaign', 'charitable' ),
-					'step_8_text'       => sprintf(
+					'step_8_title'            => esc_html__( 'Publish Your Campaign', 'charitable' ),
+					'step_8_text'             => sprintf(
 						'<p>%1$s</p>',
 						esc_html__( 'When you\'re ready, launch your campaign and start raising funds.', 'charitable' )
 					),
-					'step_9_title'      => esc_html__( 'Preview', 'charitable' ),
-					'step_9_text'       => sprintf(
+					'step_9_title'            => esc_html__( 'Preview', 'charitable' ),
+					'step_9_text'             => sprintf(
 						'<p>%1$s</p>',
 						esc_html__( 'See how your campaign will look while in draft or before making updates.', 'charitable' )
 					),
-					'step_10_title'     => esc_html__( 'View', 'charitable' ),
-					'step_10_text'      => sprintf(
+					'step_10_title'           => esc_html__( 'View', 'charitable' ),
+					'step_10_text'            => sprintf(
 						'<p>%1$s</p>',
 						esc_html__( 'You can also check out your campaign once it\'s live.', 'charitable' )
 					),
-					'step_11_title'     => esc_html__( 'Embed', 'charitable' ),
-					'step_11_text'      => sprintf(
+					'step_11_title'           => esc_html__( 'Embed', 'charitable' ),
+					'step_11_text'            => sprintf(
 						'<p>%1$s</p>',
 						esc_html__( 'Add a campaign to a new or existing page with our embed wizard, or use the shortcode provided.', 'charitable' )
 					),
-					'step_12_title'     => esc_html__( 'Settings', 'charitable' ),
-					'step_12_text'      => sprintf(
+					'step_12_title'           => esc_html__( 'Settings', 'charitable' ),
+					'step_12_text'            => sprintf(
 						'<p>%1$s</p><p>%2$s</p>',
 						esc_html__( 'Customize campaign details, preferences, and enable new functionality.', 'charitable' ),
 						esc_html__( 'Start with general settings where you can add donation goals, end dates, suggested amounts, and more.', 'charitable' )
 					),
-					'step_13_title'     => esc_html__( 'We hope you enjoyed the tour!', 'charitable' ),
-					'step_13_text'      => sprintf(
+					'step_13_title'           => esc_html__( 'We hope you enjoyed the tour!', 'charitable' ),
+					'step_13_text'            => sprintf(
 						'<p>%1$s</p>',
 						// translators: %s - getting started guide link.
 						sprintf( __( 'Remember that you can view our <a href="%1$s" target="_blank">getting started guide</a>, read our <a href="%2$s" target="_blank">documentation</a>, or <a href="%3$s" target="_blank">reach out to us</a> for support if you have any questions.', 'charitable' ), 'https://wpcharitable.com/getting-started', 'https://wpcharitable.com/documentation', 'https://wpcharitable.com/support' )
+					),
+					/* onboarding alts */
+					'step_1_title_onboarding' => esc_html__( 'Your Campaign Name', 'charitable' ),
+					'step_1_text_onboarding'  => sprintf(
+						'<p>%1$s</p>',
+						esc_html__( 'This is where you can change or update your campaign name', 'charitable' )
 					),
 				);
 			}
@@ -1303,7 +1313,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 			$before_toolbar = apply_filters( 'charitable_builder_output_before_toolbar', '' );
 			?>
 
-			<div id="charitable-builder" class="<?php echo charitable_sanitize_classes( $builder_classes, true ); // phpcs:ignore ?>">
+			<div id="charitable-builder" class="<?php echo charitable_sanitize_classes( $builder_classes, true ); ?>">
 
 				<?php
 
@@ -1367,6 +1377,8 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 
 							<span class="charitable-edit-campaign-title-area">
 								<input id="charitable_settings_title" name="title" placeholder="<?php echo esc_html__( 'Enter Your Campaign Name Here...', 'charitable' ); ?>" class="charitable-center-form-name charitable-form-name" value="<?php echo esc_html( isset( $this->campaign_data['title'] ) ? $this->campaign_data['title'] : '' ); ?>" />
+								<!--<a href="#" class="charitable-title-edit" title="<?php echo esc_html__( 'Edit Campaign Title', 'charitable' ); ?>"><img class="charitable-edit-campaign-title-icon" width="18" height="18" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/edit.png'; ?>" /></a>-->
+
 							</span>
 
 						</div>
@@ -1484,7 +1496,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 							</div>
 
 							<div class="charitable-form-row charitable-feedback-form-row charitable-feedback-form-row-button">
-								<a class="button-link button-preview-<?php echo esc_attr( $create_update_css ); ?>" data-template-id=""><?php echo esc_html__( 'Use This Template', 'charitable' ); ?></a>
+								<a class="button-link button-preview-<?php echo $create_update_css; ?>" data-template-id=""><?php echo esc_html__( 'Use This Template', 'charitable' ); ?></a>
 							</div>
 
 						</div>
@@ -1646,7 +1658,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				return;
 			}
 
-			check_admin_referer( 'charitable_onboarding_ajax_nonce' );
+			// check_admin_referer( 'charitable_onboarding_ajax_nonce' );
 
 			if ( empty( $_POST['data'] ) || empty( $_POST['data']['optionData'] ) || empty( $_POST['data']['type'] ) ) {
 				wp_send_json_error();
@@ -1715,7 +1727,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				$replace[ $key ] = sanitize_text_field( $value );
 			}
 
-			$option      = $this->get_onboarding_options();
+			$option      = $this->get_onboarding_options(); // get_option( 'charitable_builder_onboarding' );
 			$option_tour = empty( $option['tour'] ) || ! $option['tour'] || ! is_array( $option['tour'] ) ? $schema_tour : $option['tour'];
 			$option_tour = array_merge( $option_tour, $replace );
 
@@ -1840,7 +1852,59 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 			return $option;
 		}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		/* ONBOARDING */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 		/**
 		 * Save onboarding option via AJAX.

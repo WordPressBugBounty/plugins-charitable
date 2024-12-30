@@ -1386,6 +1386,10 @@ select#charitable_settings_export_donations {
   font-weight: bold;
 }
 
+form#posts-filter .actions.charitable-export-actions {
+  margin-top: 3px;
+}
+
 .post-type-charitable #donation-summary mark {
   padding: 2px 4px 2px 6px;
 }
@@ -1593,6 +1597,8 @@ form#posts-filter table tbody#the-list tr.child td {
   padding: 0;
 }
 form#posts-filter table tbody#the-list tr.child td div.charitable-campaign-list-banner {
+  justify-content: space-between;
+  flex-direction: row;
   display: flex;
   flex: 0 0 100%;
   flex-direction: row;
@@ -1603,10 +1609,11 @@ form#posts-filter table tbody#the-list tr.child td div.charitable-campaign-list-
 }
 form#posts-filter table tbody#the-list tr.child td div.charitable-campaign-list-banner > div {
   flex-grow: 1;
+  display: flex;
 }
 form#posts-filter table tbody#the-list tr.child td div.charitable-campaign-list-banner .charitable-campaign-list-banner-icon {
   width: 50px;
-  margin: 0 15px 0 0;
+  margin: 0px 15px 0 0;
 }
 form#posts-filter table tbody#the-list tr.child td div.charitable-campaign-list-banner .charitable-campaign-list-banner-icon img {
   width: 45px;
@@ -1615,8 +1622,10 @@ form#posts-filter table tbody#the-list tr.child td div.charitable-campaign-list-
   font-size: 16px;
 }
 form#posts-filter table tbody#the-list tr.child td div.charitable-campaign-list-banner .charitable-campaign-list-banner-button {
-  text-align: right;
-  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  min-width: 20%;
 }
 form#posts-filter table tbody#the-list tr.child td div.charitable-campaign-list-banner .button-link {
   background-color: #5AA152;

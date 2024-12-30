@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.7.1
 Requires PHP: 7.2
-Stable tag: 1.8.3.7
+Stable tag: 1.8.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -124,7 +124,7 @@ We also know that our developer friends may want more control, so we have added 
 Allow your users to donate with the payment solution of their choice to reach your donation goals faster.
 
 * [Stripe](https://www.wpcharitable.com/integrations/stripe/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - We're a Stripe Verified Partner for Stripe Donation payments. Easily accept credit card donations on your website with Stripe.
-* [PayPal](https://www.wpcharitable.com/integrations/paypal/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - Easily accept PayPal donations on your website.
+* PayPal - Easily accept PayPal donations on your website.
 * [Square](https://www.wpcharitable.com/extensions/charitable-square/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - Accept credit card donations with Square.
 * [Braintree](https://www.wpcharitable.com/extensions/charitable-braintree/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin)
 * [Authorize.net](https://www.wpcharitable.com/extensions/charitable-authorize-net/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin)
@@ -258,6 +258,12 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 
 == Changelog ==
 
+= Donation Form & Fundraising Campaigns v1.8.4 =
+* NEW: Onboarding wizard on first install that guides you through setting up basic settings, gateways, plugins, and your first campaign!
+* NEW: You can now opt-in into data collection to improve Charitable. See "advanced settings" screen for details.
+* UPDATED: Revised output of the "Your Donations" title that was causing issues for those adding HTML via the 'charitable_donation_amount_legend' filter.
+* FIX: Updated code related to translations, CSS, UI, and PHP standards.
+
 = Donation Form & Fundraising Campaigns v1.8.3.7 =
 * NEW: Stripe Gateway allows single or multiple credit card field layout (beta). [More Information](https://www.wpcharitable.com/documentation/credit-card-multiple-fields/)
 * FIX: Ensured some additional settings are added to the database upon a new install.
@@ -273,7 +279,6 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 * FIX: Resolved issue when donation module in campaign wasn't matching donation amount in modal triggered by donation button on same page.
 * FIX: CSS adjustments to campaign templates: wrapper element, donation buttons, and tweaks to donation suggested amounts.
 * FIX: Updated code related to translations and PHP standards.
-
 
 = Donation Form & Fundraising Campaigns v1.8.3.5 =
 * NEW: Added a 'charitable_gateway_fields_after_selector' action hook to insert content between gateway selectors and gateway fields on donation forms.
@@ -418,34 +423,5 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 * FIX: Tweaks to social sharing in campaign visual builder.
 * FIX: Resolve issue involving previewing Charitable emails while using newer Block themes.
 * FIX: Resolved typos and some PHP warnings and notices.
-
-= Donation Form & Fundraising Campaigns v1.8.1.5 =
-* NEW: Addon and plugin suggestions for campaign and donation screens when campaign or donations don't exist yet.
-* NEW: Dismissable pointer boxes added.
-* NEW: Updated text and promotional content.
-* NEW: Updated addon suggestions on Charitable dashboard.
-* FIX: "Date Created" populated in campaign CSV export.
-* FIX: Update capbility of visual campaign builder so that roles with "manage_pages" (such as Campaign Managers) would have access.
-* FIX: Minor code cleanup and tweaks for PHP notices.
-
-= Donation Form & Fundraising Campaigns v1.8.1.4 =
-* NEW: Improved marketing and payment tabs in visual builder that link to Newsletter Addon settings (if installed) or enable gateways/view settings for activated payment addons.
-* NEW: Email address and time now appearing on donation list page in admin.
-* NEW: Campaign and donation exports show fields foramtted for currency for donations, goal amounts, etc.
-* NEW: Ability for Charitable addons to add additional items on the advanced tab in "Settings".
-* NEW: Addition of 'charitable_report_overview_args' filter that allows adjustment of default values for the Overview report.
-* FIX: Fixed a minor JavaScript issue on addon directory page that enables "link to search/filter" to work via "search" keyword in the URL.
-* FIX: Issue saving legacy license codes in certain scenarios.
-* FIX: Minor code cleanup and tweaks for PHP notices.
-
-= Donation Form & Fundraising Campaigns v1.8.1.3 =
-* NEW: Pagination for all donor reports, with a filter allowing customization of items per page based on the report.
-* FIX: Lybunt reporting now sorts by total lifetime amount and includes non-default avatars if possible.
-* FIX: Donor reports should be more reliable showing non-default avatars and "last donation" amounts where applicable.
-* FIX: Top donor reports showing more rows (if available) in non-pagination display.
-* FIX: Adjustment to cache logic for visual campaign builder when loading pre-built templates when creating campaigns.
-* FIX: Improved communication with Charitable server and caching of failed API attempts for licenses.
-* FIX: Added additional checks for activities database tables.
-* FIX: Resolved a few PHP warnings and notices.
 
 **[View entire donation form and fundraising platform changelog](https://plugins.svn.wordpress.org/charitable/trunk/CHANGELOG.md)**

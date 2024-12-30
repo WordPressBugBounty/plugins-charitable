@@ -158,7 +158,14 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 	height: 50px;
 	font-size: 16px;
 	line-height: 16px;
-	border-radius: 0;
+	display: flex; /* Changed from block to flex */
+	align-items: center; /* Vertically centers the text */
+	justify-content: center; /* Optionally centers the text horizontally too */
+	padding: 0;
+	text-align: center !important;
+	text-decoration: none !important;
+	color: white;
+	transition: filter 0.3s; /* Smooth transition */
 }
 
 

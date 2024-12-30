@@ -305,12 +305,12 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 			}
 
 			if ( isset( $_POST['option_data']['status'] ) && in_array( sanitize_text_field( $_POST['option_data']['status'] ), array( 'completed', 'skipped', 'start', 'init' ) ) ) {
-				$status = sanitize_text_field( $_POST['option_data']['status'] );
+				$status = sanitize_text_field( wp_unslash( $_POST['option_data']['status'] ) );
 				$this->update_checklist_status( $status );
 				wp_send_json_success( array( 'message' => esc_html__( 'Charitable checklist status saved', 'charitable' ) ) );
 			} else {
 				// This isn't updating the status of the checklist, just passing a value.
-				$window_closed = isset( $_POST['option_data']['window_closed'] ) ? sanitize_text_field( $_POST['option_data']['window_closed'] ) : '';
+				$window_closed = isset( $_POST['option_data']['window_closed'] ) ? sanitize_text_field( $_POST['option_data']['window_closed'] ) : ''; // phpcs:ignore
 				if ( $window_closed !== '' ) {
 					$options                  = $this->get_checklist_data();
 					$options['window_closed'] = $window_closed;
@@ -319,10 +319,15 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 				}
 			}
 
-			if ( isset( $_POST['option_data']['stepStatus'] ) && 'completed' === sanitize_text_field( $_POST['option_data']['stepStatus'] ) ) {
-				$step = sanitize_text_field( $_POST['option_data']['step'] );
-				$this->mark_step_completed( $step );
-				wp_send_json_success( array( 'message' => esc_html__( 'Charitable checklist information saved', 'charitable' ) ) );
+			if ( isset( $_POST['option_data']['stepStatus'] ) && 'completed' === sanitize_text_field( $_POST['option_data']['stepStatus'] ) ) { // phpcs:ignore
+				if ( isset( $_POST['option_data']['step'] ) ) {
+					$step = sanitize_text_field( wp_unslash( $_POST['option_data']['step'] ) );
+					$this->mark_step_completed( $step );
+					wp_send_json_success( array( 'message' => esc_html__( 'Charitable checklist information saved', 'charitable' ) ) );
+				} else {
+					wp_send_json_error( array( 'message' => esc_html__( 'No checklist step was updated.', 'charitable' ) ) );
+				}
+
 			}
 
 			wp_send_json_success( array( 'message' => esc_html__( 'No checklist information was updated.', 'charitable' ) ) );
@@ -532,11 +537,11 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 		public function confirm_general_settings( $values, $new_values ) { // phpcs:ignore
 
 			// Not the right setting page.
-			if ( ! isset( $_POST['_wp_http_referer'] ) || ! isset( $_POST['option_page'] ) || 'charitable_settings' !== $_POST['option_page'] || empty( $_POST['charitable_settings'] ) ) {
+			if ( ! isset( $_POST['_wp_http_referer'] ) || ! isset( $_POST['option_page'] ) || 'charitable_settings' !== $_POST['option_page'] || empty( $_POST['charitable_settings'] ) ) { // phpcs:ignore
 				return $values;
 			}
 
-			if ( strpos( $_POST['_wp_http_referer'], 'checklist=general-settings' ) === false ) {
+			if ( strpos( $_POST['_wp_http_referer'], 'checklist=general-settings' ) === false ) { // phpcs:ignore
 				return $values;
 			}
 
@@ -562,7 +567,7 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 				return $values;
 			}
 
-			if ( strpos( $_POST['_wp_http_referer'], 'checklist=email-settings' ) === false ) {
+			if ( strpos( $_POST['_wp_http_referer'], 'checklist=email-settings' ) === false ) { // phpcs:ignore
 				return $values;
 			}
 
@@ -864,7 +869,7 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 					$stripe_connected = $stripe_gateway->maybe_stripe_connected();
 					$gateway_mode     = ( charitable_get_option( 'test_mode' ) ) ? 'test' : 'live';
 
-					if ( $stripe_connected || ! empty( $_POST['charitable_settings']['gateways'] ) ) {
+					if ( $stripe_connected || ! empty( $_POST['charitable_settings']['gateways'] ) ) { // phpcs:ignore
 						if ( $update_option ) {
 							$this->mark_step_completed( 'connect-gateway' );
 						}

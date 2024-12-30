@@ -27,6 +27,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @param  string $view      The view to display.
  * @param  array  $view_args Optional. Arguments to pass through to the view itself.
+ * @param  bool   $return_html Optional. Whether to return the HTML or echo it. Default is false.
+ *
  * @return boolean True if the view exists and was rendered. False otherwise.
  */
 function charitable_admin_view( $view, $view_args = array(), $return_html = false ) {
@@ -248,10 +250,10 @@ function charitable_do_settings_fields( $page, $section ) {
  *
  * @since  1.3.0
  *
- * @param  string[] $tabs
- * @param  string   $key
- * @param  string   $name
- * @param  mixed[]  $args
+ * @param  string[] $tabs  The existing tabs.
+ * @param  string   $key   The key for the new tab.
+ * @param  string   $name  The name of the new tab.
+ * @param  mixed[]  $args  Additional arguments for the new tab.
  * @return string[]
  */
 function charitable_add_settings_tab( $tabs, $key, $name, $args = array() ) {
@@ -583,7 +585,7 @@ function charitable_get_activated_timestamp( $type = '' ) {
 /**
  * Get when WPCharitable was first installed.
  *
- * @since 8.1.x
+ * @since 8.1.0
  *
  * @param string $type Specific install type to check for.
  *
@@ -1228,18 +1230,20 @@ function charitable_get_addons_data_from_server( $licenses = false, $update_url 
 	return $versions;
 }
 
-/**
- * Return the list of licenses.
- *
- * Note: The licenses are not necessarily valid. If a user enters an invalid
- * license, the license will be stored but it will be flagged as invalid.
- *
- * @since  1.8.0
- *
- * @return array[]
- */
-function charitable_get_licenses() {
-	return charitable_get_option( 'licenses', array() );
+if ( ! function_exists( 'charitable_get_licenses' ) ) {
+	/**
+	 * Return the list of licenses.
+	 *
+	 * Note: The licenses are not necessarily valid. If a user enters an invalid
+	 * license, the license will be stored but it will be flagged as invalid.
+	 *
+	 * @since  1.8.0
+	 *
+	 * @return array[]
+	 */
+	function charitable_get_licenses() {
+		return charitable_get_option( 'licenses', array() );
+	}
 }
 
 /**
@@ -1381,13 +1385,14 @@ function charitable_disable_dashboard_notification_ajax() {
 	} else {
 		wp_send_json_error( array( 'message' => esc_html__( 'Notification not found.', 'charitable' ) ) );
 	}
-
 }
 
 add_action( 'wp_ajax_charitable_disable_dashboard_notification', 'charitable_disable_dashboard_notification_ajax' );
 
 /**
  * Get a checkbox wrapped with markup to be displayed as a toggle.
+ *
+ * @since 1.8.2
  *
  * @param bool       $checked Is it checked or not.
  * @param string     $name The name for the input.
@@ -1413,3 +1418,92 @@ function charitable_get_checkbox_toggle( $checked, $name, $description = '', $va
 
 	return $markup;
 }
+
+/**
+ * Gets the unique site ID or token.
+ * This is generated from the home URL and two random pieces of data
+ * to create a hashed site ID that can anonymize data.
+ *
+ * @since 1.8.4
+ *
+ * @return string
+ */
+function charitable_get_site_token() {
+	$wpchar_site_token = get_option( 'wpchar_telemetry_uuid' );
+	if ( empty( $wpchar_site_token ) ) {
+		$home_url          = get_home_url();
+		$uuid              = wp_generate_uuid4();
+		$today             = gmdate( 'now' );
+		$wpchar_site_token = md5( $home_url . $uuid . $today );
+		update_option( 'wpchar_telemetry_uuid', $wpchar_site_token, false );
+	}
+	return $wpchar_site_token;
+}
+
+if ( ! function_exists( 'charitable_get_onboarding_url' ) ) :
+
+	/**
+	 * Get the URL for the first screen of the onboarding process.
+	 *
+	 * @since 1.8.4
+	 *
+	 * @return string
+	 */
+	function charitable_get_onboarding_url() {
+
+		$current_site_url = get_site_url();
+
+		return add_query_arg(
+			array(
+				'token'             => charitable_get_site_token(),
+				'version'           => charitable()->get_version(),
+				'utm_campaign'      => 'onboarding_charitable_lite',
+				'email'             => get_option( 'admin_email' ),
+				'sessionid'         => wp_rand( 10000000, 99999999 ), // generate a random session id to prevent caching.
+				'return'            => rawurlencode(
+					base64_encode( get_admin_url( null, 'admin.php') ) // phpcs:ignore
+				),
+				'update_to_pro_url' => 'https://app.charitable.com/upgrade-free-to-pro?api_token=REPLACE_API_TOKEN&license_key=REPLACE_LICENSE_KEY&oth=11ecbadab9561202d33b5ffb8405f9cb9b783af17b52c4b16e16bd8fbbd6cdccbd2a5445c2cb456cb11cdd555471c19e5e2ad446450df2f4e0fc70e410a814d4&endpoint=&siteurl=' . $current_site_url . '/wp-admin/',
+			),
+			'https://app.wpcharitable.com/setup-wizard-charitable_lite'
+		);
+	}
+
+endif;
+
+if ( ! function_exists( 'charitable_get_usage_tracking_setting' ) ) :
+
+	/**
+	 * Get the usage tracking setting.
+	 *
+	 * @since 1.8.4
+	 *
+	 * @return string
+	 */
+	function charitable_get_usage_tracking_setting() {
+		return (int) get_option( 'charitable_usage_tracking', false );
+	}
+
+endif;
+
+if ( ! function_exists( 'charitable_update_usage_tracking_setting' ) ) :
+
+	/**
+	 * Update the usage tracking setting.
+	 *
+	 * @since 1.8.4
+	 *
+	 * @param int $value The new value (0 or 1).
+	 */
+	function charitable_update_usage_tracking_setting( $value ) {
+
+		// update options.
+		update_option( 'charitable_usage_tracking', $value );
+
+		// update Charitable settings to match.
+		$settings                              = get_option( 'charitable_settings' );
+		$settings['charitable_usage_tracking'] = $value ? true : false;
+		update_option( 'charitable_settings', $settings );
+	}
+
+endif;

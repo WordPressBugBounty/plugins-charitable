@@ -142,7 +142,6 @@ class Charitable_Admin_Getting_Started {
 
 		add_action( 'admin_menu', [ $this, 'register' ] );
 		add_action( 'admin_head', [ $this, 'hide_menu' ] );
-		add_action( 'admin_init', [ $this, 'redirect' ], 9999 );
 	}
 
 	/**
@@ -178,45 +177,6 @@ class Charitable_Admin_Getting_Started {
 	}
 
 	/**
-	 * Getting_Started screen redirect.
-	 *
-	 * This function checks if a new install or update has just occurred. If so,
-	 * then we redirect the user to the appropriate page.
-	 *
-	 * @since 1.8.1.12
-	 * @version 1.8.3 tweak what is an initial install.
-	 */
-	public function redirect() {
-
-		// Check if we should consider redirection.
-		if ( ! get_transient( 'charitable_activation_redirect' ) ) {
-			return;
-		}
-
-		// If we are redirecting, clear the transient so it only happens once.
-		delete_transient( 'charitable_activation_redirect' );
-
-		// Check option to disable welcome redirect.
-		if ( get_option( 'charitable_activation_redirect', false ) ) {
-			return;
-		}
-
-		// Only do this for single site installs.
-		if ( isset( $_GET['activate-multi'] ) || is_network_admin() ) { // phpcs:ignore WordPress.Security.NonceVerification
-			return;
-		}
-
-		// Check if this is an update or first install.
-		$upgrade = get_option( 'charitable_version_upgraded_from', [] );
-
-		if ( ! $upgrade || 1 === count( $upgrade ) ) {
-			// Initial install.
-			wp_safe_redirect( admin_url( 'index.php?page=' . self::SLUG ) );
-			exit;
-		}
-	}
-
-	/**
 	 * Getting Started screen. Shows after first install.
 	 *
 	 * @since 1.8.1.12
@@ -245,7 +205,7 @@ class Charitable_Admin_Getting_Started {
 
 		?>
 
-		<div id="charitable-welcome" class="<?php echo esc_attr( sanitize_html_class( $class ) ); ?>">
+		<div id="charitable-welcome" class="<?php echo sanitize_html_class( $class ); ?>">
 
 			<div class="container">
 
@@ -259,7 +219,7 @@ class Charitable_Admin_Getting_Started {
 					</div>
 
 					<a href="#" class="play-video" title="<?php esc_attr_e( 'Watch to learn more about Charitable', 'charitable' ); ?>">
-						<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/onboarding/getting-started/video-poster.jpg" width="100%" alt="<?php esc_attr_e( 'Watch how to create your first campaign', 'charitable' ); ?>" class="video-thumbnail">
+						<img src="<?php echo charitable()->get_path( 'assets', false ); // phpcs:ignore ?>images/onboarding/getting-started/video-poster.jpg" width="100%" alt="<?php esc_attr_e( 'Watch how to create your first campaign', 'charitable' ); ?>" class="video-thumbnail">
 					</a>
 
 					<div class="block">
@@ -327,24 +287,7 @@ class Charitable_Admin_Getting_Started {
 								?>
 							<div class="charitable-gateway-footer">
 								<?php // translators: %s is the URL. ?>
-								<p>
-								<?php
-								printf(
-									wp_kses(
-										/* translators: %s is the URL. */
-										__( '<strong>Stripe not available in your country?</strong> Charitable works with payment gateways like PayPal, Authorize.net, Braintree, Payrexx, PayUMoney, GoCardless, and others. <a target="_blank" href="%s">View additional payment options</a> available with PRO extensions.', 'charitable' ),
-										array(
-											'strong' => array(),
-											'a'      => array(
-												'href'   => array(),
-												'target' => array(),
-											),
-										)
-									),
-									esc_url( admin_url( 'admin.php?page=charitable-addons' ) )
-								);
-								?>
-									</p>
+								<p><?php printf( __( '<strong>Stripe not available in your country?</strong> Charitable works with payment gateways like PayPal, Authorize.net, Braintree, Payrexx, PayUMoney, GoCardless, and others. <a target="_blank" href="%s">View additional payment options</a> available with PRO extensions.', 'charitable' ), esc_url( admin_url( 'admin.php?page=charitable-addons' ) ) ); ?></p>
 							</div>
 							<?php endif; ?>
 						<?php endif; ?>

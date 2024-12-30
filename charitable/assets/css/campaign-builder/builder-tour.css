@@ -171,6 +171,10 @@
   max-width: 300px !important;
 }
 
+body[data-shepherd-step="wpchar-visual-campaign-builder-step-13"] #tippy-12 {
+  max-width: 600px !important;
+}
+
 .charitable-tour-check {
   background-image: url("../../images/campaign-builder/check-circle.svg");
   display: inline-block;

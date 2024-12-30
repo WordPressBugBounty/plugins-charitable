@@ -829,19 +829,13 @@ function charitable_get_charitable_screens() {
  *
  * Returns true to show the notifications, false to not auto show them.
  *
- * @since  1.8.3.2
+ * @since  1.8.3
  *
  * @return bool
  */
 function charitable_get_autoshow_plugin_notifications() {
 
-	// To prevent this running on every page we need to check and see if we are on the dashboard page.
-	if ( ! is_admin() || ! isset( $_GET['page'] ) || 'charitable-dashboard' !== $_GET['page'] ) { // phpcs:ignore
-		return false;
-	}
-
-	// Logic.
-	if ( false === ( $autoshow_plugin = get_transient( 'charitable_autoshow_plugin_notifications' ) ) ) { // phpcs:ignore
+	if ( false === ( $autoshow_plugin = get_transient( 'charitable_autoshow_plugin_notifications' ) ) ) {
 		// It wasn't there, so regenerate the data and save the transient.
 		set_transient( 'charitable_autoshow_plugin_notifications', true, 60 * 60 ); // one hour.
 		return true;

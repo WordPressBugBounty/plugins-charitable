@@ -1,3 +1,9 @@
+# 1.8.4
+* NEW: Onboarding wizard on first install that guides you through setting up basic settings, gateways, plugins, and your first campaign!
+* NEW: You can now opt-in into data collection to improve Charitable. See "advanced settings" screen for details.
+* UPDATED: Revised output of the "Your Donations" title that was causing issues for those adding HTML via the 'charitable_donation_amount_legend' filter.
+* FIX: Updated code related to translations, CSS, UI, and PHP standards.
+
 # 1.8.3.7
 * NEW: Stripe Gateway allows single or multiple credit card field layout (beta). [More Information](https://www.wpcharitable.com/documentation/credit-card-multiple-fields/)
 * FIX: Ensured some additional settings are added to the database upon a new install.

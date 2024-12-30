@@ -81,12 +81,39 @@ var CharitableTour =
         ) {
           // eslint-disable-line
           app.events();
-          app.setupTour();
+          if ( app.isCampaignView() ) {
+            app.setupTourOnboarding();
+          } else {
+            app.setupTour();
+          }
         } else if (
           charitable_admin_builder_onboarding.option.tour.status === "started"
         ) {
 
         }
+
+        // remove ANY cookies that would hold campaign status.
+        wpCookies.remove("charitable_panel");
+        wpCookies.remove("charitable_panel_tab_section_tab_id");
+        wpCookies.remove("charitable_panel_layout_options_tabs_tab_open_template");
+        wpCookies.remove("charitable_panel_layout_options_tabs_tab_open_design");
+        wpCookies.remove("charitable_panel_layout_options_tabs_tab_open_settings");
+        wpCookies.remove("charitable_panel_layout_options_tabs_tab_open_marketing");
+        wpCookies.remove("charitable_panel_layout_options_tabs_tab_open_payment");
+        wpCookies.remove("charitable_panel_content_section");
+        wpCookies.remove("charitable_panel_active_field_id");
+        wpCookies.remove("charitable_panel_design_layout_options_group");
+
+      },
+
+      isCampaignView: function () {
+
+        if ( window.location.search.includes("view=design") ) {
+          return true;
+        }
+
+        return false;
+
       },
 
       /**
@@ -453,6 +480,325 @@ var CharitableTour =
         tour.start();
       },
 
+      setupTourOnboarding: function () {
+
+        const tour = new Shepherd.Tour({
+          defaultStepOptions: {
+            cancelIcon: {
+              enabled: true,
+            },
+            exitOnEsc: true,
+            classes: "",
+            classPrefix: "wpchar",
+            scrollTo: { behavior: "smooth", block: "center" },
+            when: {
+              show() {
+                const footer = $(".shepherd-footer"),
+                  currentStep = tour?.getCurrentStep(),
+                  currentStepNumber = tour?.steps.indexOf(currentStep) + 1,
+                  totalSteps = tour?.steps.length;
+
+                if (
+                  currentStepNumber === 1 ||
+                  currentStepNumber === totalSteps
+                ) {
+                  return;
+                }
+
+                var progressPercentage = (currentStepNumber / totalSteps) * 100;
+
+                if (progressPercentage > 100) {
+                  progressPercentage = 100;
+                }
+
+                // insert HTML into footer that is a progress bar showing % of current/completed steps.
+                footer.after(
+                  '<span class="charitable-tour-progress-bar"><span class="charitable-tour-progress" style="width: ' +
+                    progressPercentage +
+                    '%"></span></span>',
+                );
+
+                if ( currentStepNumber > 2 ) {
+                  // remove .shshepherd-target class from the target element.
+                  $(".shepherd-target").removeClass("shepherd-target");
+                }
+
+              },
+            },
+          },
+          tourName: "wpchar-visual-campaign-builder",
+          useModalOverlay: true,
+          modalContainer: document.getElementById("charitable-builder"),
+          stepContainer: document.getElementById("charitable-builder"),
+        });
+
+        tour.addStep({
+          id: "wpchar-visual-campaign-builder-step-0",
+          text: charitable_builder.onboarding_tour.step_0_text,
+          arrow: false,
+          cancelIcon: {
+            enabled: true,
+          },
+          classes: "wpchar-visual-campaign-builder-step-0",
+          buttons: [
+            {
+              text: charitable_builder.onboarding_tour.start_tour,
+              classes: "charitable-tour-btn-primary",
+              action: tour.next,
+            },
+            // {
+            //   text: charitable_builder.onboarding_tour.watch_video,
+            //   classes: "charitable-tour-btn-primary",
+            //   action: function () {
+            //     app.openVideo();
+            //   },
+            // },
+          ],
+        });
+
+        // assign a variable true if "view" in the querystring is 'design'.
+        var isDesignView = window.location.search.includes("view=design");
+
+        const name_step = tour.addStep({
+          id: "wpchar-visual-campaign-builder-step-1",
+          title: charitable_builder.onboarding_tour.step_1_title_onboarding,
+          text: charitable_builder.onboarding_tour.step_1_text_onboarding,
+          attachTo: {
+            element: "#charitable_settings_title",
+            on: "bottom",
+          },
+          classes: "wpchar-visual-campaign-builder-step-1",
+          buttons: [
+            {
+              text: charitable_builder.onboarding_tour.next,
+              classes: isDesignView ? "charitable-tour-btn-primary" : "charitable-tour-btn-primary charitable-tour-btn-disabled",
+              action: tour.next,
+            },
+          ],
+        });
+
+        tour.addStep({
+          id: "wpchar-visual-campaign-builder-step-4",
+          title: charitable_builder.onboarding_tour.step_4_title,
+          text: charitable_builder.onboarding_tour.step_4_text,
+          arrow: true,
+          modalOverlayOpeningPadding: 5,
+          attachTo: {
+            element: "#charitable-tour-block-1",
+            on: "left",
+          },
+          classes: "wpchar-visual-campaign-builder-step-4",
+          buttons: [
+            {
+              text: charitable_builder.onboarding_tour.next,
+              classes: "charitable-tour-btn-primary",
+              action: tour.next,
+            },
+          ],
+        });
+
+        tour.addStep({
+          id: "wpchar-visual-campaign-builder-step-5",
+          title: charitable_builder.onboarding_tour.step_5_title,
+          text: charitable_builder.onboarding_tour.step_5_text,
+          arrow: true,
+          modalOverlayOpeningPadding: 5,
+          attachTo: {
+            element: "#charitable-tour-block-2",
+            on: "left",
+          },
+          classes: "wpchar-visual-campaign-builder-step-5",
+          buttons: [
+            {
+              text: charitable_builder.onboarding_tour.next,
+              classes: "charitable-tour-btn-primary",
+              action: tour.next,
+            },
+          ],
+        });
+
+        tour.addStep({
+          id: "wpchar-visual-campaign-builder-step-6",
+          title: charitable_builder.onboarding_tour.step_6_title,
+          text: charitable_builder.onboarding_tour.step_6_text,
+          arrow: true,
+          modalOverlayOpeningPadding: 5,
+          attachTo: {
+            element: "#charitable-tour-block-3",
+            on: "left",
+          },
+          classes: "wpchar-visual-campaign-builder-step-6",
+          buttons: [
+            {
+              text: charitable_builder.onboarding_tour.next,
+              classes: "charitable-tour-btn-primary",
+              action: tour.next,
+            },
+          ],
+        });
+
+        tour.addStep({
+          id: "wpchar-visual-campaign-builder-step-7",
+          title: charitable_builder.onboarding_tour.step_7_title,
+          text: charitable_builder.onboarding_tour.step_7_text,
+          arrow: true,
+          modalOverlayOpeningPadding: 5,
+          attachTo: {
+            element: "#charitable-save",
+            on: "top-end",
+          },
+          classes: "wpchar-visual-campaign-builder-step-7",
+          buttons: [
+            {
+              text: charitable_builder.onboarding_tour.next,
+              classes: "charitable-tour-btn-primary",
+              action: function () {
+                app.gotoDraftPublishStep();
+                tour.next();
+              },
+            },
+          ],
+        });
+
+        tour.addStep({
+          id: "wpchar-visual-campaign-builder-step-8",
+          title: charitable_builder.onboarding_tour.step_8_title,
+          text: charitable_builder.onboarding_tour.step_8_text,
+          arrow: true,
+          modalOverlayOpeningPadding: 10,
+
+          attachTo: {
+            element: "#charitable-tour-block-4",
+            on: "left-start",
+          },
+          classes: "wpchar-visual-campaign-builder-step-8",
+          buttons: [
+            {
+              text: charitable_builder.onboarding_tour.next,
+              classes: "charitable-tour-btn-primary",
+              action: function () {
+                app.undoDraftPublishStep();
+                tour.next();
+              },
+            },
+          ],
+        });
+
+        tour.addStep({
+          id: "wpchar-visual-campaign-builder-step-9",
+          title: charitable_builder.onboarding_tour.step_9_title,
+          text: charitable_builder.onboarding_tour.step_9_text,
+          arrow: true,
+          modalOverlayOpeningPadding: 3,
+
+          attachTo: {
+            element: "#charitable-preview-btn",
+            on: "top",
+          },
+          classes: "wpchar-visual-campaign-builder-step-9",
+          buttons: [
+            {
+              text: charitable_builder.onboarding_tour.next,
+              classes: "charitable-tour-btn-primary",
+              action: function () {
+                tour.next();
+              },
+            },
+          ],
+        });
+
+        tour.addStep({
+          id: "wpchar-visual-campaign-builder-step-10",
+          title: charitable_builder.onboarding_tour.step_10_title,
+          text: charitable_builder.onboarding_tour.step_10_text,
+          arrow: true,
+          modalOverlayOpeningPadding: 3,
+
+          attachTo: {
+            element: "#charitable-view-btn",
+            on: "top",
+          },
+          classes: "wpchar-visual-campaign-builder-step-10",
+          buttons: [
+            {
+              text: charitable_builder.onboarding_tour.next,
+              classes: "charitable-tour-btn-primary",
+              action: function () {
+                tour.next();
+              },
+            },
+          ],
+        });
+
+        tour.addStep({
+          id: "wpchar-visual-campaign-builder-step-11",
+          title: charitable_builder.onboarding_tour.step_11_title,
+          text: charitable_builder.onboarding_tour.step_11_text,
+          arrow: true,
+          modalOverlayOpeningPadding: 3,
+
+          attachTo: {
+            element: "#charitable-embed",
+            on: "top",
+          },
+          classes: "wpchar-visual-campaign-builder-step-11",
+          buttons: [
+            {
+              text: charitable_builder.onboarding_tour.next,
+              classes: "charitable-tour-btn-primary",
+              action: function () {
+                app.gotoSettingsStep();
+                tour.next();
+              },
+            },
+          ],
+        });
+
+        tour.addStep({
+          id: "wpchar-visual-campaign-builder-step-12",
+          title: charitable_builder.onboarding_tour.step_12_title,
+          text: charitable_builder.onboarding_tour.step_12_text,
+          arrow: true,
+          modalOverlayOpeningPadding: 0,
+
+          attachTo: {
+            element: "#charitable-panel-settings .charitable-panel-sidebar",
+            on: "right",
+          },
+          classes: "wpchar-visual-campaign-builder-step-12",
+          buttons: [
+            {
+              text: charitable_builder.onboarding_tour.next,
+              classes: "charitable-tour-btn-primary",
+              action: function () {
+                CharitableCampaignBuilder.panelSwitch("design");
+                tour.next();
+              },
+            },
+          ],
+        });
+
+        tour.addStep({
+          id: "wpchar-visual-campaign-builder-step-13",
+          title: charitable_builder.onboarding_tour.step_13_title,
+          text: charitable_builder.onboarding_tour.step_13_text,
+          arrow: false,
+          classes: "wpchar-visual-campaign-builder-step-13",
+          cancelIcon: {
+            enabled: false,
+          },
+          buttons: [
+            {
+              text: charitable_builder.onboarding_tour.lets_get_started,
+              classes: "charitable-tour-btn-primary",
+              action: tour.next,
+            },
+          ],
+        });
+
+        tour.start();
+      },
+
       /**
        * Register JS events.
        *
@@ -471,6 +817,9 @@ var CharitableTour =
         });
 
         $(document).on("enter-campaign-name", () => {
+          if ( app.isCampaignView() ) {
+            return;
+          }
           if (name_step.isOpen()) {
             // Shepherd.activeTour.next();
             $(".charitable-tour-btn-primary").removeClass(
@@ -480,6 +829,9 @@ var CharitableTour =
         });
 
         $("#charitable_settings_title").on("input", function () {
+          if ( app.isCampaignView() ) {
+            return;
+          }
           if ($(this).val().length >= 5) {
             // $( document ).trigger( 'enter-campaign-name' );
             $(".charitable-tour-btn-primary").removeClass(

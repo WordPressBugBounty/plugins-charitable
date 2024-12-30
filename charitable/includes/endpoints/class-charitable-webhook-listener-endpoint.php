@@ -126,12 +126,12 @@ if ( ! class_exists( 'Charitable_Webhook_Listener_Endpoint' ) ) :
 		 */
 		public function process_incoming_webhook( WP_Query $wp_query ) {
 
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( defined( 'CHARITABLE_DEBUG_WEBHOOK' ) && CHARITABLE_DEBUG_WEBHOOK ) {
 				error_log( 'process_incoming_webhook' );
 			}
 
 			if ( ! $wp_query->is_main_query() ) {
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( defined( 'CHARITABLE_DEBUG_WEBHOOK' ) && CHARITABLE_DEBUG_WEBHOOK ) {
 					error_log( 'process_incoming_webhook is_main_query = false' );
 				}
 				return false;
@@ -144,14 +144,14 @@ if ( ! class_exists( 'Charitable_Webhook_Listener_Endpoint' ) ) :
 
 			$gateway = get_query_var( 'charitable-listener', false );
 
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( defined( 'CHARITABLE_DEBUG_WEBHOOK' ) && CHARITABLE_DEBUG_WEBHOOK ) {
 				error_log( 'process_incoming_webhook testing for gateway start' );
 			}
 
 			if ( $gateway ) {
 
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-					error_log( 'process_incoming_webhook THERE IS A GATEWAY' );
+				if ( defined( 'CHARITABLE_DEBUG_WEBHOOK' ) && CHARITABLE_DEBUG_WEBHOOK ) {
+					error_log( 'process_incoming_webhook GATEWAY' );
 					error_log( print_r( $wp_query, true ) );
 					error_log( print_r( $gateway, true ) );
 				}
@@ -166,7 +166,7 @@ if ( ! class_exists( 'Charitable_Webhook_Listener_Endpoint' ) ) :
 				return true;
 			}
 
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( defined( 'CHARITABLE_DEBUG_WEBHOOK' ) && CHARITABLE_DEBUG_WEBHOOK ) {
 				error_log( 'process_incoming_webhook testing for gateway end' );
 			}
 

@@ -719,6 +719,7 @@
 #charitable-design-wrap header .title-description,
 #charitable-design-wrap div.charitable-preview-row .title-description {
   margin: 0px 5px;
+  word-break: break-all;
 }
 #charitable-design-wrap header .title-description span,
 #charitable-design-wrap div.charitable-preview-row .title-description span {
@@ -945,6 +946,7 @@
   font-size: 16px;
   line-height: 16px;
   font-weight: 700;
+  word-break: break-word;
 }
 #charitable-design-wrap .charitable-preview-align-center {
   margin-left: auto;

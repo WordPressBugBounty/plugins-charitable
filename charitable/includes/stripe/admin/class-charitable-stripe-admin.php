@@ -137,10 +137,10 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 		public function save_stripe_settings( $values, $new_values, $old_values ) {
 
 			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-				error_log( 'save_stripe_settings');
-				error_log( print_r( $values, true ) );
-				error_log( print_r( $new_values, true ) );
-				error_log( print_r( $old_values, true ) );
+				error_log( 'save_stripe_settings'); // phpcs:ignore
+				error_log( print_r( $values, true ) ); // phpcs:ignore
+				error_log( print_r( $new_values, true ) ); // phpcs:ignore
+				error_log( print_r( $old_values, true ) ); // phpcs:ignore
 			}
 
 			/* Bail early if this is not the Stripe settings page. */
@@ -155,7 +155,7 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 
 			/* Add webhooks unless we're on localhost. */
 			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-				error_log( 'save_settings');
+				error_log( 'save_stripe_settings midpoint'); // phpcs:ignore
 			}
 
 			// a reminder on the charitable_using_stripe_connect check:
@@ -164,14 +164,14 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 			if ( function_exists( 'charitable_stripe_should_setup_webhooks' ) && charitable_stripe_should_setup_webhooks() && ! charitable_using_stripe_connect() ) {
 				if ( defined( 'CHARITABLE_FORCE_WEBHOOKS_WITHOUT_STRIPE_CONNECT' ) && CHARITABLE_FORCE_WEBHOOKS_WITHOUT_STRIPE_CONNECT ) {
 					if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-						error_log( 'made it 2');
-						error_log( print_r( $values, true ) );
+						error_log( 'charitable_stripe_should_setup_webhooks exists'); // phpcs:ignore
+						error_log( print_r( $values, true ) ); // phpcs:ignore
 					}
 					$values = $this->setup_webhooks( $values, $new_values, $old_values );
 					if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-						error_log( print_r( $values, true ) );
-						error_log( print_r( $new_values, true ) );
-						error_log( print_r( $old_values, true ) );
+						error_log( print_r( $values, true ) ); // phpcs:ignore
+						error_log( print_r( $new_values, true ) ); // phpcs:ignore
+						error_log( print_r( $old_values, true ) ); // phpcs:ignore
 					}
 				}
 			}
@@ -184,16 +184,17 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 		 *
 		 * @since  1.3.0
 		 *
-		 * @param  array $account_data The account data.
+		 * @param  array $values     The submitted values.
+		 * @param  array $new_values The new settings.
+		 * @param  array $old_values The previous settings.
+		 * @return array
 		 */
 		public function update_webhook_upon_connection( $account_data ) {
 
-			if ( function_exists( 'charitable_stripe_should_setup_webhooks' ) && charitable_stripe_should_setup_webhooks() ) {
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-					error_log( 'update_webhook_upon_connection 0');
-					error_log( print_r( charitable_stripe_should_setup_webhooks(), true ) );
-					error_log( print_r( charitable_using_stripe_connect(), true ) );
-				}
+			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				error_log( 'update_webhook_upon_connection 0');
+				error_log( print_r( charitable_stripe_should_setup_webhooks(), true ) );
+				error_log( print_r( charitable_using_stripe_connect(), true ) );
 			}
 
 			// a reminder on the charitable_using_stripe_connect check:
@@ -216,7 +217,7 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 					error_log( print_r( $values, true ) );
 				}
 
-				// update the settings.
+				// update the settings
 				update_option( 'charitable_settings', $values );
 
 			}

@@ -25,6 +25,18 @@ $check_list_completed = $checklist_class->is_checklist_completed() ? 'charitable
 $checklist_urls  = $checklist_class->get_steps_urls();
 $checklist_stats = $checklist_class->get_steps_stats();
 
+$onboarding_campaign_id = get_option( 'charitable_setup_campaign_created', 0 );
+$onboarding_completed   = $onboarding_campaign_id && get_option( 'charitable_ss_complete', false ) ? true : false;
+
+$email_signup    = get_option( 'charitable_email_signup', false );
+$opt_in_tracking = charitable_get_usage_tracking_setting();
+
+$checklist_classes['optin'] = $opt_in_tracking ? 'charitable-checklist-completed charitable-checklist-checked' : '';
+
+$tab_leave_open_campaign = $checklist_class->is_step_completed( 'first-campaign' ) ? false : true;
+$tab_leave_open_campaign = $onboarding_completed ? true : $tab_leave_open_campaign;
+
+
 if ( ! is_array( $checklist_stats ) || empty( $checklist_stats ) ) {
 	$checklist_stats = [
 		'completed' => 0,
@@ -65,7 +77,7 @@ ob_start();
 					<?php
 
 						/* translators: Suggestion on completion of checklist on checklist page. */
-						printf( __( '<strong>%1$s</strong> What\'s Next?', 'charitable' ), esc_html__( 'You\'ve completed the checklist!', 'charitable' ) );
+						printf( esc_html__( '<strong>%1$s</strong> What\'s Next?', 'charitable' ), esc_html__( 'You\'ve completed the checklist!', 'charitable' ) );
 
 					?>
 					</p>
@@ -78,7 +90,7 @@ ob_start();
 						printf(
 							/* translators: Suggestion on completion of checklist on checklist page. */
 							__( 'Don\'t forget to visit the <a href="%1$s" target="_blank">%2$s</a> and <a href="%3$s" target="_blank">%4$s</a> to see your fundraising stats and grow your campaigns.', 'charitable' ),
-							admin_url( 'admin.php?page=charitable-dashboard' ),
+							esc_url( admin_url( 'admin.php?page=charitable-dashboard' ) ),
 							esc_html__( 'dashboard', 'charitable' ),
 							esc_url( admin_url( 'admin.php?page=charitable-reports' ) ),
 							esc_html__( 'view reports', 'charitable' ),
@@ -89,7 +101,7 @@ ob_start();
 						<?php
 						printf(
 							// translators: Suggestion on completion of checklist on checklist page.
-							__( '%1$s <a href="https://www.wpcharitable.com/documentation/" target="_blank">%2$s</a> %3$s <a href="https://www.wpcharitable.com/support/" target="_blank">%4$s</a>.', 'charitable' ),
+							esc_html__( '%1$s <a href="https://www.wpcharitable.com/documentation/" target="_blank">%2$s</a> %3$s <a href="https://www.wpcharitable.com/support/" target="_blank">%4$s</a>.', 'charitable' ),
 							esc_html__( 'Need help? Visit our', 'charitable' ),
 							esc_html__( 'documentation', 'charitable' ),
 							esc_html__( 'or', 'charitable' ),
@@ -109,14 +121,32 @@ ob_start();
 
 					<h1><?php esc_html_e( 'Welcome Aboard', 'charitable' ); ?><?php echo esc_html( $first_name ); ?>!</h1>
 
-					<p>
 					<?php
-					// translators: Suggestion on completion of checklist on checklist page.
-					printf( __( '<strong>%1$s</strong> Follow these steps to start fundraising quickly.', 'charitable' ), esc_html__( 'Thanks for installing Charitable! ', 'charitable' ) );
-					?>
-					</p>
 
-				<?php endif; ?>
+					// if the user has completed onboarding, show a different message.
+					if ( $onboarding_completed ) :
+
+						?>
+
+					<p>
+						<?php
+						// translators: Suggestion on completion of checklist on checklist page.
+						printf( __( '<strong>%1$s</strong> View remaining steps below to improve your fundraising efforts.', 'charitable' ), esc_html__( 'Thanks for setting up Charitable! ', 'charitable' ) ); // phpcs:ignore
+						?>
+					</p>
+					<?php else : ?>
+					<p>
+						<?php
+						// translators: Suggestion on completion of checklist on checklist page.
+						printf( __( '<strong>%1$s</strong> Follow these steps to start fundraising quickly.', 'charitable' ), esc_html__( 'Thanks for installing Charitable! ', 'charitable' ) ); // phpcs:ignore
+						?>
+					</p>
+						<?php
+
+					endif;
+
+				endif;
+				?>
 
 			</header>
 
@@ -141,7 +171,7 @@ ob_start();
 				<?php
 				if ( $checklist_class->is_step_completed( 'connect-gateway' ) ) :
 					echo 'style="display:none;"';
-endif;
+				endif;
 				?>
 				>
 					<?php if ( $stripe_connect_url ) : ?>
@@ -158,7 +188,7 @@ endif;
 						</div>
 						<div>
 							<?php if ( ! $stripe_connected ) : ?>
-								<a href="<?php echo $stripe_connect_url; ?>"><div class="wpcharitable-stripe-connect"><span><?php esc_html_e( 'Connect With', 'charitable' ); ?></span>&nbsp;&nbsp;<svg width="49" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M48.4718 10.3338c0-3.41791-1.6696-6.11484-4.8607-6.11484-3.2045 0-5.1434 2.69693-5.1434 6.08814 0 4.0187 2.289 6.048 5.5743 6.048 1.6023 0 2.8141-.3604 3.7296-.8678v-2.6702c-.9155.4539-1.9658.7343-3.2987.7343-1.3061 0-2.464-.4539-2.6121-2.0294h6.5841c0-.1735.0269-.8678.0269-1.1882Zm-6.6514-1.26838c0-1.50868.929-2.13618 1.7773-2.13618.8213 0 1.6965.6275 1.6965 2.13618h-3.4738Zm-8.5499-4.84646c-1.3195 0-2.1678.61415-2.639 1.04139l-.1751-.82777h-2.9621V20l3.3661-.7076.0134-3.7784c.4847.3471 1.1984.8411 2.3832.8411 2.4102 0 4.6048-1.9225 4.6048-6.1548-.0134-3.87186-2.235-5.98134-4.5913-5.98134Zm-.8079 9.19894c-.7944 0-1.2656-.2804-1.5888-.6275l-.0134-4.95328c.35-.38719.8348-.65421 1.6022-.65421 1.2253 0 2.0735 1.36182 2.0735 3.11079 0 1.7891-.8347 3.1242-2.0735 3.1242Zm-9.6001-9.98666 3.3796-.72096V0l-3.3796.70761v2.72363Zm0 1.01469h3.3796V16.1282h-3.3796V4.44593Zm-3.6219.98798-.2154-.98798h-2.9083V16.1282h3.3661V8.21095c.7944-1.02804 2.1408-.84112 2.5582-.69426V4.44593c-.4309-.16022-2.0062-.45394-2.8006.98798Zm-6.7322-3.88518-3.2853.69426-.01346 10.69421c0 1.976 1.49456 3.4313 3.48726 3.4313 1.1041 0 1.912-.2003 2.3563-.4406v-2.7103c-.4309.1736-2.5583.7877-2.5583-1.1882V7.28972h2.5583V4.44593h-2.5583l.0135-2.8972ZM3.40649 7.83712c0-.5207.43086-.72096 1.14447-.72096 1.0233 0 2.31588.30707 3.33917.85447V4.83311c-1.11755-.44059-2.22162-.61415-3.33917-.61415C1.81769 4.21896 0 5.63418 0 7.99733c0 3.68487 5.11647 3.09747 5.11647 4.68627 0 .6141-.53858.8144-1.29258.8144-1.11755 0-2.54477-.4539-3.675782-1.0681v3.1776c1.252192.534 2.517842.761 3.675782.761 2.80059 0 4.72599-1.3752 4.72599-3.765-.01346-3.97867-5.14339-3.27106-5.14339-4.76638Z" fill="#fff"/></svg></div></a>
+								<a href="<?php echo esc_url( $stripe_connect_url ); ?>"><div class="wpcharitable-stripe-connect"><span><?php esc_html_e( 'Connect With', 'charitable' ); ?></span>&nbsp;&nbsp;<svg width="49" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M48.4718 10.3338c0-3.41791-1.6696-6.11484-4.8607-6.11484-3.2045 0-5.1434 2.69693-5.1434 6.08814 0 4.0187 2.289 6.048 5.5743 6.048 1.6023 0 2.8141-.3604 3.7296-.8678v-2.6702c-.9155.4539-1.9658.7343-3.2987.7343-1.3061 0-2.464-.4539-2.6121-2.0294h6.5841c0-.1735.0269-.8678.0269-1.1882Zm-6.6514-1.26838c0-1.50868.929-2.13618 1.7773-2.13618.8213 0 1.6965.6275 1.6965 2.13618h-3.4738Zm-8.5499-4.84646c-1.3195 0-2.1678.61415-2.639 1.04139l-.1751-.82777h-2.9621V20l3.3661-.7076.0134-3.7784c.4847.3471 1.1984.8411 2.3832.8411 2.4102 0 4.6048-1.9225 4.6048-6.1548-.0134-3.87186-2.235-5.98134-4.5913-5.98134Zm-.8079 9.19894c-.7944 0-1.2656-.2804-1.5888-.6275l-.0134-4.95328c.35-.38719.8348-.65421 1.6022-.65421 1.2253 0 2.0735 1.36182 2.0735 3.11079 0 1.7891-.8347 3.1242-2.0735 3.1242Zm-9.6001-9.98666 3.3796-.72096V0l-3.3796.70761v2.72363Zm0 1.01469h3.3796V16.1282h-3.3796V4.44593Zm-3.6219.98798-.2154-.98798h-2.9083V16.1282h3.3661V8.21095c.7944-1.02804 2.1408-.84112 2.5582-.69426V4.44593c-.4309-.16022-2.0062-.45394-2.8006.98798Zm-6.7322-3.88518-3.2853.69426-.01346 10.69421c0 1.976 1.49456 3.4313 3.48726 3.4313 1.1041 0 1.912-.2003 2.3563-.4406v-2.7103c-.4309.1736-2.5583.7877-2.5583-1.1882V7.28972h2.5583V4.44593h-2.5583l.0135-2.8972ZM3.40649 7.83712c0-.5207.43086-.72096 1.14447-.72096 1.0233 0 2.31588.30707 3.33917.85447V4.83311c-1.11755-.44059-2.22162-.61415-3.33917-.61415C1.81769 4.21896 0 5.63418 0 7.99733c0 3.68487 5.11647 3.09747 5.11647 4.68627 0 .6141-.53858.8144-1.29258.8144-1.11755 0-2.54477-.4539-3.675782-1.0681v3.1776c1.252192.534 2.517842.761 3.675782.761 2.80059 0 4.72599-1.3752 4.72599-3.765-.01346-3.97867-5.14339-3.27106-5.14339-4.76638Z" fill="#fff"/></svg></div></a>
 							<?php else : ?>
 								<a target="_blank" href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-settings&tab=gateways&group=gateways_stripe' ) ); ?>" class="charitable-button charitable-button-primary"><?php esc_html_e( 'Connected', 'charitable' ); ?></a>
 							<?php endif; ?>
@@ -175,6 +205,119 @@ endif;
 					</div>
 					<?php endif; ?>
 				</div>
+			</section>
+
+			<section class="charitable-step charitable-step-opt-in
+			<?php
+			if ( $opt_in_tracking ) :
+				echo 'charitable-closed';
+			endif;
+			?>
+			" data-section-name="opt-in">
+				<header>
+					<h2><span class="charitable-checklist-checkbox <?php echo esc_attr( $checklist_classes['optin'] ); ?>"></span><?php esc_html_e( 'Never Miss An Important Update', 'charitable' ); ?></h2>
+					<a href="#" class="charitable-toggle"><i class="fa fa-angle-down charitable-angle-down
+					<?php
+					if ( $opt_in_tracking ) :
+						echo 'charitable-angle-right';
+					endif;
+					?>
+					"></i></a>
+				</header>
+				<div class="charitable-toggle-container"
+				<?php
+				if ( $opt_in_tracking ) :
+					echo 'style="display:none;"';
+					endif;
+				?>
+					>
+					<div class="charitable-step-content charitable-step-two-col-content charitable-equal-flex">
+						<div class="charitable-bonus-step-container">
+							<div>
+								<p>
+								<span class="chartiable-opt-in-tracking
+								<?php
+								if ( $opt_in_tracking ) :
+									echo 'charitable-hidden';
+endif;
+								?>
+								">
+								<?php
+
+								$url = preg_replace( '(^https?://)', '', site_url() );
+
+								printf(
+									// Translators: %s: domain.
+									esc_html__( 'Opt in to get email notifications for security & feature updates, educational content, and occasional offers, and to share some basic WordPress environment info. This will help us make the plugin more compatible with %s to ensure you get donations and run campaigns smoothly.', 'charitable' ),
+									'<strong>' . esc_html( $url ) . '</strong>'
+								);
+
+
+								?>
+								</span>
+								<span class="chartiable-opt-in-tracking-1
+								<?php
+								if ( ! $opt_in_tracking ) :
+									echo 'charitable-hidden';
+endif;
+								?>
+								">
+								<?php
+
+								printf(
+									// Translators: %s: domain.
+									esc_html__( 'Being opt in you get email notifications for security & feature updates, educational content, and occasional offers. You also share some basic WordPress environment info that helps us  make the plugin more compatible with %s to ensure you get donations and run campaigns smoothly.', 'charitable' ),
+									'<strong>' . esc_html( $url ) . '</strong>'
+								);
+
+								?>
+								</span>
+								</p>
+
+								<p class="charitable-step-opt-in-allow-title"><a href="#" class="charitable-toggle-optin-allow"><?php esc_html_e( 'This will allow Charitable to:', 'charitable' ); ?> <i class="fa fa-angle-down charitable-angle-down charitable-angle-right"></i></a></p>
+								<div class="charitable-checklist-allow">
+									<ul>
+										<li>
+											<div class="charitable-checklist-allow-icon"><span class="dashicons dashicons-admin-users"></span></div>
+											<div class="charitable-checklist-allow-text">
+												<h6><?php esc_html_e( 'View Basic Info', 'charitable' ); ?></h6>
+												<p><?php esc_html_e( 'Your WordPress\'s version, mySQL & PHP versions, basic server information.', 'charitable' ); ?></p>
+											</div>
+										</li>
+										<li>
+											<div class="charitable-checklist-allow-icon"><span class="dashicons dashicons-admin-plugins"></span></div>
+											<div class="charitable-checklist-allow-text">
+												<h6><?php esc_html_e( 'View Charitable Settings Info', 'charitable' ); ?></h6>
+												<p><?php esc_html_e( 'Charitable version, license key email and url to troubleshoot authentication.', 'charitable' ); ?></p>
+											</div>
+										</li>
+										<li>
+											<div class="charitable-checklist-allow-icon"><span class="dashicons dashicons-art"></span></div>
+											<div class="charitable-checklist-allow-text">
+												<h6><?php esc_html_e( 'View Plugins &amp; Themes List', 'charitable' ); ?></h6>
+												<p><?php esc_html_e( 'Names, slugs, versions, etc. to know what to support and test against.', 'charitable' ); ?></p>
+											</div>
+										</li>
+										<li>
+											<?php
+											// translators: %s: link to documentation.
+											printf( esc_html__( 'Read %s for full details.', 'charitable' ), '<a style="margin-left:4px; margin-right: 4px;" href="' . esc_url( 'https://www.wpcharitable.com/documentation/usage-tracking/' ) . '" target="_blank">' . esc_html__( 'our documentation', 'charitable' ) . '</a>' );
+											?>
+										</li>
+									</ul>
+								</div>
+							</div>
+							<div class="charitable-button-column">
+								<?php if ( ! $opt_in_tracking ) : ?>
+									<a data-optin-tracking-status="not-joined" href="#" class="charitable-button charitable-button-primary alt"><?php esc_html_e( 'Allow &amp; Continue', 'charitable' ); ?> <i class="fa fa-arrow-right"></i></a>
+								<?php else : ?>
+									<a data-optin-tracking-status="joined" href="#" class="charitable-button charitable-button-primary"><?php esc_html_e( 'Opt Out', 'charitable' ); ?> <i class="fa fa-arrow-right"></i></a>
+								<?php endif; ?>
+							</div>
+						</div>
+					</div>
+				</div>
+
 			</section>
 
 			<section class="charitable-step charitable-step-plugin-config
@@ -203,7 +346,7 @@ endif;
 				>
 					<div class="charitable-reduced-width">
 						<p>
-						<?php printf( __( 'Take a few seconds to confirm your currency, location, and donation form settings.', 'charitable' ) ); ?>
+						<?php printf( esc_html__( 'Take a few seconds to confirm your currency, location, and donation form settings.', 'charitable' ) ); ?>
 						</p>
 					</div>
 					<?php
@@ -211,7 +354,7 @@ endif;
 					$button_css = $checklist_class->is_step_completed( 'general-settings' ) ? 'charitable-button-primary' : 'charitable-button-primary alt';
 
 					?>
-					<a href="<?php echo esc_url( $checklist_urls['general-settings'] ); ?>" class="charitable-button <?php echo $button_css; ?>"><?php esc_html_e( 'Confirm General Settings', 'charitable' ); ?></a>
+					<a href="<?php echo esc_url( $checklist_urls['general-settings'] ); ?>" class="charitable-button <?php echo esc_attr( $button_css ); ?>"><?php esc_html_e( 'Confirm General Settings', 'charitable' ); ?></a>
 				</div>
 			</section>
 
@@ -247,13 +390,13 @@ endif;
 					$button_css = $checklist_class->is_step_completed( 'email-settings' ) ? 'charitable-button-primary' : 'charitable-button-primary alt';
 
 					?>
-					<a href="<?php echo esc_url( $checklist_urls['email-settings'] ); ?>" class="charitable-button <?php echo $button_css; ?>"><?php esc_html_e( 'Confirm Email Settings', 'charitable' ); ?></a>
+					<a href="<?php echo esc_url( $checklist_urls['email-settings'] ); ?>" class="charitable-button <?php echo esc_attr( $button_css ); ?>"><?php esc_html_e( 'Confirm Email Settings', 'charitable' ); ?></a>
 				</div>
 			</section>
 
 			<section class="charitable-step charitable-step-create-first-campaign
 			<?php
-			if ( $checklist_class->is_step_completed( 'first-campaign' ) ) :
+			if ( ! $tab_leave_open_campaign ) :
 				echo 'charitable-closed';
 			endif;
 			?>
@@ -262,7 +405,7 @@ endif;
 					<h2><span class="charitable-checklist-checkbox <?php echo esc_attr( $checklist_classes['first-campaign'] ); ?>"></span><?php esc_html_e( 'Create Your First Campaign', 'charitable' ); ?></h2>
 					<a href="#" class="charitable-toggle"><i class="fa fa-angle-down charitable-angle-down
 					<?php
-					if ( $checklist_class->is_step_completed( 'first-campaign' ) ) :
+					if ( ! $tab_leave_open_campaign ) :
 						echo 'charitable-angle-right';
 					endif;
 					?>
@@ -270,20 +413,36 @@ endif;
 				</header>
 				<div class="charitable-toggle-container charitable-step-content charitable-step-two-col-content"
 				<?php
-				if ( $checklist_class->is_step_completed( 'first-campaign' ) ) :
+				if ( ! $tab_leave_open_campaign ) :
 					echo 'style="display:none;"';
 				endif;
 				?>
 				>
 					<div>
-						<p><?php esc_html_e( 'Build and launch your fundraiser campaign to start collecting donations right away.', 'charitable' ); ?></p>
+						<?php
+
+						if ( $onboarding_campaign_id ) :
+							?>
+
+							<p><?php esc_html_e( 'You have already created your first campaign! You can edit, update, or publish it with new content.', 'charitable' ); ?></p>
+
+						<?php else : ?>
+							<p><?php esc_html_e( 'Build and launch your fundraiser campaign to start collecting donations right away.', 'charitable' ); ?></p>
+						<?php endif; ?>
 					</div>
 					<?php
 
 					$button_css = $checklist_class->is_step_completed( 'first-campaign' ) ? 'charitable-button-primary' : 'charitable-button-primary alt';
 
 					?>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ) ); ?>" class="charitable-button <?php echo $button_css; ?>"><?php esc_html_e( 'Create Campaign', 'charitable' ); ?></a>
+						<?php
+
+						if ( ! $onboarding_campaign_id ) :
+							?>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ) ); ?>" class="charitable-button <?php echo esc_attr( $button_css ); ?>"><?php esc_html_e( 'Create Campaign', 'charitable' ); ?></a>
+					<?php else : ?>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-campaign-builder&campaign_id=' . intval( $onboarding_campaign_id ) ) ); ?>" class="charitable-button <?php echo esc_attr( $button_css ); ?>"><?php esc_html_e( 'Edit Campaign', 'charitable' ); ?></a>
+					<?php endif; ?>
 				</div>
 			</section>
 
@@ -329,7 +488,7 @@ endif;
 							</div>
 						</div>
 						<div>
-							<a target="_blank" href="<?php echo esc_url( charitable_utm_link( 'https://wpcharitable.com/extensions/charitable-ambassadors/', 'CheckList', 'More Information' ) ); ?>" class="charitable-button <?php echo $button_css; ?>"><?php esc_html_e( 'More Information', 'charitable' ); ?></a>
+							<a target="_blank" href="<?php echo esc_url( charitable_utm_link( 'https://wpcharitable.com/extensions/charitable-ambassadors/', 'CheckList', 'More Information' ) ); ?>" class="charitable-button <?php echo esc_attr( $button_css ); ?>"><?php esc_html_e( 'More Information', 'charitable' ); ?></a>
 						</div>
 					</div>
 					<div class="charitable-sub-container">
@@ -340,7 +499,7 @@ endif;
 							</div>
 						</div>
 						<div>
-							<a target="_blank" href="<?php echo esc_url( charitable_utm_link( 'https://wpcharitable.com/extensions/charitable-recurring-donations/', 'CheckList', 'More Information' ) ); ?>" class="charitable-button <?php echo $button_css; ?>"><?php esc_html_e( 'More Information', 'charitable' ); ?></a>
+							<a target="_blank" href="<?php echo esc_url( charitable_utm_link( 'https://wpcharitable.com/extensions/charitable-recurring-donations/', 'CheckList', 'More Information' ) ); ?>" class="charitable-button <?php echo esc_attr( $button_css ); ?>"><?php esc_html_e( 'More Information', 'charitable' ); ?></a>
 						</div>
 					</div>
 					<div class="charitable-sub-container">
@@ -351,7 +510,7 @@ endif;
 							</div>
 						</div>
 						<div>
-							<a target="_blank" href="<?php echo esc_url( charitable_utm_link( 'https://wpcharitable.com/extensions/charitable-fee-relief/', 'CheckList', 'More Information' ) ); ?>" class="charitable-button <?php echo $button_css; ?>"><?php esc_html_e( 'More Information', 'charitable' ); ?></a>
+							<a target="_blank" href="<?php echo esc_url( charitable_utm_link( 'https://wpcharitable.com/extensions/charitable-fee-relief/', 'CheckList', 'More Information' ) ); ?>" class="charitable-button <?php echo esc_attr( $button_css ); ?>"><?php esc_html_e( 'More Information', 'charitable' ); ?></a>
 						</div>
 					</div>
 				</div>
@@ -366,6 +525,16 @@ endif;
 				</div>
 			</section>
 			<?php endif; ?>
+
+			<?php if ( defined( 'CHARITABLE_SHOW_LAUNCH_WIZARD' ) && CHARITABLE_SHOW_LAUNCH_WIZARD ) { ?>
+				<section class="charitable-step-footer">
+					<div class="charitable-step-footer-interior">
+						<a href="<?php echo esc_url( charitable_get_onboarding_url() ); ?>" class="charitable-text-link">
+							<span class="underline"><?php esc_html_e( 'Launch Onboarding Wizard', 'charitable' ); ?></span>
+						</a>
+					</div>
+				</section>
+			<?php } ?>
 
 			<?php if ( ! charitable_is_pro() ) : ?>
 
@@ -420,4 +589,4 @@ endif;
 
 </div>
 <?php
-echo ob_get_clean();
+echo ob_get_clean(); // phpcs:ignore

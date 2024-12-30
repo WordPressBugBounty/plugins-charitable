@@ -106,12 +106,12 @@ if ( ! class_exists( 'Charitable_Email_Password_Reset' ) ) :
 		}
 
 		/**
-		 * Return the recipient for the email.
-		 *
-		 * @since  1.4.0
-		 *
-		 * @return string
-		 */
+		* Return the recipient for the email.
+		*
+		* @since  1.4.0
+		*
+		* @return string
+		*/
 		public function get_recipient() {
 			return $this->has_valid_user() ? $this->user->user_email : '';
 		}
@@ -132,23 +132,17 @@ if ( ! class_exists( 'Charitable_Email_Password_Reset' ) ) :
 			$fields = array(
 				'reset_link' => array(
 					'description' => __( 'The link the user needs to click to reset their password', 'charitable' ),
-					'preview'     => add_query_arg(
-						array(
-							'key'   => '123123123',
-							'login' => 'adam123',
-						),
-						charitable_get_permalink( 'reset_password_page' )
-					),
+					'preview'     => add_query_arg( array(
+						'key'   => '123123123',
+						'login' => 'adam123',
+					), charitable_get_permalink( 'reset_password_page' ) ),
 				),
 			);
 
 			if ( $this->has_valid_user() ) {
-				$fields = array_merge_recursive(
-					$fields,
-					array(
-						'reset_link' => array( 'callback' => array( $this, 'get_reset_link' ) ),
-					)
-				);
+				$fields = array_merge_recursive( $fields, array(
+					'reset_link' => array( 'callback' => array( $this, 'get_reset_link' ) ),
+				) );
 			}
 
 			return $fields;
@@ -224,13 +218,13 @@ if ( ! class_exists( 'Charitable_Email_Password_Reset' ) ) :
 		 */
 		protected function get_default_body() {
 			ob_start();
-			?>
-			<p><?php esc_html_e( 'Someone requested that the password be reset for the following account:', 'charitable' ); ?></p>
-			<p><?php esc_html_e( 'Username: [charitable_email show=user_login]', 'charitable' ); ?></p>
-			<p><?php esc_html_e( 'If this was a mistake, just ignore this email and nothing will happen.', 'charitable' ); ?></p>
-			<p><?php esc_html_e( 'To reset your password, visit the following address:', 'charitable' ); ?></p>
-			<p><a href="[charitable_email show=reset_link]">[charitable_email show=reset_link]</a></p>
-			<?php
+?>
+<p><?php _e( 'Someone requested that the password be reset for the following account:', 'charitable' ) ?></p>
+<p><?php _e( 'Username: [charitable_email show=user_login]', 'charitable' ) ?></p>
+<p><?php _e( 'If this was a mistake, just ignore this email and nothing will happen.', 'charitable' ) ?></p>
+<p><?php _e( 'To reset your password, visit the following address:', 'charitable' ) ?></p>
+<p><a href="[charitable_email show=reset_link]">[charitable_email show=reset_link]</a></p>
+<?php
 			/**
 			 * Filter the default email body.
 			 *

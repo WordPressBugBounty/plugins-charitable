@@ -835,6 +835,7 @@
         .title-description {
             // width: 50%;
             margin: 0px 5px;
+            word-break: break-all;
             span {
                 height: 10px;
                 width: 99%;
@@ -1117,6 +1118,7 @@
         font-size: 16px;
         line-height: 16px;
         font-weight: 700;
+        word-break: break-word;
     }
 
 

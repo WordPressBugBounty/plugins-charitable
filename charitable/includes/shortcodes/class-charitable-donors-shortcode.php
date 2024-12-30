@@ -34,43 +34,21 @@ if ( ! class_exists( 'Charitable_Donors_Shortcode' ) ) :
 		 */
 		public static function display( $atts ) {
 			$default = array(
-				'number'              => 10,
-				'orderby'             => 'date',
-				'order'               => 'DESC',
-				'campaign'            => 0,
-				'distinct_donors'     => 0,
-				'orientation'         => 'horizontal',
-				'show_name'           => 1,
-				'show_location'       => 0,
-				'show_amount'         => 1,
-				'show_avatar'         => 1,
-				'hide_if_no_donors'   => 0,
-				'campaign_categories' => '',
-				'builder_preview'     => false, // added in 1.8.0.
+				'number'            => 10,
+				'orderby'           => 'date',
+				'order'             => 'DESC',
+				'campaign'          => 0,
+				'distinct_donors'   => 0,
+				'orientation'       => 'horizontal',
+				'show_name'         => 1,
+				'show_location'     => 0,
+				'show_amount'       => 1,
+				'show_avatar'       => 1,
+				'hide_if_no_donors' => 0,
+				'builder_preview'   => false, // added in 1.8.0
 			);
 
-			$args = shortcode_atts( $default, $atts, 'charitable_donors' );
-
-			if ( '' !== $args['campaign_categories'] ) {
-				$campaign_categories = str_replace( ', ', ',', $args['campaign_categories'] );
-				$campaign_categories = explode( ',', $args['campaign_categories'] );
-				$cat_args            = [
-					'post_type'      => 'campaign',
-					'posts_per_page' => -1,
-					'fields'         => 'ids',
-					'tax_query'      => [
-						[
-							'taxonomy' => 'campaign_category',
-							'field'    => 'slug',
-							'terms'    => $campaign_categories,
-						],
-					],
-				];
-				$query               = new WP_Query( $cat_args );
-				if ( ! empty( $query->posts ) ) {
-					$args['campaign'] = $query->posts;
-				}
-			}
+			$args           = shortcode_atts( $default, $atts, 'charitable_donors' );
 			$args['donors'] = self::get_donors( $args );
 
 			/**
@@ -121,7 +99,7 @@ if ( ! class_exists( 'Charitable_Donors_Shortcode' ) ) :
 						'show_amount',
 						'show_avatar',
 						'hide_if_no_donors',
-						'builder_preview',
+						'builder_preview'
 					)
 				),
 				$args
@@ -163,8 +141,7 @@ if ( ! class_exists( 'Charitable_Donors_Shortcode' ) ) :
 			 * @param  array $args       All the parsed arguments.
 			 * @return array
 			 */
-			$query_args = apply_filters(
-				'charitable_donors_shortcode_donor_query_args',
+			$query_args = apply_filters( 'charitable_donors_shortcode_donor_query_args',
 				charitable_array_subset( $args, array( 'number', 'orderby', 'order', 'campaign', 'distinct_donors' ) ),
 				$args
 			);

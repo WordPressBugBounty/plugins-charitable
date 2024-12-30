@@ -1537,6 +1537,9 @@ select#charitable_settings_export_donations {
 		}
 	}
 }
+form#posts-filter .actions.charitable-export-actions {
+	margin-top: 3px;
+}
 .post-type-charitable {
 	#donation-summary {
 		mark {
@@ -1759,6 +1762,8 @@ form#posts-filter {
 				td {
 					padding: 0;
 					div.charitable-campaign-list-banner {
+						justify-content: space-between;
+						flex-direction: row;
 						.notice-dismiss {
 						}
 						display: flex;
@@ -1770,10 +1775,11 @@ form#posts-filter {
 						position: relative;
 						> div {
 							flex-grow: 1;
+							display: flex;
 						}
 						.charitable-campaign-list-banner-icon {
 							width: 50px;
-							margin: 0 15px 0 0;
+							margin: 0px 15px 0 0;
 							img {
 								width: 45px;
 							}
@@ -1784,8 +1790,10 @@ form#posts-filter {
 							}
 						}
 						.charitable-campaign-list-banner-button {
-							text-align: right;
-							flex-grow: 1;
+							display: flex;
+							flex-direction: row;
+							justify-content: end;
+							min-width: 20%;
 						}
 						.button-link {
 							background-color: #5AA152;

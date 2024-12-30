@@ -28,6 +28,7 @@ add_action( 'admin_enqueue_scripts', array( Charitable_Admin::get_instance(), 'a
  * @see Charitable_Admin::set_body_class()
  */
 add_filter( 'admin_body_class', array( Charitable_Admin::get_instance(), 'set_body_class' ) );
+add_filter( 'admin_body_class', array( Charitable_User_Onboarding::get_instance(), 'add_body_class' ) );
 
 /**
  * Do an admin action.

@@ -35,11 +35,6 @@ var CharitableOnboarding = window.CharitableOnboarding || (function (document, w
 		 */
         ready: function () { // check to see if javascript has been defined.
 
-            // check to see if charitable_reporting has been defined.
-            // if ( typeof charitable_reporting === 'undefined' ) {
-            //     return;
-            // }
-
             $checklist = $('#charitable-setup-checklist');
 
             // Bind all actions.

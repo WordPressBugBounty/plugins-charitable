@@ -165,8 +165,8 @@ if ( ! class_exists( 'Charitable_Export_Items' ) ) :
 
 			if ( ! isset( $export_args['export_donations'] ) || intval( $export_args['export_donations'] ) === 0 ) {
 				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-					error_log( 'admin_accept_export_donations_request: ' );
-					error_log( print_r( $export_args, true ) );
+					error_log( 'admin_accept_export_donations_request: ' ); // phpcs:ignore
+					error_log( print_r( $export_args, true ) ); // phpcs:ignore
 				}
 				return;
 			}

@@ -350,7 +350,16 @@
 
 .charitable-donation-form .custom-donation-input {
   max-width: 100%;
+  border-width: 0.078rem;
+  border-style: solid;
+  border-radius: 0.25rem;
+  padding: 0.8rem 1rem;
   background-color: #fff;
+  color: #4d4d4d;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 500;
+  line-height: 1.2;
 }
 
 #charitable-donor-fields>.charitable-form-field,
@@ -390,7 +399,9 @@
 }
 
 .charitable-donor-details {
-  padding: 0 20px 1em;
+  padding: 0 20px 1em 0;
+  font-size: 1rem;
+  margin-bottom: 25px;
 }
 
 .charitable-donor-details .donor-address,
@@ -1022,11 +1033,11 @@ h3.charitable-header {
 
       input {
         width: auto;
-        border-width: .078rem;
+        border-width: 0.078rem;
         border-style: solid;
-        border-radius: .25rem;
-        /* padding: 0.8rem 1rem; */
-        min-height: 35px;
+        border-radius: 0.25rem;
+        padding: 0.8rem 1rem;
+        min-height: 25px;
         background-color: #fff;
         color: #4d4d4d;
         font-size: 1rem;
@@ -1034,6 +1045,20 @@ h3.charitable-header {
         font-weight: 500;
         line-height: 1.2;
       }
+    }
+    #charitable_stripe_card_field {
+      width: auto;
+      border-width: .078rem;
+      border-style: solid;
+      border-radius: .25rem;
+      padding: 0.8rem 1rem;
+      min-height: 35px;
+      background-color: #fff;
+      color: #4d4d4d;
+      font-size: 1rem;
+      font-family: inherit;
+      font-weight: 500;
+      line-height: 1.2;
     }
   }
 

@@ -11,6 +11,7 @@
  * @since     1.2.0
  * @version   1.6.0
  * @version   1.8.2
+ * @version   1.8.4 - added user tracking option.
  */
 
 // Exit if accessed directly.
@@ -124,6 +125,7 @@ add_filter( 'charitable_save_settings', array( Charitable_Advanced_Settings::get
 add_filter( 'charitable_save_settings', array( Charitable_Advanced_Settings::get_instance(), 'minification_settings' ), 10, 2 );
 add_filter( 'charitable_save_settings', array( Charitable_Checklist::get_instance(), 'confirm_general_settings' ), 10, 2 );
 add_filter( 'charitable_save_settings', array( Charitable_Checklist::get_instance(), 'confirm_email_settings' ), 10, 2 );
+add_filter( 'charitable_save_settings', array( Charitable_Advanced_Settings::get_instance(), 'update_user_tracking_option' ), 10, 2 );
 add_filter( 'admin_init', array( Charitable_Checklist::get_instance(), 'confirm_email_changes' ), 10 );
 
 /**

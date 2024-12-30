@@ -147,7 +147,14 @@ $wrapper = '.charitable-campaign-wrap.template-' . $slug;
   	display: inline-block;
   	text-align: center;
   	text-decoration: none;
+	display: flex; /* Changed from block to flex */
+	align-items: center; /* Vertically centers the text */
+	justify-content: center; /* Optionally centers the text horizontally too */
+	text-align: center !important;
+	text-decoration: none !important;
+	transition: filter 0.3s; /* Smooth transition */
 }
+
 
 /* field: progress bar */
 
@@ -345,6 +352,10 @@ $wrapper = '.charitable-campaign-wrap.template-' . $slug;
 }
 
 /* field: campaign summary */
+
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-campaign-summary .charitable-field-template-campaign-summary div.campaign-summary-item {
+	color: white;
+}
 
 <?php echo $wrapper; ?> .charitable-field-template-campaign-summary {
 	padding-left: 0;

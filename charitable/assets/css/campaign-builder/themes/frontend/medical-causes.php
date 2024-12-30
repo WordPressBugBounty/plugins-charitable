@@ -69,7 +69,7 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 <?php echo $wrapper; ?> .charitable-campaign-column:nth-child(even) {
 	flex: 2;
 	border: 0;
-	padding-top: 50px;
+	/* padding-top: 50px; */
 }
 <?php echo $wrapper; ?> .charitable-campaign-column:nth-child(odd) {
 	border: 0;
@@ -119,6 +119,28 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
   font-size: 16px;
   line-height: 15px;
 }
+
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-button a.donate-button {
+	border-radius: 0px;
+  text-transform: uppercase;
+  border-radius: 0px;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-weight: 400;
+  min-height: 50px;
+  height: 50px;
+  font-size: 16px;
+  line-height: 15px;
+	background-color: <?php echo $button; ?> !important;
+	border-color: <?php echo $button; ?> !important;
+	display: flex; /* Changed from block to flex */
+	align-items: center; /* Vertically centers the text */
+	justify-content: center; /* Optionally centers the text horizontally too */
+	text-align: center !important;
+	text-decoration: none !important;
+	transition: filter 0.3s; /* Smooth transition */
+}
+
 
 /* field: photo */
 

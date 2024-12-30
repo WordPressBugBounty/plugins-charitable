@@ -369,10 +369,10 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		public function get_fields() {
 			$fields = array(
 				'donation_fields' => array(
-					'legend'   => _x( 'Your Donation', 'donation form amount section header', 'charitable' ),
-					'type'     => 'donation-amount-wrapper',
-					'fields'   => $this->get_donation_fields(),
-					'priority' => 20,
+					'legend'         => _x( 'Your Donation', 'donation form amount section header', 'charitable' ),
+					'type'           => 'donation-amount-wrapper',
+					'fields'         => $this->get_donation_fields(),
+					'priority'       => 20,
 					'multi_currency' => true,
 				),
 				'details_fields'  => array(
@@ -488,8 +488,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 					),
 					''
 				);
-			} else {
-				if ( defined( 'CHARITABLE_DISABLE_SHOW_CURRENT_DONATION_AMOUNT' ) && CHARITABLE_DISABLE_SHOW_CURRENT_DONATION_AMOUNT ) {
+			} elseif ( defined( 'CHARITABLE_DISABLE_SHOW_CURRENT_DONATION_AMOUNT' ) && CHARITABLE_DISABLE_SHOW_CURRENT_DONATION_AMOUNT ) {
 					$content = charitable_template_from_session_content(
 						'donation_form_current_amount_text',
 						array(
@@ -498,9 +497,8 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 						),
 						''
 					);
-				} else {
-					$content = charitable_template_donation_form_current_amount_text( $amount, $this->get_form_identifier(), $this->get_campaign()->ID );
-				}
+			} else {
+				$content = charitable_template_donation_form_current_amount_text( $amount, $this->get_form_identifier(), $this->get_campaign()->ID );
 			}
 
 			return $content;
@@ -535,9 +533,9 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			charitable_template(
 				'donation-form/form-donation.php',
 				array(
-					'campaign' => $this->get_campaign(),
+					'campaign'      => $this->get_campaign(),
 					'form_template' => $this->get_form_template(),
-					'form'     => $this,
+					'form'          => $this,
 				)
 			);
 		}
@@ -555,9 +553,9 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		 */
 		public function get_validated_donation_id() {
 			if ( array_key_exists( 'donation_id', $_GET ) ) {
-				$donation_id = intval( $_GET['donation_id'] );
-			} elseif ( array_key_exists( 'ID', $_POST ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-				$donation_id = intval( $_POST['ID'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				$donation_id = $_GET['donation_id'];
+			} elseif ( array_key_exists( 'ID', $_POST ) ) {
+				$donation_id = $_POST['ID'];
 			} else {
 				return 0;
 			}
@@ -1038,7 +1036,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		 * @param  string $minimum_amount Minimum amount likely set by user in admin settings.
 		 * @return array
 		 */
-		public function minimum_donation_amount_notice( $return = true, $minimum_amount = false ) { // phpcs:ignore
+		public function minimum_donation_amount_notice( $return = true, $minimum_amount = false ) {
 
 			if ( false === $minimum_amount ) {
 				$minimum_amount = get_post_meta( $this->get_campaign()->ID, '_campaign_minimum_donation_amount', true );
@@ -1054,7 +1052,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			if ( $return ) {
 				return $message;
 			} else {
-				echo $message; // phpcs:ignore
+				echo $message;
 			}
 		}
 
@@ -1084,7 +1082,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 					'type'      => 'checkbox',
 					'label'     => charitable_get_option( 'contact_consent_label', __( 'Yes, I am happy for you to contact me via email or phone.', 'charitable' ) ),
 					'priority'  => 8,
-					'required'  => charitable_get_option( 'contact_consent_required', false ),
+					'required'  => false,
 					'data_type' => 'meta',
 				);
 			}

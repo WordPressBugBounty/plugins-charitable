@@ -214,7 +214,7 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 					'help'     => __( 'Choose if you wish to display a register reminder or login form at the top of the donation form.', 'charitable' ),
 				),
 				'donation_form_minimal_amount_notice_display' => array(
-					'title'    => __( 'Minimum donation location <span class="badge beta">Beta</span>', 'charitable' ),
+					'title'    => __( 'Minimum donation location', 'charitable' ),
 					'type'     => 'select',
 					'priority' => 26,
 					'class'    => 'general-settings',
@@ -227,7 +227,7 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 					'help'     => __( 'Choose where you wish the minimum donation message to appear on the donation form, if a minimum is set for the campaign.', 'charitable' ),
 				),
 				'donation_form_notices_display'          => array(
-					'title'    => __( 'Notice display location  <span class="badge beta">Beta</span>', 'charitable' ),
+					'title'    => __( 'Notice display location', 'charitable' ),
 					'type'     => 'select',
 					'priority' => 27,
 					'default'  => 'top',
@@ -239,7 +239,7 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 					'help'     => __( 'Choose where notice and validation errors appear on the donation form.', 'charitable' ),
 				),
 				'donation_form_default_highlight_colour' => array(
-					'title'    => __( 'Default highlight color  <span class="badge beta">Beta</span>', 'charitable' ),
+					'title'    => __( 'Default highlight color', 'charitable' ),
 					'type'     => 'color-picker',
 					'priority' => 28,
 					'default'  => false,

@@ -6,280 +6,66 @@
  * @package Charitable/Admin View/Welcome Page
  * @since   1.0.0
  * @version 1.8.0
+ * @version 1.8.4 Revised for server-side onboarding.
  */
 
-wp_enqueue_style( 'charitable-admin-pages' );
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-require_once ABSPATH . 'wp-admin/includes/translation-install.php';
+// assemble a url to the setup wizard using WordPress function.
+$onboarding_url = charitable_get_onboarding_url();
 
-$gateways        = Charitable_Gateways::get_instance()->get_active_gateways_names();
-$campaigns       = wp_count_posts( 'campaign' );
-$campaigns_count = $campaigns->publish + $campaigns->draft + $campaigns->future + $campaigns->pending + $campaigns->private;
-$emails          = charitable_get_helper( 'emails' )->get_enabled_emails_names();
-$install         = isset( $_GET['install'] ) && $_GET['install']; // phpcs:ignore
-$languages       = wp_get_available_translations();
-$locale          = get_locale();
-$language        = isset( $languages[ $locale ]['native_name'] ) ? $languages[ $locale ]['native_name'] : $locale;
-$currency        = charitable_get_default_currency();
-$currencies      = charitable_get_currency_helper()->get_all_currencies();
-$all_extensions  = array(
-	'payfast'                        => __( 'Accept donations in South African Rand', 'charitable' ),
-	'payu-money'                     => __( 'Accept donations in Indian Rupees with PayUmoney', 'charitable' ),
-	'easy-digital-downloads-connect' => __( 'Collect donations with Easy Digital Downloads', 'charitable' ),
-	'recurring-donations'            => __( 'Accept recurring donations', 'charitable' ),
-	'fee-relief'                     => __( 'Let donors cover the gateway fees', 'charitable' ),
-	'stripe'                         => __( 'Accept credit card donations with Stripe', 'charitable' ),
-	'authorize-net'                  => __( 'Collect donations with Authorize.Net', 'charitable' ),
-	'ambassadors'                    => __( 'Peer to peer fundraising or crowdfunding', 'charitable' ),
-	'windcave'                       => sprintf(
-		/* translators: %s: currency code */
-		__( 'Collect donations in %s', 'charitable' ),
-		$currencies[ $currency ]
-	),
-	'anonymous-donations'            => __( 'Let donors give anonymously', 'charitable' ),
-	'user-avatar'                    => __( 'Let your donors upload their own profile photo', 'charitable' ),
-);
+// Enqueue the styles for the onboarding process.
+wp_enqueue_style( 'charitable-admin-user-onboarding' );
 
-if ( 'en_ZA' === $locale || 'ZAR' === $currency ) {
-	$extensions = array_intersect_key(
-		$all_extensions,
-		array(
-			'payfast'             => '',
-			'recurring-donations' => '',
-			'ambassadors'         => '',
-			'fee-relief'          => '',
-		)
-	);
-} elseif ( 'hi_IN' === $locale || 'INR' === $currency ) {
-	$extensions = array_intersect_key(
-		$all_extensions,
-		array(
-			'payu-money'  => '',
-			'ambassadors' => '',
-			'fee-relief'  => '',
-			'windcave'    => '',
-		)
-	);
-} elseif ( in_array( $locale, array( 'en_NZ', 'ms_MY', 'ja', 'zh_HK' ) ) || in_array( $currency, array( 'NZD', 'MYR', 'JPY', 'HKD' ) ) ) {
-	$extensions = array_intersect_key(
-		$all_extensions,
-		array(
-			'recurring-donations' => '',
-			'stripe'              => '',
-			'windcave'            => '',
-			'fee-relief'          => '',
-		)
-	);
-} elseif ( in_array( $locale, array( 'th' ) ) || in_array( $currency, array( 'BND', 'FJD', 'KWD', 'PGK', 'SBD', 'THB', 'TOP', 'VUV', 'WST' ) ) ) {
-	$extensions = array_intersect_key(
-		$all_extensions,
-		array(
-			'windcave'            => '',
-			'fee-relief'          => '',
-			'ambassadors'         => '',
-			'anonymous-donations' => '',
-		)
-	);
-} elseif ( class_exists( 'EDD' ) ) {
-	$extensions = array_intersect_key(
-		$all_extensions,
-		array(
-			'ambassadors'                    => '',
-			'easy-digital-downloads-connect' => '',
-			'anonymous-donations'            => '',
-			'user-avatar'                    => '',
-		)
-	);
-} else {
-	$extensions = array_intersect_key(
-		$all_extensions,
-		array(
-			'recurring-donations' => '',
-			'stripe'              => '',
-			'authorize-net'       => '',
-			'fee-relief'          => '',
-		)
-	);
+// Has this user already completed the onboarding process?
+$onboarding_completed = get_option( 'charitable_ss_complete', false ) ? true : false;
+$onboarding_welcome   = ! empty( $_GET['f'] ) ? intval( $_GET['f'] ) : false;
+
+$welcome_headline  = $onboarding_completed ? __( 'Welcome back to the Charitable Setup Wizard!', 'charitable' ) : __( 'Welcome to the Charitable Setup Wizard!', 'charitable' );
+$introduction_text = $onboarding_completed ? __( 'You have already completed the setup wizard. If you need to make any changes, you can restart this process or adjust your Charitable settings.', 'charitable' ) : __( 'Your first fundraising begins with a creating a campaign. Ready to get started? Your first campaign is just 5 minutes away!', 'charitable' );
+$button_label      = $onboarding_completed ? __( 'Restart Setup Wizard', 'charitable' ) : __( 'Let\'s Get Started', 'charitable' );
+
+
+// Either they are going "back" to the checklist page or (if the checlist is disabled) the welcome page.
+$checklist_class      = Charitable_Checklist::get_instance();
+$checklist_possible   = $checklist_class->maybe_load_checklist_assets();
+$welcome_go_back_url  = ! $checklist_possible ? admin_url( 'admin.php?page=charitable-dashboard&charitable_onboarding=cancel' ) : admin_url( 'admin.php?page=charitable-setup-checklist&charitable_onboarding=cancel' );
+$welcome_go_back_text = ! $checklist_possible ? __( 'Go back to the dashboard', 'charitable' ) : __( 'Cancel this wizard and go back to the checklist', 'charitable' );
+
+// Resume the onboarding process if it has been started, and override text.
+$resume_onboarding = get_option( 'charitable_started_onboarding', false );
+if ( $resume_onboarding && ! $onboarding_welcome ) {
+	$welcome_headline    = __( 'Welcome back to the Charitable Setup Wizard!', 'charitable' );
+	$introduction_text   = __( 'You have already started the setup wizard. Would you like to continue where you left off?', 'charitable' );
+	$button_label        = __( 'Resume Setup Wizard', 'charitable' );
+	$onboarding_url      = 'https://app.wpcharitable.com/setup-wizard-charitable_lite&resume=' . charitable_get_site_token();
+	$welcome_go_back_url = admin_url( 'admin.php?page=charitable-setup-checklist&charitable_onboarding=cancel' );
+}
+// Override even more things if the user is returning from a login after the onboarding process by checking for reauth=1 in the query string.
+if ( ! empty( $_GET['lostconnection'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$welcome_headline    = __( 'Welcome back!', 'charitable' );
+	$introduction_text   = __( 'You seem to have been logged out of your WordPress admin during the onboarding process. In order for the onboarding to install plugins and update settings please go back the last step and submit while you are still logged into WordPress.', 'charitable' );
+	$button_label        = __( 'Go Back', 'charitable' );
+	$onboarding_url      = charitable_get_onboarding_url();
+	$onboarding_url      = 'https://app.wpcharitable.com/setup-wizard-charitable_lite&resume=' . charitable_get_site_token();
+	$welcome_go_back_url = admin_url( 'admin.php?page=charitable-setup-checklist&charitable_onboarding=cancel' );
 }
 
 ?>
-<div class="wrap about-wrap charitable-wrap">
-	<h1>
-		<strong><?php esc_html_e( 'Charitable', 'charitable' ); ?></strong>
-		<sup class="version"><?php echo esc_html( charitable()->get_version() ); ?></sup>
-	</h1>
-	<div class="badge v2">
-		<a href="
-		<?php
-		echo charitable_ga_url(
-			'https://www.wpcharitable.com',
-			rawurlencode( 'Welcome Page Icon' ),
-			rawurlencode( 'Icon' )
-		)
-		?>
-		" target="_blank"><div class="mascot"></div></a>
+<div class="charitable-user-onboarding-wrap">
+	<div class="charitable-user-onboarding-logo">
+		<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/onboarding/welcome/charitable-header-logo.png' ); ?>" alt="Charitable">
 	</div>
-	<div class="intro">
-		<?php
-
-		echo esc_html__( 'Thank you for installing Charitable!', 'charitable' );
-
-		$view_pricing_url = charitable_ga_url(
-			'https://wpcharitable.com/pricing/',
-			rawurlencode( 'Welcome Page Sidebar Link' ),
-			rawurlencode( 'View Pricing' )
-		);
-
-		do_action( 'charitable_maybe_show_notification' );
-
-		?>
+	<div class="chartiable-user-onboarding-content">
+		<h1><?php echo esc_html( $welcome_headline ); ?></h1>
+		<p><?php echo esc_html( $introduction_text ); ?></p>
+		<a href="<?php echo esc_url( $onboarding_url ); ?>" class="charitable-button-link"><?php echo esc_html( $button_label ); ?> →</a>
 	</div>
-	<hr />
-	<div class="column-left">
-		<div class="column-inside">
-			<h2><?php _e( 'The WordPress Fundraising Toolkit', 'charitable' ); ?></h2>
-			<p><?php _e( 'Charitable is everything you need to start accepting donations today. Stripe, PayPal and offline donations work right out of the box, and when your organization is ready to grow, our extensions give you the tools you need to move forward.', 'charitable' ); ?></p>
-			<?php if ( current_user_can( 'manage_charitable_settings' ) ) : ?>
-				<hr />
-				<h3><?php _e( 'Getting Started', 'charitable' ); ?></h3>
-				<ul class="checklist">
-					<?php if ( count( $gateways ) > 0 ) : ?>
-						<li class="done">
-						<?php
-							printf(
-								// translators: %1$s is a list of gateways, %2$s is a link to the gateways settings page.
-								_x( 'You have activated %1$s. <a href="%2$s">Change settings</a>', 'You have activated x and y. Change gateway settings.', 'charitable' ),
-								charitable_list_to_sentence_part( $gateways ),
-								esc_url( admin_url( 'admin.php?page=charitable-settings&tab=gateways' ) )
-							);
-						?>
-						</li>
-					<?php else : ?>
-						<li class="not-done"><a href="<?php echo admin_url( 'admin.php?page=charitable-settings&tab=gateways' ); ?>"><?php _e( 'You need to enable a payment gateway', 'charitable' ); ?></a></li>
-					<?php endif ?>
-					<?php if ( $campaigns_count > 0 ) : ?>
-						<li class="done">
-						<?php
-							printf(
-								// translators: %s is a link to create a new campaign.
-								__( 'You have created your first campaign. <a href="%s">Create another one.</a>', 'charitable' ),
-								esc_url( admin_url( 'post-new.php?post_type=campaign' ) )
-							);
-						?>
-						</li>
-					<?php else : ?>
-						<li class="not-done"><a href="<?php echo admin_url( 'post-new.php?post_type=campaign' ); ?>"><?php _e( 'Create your first campaign', 'charitable' ); ?></a></li>
-					<?php endif ?>
-					<?php if ( count( $emails ) > 0 ) : ?>
-						<li class="done">
-						<?php
-							printf(
-								// translators: %1$s is a list of emails, %2$s is a link to the emails settings page.
-								_x( 'You have turned on the %1$s. <a href="%2$s">Change settings</a>', 'You have activated x and y. Change email settings.', 'charitable' ),
-								charitable_list_to_sentence_part( $emails ),
-								esc_url( admin_url( 'admin.php?page=charitable-settings&tab=emails' ) )
-							);
-						?>
-						</li>
-					<?php else : ?>
-						<li class="not-done"><a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-settings&tab=emails' ) ); ?>"><?php esc_html_e( 'Turn on email notifications', 'charitable' ); ?></a></li>
-					<?php endif ?>
-				</ul>
-				<?php
-
-					$doc_url = charitable_ga_url(
-						'https://www.wpcharitable.com/documentation/',
-						rawurlencode( 'Dashboard Intro Copy Doc' ),
-						rawurlencode( 'our documentation' )
-					);
-
-					$support_url = charitable_ga_url(
-						'https://www.wpcharitable.com/support/',
-						rawurlencode( 'Dashboard Intro Copy Support' ),
-						rawurlencode( 'our support' )
-					);
-
-				?>
-				<p style="margin-bottom: 0;">
-				<?php
-					printf(
-						/* translators: %1$s is a link to the documentation, %2$s is a link to the support page. */
-						__( 'Need a hand with anything? You might find the answer in <a target="_blank" href="%1$s">our documentation</a>, or you can always get in touch with us via <a target="_blank" href="%2$s">our support page</a>.', 'charitable' ),
-						$doc_url,
-						$support_url
-					);
-				?>
-				</p>
-			<?php endif ?>
-			<hr />
-			<?php
-			if ( strpos( $locale, 'en' ) !== 0 ) :
-				?>
-				<h3>
-				<?php
-				// translators: %s is the language name.
-				printf( esc_html_x( 'Translate Charitable into %s', 'translate Charitable into language', 'charitable' ), esc_html( $language ) );
-				?>
-				</h3>
-				<p>
-				<?php
-				/* translators: %s is the language name */
-				printf(	__( 'You can help us translate Charitable into %s by <a target="_blank" href="https://translate.wordpress.org/projects/wp-plugins/charitable">contributing to the translation project</a>.', 'charitable' ), // phpcs:ignore
-					$language
-				);
-				?>
-				</p>
-				<hr />
-			<?php endif ?>
-			<h3><?php _e( 'Try Reach, a free theme designed for fundraising', 'charitable' ); ?></h3>
-			<img src="<?php echo charitable()->get_path( 'assets', false ); ?>images/reach-mockup.png" alt="<?php _e( 'Screenshot of Reach, a WordPress fundraising theme designed to complement Charitable', 'charitable' ); ?>" style="margin-bottom: 21px; float: right; margin-left: 20px;" width="336" height="166" />
-			<p><?php _e( 'We built Reach to help non-profits &amp; social entrepreneurs run beautiful online fundraising campaigns. Whether you’re creating a website for your organization’s peer-to-peer fundraising event or building an online crowdfunding platform, Reach is the perfect starting point.', 'charitable' ); ?></p>
-			<?php
-
-				$download_url = charitable_ga_url(
-					'https://www.wpcharitable.com/download-reach/',
-					rawurlencode( 'Dashboard Reach Download Button' ),
-					rawurlencode( 'Download It Free' )
-				);
-
-				$view_demo = charitable_ga_url(
-					'https://demo.wpcharitable.com/reach/',
-					rawurlencode( 'Dashboard Demo Reach Button' ),
-					rawurlencode( 'View Demo' )
-				);
-
-				?>
-			<p><a href="<?php echo esc_url( $download_url ); ?>" class="button-primary" style="margin-right: 8px;" target="_blank"><?php _e( 'Download it free', 'charitable' ); ?></a><a href="<?php echo esc_url( $view_demo ); ?>" class="button-secondary" target="_blank"><?php _e( 'View demo', 'charitable' ); ?></a></p>
-		</div>
-	</div>
-	<div class="column-right">
-		<div class="bundle-promo">
-			<h2><?php esc_html_e( 'Get Charitable Pro', 'charitable' ); ?></h2>
-			<p><?php esc_html_e( 'Upgrade to Charitable Pro today and unlock access to powerful features like Fee Relief, Recurring Donations, Crowdfunding, Peer-to-Peer Fundraising Campaigns and more.', 'charitable' ); ?></p>
-
-			<p style="text-align: center;"><a href="<?php echo esc_url( $view_pricing_url ); ?>" class="button-primary" target="_blank" rel="noopener"><?php esc_html_e( 'Get Started with Charitable Pro', 'charitable' ); ?></a></p>
-
-			<small><em><?php esc_html_e( 'Bonus: Charitable Lite users save $300 or more off the regular price, automatically applied at checkout!', 'charitable' ); ?></em></small>
-		</div>
-		<div class="column-inside">
-			<h3><?php esc_html_e( 'Recommended Extensions', 'charitable' ); ?></h3>
-			<ul class="extensions">
-				<?php
-				foreach ( $extensions as $extension => $description ) :
-
-					$extension_url = charitable_ga_url(
-						'https://wpcharitable.com/extensions/charitable-' . $extension,
-						rawurlencode( 'Recommended Extensions' ),
-						$extension
-					);
-
-					?>
-					<li class="<?php echo $extension; ?>">
-						<?php /* translators: %s is the extension name */ ?>
-						<a href="<?php echo $extension_url; ?>" target="_blank" rel="noopener"><img src="<?php echo charitable()->get_path( 'assets', false ); ?>images/extensions/<?php echo $extension; ?>.png" width="640" height="300" alt="<?php echo esc_attr( sprintf( _x( '%s banner', 'extension banner', 'charitable' ), $extension ) ); ?>" /><?php echo $description; ?></a>
-					</li>
-				<?php endforeach ?>
-			</ul>
-		</div>
+	<div class="charitable-go-back"><a href="<?php echo esc_url( $welcome_go_back_url ); ?>">← <?php echo esc_html( $welcome_go_back_text ); ?></a></div>
+	<div class="charitable-onbarding-notice">
+		<p><?php echo esc_html__( 'Note: You will be transfered to an WPCharitable.com to complete the setup wizard.', 'charitable' ); ?></p>
 	</div>
 </div>

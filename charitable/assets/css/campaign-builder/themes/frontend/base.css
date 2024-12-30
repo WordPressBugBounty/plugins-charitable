@@ -59,10 +59,6 @@
   width: 100%;
   max-width: 100%;
 }
-.charitable-campaign-field.donate-button {
-  padding-left: 0;
-  padding-right: 0;
-}
 
 /* 5.0 - Tabs  */
 .charitable-campaign-wrap .charitable-campaign-container .section[data-section-type=tabs] article {
@@ -239,6 +235,7 @@
   color: #000000;
   font-size: 14px;
   line-height: 24px;
+  word-break: break-all;
 }
 .charitable-campaign-field.charitable-campaign-field-campaign-description .charitable-campaign-builder-no-description-preview div {
   margin: 0;
@@ -284,7 +281,8 @@
   margin-top: 15px;
   margin-bottom: 15px;
 }
-.charitable-campaign-field.charitable-campaign-field-donate-button button.charitable-button {
+.charitable-campaign-field.charitable-campaign-field-donate-button button.charitable-button,
+.charitable-campaign-field.charitable-campaign-field-donate-button a.charitable-button {
   background-color: var(--charitable_campaign_theme_button);
   border-color: var(--charitable_campaign_theme_button);
   text-transform: none;
@@ -295,9 +293,8 @@
   font-weight: 400;
   font-size: 16px;
   line-height: 25px;
-}
-.charitable-campaign-field.charitable-campaign-field-donate-button button.charitable-button.charitable-disabled {
-  opacity: 0.5;
+  padding-left: 0;
+  padding-right: 0;
 }
 .charitable-campaign-field.charitable-campaign-field-donate-button button.charitable-button:hover {
   text-decoration: none;
@@ -454,18 +451,16 @@
   justify-content: space-between;
   margin: 0;
   padding: 0;
-  flex-direction: row;
 }
 .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts .charitable-template-donation-amount {
   color: #000;
+  flex: 0 0 25%;
   background-color: transparent;
+  padding: 5px;
   text-align: center;
   display: table;
   min-height: 75px;
-  flex: 1 1 30%;
-  max-width: 33.33%;
-  box-sizing: border-box;
-  padding: 5px;
+  margin: 0;
 }
 .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts .charitable-template-donation-amount input[type=radio] {
   display: none;
@@ -490,24 +485,18 @@
   font-weight: 400;
 }
 .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts .charitable-template-donation-amount.custom-donation-amount {
-  flex: 0 0 100%; /* Take full width */
-  max-width: 100% !important;
+  flex-basis: 100%;
+  min-height: auto;
 }
 .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts .charitable-template-donation-amount.custom-donation-amount label {
   display: none;
 }
 .charitable-campaign-field.charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts .charitable-template-donation-amount.custom-donation-amount input[type=text] {
   background: transparent;
-  display: flex;
-  box-sizing: border-box; /* Include padding and border in the element's width and height */
-  width: 100%; /* Take up the full width of the parent */
-  padding: 10px; /* This padding is included in the width due to border-box */
+  width: 100%;
   border: 0;
   color: #000;
   border: 1px solid #000;
-  font-size: 14px;
-  line-height: 24px;
-  display: block !important;
 }
 
 /* DIVI */
@@ -903,7 +892,6 @@ body.et_divi_theme .et-l--header .charitable-campaign-field.charitable-campaign-
 }
 
 .charitable-campaign-wrap {
-  width: 100% !important;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
 .charitable-campaign-wrap .charitable-campaign-container .charitable-notice {

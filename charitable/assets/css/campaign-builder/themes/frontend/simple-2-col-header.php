@@ -264,13 +264,6 @@ font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     font-weight: 400;
     font-size: 16px;
     line-height: 25px;
-    display: inline-block;
-    text-align: center;
-    text-decoration: none;
-}
-<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-button button.charitable-button:hover,
-<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-button a.charitable-button:hover {
-    text-decoration: underline;
 }
 
 /* field: photo */

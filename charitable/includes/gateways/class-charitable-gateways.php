@@ -65,7 +65,7 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 
 			do_action( 'charitable_gateway_start', $this );
 
-			add_action( 'wp_ajax_charitable-show-stripe-keys', array( $this, 'show_stripe_manual_keys_ajax'), 10 );
+			add_action( 'wp_ajax_charitable-show-stripe-keys', array( $this, 'show_stripe_manual_keys_ajax' ), 10 );
 		}
 
 		/**
@@ -101,16 +101,15 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 			 *
 			 * @param array $gateways The list of gateways in gateway ID => gateway class format.
 			 */
-			$this->gateways = apply_filters(
+			$this->gateways           = apply_filters(
 				'charitable_payment_gateways',
 				array(
-					'stripe'     => 'Charitable_Gateway_Stripe_AM',
-					'paypal'     => 'Charitable_Gateway_Paypal',
-					'offline'    => 'Charitable_Gateway_Offline',
+					'stripe'  => 'Charitable_Gateway_Stripe_AM',
+					'paypal'  => 'Charitable_Gateway_Paypal',
+					'offline' => 'Charitable_Gateway_Offline',
 				)
 			);
 			$this->gateways['stripe'] = 'Charitable_Gateway_Stripe_AM';
-
 		}
 
 		/**
@@ -221,7 +220,7 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 			$gateways = array();
 
 			foreach ( $this->get_active_gateways() as $id => $class ) {
-				$gateway         = new $class;
+				$gateway         = new $class();
 				$gateways[ $id ] = $gateway->get_label();
 			}
 
@@ -239,7 +238,7 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 			$gateways = array();
 
 			foreach ( $this->get_active_gateways() as $id => $class ) {
-				$gateway    = new $class;
+				$gateway    = new $class();
 				$gateways[] = $gateway->get_name();
 			}
 
@@ -268,7 +267,7 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 		 */
 		public function get_gateway_object( $gateway ) {
 			$class  = $this->get_gateway( $gateway );
-			$object = $class ? new $class : null;
+			$object = $class ? new $class() : null;
 
 			/**
 			 * Filter the gateway object.
@@ -386,7 +385,7 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 		public function all_gateways_support( $feature ) {
 			foreach ( $this->get_active_gateways() as $gateway_id => $gateway_class ) {
 
-				$gateway_object = new $gateway_class;
+				$gateway_object = new $gateway_class();
 
 				if ( false === $gateway_object->supports( $feature ) ) {
 					return false;
@@ -409,7 +408,7 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 		public function any_gateway_supports( $feature ) {
 			foreach ( $this->get_active_gateways() as $gateway_id => $gateway_class ) {
 
-				$gateway_object = new $gateway_class;
+				$gateway_object = new $gateway_class();
 
 				if ( true === $gateway_object->supports( $feature ) ) {
 					return true;
@@ -637,7 +636,7 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 			$customer_site_url = remove_query_arg(
 				array(
 					'state',
-					'wpcharitable_gateway_connect_completion'
+					'wpcharitable_gateway_connect_completion',
 				),
 				$current_url
 			);
@@ -788,10 +787,10 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 
 			$settings = get_option( 'charitable_settings' );
 
-			unset( $settings['gateways_stripe'][ 'live_secret_key' ] );
-			unset( $settings['gateways_stripe'][ 'live_public_key' ] );
-			unset( $settings['gateways_stripe'][ 'test_secret_key' ] );
-			unset( $settings['gateways_stripe'][ 'test_public_key' ] );
+			unset( $settings['gateways_stripe']['live_secret_key'] );
+			unset( $settings['gateways_stripe']['live_public_key'] );
+			unset( $settings['gateways_stripe']['test_secret_key'] );
+			unset( $settings['gateways_stripe']['test_public_key'] );
 
 			update_option( 'charitable_settings', $settings );
 
@@ -813,7 +812,6 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 
 			wp_safe_redirect( $redirect_url );
 			exit;
-
 		}
 
 		/**
@@ -826,9 +824,12 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 		 */
 		public function redirect_gateway_settings( $gateway ) {
 
-			$settings_url = add_query_arg( array(
-				'group' => 'gateways_' . $gateway,
-			), admin_url( 'admin.php?page=charitable-settings&tab=gateways' ) );
+			$settings_url = add_query_arg(
+				array(
+					'group' => 'gateways_' . $gateway,
+				),
+				admin_url( 'admin.php?page=charitable-settings&tab=gateways' )
+			);
 
 			wp_safe_redirect( $settings_url );
 			exit;
@@ -888,6 +889,59 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 			}
 		}
 
+		/**
+		 * Check the setup stored value of the payment methods.
+		 *
+		 * @since  1.8.4
+		 *
+		 * @return bool
+		 */
+		public function check_setup_payment_methods() {
+
+			$payment_methods = get_option( 'charitable_setup_payment_methods', array() );
+
+			if ( ! is_array( $payment_methods ) ) {
+				return false;
+			}
+
+			$payment_methods = array_map( 'sanitize_text_field', $payment_methods );
+
+			if ( empty( $payment_methods ) ) {
+				return false;
+			}
+
+			$gateways_enbled = 0;
+
+			if ( in_array( 'stripe', $payment_methods, true ) ) {
+				// check if this gateway is already enabled.
+				if ( ! $this->is_active_gateway( 'stripe' ) ) {
+					$this->enable_gateway( 'stripe', false );
+					++$gateways_enbled;
+				}
+			}
+
+			if ( in_array( 'paypal', $payment_methods, true ) ) {
+				// check if this gateway is already enabled.
+				if ( ! $this->is_active_gateway( 'paypal' ) ) {
+					$this->enable_gateway( 'paypal', false );
+					++$gateways_enbled;
+				}
+			}
+
+			if ( in_array( 'offline', $payment_methods, true ) ) {
+				// check if this gateway is already enabled.
+				if ( ! $this->is_active_gateway( 'offline' ) ) {
+					$this->enable_gateway( 'offline', false );
+				}
+			}
+
+			if ( $gateways_enbled > 0 && class_exists( 'Charitable_Checklist' ) ) {
+				$checklist_class = Charitable_Checklist::get_instance();
+				$checklist_class->mark_step_completed( 'connect-payment' );
+			}
+
+			return true;
+		}
 
 		/**
 		 * Display the test and live fields that represent the manual keys for Stripe that users might be already using prior to 1.7.0.
@@ -910,7 +964,7 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 				return;
 			}
 
-			$settings   = get_option( 'charitable_settings' );
+			$settings = get_option( 'charitable_settings' );
 
 			if ( false === $settings ) {
 				return;
@@ -918,10 +972,10 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 
 			$gateway_id = 'stripe';
 
-			$live_secret_key = $settings['gateways_' . $gateway_id ][ 'live_secret_key' ];
-			$live_public_key = $settings['gateways_' . $gateway_id ][ 'live_public_key' ];
-			$test_secret_key = $settings['gateways_' . $gateway_id ][ 'test_secret_key' ];
-			$test_public_key = $settings['gateways_' . $gateway_id ][ 'test_public_key' ];
+			$live_secret_key = $settings[ 'gateways_' . $gateway_id ]['live_secret_key'];
+			$live_public_key = $settings[ 'gateways_' . $gateway_id ]['live_public_key'];
+			$test_secret_key = $settings[ 'gateways_' . $gateway_id ]['test_secret_key'];
+			$test_public_key = $settings[ 'gateways_' . $gateway_id ]['test_public_key'];
 
 			$html = '<tr><th scope="row">Live Settings</th><td><hr  />
 			</td></tr><tr class="wide"><th scope="row">Live Secret Key</th><td><input type="text"
@@ -952,10 +1006,7 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 			</td></tr>';
 
 			wp_send_json_success( $html );
-
 		}
-
-
 	}
 
 endif;

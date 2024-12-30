@@ -42,9 +42,6 @@ var CharitableOnboarding = window.CharitableOnboarding || ( function( document, 
 		 * @since 1.8.1.12
 		 */
 		ready: function() {
-
-			// app.setup();
-			// app.events();
 		},
 
 		/**

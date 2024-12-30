@@ -140,7 +140,11 @@ if ( ! class_exists( 'Charitable_Admin_Plugins_Third_Party' ) ) :
 		}
 
 		/**
-		 * Install plugins which are not addons.
+		 * Install plugins which are not Charitable addons.
+		 *
+		 * @since   1.8.1
+		 *
+		 * @return void
 		 */
 		public function install_plugin() {
 
@@ -215,7 +219,7 @@ if ( ! class_exists( 'Charitable_Admin_Plugins_Third_Party' ) ) :
 			$url    = esc_url( $url );
 
 			ob_start();
-			if ( false === ( $creds = request_filesystem_credentials( $url, $method, false, false, null ) ) ) {
+			if ( false === ( $creds = request_filesystem_credentials( $url, $method, false, false, null ) ) ) { // phpcs:ignore
 				$form = ob_get_clean();
 
 				wp_send_json( array( 'form' => $form ) );
@@ -290,6 +294,11 @@ if ( ! class_exists( 'Charitable_Admin_Plugins_Third_Party' ) ) :
 
 		/**
 		 * Activate plugin.
+		 *
+		 * @since  1.8.1
+		 * @version 1.8.4
+		 *
+		 * @return void
 		 */
 		public function activate_plugin() {
 
@@ -316,6 +325,84 @@ if ( ! class_exists( 'Charitable_Admin_Plugins_Third_Party' ) ) :
 			}
 
 			$success = activate_plugin( $basename, '', false );
+
+			// Disable MonsterInsights redirect.
+			if ( strstr( $basename, 'google-analytics-for-wordpress' ) ) {
+				if ( charitable_is_debug() ) :
+					error_log( print_r( 'MonsterInsights activated, deleting transient/updating option to prevent redirect.', true ) ); // phpcs:ignore
+				endif;
+				delete_transient( '_monsterinsights_activation_redirect' );
+			}
+			// Disable Exactmetrics redirect.
+			if ( strstr( $basename, 'google-analytics-dashboard-for-wp' ) ) {
+				if ( charitable_is_debug() ) :
+					error_log( print_r( 'Exactmetrics activated, deleting transient/updating option to prevent redirect.', true ) ); // phpcs:ignore
+				endif;
+				delete_transient( '_exactmetrics_activation_redirect' );
+			}
+			// Disable WP Mail SMTP redirect.
+			if ( strstr( $basename, 'wp-mail-smtp' ) ) {
+				if ( charitable_is_debug() ) :
+					error_log( print_r( 'WP Mail SMTP activated, deleting transient/updating option to prevent redirect.', true ) ); // phpcs:ignore
+				endif;
+				delete_transient( 'wp_mail_smtp_activation_redirect' );
+			}
+			// Disable Rafflepress redirect.
+			if ( strstr( $basename, 'rafflepress' ) ) {
+				if ( charitable_is_debug() ) :
+					error_log( print_r( 'Rafflepress activated, deleting transient/updating option to prevent redirect.', true ) ); // phpcs:ignore
+				endif;
+				delete_transient( '_rafflepress_welcome_screen_activation_redirect' );
+			}
+			// Disable seedprod redirect.
+			if ( strstr( $basename, 'seedprod' ) ) {
+				if ( charitable_is_debug() ) :
+					error_log( print_r( 'SeedProd activated, deleting transient/updating option to prevent redirect.', true ) ); // phpcs:ignore
+				endif;
+				delete_transient( '_seedprod_welcome_screen_activation_redirect' );
+			}
+			// Disable instagram-feed redirect.
+			if ( strstr( $basename, 'instagram-feed' ) ) {
+				if ( charitable_is_debug() ) :
+					error_log( print_r( 'Instagram Feed activated, deleting transient/updating option to prevent redirect.', true ) ); // phpcs:ignore
+				endif;
+				delete_option( 'sbi_plugin_do_activation_redirect' );
+			}
+			// Disable facebook-feed redirect.
+			if ( strstr( $basename, 'facebook-feed' ) ) {
+				if ( charitable_is_debug() ) :
+					error_log( print_r( 'Facebook Feed activated, deleting transient/updating option to prevent redirect.', true ) ); // phpcs:ignore
+				endif;
+				delete_option( 'cff_plugin_do_activation_redirect' );
+			}
+			// Disable trustpulse redirect.
+			if ( strstr( $basename, 'trustpulse' ) ) {
+				if ( charitable_is_debug() ) :
+					error_log( print_r( 'TrustPulse activated, deleting transient/updating option to prevent redirect.', true ) ); // phpcs:ignore
+				endif;
+				delete_option( 'trustpulse_api_plugin_do_activation_redirect' );
+			}
+			// Disable searchwp-live-ajax-search redirect.
+			if ( strstr( $basename, 'searchwp-live-ajax-search' ) ) {
+				if ( charitable_is_debug() ) :
+					error_log( print_r( 'SearchWP Live Search activated, deleting transient/updating option to prevent redirect.', true ) ); // phpcs:ignore
+				endif;
+				delete_transient( 'searchwp_live_search_activation_redirect' );
+			}
+			// Disable duplicator redirect.
+			if ( strstr( $basename, 'duplicator' ) ) {
+				if ( charitable_is_debug() ) :
+					error_log( print_r( 'Duplicator activated, deleting transient/updating option to prevent redirect.', true ) ); // phpcs:ignore
+				endif;
+				update_option( 'duplicator_redirect_to_welcome', false );
+			}
+			// Disable pushengage redirect.
+			if ( strstr( $basename, 'pushengage' ) ) {
+				if ( charitable_is_debug() ) :
+					error_log( print_r( 'PushEngage activated, deleting transient/updating option to prevent redirect.', true ) ); // phpcs:ignore
+				endif;
+				delete_transient( 'pushengage_activation_redirect' );
+			}
 
 			if ( is_wp_error( $success ) ) {
 				wp_send_json_error(
@@ -1231,7 +1318,7 @@ if ( ! class_exists( 'Charitable_Admin_Plugins_Third_Party' ) ) :
 			$partner_list = $this->get_plugins( false );
 
 			$preferred_partners = apply_filters(
-				'charitable_recommended_partners_ ' . $recommendation_type,
+				'charitable_recommended_partners_ ' . $recommendation_type, // @codingStandardsIgnoreLine
 				array(
 					'charitable',
 					'optinmonster',
@@ -1308,7 +1395,7 @@ if ( ! class_exists( 'Charitable_Admin_Plugins_Third_Party' ) ) :
 			*/
 
 			$preferred_addons = apply_filters(
-				'charitable_recommended_addons_ ' . $recommendation_type,
+				'charitable_recommended_addons_ ' . $recommendation_type, // @codingStandardsIgnoreLine
 				array(
 					'charitable-recurring',
 					'charitable-ambassadors',

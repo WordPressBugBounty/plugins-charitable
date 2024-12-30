@@ -64,8 +64,6 @@ if ( charitable()->load_core_stripe() && class_exists( 'Charitable_Gateway_Strip
 		<?php
 	endif;
 
-	do_action( 'charitable_gateway_fields_after_selector', $form, $field, $gateways );
-
 	foreach ( $gateways as $gateway_id => $details ) :
 
 		if ( ! isset( $details['fields'] ) || empty( $details['fields'] ) ) :
