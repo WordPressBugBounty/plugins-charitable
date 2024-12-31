@@ -1129,6 +1129,9 @@ add_action( 'admin_init', 'charitable_update_third_party_warning_option' );
  * Get an option related to third party warning ( null, noted, dismissed )
  *
  * @since  1.7.0.8
+ *
+ * @param  string $plugin_path Plugin path.
+ * @param  string $category    Category.
  */
 function charitable_get_third_party_warning_option( $plugin_path = false, $category = 'plugins' ) {
 
@@ -1155,6 +1158,10 @@ function charitable_get_third_party_warning_option( $plugin_path = false, $categ
  * Get an option related to third party warning ( null, noted, dismissed )
  *
  * @since  1.7.0.8
+ *
+ * @param  string $plugin_path Plugin path.
+ * @param  string $value       Value.
+ * @param  string $category    Category.
  */
 function charitable_set_third_party_warning_option( $plugin_path = false, $value = false, $category = 'plugins' ) {
 

@@ -1,3 +1,9 @@
+# 1.8.4.1
+* FIX: Resolved an issue involving the "Use This Template" button in visual campaign when choosing campaigns in some scenarios.
+* FIX: Resolved an internal server issue when attempting to fetch CSS when campaign builder was viewing the Club template.
+* FIX: Minor adjustments and tweaks to campaign templates including word breaking and word wrapping in the visual builder.
+* FIX: Updated code related to typos, translations and PHP standards.
+
 # 1.8.4
 * NEW: Onboarding wizard on first install that guides you through setting up basic settings, gateways, plugins, and your first campaign!
 * NEW: You can now opt-in into data collection to improve Charitable. See "advanced settings" screen for details.

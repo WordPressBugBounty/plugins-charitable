@@ -305,7 +305,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			// If error(s) occured during license key verification, display them and exit now.
 			if ( empty( $temp_addons ) ) { ?>
 
-					<h1 class="page-title"><?php echo __( 'Charitable Addons', 'charitable' ); ?></h1>
+					<h1 class="page-title"><?php esc_html_e( 'Charitable Addons', 'charitable' ); ?></h1>
 
 					<div class="error below-h2">
 						<p>
@@ -351,14 +351,15 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			// Get installed plugins and upgrade URL.
 			$installed_plugins = get_plugins();
 			$upgrade_url       = $this->charitable_get_upgrade_link();
-			$type              = ( isset( $_GET['plan'] ) ) ? esc_attr( $_GET['plan'] ) : $this->get_current_plan_slug(); // todo: remove $_GET.
+			$type              = ( isset( $_GET['plan'] ) ) ? esc_attr( $_GET['plan'] ) : $this->get_current_plan_slug(); // phpcs:ignore
 			$preset_search     = ( isset( $_GET['search'] ) ) ? trim( esc_attr( $_GET['search'] ) ) : ''; // phpcs:ignore
 			?>
 
-			<h1 class="page-title"><?php echo get_admin_page_title(); ?><input type="search" placeholder="<?php esc_html_e( 'Search Addons', 'charitable' ); ?><" id="charitable-admin-addons-search" value="<?php echo $preset_search; ?>" /></h1>
+			<h1 class="page-title"><?php echo esc_html( get_admin_page_title() ); ?><input type="search" placeholder="<?php esc_html_e( 'Search Addons', 'charitable' ); ?>" id="charitable-admin-addons-search" value="<?php echo esc_html( $preset_search ); ?>" /></h1>
 
 			<?php
 
+			// phpcs:disable
 			if ( defined( 'CHARITABLE_DEBUG_LICENSE' ) && CHARITABLE_DEBUG_LICENSE ) {
 				echo '<p>Plan type is: ' . $type . '</p>';
 				error_log( 'addons_directory_content' );
@@ -366,12 +367,13 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				error_log( print_r( $installed_plugins, true ) );
 				error_log( print_r( $upgrade_url, true ) );
 			}
+			// phpcs:enable
 
 			?>
 
 			<?php if ( ! charitable_is_pro() ) { ?>
 
-				<?php echo Charitable_Settings::get_instance()->settings_cta(); ?>
+				<?php echo Charitable_Settings::get_instance()->settings_cta(); // @codingStandardsIgnoreLine ?>
 
 			<?php } ?>
 
@@ -692,7 +694,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 						// we have a valid license that we could get an upgrade path, etc. from.
 						$upgrade_url = charitable_ga_url(
-							// pid = plan_id
+							// pid = plan_id.
 							self::UPDATE_URL . '/?license_upgrade=true&license_key=' . $license_data_to_send['license'] . '&upid=' . $upid . '&pid=' . $license_data_to_send['plan_id'] . '&addon=' . esc_html( $addon['name'] ),
 							urlencode( 'Plugin Addon Page' ),
 							urlencode( $addon['name'] . ' Upgrade' )

@@ -719,7 +719,7 @@
 #charitable-design-wrap header .title-description,
 #charitable-design-wrap div.charitable-preview-row .title-description {
   margin: 0px 5px;
-  word-break: break-all;
+  word-break: break-word;
 }
 #charitable-design-wrap header .title-description span,
 #charitable-design-wrap div.charitable-preview-row .title-description span {

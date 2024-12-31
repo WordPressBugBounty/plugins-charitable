@@ -195,7 +195,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 			$this->campaign_data['id']          = 0;
 			$this->campaign_data['campaign_id'] = 0;
 
-			$campaign_name = isset( $_POST['campaign_name'] ) && '' !== trim( $_POST['campaign_name'] ) ? esc_html( $_POST['campaign_name'] ) : '';
+			$campaign_name = isset( $_POST['campaign_name'] ) && '' !== trim( $_POST['campaign_name'] ) ? esc_html( $_POST['campaign_name'] ) : ''; // phpcs:ignore
 
 			$this->campaign_data['tabs']['campaign']['title'] = esc_html__( 'Story.', 'charitable' );
 			$this->campaign_data['tabs']['campaign']['desc']  = esc_html__( 'Write Your Campaign\'s Story Here', 'charitable' );
@@ -222,11 +222,11 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 			}
 
 			// This isn't a charitable campaign builder page.
-			if ( ! isset( $_GET['page'] ) || $_GET['page'] !== 'charitable-campaign-builder' ) {
+			if ( ! isset( $_GET['page'] ) || $_GET['page'] !== 'charitable-campaign-builder' ) { // phpcs:ignore
 				return;
 			}
 
-			$this->view        = isset( $_GET['view'] ) ? esc_attr( $_GET['view'] ) : false;
+			$this->view        = isset( $_GET['view'] ) ? esc_attr( $_GET['view'] ) : false; // phpcs:ignore
 			$this->campaign_id = isset( $_GET['campaign_id'] ) ? intval( $_GET['campaign_id'] ) : false; // phpcs:ignore
 
 			// if no view was past, determine if the new campaign cofmr has been used (check settings) and if not redirect to template screen.
@@ -764,8 +764,20 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				'feedback_form_fields_required'     => esc_html__( 'Some fields of this form are required. Please update the form and try submiting again. Thanks!', 'charitable' ),
 				'empty_label'                       => esc_html__( 'Empty Label', 'charitable' ),
 				'no_pages_found'                    => esc_html__( 'No results found', 'charitable' ),
-				'empty_tab'                         => esc_html__( 'This tab is empty. Drag a block from the left into this area or<br/><strong><a href="#" class="charitable-configure-tab-settings">' . __( 'configure tab settings', 'charitable' ) . '</a></strong>', 'charitable' ),
-				'no_tabs'                           => esc_html__( 'There are no tabs yet for this template. You can <br/><strong><a href="#" class="charitable-configure-tab-settings">' . __( 'configure tab settings', 'charitable' ) . '</a> to add a tab.</strong>', 'charitable' ),
+				'empty_tab'                         => sprintf(
+				/* translators: %s: configure tab settings link */
+					esc_html__( 'This tab is empty. Drag a block from the left into this area or%1$s%2$s%3$s', 'charitable' ),
+					'<br/><strong><a href="#" class="charitable-configure-tab-settings">',
+					esc_html__( 'configure tab settings', 'charitable' ),
+					'</a></strong>'
+				),
+				'no_tabs'                           => sprintf(
+				/* translators: %s: configure tab settings link */
+					esc_html__( 'There are no tabs yet for this template. You can %1$s%2$s%3$s to add a tab.', 'charitable' ),
+					'<br/><strong><a href="#" class="charitable-configure-tab-settings">',
+					esc_html__( 'configure tab settings', 'charitable' ),
+					'</a></strong>'
+				),
 				'new_tab'                           => esc_html__( 'New Tab', 'charitable' ),
 				'default_campaign_title'            => esc_html__( 'My New Campaign', 'charitable' ),
 				'field_disabled_due_to_modal'       => esc_html__( 'We\'re sorry, the %name% is not available because you have the display settings for donation form set to \'modal\' in Charitable general settings.', 'charitable' ),
@@ -1477,7 +1489,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 
 					<?php
 
-						$create_update_css = isset( $_GET['campaign_id'] ) && 0 !== intval( $_GET['campaign_id'] ) ? 'update-campaign' : 'create-campaign';
+						$create_update_css = isset( $_GET['campaign_id'] ) && 0 !== intval( $_GET['campaign_id'] ) ? 'update-campaign' : 'create-campaign'; // phpcs:ignore
 
 					?>
 
@@ -1496,7 +1508,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 							</div>
 
 							<div class="charitable-form-row charitable-feedback-form-row charitable-feedback-form-row-button">
-								<a class="button-link button-preview-<?php echo $create_update_css; ?>" data-template-id=""><?php echo esc_html__( 'Use This Template', 'charitable' ); ?></a>
+								<a class="button-link button-preview-<?php echo esc_attr( $create_update_css ); ?>" data-template-id=""><?php echo esc_html__( 'Use This Template', 'charitable' ); ?></a>
 							</div>
 
 						</div>
@@ -1658,9 +1670,9 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				return;
 			}
 
-			// check_admin_referer( 'charitable_onboarding_ajax_nonce' );
+			check_ajax_referer( 'charitable_onboarding_ajax_nonce', 'nonce' );
 
-			if ( empty( $_POST['data'] ) || empty( $_POST['data']['optionData'] ) || empty( $_POST['data']['type'] ) ) {
+			if ( empty( $_POST['data'] ) || empty( $_POST['data']['optionData'] ) || empty( $_POST['data']['type'] ) ) { // phpcs:ignore
 				wp_send_json_error();
 			}
 
@@ -1727,7 +1739,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				$replace[ $key ] = sanitize_text_field( $value );
 			}
 
-			$option      = $this->get_onboarding_options(); // get_option( 'charitable_builder_onboarding' );
+			$option      = $this->get_onboarding_options();
 			$option_tour = empty( $option['tour'] ) || ! $option['tour'] || ! is_array( $option['tour'] ) ? $schema_tour : $option['tour'];
 			$option_tour = array_merge( $option_tour, $replace );
 
@@ -1852,59 +1864,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 			return $option;
 		}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 		/* ONBOARDING */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 		/**
 		 * Save onboarding option via AJAX.

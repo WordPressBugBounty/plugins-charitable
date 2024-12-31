@@ -14,7 +14,7 @@ ob_start();
 ?>
 
 <div id="charitable-smtp" class="wrap">
-	<h1 class="screen-reader-text"><?php echo get_admin_page_title(); ?></h1>
+	<h1 class="screen-reader-text"><?php echo esc_html( get_admin_page_title() ); ?></h1>
 
 	<div class="charitable-intergrations-container intergration-smtp">
 
@@ -28,8 +28,8 @@ ob_start();
 
 			<div>
 				<div class="charitable-screenshot">
-					<img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/integrations/smtp-screenshot-thumnbail.png'; ?>" alt="<?php echo esc_html__( 'Integrate WP Mail SMTP Into Charitable For Improved Email Reliability', 'charitable' ); ?>">
-					<a href="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/zoom.svg'; ?>" class="hover" data-lity=""></a>
+					<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/integrations/smtp-screenshot-thumnbail.png' ); ?>" alt="<?php echo esc_html__( 'Integrate WP Mail SMTP Into Charitable For Improved Email Reliability', 'charitable' ); ?>">
+					<a href="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/icons/zoom.svg' ); ?>" class="hover" data-lity=""></a>
 				</div>
 			</div>
 			<div>
@@ -49,7 +49,7 @@ ob_start();
 
 			<?php
 
-			$charitable_plugins_third_party = new Charitable_Admin_Plugins_Third_Party();
+			$charitable_plugins_third_party = new Charitable_Admin_Plugins_Third_Party(); // phpcs:ignore
 
 			// determine if the SMTP plugin is installed and activated.
 			$is_smtp_installed = $charitable_plugins_third_party->is_plugin_installed( 'wp-mail-smtp' );
@@ -69,7 +69,7 @@ ob_start();
 				</div>
 				<div class="step">
 					<div class="vertical-wrapper">
-						<div class="step-image"><img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/reports/analytics/step-1.png'; ?>" alt="<?php echo esc_html__( 'Step 1', 'charitable' ); ?>" /></div>
+						<div class="step-image"><img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/reports/analytics/step-1.png' ); ?>" alt="<?php echo esc_html__( 'Step 1', 'charitable' ); ?>" /></div>
 					</div>
 				</div>
 			</div>
@@ -93,7 +93,7 @@ ob_start();
 				</div>
 				<div class="step">
 					<div class="vertical-wrapper">
-						<div class="step-image"><img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/reports/analytics/step-1.png'; ?>" alt="<?php echo esc_html__( 'Step 1', 'charitable' ); ?>" /></div>
+						<div class="step-image"><img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/reports/analytics/step-1.png' ); ?>" alt="<?php echo esc_html__( 'Step 1', 'charitable' ); ?>" /></div>
 					</div>
 				</div>
 			</div>
@@ -116,7 +116,7 @@ ob_start();
 				</div>
 				<div class="step">
 					<div class="vertical-wrapper">
-						<div class="step-image"><img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/reports/analytics/step-1.png'; ?>" alt="<?php echo esc_html__( 'Step 1', 'charitable' ); ?>" /></div>
+						<div class="step-image"><img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/reports/analytics/step-1.png' ); ?>" alt="<?php echo esc_html__( 'Step 1', 'charitable' ); ?>" /></div>
 					</div>
 				</div>
 			</div>
@@ -133,7 +133,7 @@ ob_start();
 				</div>
 				<div class="step">
 					<div class="vertical-wrapper">
-						<div class="step-image"><img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/reports/analytics/step-2.png'; ?>" alt="<?php echo esc_html__( 'Step 2', 'charitable' ); ?>" /></div>
+						<div class="step-image"><img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/reports/analytics/step-2.png' ); ?>" alt="<?php echo esc_html__( 'Step 2', 'charitable' ); ?>" /></div>
 					</div>
 				</div>
 			</div>
@@ -150,7 +150,7 @@ ob_start();
 			<div class="charitable-screenshot-close-icon">×</div>
 
 			<div class="interior">
-				<img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/integrations/smtp-screenshot-full.png'; ?>" alt="<?php echo esc_html__( 'Integrate WP Mail SMTP Into Charitable For Improved Email Reliability', 'charitable' ); ?>">
+				<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/integrations/smtp-screenshot-full.png' ); ?>" alt="<?php echo esc_html__( 'Integrate WP Mail SMTP Into Charitable For Improved Email Reliability', 'charitable' ); ?>">
 			</div>
 
 		</div>
@@ -160,4 +160,4 @@ ob_start();
 </div>
 
 <?php
-echo ob_get_clean();
+echo ob_get_clean(); // phpcs:ignore

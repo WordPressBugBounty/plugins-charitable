@@ -1066,7 +1066,6 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 			// Create campaign via preview window. Sneaky!
 			$builder.on( 'click', '.button-preview-create-campaign', function( e ) {
 				e.preventDefault();
-
 				// find the create button in the list and click that instead of trying to duplicate everything.
 				var $theButton = $( this ),
 					theTemplateID = $theButton.data('template-id');
@@ -1076,7 +1075,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 					$('#charitable-builder-underlay').remove();
 					// $('.charitable-templates-preview-container').addClass('charitable-hidden');
 					$('.charitable-builder-modal.charitable-builder-modal-template-preview').removeClass('active');
-					elements.$templatePreview.find('.charitable-template-list-container-item.charitable-template-' + theTemplateID + ' .button.create-campaign').click();
+					elements.$templatePreview.find('.charitable-template-list-container-item.charitable-template-' + theTemplateID + ' .button.update-campaign').click();
 				}
 
 			} );

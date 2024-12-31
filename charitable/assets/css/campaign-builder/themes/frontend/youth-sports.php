@@ -147,6 +147,20 @@ $wrapper = '.charitable-campaign-wrap.template-' . $slug;
   	display: inline-block;
   	text-align: center;
   	text-decoration: none;
+}
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-button a.donate-button {
+	border-radius: 0px;
+  text-transform: uppercase;
+  border-radius: 0px;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-weight: 400;
+  min-height: 50px;
+  height: 50px;
+  font-size: 16px;
+  line-height: 15px;
+	background-color: <?php echo $button; ?> !important;
+	border-color: <?php echo $button; ?> !important;
 	display: flex; /* Changed from block to flex */
 	align-items: center; /* Vertically centers the text */
 	justify-content: center; /* Optionally centers the text horizontally too */
@@ -154,7 +168,6 @@ $wrapper = '.charitable-campaign-wrap.template-' . $slug;
 	text-decoration: none !important;
 	transition: filter 0.3s; /* Smooth transition */
 }
-
 
 /* field: progress bar */
 
@@ -353,10 +366,6 @@ $wrapper = '.charitable-campaign-wrap.template-' . $slug;
 
 /* field: campaign summary */
 
-<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-campaign-summary .charitable-field-template-campaign-summary div.campaign-summary-item {
-	color: white;
-}
-
 <?php echo $wrapper; ?> .charitable-field-template-campaign-summary {
 	padding-left: 0;
 	padding-right: 0;
@@ -373,11 +382,12 @@ $wrapper = '.charitable-campaign-wrap.template-' . $slug;
 	font-size: 32px;
 	line-height: 38px;
 }
-<?php echo $wrapper; ?> .charitable-field-template-campaign-summary .campaign-summary-item {
+<?php echo $wrapper; ?> .charitable-field-template-campaign-summary div.campaign-summary-item {
 	border: 0;
 	margin-top: 5px;
 	margin-bottom: 5px;
 	text-transform: capitalize;
+	color: white;
 }
 <?php echo $wrapper; ?> .charitable-field-template-campaign-summary .campaign-summary-item.campaign_hide_percent_raised {
 	width: 34%;
@@ -398,6 +408,9 @@ $wrapper = '.charitable-campaign-wrap.template-' . $slug;
 <?php echo $wrapper; ?> .charitable-campaign-field-donate-amount input.custom-donation-input[type="text"] {
 	color: white !important;
 }
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-amount ul li.suggested-donation-amount {
+
+}
 <?php echo $wrapper; ?> .charitable-campaign-field-donate-amount ul li.suggested-donation-amount.selected {
 	border: 0 !important;
 }
@@ -408,15 +421,25 @@ $wrapper = '.charitable-campaign-wrap.template-' . $slug;
 <?php echo $wrapper; ?> .charitable-campaign-field-donate-amount input.custom-donation-input[type="text"] {
 	border: 1px solid !important;
 }
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-amount input.custom-donation-input[type="text"] {
+	padding: 20px;
+	max-width: calc(100% - 40px);
+}
 <?php echo $wrapper; ?> .charitable-campaign-field-donate-amount ul li.suggested-donation-amount.selected label,
 <?php echo $wrapper; ?> .charitable-campaign-field-donate-amount ul li.suggested-donation-amount:hover label {
 	border-width: 1px;
 	border-style: solid;
 	border-color: <?php echo $button; ?> !important;
 }
-<?php echo $wrapper; ?> .charitable-campaign-field-donate-amount ul li.suggested-donation-amount.selected span.amount {
-
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-amount ul li.custom-donation-amount {
+	max-width: calc(100% - 10px);
 }
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-amount .charitable-template-donation-options ul.charitable-template-donation-amounts .charitable-template-donation-amount.selected {
+	color: #000;
+  	border: 5px solid #000;
+	max-width: calc(100% - 20px);
+}
+
 
 
 

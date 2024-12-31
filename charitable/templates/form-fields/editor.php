@@ -43,7 +43,7 @@ $editor_args = wp_parse_args( $editor_args, $default_editor_args );
 <div id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>" class="<?php echo esc_attr( $classes ); ?>">
 	<?php if ( isset( $field['label'] ) ) : ?>
 		<label for="<?php echo esc_attr( $field['key'] ); ?>">
-			<?php echo $field['label']; ?>
+			<?php echo esc_html( $field['label'] ); ?>
 			<?php if ( $is_required ) : ?>
 				<abbr class="required" title="required">*</abbr>
 			<?php endif ?>

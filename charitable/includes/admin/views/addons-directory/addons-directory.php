@@ -10,8 +10,6 @@
  * @version   1.6.19
  */
 
-// charitable_get_admin_settings()->get_sections();
-
 do_action( 'charitable_addons_directory_page_start' );
 
 $plan_slug = Charitable_Addons_Directory::get_current_plan_slug();
@@ -19,8 +17,8 @@ $plan_slug = Charitable_Addons_Directory::get_current_plan_slug();
 ob_start();
 ?>
 <div id="charitable-settings" class="wrap">
-	<h1 class="screen-reader-text"><?php echo get_admin_page_title(); ?></h1>
-	<h1><?php echo get_admin_page_title(); ?></h1>
+	<h1 class="screen-reader-text"><?php echo esc_html( get_admin_page_title() ); ?></h1>
+	<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
 	<?php do_action( 'charitable_maybe_show_notification' ); ?>
 	<div id="charitable-admin-addons" class="wrap charitable-admin-wrap">
 		<?php do_action( 'charitable_addons_directory_section' ); ?>
@@ -30,4 +28,4 @@ ob_start();
 
 do_action( 'charitable_addons_directory_page_end' );
 
-echo ob_get_clean();
+echo ob_get_clean(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
