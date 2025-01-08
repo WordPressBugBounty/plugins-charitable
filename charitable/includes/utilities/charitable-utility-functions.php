@@ -241,7 +241,8 @@ function charitable_list_to_sentence_part( $list ) {
  *
  * @global WP_Locale $wp_locale
  *
- * @since  1.4.10
+ * @since   1.4.10
+ * @version 1.8.4.2 Fix bug where english dates weren't being found in $wp_locale.
  *
  * @param  string $date          The date to be sanitized.
  * @param  string $return_format The date format to return. Default is U (timestamp).
@@ -254,6 +255,22 @@ function charitable_sanitize_date( $date, $return_format = 'U' ) {
 		return false;
 	}
 
+	// If the month is in english, we need to ensure it's translated if the site is in another language.
+	$english_to_local_month = array(
+		'january'   => $wp_locale->get_month( 1 ),
+		'february'  => $wp_locale->get_month( 2 ),
+		'march'     => $wp_locale->get_month( 3 ),
+		'april'     => $wp_locale->get_month( 4 ),
+		'may'       => $wp_locale->get_month( 5 ),
+		'june'      => $wp_locale->get_month( 6 ),
+		'july'      => $wp_locale->get_month( 7 ),
+		'august'    => $wp_locale->get_month( 8 ),
+		'september' => $wp_locale->get_month( 9 ),
+		'october'   => $wp_locale->get_month( 10 ),
+		'november'  => $wp_locale->get_month( 11 ),
+		'december'  => $wp_locale->get_month( 12 ),
+	);
+
 	// a fix for a PHP warning to cover this particulr case.
 	$date_format = 'Y-m-d H:i:s';
 	$date_time   = DateTime::createFromFormat( $date_format, $date );
@@ -263,6 +280,14 @@ function charitable_sanitize_date( $date, $return_format = 'U' ) {
 	}
 
 	list( $month, $day, $year ) = explode( ' ', $date );
+
+	// Normalize the month to lower case to match key.
+	$month = strtolower( trim( $month ) );
+
+	// Translate the month using the mapping.
+	if ( array_key_exists( $month, $english_to_local_month ) ) {
+		$month = $english_to_local_month[ $month ];
+	}
 
 	$day   = trim( $day, ',' );
 	$month = 1 + array_search( $month, array_values( $wp_locale->month ), true );

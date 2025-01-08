@@ -12,6 +12,7 @@ $slug            = 'medical-bills';
 $wrapper         = '.charitable-campaign-wrap.template-' . $slug;
 $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' . $slug;
 
+require_once ('../../../../../includes/admin/campaign-builder/templates/functions-campaign-templates.php');
 ?>
 
 :root {
@@ -106,6 +107,7 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 	border-radius: 35px;
 	background-color: <?php echo $button; ?> !important;
 	border-color: <?php echo $button; ?> !important;
+	color: <?php echo charitable_get_constracting_text_color($button); ?>;
 	display: flex; /* Changed from block to flex */
 	align-items: center; /* Vertically centers the text */
 	justify-content: center; /* Optionally centers the text horizontally too */

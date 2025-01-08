@@ -10,6 +10,8 @@ $button    = isset( $_GET['b'] ) ? '#' . preg_replace("/[^A-Za-z0-9 ]/", '', $_G
 $slug    = 'simple-2-col';
 $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #charitable-design-wrap .charitable-campaign-preview';
 
+require_once ('../../../../../includes/admin/campaign-builder/templates/functions-campaign-templates.php');
+
 ?>
 
 /* field: headlines */
@@ -59,8 +61,19 @@ $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #chari
 
 }
 <?php echo $wrapper; ?> .charitable-field.charitable-field-donate-button .charitable-field-preview-donate-button span.placeholder.button {
-    background-color: <?php echo $button; ?>;
-    border-color: <?php echo $button; ?>;
+    background-color: <?php echo $button; ?> !important;
+    border-color: <?php echo $button; ?> !important;
+    color: <?php echo charitable_get_constracting_text_color($button); ?>;
+    text-transform: none;
+    border-radius: 0px;
+    margin-top: 0;
+    margin-bottom: 0;
+    width: 100%;
+    font-weight: 400;
+    min-height: 50px;
+    height: 50px;
+    font-size: 16px;
+    line-height: 50px;
 }
 
 

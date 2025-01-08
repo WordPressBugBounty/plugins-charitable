@@ -1013,7 +1013,7 @@ class Charitable_Builder_Form_Fields {
 
 		if ( empty( $params['options'] ) ) {
 
-			$html .= '<p><em><small>There are currently no Charitable specific tags. <a target="_blank" href="' . admin_url( 'edit-tags.php?taxonomy=campaign_tag&post_type=campaign' ) . '">Click here</a> to start adding some or <a href="https://wpcharitable.com/docs#">read our documentation for more</a>.</small></em></p>';
+			$html .= '<p><em><small>There are currently no Charitable specific tags. <a target="_blank" href="' . admin_url( 'edit-tags.php?taxonomy=campaign_tag&post_type=campaign' ) . '">Click here</a> to start adding some or <a href="https://wpcharitable.com/documentation/charitable-tags-and-categories">read our documentation for more</a>.</small></em></p>';
 
 		}
 
@@ -1021,7 +1021,7 @@ class Charitable_Builder_Form_Fields {
 
 			if ( empty( $params['options'] ) ) {
 
-				$html .= '<p><em><small>There are currently no Charitable specific tags. <a target="_blank" href="' . admin_url( 'edit-tags.php?taxonomy=campaign_tag&post_type=campaign' ) . '">Click here</a> to start adding some or <a href="https://wpcharitable.com/docs#">read our documentation for more</a>.</small></em></p>';
+				$html .= '<p><em><small>There are currently no Charitable specific tags. <a target="_blank" href="' . admin_url( 'edit-tags.php?taxonomy=campaign_tag&post_type=campaign' ) . '">Click here</a> to start adding some or <a href="https://wpcharitable.com/documentation/charitable-tags-and-categories">read our documentation for more</a>.</small></em></p>';
 
 			} else {
 
@@ -1267,7 +1267,7 @@ class Charitable_Builder_Form_Fields {
 
 		if ( empty( $categories_terms ) ) {
 
-			$html .= '<p><em><small>There are currently no Charitable campaign categories. <a target="_blank" href="' . admin_url( 'edit-tags.php?taxonomy=campaign_category&post_type=campaign' ) . '">Click here</a> to start adding some or <a href="https://wpcharitable.com/docs#">read our documentation for more</a>.</small></em></p>';
+			$html .= '<p><em><small>There are currently no Charitable campaign categories. <a target="_blank" href="' . admin_url( 'edit-tags.php?taxonomy=campaign_category&post_type=campaign' ) . '">Click here</a> to start adding some or <a href="https://wpcharitable.com/documentation/charitable-tags-and-categories">read our documentation for more</a>.</small></em></p>';
 
 		} else {
 
@@ -1593,7 +1593,7 @@ class Charitable_Builder_Form_Fields {
 		}
 
 		// check and see if this is a new campaign, and if so add some defaults.
-		if ( ( false === $campaign_data || empty( $campaign_data['settings']['donation-options'] ) ) && ! isset( $_GET['campaign_id'] ) ) {
+		if ( ( false === $campaign_data || empty( $campaign_data['settings']['donation-options'] ) ) && ! isset( $_GET['campaign_id'] ) ) { // phpcs:ignore
 
 			$value = array(
 

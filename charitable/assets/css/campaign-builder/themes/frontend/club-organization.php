@@ -10,6 +10,8 @@
 
 header( 'Content-type: text/css; charset: UTF-8' );
 
+require_once ('../../../../../includes/admin/campaign-builder/templates/functions-campaign-templates.php');
+
 if ( ! function_exists( 'charitable_sanitize_hex_color' ) ) {
 	/**
 	 * Sanitize a hex color.
@@ -148,10 +150,11 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 <?php echo charitable_esc_attr_php( $wrapper ); ?> .charitable-campaign-field-donate-button a.donate-button {
 	background-color: <?php echo charitable_sanitize_hex_color( $button ); ?> !important;
 	border-color: <?php echo charitable_sanitize_hex_color( $button ); ?> !important;
+	color: <?php echo charitable_get_constracting_text_color($button); ?>;
 	text-transform: uppercase;
 	border-radius: 10px;
-	margin-top: 0;
-	margin-bottom: 0;
+	margin-top: 10px;
+	margin-bottom: 10px;
 	width: 100%;
 	font-weight: 400;
 	min-height: 50px;
@@ -164,7 +167,6 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 	padding: 0;
 	text-align: center !important;
 	text-decoration: none !important;
-	color: white;
 	transition: filter 0.3s; /* Smooth transition */
 }
 

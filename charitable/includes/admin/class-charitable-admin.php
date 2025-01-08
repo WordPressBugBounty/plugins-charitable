@@ -319,7 +319,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		public function admin_enqueue_scripts() {
 
 			$min     = charitable_get_min_suffix(); // 1.8.3
-			$version = charitable()->get_version();
+			$version = charitable_is_break_cache() ? charitable()->get_version() . '.' . time() : charitable()->get_version();
 
 			$assets_dir = charitable()->get_path( 'assets', false );
 
@@ -624,7 +624,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				'select2',
 				$assets_dir . 'js/libraries/select2' . $min . '.js',
 				array( 'jquery' ),
-				'4.0.12',
+				$version,
 				true
 			);
 
@@ -632,7 +632,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				'select2-css',
 				$assets_dir . 'css/libraries/select2' . $min . '.css',
 				array(),
-				'4.0.12'
+				$version
 			);
 
 			do_action( 'after_charitable_admin_enqueue_scripts', $min, $version, $assets_dir );

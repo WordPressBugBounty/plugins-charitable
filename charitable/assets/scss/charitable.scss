@@ -188,6 +188,7 @@
 
 .charitable-form-content {
   margin-bottom: 1em;
+  font-size: 16px;
 }
 
 .charitable-gateway-fields {
@@ -349,7 +350,8 @@
 }
 
 .charitable-donation-form .custom-donation-input {
-  max-width: 100%;
+  max-width: calc(100% - 2rem);
+  min-height: 30px;
   border-width: 0.078rem;
   border-style: solid;
   border-radius: 0.25rem;
@@ -1052,13 +1054,15 @@ h3.charitable-header {
       border-style: solid;
       border-radius: .25rem;
       padding: 0.8rem 1rem;
-      min-height: 35px;
+      min-height: 30px;
       background-color: #fff;
       color: #4d4d4d;
       font-size: 1rem;
       font-family: inherit;
       font-weight: 500;
       line-height: 1.2;
+      padding-top: 22px !important;
+      padding-bottom: 3px !important;
     }
   }
 
@@ -1233,8 +1237,8 @@ h3.charitable-header {
           width: 100%;
           text-align: center;
           padding: 0;
+          min-height: 45px;
         }
-
         width: 100%;
         margin: 0;
       }
@@ -1302,21 +1306,22 @@ h3.charitable-header {
         padding: 0.8rem 1rem;
         background-color: #fff;
         color: #4d4d4d;
-        font-size: 1rem;
+        font-size: inherit;
         font-family: inherit;
         font-weight: 500;
         line-height: 1.2;
+        min-height: 18px;
       }
 
       select {
         border-width: .078rem;
         border-style: solid;
         border-radius: .25rem;
-        padding: 0.8rem 1rem;
-
+        padding: 0.5rem 1rem;
+        min-height: 40px;
         background-color: #fff;
         color: #4d4d4d;
-        font-size: 1rem;
+        font-size: inherit;
         font-family: inherit;
         font-weight: 500;
         line-height: 1.2;
@@ -1457,7 +1462,7 @@ h3.charitable-header {
         padding: 0.8rem 1rem;
         background-color: #fff;
         color: #4d4d4d;
-        font-size: 1rem;
+        font-size: inherit;
         font-family: inherit;
         font-weight: 500;
         line-height: 1.2;
@@ -1480,6 +1485,32 @@ h3.charitable-header {
     }
   }
 }
+
+// mobile styles for under 700px wide //
+@media screen and (max-width: 700px) {
+  .charitable-donation-form.charitable-template-minimal {
+    #charitable-donor-fields #charitable-user-fields {
+      .charitable-form-group.charitable-form-group-number-1 {
+        flex-direction: column;
+      }
+    }
+    .donation-amounts.has-suggested-amounts.donation-amounts-count-1,
+    .donation-amounts.has-suggested-amounts.donation-amounts-count-2,
+    .donation-amounts.has-suggested-amounts.donation-amounts-count-3,
+    .donation-amounts.has-suggested-amounts.donation-amounts-count-5,
+    .donation-amounts.has-suggested-amounts.donation-amounts-count-7,
+    .donation-amounts.has-suggested-amounts.donation-amounts-count-8,
+    .donation-amounts.has-suggested-amounts.donation-amounts-count-9,
+    .donation-amounts.has-suggested-amounts.donation-amounts-count-10 {
+      grid-template-columns: 1fr;
+    }
+    .donation-amounts.has-suggested-amounts.donation-amounts-count-4,
+    .donation-amounts.has-suggested-amounts.donation-amounts-count-6{
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+}
+
 
 #charitable-gateway-fields-stripe {
   &.charitable-cc-fields-multiple {

@@ -27,7 +27,7 @@ $donation = $view_args['donation'];
  */
 do_action( 'charitable_donation_receipt_before', $donation );
 
-echo $content;
+echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 /**
  * Display the donation receipt content.

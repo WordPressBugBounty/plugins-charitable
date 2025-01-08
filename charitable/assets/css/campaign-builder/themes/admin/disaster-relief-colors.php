@@ -10,6 +10,7 @@ $button    = isset( $_GET['b'] ) ? '#' . preg_replace("/[^A-Za-z0-9 ]/", '', $_G
 $slug    = 'disaster-relief';
 $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #charitable-design-wrap .charitable-campaign-preview';
 
+require_once ('../../../../../includes/admin/campaign-builder/templates/functions-campaign-templates.php');
 ?>
 
 .charitable-preview.charitable-builder-template-<?php echo $slug; ?> { /* everything wraps in this */
@@ -125,6 +126,7 @@ $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #chari
 <?php echo $wrapper; ?> .charitable-field.charitable-field-donate-button .charitable-field-preview-donate-button span.placeholder.button {
   background-color: <?php echo $button; ?> !important;
   border-color: <?php echo $button; ?> !important;
+  color: <?php echo charitable_get_constracting_text_color($button); ?>;
   text-transform: uppercase;
   border-radius: 35px;
   margin-top: 0;
@@ -222,6 +224,12 @@ $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #chari
 <?php echo $wrapper; ?> .charitable-field-preview-social-linking .charitable-placeholder {
     padding: 10px;
 }
+<?php echo $wrapper; ?> .charitable-field-preview-social-linking .charitable-field-preview-social-linking-headline-container.charitable-placeholder {
+    padding-left: 0;
+    padding-top: 2px;
+    padding-bottom: 0;
+    padding-right: 0;
+}
 
 /* field: social sharing */
 
@@ -250,6 +258,12 @@ $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #chari
 }
 <?php echo $wrapper; ?> .charitable-field-preview-social-sharing .charitable-placeholder {
     padding: 10px;
+}
+<?php echo $wrapper; ?> .charitable-field-preview-social-sharing .charitable-field-preview-social-sharing-headline-container.charitable-placeholder {
+    padding-left: 0;
+    padding-top: 2px;
+    padding-bottom: 0;
+    padding-right: 0;
 }
 
 /* field: campaign summary */

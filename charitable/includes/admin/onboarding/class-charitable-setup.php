@@ -1608,7 +1608,8 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 		/**
 		 * Process meta.
 		 *
-		 * @since 1.8.4
+		 * @since   1.8.4
+		 * @version 1.8.4.2 - Upon successful tracking opt-in, send initial usage information.
 		 *
 		 * @param array $meta The meta to process.
 		 * @return bool
@@ -1668,6 +1669,10 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 						error_log( 'tracking is enabled' ); // phpcs:ignore
 					}
 					charitable_update_usage_tracking_setting( true );
+					// Send initial usage information just once (after that scheduled), now that we have permission.
+					if ( class_exists( 'Charitable_Tracking' ) ) {
+						Charitable_Tracking::get_instance()->send_checkins( false, true );
+					}
 				}
 			}
 			if ( key_exists( 'email_signup', $meta ) ) {

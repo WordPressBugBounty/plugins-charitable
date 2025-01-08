@@ -296,7 +296,7 @@ body.post-type-campaign .charitable-campaign-filter-actions a {
   color: #2B66D1;
   font-weight: 500;
   display: inline-block;
-  padding-top: 12px;
+  padding-top: 8px;
 }
 body.post-type-campaign .charitable-campaign-legacy-actions a label,
 body.post-type-campaign .charitable-campaign-export-actions a label,
@@ -340,6 +340,7 @@ body.post-type-campaign .charitable-campaign-filter-actions a img {
 }
 body.post-type-campaign .charitable-legacy-actions {
   margin-left: 10px;
+  margin-top: 3px;
 }
 body.post-type-campaign input#post-search-input {
   border-color: #E4E4E7;
@@ -658,7 +659,7 @@ body.post-type-donation p.search-box {
   position: absolute;
   right: 20px;
   top: auto;
-  margin-top: 35px;
+  margin-top: 39px;
 }
 body.post-type-donation select,
 body.post-type-donation input#search-submit,

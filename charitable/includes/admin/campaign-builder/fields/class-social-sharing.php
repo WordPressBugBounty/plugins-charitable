@@ -462,10 +462,10 @@ if ( ! class_exists( 'Charitable_Field_Social_Sharing' ) ) :
 				'charitable_builder_social_sharing_networks',
 				array(
 					'twitter'   => array(
-						'label'        => esc_html__( 'Twitter', 'charitable' ),
+						'label'        => esc_html__( 'Twitter / X', 'charitable' ),
 						'css_class'    => '',
 						'field_id'     => 'twitter_url',
-						'public_label' => esc_html__( 'Twitter', 'charitable' ),
+						'public_label' => esc_html__( 'Twitter / X', 'charitable' ),
 						'icon_url'     => charitable()->get_path( 'directory', false ) . 'assets/images/campaign-builder/fields/social-sharing/twitter' . $suffix . '.svg',
 						'share_url'    => 'http://twitter.com/share?text={$text}&url={$url}&hashtags={$tags}',
 					),

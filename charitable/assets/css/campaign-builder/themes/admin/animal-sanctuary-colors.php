@@ -10,6 +10,7 @@ $button    = isset( $_GET['b'] ) ? '#' . preg_replace("/[^A-Za-z0-9 ]/", '', $_G
 $slug = 'animal-sanctuary';
 $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #charitable-design-wrap .charitable-campaign-preview';
 
+require_once ('../../../../../includes/admin/campaign-builder/templates/functions-campaign-templates.php');
 ?>
 
 .charitable-preview.charitable-builder-template-<?php echo $slug; ?> { /* everything wraps in this */
@@ -118,6 +119,7 @@ font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 <?php echo $wrapper; ?> .charitable-field.charitable-field-donate-button .charitable-field-preview-donate-button span.placeholder.button {
 background-color: <?php echo $button; ?> !important;
 border-color: <?php echo $button; ?> !important;
+color: <?php echo charitable_get_constracting_text_color($button); ?>;
 text-transform: uppercase;
 border-radius: 10px;
 margin-top: 0;

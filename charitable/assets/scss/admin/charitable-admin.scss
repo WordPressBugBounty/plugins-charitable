@@ -260,7 +260,7 @@ body.post-type-campaign {
             color: #2B66D1;
             font-weight: 500;
             display: inline-block;
-            padding-top: 12px;
+            padding-top: 8px;
 
             label {
                 display: block;
@@ -318,6 +318,7 @@ body.post-type-campaign {
 
     .charitable-legacy-actions {
         margin-left: 10px;
+        margin-top: 3px;
     }
 
     input#post-search-input {
@@ -752,7 +753,7 @@ body.post-type-donation {
         position: absolute;
         right: 20px;
         top: auto;
-        margin-top: 35px;
+        margin-top: 39px;
     }
 
     select,

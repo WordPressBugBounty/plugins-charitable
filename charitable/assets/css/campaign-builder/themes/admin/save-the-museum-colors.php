@@ -10,6 +10,7 @@ $button    = isset( $_GET['b'] ) ? '#' . preg_replace("/[^A-Za-z0-9 ]/", '', $_G
 $slug = 'save-the-museum';
 $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #charitable-design-wrap .charitable-campaign-preview';
 
+require_once ('../../../../../includes/admin/campaign-builder/templates/functions-campaign-templates.php');
 ?>
 
 .charitable-preview.charitable-builder-template-<?php echo $slug; ?> { /* everything wraps in this */
@@ -154,6 +155,7 @@ $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #chari
 <?php echo $wrapper; ?> .charitable-field.charitable-field-donate-button .charitable-field-preview-donate-button span.placeholder.button {
   background-color: <?php echo $button; ?> !important;
   border-color: black !important;
+  color: <?php echo charitable_get_constracting_text_color($button); ?>;
   text-transform: uppercase;
   border-radius: 0px;
   margin-top: 0;
@@ -164,7 +166,6 @@ $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #chari
   height: 50px;
   font-size: 16px;
   line-height: 50px;
-  color: black;
 }
 
 /* field: photo */
@@ -222,7 +223,9 @@ $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #chari
 /* field: social linking */
 
 <?php echo $wrapper; ?> .charitable-field-preview-social-linking {
-    display: table;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 
 <?php echo $wrapper; ?> .charitable-field-preview-social-linking .charitable-field-preview-social-linking-headline-container {
@@ -231,21 +234,27 @@ $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #chari
     padding: 0;
 }
 <?php echo $wrapper; ?> .charitable-field-preview-social-linking .charitable-field-row {
-    display: block;
-    float: left;
-    width: auto;
-    margin: 0 0 0 0;
+    display: flex;
+    gap: 10px;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 <?php echo $wrapper; ?> .charitable-field-preview-social-linking h5.charitable-field-preview-headline {
     font-size: 14px !important;
     line-height: 16px !important;
     color: <?php echo $secondary; ?>;
     font-weight: 300;
-    margin: 0 15px 0 0;
+    margin: 0 5px 0 0;
     padding: 5px 5px 5px 0;
 }
 <?php echo $wrapper; ?> .charitable-field-preview-social-linking .charitable-placeholder {
-    padding: 10px;
+    padding: 0;
+}
+<?php echo $wrapper; ?> .charitable-field-preview-social-linking .charitable-social-field-column {
+    min-height: 30px;
+    padding: 0;
+    margin: 0;
+    min-width: 30px;
 }
 
 /* field: social sharing */
@@ -266,11 +275,11 @@ $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #chari
     margin: 0 0 0 0;
 }
 <?php echo $wrapper; ?> .charitable-field-preview-social-sharing h5.charitable-field-preview-headline {
-    font-size: 14px;
-    line-height: 16px;
+    font-size: 14px !important;
+    line-height: 16px !important;
     color: <?php echo $secondary; ?>;
     font-weight: 300;
-    margin: 0 15px 0 0;
+    margin: 0 10px 0 0;
     padding: 5px 5px 5px 0;
 }
 <?php echo $wrapper; ?> .charitable-field-preview-social-sharing .charitable-placeholder {

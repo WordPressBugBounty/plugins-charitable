@@ -12,6 +12,8 @@ $slug            = 'animal-sanctuary';
 $wrapper         = '.charitable-campaign-wrap.template-' . $slug;
 $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' . $slug;
 
+require_once ('../../../../../includes/admin/campaign-builder/templates/functions-campaign-templates.php');
+
 ?>
 
 :root {
@@ -100,7 +102,7 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 	padding: 0;
 	text-align: center !important;
 	text-decoration: none !important;
-	color: white;
+	color: <?php echo charitable_get_constracting_text_color($button); ?>;
 	transition: filter 0.3s; /* Smooth transition */
 }
 <?php echo $wrapper; ?> .charitable-campaign-field-donate-button button.button:hover,

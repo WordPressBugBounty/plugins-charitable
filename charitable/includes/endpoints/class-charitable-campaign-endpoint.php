@@ -210,7 +210,7 @@ if ( ! class_exists( 'Charitable_Campaign_Endpoint' ) ) :
 			}
 
 			$min           = charitable_get_min_suffix();
-			$version       = charitable()->get_version();
+			$version       = charitable_is_break_cache() ? charitable()->get_version() . '.' . time() : charitable()->get_version();
 			$assets_dir    = charitable()->get_path( 'assets', false );
 			$campaign_data = ( false !== $campaign_id ) ? get_post_meta( intval( $campaign_id ), 'campaign_settings_v2', true ) : false;
 

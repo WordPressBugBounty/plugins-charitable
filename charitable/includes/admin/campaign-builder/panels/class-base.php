@@ -166,8 +166,8 @@ if ( ! class_exists( 'Charitable_Builder_Panel' ) ) :
 		public function get_campaign_settings() {
 
 			// was a campaign ID passed (then we are editting an existin campaign form).
-			if ( ! empty( $_GET['campaign_id'] ) ) {
-				$campaign_id = (int) $_GET['campaign_id'];
+			if ( ! empty( $_GET['campaign_id'] ) ) { // phpcs:ignore
+				$campaign_id = (int) $_GET['campaign_id']; // phpcs:ignore
 
 				$this->campaign_data = get_post_meta( $campaign_id, 'campaign_settings_v2', true );
 
@@ -201,7 +201,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel' ) ) :
 
 			$this->campaign_data['id'] = $this->campaign_data['campaign_id'] = 0;
 
-			$campaign_name = isset( $_POST['campaign_name'] ) && '' !== trim( $_POST['campaign_name'] ) ? esc_html( $_POST['campaign_name'] ) : 'New Campaign';
+			$campaign_name = isset( $_POST['campaign_name'] ) && '' !== trim( $_POST['campaign_name'] ) ? esc_html( $_POST['campaign_name'] ) : esc_html__( 'New Campaign', 'charitable' ); // phpcs:ignore
 
 			$this->campaign_data['tabs']['campaign']['title'] = 'Story';
 			$this->campaign_data['tabs']['campaign']['desc']  = 'Write Your Campaign\'s Story Here';

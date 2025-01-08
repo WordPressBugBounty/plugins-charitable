@@ -83,10 +83,10 @@ $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #chari
 <?php echo $wrapper; ?> .column[data-column-id="0"] {
 	flex: 1;
 	border: 0;
-	padding-left: 0;
-	padding-top: 0;
-	padding-right: 0;
-	padding-bottom: 0;
+	padding-left: 15px;
+	padding-top: 15px;
+	padding-right: 15px;
+	padding-bottom: 15px;
 	background-color: transparent;
 }
 <?php echo $wrapper; ?> .column[data-column-id="0"] .charitable-field-photo {

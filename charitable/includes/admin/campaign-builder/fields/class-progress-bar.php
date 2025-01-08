@@ -72,6 +72,7 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 		 *
 		 * @since 1.8.0
 		 * @version 1.8.1.12
+		 * @version 1.8.4.2 updated infinity display / goal.
 		 *
 		 * @param array   $field_data     Any field data.
 		 * @param array   $campaign_data  Amount data and settings.
@@ -86,8 +87,12 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 			$headline         = ! empty( $field_data['headline'] ) ? '<h5 class="charitable-field-preview-headline">' . esc_html( $field_data['headline'] ) . '</h5>' : '';
 
 			$goal = isset( $campaign_data['id'] ) ? get_post_meta( $campaign_data['id'], '_campaign_goal', true ) : false;
-			$goal = ! $goal ? '∞' : Charitable_Currency::get_instance()->get_sanitized_and_localized_amount( $goal );
-			$goal = charitable_get_currency_helper()->get_monetary_amount( $goal ); // Add appropriate currency to the goal.
+			if ( ! $goal || 0 === intval( $goal ) ) {
+				$goal = '∞';
+			} else {
+				$goal = Charitable_Currency::get_instance()->get_sanitized_and_localized_amount( $goal );
+				$goal = charitable_get_currency_helper()->get_monetary_amount( $goal ); // Add appropriate currency to the goal.
+			}
 			$goal = ! empty( $field_data['label_goal'] ) ? '<span>' . esc_html( $field_data['label_goal'] ) . '</span> ' . $goal : '<span>' . esc_html__( 'Goal: ', 'charitable' ) . '</span> ' . $goal;
 			$goal = apply_filters( 'charitable_campaign_builder_progress_bar_goal', $goal, $field_data, $campaign_data );
 

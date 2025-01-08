@@ -19,6 +19,8 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 // .charitable-field        ----------> .charitable-campaign-field
 // .charitable-preview-*    ----------> .charitable-campaign-*
 
+require_once ('../../../../../includes/admin/campaign-builder/templates/functions-campaign-templates.php');
+
 ?>
 
 /* this narrows things down a little to the preview area header/tabs */
@@ -55,9 +57,25 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 
 /* field: button */
 
-<?php echo $wrapper; ?> .charitable-campaign-field-donate-button button.button {
-	background-color: <?php echo $button; ?> !important;
-	border-color: <?php echo $button; ?> !important;
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-button button.charitable-button,
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-button a.charitable-button {
+	  background-color: <?php echo $button; ?> !important;
+	  border-color: <?php echo $button; ?> !important;
+    color: <?php echo charitable_get_constracting_text_color($button); ?>;
+    text-transform: none;
+    border-radius: 0px;
+    margin-top: 0;
+    margin-bottom: 0;
+    width: 100%;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 25px;
+    display: flex; /* Changed from block to flex */
+	  align-items: center; /* Vertically centers the text */
+	  justify-content: center; /* Optionally centers the text horizontally too */
+    text-align: center !important;
+	  text-decoration: none !important;
+	  transition: filter 0.3s; /* Smooth transition */
 }
 
 /* field: photo */

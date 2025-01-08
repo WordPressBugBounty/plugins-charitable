@@ -12,6 +12,8 @@ $slug            = 'environmental';
 $wrapper         = '.charitable-campaign-wrap.template-' . $slug;
 $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' . $slug;
 
+require_once ('../../../../../includes/admin/campaign-builder/templates/functions-campaign-templates.php');
+
 ?>
 
 :root {
@@ -34,7 +36,7 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 /* column specifics */
 
 <?php echo $wrapper; ?> .charitable-campaign-column:nth-child(even) {
-	padding: 50px 25px 0 25px;
+	padding: 20px 25px 0 25px;
 	background-color: <?php echo $primary; ?>;
 	max-width: calc(100% - 50px);
 }
@@ -44,6 +46,9 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 	padding-right: 0;
 	padding-bottom: 0;
 	background-color: transparent;
+}
+<?php echo $wrapper; ?> .charitable-campaign-column:first-of-type {
+	padding: 15px !important;
 }
 <?php echo $wrapper; ?> .charitable-campaign-column:nth-child(odd) .charitable-campaign-field.charitable-campaign-field-photo {
 	margin-top: 0;
@@ -162,7 +167,7 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 	font-size: 16px;
 	line-height: 16px;
 	border-radius: 0;
-	color: white;
+	color: <?php echo charitable_get_constracting_text_color($button); ?>;
 	display: flex; /* Changed from block to flex */
 	align-items: center; /* Vertically centers the text */
 	justify-content: center; /* Optionally centers the text horizontally too */
@@ -170,6 +175,8 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 	text-decoration: none !important;
 	transition: filter 0.3s; /* Smooth transition */
 }
+
+
 
 /* tabs: tab container */
 
@@ -313,3 +320,26 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 }
 
 
+
+<?php echo $wrapper; ?>  .charitable-campaign-container {
+  container-type: inline-size;
+  container-name: campaign-<?php echo $slug; ?>-area;
+}
+@container campaign-<?php echo $slug; ?>-area (max-width: 700px) {
+	<?php echo $wrapper; ?> .charitable-campaign-column:first-of-type {
+		padding: 0 !important;
+		max-width: 100%;
+	}
+	<?php echo $wrapper; ?>  .charitable-campaign-container .charitable-tabs {
+		margin-top: 0px;
+	}
+	.charitable-campaign-wrap .charitable-campaign-column,
+  	.charitable-campaign-wrap .charitable-campaign-column:nth-child(even),
+  	.charitable-campaign-wrap .charitable-campaign-column:nth-child(odd) {
+    	flex: 0 0 100% !important;
+    	padding-top: 0;
+    	padding-bottom: 0;
+    	padding-left: 0;
+    	padding-right: 0;
+  	}
+}

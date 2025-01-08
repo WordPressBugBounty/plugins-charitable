@@ -491,7 +491,7 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 					$this
 				);
 
-			}//end if
+			} //end if
 
 			return apply_filters( 'charitable_campaign_time_left', $time_left, $this );
 		}

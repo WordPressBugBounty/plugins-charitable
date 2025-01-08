@@ -10,6 +10,7 @@ $button    = isset( $_GET['b'] ) ? '#' . preg_replace("/[^A-Za-z0-9 ]/", '', $_G
 $slug = 'youth-sports';
 $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #charitable-design-wrap .charitable-campaign-preview';
 
+require_once ('../../../../../includes/admin/campaign-builder/templates/functions-campaign-templates.php');
 ?>
 
 /* row specifics */
@@ -42,6 +43,7 @@ $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #chari
 <?php echo $wrapper; ?> .charitable-field.charitable-field-donate-button .charitable-field-preview-donate-button span.placeholder.button {
     background-color: <?php echo $button; ?>;
     border-color: <?php echo $button; ?>;
+    color: <?php echo charitable_get_constracting_text_color($button); ?>;
 }
 
 /* field: donate amount */

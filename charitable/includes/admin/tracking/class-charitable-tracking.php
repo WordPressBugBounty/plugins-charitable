@@ -36,13 +36,16 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 		/**
 		 * Starts the process of sending in the optin usage checking.
 		 *
-		 * @since 1.8.4
+		 * @since 1.8.4.2
+		 *
+		 * @param boolean $override            Override usage_optin_allowed.
+		 * @param boolean $ignore_last_checkin Ignore last checkin flag.
 		 *
 		 * @return void
 		 */
-		public function send_checkins() {
-			$this->send_optin_usage_checkin();
-			$this->send_tracking_checkin();
+		public function send_checkins( $override = false, $ignore_last_checkin = false ) {
+			$this->send_optin_usage_checkin( $override, $ignore_last_checkin );
+			$this->send_tracking_checkin( $override, $ignore_last_checkin );
 		}
 
 		/**
@@ -55,16 +58,24 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 		public function test_checkin() {
 			if ( is_admin() && current_user_can( 'manage_options' ) && defined( 'CHARITABLE_DEBUG_USAGE' ) && CHARITABLE_DEBUG_USAGE ) { // phpcs:ignore
 				// detect the query string in the admin url.
-				$send_checkin = isset( $_GET['charitable_send_checkin'] ) ? sanitize_text_field( wp_unslash( $_GET['charitable_send_checkin'] ) ) : false;
-				error_log( 'charitable test checkin triggered' );
+				$send_checkin = isset( $_GET['charitable_send_checkin'] ) ? sanitize_text_field( wp_unslash( $_GET['charitable_send_checkin'] ) ) : false; // phpcs:ignore
+				if ( charitable_is_debug() ) {
+					error_log( 'charitable test checkin triggered' ); // phpcs:ignore
+				}
 				if ( 'usage' === $send_checkin ) {
-					error_log( 'charitable test checkin was run for usage' );
+					if ( charitable_is_debug() ) {
+						error_log( 'charitable test checkin was run for usage' ); // phpcs:ignore
+					}
 					$this->send_optin_usage_checkin( true, true );
 				} elseif ( 'tracking' === $send_checkin ) {
-					error_log( 'charitable test checkin was run for tracking' );
+					if ( charitable_is_debug() ) {
+						error_log( 'charitable test checkin was run for tracking' ); // phpcs:ignore
+					}
 					$this->send_tracking_checkin( true, true );
 				} elseif ( 'both' === $send_checkin ) {
-					error_log( 'charitable test checkin was run for both' );
+					if ( charitable_is_debug() ) {
+						error_log( 'charitable test checkin was run for both' ); // phpcs:ignore
+					}
 					$this->send_optin_usage_checkin( true, true );
 					$this->send_tracking_checkin( true, true );
 				}
@@ -363,7 +374,7 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 			$where_sql  = array_filter( $where_sql );
 			$where_args = implode( ' AND ', $where_sql );
 
-			$left_join = array();
+			$left_join      = array();
 			$left_join[]    = $wpdb->prefix . 'postmeta pm1 ON p.ID = pm1.post_id';
 			$left_join[]    = $wpdb->prefix . 'postmeta pm2 ON p.ID = pm2.post_id';
 			$left_join[]    = $wpdb->prefix . 'postmeta pm3 ON p.ID = pm3.post_id';
@@ -594,7 +605,7 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 		}
 
 		/**
-		 * Check if tracking is allowed.
+		 * Check if optin usage tracking is allowed.
 		 *
 		 * @since 1.8.4
 		 *

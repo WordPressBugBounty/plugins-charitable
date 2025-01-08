@@ -17,6 +17,8 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 // .charitable-field        ----------> .charitable-campaign-field
 // .charitable-preview-*    ----------> .charitable-campaign-*
 
+require_once ('../../../../../includes/admin/campaign-builder/templates/functions-campaign-templates.php');
+
 ?>
 
 .charitable-preview.charitable-builder-template-<?php echo $slug; ?> { /* everything wraps in this */
@@ -256,6 +258,7 @@ font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 <?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-donate-button a.charitable-button {
     background-color: <?php echo $button; ?>;
     border-color: <?php echo $button; ?>;
+    color: <?php echo charitable_get_constracting_text_color($button); ?>;
     text-transform: none;
     border-radius: 0px;
     margin-top: 0;
@@ -264,6 +267,12 @@ font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     font-weight: 400;
     font-size: 16px;
     line-height: 25px;
+    display: flex; /* Changed from block to flex */
+	  align-items: center; /* Vertically centers the text */
+	  justify-content: center; /* Optionally centers the text horizontally too */
+    text-align: center !important;
+	  text-decoration: none !important;
+	  transition: filter 0.3s; /* Smooth transition */
 }
 
 /* field: photo */

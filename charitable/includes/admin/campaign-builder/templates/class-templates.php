@@ -310,7 +310,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						echo '<a href="#" class="charitable-field-delete" title="Delete Field"><i class="fa fa-trash-o"></i></a>';
 					endif;
 
-					echo $class->field_preview( $field_settings, $campaign_data, $field_id, $theme );
+					echo $class->field_preview( $field_settings, $campaign_data, $field_id, $theme ); // phpcs:ignore
 					echo '</div>';
 
 				else :
@@ -467,7 +467,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 
 			?>
 
-			<div class="tab-content <?php echo $no_tab_class; ?>">
+			<div class="tab-content <?php echo esc_attr( $no_tab_class ); ?>">
 					<ul>
 					<?php if ( $tabs ) : ?>
 							<?php
@@ -484,13 +484,13 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 
 								?>
 
-								<li id="tab_<?php echo intval( $tab_id ); ?>_content" class="tab_content_item <?php echo $class; ?>" data-tab-type="<?php echo esc_attr( $type ); ?>" data-tab-id="<?php echo esc_attr( $tab_id ); ?>">
+								<li id="tab_<?php echo intval( $tab_id ); ?>_content" class="tab_content_item <?php echo esc_attr( $class ); ?>" data-tab-type="<?php echo esc_attr( $type ); ?>" data-tab-id="<?php echo esc_attr( $tab_id ); ?>">
 
 									<div class="charitable-tab-wrap ui-sortable">
 
-								<?php echo $this->tab_empty_notice(); ?>
+								<?php echo $this->tab_empty_notice(); // phpcs:ignore ?>
 
-								<?php echo charitable_builder_tab_content_preview_by_type( $type ); ?>
+								<?php echo charitable_builder_tab_content_preview_by_type( $type ); // phpcs:ignore ?>
 
 								<?php
 
@@ -1040,6 +1040,8 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 
 						echo $this->get_template_element_start( $row['type'], $element_counter, $additional_css ); // phpcs:ignore
 
+						$tabs_rendered = false;
+
 						foreach ( $row['columns'] as $column ) {
 
 							echo '<!-- column START -->';
@@ -1054,6 +1056,9 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 
 								switch ( $section['type'] ) {
 									case 'fields':
+										if ( $tabs_rendered ) {
+											++$last_field_id;
+										}
 										$last_field_id = (int) $this->render_fields( $section['fields'], $theme, $campaign_data, $last_field_id );
 										break;
 									case 'header':
@@ -1065,6 +1070,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 										echo $this->get_template_tab_nav( $section['tabs'], $theme, $campaign_tabs );
 										$last_field_id = (int) $this->get_template_tab_content( $section['tabs'], $theme, $campaign_data, $row_fields, $last_field_id );
 										echo $this->get_template_element_end( 'tabs' );
+										$tabs_rendered = true;
 										break;
 									default:
 										do_action( 'charitable_campaign_builder_preview_section_' . $section['type'], $section, $row, $theme, $campaign_data );
@@ -1583,7 +1589,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 
 							foreach ( $this->prepared_templates as $campaign_template_slug => $campaign_template_data ) :
 
-								$this->output_template_item( $campaign_template_slug, $campaign_template_data, array( 'blank' ), array() );
+								$this->output_template_item( $campaign_template_slug, $campaign_template_data, array( 'blank' ), array(), $current_template_id );
 
 							endforeach;
 
@@ -1597,7 +1603,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 
 							foreach ( $this->prepared_templates as $campaign_template_slug => $campaign_template_data ) :
 
-								$this->output_template_item( $campaign_template_slug, $campaign_template_data, false, array( 'blank' ) );
+								$this->output_template_item( $campaign_template_slug, $campaign_template_data, false, array( 'blank' ), $current_template_id );
 
 							endforeach;
 
@@ -1639,8 +1645,9 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 		 * @param array  $campaign_template_data  The template data.
 		 * @param array  $filter_include          The categories to include.
 		 * @param array  $filter_exclude          The categories to exclude.
+		 * @param bool   $current_template_id     The current template ID.
 		 */
-		private function output_template_item( $campaign_template_slug = '', $campaign_template_data = array(), $filter_include = array(), $filter_exclude = array() ) {
+		private function output_template_item( $campaign_template_slug = '', $campaign_template_data = array(), $filter_include = array(), $filter_exclude = array(), $current_template_id = false ) {
 
 			$create_update_term  = isset( $_GET['campaign_id'] ) && 0 !== intval( $_GET['campaign_id'] ) ? esc_html__( 'Restart Campaign', 'charitable' ) : esc_html__( 'Create Campaign', 'charitable' ); // phpcs:ignore
 
@@ -1699,8 +1706,6 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 			$template_description = esc_html( wp_strip_all_tags( $campaign_template_data['meta']['description'] ) );
 			$template_types       = is_array( $campaign_template_data['meta']['template_type'] ) && ! empty( $campaign_template_data['meta']['template_type'] ) ? implode( ' ', $campaign_template_data['meta']['template_type'] ) : false;
 			$template_types       = ( false === $template_types && false !== $campaign_template_data['meta']['template_type'] ) ? esc_attr( $campaign_template_data['meta']['template_type'] ) : $template_types;
-			$current_template_id  = isset( $template_data['template_id'] ) ? $template_data['template_id'] : false;
-
 			?>
 
 			<div class="charitable-template-list-container-item charitable-template-<?php echo esc_attr( $campaign_template_slug ); ?> <?php echo esc_attr( $template_types ); ?>">
@@ -2406,7 +2411,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 											'fields' => array(
 												array(
 													'type' => 'text',
-													'headline' => 'Help the youth learning with an adventure',
+													'headline' => 'Help the youth learn with an adventure',
 													'content' => 'Join us in giving our students the opportunity to explore, learn, and grow on this incredible journey!',
 													'align' => 'center',
 												),
@@ -2555,7 +2560,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 												),
 												array(
 													'type' => 'campaign-description',
-													'headline' => 'Donate today to support our mission to rescue, rehabilitate and rehome',
+													'headline' => 'Donate today to support our mission to rescue, rehabilitate, and rehome',
 													'content' => '<p>I\'m thrilled to launch our new campaign aimed at supporting an incredible cause: an animal sanctuary dedicated to rescuing abandoned and lost animals and finding them loving homes. With your help, we aim to raise funds to maintain this sanctuary, providing a safe haven for these adorable pets and ensuring they receive the care they deserve. Your contributions will not only help us sustain the facility but also enable us to actively seek new, caring families for these animals, giving them a chance at a brighter and happier future. Together, we can make a real difference in the lives of these innocent creatures.</p>',
 												),
 												array(
@@ -2843,14 +2848,14 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 													'type' => 'text',
 													'headline' => 'Save Earth',
 													'content' => 'Together, let\'s reclaim the serenity of our shorelines and ensure a cleaner, greener future for generations to come.',
-													'width_percentage' => 75,
+													'width_percentage' => 100,
 													'align' => 'left',
 												),
 												array(
 													'type' => 'campaign-description',
 													'headline' => 'Help Preserving The Earth For Future Generations',
 													'content' => '<p>We are announcing a campaign dedicated to restoring the natural beauty of our local beach, which has sadly fallen victim to years of neglect and pollution. Our non-profit is on a mission to raise funds for cleaning supplies, vehicles, and essential costs to orchestrate a massive cleanup effort. By contributing, you\'re not just supporting a cleaner beach but also promoting environmental health and community pride. </p>',
-													'width_percentage' => 75,
+													'width_percentage' => 100,
 													'align' => 'left',
 												),
 												array(
@@ -2861,7 +2866,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 												array(
 													'type' => 'donate-button',
 													'button_label' => 'Donate Now',
-													'width_percentage' => 75,
+													'width_percentage' => 100,
 													'align' => 'left',
 												),
 												array(
@@ -3110,7 +3115,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 													'type' => 'campaign-description',
 													'headline' => 'About This Club',
 													'content' => '<p>We are announcing a campaign to support our cherished local country club, a haven for our community, especially our elderly residents. Our non-profit is passionately rallying for funds to ensure the maintenance of this vital space and to sustain the heartwarming annual events that bring together generations. By contributing, you\'re preserving a beloved institution that unites the young and the old, fostering a sense of belonging and community spirit. Join us in safeguarding this haven for all ages!</p>',
-													'width_percentage' => 75,
+													'width_percentage' => 100,
 													'align' => 'left',
 												),
 												array(
@@ -3123,19 +3128,19 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 													'label_donate' => ' ',
 													'label_goal' => 'Goal USD: ',
 													'meta_position' => 'top',
-													'width_percentage' => 75,
+													'width_percentage' => 100,
 													'align' => 'left',
 												),
 												array(
 													'type' => 'campaign-summary',
-													'width_percentage' => 75,
+													'width_percentage' => 100,
 													'align' => 'left',
 												),
 												array(
 													'type' => 'donate-button',
 													'button_label' => 'Donate Now',
 													'width_percentage' => 40,
-													'align' => 'left',
+													'align' => 'center',
 												),
 											),
 										),
@@ -3424,7 +3429,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 														),
 														array(
 															'type' => 'photo',
-															'default' => 'photo-1.jpg',
+															'default' => 'photo-2.jpg',
 														),
 														array(
 															'type' => 'text',
@@ -3433,7 +3438,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 														),
 														array(
 															'type' => 'photo',
-															'default' => 'photo-2.jpg',
+															'default' => 'photo-1.jpg',
 														),
 													),
 												),
@@ -3453,7 +3458,13 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 													'title' => 'Comments',
 													'type' => '',
 													'slug' => 'comments',
-													'fields' => array(),
+													'fields' => array(
+														array(
+															'type' => 'text',
+															'headline' => ' ',
+															'content' => 'This is on third tab.',
+														),
+													),
 												),
 											),
 										),

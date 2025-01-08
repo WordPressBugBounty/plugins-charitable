@@ -605,6 +605,10 @@
   border-color: rgba(0, 0, 0, 0.15);
   border-width: 1px;
   border-style: solid;
+  /* images */
+}
+#charitable-design-wrap .primary-image-container img.charitable-campaign-builder-preview-photo {
+  max-width: 100%;
 }
 #charitable-design-wrap .primary-image-container .primary-image {
   background-size: cover;

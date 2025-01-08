@@ -291,7 +291,7 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 						'value'    => $this->get_user_value( 'user_url' ),
 					),
 					'twitter'  => array(
-						'label'    => __( 'Twitter', 'charitable' ),
+						'label'    => __( 'Twitter / X', 'charitable' ),
 						'type'     => 'text',
 						'priority' => 44,
 						'required' => false,

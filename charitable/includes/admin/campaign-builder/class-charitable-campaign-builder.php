@@ -284,6 +284,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 
 			$min           = '';
 			$style_version = charitable_get_style_version();
+			$version       = charitable_is_break_cache() ? charitable()->get_version() . '.' . time() : charitable()->get_version();
 
 			/*
 			* Builder CSS.
@@ -556,7 +557,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 					'charitable-builder-choicesjs',
 					'wp-util',
 				),
-				charitable()->get_version()
+				$version
 			);
 
 			wp_enqueue_script(

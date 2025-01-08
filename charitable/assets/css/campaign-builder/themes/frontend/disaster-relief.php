@@ -12,6 +12,7 @@ $slug            = 'disaster-relief';
 $wrapper         = '.charitable-campaign-wrap.template-' . $slug;
 $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' . $slug;
 
+require_once ('../../../../../includes/admin/campaign-builder/templates/functions-campaign-templates.php');
 ?>
 
 :root {
@@ -91,6 +92,7 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 	border-radius: 35px;
 	background-color: <?php echo $button; ?> !important;
 	border-color: <?php echo $button; ?> !important;
+	color: <?php echo charitable_get_constracting_text_color($button); ?>;
 	display: flex; /* Changed from block to flex */
 	align-items: center; /* Vertically centers the text */
 	justify-content: center; /* Optionally centers the text horizontally too */
@@ -284,6 +286,14 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 <?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-social-links .charitable-field-template-social-linking img,
 <?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-social-sharing .charitable-field-template-social-sharing img {
 	height: 30px !important;
+}
+
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-social-links .charitable-field-template-social-linking-headline-container.charitable-placeholder,
+<?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-social-sharing .charitable-field-template-social-sharing-headline-container.charitable-placeholder {
+    padding-left: 0;
+    padding-top: 2px;
+    padding-bottom: 0;
+    padding-right: 0;
 }
 
 /* tabs: tab container */

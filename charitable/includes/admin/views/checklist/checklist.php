@@ -76,8 +76,13 @@ ob_start();
 					<p>
 					<?php
 
-						/* translators: Suggestion on completion of checklist on checklist page. */
-						printf( esc_html__( '<strong>%1$s</strong> What\'s Next?', 'charitable' ), esc_html__( 'You\'ve completed the checklist!', 'charitable' ) );
+						echo wp_kses_post(
+							sprintf(
+								/* translators: Suggestion on completion of checklist on checklist page. */
+								__( '<strong>%1$s</strong> What\'s Next?', 'charitable' ),
+								esc_html__( 'You\'ve completed the checklist!', 'charitable' )
+							)
+						);
 
 					?>
 					</p>
@@ -93,7 +98,7 @@ ob_start();
 							esc_url( admin_url( 'admin.php?page=charitable-dashboard' ) ),
 							esc_html__( 'dashboard', 'charitable' ),
 							esc_url( admin_url( 'admin.php?page=charitable-reports' ) ),
-							esc_html__( 'view reports', 'charitable' ),
+							esc_html__( 'view reports', 'charitable' )
 						);
 						?>
 						</li>
@@ -177,7 +182,7 @@ ob_start();
 					<?php if ( $stripe_connect_url ) : ?>
 					<div class="charitable-sub-container charitable-connect-stripe">
 						<div>
-							<div class="charitable-gateway-icon"><img src="<?php echo charitable()->get_path( 'assets', false ); ?>images/onboarding/stripe-checklist.svg" alt="" /></div><div class="charitable-gateway-info-column">
+							<div class="charitable-gateway-icon"><img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/onboarding/stripe-checklist.svg" alt="" /></div><div class="charitable-gateway-info-column">
 								<h3><?php esc_html_e( 'Stripe', 'charitable' ); ?> <span class="charitable-badge charitable-badge-sm charitable-badge-inline charitable-badge-green charitable-badge-rounded"><i class="fa fa-star" aria-hidden="true"></i><?php esc_html_e( 'Recommended', 'charitable' ); ?></span></h3>
 								<?php if ( ! $stripe_connected ) : ?>
 								<p><?php esc_html_e( 'You can create and connect to your Stripe account in just a few minutes.', 'charitable' ); ?></p>
@@ -482,7 +487,7 @@ endif;
 				>
 					<div class="charitable-sub-container">
 						<div>
-							<div class="charitable-next-level-icon"><img src="<?php echo charitable()->get_path( 'assets', false ); ?>images/onboarding/checklist-fundraiser-1.svg" alt="" /></div>
+							<div class="charitable-next-level-icon"><img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/onboarding/checklist-fundraiser-1.svg" alt="" /></div>
 								<div class="charitable-gateway-info-column"><h3><?php esc_html_e( 'Ambassadors', 'charitable' ); ?></h3>
 								<p><?php esc_html_e( 'Transform your website into a peer-to-peer fundraising platform.', 'charitable' ); ?></p>
 							</div>
@@ -493,7 +498,7 @@ endif;
 					</div>
 					<div class="charitable-sub-container">
 						<div>
-							<div class="charitable-next-level-icon"><img src="<?php echo charitable()->get_path( 'assets', false ); ?>images/onboarding/checklist-fundraiser-2.svg" alt="" /></div>
+							<div class="charitable-next-level-icon"><img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/onboarding/checklist-fundraiser-2.svg" alt="" /></div>
 								<div class="charitable-gateway-info-column"><h3><?php esc_html_e( 'Recurring Donations', 'charitable' ); ?></h3>
 								<p><?php esc_html_e( 'Grow your organization\'s revenue with recurring donations.', 'charitable' ); ?></p>
 							</div>
@@ -504,7 +509,7 @@ endif;
 					</div>
 					<div class="charitable-sub-container">
 						<div>
-							<div class="charitable-next-level-icon"><img src="<?php echo charitable()->get_path( 'assets', false ); ?>images/onboarding/checklist-fundraiser-3.svg" alt="" /></div>
+							<div class="charitable-next-level-icon"><img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/onboarding/checklist-fundraiser-3.svg" alt="" /></div>
 								<div class="charitable-gateway-info-column"><h3><?php esc_html_e( 'Fee Relief', 'charitable' ); ?></h3>
 								<p><?php esc_html_e( 'Give your donors the option to cover the processing fees on their donations.', 'charitable' ); ?></p>
 							</div>

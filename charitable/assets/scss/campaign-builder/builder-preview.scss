@@ -692,6 +692,11 @@
         border-width: 1px;
         border-style: solid;
 
+        /* images */
+        img.charitable-campaign-builder-preview-photo {
+            max-width: 100%;
+        }
+
         .primary-image {
             background-size: cover;
             min-height: 200px;

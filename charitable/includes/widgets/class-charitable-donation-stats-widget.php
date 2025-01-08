@@ -33,7 +33,7 @@ if ( ! class_exists( 'Charitable_Donation_Stats_Widget' ) ) :
 				'charitable_donation_stats_widget',
 				__( 'Donation Stats', 'charitable' ),
 				array(
-					'description' => __( 'Show off your donation statistics.', 'charitable' ),
+					'description'                 => __( 'Show off your donation statistics.', 'charitable' ),
 					'customize_selective_refresh' => true,
 				)
 			);
@@ -44,10 +44,10 @@ if ( ! class_exists( 'Charitable_Donation_Stats_Widget' ) ) :
 		 *
 		 * @since   1.0.0
 		 *
-		 * @param 	array $args     Display arguments including 'before_title', 'after_title',
+		 * @param   array $args     Display arguments including 'before_title', 'after_title',
 		 *                          'before_widget', and 'after_widget'.
-		 * @param 	array $instance The settings for the particular instance of the widget.
-		 * @return 	void
+		 * @param   array $instance The settings for the particular instance of the widget.
+		 * @return  void
 		 */
 		public function widget( $args, $instance ) {
 			$view_args = array_merge( $args, $instance );
@@ -71,17 +71,17 @@ if ( ! class_exists( 'Charitable_Donation_Stats_Widget' ) ) :
 			$title = isset( $instance['title'] ) ? esc_attr( $instance['title'] ) : '';
 			?>
 			<p>
-				<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:', 'charitable' ); ?></label>
-				<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ) ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
+				<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Title:', 'charitable' ); ?></label>
+				<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
 			</p>
 			<?php
 			/**
 			 * Add extra settings for the widget.
 			 *
-			 * @since 	1.5.0
+			 * @since   1.5.0
 			 *
-			 * @param 	array                            $args Widget instance arguments.
-			 * @param 	Charitable_Donation_Stats_Widget $this This widget instance.
+			 * @param   array                            $args Widget instance arguments.
+			 * @param   Charitable_Donation_Stats_Widget $this This widget instance.
 			 */
 			do_action( 'charitable_donation_stats_widget_settings_bottom', $instance, $this );
 		}
@@ -97,7 +97,7 @@ if ( ! class_exists( 'Charitable_Donation_Stats_Widget' ) ) :
 		 */
 		public function update( $new_instance, $old_instance ) {
 			$instance = array(
-				'title' => strip_tags( $new_instance['title'] ),
+				'title' => wp_strip_all_tags( $new_instance['title'] ),
 			);
 
 			/**
@@ -107,9 +107,9 @@ if ( ! class_exists( 'Charitable_Donation_Stats_Widget' ) ) :
 			 *
 			 * @param   array $instance     The parsed instance settings.
 			 * @param   array $new_instance The updated settings.
-		 	 * @param   array $old_instance The old settings.
-		 	 * @return  array
-		 	 */
+			 * @param   array $old_instance The old settings.
+			 * @return  array
+			 */
 			return apply_filters( 'charitable_donation_stats_widget_update_instance', $instance, $new_instance, $old_instance );
 		}
 	}

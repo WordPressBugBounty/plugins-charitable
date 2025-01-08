@@ -7,7 +7,8 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; }
 
 /**
  * Charitable_Extension_Activation
@@ -21,20 +22,20 @@ class Charitable_Extension_Activation {
 	/**
 	 * Setup the activation class
 	 *
-	 * @param 	string $plugin_path Path to this plugin's directory.
-	 * @param 	string $plugin_file Core plugin file.
-	 * @return 	void
-	 * @access 	public
-	 * @since 	1.0.0
+	 * @param   string $plugin_path Path to this plugin's directory.
+	 * @param   string $plugin_file Core plugin file.
+	 * @return  void
+	 * @access  public
+	 * @since   1.0.0
 	 */
 	public function __construct( $plugin_path, $plugin_file ) {
 		// We need plugin.php!
-		require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+		require_once( ABSPATH . 'wp-admin/includes/plugin.php' ); // @codingStandardsIgnoreLine
 
 		$plugins = get_plugins();
 
 		// Set plugin directory.
-		$plugin_path = array_filter( explode( '/', $plugin_path ) );
+		$plugin_path       = array_filter( explode( '/', $plugin_path ) );
 		$this->plugin_path = end( $plugin_path );
 
 		// Set plugin file.
@@ -50,7 +51,7 @@ class Charitable_Extension_Activation {
 		// Is EDD installed?
 		foreach ( $plugins as $plugin_path => $plugin ) {
 			if ( $plugin['Name'] == 'Charitable' ) {
-				$this->has_charitable = true;
+				$this->has_charitable  = true;
 				$this->charitable_base = $plugin_path;
 				break;
 			}
@@ -87,6 +88,6 @@ class Charitable_Extension_Activation {
 		}
 
 		// translators: %s is a link to the Charitable plugin.
-		echo '<div class="error"><p>' . esc_html( $this->plugin_name ) . sprintf( __( ' requires Charitable! Please %s to continue!', 'charitable' ), $link ) . '</p></div>';
+		echo '<div class="error"><p>' . esc_html( $this->plugin_name ) . wp_kses_post( sprintf( __( ' requires Charitable! Please %s to continue!', 'charitable' ), $link ) ) . '</p></div>';
 	}
 }

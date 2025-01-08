@@ -102,6 +102,7 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 }
 
 
+
 /* headlines in general */
 
 <?php echo charitable_esc_attr_php( $wrapper ); ?> h5.charitable-field-template-headline,

@@ -303,6 +303,17 @@ function charitable_is_admin_debug() {
 }
 
 /**
+ * Returns if charitable is in break-cache mode, which is a mode that attempts to break cache for certain styles and scripts.
+ *
+ * @since  1.8.4.2
+ *
+ * @return boolean
+ */
+function charitable_is_break_cache() {
+	return ( charitable_is_debug() || ( defined( 'CHARITABLE_BREAK_CACHE_STYLES' ) && CHARITABLE_BREAK_CACHE_STYLES ) ) ? true : false;
+}
+
+/**
  * Returns if charitable is in debug mode, mostly by checking the constant.
  *
  * @since  1.8.0
@@ -767,8 +778,7 @@ function charitable_get_min_suffix() {
  * @return string
  */
 function charitable_get_style_version() {
-
-	return ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) || ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) ? time() : charitable()->get_version();
+	return ( charitable_is_break_cache() || ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) || ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) ) ? time() : charitable()->get_version();
 }
 
 /**

@@ -12,6 +12,8 @@ $slug            = 'school-trip';
 $wrapper         = '.charitable-campaign-wrap.template-' . $slug;
 $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' . $slug;
 
+require_once ('../../../../../includes/admin/campaign-builder/templates/functions-campaign-templates.php');
+
 ?>
 
 :root {
@@ -93,6 +95,7 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 <?php echo $wrapper; ?> a.charitable-button {
 	background-color: <?php echo $button; ?> !important;
 	border-color: <?php echo $button; ?> !important;
+  color: <?php echo charitable_get_constracting_text_color($button); ?>;
   text-transform: uppercase;
   border-radius: 0px;
   margin-top: 0;

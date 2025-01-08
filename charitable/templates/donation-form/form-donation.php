@@ -9,6 +9,7 @@
  * @since   1.0.0
  * @version 1.6.57
  * @version 1.8.3.5 Added $form_class to allow for charitable-minimal beta.
+ * @version 1.8.4.2 Added charitable_donation_after_form_submit_button action.
  */
 
 // Exit if accessed directly.
@@ -68,6 +69,7 @@ if ( ! $form ) {
 		?>
 	<div class="charitable-form-field charitable-submit-field">
 		<button class="<?php echo esc_attr( charitable_get_button_class( 'donate' ) ); ?>" type="submit" name="donate"><?php esc_html_e( 'Donate', 'charitable' ); ?></button>
+		<?php do_action( 'charitable_donation_after_form_submit_button', $form, $view_args ); ?>
 		<div class="charitable-form-processing" style="display: none;">
 			<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/charitable-loading.gif" width="60" height="60" alt="<?php esc_attr_e( 'Loading&hellip;', 'charitable' ); ?>" />
 		</div>

@@ -1075,7 +1075,37 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 					$('#charitable-builder-underlay').remove();
 					// $('.charitable-templates-preview-container').addClass('charitable-hidden');
 					$('.charitable-builder-modal.charitable-builder-modal-template-preview').removeClass('active');
-					elements.$templatePreview.find('.charitable-template-list-container-item.charitable-template-' + theTemplateID + ' .button.update-campaign').click();
+					//  if the button.update-campaign exists, click that.
+					if ( $('#charitable-template-list .charitable-template[data-template-code="' + theTemplateID + '"] .button.update-campaign').length > 0 ) {
+						elements.$templatePreview.find('.charitable-template-list-container-item.charitable-template-' + theTemplateID + ' .button.update-campaign').click();
+					} else {
+						// if the button.create-campaign exists, click that.
+						elements.$templatePreview.find('.charitable-template-list-container-item.charitable-template-' + theTemplateID + ' .button.create-campaign').click();
+					}
+
+				}
+
+			} );
+
+			$builder.on( 'click', '.button-preview-update-campaign', function( e ) {
+				e.preventDefault();
+				// find the create button in the list and click that instead of trying to duplicate everything.
+				var $theButton = $( this ),
+					theTemplateID = $theButton.data('template-id');
+
+				if ( theTemplateID !== '' ) {
+					$('.charitable-template-list-container').removeClass('disabled');
+					$('#charitable-builder-underlay').remove();
+					// $('.charitable-templates-preview-container').addClass('charitable-hidden');
+					$('.charitable-builder-modal.charitable-builder-modal-template-preview').removeClass('active');
+					//  if the button.update-campaign exists, click that.
+					if ( $('#charitable-template-list .charitable-template[data-template-code="' + theTemplateID + '"] .button.update-campaign').length > 0 ) {
+						elements.$templatePreview.find('.charitable-template-list-container-item.charitable-template-' + theTemplateID + ' .button.update-campaign').click();
+					} else {
+						// if the button.create-campaign exists, click that.
+						elements.$templatePreview.find('.charitable-template-list-container-item.charitable-template-' + theTemplateID + ' .button.create-campaign').click();
+					}
+
 				}
 
 			} );
@@ -2173,9 +2203,9 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 					field_name = $(this).attr('name'); // eslint-disable-line
 
 				// do not proceed with updating other suggest amount boxes if the field_name contains the string 'recurring' (only do this for the default non-recurring).
-				// if ( field_name.indexOf('recurring') < 1 ) {
+				if ( field_name.indexOf('recurring') < 1 ) {
 					app.updateSuggestedDonationAmountDefault( $( this ).val() );
-				// }
+				}
 
 			} );
 

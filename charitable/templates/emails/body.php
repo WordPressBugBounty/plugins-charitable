@@ -18,4 +18,4 @@ if ( ! isset( $view_args['email'] ) ) {
 	return;
 }
 
-echo $view_args['email']->get_body();
+echo $view_args['email']->get_body(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

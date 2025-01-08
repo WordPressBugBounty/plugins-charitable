@@ -132,7 +132,7 @@ if ( ! class_exists( 'Charitable_Registry' ) ) :
 		protected function get_class_instance( $class ) {
 			if ( ! class_exists( $class ) ) {
 				/* translators: %s: class name */
-				wp_die( sprintf( _x( 'Class %s does not exist.', 'error message when non-existent class is called', 'charitable' ), $class ) );
+				wp_die( esc_html( sprintf( _x( 'Class %s does not exist.', 'error message when non-existent class is called', 'charitable' ), $class ) ) );
 			}
 
 			return new $class;
