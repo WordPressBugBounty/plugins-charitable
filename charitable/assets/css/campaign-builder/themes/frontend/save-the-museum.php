@@ -113,6 +113,10 @@ require_once ('../../../../../includes/admin/campaign-builder/templates/function
   font-size: 16px;
   line-height: 15px;
 }
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-button button.button:hover,
+<?php echo $wrapper; ?> .charitable-campaign-field-donate-button a.donate-button:hover {
+  background-color: <?php echo $button; ?> !important;
+}
 
 /* field: progress bar */
 
@@ -160,6 +164,10 @@ require_once ('../../../../../includes/admin/campaign-builder/templates/function
   flex-wrap: wrap;
   flex-direction: row;
   justify-content: start;
+}
+
+<?php echo $wrapper; ?>  .charitable-campaign-field.charitable-campaign-field-social-links .charitable-field-template-social-linking .charitable-field-row.charitable-field-row-social-linking {
+  width: auto !important;
 }
 
 <?php echo $wrapper; ?> .charitable-field-template-social-linking .charitable-field-template-social-linking-headline-container  {
@@ -434,3 +442,39 @@ require_once ('../../../../../includes/admin/campaign-builder/templates/function
 /* field: organizer */
 
 
+<?php echo $wrapper; ?>  .charitable-campaign-container {
+  container-type: inline-size;
+  container-name: campaign-<?php echo $slug; ?>-area;
+}
+@container campaign-<?php echo $slug; ?>-area (max-width: 700px) {
+  <?php echo $wrapper; ?>  #charitable-template-row-0 {
+    display: flex
+;    flex-direction: column;
+    flex-flow: column-reverse;
+  }
+	<?php echo $wrapper; ?> .charitable-campaign-column:nth-child(even) {
+    padding: 0 0 0 0;
+  }
+  <?php echo $wrapper; ?> .charitable-campaign-container .section[data-section-type="tabs"] article {
+    padding-bottom: 0;
+  }
+	<?php echo $wrapper; ?>  .charitable-campaign-container .section[data-section-type="tabs"] article nav {
+		margin-top: 0px;
+		margin-bottom: 0px;
+	}
+  <?php echo $wrapper; ?>  .section[data-section-type="tabs"] article .tab-content > ul li {
+
+  }
+	<?php echo $wrapper; ?>  .charitable-campaign-container .charitable-tabs {
+		margin-top: 0px;
+	}
+	.charitable-campaign-wrap .charitable-campaign-column,
+  	.charitable-campaign-wrap .charitable-campaign-column:nth-child(even),
+  	.charitable-campaign-wrap .charitable-campaign-column:nth-child(odd) {
+    	flex: 0 0 100% !important;
+    	padding-top: 0;
+    	padding-bottom: 0;
+    	padding-left: 0;
+    	padding-right: 0;
+  	}
+}

@@ -497,4 +497,42 @@ $preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' .
 
 /* field: organizer */
 
+<?php echo $wrapper; ?>  .charitable-campaign-container {
+  container-type: inline-size;
+  container-name: campaign-<?php echo $slug; ?>-area;
+}
+@container campaign-<?php echo $slug; ?>-area (max-width: 700px) {
+	<?php echo $wrapper; ?> .charitable-campaign-column:nth-child(odd) {
+		padding: 0 !important;
+	}
+	<?php echo $wrapper; ?> .charitable-campaign-column:nth-child(even) {
+		padding-top: 0 !important;
+	}
+	<?php echo $wrapper; ?>  .charitable-campaign-field.charitable-campaign-align-center.charitable-campaign-field-photo .charitable-campaign-primary-image {
+		width: 100%;
+		display: block;
+	}
+	<?php echo $wrapper; ?>  .charitable-campaign-field.charitable-campaign-align-center.charitable-campaign-field-photo .charitable-campaign-primary-image img {
+		width: 100%;
+		height: auto;
+	}
+	<?php echo $wrapper; ?>  .charitable-campaign-container .section[data-section-type="tabs"] article nav {
+		margin-top: 20px;
+		margin-bottom: 0px;
+	}
+	<?php echo $wrapper; ?>  .charitable-tabs {
+		margin-bottom: 0;
+	}
+	.charitable-campaign-wrap .charitable-campaign-column,
+  	.charitable-campaign-wrap .charitable-campaign-column:nth-child(even),
+  	.charitable-campaign-wrap .charitable-campaign-column:nth-child(odd) {
+    	flex: 0 0 100% !important;
+    	padding-top: 0;
+    	padding-bottom: 0;
+    	padding-left: 0;
+    	padding-right: 0;
+  	}
+}
+
 // @codingStandardsIgnoreEnd
+

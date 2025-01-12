@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.7.1
 Requires PHP: 7.2
-Stable tag: 1.8.4.2
+Stable tag: 1.8.4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -245,7 +245,7 @@ You can. Charitable has full localization support through the `charitable` textd
 
 = How do I get support? =
 
-You can post in the [support forum](https://wordpress.org/support/plugin/charitable) or reach us via [our support form](http://wpcharitable.com/support/?utm_source=wprepos&utm_medium=link&utm_campaign=liteplugin&utm_content=our+support+form).
+You can post in the [support forum](https://wordpress.org/support/plugin/charitable) or reach us via [our support form](https://wpcharitable.com/support/?utm_source=wprepos&utm_medium=link&utm_campaign=liteplugin&utm_content=our+support+form).
 
 == Screenshots ==
 
@@ -258,11 +258,19 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 
 == Changelog ==
 
+= Donation Form & Fundraising Campaigns v1.8.4.3 =
+* NEW: (Visual Campaign Builder) New options for Social Links and Social Sharing fields including YouTube (links only), Threads, and Bluesky.
+* FIX: (Visual Campaign Builder) Visual tweaks to campaigns on "narrow content" themes.
+* FIX: Adding additional check to resolve several JavaScript errors in some scenarios in the campaign builder.
+* FIX: Resolved issue involving default fields appearing in visual builder for campaign summary.
+* FIX: Resolved an issue regarding rendering HTML in emails in some scenarios.
+* FIX: Updated code related to opt-in data collection, translations, CSS, UI, and PHP standards.
+
 = Donation Form & Fundraising Campaigns v1.8.4.2 =
-* NEW: Visual Campaign Builder: Changing button color in "advanced" will automatically adjust donation button text for contrast.
-* FIX: Visual Campaign Builder: Updated documentation links.
-* FIX: Visual Campaign Builder: Adjustments and tweaks to campaigns in visual builder (admin and frontend).
-* FIX: Resolved issue involving santitization of non-english dates in some scenarios resulting in incorrect "days until" calculations.
+* NEW: (Visual Campaign Builder) Changing button color in "advanced" will automatically adjust donation button text for contrast.
+* FIX: (Visual Campaign Builder) Updated documentation links.
+* FIX: (Visual Campaign Builder) Adjustments and tweaks to campaigns in visual builder (admin and frontend).
+* FIX: Resolved issue involving sanitization of non-english dates in some scenarios resulting in incorrect "days until" calculations.
 * FIX: Updated code related to opt-in data collection, translations, CSS, UI, and PHP standards.
 
 = Donation Form & Fundraising Campaigns v1.8.4.1 =

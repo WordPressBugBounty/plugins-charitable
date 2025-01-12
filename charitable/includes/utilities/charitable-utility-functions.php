@@ -30,7 +30,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 function charitable_element_key_sort( $key, $a, $b ) {
 	foreach ( array( $a, $b ) as $item ) {
 		if ( ! array_key_exists( $key, $item ) ) {
-			error_log( sprintf( '%s missing from element: ' . wp_json_encode( $item ), $key ) );
+			if ( charitable_is_debug() ) {
+				error_log( sprintf( '%s missing from element: ' . wp_json_encode( $item ), $key ) ); // phpcs:ignore
+			}
 		}
 	}
 
@@ -531,7 +533,7 @@ function charitable_search_database_for_transients_by_prefix( $prefix = '', $pos
 /**
  * Expects a passed in multidimensional array of transient keys.
  *
- * array(
+ * Array(
  *     array( 'option_name' => '_transient_blah_blah' ),
  *     array( 'option_name' => 'transient_another_one' ),
  * )

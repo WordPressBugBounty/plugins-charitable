@@ -255,7 +255,7 @@ require_once ('../../../../../includes/admin/campaign-builder/templates/function
 	font-weight: 700;
 }
 <?php echo $wrapper; ?> .charitable-field-template-social-linking .charitable-placeholder {
-	padding: 10px;
+	padding: 0 10px 0 0;
 }
 <?php echo $wrapper; ?> .charitable-field-template-social-linking .charitable-field-row .charitable-field-column {
 	float: left;

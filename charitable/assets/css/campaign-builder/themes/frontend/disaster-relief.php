@@ -178,9 +178,13 @@ require_once ('../../../../../includes/admin/campaign-builder/templates/function
 	margin-bottom: 20px;
 }
 <?php echo $wrapper; ?> .charitable-field-template-social-linking {
-	display: table;
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: row;
 }
-
+<?php echo $wrapper; ?> .charitable-field-row-social-linking {
+	width: auto !important;
+}
 <?php echo $wrapper; ?> .charitable-field-template-social-linking .charitable-field-template-social-linking-headline-container  {
 	float: left;
 	display: table-cell;
@@ -286,6 +290,7 @@ require_once ('../../../../../includes/admin/campaign-builder/templates/function
 <?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-social-links .charitable-field-template-social-linking img,
 <?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-social-sharing .charitable-field-template-social-sharing img {
 	height: 30px !important;
+	width: auto !important;
 }
 
 <?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-social-links .charitable-field-template-social-linking-headline-container.charitable-placeholder,
@@ -402,3 +407,33 @@ require_once ('../../../../../includes/admin/campaign-builder/templates/function
 
 /* field: organizer */
 
+<?php echo $wrapper; ?> {
+  container-type: inline-size;
+  container-name: campaign-<?php echo $slug; ?>-area;
+}
+@container campaign-<?php echo $slug; ?>-area (max-width: 700px) {
+
+}
+@container campaign-<?php echo $slug; ?>-area (max-width: 400px) {
+
+
+
+}
+@container campaign-<?php echo $slug; ?>-area (max-width: 1000px) {
+
+	  <?php echo $wrapper; ?> .charitable-field-template-social-linking .charitable-field-row.charitable-field-row-social-linking {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 5px;
+	  }
+	  <?php echo $wrapper; ?> .charitable-campaign-field.charitable-campaign-field-social-sharing .charitable-field-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 5px;
+	  }
+	  <?php echo $wrapper; ?>  .section[data-section-type="tabs"] article {
+		padding: 13px !important;
+	  }
+
+
+}

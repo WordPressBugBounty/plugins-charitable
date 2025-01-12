@@ -37,9 +37,9 @@ $enabled_tabs = isset( $campaign_data['layout']['advanced']['enable_tabs'] ) && 
 	$campaign = $view_args['campaign']; // Charitable_Campaign Instance of `Charitable_Campaign`.
 
 
-if ( ! empty( $_GET['charitable_campaign_preview'] ) ) {
+if ( ! empty( $_GET['charitable_campaign_preview'] ) ) { //phpcs:ignore
 	// get the transient that is storing the temp settings information, as this is what we will use to display the preview.
-	$campaign_data = get_transient( 'charitable_campaign_preview_' . intval( $_GET['charitable_campaign_preview'] ) );
+	$campaign_data = get_transient( 'charitable_campaign_preview_' . intval( $_GET['charitable_campaign_preview'] ) ); //phpcs:ignore
 
 } else {
 	$campaign_data = empty( $view_args['campaign_data'] ) && ! empty( $view_args['id'] ) ? get_post_meta( intval( $view_args['id'] ), 'campaign_settings_v2', true ) : $view_args['campaign_data'];
@@ -74,7 +74,7 @@ $post_status = get_post_status( $campaign_data['id'] );
 $post_author = get_post_field( 'post_author', $campaign_data['id'] );
 
 // Only display the message if the viewer if the view isn't viewing a preview from the campaign builder (maybe they are viewing this via shortcode on the frontend, etc.).
-if ( empty( $_GET['charitable_campaign_preview'] ) && ( false === $post_status || 'draft' === $post_status ) ) :
+if ( empty( $_GET['charitable_campaign_preview'] ) && ( false === $post_status || 'draft' === $post_status ) ) : //phpcs:ignore
 
 	// if the user is the author of the post OR if they have permissions to view drafts, show the notice.
 	if ( $post_author === get_current_user_id() || current_user_can( 'edit_posts' ) ) {
@@ -193,40 +193,40 @@ if ( 'publish' === $post_status || ( ( false === $post_status || 'draft' === $po
 									if ( false !== $enable_tabs ) {
 
 
-									// If there is campaign data, make a list of fields already in use which might determine if we show any tabs or not.
-									$fields_in_tabs = array();
+										// If there is campaign data, make a list of fields already in use which might determine if we show any tabs or not.
+										$fields_in_tabs = array();
 
-									if ( ! empty( $section['tabs'] ) ) {
-										foreach ( $section['tabs'] as $section_tab ) {
-											if ( ! empty( $section_tab['fields'] ) ) {
-												$fields_in_tabs = array_merge( $fields_in_tabs, $section_tab['fields'] );
+										if ( ! empty( $section['tabs'] ) ) {
+											foreach ( $section['tabs'] as $section_tab ) {
+												if ( ! empty( $section_tab['fields'] ) ) {
+													$fields_in_tabs = array_merge( $fields_in_tabs, $section_tab['fields'] );
+												}
 											}
 										}
-									}
 
-									// If there are no fields in any tabs, don't show the tabs.
-									if ( empty( $fields_in_tabs ) ) {
-										continue;
-									}
-
-									$tab_tabs  = (array) isset( $section['tabs'] ) && ! empty( $section['tabs'] ) ? $section['tabs'] : array();
-									$tab_order = isset( $campaign_data['tab_order'] ) && ! empty( $campaign_data['tab_order'] ) ? $campaign_data['tab_order'] : array();
-									$tab_style = isset( $campaign_data['layout']['advanced']['tab_style'] ) && '' !== trim( $campaign_data['layout']['advanced']['tab_style'] ) ? $campaign_data['layout']['advanced']['tab_style'] : 'medium';
-									$tab_size  = isset( $campaign_data['layout']['advanced']['tab_size'] ) && '' !== trim( $campaign_data['layout']['advanced']['tab_size'] ) ? $campaign_data['layout']['advanced']['tab_size'] : 'medium';
-									$css_class = isset( $campaign_data['layout']['advanced']['enable_tabs'] ) && 'disabled' === trim( $campaign_data['layout']['advanced']['enable_tabs'] ) ? 'disabled' : false;
-
-									// sort a multidimensional array matching the same order of keys as another multidimensional array.
-									if ( ! empty( $tab_order ) ) {
-										$_temp_tab_tabs = array();
-										foreach ( $tab_order as $order_id => $tab_id ) {
-											if ( isset( $tab_tabs[ $tab_id ] ) ) {
-												$_temp_tab_tabs[ $tab_id ] = $tab_tabs[ $tab_id ];
-											}
+										// If there are no fields in any tabs, don't show the tabs.
+										if ( empty( $fields_in_tabs ) ) {
+											continue;
 										}
-										$tab_tabs = $_temp_tab_tabs;
-									}
 
-									?>
+										$tab_tabs  = (array) isset( $section['tabs'] ) && ! empty( $section['tabs'] ) ? $section['tabs'] : array();
+										$tab_order = isset( $campaign_data['tab_order'] ) && ! empty( $campaign_data['tab_order'] ) ? $campaign_data['tab_order'] : array();
+										$tab_style = isset( $campaign_data['layout']['advanced']['tab_style'] ) && '' !== trim( $campaign_data['layout']['advanced']['tab_style'] ) ? $campaign_data['layout']['advanced']['tab_style'] : 'medium';
+										$tab_size  = isset( $campaign_data['layout']['advanced']['tab_size'] ) && '' !== trim( $campaign_data['layout']['advanced']['tab_size'] ) ? $campaign_data['layout']['advanced']['tab_size'] : 'medium';
+										$css_class = isset( $campaign_data['layout']['advanced']['enable_tabs'] ) && 'disabled' === trim( $campaign_data['layout']['advanced']['enable_tabs'] ) ? 'disabled' : false;
+
+										// sort a multidimensional array matching the same order of keys as another multidimensional array.
+										if ( ! empty( $tab_order ) ) {
+											$_temp_tab_tabs = array();
+											foreach ( $tab_order as $order_id => $tab_id ) {
+												if ( isset( $tab_tabs[ $tab_id ] ) ) {
+													$_temp_tab_tabs[ $tab_id ] = $tab_tabs[ $tab_id ];
+												}
+											}
+											$tab_tabs = $_temp_tab_tabs;
+										}
+
+										?>
 									<article>
 										<nav class="charitable-campaign-nav charitable-tab-style-<?php echo esc_attr( $tab_style ); ?> charitable-tab-size-<?php echo esc_attr( $tab_size ); ?>">
 											<ul>
@@ -331,7 +331,7 @@ if ( 'publish' === $post_status || ( ( false === $post_status || 'draft' === $po
 
 									<?php } // end if tabs ?>
 
-								<?php
+									<?php
 
 
 								} elseif ( 'fields' === $section_type ) {
@@ -340,8 +340,8 @@ if ( 'publish' === $post_status || ( ( false === $post_status || 'draft' === $po
 
 									foreach ( $section['fields'] as $key => $field_id ) :
 
-											$field_data  = $campaign_data['fields'][ $field_id ];
-											$field_type  = isset( $field_types_data[ $field_id ] ) ? sanitize_key( $field_types_data[ $field_id ] ) : false;
+											$field_data  = ! empty( $campaign_data['fields'][ $field_id ] ) ? $campaign_data['fields'][ $field_id ] : false;
+											$field_type  = false !== $field_data && isset( $field_types_data[ $field_id ] ) ? sanitize_key( $field_types_data[ $field_id ] ) : false;
 											$field_class = 'Charitable_Field_' . str_replace( ' ', '_', ( ucwords( str_replace( '-', ' ', $field_type ) ) ) );
 
 										if ( class_exists( $field_class ) ) :

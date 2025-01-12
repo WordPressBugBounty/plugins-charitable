@@ -803,6 +803,7 @@ var CharitableTour =
        * Register JS events.
        *
        * @since 1.8.1.15
+       * @version 1.8.4.3 resolved TypeError, added checks.
        */
       events: function () {
         $("a.create-campaign").on("blur", function () {
@@ -812,7 +813,12 @@ var CharitableTour =
         $(document).on("charitableEditorScreenStart", function () {
           // wait 2 seconds for the fields to load
           setTimeout(function () {
-            Shepherd.activeTour.next();
+            if (Shepherd.activeTour && typeof Shepherd.activeTour.next === 'function') {
+              // Call the next() function if it exists and is a function
+              Shepherd.activeTour.next();
+            } else {
+              // Shepherd.activeTour or Shepherd.activeTour.next is not available.
+            }
           }, 500);
         });
 

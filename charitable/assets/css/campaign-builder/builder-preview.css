@@ -331,6 +331,22 @@
 #charitable-design-wrap .charitable-field-preview-social-linking .charitable-social-field-column.charitable-social-linking-preview-mastodon .charitable-placeholder {
   background-image: url("../../images/campaign-builder/fields/social-sharing/mastodon.svg");
 }
+#charitable-design-wrap .charitable-field-preview-social-sharing .charitable-social-field-column.charitable-social-sharing-preview-youtube .charitable-placeholder, #charitable-design-wrap .charitable-field-preview-social-sharing .charitable-social-field-column.charitable-social-linking-preview-youtube .charitable-placeholder,
+#charitable-design-wrap .charitable-field-preview-social-linking .charitable-social-field-column.charitable-social-sharing-preview-youtube .charitable-placeholder,
+#charitable-design-wrap .charitable-field-preview-social-linking .charitable-social-field-column.charitable-social-linking-preview-youtube .charitable-placeholder {
+  background-image: url("../../images/campaign-builder/fields/social-sharing/youtube.svg");
+}
+#charitable-design-wrap .charitable-field-preview-social-sharing .charitable-social-field-column.charitable-social-sharing-preview-threads .charitable-placeholder, #charitable-design-wrap .charitable-field-preview-social-sharing .charitable-social-field-column.charitable-social-linking-preview-threads .charitable-placeholder,
+#charitable-design-wrap .charitable-field-preview-social-linking .charitable-social-field-column.charitable-social-sharing-preview-threads .charitable-placeholder,
+#charitable-design-wrap .charitable-field-preview-social-linking .charitable-social-field-column.charitable-social-linking-preview-threads .charitable-placeholder {
+  background-image: url("../../images/campaign-builder/fields/social-sharing/threads.svg");
+}
+
+#charitable-design-wrap .charitable-field-preview-social-sharing .charitable-social-field-column.charitable-social-sharing-preview-bluesky .charitable-placeholder, #charitable-design-wrap .charitable-field-preview-social-sharing .charitable-social-field-column.charitable-social-linking-preview-bluesky .charitable-placeholder,
+#charitable-design-wrap .charitable-field-preview-social-linking .charitable-social-field-column.charitable-social-sharing-preview-bluesky .charitable-placeholder,
+#charitable-design-wrap .charitable-field-preview-social-linking .charitable-social-field-column.charitable-social-linking-preview-bluesky .charitable-placeholder {
+  background-image: url("../../images/campaign-builder/fields/social-sharing/bluesky.svg");
+}
 #charitable-design-wrap .charitable-field-preview-social-sharing div.charitable-field-row div,
 #charitable-design-wrap .charitable-field-preview-social-linking div.charitable-field-row div {
   text-align: center;

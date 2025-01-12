@@ -2640,7 +2640,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						'meta'     => array(
 							'label'         => 'Save The Museum',
 							'slug'          => 'save-the-museum',
-							'description'   => 'Save a histroical building, residence, or important landmark.',
+							'description'   => 'Save a historical building, residence, or important landmark.',
 							'template_type' => array( 'single', 'prebuilt' ),
 							'search_tags'   => array(
 								'legal',
@@ -2989,7 +2989,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 												array(
 													'type' => 'text',
 													'headline' => 'Donate Today',
-													'content' => 'This project will only be funded if at least $270,000 is raised by December 22, 2024.',
+													'content' => 'This project will only be funded if at least $270,000 is raised by December 22, 2025.',
 												),
 												array(
 													'type' => 'campaign-summary',
@@ -3490,7 +3490,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 												array(
 													'type' => 'text',
 													'headline' => ' ',
-													'content' => 'This project will only be funded if at least $270,000 is raised by December 22, 2020.',
+													'content' => 'This project will only be funded if at least $270,000 is raised by December 22, 2025.',
 												),
 												array(
 													'type' => 'donate-button',

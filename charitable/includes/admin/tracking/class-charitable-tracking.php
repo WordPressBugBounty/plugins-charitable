@@ -7,6 +7,7 @@
  * @subpackage  Admin
  * @copyright   Copyright (c) 2024, David Bisset
  * @since       1.8.4
+ * @version     1.8.4.2
  */
 
 // Exit if accessed directly.

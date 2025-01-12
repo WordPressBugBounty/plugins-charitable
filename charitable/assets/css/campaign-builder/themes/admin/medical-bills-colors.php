@@ -270,6 +270,16 @@ require_once ('../../../../../includes/admin/campaign-builder/templates/function
 <?php echo $wrapper; ?> .charitable-field.charitable-field-social-sharing .charitable-social-sharing-preview-mastodon .charitable-placeholder {
 
 }
+<?php echo $wrapper; ?> .charitable-field-preview-social-linking .charitable-placeholder {
+    padding: 10px;
+}
+<?php echo $wrapper; ?> .charitable-field-preview-social-linking .charitable-field-preview-social-linking-headline-container.charitable-placeholder {
+    padding-left: 0;
+    padding-top: 6px;
+    padding-bottom: 0;
+    padding-right: 0;
+}
+
 
 /* field: social sharing */
 
@@ -289,7 +299,15 @@ require_once ('../../../../../includes/admin/campaign-builder/templates/function
 <?php echo $wrapper; ?> .charitable-field-preview-social-sharing .charitable-placeholder {
 
 }
-
+<?php echo $wrapper; ?> .charitable-field-preview-social-sharing .charitable-placeholder {
+    padding: 10px;
+}
+<?php echo $wrapper; ?> .charitable-field-preview-social-sharing h5.charitable-field-preview-headline {
+    padding-left: 0px;
+    padding-top: 6px;
+    padding-bottom: 0;
+    padding-right: 5px;
+}
 /* field: campaign summary */
 
 <?php echo $wrapper; ?> .charitable-field-preview-campaign-summary {

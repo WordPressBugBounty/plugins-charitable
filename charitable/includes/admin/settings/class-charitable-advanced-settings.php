@@ -416,6 +416,10 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 				// add the option.
 				$values['charitable_usage_tracking'] = true;
 				update_option( 'charitable_usage_tracking', 1 );
+				// Send initial usage information just once (after that scheduled), now that we have permission.
+				if ( class_exists( 'Charitable_Tracking' ) ) {
+					Charitable_Tracking::get_instance()->send_checkins( false, true );
+				}
 			}
 
 			return $values;

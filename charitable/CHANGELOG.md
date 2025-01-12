@@ -1,8 +1,16 @@
+# 1.8.4.3
+* NEW: (Visual Campaign Builder) New options for Social Links and Social Sharing fields including YouTube (links only), Threads, and Bluesky.
+* FIX: (Visual Campaign Builder) Visual tweaks to campaigns on "narrow content" themes.
+* FIX: Adding additional check to resolve several JavaScript errors in some scenarios in the campaign builder.
+* FIX: Resolved issue involving default fields appearing in visual builder for campaign summary.
+* FIX: Resolved an issue regarding rendering HTML in emails in some scenarios.
+* FIX: Updated code related to opt-in data collection, translations, CSS, UI, and PHP standards.
+
 # 1.8.4.2
 * NEW: Visual Campaign Builder: Changing button color in "advanced" will automatically adjust donation button text for contrast.
 * FIX: Visual Campaign Builder: Updated documentation links.
 * FIX: Visual Campaign Builder: Adjustments and tweaks to campaigns in visual builder (admin and frontend).
-* FIX: Resolved issue involving santitization of non-english dates in some scenarios resulting in incorrect "days until" calculations.
+* FIX: Resolved issue involving sanitization of non-english dates in some scenarios resulting in incorrect "days until" calculations.
 * FIX: Updated code related to opt-in data collection, translations, CSS, UI, and PHP standards.
 
 # 1.8.4.1

@@ -37,12 +37,18 @@
             margin: 0 20px 0 0;
             padding: 0;
             color: $color_theme_base_primary;
+            word-break: keep-all;
         }
 
-        .charitable-field-row {
+        .charitable-field-row.charitable-field-row-social-linking {
+
+            display: flex;
+            float: none;
+            width: 100%;
+            flex-direction: row;
+            flex-wrap: wrap;
 
             .charitable-social-field-column {
-                float: left;
                 margin-right: 20px;
 
                 .charitable-campaign-social-link {
@@ -50,9 +56,9 @@
                     min-height: 20px !important;
 
                     img {
-                        width: 25px;
+                        width: auto;
                         height: 25px;
-                        position: absolute;
+                        /* position: absolute; */
                         top: 0;
                         left: 0;
                         right: 0;
@@ -61,7 +67,7 @@
                     }
 
                     a {
-                        width: 25px;
+                        width: auto;
                         height: 25px;
                         display: block;
                         position: relative;

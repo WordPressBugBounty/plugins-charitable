@@ -77,7 +77,7 @@ if ( ! class_exists( 'Charitable_Tools_Settings' ) ) :
 					'value'    => 'import',
 				),
 				'import_campaign'  => array(
-					'label_for'         => __( 'Campaign Import <span class="badge beta">Beta</span>', 'charitable' ),
+					'label_for'         => __( 'Campaign Import', 'charitable' ),
 					'type'              => 'file',
 					'wrapper_class'     => 'test',
 					'nonce_action_name' => 'import_campaign',
@@ -96,7 +96,7 @@ if ( ! class_exists( 'Charitable_Tools_Settings' ) ) :
 					'default'           => 2,
 				),
 				'import_donations' => array(
-					'label_for'         => __( 'Campaign Donations <span class="badge beta">Beta</span>', 'charitable' ),
+					'label_for'         => __( 'Campaign Donations', 'charitable' ),
 					'type'              => 'file',
 					'wrapper_class'     => 'test',
 					'nonce_action_name' => 'import_donations',
@@ -140,7 +140,7 @@ if ( ! class_exists( 'Charitable_Tools_Settings' ) ) :
 					'value'    => 'export',
 				),
 				'export_campaign'  => array(
-					'label_for'         => __( 'Campaign Export <span class="badge beta">Beta</span>', 'charitable' ),
+					'label_for'         => __( 'Campaign Export', 'charitable' ),
 					'type'              => 'select-form',
 					'wrapper_class'     => 'test',
 					'nonce_action_name' => 'export_campaign',
@@ -160,7 +160,7 @@ if ( ! class_exists( 'Charitable_Tools_Settings' ) ) :
 					'options'           => $this->get_campaigns_to_export(),
 				),
 				'export_donations' => array(
-					'label_for'         => __( 'Donations Export <span class="badge beta">Beta</span>', 'charitable' ),
+					'label_for'         => __( 'Donations Export', 'charitable' ),
 					'type'              => 'select-form',
 					'wrapper_class'     => 'test',
 					'nonce_action_name' => 'export_donations_from_campaign',

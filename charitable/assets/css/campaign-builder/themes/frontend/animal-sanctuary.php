@@ -186,7 +186,7 @@ require_once ('../../../../../includes/admin/campaign-builder/templates/function
 	font-weight: 700;
 }
 <?php echo $wrapper; ?> .charitable-field-template-social-linking .charitable-placeholder {
-	padding: 10px;
+	padding: 0px;
 }
 <?php echo $wrapper; ?> .charitable-field-template-social-linking .charitable-field-row .charitable-field-column {
 	float: left;
@@ -273,10 +273,12 @@ require_once ('../../../../../includes/admin/campaign-builder/templates/function
 	border: 1px solid rgba(0, 0, 0, 0.20);
 	border-radius: 10px;
 	display: table;
-	width: 100%;
+	width: calc(100% - 30px);
 	padding: 15px;
 }
-
+<?php echo $wrapper; ?>  .charitable-campaign-field.charitable-campaign-field-social-sharing .charitable-field-template-social-sharing .charitable-field-row .charitable-social-field-column .charitable-campaign-social-link img {
+	max-width: 100% !important;
+}
 
 /* field: campaign summary */
 

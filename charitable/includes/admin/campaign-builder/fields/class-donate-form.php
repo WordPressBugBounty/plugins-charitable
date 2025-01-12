@@ -83,7 +83,7 @@ if ( ! class_exists( 'Charitable_Field_Donation_Form' ) ) :
 			if ( 'preview' === $mode ) {
 
 				$html = '
-				<span class="charitable-placeholder"></span>
+				<!--<span class="charitable-placeholder"></span>-->
 				<span class="charitable-form-placeholder">
 					<div class="charitable-preview-notice">
 						<h6><i class="fa fa-file-image-o"></i>&nbsp;Donation Form</h6>
@@ -112,7 +112,7 @@ if ( ! class_exists( 'Charitable_Field_Donation_Form' ) ) :
 			$html  = $this->field_title( $this->name );
 			$html .= $this->field_wrapper( $this->render( $field_data, $campaign_data, $field_id, 'preview' ), $field_data );
 
-			echo $html;
+			echo $html; // phpcs:ignore
 		}
 
 		/**

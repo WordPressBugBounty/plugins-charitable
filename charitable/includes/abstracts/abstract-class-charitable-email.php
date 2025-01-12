@@ -324,7 +324,7 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 		 * @return boolean
 		 */
 		public function is_preview() {
-			return isset( $_GET['charitable_action'] ) && 'preview_email' == $_GET['charitable_action'];
+			return isset( $_GET['charitable_action'] ) && 'preview_email' === $_GET['charitable_action']; // phpcs:ignore WordPress.Security.NonceVerification
 		}
 
 		/**
@@ -601,6 +601,7 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 		 * Returns the body content of the email, formatted as HTML.
 		 *
 		 * @since  1.0.0
+		 * @version 1.8.4.3 add wp_kses_post and html_entity_decode.
 		 *
 		 * @return string
 		 */
@@ -608,6 +609,12 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 			$body = $this->get_option( 'body', $this->get_default_body() );
 			$body = do_shortcode( $body );
 			$body = wpautop( $body );
+
+			// Because this addition is applying to all emails potentially, let's add a temp global for any troubleshooting.
+			if ( ! defined( 'CHARITABLE_EMAILS_DISABLE_HTML' ) || ! CHARITABLE_EMAILS_DISABLE_HTML ) {
+				$body = wp_kses_post( $body );
+				$body = html_entity_decode( $body );
+			}
 
 			/**
 			 * Filter the email body before it is sent.

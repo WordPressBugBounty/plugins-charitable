@@ -100,7 +100,9 @@ if ( ! class_exists( 'Charitable_Field_Social_Sharing' ) ) :
 				'facebook'  => 1,
 				'linkedin'  => 1,
 				'pinterest' => 1,
-				'mastodon'  => 1,
+				'mastodon'  => 0,
+				'threads'   => 0,
+				'bluesky'   => 1,
 			);
 
 			// Load the class templates file.
@@ -144,8 +146,8 @@ if ( ! class_exists( 'Charitable_Field_Social_Sharing' ) ) :
 
 							// Prepare the custom share URL.
 							if ( 'mastodon' !== $network && ! empty( $social_networks_template[ $label ]['share_url'] ) ) {
-								$share_url = str_replace( '{$text}', urlencode( wp_strip_all_tags( $campaign_data['title'] ) ), $social_networks_template[ $label ]['share_url'] );
-								$share_url = str_replace( '{$url}', urlencode( get_permalink( $campaign_data['id'] ) ), $share_url );
+								$share_url = str_replace( '{$text}', rawurlencode( wp_strip_all_tags( $campaign_data['title'] ) ), $social_networks_template[ $label ]['share_url'] );
+								$share_url = str_replace( '{$url}', rawurlencode( get_permalink( $campaign_data['id'] ) ), $share_url );
 								$share_url = str_replace( '{$tags}', '', $share_url );
 								$share_url = apply_filters( 'charitable_campaign_social_sharing_link_' . $network, $share_url, $social_networks_template[ $label ], $campaign_data );
 								$href      = '<a href="' . $share_url . '" ' . $new_tab . '>';
@@ -193,6 +195,12 @@ if ( ! class_exists( 'Charitable_Field_Social_Sharing' ) ) :
 					<span class="charitable-placeholder"></span>
 				</div>
 				<div class="charitable-social-field-column charitable-hidden charitable-social-sharing-' . $mode . '-mastodon">
+					<span class="charitable-placeholder"></span>
+				</div>
+				<div class="charitable-social-field-column charitable-hidden charitable-social-sharing-' . $mode . '-threads">
+					<span class="charitable-placeholder"></span>
+				</div>
+				<div class="charitable-social-field-column charitable-hidden charitable-social-sharing-' . $mode . '-bluesky">
 					<span class="charitable-placeholder"></span>
 				</div>';
 
@@ -307,6 +315,8 @@ if ( ! class_exists( 'Charitable_Field_Social_Sharing' ) ) :
 						'LinkedIn'    => 'linkedin',
 						'Pinterest'   => 'pinterest',
 						'Mastodon'    => 'mastodon',
+						'Threads'     => 'threads',
+						'Bluesky'    => 'bluesky',
 					),
 					'defaults' => array(
 						'twitter',
@@ -314,6 +324,8 @@ if ( ! class_exists( 'Charitable_Field_Social_Sharing' ) ) :
 						'linkedin',
 						'pinterest',
 						'mastodon',
+						'threads',
+						'bluesky',
 					),
 				)
 			);
@@ -397,7 +409,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Sharing' ) ) :
 		 */
 		public function settings_section_top( $field_id = false, $campaign_data = false ) {
 
-			$message = '<p><a target="_blank" class="" data-type="' . esc_attr( $this->edit_type ) . '" data-section="' . $this->edit_section . '" href="http://wpcharitable.com/campaign-builder/fields/social-sharing">' . esc_html__( 'Learn how to add additional social networks to share.', 'charitable' ) . '</a></p>';
+			$message = '<p>' . esc_html__( 'Don\'t see a social network here that you use and would like added?', 'charitable' ) . ' <a target="_blank" class="charitable-new-tab-link" data-type="' . esc_attr( $this->edit_type ) . '" data-section="' . $this->edit_section . '" href="https://wpcharitable.com/contact">' . esc_html__( 'Let us know!', 'charitable' ) . '</a></p>';
 
 			echo $message; // phpcs:ignore.
 		}
@@ -504,6 +516,22 @@ if ( ! class_exists( 'Charitable_Field_Social_Sharing' ) ) :
 						'data'         => array(
 							'src' => false,
 						),
+					),
+					'threads'   => array(
+						'label'        => esc_html__( 'Threads', 'charitable' ),
+						'css_class'    => '',
+						'field_id'     => 'threads_url',
+						'public_label' => esc_html__( 'Threads', 'charitable' ),
+						'icon_url'     => charitable()->get_path( 'directory', false ) . 'assets/images/campaign-builder/fields/social-sharing/threads' . $suffix . '.svg',
+						'share_url'    => 'https://www.threads.net/intent/post?text={$text}%0D%0A%0D%0A{$url}',
+					),
+					'bluesky'   => array(
+						'label'        => esc_html__( 'Bluesky', 'charitable' ),
+						'css_class'    => '',
+						'field_id'     => 'bluesky_url',
+						'public_label' => esc_html__( 'Bluesky', 'charitable' ),
+						'icon_url'     => charitable()->get_path( 'directory', false ) . 'assets/images/campaign-builder/fields/social-sharing/bluesky' . $suffix . '.svg',
+						'share_url'    => 'https://bsky.app/intent/compose?text={$text}%0D%0A%0D%0A{$url}',
 					),
 
 				),

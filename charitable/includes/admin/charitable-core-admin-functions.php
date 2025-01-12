@@ -215,19 +215,19 @@ function charitable_do_settings_fields( $page, $section ) {
 			$class = ' class="' . esc_attr( $field['args']['class'] ) . '"';
 		}
 
-		echo "<tr{$class}>";
+		echo "<tr{$class}>"; // phpcs:ignore
 
 		if ( ! empty( $field['args']['label_for'] ) ) {
-			echo '<th scope="row"><label for="' . esc_attr( $field['args']['label_for'] ) . '">' . $field['title'] . '</label></th>';
+			echo '<th scope="row"><label for="' . esc_attr( $field['args']['label_for'] ) . '">' . esc_html( $field['title'] ) . '</label></th>';
 			echo '<td>';
 			call_user_func( $field['callback'], $field['args'] );
 			echo '</td>';
 		} elseif ( ! empty( $field['title'] ) ) {
-			if ( $field['args']['type'] === 'heading' && isset( $field['args']['help'] ) ) { // if this is a heading display a "help" as a subheading
-				echo '<th scope="row" colspan="2"><h4>' . $field['title'] . '</h4>';
-				echo '<p>' . $field['args']['help'] . '</p>';
+			if ( $field['args']['type'] === 'heading' && isset( $field['args']['help'] ) ) { // if this is a heading display a "help" as a subheading.
+				echo '<th scope="row" colspan="2"><h4>' . esc_html( $field['title'] ) . '</h4>';
+				echo '<p>' . sanitize_text_field( $field['args']['help'] ) . '</p>'; // phpcs:ignore
 			} else {
-				echo '<th scope="row"><h4>' . $field['title'] . '</h4>';
+				echo '<th scope="row"><h4>' . esc_html( $field['title'] ) . '</h4>';
 			}
 			echo '</th>';
 			if ( $field['args']['type'] !== 'heading' ) {
@@ -280,28 +280,28 @@ function charitable_add_settings_tab( $tabs, $key, $name, $args = array() ) {
  * @return boolean
  */
 function charitable_is_tools_view( $tab = '' ) {
-	if ( ! empty( $_POST ) ) {
-		$is_settings = array_key_exists( 'option_page', $_POST ) && 'charitable_tools' === $_POST['option_page'];
+	if ( ! empty( $_POST ) ) { // phpcs:ignore
+		$is_settings = array_key_exists( 'option_page', $_POST ) && 'charitable_tools' === $_POST['option_page']; // phpcs:ignore
 
 		if ( ! $is_settings || empty( $tab ) ) {
 			return $is_settings;
 		}
 
-		return array_key_exists( 'charitable_tools', $_POST ) && array_key_exists( $tab, $_POST['charitable_tools'] );
+		return array_key_exists( 'charitable_tools', $_POST ) && array_key_exists( $tab, $_POST['charitable_tools'] ); // phpcs:ignore
 	}
 
-	$is_settings = isset( $_GET['page'] ) && 'charitable-tools' == $_GET['page'];
+	$is_settings = isset( $_GET['page'] ) && 'charitable-tools' === $_GET['page']; // phpcs:ignore
 
 	if ( ! $is_settings || empty( $tab ) ) {
 		return $is_settings;
 	}
 
 	/* The general tab can be loaded when tab is not set. */
-	if ( 'general' == $tab ) {
-		return ! isset( $_GET['tab'] ) || 'general' == $_GET['tab'];
+	if ( 'general' === $tab ) {
+		return ! isset( $_GET['tab'] ) || 'general' == $_GET['tab']; // phpcs:ignore
 	}
 
-	return isset( $_GET['tab'] ) && $tab == $_GET['tab'];
+	return isset( $_GET['tab'] ) && $tab == $_GET['tab']; // phpcs:ignore
 }
 
 /**
@@ -334,19 +334,19 @@ function charitable_do_tools_fields( $page, $section ) {
 			$class = ' class="' . esc_attr( $field['args']['class'] ) . '"';
 		}
 
-		echo "<tr{$class}>";
+		echo "<tr{$class}>"; // phpcs:ignore
 
 		if ( ! empty( $field['args']['label_for'] ) ) {
-			echo '<th scope="row"><label for="' . esc_attr( $field['args']['label_for'] ) . '">' . $field['title'] . '</label></th>';
+			echo '<th scope="row"><label for="' . esc_attr( $field['args']['label_for'] ) . '">' . esc_html( $field['title'] ) . '</label></th>';
 			echo '<td>';
 			call_user_func( $field['callback'], $field['args'] );
 			echo '</td>';
 		} elseif ( ! empty( $field['title'] ) ) {
-			if ( $field['args']['type'] === 'heading' && isset( $field['args']['help'] ) ) { // if this is a heading display a "help" as a subheading
-				echo '<th scope="row" colspan="2"><h4>' . $field['title'] . '</h4>';
-				echo '<p>' . $field['args']['help'] . '</p>';
+			if ( $field['args']['type'] === 'heading' && isset( $field['args']['help'] ) ) { // if this is a heading display a "help" as a subheading.
+				echo '<th scope="row" colspan="2"><h4>' . esc_html( $field['title'] ) . '</h4>';
+				echo '<p>' . sanitize_text_field( $field['args']['help'] ) . '</p>'; // phpcs:ignore
 			} else {
-				echo '<th scope="row"><h4>' . $field['title'] . '</h4>';
+				echo '<th scope="row"><h4>' . esc_html( $field['title'] ) . '</h4>';
 			}
 			echo '</th>';
 			if ( $field['args']['type'] !== 'heading' ) {
@@ -387,7 +387,7 @@ function charitable_add_upgrade_item() {
 		return;
 	}
 
-	$submenu['charitable'][99] = array(
+	$submenu['charitable'][99] = array( // phpcs:ignore
 		__( 'Upgrade to Pro', 'charitable' ),
 		'manage_options',
 		charitable_ga_url(
@@ -645,7 +645,13 @@ function charitable_get_default_user_agent() {
 	return 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ) . '; WPCharitable/' . $wpcharitable_type;
 }
 
-
+/**
+ * Get the template paths.
+ *
+ * @since 1.8.0
+ *
+ * @return array
+ */
 function charitable_theme_template_paths() {
 
 	$template_dir = 'charitable';
@@ -807,6 +813,7 @@ function charitable_can_activate( $type ) {
  * Determine if the plugin/addon installations/activations are allowed.
  *
  * @since 1.7.3
+ * @since 1.8.4.3 // Removed 'Addons require additional license checks' comments.
  *
  * @internal Use charitable_can_activate() or charitable_can_install() instead.
  *
@@ -840,12 +847,6 @@ function charitable_can_do( $what, $type ) {
 	if ( $type === 'plugin' ) {
 		return true;
 	}
-
-	// Addons require additional license checks.
-	// $license = get_option( 'charitable_license', [] );
-
-	// // Allow addons installation if license is not expired, enabled and valid.
-	// return empty( $license['is_expired'] ) && empty( $license['is_disabled'] ) && empty( $license['is_invalid'] );
 
 	return true;
 }
@@ -883,7 +884,7 @@ function charitable_verify_ssl() {
 	wp_send_json_error(
 		array(
 			'msg'   => esc_html__( 'There was an error and the connection failed. Please contact your web host with the technical details below.', 'charitable' ),
-			'debug' => '<pre>' . print_r( map_deep( $response, 'wp_strip_all_tags' ), true ) . '</pre>',
+			'debug' => '<pre>' . print_r( map_deep( $response, 'wp_strip_all_tags' ), true ) . '</pre>', // phpcs:ignore
 		)
 	);
 }
@@ -911,10 +912,10 @@ function charitable_deactivate_addon() {
 		$plugin = sanitize_text_field( wp_unslash( $_POST['plugin'] ) );
 
 		if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-			error_log( 'charitable_deactivate_addon' );
-			error_log( print_r( $plugin, true ) );
-			error_log( print_r( $_POST, true ) );
-			error_log( print_r( $type, true ) );
+			error_log( 'charitable_deactivate_addon' ); // phpcs:ignore
+			error_log( print_r( $plugin, true ) ); // phpcs:ignore
+			error_log( print_r( $_POST, true ) ); // phpcs:ignore
+			error_log( print_r( $type, true ) ); // phpcs:ignore
 		}
 
 		deactivate_plugins( $plugin );
@@ -1008,9 +1009,9 @@ function charitable_ajax_install_addon() {
 		global $hook_suffix;
 
 		if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-			error_log( 'charitable_ajax_install_addon' );
-			error_log( print_r( $_POST, true ) );
-			error_log( print_r( $download_url, true ) );
+			error_log( 'charitable_ajax_install_addon' ); // phpcs:ignore
+			error_log( print_r( $_POST, true ) ); // phpcs:ignore
+			error_log( print_r( $download_url, true ) ); // phpcs:ignore
 		}
 
 		// Set the current screen to avoid undefined notices.
@@ -1036,8 +1037,8 @@ function charitable_ajax_install_addon() {
 		}
 
 		if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-			error_log( 'charitable_ajax_install_addon creds' );
-			error_log( print_r( $creds, true ) );
+			error_log( 'charitable_ajax_install_addon creds' ); // phpcs:ignore
+			error_log( print_r( $creds, true ) ); // phpcs:ignore
 		}
 
 		// If we are not authenticated, make it happen now.
@@ -1188,6 +1189,9 @@ function charitable_set_third_party_warning_option( $plugin_path = false, $value
  * Return the latest versions of Charitable plugins.
  *
  * @since  1.8.0
+ *
+ * @param  array  $licenses  Licenses.
+ * @param  string $update_url Update URL.
  *
  * @return array
  */
@@ -1466,7 +1470,8 @@ if ( ! function_exists( 'charitable_get_onboarding_url' ) ) :
 				'version'           => charitable()->get_version(),
 				'utm_campaign'      => 'onboarding_charitable_lite',
 				'email'             => get_option( 'admin_email' ),
-				'sessionid'         => wp_rand( 10000000, 99999999 ), // generate a random session id to prevent caching.
+				// generate a random session id to prevent caching.
+				'sessionid'         => wp_rand( 10000000, 99999999 ),
 				'return'            => rawurlencode(
 					base64_encode( get_admin_url( null, 'admin.php') ) // phpcs:ignore
 				),

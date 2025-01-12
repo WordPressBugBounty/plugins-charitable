@@ -92,7 +92,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 				$html .= '<div class="charitable-field-' . $mode . '-social-linking-headline-container charitable-placeholder"><h5 class="charitable-field-' . $mode . '-headline">' . trim( $headline ) . '</h5></div>';
 			}
 
-			$html .= '<div class="charitable-field-row">';
+			$html .= '<div class="charitable-field-row charitable-field-row-social-linking">';
 
 			$social_networks_settings = $this->custom_sort_social_network_preview( $social_networks_settings );
 			$suffix                   = ! empty( $template_data['meta']['suffixes'][ $this->type ] ) ? esc_attr( $template_data['meta']['suffixes'][ $this->type ] ) : false;
@@ -101,7 +101,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 			foreach ( $social_networks_settings as $label => $value ) {
 
 				$label = str_replace( '_url', '', esc_attr( $label ) );
-				if ( ! array_intersect( array( 'twitter', 'facebook', 'linkedin', 'instagram', 'tiktok', 'pinterest', 'mastodon' ), array( $label ) ) ) {
+				if ( ! array_intersect( array( 'twitter', 'facebook', 'linkedin', 'instagram', 'tiktok', 'pinterest', 'mastodon', 'youtube', 'threads', 'bluesky' ), array( $label ) ) ) {
 					continue;
 				}
 
@@ -351,9 +351,9 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 		 */
 		public function settings_section_top( $field_id = false, $campaign_data = false ) {
 
-			$message = '<p>' . esc_html__( 'Include full links urls or profile urls to your social networks.', 'charitable' ) . ' <a class="charitable-field-edit" data-type="' . $this->edit_type . '" data-section="' . $this->edit_section . '" href="http://wpcharitable.com/campaign-builder/fields/social-links">' . esc_html__( 'Learn how to expand the options of this field.', 'charitable' ) . '</a></p>';
+			$message = '<p>' . esc_html__( 'Don\'t see a social network here that you use and would like added?', 'charitable' ) . ' <a target="_blank" class="charitable-new-tab-link" data-type="' . esc_attr( $this->edit_type ) . '" data-section="' . $this->edit_section . '" href="https://wpcharitable.com/contact">' . esc_html__( 'Let us know!', 'charitable' ) . '</a></p>';
 
-			echo $message;
+			echo $message; // phpcs:ignore
 		}
 
 		/**
@@ -406,6 +406,9 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 				'tiktok_url'    => isset( $social_networks_settings['tiktok_url'] ) ? esc_url( $social_networks_settings['tiktok_url'] ) : '',
 				'pinterest_url' => isset( $social_networks_settings['pinterest_url'] ) ? esc_url( $social_networks_settings['pinterest_url'] ) : '',
 				'mastodon_url'  => isset( $social_networks_settings['mastodon_url'] ) ? esc_url( $social_networks_settings['mastodon_url'] ) : '',
+				'youtube_url'   => isset( $social_networks_settings['youtube_url'] ) ? esc_url( $social_networks_settings['youtube_url'] ) : '',
+				'threads_url'   => isset( $social_networks_settings['threads_url'] ) ? esc_url( $social_networks_settings['threads_url'] ) : '',
+				'bluesky_url'   => isset( $social_networks_settings['bluesky_url'] ) ? esc_url( $social_networks_settings['bluesky_url'] ) : '',
 			);
 
 			return apply_filters( 'charitable_campaign_social_links_networks_preview', $updated_settings, $social_networks_settings );
@@ -446,6 +449,9 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 					break;
 				case 'pinterest':
 					$link = 'https://pinterest.com/pin/create/button/?url=' . esc_url( $url );
+					break;
+				case 'bluesky':
+					$link = 'https://bsky.app/intent/compose?text=' . esc_url( $url );
 					break;
 				case 'mastodon':
 					$link = esc_url( $url );
@@ -513,9 +519,9 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 						'icon_url'     => charitable()->get_path( 'directory', false ) . 'assets/images/campaign-builder/fields/social-sharing/instagram' . $suffix . '.svg',
 					),
 					'tiktok'    => array(
-						'label'        => 'Tiktok URL',
+						'label'        => 'TikTok URL',
 						'field_id'     => 'tiktok_url',
-						'public_label' => 'Tiktok',
+						'public_label' => 'TikTok',
 						'icon'         => 'fa-brands fa-tiktok',
 						'icon_url'     => charitable()->get_path( 'directory', false ) . 'assets/images/campaign-builder/fields/social-sharing/tiktok' . $suffix . '.svg',
 					),
@@ -525,6 +531,27 @@ if ( ! class_exists( 'Charitable_Field_Social_Links' ) ) :
 						'public_label' => 'Pinterest',
 						'icon'         => 'fa-brands fa-pinterest',
 						'icon_url'     => charitable()->get_path( 'directory', false ) . 'assets/images/campaign-builder/fields/social-sharing/pinterest' . $suffix . '.svg',
+					),
+					'youtube'   => array(
+						'label'        => 'YouTube URL',
+						'field_id'     => 'youtube_url',
+						'public_label' => 'YouTube',
+						'icon'         => 'fa-brands fa-youtube',
+						'icon_url'     => charitable()->get_path( 'directory', false ) . 'assets/images/campaign-builder/fields/social-sharing/youtube' . $suffix . '.svg',
+					),
+					'threads'   => array(
+						'label'        => 'Threads URL',
+						'field_id'     => 'threads_url',
+						'public_label' => 'Threads',
+						'icon'         => 'fa-brands fa-threads',
+						'icon_url'     => charitable()->get_path( 'directory', false ) . 'assets/images/campaign-builder/fields/social-sharing/threads' . $suffix . '.svg',
+					),
+					'bluesky'   => array(
+						'label'        => 'Bluesky URL',
+						'field_id'     => 'bluesky_url',
+						'public_label' => 'Bluesky',
+						'icon'         => 'fa-brands fa-bluesky',
+						'icon_url'     => charitable()->get_path( 'directory', false ) . 'assets/images/campaign-builder/fields/social-sharing/bluesky' . $suffix . '.svg',
 					),
 					'mastodon'  => array(
 						'label'        => 'Mastodon URL',

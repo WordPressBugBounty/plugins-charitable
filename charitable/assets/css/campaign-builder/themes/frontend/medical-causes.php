@@ -35,6 +35,7 @@ require_once ('../../../../../includes/admin/campaign-builder/templates/function
 	line-height: 64px !important;
 	margin-top: 0px;
 	margin-bottom: 20px;
+  margin-left: -1px;
 }
 <?php echo $wrapper; ?> div.charitable-campaign-row .tab-content h5.charitable-field-template-headline {
 	color: black !important;
@@ -417,4 +418,40 @@ require_once ('../../../../../includes/admin/campaign-builder/templates/function
 /* field: organizer */
 
 
-
+<?php echo $wrapper; ?>  .charitable-campaign-container {
+  container-type: inline-size;
+  container-name: campaign-<?php echo $slug; ?>-area;
+}
+@container campaign-<?php echo $slug; ?>-area (max-width: 700px) {
+	<?php echo $wrapper; ?> .charitable-campaign-column:first-of-type {
+		padding: 0 !important;
+		max-width: 100%;
+	}
+  <?php echo $wrapper; ?> .charitable-campaign-row {
+    padding: 10px 30px;
+  }
+  <?php echo $wrapper; ?> .charitable-campaign-container .section[data-section-type="tabs"] article {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+	<?php echo $wrapper; ?>  .charitable-campaign-container .section[data-section-type="tabs"] article nav {
+		margin-top: 0px;
+		margin-bottom: 0px;
+	}
+  <?php echo $wrapper; ?>  .section[data-section-type="tabs"] article .tab-content > ul li {
+    margin-top: 0;
+    padding-top: 0 !important;
+  }
+	<?php echo $wrapper; ?>  .charitable-campaign-container .charitable-tabs {
+		margin-top: 0px;
+	}
+	.charitable-campaign-wrap .charitable-campaign-column,
+  	.charitable-campaign-wrap .charitable-campaign-column:nth-child(even),
+  	.charitable-campaign-wrap .charitable-campaign-column:nth-child(odd) {
+    	flex: 0 0 100% !important;
+    	padding-top: 0;
+    	padding-bottom: 0;
+    	padding-left: 0;
+    	padding-right: 0;
+  	}
+}

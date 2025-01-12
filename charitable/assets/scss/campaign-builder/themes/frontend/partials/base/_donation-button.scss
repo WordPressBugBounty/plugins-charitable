@@ -3,6 +3,7 @@
     margin-top: 15px;
     margin-bottom: 15px;
 
+    a.charitable-button,
     button.charitable-button {
         background-color: var( --charitable_campaign_theme_button );
         border-color: var( --charitable_campaign_theme_button );
@@ -14,14 +15,16 @@
         font-weight: 400;
         font-size: 16px;
         line-height: 25px;
+        padding-left: 0;
+        padding-right: 0;
         &.charitable-disabled {
             opacity: 0.5;
         }
     }
+    a.charitable-button:hover,
     button.charitable-button:hover {
         text-decoration: none;
         filter: brightness(150%);
     }
 
 }
-

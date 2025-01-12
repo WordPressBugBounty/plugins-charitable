@@ -215,6 +215,10 @@ function charitable_get_users_as_campaign_creators( $by = 'permissions', $additi
 
 		$users_with_permissions = [];
 
+		if ( ! is_array( $allowed_users ) ) {
+			$allowed_users = [];
+		}
+
 		foreach ( $all_users as $user ) {
 
 			if ( user_can( $user->ID, 'create_campaigns' ) || user_can( $user->ID, 'edit_campaigns' ) ) { // phpcs:ignore

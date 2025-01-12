@@ -37,6 +37,7 @@
             margin: 0 20px 0 0;
             padding: 0;
             color: $color_theme_base_primary;
+            word-break: keep-all;
         }
 
         .charitable-field-row {
@@ -50,7 +51,7 @@
                     min-height: 20px !important;
 
                     img {
-                      width: 25px;
+                      width: auto;
                       height: 25px;
                       position: absolute;
                       top: 0;

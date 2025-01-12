@@ -34,7 +34,7 @@ $wrapper_no_fields = '.charitable-preview.charitable-builder-template-' . $slug 
 /* wide spread changes in header vs tabs */
 
 <?php echo $wrapper; ?> > header {
-    margin-left: 5px;
+    margin-left: 0px;
     margin-right: 0px;
     margin-bottom: 10px;
     font-size: 40px;
@@ -135,9 +135,7 @@ $wrapper_no_fields = '.charitable-preview.charitable-builder-template-' . $slug 
 <?php echo $wrapper; ?> .column[data-column-id="0"] {
     flex: 1;
     border: 0;
-    padding-left: 0;
-    padding-top: 0;
-    padding-bottom: 0;
+    padding: 2px;
 }
 <?php echo $wrapper; ?> .column[data-column-id="0"] .charitable-field-photo {
     padding: 0;
@@ -147,8 +145,13 @@ $wrapper_no_fields = '.charitable-preview.charitable-builder-template-' . $slug 
 <?php echo $wrapper; ?> .column[data-column-id="1"] {
     flex: 1;
     border: 0;
+    padding: 2px;
 }
-
+<?php echo $wrapper; ?> .column[data-column-id="2"] {
+    flex: 1;
+    border: 0;
+    padding: 2px;
+}
 <?php echo $wrapper; ?> .charitable-panel-fields .charitable-field-wrap {
     padding-bottom: 0;
 }
@@ -332,36 +335,6 @@ $wrapper_no_fields = '.charitable-preview.charitable-builder-template-' . $slug 
     padding: 10px;
 }
 
-<?php /* echo $wrapper; ?> .charitable-field.charitable-field-social-links .charitable-social-linking-preview-twitter .charitable-placeholder,
-<?php echo $wrapper; ?> .charitable-field.charitable-field-social-sharing .charitable-social-sharing-preview-twitter .charitable-placeholder {
-    background-image: url('../../../../../assets/images/campaign-builder/fields/social-links/twitter-dark.svg');
-}
-<?php echo $wrapper; ?> .charitable-field.charitable-field-social-links .charitable-social-linking-preview-facebook .charitable-placeholder,
-<?php echo $wrapper; ?> .charitable-field.charitable-field-social-sharing .charitable-social-sharing-preview-facebook .charitable-placeholder {
-    background-image: url('../../../../../assets/images/campaign-builder/fields/social-links/facebook-dark.svg');
-}
-
-<?php echo $wrapper; ?> .charitable-field.charitable-field-social-links .charitable-social-linking-preview-linkedin .charitable-placeholder,
-<?php echo $wrapper; ?> .charitable-field.charitable-field-social-sharing .charitable-social-sharing-preview-linkedin .charitable-placeholder {
-    background-image: url('../../../../../assets/images/campaign-builder/fields/social-links/linkedin-dark.svg');
-}
-<?php echo $wrapper; ?> .charitable-field.charitable-field-social-links .charitable-social-linking-preview-instagram .charitable-placeholder,
-<?php echo $wrapper; ?> .charitable-field.charitable-field-social-sharing .charitable-social-sharing-preview-instagram .charitable-placeholder {
-    background-image: url('../../../../../assets/images/campaign-builder/fields/social-links/instagram-dark.svg');
-}
-<?php echo $wrapper; ?> .charitable-field.charitable-field-social-links .charitable-social-linking-preview-pinterest .charitable-placeholder,
-<?php echo $wrapper; ?> .charitable-field.charitable-field-social-sharing .charitable-social-sharing-preview-pinterest .charitable-placeholder {
-    background-image: url('../../../../../assets/images/campaign-builder/fields/social-links/pinterest-dark.svg');
-}
-<?php echo $wrapper; ?> .charitable-field.charitable-field-social-links .charitable-social-linking-preview-tiktok charitable-.placeholder,
-<?php echo $wrapper; ?> .charitable-field.charitable-field-social-sharing .charitable-social-sharing-preview-tiktok .charitable-placeholder {
-    background-image: url('../../../../../assets/images/campaign-builder/fields/social-links/tiktok-dark.svg');
-}
-<?php echo $wrapper; ?> .charitable-field.charitable-field-social-links .charitable-social-linking-preview-mastodon .charitable-placeholder,
-<?php echo $wrapper; ?> .charitable-field.charitable-field-social-sharing .charitable-social-sharing-preview-mastodon .charitable-placeholder {
-    background-image: url('../../../../../assets/images/campaign-builder/fields/social-links/mastodon-dark.svg');
-} */ ?>
-
 /* field: social sharing */
 
 <?php echo $wrapper; ?> .charitable-field-preview-social-sharing {
@@ -468,7 +441,7 @@ $wrapper_no_fields = '.charitable-preview.charitable-builder-template-' . $slug 
     margin-right: 0;
 }
 <?php echo $wrapper; ?> .charitable-preview-tab-container .tab-content {
-    padding: 0 10px;
+    padding: 0 1px;
 }
 
 

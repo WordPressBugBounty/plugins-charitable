@@ -128,7 +128,7 @@ if ( ! class_exists( 'Campaign_Builder_Preview' ) ) :
 			$this->campaign_data = get_post_meta( $campaign_id, 'campaign_settings_v2', true );
 
 			// Check valid campaign was found.
-			if ( empty( $this->campaign_data ) || ( empty( $this->campaign_data['id'] ) && empty( absint( $_GET['charitable_campaign_preview'] ) ) ) ) {
+			if ( empty( $this->campaign_data ) || ( empty( $this->campaign_data['id'] ) && empty( absint( $_GET['charitable_campaign_preview'] ) ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				return false;
 			}
 

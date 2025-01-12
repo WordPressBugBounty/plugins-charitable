@@ -255,10 +255,13 @@ $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #chari
 	line-height: 16px;
 	color: #24231E;
 	font-weight: 300;
-	margin: 0 0 0 0;
+	margin: 7px 5px 0 0;
 	padding: 0;
 }
 <?php echo $wrapper; ?> .charitable-field-preview-social-linking .charitable-placeholder {
+	padding: 0px;
+}
+<?php echo $wrapper; ?> .charitable-field-preview-social-linking .charitable-social-field-column .charitable-placeholder {
 	padding: 10px;
 }
 
@@ -291,6 +294,18 @@ $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #chari
 <?php echo $wrapper; ?> .charitable-field.charitable-field-social-sharing .charitable-social-sharing-preview-mastodon .charitable-placeholder {
 	background-image: url('../../../../../assets/images/campaign-builder/fields/social-links/mastodon-dark.svg');
 }
+<?php echo $wrapper; ?> .charitable-field-preview-social-linking .charitable-social-linking-preview-youtube .charitable-placeholder,
+<?php echo $wrapper; ?> .charitable-field-preview-social-sharing .charitable-social-sharing-preview-youtube .charitable-placeholder {
+    background-image: url('../../../../../assets/images/campaign-builder/fields/social-links/youtube-dark.svg');
+}
+<?php echo $wrapper; ?> .charitable-field-preview-social-linking .charitable-social-linking-preview-threads .charitable-placeholder,
+<?php echo $wrapper; ?> .charitable-field-preview-social-sharing .charitable-social-sharing-preview-threads .charitable-placeholder {
+    background-image: url('../../../../../assets/images/campaign-builder/fields/social-links/threads-dark.svg');
+}
+<?php echo $wrapper; ?> .charitable-field-preview-social-linking .charitable-social-linking-preview-bluesky .charitable-placeholder,
+<?php echo $wrapper; ?> .charitable-field-preview-social-sharing .charitable-social-sharing-preview-bluesky .charitable-placeholder {
+    background-image: url('../../../../../assets/images/campaign-builder/fields/social-links/bluesky-dark.svg');
+}
 
 /* field: social sharing */
 
@@ -314,7 +329,7 @@ $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #chari
 	line-height: 16px;
 	color: #24231E;
 	font-weight: 300;
-	margin: 0 0 0 0;
+	margin: 7px 5px 0 0;
 	padding: 0;
 }
 <?php echo $wrapper; ?> .charitable-field-preview-social-sharing .charitable-placeholder {

@@ -93,6 +93,9 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 			// Hide loading overlay and make the Form Builder ready to use.
 			app.hideLoadingOverlay(); // eslint-disable-line
 
+			// if a textarea for a coded field is present, init the code editor.
+			app.initCodeEditor();
+
 		},
 
 		/**
@@ -112,7 +115,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 			app.showLoadingOverlay();
 
-			s.version = '1.8.2';
+			s.version = '1.8.4.3';
 
 			// Cache builder element.
 			$builder     = $( '#charitable-builder' );
@@ -2038,6 +2041,32 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 		},
 
 		/**
+		 * Attempts to load a code editor when the page loads, or at other times called.
+		 *
+		 * @since 1.8.4.3.
+		 */
+		initCodeEditor: function() {
+
+			// if a textarea for a coded field is present, init the code editor.
+			if ( $( '.campaign-builder-codeeditor' ).length > 0 ) {
+
+				var field_id = '';
+
+				// get the field id which should be the number after charitable-panel-field-settings-field_html_html_ in the id attr.
+				// for each element that has the id 'charitable-panel-field-settings-field_html_html_' + field_id, init the editor.
+				$( '.campaign-builder-codeeditor' ).each( function() {
+					// does this element have 'charitable-panel-field-settings-field_html_html_' in the id?
+					if ( $( this ).attr( 'id' ).indexOf( 'charitable-panel-field-settings-field_html_html_' ) !== -1 ) {
+						field_id = $( this ).attr( 'id' ).replace( 'charitable-panel-field-settings-field_html_html_', '' );
+						wpchar.debug( 'field_id: ' + field_id );
+						$builder.trigger( 'charitableFieldAddHTML', [ field_id, 'html' ] );
+					}
+				});
+			}
+
+		},
+
+		/**
 		 * Show loading overlay.
 		 *
 		 * @since 1.8.0
@@ -3298,7 +3327,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 			if ( endDate.trim() === '' ) {
 
-				wpchar.debug('made it - no end date');
+				wpchar.debug('updateEndDateRelatedItems - no end date');
 
 				// if there is no value, then there is no end date... for each campaign summary field, check and see if it has a charitable-hidden class... and if it doesn't, add it.
 				elements.$preview.find('.charitable-field-campaign-summary').each(function () {
@@ -3314,7 +3343,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 			} else {
 
-				wpchar.debug('made it - there is an end date');
+				wpchar.debug('updateEndDateRelatedItems - there is an end date');
 
 				elements.$preview.find('.charitable-field-campaign-summary').each(function () {
 					var field_id = $( this ).attr('data-field-id');
@@ -3369,7 +3398,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 			if ( goalAmount === '' || goalAmount === '0' || goalAmount === '0.00' ) {
 
-				wpchar.debug('made it 0');
+				wpchar.debug('updateGoalRelatedItems - checkpoint 0');
 
 				// if there is no value, then there is no goal and therefore no progress bar.
 				elements.$preview.find('.charitable-field-progress-bar .progress').addClass('charitable-campaign-preview-not-available').addClass('charitable-hidden');
@@ -3399,7 +3428,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 				if ( regex_comma.test( goalAmount ) ) {
 
-					wpchar.debug('made it 2');
+					wpchar.debug('updateGoalRelatedItems - checkpoint 1');
 
 					app.updateGoalisPresentRelatedUI();
 
@@ -3415,7 +3444,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 				} else if ( regex_decemial.test( goalAmount ) ) {
 
-					wpchar.debug('made it 1');
+					wpchar.debug('updateGoalRelatedItems - checkpoint 2');
 
 					app.updateGoalisPresentRelatedUI();
 
@@ -3432,7 +3461,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 				} else {
 
-					wpchar.debug('made it 3');
+					wpchar.debug('updateGoalRelatedItems - checkpoint 3');
 
 					app.updateGoalisPresentRelatedUI();
 
@@ -4041,6 +4070,12 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 			if ( checkboxName.indexOf( 'mastodon' ) >= 0 ) {
 				preview_field.find('.charitable-social-sharing-preview-mastodon' ).toggleClass('charitable-hidden');
 			}
+			if ( checkboxName.indexOf( 'threads' ) >= 0 ) {
+				preview_field.find('.charitable-social-sharing-preview-threads' ).toggleClass('charitable-hidden');
+			}
+			if ( checkboxName.indexOf( 'bluesky' ) >= 0 ) {
+				preview_field.find('.charitable-social-sharing-preview-bluesky' ).toggleClass('charitable-hidden');
+			}
 
 		},
 
@@ -4065,7 +4100,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 		},
 
 		/**
-		 * Updating the fields for socia links.
+		 * Updating the fields for social links.
 		 *
 		 * @since 1.8.0
 		 *
@@ -4076,7 +4111,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 		updateSocialLinksPreview: function( field_id = 0, textFieldName = '', linkURL = '' ) {
 
 			const 	preview_field = $('#charitable-field-' + field_id ),
-					social_networks = [ 'twitter', 'facebook', 'linkedin', 'instagram', 'tiktok', 'pinterest', 'mastodon' ];
+					social_networks = [ 'twitter', 'facebook', 'linkedin', 'instagram', 'tiktok', 'pinterest', 'mastodon', 'youtube', 'threads', 'bluesky' ];
 
 			var visibleNetworks = 0;
 
@@ -4473,7 +4508,9 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 				$('.charitable-layout-options-tab-general .charitable-panel-field[data-field-id="' + field_id + '"]').find('input[type=text],input[type=button],input[type=range],input[type=url],textarea,select').filter(':visible:first').focus();
 
 				if ( 'html' === field_type ) {
-					CharitableCampaignBuilderFieldHTML.codemirrorInit( field_id ); // eslint-disable-line
+					// CharitableCampaignBuilderFieldHTML.codemirrorInit( field_id ); // eslint-disable-line
+					// trigger an event that another JS file can listen for.
+					$builder.trigger( 'charitableFieldAddHTML', [ field_id, field_type ] );
 				} else {
 					$builder.trigger( 'charitableFieldEdit', [ type, section, edit_field_id, field_id, field_type ] );
 				}

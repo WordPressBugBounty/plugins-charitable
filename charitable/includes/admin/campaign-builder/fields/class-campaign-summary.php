@@ -165,10 +165,8 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Summary' ) ) :
 				if ( ! empty( $field_data['show_hide'] ) && isset( $field_data['show_hide']['campaign_hide_time_remaining'] ) && 1 === intval( $field_data['show_hide']['campaign_hide_time_remaining'] ) ) {
 					$preview_css_class = $is_time_left ? false : 'charitable-hidden';
 				}
-			} else {
-				if ( ! empty( $field_data['show_hide'] ) && isset( $field_data['show_hide']['campaign_hide_time_remaining'] ) && 1 === intval( $field_data['show_hide']['campaign_hide_time_remaining'] ) ) {
+			} elseif ( ! empty( $field_data['show_hide'] ) && isset( $field_data['show_hide']['campaign_hide_time_remaining'] ) && 1 === intval( $field_data['show_hide']['campaign_hide_time_remaining'] ) ) {
 					$preview_css_class = $is_time_left ? false : 'charitable-hidden';
-				}
 			}
 
 			// $preview_css_class = $is_time_left ? false : 'charitable-hidden';
@@ -420,6 +418,11 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Summary' ) ) :
 					return true;
 				} else {
 					return false;
+				}
+			} else { // phpcs:ignore
+				// With no settings, establish defaults.
+				if ( 'campaign_hide_amount_donated' === $slug || 'campaign_hide_number_of_donors' === $slug ) {
+					return true;
 				}
 			}
 

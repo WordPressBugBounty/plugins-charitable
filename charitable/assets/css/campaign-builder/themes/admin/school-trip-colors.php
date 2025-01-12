@@ -302,7 +302,7 @@ line-height: 50px;
   padding: 5px 5px 5px 0;
 }
 <?php echo $wrapper; ?> .charitable-field-preview-social-linking .charitable-placeholder {
-  padding: 10px;
+  padding: 2px 0 0 0px;
 }
 
 /* field: social sharing */
@@ -368,6 +368,18 @@ line-height: 50px;
 <?php echo $wrapper; ?> .charitable-field.charitable-field-social-links .charitable-social-linking-preview-mastodon .charitable-placeholder,
 <?php echo $wrapper; ?> .charitable-field.charitable-field-social-sharing .charitable-social-sharing-preview-mastodon .charitable-placeholder {
     background-image: url('../../../../../assets/images/campaign-builder/fields/social-links/mastodon-white.svg');
+}
+<?php echo $wrapper; ?> .charitable-field-preview-social-linking .charitable-social-linking-preview-youtube .charitable-placeholder,
+<?php echo $wrapper; ?> .charitable-field-preview-social-sharing .charitable-social-sharing-preview-youtube .charitable-placeholder {
+    background-image: url('../../../../../assets/images/campaign-builder/fields/social-links/youtube-white.svg');
+}
+<?php echo $wrapper; ?> .charitable-field-preview-social-linking .charitable-social-linking-preview-threads .charitable-placeholder,
+<?php echo $wrapper; ?> .charitable-field-preview-social-sharing .charitable-social-sharing-preview-threads .charitable-placeholder {
+    background-image: url('../../../../../assets/images/campaign-builder/fields/social-links/threads-white.svg');
+}
+<?php echo $wrapper; ?> .charitable-field-preview-social-linking .charitable-social-linking-preview-bluesky .charitable-placeholder,
+<?php echo $wrapper; ?> .charitable-field-preview-social-sharing .charitable-social-sharing-preview-bluesky .charitable-placeholder {
+    background-image: url('../../../../../assets/images/campaign-builder/fields/social-links/bluesky-white.svg');
 }
 
 

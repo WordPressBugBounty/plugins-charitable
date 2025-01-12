@@ -152,7 +152,9 @@ color: <?php echo charitable_get_constracting_text_color($button); ?>;
   color: <?php echo $secondary; ?>;
 
 }
-
+<?php echo $wrapper; ?> .charitable-field-preview-social-linking .charitable-placeholder {
+  padding: 0px;
+}
 /* field: social sharing */
 
 
@@ -165,7 +167,7 @@ color: <?php echo charitable_get_constracting_text_color($button); ?>;
   padding: 5px 5px 5px 0;
 }
 <?php echo $wrapper; ?> .charitable-field-preview-social-sharing .charitable-placeholder {
-  padding: 10px;
+  padding: 0px;
 }
 
 /* field: campaign summary */

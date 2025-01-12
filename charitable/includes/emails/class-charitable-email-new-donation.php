@@ -142,9 +142,11 @@ if ( ! class_exists( 'Charitable_Email_New_Donation' ) ) :
 				return false;
 			}
 
-			$email = new Charitable_Email_New_Donation( array(
-				'donation' => $donation,
-			) );
+			$email = new Charitable_Email_New_Donation(
+				array(
+					'donation' => $donation,
+				)
+			);
 
 			$success = $email->send();
 
@@ -232,11 +234,11 @@ if ( ! class_exists( 'Charitable_Email_New_Donation' ) ) :
 		 */
 		protected function get_default_body() {
 			ob_start();
-?>
-<p><?php _e( '[charitable_email show=donor] has just made a donation!', 'charitable' ) ?></p>
+			?>
+<p><?php esc_html_e( '[charitable_email show=donor] has just made a donation!', 'charitable' ); ?></p>
 <p><strong>Summary</strong><br />
 [charitable_email show=donation_summary]</p>
-<?php
+			<?php
 			/**
 			 * Filter the default body content.
 			 *

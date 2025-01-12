@@ -76,7 +76,7 @@ if ( ! class_exists( 'Charitable_Email_Preview_Endpoint' ) ) :
 		 * @return boolean
 		 */
 		public function is_page( $args = array() ) {
-			return array_key_exists( 'charitable_action', $_GET ) && 'preview_email' == $_GET['charitable_action'];
+			return array_key_exists( 'charitable_action', $_GET ) && 'preview_email' === $_GET['charitable_action']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
 
 		/**
