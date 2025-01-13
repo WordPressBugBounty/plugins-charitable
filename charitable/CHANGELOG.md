@@ -1,5 +1,10 @@
+# 1.8.4.4
+* FIX: Adjusted escaping of setting labels resolving an issue rendering HTML beta tags.
+* FIX: CSS adjustments to display banners on some admin screens.
+* FIX: Resolved a bug with dashboard notifications.
+
 # 1.8.4.3
-* NEW: (Visual Campaign Builder) New options for Social Links and Social Sharing fields including YouTube (links only), Threads, and Bluesky.
+* NEW: (Visual Campaign Builder) New options for Social Links and Social Sharing fields include YouTube (links only), Threads, and Bluesky.
 * FIX: (Visual Campaign Builder) Visual tweaks to campaigns on "narrow content" themes.
 * FIX: Adding additional check to resolve several JavaScript errors in some scenarios in the campaign builder.
 * FIX: Resolved issue involving default fields appearing in visual builder for campaign summary.

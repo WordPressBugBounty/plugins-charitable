@@ -201,6 +201,9 @@ var CharitableAdminUI = window.CharitableAdminUI || ( function( document, window
                                     // change the text of the dashboard notifications, if it exists.
                                     $('#charitable-dashboard-report-sections').find('.charitable-dashboard-notifications .header h4').html('Notifications');
 
+                                    // Set up the "no active notifications" message on dashboard.
+                                    $('#charitable-dashboard-report-sections').find('.charitable-dashboard-notifications').find('.charitable-report-ui').html('<div class="no-items"><p><strong>There is currently no active notifications.</strong></p><p class="link charitable-view-notifications"><a href="#">View Notification<img src="/wp-content/plugins/charitable/assets/images/icons/east.svg"></a></p></div>');
+
                                     // remove the red dot from notifications icon and the WP admin menu.
                                     $('.charitable-notification-inbox').find('.number').remove();
                                     $('#toplevel_page_charitable').find('li.notifications .charitable-menu-notification-indicator').remove();
@@ -209,11 +212,39 @@ var CharitableAdminUI = window.CharitableAdminUI || ( function( document, window
                                     $('#charitable-plugin-notifications').find('.dismiss-all').remove();
                                 } else {
                                     $('#charitable-plugin-notifications').find('#new-notifications-count').html( active_notification_count );
-                                    $('#charitable-dashboard-report-sections').find('#new-notifications-count-dashboard').html( active_notification_count );
+
+                                    // Get the number of active notifications for the dashboard.
+                                    var active_notification_count_dashboard = $('#charitable-dashboard-report-sections').find('.charitable-dashboard-notifications .charitable-notification').length;
+
+                                    if ( active_notification_count > active_notification_count_dashboard ) {
+                                        if ( active_notification_count === 1 ) {
+                                            $('#charitable-dashboard-report-sections').find('#new-notifications-count-dashboard').html( active_notification_count + '+' );
+                                            // Insert HTML into .charitable-report-ui of this id.
+                                            $('#charitable-dashboard-report-sections').find('.charitable-dashboard-notifications').find('.charitable-report-ui').html('<div class="no-items"><p><strong>There is currently one active notification.</strong></p><p class="link charitable-view-notifications"><a href="#">View Notification<img src="/wp-content/plugins/charitable/assets/images/icons/east.svg"></a></p></div>');
+                                        } else {
+                                            $('#charitable-dashboard-report-sections').find('#new-notifications-count-dashboard').html( active_notification_count_dashboard + '+' );
+                                        }
+                                    } else {
+                                        $('#charitable-dashboard-report-sections').find('#new-notifications-count-dashboard').html( active_notification_count_dashboard );
+                                    }
                                 }
 
+                                var active_notification_count_dashboard = $('#charitable-dashboard-report-sections').find('.charitable-dashboard-notifications .charitable-notification').length;
+
                                 $('#charitable-plugin-notifications').find('#new-notifications-count').html( active_notification_count );
-                                $('#charitable-dashboard-report-sections').find('#new-notifications-count-dashboard').html( active_notification_count );
+
+                                if ( active_notification_count > active_notification_count_dashboard ) {
+                                    if ( active_notification_count === 1 ) {
+                                        $('#charitable-dashboard-report-sections').find('#new-notifications-count-dashboard').html( active_notification_count + '+' );
+                                        // Insert HTML into .charitable-report-ui of this id.
+                                        $('#charitable-dashboard-report-sections').find('.charitable-dashboard-notifications').find('.charitable-report-ui').html('<div class="no-items"><p><strong>There is currently one active notification.</strong></p><p class="link charitable-view-notifications"><a href="#">View Notification<img src="/wp-content/plugins/charitable/assets/images/icons/east.svg"></a></p></div>');
+                                    } else {
+                                        $('#charitable-dashboard-report-sections').find('#new-notifications-count-dashboard').html( active_notification_count_dashboard + '+' );
+                                    }
+                                } else {
+                                    $('#charitable-dashboard-report-sections').find('#new-notifications-count-dashboard').html( active_notification_count_dashboard );
+                                }
+
                                 // if active is only one, use the singular form... otherwise use the plural form.
                                 if ( active_notification_count === 1 ) {
                                     app.replaceNotifications(".new-notifications.notifications-visible");
@@ -294,6 +325,9 @@ var CharitableAdminUI = window.CharitableAdminUI || ( function( document, window
                                 $('#charitable-dashboard-report-sections').find('#new-notifications-count-dashboard').html( active_notification_count );
 
                                 $('#charitable-plugin-notifications').find('#dismissed-notifications-count').html( dismissed_notification_count );
+
+                                $('#charitable-dashboard-report-sections').find('.charitable-dashboard-notifications').find('.charitable-report-ui').html('<div class="no-items"><p><strong>There is currently no active notifications.</strong></p><p class="link charitable-view-notifications"><a href="#">View Notification<img src="/wp-content/plugins/charitable/assets/images/icons/east.svg"></a></p></div>');
+
                             }
                         }
                     });

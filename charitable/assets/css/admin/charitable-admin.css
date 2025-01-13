@@ -459,6 +459,7 @@ body.post-type-campaign #wpbody-content .page-title-action {
   padding-top: 0;
   padding-bottom: 0;
   line-height: 26px;
+  top: -2px;
 }
 body.post-type-campaign #wpbody-content .page-title-action:hover {
   background-color: #3f7539;

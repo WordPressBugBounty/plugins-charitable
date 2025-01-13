@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.7.1
 Requires PHP: 7.2
-Stable tag: 1.8.4.3
+Stable tag: 1.8.4.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -258,8 +258,13 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 
 == Changelog ==
 
+= Donation Form & Fundraising Campaigns v1.8.4.4 =
+* FIX: Adjusted escaping of setting labels resolving an issue rendering HTML beta tags.
+* FIX: CSS adjustments to display banners on some admin screens.
+* FIX: Resolved a bug with dashboard notifications.
+
 = Donation Form & Fundraising Campaigns v1.8.4.3 =
-* NEW: (Visual Campaign Builder) New options for Social Links and Social Sharing fields including YouTube (links only), Threads, and Bluesky.
+* NEW: (Visual Campaign Builder) New options for Social Links and Social Sharing fields include YouTube (links only), Threads, and Bluesky.
 * FIX: (Visual Campaign Builder) Visual tweaks to campaigns on "narrow content" themes.
 * FIX: Adding additional check to resolve several JavaScript errors in some scenarios in the campaign builder.
 * FIX: Resolved issue involving default fields appearing in visual builder for campaign summary.

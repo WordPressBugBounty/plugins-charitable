@@ -1610,16 +1610,20 @@ form#posts-filter table tbody#the-list tr.child td div.charitable-campaign-list-
 form#posts-filter table tbody#the-list tr.child td div.charitable-campaign-list-banner > div {
   flex-grow: 1;
   display: flex;
+  align-items: center;
 }
 form#posts-filter table tbody#the-list tr.child td div.charitable-campaign-list-banner .charitable-campaign-list-banner-icon {
-  width: 50px;
+  width: auto;
+  height: 45px;
   margin: 0px 15px 0 0;
 }
 form#posts-filter table tbody#the-list tr.child td div.charitable-campaign-list-banner .charitable-campaign-list-banner-icon img {
-  width: 45px;
+  height: 45px;
 }
 form#posts-filter table tbody#the-list tr.child td div.charitable-campaign-list-banner .charitable-campaign-list-banner-text p {
   font-size: 16px;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 form#posts-filter table tbody#the-list tr.child td div.charitable-campaign-list-banner .charitable-campaign-list-banner-button {
   display: flex;
@@ -2186,7 +2190,7 @@ body.post-type-charitable .postbox h2 .badge {
   padding: 0.25em 0.4em;
   font-size: 75%;
   font-weight: 700;
-  line-height: 1;
+  line-height: 11px;
   text-align: center;
   white-space: nowrap;
   vertical-align: baseline;

@@ -215,19 +215,19 @@ function charitable_do_settings_fields( $page, $section ) {
 			$class = ' class="' . esc_attr( $field['args']['class'] ) . '"';
 		}
 
-		echo "<tr{$class}>"; // phpcs:ignore
+        echo "<tr{$class}>"; // phpcs:ignore
 
 		if ( ! empty( $field['args']['label_for'] ) ) {
-			echo '<th scope="row"><label for="' . esc_attr( $field['args']['label_for'] ) . '">' . esc_html( $field['title'] ) . '</label></th>';
+            echo '<th scope="row"><label for="' . esc_attr( $field['args']['label_for'] ) . '">' . charitable_santitize_setting_labels( $field['title'] ) . '</label></th>'; // phpcs:ignore
 			echo '<td>';
 			call_user_func( $field['callback'], $field['args'] );
 			echo '</td>';
 		} elseif ( ! empty( $field['title'] ) ) {
 			if ( $field['args']['type'] === 'heading' && isset( $field['args']['help'] ) ) { // if this is a heading display a "help" as a subheading.
 				echo '<th scope="row" colspan="2"><h4>' . esc_html( $field['title'] ) . '</h4>';
-				echo '<p>' . sanitize_text_field( $field['args']['help'] ) . '</p>'; // phpcs:ignore
+                echo '<p>' . sanitize_text_field( $field['args']['help'] ) . '</p>'; // phpcs:ignore
 			} else {
-				echo '<th scope="row"><h4>' . esc_html( $field['title'] ) . '</h4>';
+				echo '<th scope="row"><h4>' . charitable_santitize_setting_labels( $field['title'] ) . '</h4>'; // phpcs:ignore
 			}
 			echo '</th>';
 			if ( $field['args']['type'] !== 'heading' ) {
@@ -337,7 +337,7 @@ function charitable_do_tools_fields( $page, $section ) {
 		echo "<tr{$class}>"; // phpcs:ignore
 
 		if ( ! empty( $field['args']['label_for'] ) ) {
-			echo '<th scope="row"><label for="' . esc_attr( $field['args']['label_for'] ) . '">' . esc_html( $field['title'] ) . '</label></th>';
+			echo '<th scope="row"><label for="' . esc_attr( $field['args']['label_for'] ) . '">' . charitable_santitize_setting_labels( $field['title'] ) . '</label></th>'; // phpcs:ignore
 			echo '<td>';
 			call_user_func( $field['callback'], $field['args'] );
 			echo '</td>';
@@ -346,7 +346,7 @@ function charitable_do_tools_fields( $page, $section ) {
 				echo '<th scope="row" colspan="2"><h4>' . esc_html( $field['title'] ) . '</h4>';
 				echo '<p>' . sanitize_text_field( $field['args']['help'] ) . '</p>'; // phpcs:ignore
 			} else {
-				echo '<th scope="row"><h4>' . esc_html( $field['title'] ) . '</h4>';
+				echo '<th scope="row"><h4>' . charitable_santitize_setting_labels( $field['title'] ) . '</h4>'; // phpcs:ignore
 			}
 			echo '</th>';
 			if ( $field['args']['type'] !== 'heading' ) {
@@ -1519,3 +1519,27 @@ if ( ! function_exists( 'charitable_update_usage_tracking_setting' ) ) :
 	}
 
 endif;
+
+/**
+ * Santitize setting labels to allow only <div> and <span> tags and their respective attributes.
+ *
+ * @since 1.8.4
+ *
+ * @param mixed $content The content to sanitize.
+ *
+ * @return string
+ */
+function charitable_santitize_setting_labels( $content ) {
+	$allowed_tags = array(
+		'div'  => array(
+			'class' => array(),
+			'id'    => array(),
+		),
+		'span' => array(
+			'class' => array(),
+			'id'    => array(),
+		),
+	);
+
+	return wp_kses( $content, $allowed_tags );
+}

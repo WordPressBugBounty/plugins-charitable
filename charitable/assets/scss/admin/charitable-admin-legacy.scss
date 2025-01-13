@@ -1776,17 +1776,21 @@ form#posts-filter {
 						> div {
 							flex-grow: 1;
 							display: flex;
+							align-items: center;
 						}
 						.charitable-campaign-list-banner-icon {
-							width: 50px;
+							width: auto;
+							height: 45px;
 							margin: 0px 15px 0 0;
 							img {
-								width: 45px;
+								height: 45px;
 							}
 						}
 						.charitable-campaign-list-banner-text {
 							p {
 								font-size: 16px;
+								margin-top: 0;
+								margin-bottom: 0;
 							}
 						}
 						.charitable-campaign-list-banner-button {
@@ -2436,7 +2440,7 @@ body.post-type-charitable .postbox h2 .badge {
 	padding: 0.25em 0.4em;
 	font-size: 75%;
 	font-weight: 700;
-	line-height: 1;
+	line-height: 11px;
 	text-align: center;
 	white-space: nowrap;
 	vertical-align: baseline;
