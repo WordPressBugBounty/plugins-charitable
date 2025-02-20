@@ -178,12 +178,15 @@ if ( ! class_exists( 'Charitable_Tools_System_Info' ) ) :
 		 *
 		 * @since 1.8.1.6
 		 * @version 1.8.3 added version upgraded from.
+		 * @version 1.8.4.5
 		 *
 		 * @return string
 		 */
 		private function charitable_info() {
 
 			$data = '-- Charitable Info' . "\n\n";
+
+			$activated = get_option( 'wpcharitable_activated_datetime', false );
 
 			$slug_dismissed   = get_user_meta( get_current_user_id(), 'charitable-pointer-slug-dismissed', true );
 			$dismissed_addons = get_user_meta( get_current_user_id(), 'charitable_dismissed_addons', true );
@@ -211,6 +214,9 @@ if ( ! class_exists( 'Charitable_Tools_System_Info' ) ) :
 			}
 			if ( ! empty( array_filter( $wpc_plugin_failure ) ) ) {
 				$data .= 'Plugin Version DEBUG 2:  ' . implode( ',', $wpc_plugin_failure ) . "\n";
+			}
+			if ( $activated ) {
+				$data .= 'Activated:                ' . $this->get_formatted_datetime( $activated ) . "\n";
 			}
 			return $data;
 		}

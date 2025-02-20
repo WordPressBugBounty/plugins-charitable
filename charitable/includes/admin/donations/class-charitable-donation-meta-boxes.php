@@ -324,7 +324,7 @@ if ( ! class_exists( 'Charitable_Donation_Meta_Boxes' ) ) :
 			$status  = str_replace( 'change_status_to_', '', $action );
 			$success = $donation->update_status( $status );
 
-			if ( array_key_exists( 'gateway_refund', $_POST ) && $_POST['gateway_refund'] ) {
+			if ( array_key_exists( 'gateway_refund', $_POST ) && $_POST['gateway_refund'] ) { // phpcs:ignore
 				$gateway = $donation->get_gateway();
 
 				/**
@@ -362,10 +362,11 @@ if ( ! class_exists( 'Charitable_Donation_Meta_Boxes' ) ) :
 				return;
 			}
 
-			/* translators: %s: gateway name */
-			printf( '%s' . __( 'Refund in %s automatically.', 'charitable' ),
+			printf(
+				/* translators: %s: gateway name */
+				'%s' . esc_html__( 'Refund in %s automatically.', 'charitable' ),
 				'<input type="checkbox" name="gateway_refund" value="1" />',
-				$donation->get_gateway_object()->get_name()
+				esc_html( $donation->get_gateway_object()->get_name() )
 			);
 		}
 
@@ -386,8 +387,8 @@ if ( ! class_exists( 'Charitable_Donation_Meta_Boxes' ) ) :
 			$this->maybe_save_form_submission( $donation_id );
 
 			/* Handle any fired actions */
-			if ( ! empty( $_POST['charitable_donation_action'] ) ) {
-				charitable_get_donation_actions()->do_action( sanitize_text_field( $_POST['charitable_donation_action'] ), $donation_id );
+			if ( ! empty( $_POST['charitable_donation_action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+				charitable_get_donation_actions()->do_action( sanitize_text_field( $_POST['charitable_donation_action'] ), $donation_id ); // phpcs:ignore
 			}
 
 			/**

@@ -203,7 +203,7 @@ ob_start();
 						<?php if ( ! $stripe_connected ) : ?>
 						<div class="charitable-sub-container-row">
 							<?php // translators: Suggestion on completion of checklist on checklist page. ?>
-							<p><?php printf( __( '<strong>Stripe not available in your country?</strong> Charitable works with payment gateways like PayPal, Authorize.net, Braintree, Payrexx, PayUMoney, GoCardless, and others. <a target="_blank" href="%s">View additional payment options</a> available with PRO extensions.', 'charitable' ), esc_url( admin_url( 'admin.php?page=charitable-addons' ) ) ); ?></p>
+							<p><?php echo wp_kses_post( sprintf( __( '<strong>Stripe not available in your country?</strong> Charitable works with payment gateways like PayPal, Authorize.net, Braintree, Payrexx, PayUMoney, GoCardless, and others. <a target="_blank" href="%s">View additional payment options</a> available with PRO extensions.', 'charitable' ), esc_url( admin_url( 'admin.php?page=charitable-addons' ) ) ) ); ?></p>
 						</div>
 						<?php else : ?>
 						<?php endif; ?>

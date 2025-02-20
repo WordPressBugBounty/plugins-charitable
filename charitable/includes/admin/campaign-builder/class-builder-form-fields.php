@@ -271,6 +271,7 @@ class Charitable_Builder_Form_Fields {
 	 * Output a toggle switch for the form settings in the left sidebar.
 	 *
 	 * @since 1.8.0
+	 * @since 1.8.4.5 - bug fix for saving when $values is present.
 	 *
 	 * @param mixed  $value Field value.
 	 * @param string $label Feld label.
@@ -287,7 +288,7 @@ class Charitable_Builder_Form_Fields {
 			'container_class' => '',
 			'field_id'        => '',
 			'type'            => 'toggle',
-			'defaults'        => array(),
+			'default'         => array(),
 			'checked_value'   => 'true',
 			'use_defaults'    => true,
 		);
@@ -310,7 +311,19 @@ class Charitable_Builder_Form_Fields {
 
 		foreach ( $params['options'] as $text => $box_id ) {
 
-			$checked = ( $params['use_defaults'] && ! empty( $defaults ) && in_array( $box_id, $params['defaults'] ) ) || ( ! empty( $value ) && isset( $value[ $box_id ] ) ) ? 'checked="checked"' : false;
+			// If there is any value, we need to check if the box_id is in the value.
+
+			if ( ! empty( $value ) && is_array( $value ) ) {
+				if ( key_exists( $box_id, $value ) ) {
+					$checked = 'checked="checked"';
+				} else {
+					$checked = false;
+				}
+			} elseif ( is_array( $params['default'] ) && in_array( $box_id, $params['default'] ) ) {
+				$checked = 'checked="checked"';
+			} else {
+				$checked = false;
+			}
 
 			$toggle_name = $params['name'] . '[' . $box_id . ']';
 
@@ -406,6 +419,8 @@ class Charitable_Builder_Form_Fields {
 			$params['name'] = str_replace( $params['name'][0] . ']', $params['name'][0], $name );
 		}
 
+
+
 		$css_container_classes      = isset( $params['container_class'] ) ? explode( ' ', $params['container_class'] ) : array();
 		$css_container_classes      = array_unique( $css_container_classes );
 		$params['container_class']  = implode( ' ', $css_container_classes );
@@ -438,6 +453,7 @@ class Charitable_Builder_Form_Fields {
 	 * Output a generic set of radio buttons for the form settings in the left sidebar.
 	 *
 	 * @since 1.8.0
+	 * @version 1.8.4.5
 	 *
 	 * @param string $value Field value.
 	 * @param string $label Feld label.
@@ -488,9 +504,12 @@ class Charitable_Builder_Form_Fields {
                     <label for="' . $this->id_slug . '-' . $params['id'] . '">' . $label . ' ' . $tooltip_html . '</label>';
 
 		foreach ( $params['options'] as $text => $box_id ) {
-			$checked = ( $value !== false && key_exists( $box_id, $value ) && $value[ $box_id ] !== false ) ? 'checked="checked"' : false;
-			$checked = ( false === $checked && $value !== false && $value[0] === $box_id ) ? 'checked="checked"' : $checked;
-			$checked = ( false === $checked && ! empty( $params['option_default'] ) && $box_id === $params['option_default'] ) ? 'checked="checked"' : $checked;
+			// For radio buttons, we just need to check if the value matches the box_id.
+			$checked = ( $value[0] === $box_id ) ? 'checked="checked"' : '';
+			// Only fall back to default if no value is set.
+			if ( empty( $value[0] ) && ! empty( $params['option_default'] ) && $box_id === $params['option_default'] ) {
+				$checked = 'checked="checked"';
+			}
 
 			$input_id = str_replace( '[', '-', $params['name'] );
 			$input_id = str_replace( ']', '-', $input_id );

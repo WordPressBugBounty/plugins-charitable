@@ -19,13 +19,13 @@ endif;
 
 ?>
 <input type="text"
-	id="<?php printf( 'charitable_settings_%s', implode( '_', $view_args['key'] ) ); ?>"
-	name="<?php printf( 'charitable_settings[%s]', $view_args['name'] ); ?>"
+	id="<?php printf( 'charitable_settings_%s', esc_attr( implode( '_', $view_args['key'] ) ) ); ?>"
+	name="<?php printf( 'charitable_settings[%s]', esc_attr( $view_args['name'] ) ); ?>"
 	value="<?php echo esc_attr( $value ); ?>"
 	class="<?php echo esc_attr( $view_args['classes'] ); ?>"
-    data-default-color="<?php echo $default_color; ?>"
-	<?php echo charitable_get_arbitrary_attributes( $view_args ); ?> />
+	data-default-color="<?php echo esc_attr( $default_color ); ?>"
+	<?php echo wp_kses_post( charitable_get_arbitrary_attributes( $view_args ) ); ?> />
 <?php if ( isset( $view_args['help'] ) ) : ?>
-	<div class="charitable-help"><?php echo $view_args['help']; ?></div>
+	<div class="charitable-help"><?php echo esc_html( $view_args['help'] ); ?></div>
 	<?php
 endif;

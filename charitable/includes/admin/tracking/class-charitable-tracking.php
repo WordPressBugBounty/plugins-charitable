@@ -7,7 +7,7 @@
  * @subpackage  Admin
  * @copyright   Copyright (c) 2024, David Bisset
  * @since       1.8.4
- * @version     1.8.4.2
+ * @version     1.8.4.5
  */
 
 // Exit if accessed directly.
@@ -87,6 +87,7 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 		 * Fetch tracking data.
 		 *
 		 * @since 1.8.4
+		 * @version 1.8.4.5
 		 *
 		 * @return array $data Tracked data.
 		 */
@@ -126,6 +127,8 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 			$data['upgraded_from']      = get_option( 'charitable_upgraded_from', '' );
 			$data['activated']          = get_option( 'charitable_activated', '' );
 			$data['activated_datetime'] = get_option( 'wpcharitable_activated_datetime', '' );
+			$data['first_campaign']     = get_option( 'charitable_first_campaign', '' );
+			$data['first_donation']     = get_option( 'charitable_first_donation', '' );
 			$data['multisite']          = is_multisite();
 			$data['url']                = home_url();
 			$data['themename']          = $theme_data->Name; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
@@ -745,6 +748,55 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 			}
 
 			return $wp_pages_count;
+		}
+
+		/**
+		 * Insert time for first campaign.
+		 *
+		 * @since 1.8.4.5
+		 *
+		 * @param string $insert_or_update Insert or update.
+		 * @param int    $campaign_id       Campaign ID.
+		 * @param array  $data              Data.
+		 * @param object $object            Object.
+		 *
+		 * @return void
+		 */
+		public function insert_time_to_first_campaign( $insert_or_update, $campaign_id, $data, $object ) {
+			global $wpdb;
+
+			// Only do this for inserts.
+			if ( 'insert' !== $insert_or_update ) {
+				return;
+			}
+
+			$first_campaign = get_option( 'charitable_first_campaign' );
+
+			if ( ! $first_campaign ) {
+				$first_campaign = time();
+				update_option( 'charitable_first_campaign', $first_campaign );
+			}
+		}
+
+		/**
+		 * Insert time for first donation.
+		 *
+		 * @since 1.8.4.5
+		 *
+		 * @param int    $donation_id       Donation ID.
+		 * @param object $object            Charitable_Donation_Processor Object.
+		 *
+		 * @return void
+		 */
+		public function insert_time_to_first_donation( $donation_id, $object ) {
+			global $wpdb;
+
+			$first_donation = get_option( 'charitable_first_donation' );
+
+			if ( ! $first_donation ) {
+				$first_donation = time();
+				update_option( 'charitable_first_donation', $first_donation );
+			}
 		}
 
 		/**

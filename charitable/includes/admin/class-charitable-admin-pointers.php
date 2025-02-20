@@ -178,6 +178,7 @@ if ( ! class_exists( 'Charitable_Admin_Pointers' ) ) :
 
 			$pointers = wp_json_encode( $this->pointers );
 
+			// phpcs:disable
 			echo(
 				"<script>
 				jQuery( function( $ ) {
@@ -275,6 +276,7 @@ if ( ! class_exists( 'Charitable_Admin_Pointers' ) ) :
 					}
 				});</script>"
 			);
+			// phpcs:enable
 		}
 
 		/**

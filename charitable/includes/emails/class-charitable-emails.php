@@ -74,15 +74,18 @@ if ( ! class_exists( 'Charitable_Emails' ) ) :
 		 * @return string[]
 		 */
 		public function register_emails() {
-			$this->emails = apply_filters( 'charitable_emails', array(
-				'donation_receipt'              => 'Charitable_Email_Donation_Receipt',
-				'offline_donation_receipt'      => 'Charitable_Email_Offline_Donation_Receipt',
-				'new_donation'                  => 'Charitable_Email_New_Donation',
-				'campaign_end'                  => 'Charitable_Email_Campaign_End',
-				'offline_donation_notification' => 'Charitable_Email_Offline_Donation_Notification',
-				'password_reset'                => 'Charitable_Email_Password_Reset',
-				'email_verification'            => 'Charitable_Email_Email_Verification',
-			) );
+			$this->emails = apply_filters(
+				'charitable_emails',
+				array(
+					'donation_receipt'              => 'Charitable_Email_Donation_Receipt',
+					'offline_donation_receipt'      => 'Charitable_Email_Offline_Donation_Receipt',
+					'new_donation'                  => 'Charitable_Email_New_Donation',
+					'campaign_end'                  => 'Charitable_Email_Campaign_End',
+					'offline_donation_notification' => 'Charitable_Email_Offline_Donation_Notification',
+					'password_reset'                => 'Charitable_Email_Password_Reset',
+					'email_verification'            => 'Charitable_Email_Email_Verification',
+				)
+			);
 
 			return $this->emails;
 		}
@@ -104,25 +107,32 @@ if ( ! class_exists( 'Charitable_Emails' ) ) :
 			 *
 			 * @param string[] $emails The list of emails and their label.
 			 */
-			$emails = apply_filters( 'charitable_resendable_donation_emails', array(
-				'donation_receipt',
-				'new_donation',
-				'offline_donation_receipt',
-				'offline_donation_notification',
-			) );
+			$emails = apply_filters(
+				'charitable_resendable_donation_emails',
+				array(
+					'donation_receipt',
+					'new_donation',
+					'offline_donation_receipt',
+					'offline_donation_notification',
+				)
+			);
 
 			foreach ( $emails as $email ) {
 				$class  = $this->get_email( $email );
-				$object = new $class;
+				$object = new $class();
 
-				$donation_actions->register( 'resend_' . $email, array(
-					'label'           => $object->get_name(),
-					'callback'        => array( $this, 'resend_email' ),
-					'button_text'     => __( 'Resend Email', 'charitable' ),
-					'active_callback' => array( $class, 'can_be_resent' ),
-					'success_message' => 11,
-					'failed_message'  => 12,
-				), __( 'Resend Donation Emails', 'charitable' ) );
+				$donation_actions->register(
+					'resend_' . $email,
+					array(
+						'label'           => $object->get_name(),
+						'callback'        => array( $this, 'resend_email' ),
+						'button_text'     => __( 'Resend Email', 'charitable' ),
+						'active_callback' => array( $class, 'can_be_resent' ),
+						'success_message' => 11,
+						'failed_message'  => 12,
+					),
+					__( 'Resend Donation Emails', 'charitable' )
+				);
 			}
 		}
 
@@ -142,7 +152,7 @@ if ( ! class_exists( 'Charitable_Emails' ) ) :
 		public function resend_email( $success, $object_id, $args, $action ) {
 			$email  = str_replace( 'resend_', '', $action );
 			$class  = $this->get_email( $email );
-			$object = new $class;
+			$object = new $class();
 
 			return $object->resend( $object_id, $args );
 		}
@@ -155,20 +165,20 @@ if ( ! class_exists( 'Charitable_Emails' ) ) :
 		 * @return void
 		 */
 		public function handle_email_settings_request() {
-			if ( ! wp_verify_nonce( $_REQUEST['_nonce'], 'email' ) ) {
-				wp_die( __( 'Cheatin\' eh?!', 'charitable' ) );
+			if ( ! wp_verify_nonce( $_REQUEST['_nonce'], 'email' ) ) { // phpcs:ignore
+				wp_die( __( 'Cheatin\' eh?!', 'charitable' ) ); // phpcs:ignore
 			}
 
-			$email = isset( $_REQUEST['email_id'] ) ? $_REQUEST['email_id'] : false;
+			$email = isset( $_REQUEST['email_id'] ) ? $_REQUEST['email_id'] : false; // phpcs:ignore
 
 			/* Gateway must be set */
 			if ( false === $email ) {
-				wp_die( __( 'Missing email.', 'charitable' ) );
+				wp_die( __( 'Missing email.', 'charitable' ) ); // phpcs:ignore
 			}
 
 			/* Validate email. */
 			if ( ! isset( $this->emails[ $email ] ) ) {
-				wp_die( __( 'Invalid email.', 'charitable' ) );
+				wp_die( __( 'Invalid email.', 'charitable' ) ); // phpcs:ignore
 			}
 
 			/* All good, so disable or enable the email */
@@ -222,7 +232,7 @@ if ( ! class_exists( 'Charitable_Emails' ) ) :
 					continue;
 				}
 
-				$email                            = new $class;
+				$email                            = new $class();
 				$emails[ $email->get_email_id() ] = $email->get_name();
 			}
 
@@ -264,7 +274,7 @@ if ( ! class_exists( 'Charitable_Emails' ) ) :
 		 * @return void
 		 */
 		protected function enable_email( $email ) {
-			$settings                   = get_option( 'charitable_settings', array() );
+			$settings = get_option( 'charitable_settings', array() );
 			if ( ! is_array( $settings ) ) {
 				$settings = array();
 			}

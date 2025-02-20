@@ -2585,7 +2585,7 @@ body.charitable_page_charitable-reports {
         input.charitable-datepicker {
             width: 115px;
             display: inline-block;
-            background-image: url('../images/icons/calendar.png');
+            background-image: url('../../images/icons/calendar.png');
             background-repeat: no-repeat;
             background-position: 90px center;
             background-size: 15px 15px;
@@ -2600,7 +2600,7 @@ body.charitable_page_charitable-reports {
         input.charitable-reports-datepicker {
             width: 195px;
             display: inline-block;
-            background-image: url("../images/icons/calendar.png");
+            background-image: url("../../images/icons/calendar.png");
             background-repeat: no-repeat;
             background-position: 170px center;
             background-size: 15px 15px;
@@ -3076,7 +3076,7 @@ body.charitable_page_charitable-reports {
         width: 33%;
 
         .apexcharts-canvas {
-            background-image: url("../../assets/images/icons/payments.svg");
+            background-image: url("../../../assets/images/icons/payments.svg");
             background-repeat: no-repeat;
             background-position: center;
             margin-left: auto;

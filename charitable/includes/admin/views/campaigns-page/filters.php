@@ -8,7 +8,7 @@
  * @version 1.8.0
  */
 
-$filters = $_GET;
+$filters = $_GET; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 unset(
 	$filters['post_type'],
@@ -22,8 +22,8 @@ unset(
 ?>
 
 <div class="alignleft actions charitable-export-actions charitable-campaign-filter-actions">
-	<a href="#charitable-campaigns-filter-modal" title="<?php _e( 'Export', 'charitable' ); ?>" class="campaign-export-with-icon trigger-modal hide-if-no-js" data-trigger-modal><img src="<?php echo charitable()->get_path( 'directory', false ) . 'assets/images/icons/filter.svg'; ?>" alt="<?php _e( 'Filter', 'charitable' ); ?>"  /><label><?php _e( 'Filter', 'charitable' ); ?></label></a></li>
+	<a href="#charitable-campaigns-filter-modal" title="<?php esc_html_e( 'Export', 'charitable' ); ?>" class="campaign-export-with-icon trigger-modal hide-if-no-js" data-trigger-modal><img src="<?php echo esc_url( charitable()->get_path( 'directory', false ) ) . 'assets/images/icons/filter.svg'; ?>" alt="<?php esc_html_e( 'Filter', 'charitable' ); ?>"  /><label><?php esc_html_e( 'Filter', 'charitable' ); ?></label></a></li>
 	<?php if ( count( $filters ) ) : ?>
-		<a href="<?php echo esc_url_raw( add_query_arg( array( 'post_type' => Charitable::CAMPAIGN_POST_TYPE ), admin_url( 'edit.php' ) ) ); ?>" class="charitable-campaigns-clear button dashicons-before dashicons-clear"><?php _e( 'Clear Filters', 'charitable' ); ?></a>
+		<a href="<?php echo esc_url_raw( add_query_arg( array( 'post_type' => Charitable::CAMPAIGN_POST_TYPE ), admin_url( 'edit.php' ) ) ); ?>" class="charitable-campaigns-clear button dashicons-before dashicons-clear"><?php esc_html_e( 'Clear Filters', 'charitable' ); ?></a>
 	<?php endif ?>
 </div>

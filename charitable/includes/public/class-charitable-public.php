@@ -213,6 +213,9 @@ if ( ! class_exists( 'Charitable_Public' ) ) :
 
 			wp_enqueue_style( 'charitable-styles' );
 
+			// 1.8.4.5
+			wp_enqueue_style( 'dashicons' );
+
 			/* Lean Modal is registered but NOT enqueued yet. */
 			if ( 'modal' == charitable_get_option( 'donation_form_display', 'separate_page' ) ) {
 

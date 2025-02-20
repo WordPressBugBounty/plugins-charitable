@@ -924,7 +924,7 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 			?>
 				<div class="charitable-blank-slate">
 
-					<img class="charitable-blank-slate-hero-image" src="<?php echo charitable()->get_path( 'directory', false ) . 'assets/images/icons/blank-slate-donations.svg'; ?>" alt=""  />
+					<img class="charitable-blank-slate-hero-image" src="<?php echo esc_url( charitable()->get_path( 'directory', false ) ) . 'assets/images/icons/blank-slate-donations.svg'; ?>" alt=""  />
 
 					<?php if ( $campaign_exists ) : ?>
 						<h2 class="charitable-blank-slate-message">

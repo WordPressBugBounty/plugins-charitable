@@ -38,3 +38,17 @@ add_action( 'charitable_usage_tracking_cron', array( Charitable_Tracking::get_in
  * @see     Charitable_Tracking::test_checkin()
  */
 add_action( 'init', array( Charitable_Tracking::get_instance(), 'test_checkin' ) );
+
+/**
+ * Save the time to first campaign.
+ *
+ * @see     Charitable_Tracking::insert_time_to_first_campaign()
+ */
+add_action( 'charitable_campaign_processor_save_core', array( Charitable_Tracking::get_instance(), 'insert_time_to_first_campaign' ), 10, 4 );
+
+/**
+ * Save the time to first donation.
+ *
+ * @see     Charitable_Tracking::insert_time_to_first_donation()
+ */
+add_action( 'charitable_after_save_donation', array( Charitable_Tracking::get_instance(), 'insert_time_to_first_donation' ), 10, 2 );

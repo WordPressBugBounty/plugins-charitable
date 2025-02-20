@@ -39,9 +39,9 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 		 * @return  void
 		 */
 		private function __construct() {
-			require_once( 'class-charitable-benefactor.php' );
-			require_once( 'class-charitable-benefactors-db.php' );
-			require_once( 'charitable-benefactors-hooks.php' );
+			require_once 'class-charitable-benefactor.php';
+			require_once 'class-charitable-benefactors-db.php';
+			require_once 'charitable-benefactors-hooks.php';
 		}
 
 		/**
@@ -67,7 +67,7 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 		 * @return  void
 		 */
 		public static function load() {
-			do_action( 'charitable_benefactors_addon_loaded', Charitable_Benefactors::get_instance() );
+			do_action( 'charitable_benefactors_addon_loaded', self::get_instance() );
 		}
 
 		/**
@@ -111,10 +111,13 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 		 * @return  void
 		 */
 		public function benefactor_meta_box( $benefactor, $extension ) {
-			charitable_admin_view( 'metaboxes/campaign-benefactors/summary', array(
-				'benefactor' => $benefactor,
-				'extension' => $extension,
-			) );
+			charitable_admin_view(
+				'metaboxes/campaign-benefactors/summary',
+				array(
+					'benefactor' => $benefactor,
+					'extension'  => $extension,
+				)
+			);
 		}
 
 		/**
@@ -127,10 +130,13 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 		 * @return  void
 		 */
 		public function benefactor_form( $benefactor, $extension ) {
-			charitable_admin_view( 'metaboxes/campaign-benefactors/form', array(
-				'benefactor' => $benefactor,
-				'extension' => $extension,
-			) );
+			charitable_admin_view(
+				'metaboxes/campaign-benefactors/form',
+				array(
+					'benefactor' => $benefactor,
+					'extension'  => $extension,
+				)
+			);
 		}
 
 		/**
@@ -142,12 +148,12 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 		 * @return  void
 		 */
 		public function save_benefactors( WP_Post $post ) {
-			if ( ! isset( $_POST['_campaign_benefactor'] ) ) {
+			if ( ! isset( $_POST['_campaign_benefactor'] ) ) { // phpcs:ignore
 				return;
 			}
 
 			$currency_helper = charitable_get_currency_helper();
-			$benefactors = $_POST['_campaign_benefactor'];
+			$benefactors     = $_POST['_campaign_benefactor'];
 
 			foreach ( $benefactors as $campaign_benefactor_id => $data ) {
 
@@ -156,9 +162,9 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 					continue;
 				}
 
-				$data['campaign_id'] = $post->ID;
+				$data['campaign_id']                       = $post->ID;
 				$data['contribution_amount_is_percentage'] = intval( false !== strpos( $data['contribution_amount'], '%' ) );
-				$data['contribution_amount'] = $currency_helper->sanitize_monetary_amount( $data['contribution_amount'] );
+				$data['contribution_amount']               = $currency_helper->sanitize_monetary_amount( $data['contribution_amount'] );
 
 				/* If the contribution amount was set to 0, we won't create a benefactor object. */
 				if ( 0 == $data['contribution_amount'] ) {
@@ -195,7 +201,7 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 					$data['date_deactivated'] = $campaign_end_date;
 				}
 
-				$campaign_benefactor_id = intval( $campaign_benefactor_id  ); // _0 was showing up.
+				$campaign_benefactor_id = intval( $campaign_benefactor_id ); // _0 was showing up.
 
 				/* Insert or update benefactor record */
 				if ( 0 == $campaign_benefactor_id ) {
@@ -204,7 +210,6 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 					charitable_get_table( 'benefactors' )->update( $campaign_benefactor_id, $data );
 				}
 			}//end foreach
-
 		}
 
 		/**
@@ -223,13 +228,16 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 
 			ob_start();
 
-			charitable_admin_view( 'metaboxes/campaign-benefactors/form', array(
-				'benefactor' => null,
-				'extension' => $_POST['extension'],
-				'index' => "_{$idx}",
-			) );
+			charitable_admin_view(
+				'metaboxes/campaign-benefactors/form',
+				array(
+					'benefactor' => null,
+					'extension'  => $_POST['extension'],
+					'index'      => "_{$idx}", // phpcs:ignore
+				)
+			);
 
-			echo ob_get_clean();
+			echo ob_get_clean(); //phpcs:ignore
 
 			wp_die();
 		}
@@ -251,7 +259,7 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 				$return = array( 'error' => __( 'No benefactor ID provided.', 'charitable' ) );
 			} else {
 				$deleted = charitable_get_table( 'benefactors' )->delete( $benefactor_id );
-				$return = array( 'deleted' => $deleted );
+				$return  = array( 'deleted' => $deleted );
 			}
 
 			echo wp_json_encode( $return );

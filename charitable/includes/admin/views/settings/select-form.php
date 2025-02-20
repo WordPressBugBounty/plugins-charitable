@@ -25,20 +25,20 @@ $error_message      = false;
 
 // determine if the fields should be shown, based on what we are trying to do with them.
 if ( isset( $view_args['nonce_action_name'] ) && 'export_campaign' === $view_args['nonce_action_name'] && is_array( $view_args['options'] ) && 0 === count( $view_args['options'] ) ) {
-    $error_message = '<strong>' . __('You have no campaigns to export.', 'charitable' ) . '</strong>';
-} else if ( isset( $view_args['nonce_action_name'] ) && 'export_donations_from_campaign' === $view_args['nonce_action_name'] && is_array( $view_args['options'] ) && 0 === count( $view_args['options'] ) ) {
-	$error_message = '<strong>' . __('You have no donations to export.', 'charitable' ) . '</strong>';
+	$error_message = '<strong>' . __( ' You have no campaigns to export.', 'charitable' ) . '</strong>';
+} elseif ( isset( $view_args['nonce_action_name'] ) && 'export_donations_from_campaign' === $view_args['nonce_action_name'] && is_array( $view_args['options'] ) && 0 === count( $view_args['options'] ) ) {
+	$error_message = '<strong>' . __( 'You have no donations to export.', 'charitable' ) . '</strong>';
 }
 ?>
-<form action="<?php echo $form_action_url; ?>" method="<?php echo $form_action_method; ?>">
+<form action="<?php echo esc_url( $form_action_url ); ?>" method="<?php echo esc_attr( $form_action_method ); ?>">
 
 	<?php wp_nonce_field( $nonce_action_name, $nonce_field_name ); ?>
 
 	<?php if ( ! $error_message ) { ?>
-		<select id="<?php printf( 'charitable_settings_%s', implode( '_', $view_args['key'] ) ); ?>"
-			name="<?php printf( 'charitable_settings[%s]', $view_args['name'] ); ?>"
+		<select id="<?php printf( 'charitable_settings_%s', esc_attr( implode( '_', $view_args['key'] ) ) ); ?>"
+			name="<?php printf( 'charitable_settings[%s]', esc_attr( $view_args['name'] ) ); ?>"
 			class="<?php echo esc_attr( $view_args['classes'] ); ?>"
-			<?php echo charitable_get_arbitrary_attributes( $view_args ); ?>
+			<?php echo charitable_get_arbitrary_attributes( $view_args ); // phpcs:ignore ?>
 			>
 			<?php
 			foreach ( $view_args['options'] as $key => $option ) :
@@ -47,22 +47,22 @@ if ( isset( $view_args['nonce_action_name'] ) && 'export_campaign' === $view_arg
 					?>
 					<optgroup label="<?php echo $label; ?>">
 					<?php foreach ( $option['options'] as $k => $opt ) : ?>
-						<option value="<?php echo $k; ?>" <?php selected( $k, $value ); ?>><?php echo $opt; ?></option>
+						<option value="<?php echo $k; ?>" <?php selected( $k, $value ); // phpcs:ignore ?>><?php echo $opt; ?></option>
 					<?php endforeach ?>
 					</optgroup>
 				<?php else : ?>
-					<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $key, $value ); ?>><?php echo $option; ?></option>
+					<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $key, $value ); ?>><?php echo $option; // phpcs:ignore ?></option>
 					<?php
 				endif;
 			endforeach
 			?>
 		</select>
-		<input class="button button-primary" type="submit" value="<?php echo $button_label; ?>">
+		<input class="button button-primary" type="submit" value="<?php echo $button_label; // phpcs:ignore ?>">
 	<?php } else { ?>
-        <p><?php echo $error_message; ?></p>
-    <?php } ?>
+		<p><?php echo $error_message; ?></p>
+	<?php } ?>
 </form>
 <?php if ( isset( $view_args['help'] ) ) : ?>
-	<div class="charitable-help"><?php echo $view_args['help']; ?></div>
+	<div class="charitable-help"><?php echo $view_args['help']; // phpcs:ignore ?></div>
 	<?php
 endif;

@@ -334,8 +334,8 @@ if ( ! class_exists( 'Charitable_Email_Email_Verification' ) ) :
 		protected function get_default_body() {
 			ob_start();
 			?>
-<p><?php _e( 'Welcome to [charitable_email show=site_name]', 'charitable' ); ?></p>
-<p><?php _e( 'To complete your registration, please confirm your email address by clicking the link below:', 'charitable' ); ?></p>
+<p><?php esc_html_e( 'Welcome to [charitable_email show=site_name]', 'charitable' ); ?></p>
+<p><?php esc_html_e( 'To complete your registration, please confirm your email address by clicking the link below:', 'charitable' ); ?></p>
 <p><a href="[charitable_email show=confirmation_url]">[charitable_email show=confirmation_url]</a></p>
 			<?php
 			/**

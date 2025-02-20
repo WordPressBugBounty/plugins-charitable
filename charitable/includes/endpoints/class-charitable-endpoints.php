@@ -542,11 +542,11 @@ if ( ! class_exists( 'Charitable_Endpoints' ) ) :
 							echo esc_url( add_query_arg( 'charitable-tab', 'all', remove_query_arg( $removed_args ) ) );}
 						?>
 						#tabs-panel-charitable-all">
-							<?php _e( 'View All', 'charitable' ); ?>
+							<?php esc_html_e( 'View All', 'charitable' ); ?>
 						</a>
 					</li><!-- /.tabs -->
 				</ul>
-				<div id="tabs-panel-charitable-all" class="tabs-panel tabs-panel-view-all <?php echo ( 'all' == $current_tab ? 'tabs-panel-active' : 'tabs-panel-inactive' ); ?>">
+				<div id="tabs-panel-charitable-all" class="tabs-panel tabs-panel-view-all <?php echo ( 'all' === $current_tab ? 'tabs-panel-active' : 'tabs-panel-inactive' ); ?>">
 					<ul id="charitable-checklist-all" class="categorychecklist form-no-clear">
 					<?php
 						echo walk_nav_menu_tree( array_map( 'wp_setup_nav_menu_item', $endpoints ), 0, (object) array( 'walker' => $walker ) );
@@ -567,7 +567,7 @@ if ( ! class_exists( 'Charitable_Endpoints' ) ) :
 							)
 						);
 						?>
-									#charitable" class="select-all"><?php _e( 'Select All', 'charitable' ); ?></a>
+									#charitable" class="select-all"><?php esc_html_e( 'Select All', 'charitable' ); ?></a>
 					</span>
 					<span class="add-to-menu">
 						<input type="submit"<?php wp_nav_menu_disabled_check( $nav_menu_selected_id ); ?> class="button-secondary submit-add-to-menu right" value="<?php esc_attr_e( 'Add to Menu', 'charitable' ); ?>" name="add-charitable-menu-item" id="submit-charitable" />

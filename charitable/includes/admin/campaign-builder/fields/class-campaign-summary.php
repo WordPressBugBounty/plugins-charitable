@@ -130,7 +130,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Summary' ) ) :
 
 			<?php
 
-			$preview_css_class = $this->maybe_display_field( $campaign_data, $field_id, 'campaign_hide_number_of_donors' ) ? false : 'charitable-hidden';
+			$preview_css_class = $this->maybe_display_field( $campaign_data, $field_id, 'campaign_hide_number_of_donors', $field_data ) ? false : 'charitable-hidden';
 
 			?>
 
@@ -293,7 +293,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Summary' ) ) :
 						esc_html__( 'Percent Raised', 'charitable' )   => 'campaign_hide_percent_raised',
 						esc_html__( 'Time Remaining', 'charitable' )   => 'campaign_hide_time_remaining',
 					),
-					'defaults'    => array(
+					'defaults'     => array(
 						'campaign_hide_amount_donated',
 						'campaign_hide_number_of_donors',
 					),
@@ -398,10 +398,20 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Summary' ) ) :
 		 * @param array  $campaign_data Campaign Data.
 		 * @param int    $field_id Field ID.
 		 * @param string $slug Slug.
+		 * @param array  $field_data Field Data.
 		 */
-		public function maybe_display_field( $campaign_data = false, $field_id = 0, $slug = false ) {
+		public function maybe_display_field( $campaign_data = false, $field_id = 0, $slug = false, $field_data = false ) {
 
 			if ( false === $slug ) {
+				return false;
+			}
+
+			// Overriding check - if the slug is a key in $field_Data and equals 1, return true.
+			if ( ! empty( $field_data ) && ! empty( $field_data['show_hide'] ) && key_exists( $slug, $field_data['show_hide'] ) ) {
+				if ( 1 === intval( $field_data['show_hide'][ $slug ] ) ) {
+					return true;
+				}
+			} else if ( ! empty( $field_data ) && ! empty( $field_data['show_hide'] ) && ! key_exists( $slug, $field_data['show_hide'] ) ) {
 				return false;
 			}
 
@@ -421,8 +431,10 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Summary' ) ) :
 				}
 			} else { // phpcs:ignore
 				// With no settings, establish defaults.
-				if ( 'campaign_hide_amount_donated' === $slug || 'campaign_hide_number_of_donors' === $slug ) {
-					return true;
+				if ( empty( $settings ) || ! isset( $settings['show_hide'] ) ) {
+					if ( 'campaign_hide_amount_donated' === $slug || 'campaign_hide_number_of_donors' === $slug ) {
+						return true;
+					}
 				}
 			}
 

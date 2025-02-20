@@ -19,14 +19,14 @@ $date_time_format = get_option( 'date_format' ) . ' - ' . get_option( 'time_form
 	<table class="widefat">
 		<thead>
 			<tr>
-				<th><?php _e( 'Date &amp; Time', 'charitable' ); ?></th>
-				<th><?php _e( 'Log', 'charitable' ); ?></th>
+				<th><?php esc_html_e( 'Date &amp; Time', 'charitable' ); ?></th>
+				<th><?php esc_html_e( 'Log', 'charitable' ); ?></th>
 			</th>
 		</thead>
 		<?php foreach ( $logs as $log ) : ?>
 		<tr>
-			<td><?php echo get_date_from_gmt( date( 'Y-m-d H:i:s', $log['time'] ), $date_time_format ); ?></td>
-			<td><?php echo $log['message']; ?></td>
+			<td><?php echo esc_html( get_date_from_gmt( gmdate( 'Y-m-d H:i:s', $log['time'] ), $date_time_format ) ); ?></td>
+			<td><?php echo ( $log['message'] ); // phpcs:ignore ?></td>
 		</tr>
 		<?php endforeach ?>
 	</table>

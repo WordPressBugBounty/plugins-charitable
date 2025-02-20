@@ -131,16 +131,23 @@ if ( ! class_exists( 'Charitable_Privacy_Settings' ) ) :
 					'default'  => __( 'Your personal data will be used to process your donation, support your experience throughout this website, and for other purposes described in our [privacy_policy].', 'charitable' ),
 					'help'     => __( 'Information about your website privacy policy for people to see when they donate, register an account, or manage their profile. Leave empty to disable.', 'charitable' ),
 				),
-				'donation_form_minimal_fields'  => array(
+				'contact_consent'  => array(
 					'title'    => __( 'Contact Consent Field', 'charitable' ),
 					'type'     => 'radio',
 					'priority' => 40,
-					'default'  => '1',
+					'default'  => '0',
 					'options'  => array(
 						'1' => __( 'Yes', 'charitable' ),
 						'0' => __( 'No', 'charitable' ),
 					),
 					'help'     => __( 'Display a checkbox asking people for their consent to being contacted when they donate, register an account, or manage their profile.', 'charitable' ),
+				),
+				'contact_consent_required'     => array(
+					'label_for' => __( 'Make Consent Field Required For Donation Forms', 'charitable' ),
+					'type'      => 'checkbox',
+					'help'      => __( 'Requires the user acknowledge consent before submitting a donation, which might be required for some countries or situations.', 'charitable' ),
+					'priority'  => 41,
+					'default'   => false,
 				),
 				'contact_consent_label'         => array(
 					'title'    => __( 'Contact Consent Label', 'charitable' ),

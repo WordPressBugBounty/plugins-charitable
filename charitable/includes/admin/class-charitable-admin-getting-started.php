@@ -205,7 +205,7 @@ class Charitable_Admin_Getting_Started {
 
 		?>
 
-		<div id="charitable-welcome" class="<?php echo sanitize_html_class( $class ); ?>">
+		<div id="charitable-welcome" class="<?php echo esc_attr( sanitize_html_class( $class ) ); ?>">
 
 			<div class="container">
 
@@ -219,7 +219,7 @@ class Charitable_Admin_Getting_Started {
 					</div>
 
 					<a href="#" class="play-video" title="<?php esc_attr_e( 'Watch to learn more about Charitable', 'charitable' ); ?>">
-						<img src="<?php echo charitable()->get_path( 'assets', false ); // phpcs:ignore ?>images/onboarding/getting-started/video-poster.jpg" width="100%" alt="<?php esc_attr_e( 'Watch how to create your first campaign', 'charitable' ); ?>" class="video-thumbnail">
+						<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/onboarding/getting-started/video-poster.jpg" width="100%" alt="<?php esc_attr_e( 'Watch how to create your first campaign', 'charitable' ); ?>" class="video-thumbnail">
 					</a>
 
 					<div class="block">
@@ -253,7 +253,7 @@ class Charitable_Admin_Getting_Started {
 						<?php if ( $stripe_connect_url ) : ?>
 							<div class="charitable-sub-container charitable-connect-stripe">
 								<div>
-									<div class="charitable-gateway-icon"><img src="<?php echo charitable()->get_path( 'assets', false ); // phpcs:ignore ?>/images/onboarding/stripe-checklist.svg" alt=""></div><div class="charitable-gateway-info-column"><h3><?php esc_html_e( 'Stripe', 'charitable' ); ?> <span class="charitable-badge charitable-badge-sm charitable-badge-inline charitable-badge-green charitable-badge-rounded"><i class="fa fa-star" aria-hidden="true"></i><?php esc_html_e( 'Recommended', 'charitable' ); ?></span></h3>
+									<div class="charitable-gateway-icon"><img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); // phpcs:ignore ?>/images/onboarding/stripe-checklist.svg" alt=""></div><div class="charitable-gateway-info-column"><h3><?php esc_html_e( 'Stripe', 'charitable' ); ?> <span class="charitable-badge charitable-badge-sm charitable-badge-inline charitable-badge-green charitable-badge-rounded"><i class="fa fa-star" aria-hidden="true"></i><?php esc_html_e( 'Recommended', 'charitable' ); ?></span></h3>
 										<?php if ( ! $stripe_connected ) : ?>
 											<p><?php esc_html_e( 'You can create and connect to your Stripe account in just a few minutes.', 'charitable' ); ?></p>
 										<?php else : ?>
@@ -455,7 +455,7 @@ class Charitable_Admin_Getting_Started {
 						<h1><?php esc_html_e( 'Testimonials', 'charitable' ); ?></h1>
 
 						<div class="testimonial-block charitable-clear">
-							<img src="<?php echo charitable()->get_path( 'assets', false ); // phpcs:ignore ?>/images/onboarding/getting-started/stephen-circle2x.jpg">
+							<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); // phpcs:ignore ?>/images/onboarding/getting-started/stephen-circle2x.jpg">
 							<div class="testimonials-stars">
 								<div><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.776 4.454a.25.25 0 01.448 0l2.069 4.192a.25.25 0 00.188.137l4.626.672a.25.25 0 01.139.426l-3.348 3.263a.25.25 0 00-.072.222l.79 4.607a.25.25 0 01-.362.263l-4.138-2.175a.25.25 0 00-.232 0l-4.138 2.175a.25.25 0 01-.363-.263l.79-4.607a.25.25 0 00-.071-.222L4.754 9.881a.25.25 0 01.139-.426l4.626-.672a.25.25 0 00.188-.137l2.069-4.192z"></path></svg></div>
 								<div><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.776 4.454a.25.25 0 01.448 0l2.069 4.192a.25.25 0 00.188.137l4.626.672a.25.25 0 01.139.426l-3.348 3.263a.25.25 0 00-.072.222l.79 4.607a.25.25 0 01-.362.263l-4.138-2.175a.25.25 0 00-.232 0l-4.138 2.175a.25.25 0 01-.363-.263l.79-4.607a.25.25 0 00-.071-.222L4.754 9.881a.25.25 0 01.139-.426l4.626-.672a.25.25 0 00.188-.137l2.069-4.192z"></path></svg></div>
@@ -470,7 +470,7 @@ class Charitable_Admin_Getting_Started {
 
 
 						<div class="testimonial-block charitable-clear">
-						<img src="<?php echo charitable()->get_path( 'assets', false ); // phpcs:ignore ?>/images/onboarding/getting-started/paul-circle2x.jpg" />
+						<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); // phpcs:ignore ?>/images/onboarding/getting-started/paul-circle2x.jpg" />
 							<div class="testimonials-stars">
 								<div><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.776 4.454a.25.25 0 01.448 0l2.069 4.192a.25.25 0 00.188.137l4.626.672a.25.25 0 01.139.426l-3.348 3.263a.25.25 0 00-.072.222l.79 4.607a.25.25 0 01-.362.263l-4.138-2.175a.25.25 0 00-.232 0l-4.138 2.175a.25.25 0 01-.363-.263l.79-4.607a.25.25 0 00-.071-.222L4.754 9.881a.25.25 0 01.139-.426l4.626-.672a.25.25 0 00.188-.137l2.069-4.192z"></path></svg></div>
 								<div><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.776 4.454a.25.25 0 01.448 0l2.069 4.192a.25.25 0 00.188.137l4.626.672a.25.25 0 01.139.426l-3.348 3.263a.25.25 0 00-.072.222l.79 4.607a.25.25 0 01-.362.263l-4.138-2.175a.25.25 0 00-.232 0l-4.138 2.175a.25.25 0 01-.363-.263l.79-4.607a.25.25 0 00-.071-.222L4.754 9.881a.25.25 0 01.139-.426l4.626-.672a.25.25 0 00.188-.137l2.069-4.192z"></path></svg></div>

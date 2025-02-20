@@ -1,3 +1,9 @@
+# 1.8.4.5
+* NEW: A minimum number of characters is now required for a password for user registeration. Customize via the 'charitable_minimum_password_length' filter.
+* FIX: Resolved issues related to the campaign visual builder and several UI elements.
+* FIX: Improved methods of exporting and importing donations via Tools.
+* FIX: Updated code related to opt-in data collection, translations, CSS, UI, typos, and PHP standards.
+
 # 1.8.4.4
 * FIX: Adjusted escaping of setting labels resolving an issue rendering HTML beta tags.
 * FIX: CSS adjustments to display banners on some admin screens.

@@ -45,10 +45,32 @@ if ( ! class_exists( 'Charitable_Donors_Shortcode' ) ) :
 				'show_amount'       => 1,
 				'show_avatar'       => 1,
 				'hide_if_no_donors' => 0,
+				'campaign_categories' => '',
 				'builder_preview'   => false, // added in 1.8.0
 			);
 
-			$args           = shortcode_atts( $default, $atts, 'charitable_donors' );
+			$args = shortcode_atts( $default, $atts, 'charitable_donors' );
+
+			if ( '' !== $args['campaign_categories'] ) {
+				$campaign_categories = str_replace( ', ', ',', $args['campaign_categories'] );
+				$campaign_categories = explode( ',', $args['campaign_categories'] );
+				$cat_args            = [
+					'post_type'      => 'campaign',
+					'posts_per_page' => -1,
+					'fields'         => 'ids',
+					'tax_query'      => [
+						[
+							'taxonomy' => 'campaign_category',
+							'field'    => 'slug',
+							'terms'    => $campaign_categories,
+						],
+					],
+				];
+				$query               = new WP_Query( $cat_args );
+				if ( ! empty( $query->posts ) ) {
+					$args['campaign'] = $query->posts;
+				}
+			}
 			$args['donors'] = self::get_donors( $args );
 
 			/**

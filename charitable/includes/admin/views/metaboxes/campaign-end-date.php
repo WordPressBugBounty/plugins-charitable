@@ -23,13 +23,13 @@ $description        = array_key_exists( 'description', $view_args ) ? $view_args
 ?>
 <div id="charitable-campaign-end-date-metabox-wrap" class="charitable-metabox-wrap">
 	<label for="campaign_end_date"><?php echo $title; ?></label>
-	<input type="text" id="campaign_end_date" name="_campaign_end_date" placeholder="&#8734;" class="charitable-datepicker" autocomplete="off" data-date="<?php echo $end_date_formatted; ?>" data-format="<?php echo $js_format; ?>" />
+	<input type="text" id="campaign_end_date" name="_campaign_end_date" placeholder="&#8734;" class="charitable-datepicker" autocomplete="off" data-date="<?php echo esc_attr( $end_date_formatted ); ?>" data-format="<?php echo esc_attr( $js_format ); ?>" />
 	<?php if ( $end_date ) : ?>
-		<span class="charitable-end-time"><?php echo date_i18n( '@ G:i A', $end_time ); ?></span>
+		<span class="charitable-end-time"><?php echo esc_html( date_i18n( '@ G:i A', $end_time ) ); ?></span>
 		<input type="hidden" id="campaign_end_time" name="_campaign_end_time" value="<?php echo esc_attr( date_i18n( 'H:i:s', $end_time ) ); ?>" />
 	<?php else : ?>
 		<span class="charitable-end-time" style="display: none;">=</span>
 		<input type="hidden" id="campaign_end_time" name="_campaign_end_time" value="0" />
 	<?php endif ?>
-	<span class="charitable-helper"><?php echo $description; ?></span>
+	<span class="charitable-helper"><?php echo $description; // phpcs:ignore ?></span>
 </div>

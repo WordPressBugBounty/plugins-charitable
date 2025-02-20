@@ -405,12 +405,7 @@ if ( ! class_exists( 'Charitable_Field_Donation_Wall' ) ) :
 						'Show Location' => 'show_location',
 						'Show Amount'   => 'show_amount',
 						'Show Avatar'   => 'show_avatar',
-					),
-					'defaults'        => array(
-						'show_name',
-						'show_amount',
-						'show_avatar',
-					),
+					)
 				)
 			);
 

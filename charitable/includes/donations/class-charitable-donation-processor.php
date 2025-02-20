@@ -919,7 +919,7 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 				$redirect_url = charitable_get_permalink( 'donation_receipt_page', array( 'donation_id' => $this->donation_id ) );
 			}
 
-			return $redirect_url;
+			return apply_filters( 'charitable_redirection_after_gateway_processing', $redirect_url, $gateway_processing, $this );
 		}
 
 		/**

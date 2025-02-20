@@ -336,16 +336,15 @@
 #charitable-design-wrap .charitable-field-preview-social-linking .charitable-social-field-column.charitable-social-linking-preview-youtube .charitable-placeholder {
   background-image: url("../../images/campaign-builder/fields/social-sharing/youtube.svg");
 }
-#charitable-design-wrap .charitable-field-preview-social-sharing .charitable-social-field-column.charitable-social-sharing-preview-threads .charitable-placeholder, #charitable-design-wrap .charitable-field-preview-social-sharing .charitable-social-field-column.charitable-social-linking-preview-threads .charitable-placeholder,
-#charitable-design-wrap .charitable-field-preview-social-linking .charitable-social-field-column.charitable-social-sharing-preview-threads .charitable-placeholder,
-#charitable-design-wrap .charitable-field-preview-social-linking .charitable-social-field-column.charitable-social-linking-preview-threads .charitable-placeholder {
-  background-image: url("../../images/campaign-builder/fields/social-sharing/threads.svg");
-}
-
 #charitable-design-wrap .charitable-field-preview-social-sharing .charitable-social-field-column.charitable-social-sharing-preview-bluesky .charitable-placeholder, #charitable-design-wrap .charitable-field-preview-social-sharing .charitable-social-field-column.charitable-social-linking-preview-bluesky .charitable-placeholder,
 #charitable-design-wrap .charitable-field-preview-social-linking .charitable-social-field-column.charitable-social-sharing-preview-bluesky .charitable-placeholder,
 #charitable-design-wrap .charitable-field-preview-social-linking .charitable-social-field-column.charitable-social-linking-preview-bluesky .charitable-placeholder {
   background-image: url("../../images/campaign-builder/fields/social-sharing/bluesky.svg");
+}
+#charitable-design-wrap .charitable-field-preview-social-sharing .charitable-social-field-column.charitable-social-sharing-preview-threads .charitable-placeholder, #charitable-design-wrap .charitable-field-preview-social-sharing .charitable-social-field-column.charitable-social-linking-preview-threads .charitable-placeholder,
+#charitable-design-wrap .charitable-field-preview-social-linking .charitable-social-field-column.charitable-social-sharing-preview-threads .charitable-placeholder,
+#charitable-design-wrap .charitable-field-preview-social-linking .charitable-social-field-column.charitable-social-linking-preview-threads .charitable-placeholder {
+  background-image: url("../../images/campaign-builder/fields/social-sharing/threads.svg");
 }
 #charitable-design-wrap .charitable-field-preview-social-sharing div.charitable-field-row div,
 #charitable-design-wrap .charitable-field-preview-social-linking div.charitable-field-row div {
@@ -371,22 +370,47 @@
   margin-left: 5px;
 }
 #charitable-design-wrap .charitable-field-preview-campaign-summary {
-  padding-left: 20px;
-  padding-right: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+}
+#charitable-design-wrap .charitable-field-preview-campaign-summary .placeholder {
+  width: 100%;
+}
+#charitable-design-wrap .charitable-field-preview-campaign-summary .placeholder h5 {
+  margin-bottom: 0;
+}
+#charitable-design-wrap .charitable-field-preview-campaign-summary .placeholder:has(h5:empty):not(:has(h5:not(:empty))) {
+  display: none;
+}
+#charitable-design-wrap .charitable-field-preview-campaign-summary .placeholder:empty {
+  display: none;
+}
+#charitable-design-wrap .charitable-field-preview-campaign-summary .charitable-field-template-headline {
+  width: 100%;
+  margin-bottom: 20px;
 }
 #charitable-design-wrap .charitable-field-preview-campaign-summary .campaign-summary-item {
-  float: left;
-  width: 50%;
   border-bottom: 1px solid #e6e6e6;
   opacity: 0.35;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: left;
+  text-transform: capitalize;
+  flex: 0 0 calc(50% - 10px);
 }
-#charitable-design-wrap .charitable-field-preview-campaign-summary .amount,
-#charitable-design-wrap .charitable-field-preview-campaign-summary .donors-count {
+#charitable-design-wrap .charitable-field-preview-campaign-summary .campaign-summary-item:nth-child(odd) {
+  text-align: left;
+}
+#charitable-design-wrap .charitable-field-preview-campaign-summary .campaign-summary-item:nth-child(even) {
+  text-align: left;
+}
+#charitable-design-wrap .charitable-field-preview-campaign-summary .campaign-summary-item span {
+  text-align: left;
+  text-transform: capitalize;
   display: block;
-  font-size: 1.5em;
-  font-weight: bolder;
-  color: #e27730;
-  line-height: 1.7em;
 }
 #charitable-design-wrap .charitable-field-preview-info-bar .row {
   width: 100%;

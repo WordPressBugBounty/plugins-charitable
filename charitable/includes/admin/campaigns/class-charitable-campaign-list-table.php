@@ -59,6 +59,8 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 		 *
 		 * @since  1.8.0
 		 *
+		 * @param  string $classes The current body classes.
+		 *
 		 * @return string
 		 */
 		public function admin_body_class( $classes ) {
@@ -382,17 +384,17 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 						break;
 
 					default:
-						$vars['post_status'] = esc_attr( $_GET['post_status'] );
+						$vars['post_status'] = esc_attr( $_GET['post_status'] ); // phpcs:ignore
 						$vars['perm']        = 'readable';
 				}
 			}
 
 			if ( ! empty( $_GET['charitable_nonce'] ) &&
-				wp_verify_nonce( esc_html( $_GET['charitable_nonce'] ), 'charitable_filter_campaigns' ) ) :
+				wp_verify_nonce( esc_html( $_GET['charitable_nonce'] ), 'charitable_filter_campaigns' ) ) :  // phpcs:ignore
 
 				/* Set up start date query */
 				if ( isset( $_GET['start_date_from'] ) && ! empty( $_GET['start_date_from'] ) ) {
-					$start_date_from             = $this->get_parsed_date( esc_html( $_GET['start_date_from'] ) );
+					$start_date_from             = $this->get_parsed_date( esc_html( $_GET['start_date_from'] ) );  // phpcs:ignore
 					$vars['date_query']['after'] = array(
 						'year'  => $start_date_from['year'],
 						'month' => $start_date_from['month'],
@@ -401,7 +403,7 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 				}
 
 				if ( isset( $_GET['start_date_to'] ) && ! empty( $_GET['start_date_to'] ) ) {
-					$start_date_to                = $this->get_parsed_date( esc_html( $_GET['start_date_to'] ) );
+					$start_date_to                = $this->get_parsed_date( esc_html( $_GET['start_date_to'] ) );  // phpcs:ignore
 					$vars['date_query']['before'] = array(
 						'year'  => $start_date_to['year'],
 						'month' => $start_date_to['month'],
@@ -411,7 +413,7 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 
 				/* Set up end date query */
 				if ( isset( $_GET['end_date_from'] ) && ! empty( $_GET['end_date_from'] ) ) {
-					$end_date_from        = $this->get_parsed_date( esc_html( $_GET['end_date_from'] ) );
+					$end_date_from        = $this->get_parsed_date( esc_html( $_GET['end_date_from'] ) ); // phpcs:ignore
 					$vars['meta_query'][] = array(
 						'key'     => '_campaign_end_date',
 						'value'   => sprintf( '%d-%d-%d 00:00:00', $end_date_from['year'], $end_date_from['month'], $end_date_from['day'] ),
@@ -421,7 +423,7 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 				}
 
 				if ( isset( $_GET['end_date_to'] ) && ! empty( $_GET['end_date_to'] ) ) {
-					$end_date_to          = $this->get_parsed_date( esc_html( $_GET['end_date_to'] ) );
+					$end_date_to          = $this->get_parsed_date( esc_html( $_GET['end_date_to'] ) );  // phpcs:ignore
 					$vars['meta_query'][] = array(
 						'key'     => '_campaign_end_date',
 						'value'   => sprintf( '%d-%d-%d 00:00:00', $end_date_to['year'], $end_date_to['month'], $end_date_to['day'] ),
@@ -435,7 +437,7 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 				}
 
 				/* Filter by campaign. */
-				if ( isset( $_GET['campaign_id'] ) && false !== stripos( esc_html( $_GET['charitable_nonce'] ), 'all' ) ) {
+				if ( isset( $_GET['campaign_id'] ) && false !== stripos( esc_html( $_GET['charitable_nonce'] ), 'all' ) ) {  // phpcs:ignore
 					$vars['post__in'] = charitable_get_table( 'campaign_donations' )->get_donation_ids_for_campaign( intval( $_GET['campaign_id'] ) );
 				}
 
@@ -533,14 +535,14 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 			?>
 				<div class="charitable-blank-slate">
 
-					<img class="charitable-blank-slate-hero-image" src="<?php echo charitable()->get_path( 'directory', false ) . 'assets/images/icons/blank-slate-campaigns.svg'; ?>" alt=""  />
+					<img class="charitable-blank-slate-hero-image" src="<?php echo esc_url( charitable()->get_path( 'directory', false ) ) . 'assets/images/icons/blank-slate-campaigns.svg'; ?>" alt=""  />
 
 					<h2 class="charitable-blank-slate-message">
 						<?php esc_html_e( 'Get Started And Create Your First Campaign!', 'charitable' ); ?>
 					</h2>
 
 					<div class="charitable-blank-slate-buttons">
-						<a class="charitable-blank-slate-cta charitable-button" target="_blank" href="<?php echo admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ); ?>"><?php esc_html_e( 'Create Campaign', 'charitable' ); ?></a>
+						<a class="charitable-blank-slate-cta charitable-button" target="_blank" href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ) ); ?>"><?php esc_html_e( 'Create Campaign', 'charitable' ); ?></a>
 						<div class="charitable-blank-slate-buttons-legacy">
 							<div><a target="_blank" href="https://www.wpcharitable.com/documentation/creating-your-first-campaign/?utm_campaign=liteplugin&utm_source=charitableplugin&utm_medium=campaign-page&utm_content=Read%20The%20Full%20Guide"><?php esc_html_e( 'Read The Guide On Creating Your First Campaign', 'charitable' ); ?></a></div>
 							<?php if ( ! charitable_disable_legacy_campaigns() ) : ?>

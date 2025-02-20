@@ -263,7 +263,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 
 			foreach ( $fields as $key => $field_type_data ) :
 
-				$field_type = is_array( $field_type_data ) && ! empty( $field_type_data['type'] ) ? esc_attr( $field_type_data['type'] ) : esc_attr( $key );
+				$field_type = is_array( $field_type_data ) && ! empty( $field_type_data['type'] ) ? esc_html( $field_type_data['type'] ) : esc_html( $key );
 
 				$type = 'Charitable_Field_' . str_replace( ' ', '_', ( ucwords( str_replace( '-', ' ', $field_type ) ) ) );
 
@@ -299,9 +299,9 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						$class->can_be_deleted ? 'charitable-can-delete' : 'charitable-no-delete',
 					);
 
-					echo '<div class="' . implode( ' ', $charitable_field_css_classes ) . '" id="charitable-field-' . intval( $field_id ) . '" data-field-id="' . intval( $field_id ) . '" data-field-type="' . esc_attr( $field_type ) . '" data-field-max="' . intval( $class->max_allowed ) . '" style="">';
+					echo '<div class="' . esc_attr( implode( ' ', $charitable_field_css_classes ) ) . '" id="charitable-field-' . intval( $field_id ) . '" data-field-id="' . intval( $field_id ) . '" data-field-type="' . esc_attr( $field_type ) . '" data-field-max="' . intval( $class->max_allowed ) . '" style="">'; // phpcs:ignore
 					if ( $class->can_be_edited ) :
-						echo '<a href="#" class="charitable-field-edit" data-type="' . esc_attr( $class->edit_type ) . '" data-section="' . $class->edit_section . '" data-edit-field-id="' . $class->edit_field_id . '" title="' . $class->edit_label . '"><i class="fa fa-pencil"></i></a>';
+						echo '<a href="#" class="charitable-field-edit" data-type="' . esc_attr( $class->edit_type ) . '" data-section="' . esc_attr( $class->edit_section ) . '" data-edit-field-id="' . esc_attr( $class->edit_field_id ) . '" title="' . esc_attr( $class->edit_label ) . '"><i class="fa fa-pencil"></i></a>';
 					endif;
 					if ( $class->can_be_duplicated ) :
 						echo '<a href="#" class="charitable-field-duplicate" title="Duplicate Field"><i class="fa fa-files-o" aria-hidden="true"></i></a>';
@@ -547,7 +547,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 													$class->can_be_deleted ? 'charitable-can-delete' : 'charitable-no-delete',
 												);
 
-												echo '<div class="' . implode( ' ', $charitable_field_css_classes ) . '" id="charitable-field-' . intval( $field_id ) . '" data-field-id="' . intval( $field_id ) . '" data-field-type="' . $field_type . '" data-field-max="' . $class->max_allowed . '" style="">';
+												echo '<div class="' . implode( ' ', $charitable_field_css_classes ) . '" id="charitable-field-' . intval( $field_id ) . '" data-field-id="' . intval( $field_id ) . '" data-field-type="' . esc_attr( $field_type ) . '" data-field-max="' . esc_attr( $class->max_allowed ) . '" style="">';
 
 												if ( $class->can_be_edited ) :
 													echo '<a href="#" class="charitable-field-edit" data-type="' . esc_attr( $class->edit_type ) . '" data-section="' . esc_attr( $class->edit_section ) . '" data-edit-field-id="' . esc_attr( $class->edit_field_id ) . '" title="' . esc_html( $class->edit_label ) . '"><i class="fa fa-pencil"></i></a>';
@@ -558,7 +558,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 												if ( $class->can_be_deleted ) :
 													echo '<a href="#" class="charitable-field-delete" title="Delete Field"><i class="fa fa-trash-o"></i></a>';
 													endif;
-												echo $class->field_preview( $field_settings, $campaign_data, $field_id, 'preview', $theme );
+												echo $class->field_preview( $field_settings, $campaign_data, $field_id, 'preview', $theme ); // phpcs:ignore
 												echo '</div>';
 
 												else :
@@ -591,13 +591,13 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						<?php endif; ?>
 					</ul>
 					<?php if ( $no_tab_class ) : ?>
-						<p class="no-tab-notice"><?php echo $this->no_tab_empty_notice(); ?></p>
+						<p class="no-tab-notice"><?php echo $this->no_tab_empty_notice(); // phpcs:ignore ?></p>
 					<?php endif; ?>
 				</div>
 
 			<?php
 
-			echo ob_get_clean();
+			echo ob_get_clean(); // phpcs:ignore
 
 			return absint( $field_id - 1 );
 		}
@@ -645,13 +645,13 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 				$display_html = $this->get_addon_install_or_activate_buttons( $field_type );
 
 				if ( ! empty( $display_html['title'] ) ) {
-					echo $display_html['title'];
+					echo $display_html['title']; // phpcs:ignore
 				} else {
 					echo '<h2>We\'re sorry, the <strong>' . esc_html( $field_label ) . '</strong> does not seem to be available.</h2>';
 				}
 
 				if ( ! empty( $display_html['description'] ) ) {
-					echo $display_html['description'];
+					echo $display_html['description']; // phpcs:ignore
 				} else {
 					echo '<p>Please make sure that you have the latest version of the <strong>' . esc_html( $addon_label ) . '</strong> addon installed and activated.</p>';
 				}
@@ -659,9 +659,9 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 				echo '<div class="education-buttons">';
 
 				if ( ! empty( $display_html['buttons'] ) ) {
-					echo $display_html['buttons'];
+					echo $display_html['buttons']; // phpcs:ignore
 				} else {
-					echo '<a class="button-link" target="_blank" href="' . admin_url( 'admin.php?page=charitable-addons&search=' . $search_term ) . '">' . esc_html__( 'View Addons', 'charitable' ) . '</a>';
+					echo '<a class="button-link" target="_blank" href="' . esc_url( admin_url( 'admin.php?page=charitable-addons&search=' . $search_term ) ) . '">' . esc_html__( 'View Addons', 'charitable' ) . '</a>';
 				}
 
 				echo '</div>';
@@ -733,7 +733,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 					'title'       => '<h2>We\'re sorry, the <strong>' . esc_html( $addon_information['name'] ) . '</strong> addon does not seem to be available.</h2>',
 					'description' => '<p>It appears you need <strong>' . esc_html( $addon_information['name'] ) . '</strong> to be installed and activated.</p>',
 					'buttons'     => '<a class="button-link charitable-not-installed" data-plugin-url="' . $addon_information['install'] . '" data-name="' . $addon_information['name'] . '" data-slug="" data-field-icon="" href="#">' . esc_html__( 'Install &amp; Activate ', 'charitable' ) . esc_html( $addon_information['name'] ) . '</a>',
-					'install_url' => ! empty( $addon_informationp['install'] ) ? esc_url( $addon_informationp['install'] ) : false,
+					'install_url' => ! empty( $addon_information['install'] ) ? esc_url( $addon_information['install'] ) : false,
 				);
 			}
 
@@ -1065,11 +1065,11 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 										$last_field_id = (int) $this->render_fields( $section['fields'], $theme, $campaign_data, $last_field_id );
 										break;
 									case 'tabs':
-										echo $this->get_template_element_start( 'tabs', null, null, $campaign_data );
+										echo $this->get_template_element_start( 'tabs', null, null, $campaign_data ); // phpcs:ignore
 										$campaign_tabs = ! empty( $campaign_data['tabs'] ) ? $campaign_data['tabs'] : array();
-										echo $this->get_template_tab_nav( $section['tabs'], $theme, $campaign_tabs );
+										echo $this->get_template_tab_nav( $section['tabs'], $theme, $campaign_tabs ); // phpcs:ignore
 										$last_field_id = (int) $this->get_template_tab_content( $section['tabs'], $theme, $campaign_data, $row_fields, $last_field_id );
-										echo $this->get_template_element_end( 'tabs' );
+										echo $this->get_template_element_end( 'tabs' ); // phpcs:ignore
 										$tabs_rendered = true;
 										break;
 									default:
@@ -1086,7 +1086,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 
 								echo '<div class="charitable-drag-new-block-here"><p>Drag New Block Here.</p></div>';
 
-								echo $field_html;
+								echo $field_html; // phpcs:ignore
 
 								++$section_counter;
 
@@ -1102,7 +1102,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 							echo '<!-- column END -->';
 						}
 
-						echo $this->get_template_element_end( $row['type'], $element_counter );
+						echo $this->get_template_element_end( $row['type'], $element_counter ); // phpcs:ignore
 
 						++$element_counter;
 					}
@@ -1193,7 +1193,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 									if ( class_exists( $type ) ) :
 										$class = new $type();
 										if ( method_exists( $class, 'settings_display' ) ) {
-											echo $class->settings_display( $field_id, $campaign_data ); // second param was $this->campaign_data, but that isn't available.
+											echo $class->settings_display( $field_id, $campaign_data ); // phpcs:ignore --- second param was $this->campaign_data, but that isn't available.
 										}
 									endif;
 									++$field_id;
@@ -1216,7 +1216,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 										if ( class_exists( $type ) ) :
 											$class = new $type();
 											if ( method_exists( $class, 'settings_display' ) ) {
-												echo $class->settings_display( $field_id, $campaign_data ); // second param was $this->campaign_data, but that isn't available.
+												echo $class->settings_display( $field_id, $campaign_data ); // phpcs:ignore --- second param was $this->campaign_data, but that isn't available.
 											}
 										endif;
 
@@ -1280,7 +1280,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						<input type="checkbox" id="charitable-panel-field-settings-charitable-campaign-enable-tabs" name="layout__advanced__enable_tabs" data-advanced-field-id="enable_tabs" value="disabled" <?php checked( $enable_tabs, 'disabled' ); ?> />
 						<label class="charitable-toggle-control-icon" for="charitable-panel-field-settings-charitable-campaign-enable-tabs"></label>
 						<label for="charitable-panel-field-settings-charitable-campaign-enable-tabs">Hide tab section. </label>
-						<?php echo charitable_get_tooltip_html( esc_html__( 'Remove tabs from your public campaign page but not delete any items in the preview.', 'charitable' ), 'tooltipstered' ); ?>
+						<?php echo charitable_get_tooltip_html( esc_html__( 'Remove tabs from your public campaign page but not delete any items in the preview.', 'charitable' ), 'tooltipstered' ); // phpcs:ignore ?>
 					</span>
 				</div>
 
@@ -1517,7 +1517,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 
 			if ( isset( $_GET['campaign_id'] ) && 0 !== intval( $_GET['campaign_id'] ) ) { // phpcs:ignore
 
-				$template_data       = charitable_get_template_data_from_campaign( abs( $_GET['campaign_id'] ) );
+				$template_data       = charitable_get_template_data_from_campaign( abs( $_GET['campaign_id'] ) ); // phpcs:ignore
 				$current_template_id = isset( $template_data['template_id'] ) ? $template_data['template_id'] : false;
 
 			}

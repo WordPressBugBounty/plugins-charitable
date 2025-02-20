@@ -359,6 +359,18 @@
             &.charitable-social-linking-preview-mastodon .charitable-placeholder  {
                 background-image: url( '../../images/campaign-builder/fields/social-sharing/mastodon.svg');
             }
+            &.charitable-social-sharing-preview-youtube .charitable-placeholder,
+            &.charitable-social-linking-preview-youtube .charitable-placeholder  {
+                background-image: url( '../../images/campaign-builder/fields/social-sharing/youtube.svg');
+            }
+            &.charitable-social-sharing-preview-bluesky .charitable-placeholder,
+            &.charitable-social-linking-preview-bluesky .charitable-placeholder  {
+                background-image: url( '../../images/campaign-builder/fields/social-sharing/bluesky.svg');
+            }
+            &.charitable-social-sharing-preview-threads .charitable-placeholder,
+            &.charitable-social-linking-preview-threads .charitable-placeholder  {
+                background-image: url( '../../images/campaign-builder/fields/social-sharing/threads.svg');
+            }
         }
         div.charitable-field-row div {
             text-align: center;
@@ -385,28 +397,83 @@
 
     /* campaign summary */
 
-    .charitable-field-preview-campaign-summary {
+    // .charitable-field-preview-campaign-summary {
 
-        padding-left: 20px;
-        padding-right: 20px;
+    //     padding-left: 20px;
+    //     padding-right: 20px;
+
+    //     .campaign-summary-item {
+    //         float: left;
+    //         width: 50%;
+    //         // padding: 1em 0;
+    //         border-bottom: 1px solid #e6e6e6;
+    //         opacity: 0.35;
+    //     }
+
+    //     .amount,
+    //     .donors-count {
+    //         display: block;
+    //         font-size: 1.5em;
+    //         font-weight: bolder;
+    //         color: $color_orange;
+    //         line-height: 1.7em;
+    //     }
+
+    // }
+
+    .charitable-field-preview-campaign-summary {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        width: 100%;
+
+        .placeholder {
+            width: 100%;
+            h5 {
+                margin-bottom: 0;
+            }
+        }
+
+        .placeholder:has(h5:empty):not(:has(h5:not(:empty))) {
+            display: none;
+        }
+
+        .placeholder {
+            // If the placeholder div itself is empty
+            &:empty {
+                display: none;
+            }
+        }
+
+        .charitable-field-template-headline {
+            width: 100%;
+            margin-bottom: 20px;
+        }
 
         .campaign-summary-item {
-            float: left;
-            width: 50%;
-            // padding: 1em 0;
             border-bottom: 1px solid #e6e6e6;
             opacity: 0.35;
-        }
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 16px;
+            text-align: left;
+            text-transform: capitalize;
+            flex: 0 0 calc(50% - 10px);
 
-        .amount,
-        .donors-count {
-            display: block;
-            font-size: 1.5em;
-            font-weight: bolder;
-            color: $color_orange;
-            line-height: 1.7em;
-        }
+            &:nth-child(odd) {
+                text-align: left;
+            }
 
+            &:nth-child(even) {
+                text-align: left;
+            }
+
+            span {
+                text-align: left;
+                text-transform: capitalize;
+                display: block;
+            }
+        }
     }
 
     /* info bar */

@@ -22,13 +22,13 @@ $default_editor_args = array(
 );
 $editor_args         = wp_parse_args( $editor_args, $default_editor_args );
 ?>
-<div <?php echo charitable_get_arbitrary_attributes( $view_args ); ?>>
+<div <?php echo esc_attr( charitable_get_arbitrary_attributes( $view_args ) ); ?>>
 	<?php
 	wp_editor( $value, sprintf( 'charitable_settings_%s', implode( '_', $view_args['key'] ) ), $editor_args );
 
 	if ( isset( $view_args['help'] ) ) :
 		?>
-		<div class="charitable-help"><?php echo $view_args['help']; ?></div>
+		<div class="charitable-help"><?php echo esc_html( $view_args['help'] ); ?></div>
 		<?php
 	endif;
 	?>

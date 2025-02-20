@@ -136,6 +136,8 @@
 .charitable-form-field.charitable-form-field-checkbox label {
   display: inline;
   padding-left: 4px;
+  font-size: 16px;
+  line-height: 16px;
 }
 
 .charitable-form-field.charitable-radio-list {
@@ -782,6 +784,26 @@ h3.charitable-header {
   padding: 0;
   margin: 0;
   list-style: none;
+}
+.charitable-notice > ul.charitable-notice-errors {
+  font-size: 1rem;
+  line-height: 1rem;
+}
+.charitable-notice > ul.charitable-notice-errors li {
+  margin-bottom: 5px;
+}
+.charitable-notice > ul.charitable-notice-errors li:last-child {
+  margin-bottom: 0;
+}
+.charitable-notice > ul.charitable-notice-errors li:before {
+  content: "\f534";
+  font-family: "dashicons";
+  height: 15px;
+  color: orange;
+  position: relative;
+  top: 6px;
+  font-size: 1.3rem;
+  margin-right: 10px;
 }
 
 .charitable-notice > ul li {

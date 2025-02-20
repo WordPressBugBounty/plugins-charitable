@@ -540,7 +540,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 																		<?php
 																		if ( $include_icons ) :
 																			?>
-										<img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/east.svg'; // phpcs:ignore ?>" /><?php endif; ?></a></p>
+										<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ) . 'images/icons/east.svg'; // phpcs:ignore ?>" /><?php endif; ?></a></p>
 								</div>
 							<?php endif; ?>
 						</div>
@@ -550,7 +550,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 												<?php
 												if ( $include_icons ) :
 													?>
-								<img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/east.svg'; // phpcs:ignore ?>" /><?php endif; ?></a>
+								<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ) . 'images/icons/east.svg'; // phpcs:ignore ?>" /><?php endif; ?></a>
 							<?php endif; ?>
 						</div>
 					</div>
@@ -581,7 +581,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 																	<?php
 																	if ( $include_icons ) :
 																		?>
-									<img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/east.svg'; // phpcs:ignore ?>" /><?php endif; ?></a></p>
+									<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ) . 'images/icons/east.svg'; // phpcs:ignore ?>" /><?php endif; ?></a></p>
 								<?php endif; ?>
 							</div>
 						<?php endif; ?>
@@ -589,9 +589,9 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 						<div class="more">
 							<?php if ( ! empty( $top_campaigns->posts ) && false === $action ) : ?>
 								<?php if ( charitable_disable_legacy_campaigns() ) : ?>
-									<a href="<?php echo admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ); // phpcs:ignore ?>"><?php echo esc_html__( 'Add New Campaign', 'charitable' ); ?> <img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/east.svg'; // phpcs:ignore ?>" /></a>
+									<a href="<?php echo admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ); // phpcs:ignore ?>"><?php echo esc_html__( 'Add New Campaign', 'charitable' ); ?> <img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ) . 'images/icons/east.svg'; // phpcs:ignore ?>" /></a>
 								<?php else : ?>
-									<a href="<?php echo admin_url( 'post-new.php?post_type=campaign' ); // phpcs:ignore ?>"><?php echo esc_html__( 'Add New Campaign', 'charitable' ); ?> <img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/east.svg'; // phpcs:ignore ?>" /></a>
+									<a href="<?php echo admin_url( 'post-new.php?post_type=campaign' ); // phpcs:ignore ?>"><?php echo esc_html__( 'Add New Campaign', 'charitable' ); ?> <img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ) . 'images/icons/east.svg'; // phpcs:ignore ?>" /></a>
 								<?php endif; ?>
 							<?php endif; ?>
 						</div>
@@ -639,7 +639,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 											<?php endforeach; ?>
 										</div>
 										<div class="no-items">
-									<p class="link"><a href="<?php echo admin_url( 'admin.php?page=charitable-tools&tab=snippets' ); ?>"><?php esc_html_e( 'View All Snippets', 'charitable' ); ?> <img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/east.svg'; ?>" /> </a></p>
+									<p class="link"><a href="<?php echo admin_url( 'admin.php?page=charitable-tools&tab=snippets' ); ?>"><?php esc_html_e( 'View All Snippets', 'charitable' ); ?> <img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ) . 'images/icons/east.svg'; ?>" /> </a></p>
 								</div>
 									</div>
 								</div>
@@ -729,7 +729,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 												<?php endif; ?>
 												<a href="<?php echo esc_url( $extension_url ); ?>" target="_blank" rel="noopener">
 													<?php /* translators: %s: extension title */ ?>
-													<img src="<?php echo charitable()->get_path( 'assets', false ); ?>images/extensions/<?php echo esc_attr( $addon_slug ); ?>.png" alt="<?php echo esc_attr( sprintf( _x( '%s banner', 'extension banner', 'charitable' ), $addon_slug ) ); ?>" />
+													<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/extensions/<?php echo esc_attr( $addon_slug ); ?>.png" alt="<?php echo esc_attr( sprintf( _x( '%s banner', 'extension banner', 'charitable' ), $addon_slug ) ); ?>" />
 													<h4><?php echo esc_html( $addon_info['title'] ); ?></h4>
 													<?php echo esc_html( $addon_info['description'] ); ?>
 												</a>
@@ -1435,7 +1435,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 				<p><?php esc_html_e( 'Thanks for being a loyal Charitable Lite user. Upgrade to Charitable Pro to unlock all the awesome features and experience why Charitable is consistently rated a top WordPress donation and fundraising plugin.', 'charitable' ); ?></p>
 				<p>
 					<?php
-					printf( __( 'We know that you will truly love Charitable. Over 10,000+ non-profits who have chosen Charitable to get more donations from their website can\'t be wrong!', 'charitable' ) ); // phpcs:ignore
+					printf( esc_html__( 'We know that you will truly love Charitable. Over 10,000+ non-profits who have chosen Charitable to get more donations from their website can\'t be wrong!', 'charitable' ) );
 					?>
 				</p>
 				<h6><?php esc_html_e( 'Pro Features:', 'charitable' ); ?></h6>

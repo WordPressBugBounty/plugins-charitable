@@ -83,7 +83,7 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 		public function render( $field_data = false, $campaign_data = false, $field_id = false, $mode = 'template', $template_data = false ) {
 
 			$show_donated_css = false;
-			$show_goal        = false;
+			$show_goal_css    = false;
 			$headline         = ! empty( $field_data['headline'] ) ? '<h5 class="charitable-field-preview-headline">' . esc_html( $field_data['headline'] ) . '</h5>' : '';
 
 			$goal = isset( $campaign_data['id'] ) ? get_post_meta( $campaign_data['id'], '_campaign_goal', true ) : false;
@@ -114,6 +114,10 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 				}
 			}
 
+			// if the "show_goal" is set to "show_goal" then show the goal, otherise do not but hidding it by setting 'charitable-hidden' class.
+			$show_donated_css = ! empty( $field_data ) && ! empty( $field_data['show_hide'] ) && in_array( 'show_donated', $field_data['show_hide'] ) ? '' : 'charitable-hidden';
+			$show_goal_css    = ! empty( $field_data ) && ! empty( $field_data['show_hide'] ) && in_array( 'show_goal', $field_data['show_hide'] ) ? '' : 'charitable-hidden';
+
 			$progress_bar_css = $show_progress_bar ? '' : ' charitable-campaign-preview-not-available charitable-hidden';
 
 			$width = ( 'preview' === $mode ) ? $this->keep_in_range( absint( $percent ), 5, 100 ) : $this->keep_in_range( absint( $percent ), 0, 100 );
@@ -124,7 +128,7 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 
 				$preview_text .= '<div class="placeholder charitable-placeholder meta-top">' . $headline;
 				$preview_text .= '<div class="progress-bar-info-row">';
-				$preview_text .= '<div class="campaign-percent-raised ' . $show_donated_css . '">' . $show_donated . '</div><div class="campaign-goal ' . $show_goal . '"> ' . $goal . '</div></div>';
+				$preview_text .= '<div class="campaign-percent-raised ' . $show_donated_css . '">' . $show_donated . '</div><div class="campaign-goal ' . $show_goal_css . '"> ' . $goal . '</div></div>';
 				$preview_text .= '<div class="progress' . $progress_bar_css . '"><div class="progress-bar" style="width: ' . $width . '%"><span></span></div></div>';
 				$preview_text .= '</div>';
 
@@ -133,7 +137,7 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 				$preview_text .= '<div class="placeholder charitable-placeholder meta-bottom">' . $headline;
 				$preview_text .= '<div class="progress' . $progress_bar_css . '"><div class="progress-bar" style="width: ' . $width . '%"><span></span></div></div>';
 				$preview_text .= '<div class="progress-bar-info-row">';
-				$preview_text .= '<div class="campaign-percent-raised ' . $show_donated_css . '">' . $show_donated . '</div><div class="campaign-goal ' . $show_goal . '"> ' . $goal . '</div></div>';
+				$preview_text .= '<div class="campaign-percent-raised ' . $show_donated_css . '">' . $show_donated . '</div><div class="campaign-goal ' . $show_goal_css . '"> ' . $goal . '</div></div>';
 				$preview_text .= '</div>';
 
 			}
@@ -229,7 +233,7 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 						'Show Donated' => 'show_donated',
 						'Show Goal'    => 'show_goal',
 					),
-					'defaults'        => array(
+					'default'         => array(
 						'show_donated',
 						'show_goal',
 					),
@@ -323,8 +327,8 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 		 */
 		public function settings_display_ajax() {
 
-			$field_id    = isset( $_POST['field_id'] ) ? intval( $_POST['field_id'] ) : false;
-			$campaign_id = isset( $_POST['campaign_id'] ) ? intval( $_POST['campaign_id'] ) : false;
+			$field_id    = isset( $_POST['field_id'] ) ? intval( $_POST['field_id'] ) : false; // phpcs:ignore
+			$campaign_id = isset( $_POST['campaign_id'] ) ? intval( $_POST['campaign_id'] ) : false; // phpcs:ignore
 
 			if ( false === $field_id ) {
 				return;
@@ -341,7 +345,7 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( //	phpcs:ignore
 				$settings['css_class'],
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(

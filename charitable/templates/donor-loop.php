@@ -107,7 +107,7 @@ if ( $donors->count() ) :
 			<?php for ( $x = 1; $x <= $limit; $x++ ) : ?>
 			<li class="donor">
 				<?php if ( ! empty( $args['show_avatar'] ) && 1 === intval( $args['show_avatar'] ) ) : ?>
-				<img alt="" src="<?php echo charitable()->get_path( 'directory', false ) . 'assets/images/campaign-builder/fields/donor-wall/avatar.jpg'; ?>" class="avatar avatar-100 photo" loading="lazy" decoding="async" width="100" height="100">
+				<img alt="" src="<?php echo esc_url( charitable()->get_path( 'directory', false ) ) . 'assets/images/campaign-builder/fields/donor-wall/avatar.jpg'; ?>" class="avatar avatar-100 photo" loading="lazy" decoding="async" width="100" height="100">
 				<?php endif; ?>
 				<?php if ( ! empty( $args['show_name'] ) && 1 === intval( $args['show_name'] ) ) : ?>
 				<p class="donor-name"><?php _e( 'John Smith', 'charitable' ); ?></p>

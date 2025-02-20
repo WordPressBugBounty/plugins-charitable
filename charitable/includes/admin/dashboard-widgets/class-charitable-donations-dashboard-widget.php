@@ -49,11 +49,11 @@ if ( ! class_exists( 'Charitable_Donations_Dashboard_Widget' ) ) :
 		 * @return  void
 		 */
 		public static function display() {
-	?>
+			?>
 			<p class="hide-if-no-js">
-				<img src="<?php echo charitable()->get_path( 'assets', false ) ?>/images/charitable-loading.gif" width="60" height="60" alt="<?php esc_attr_e( 'Loading&hellip;', 'charitable' ) ?>" />
+				<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>/images/charitable-loading.gif" width="60" height="60" alt="<?php esc_attr_e( 'Loading&hellip;', 'charitable' ); ?>" />
 			</p>
-	<?php
+			<?php
 		}
 
 		/**

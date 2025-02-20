@@ -77,7 +77,7 @@ if ( ! class_exists( 'Charitable_Customize_Select_Sections_Control' ) ) :
 
 			$output .= '</select>';
 
-			echo $output;
+			echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	}
 

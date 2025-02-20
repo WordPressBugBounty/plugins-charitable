@@ -30,56 +30,56 @@ $this_year  = $table->get_donations_summary_by_period( apply_filters( 'charitabl
 <div class="charitable-donation-statistics">
 	<div class="cell">
 		<h3 class="amount">
-			<?php echo charitable_format_money( $today->amount ); ?>
+			<?php echo esc_html( charitable_format_money( $today->amount ) ); ?>
 		</h3>
 		<p class="summary">
 			<?php
 				printf(
 					/* translators: %d: number of donations */
-					_n( '%d donation <span class="time-period">today</span>', '%d donations <span class="time-period">today</span>', $today->count, 'charitable' ),
-					$today->count
+					esc_html( _n( '%d donation <span class="time-period">today</span>', '%d donations <span class="time-period">today</span>', $today->count, 'charitable' ) ),
+					intval( $today->count )
 				);
 				?>
 		</p>
 	</div>
 	<div class="cell">
 		<h3 class="amount">
-			<?php echo charitable_format_money( $this_month->amount ); ?>
+			<?php echo esc_html( charitable_format_money( $this_month->amount ) ); ?>
 		</h3>
 		<p class="summary">
 			<?php
 				printf(
 					/* translators: %d: number of donations */
-					_n( '%d donation <span class="time-period">this month</span>', '%d donations <span class="time-period">this month</span>', $this_month->count, 'charitable' ),
-					$this_month->count
+					esc_html( _n( '%d donation <span class="time-period">this month</span>', '%d donations <span class="time-period">this month</span>', $this_month->count, 'charitable' ) ),
+					intval( $this_month->count )
 				);
 				?>
 		</p>
 	</div>
 	<div class="cell">
 		<h3 class="amount">
-			<?php echo charitable_format_money( $last_month->amount ); ?>
+			<?php echo esc_html( charitable_format_money( $last_month->amount ) ); ?>
 		</h3>
 		<p class="summary">
 			<?php
 				printf(
 					/* translators: %d: number of donations */
-					_n( '%d donation <span class="time-period">last month</span>', '%d donations <span class="time-period">last month</span>', $last_month->count, 'charitable' ),
-					$last_month->count
+					esc_html( _n( '%d donation <span class="time-period">last month</span>', '%d donations <span class="time-period">last month</span>', $last_month->count, 'charitable' ) ),
+					intval( $last_month->count )
 				);
 				?>
 		</p>
 	</div>
 	<div class="cell">
 		<h3 class="amount">
-			<?php echo charitable_format_money( $this_year->amount ); ?>
+			<?php echo esc_html( charitable_format_money( $this_year->amount ) ); ?>
 		</h3>
 		<p class="summary">
 			<?php
 				printf(
 					/* translators: %d: number of donations */
-					_n( '%d donation <span class="time-period">this year</span>', '%d donations <span class="time-period">this year</span>', $this_year->count, 'charitable' ),
-					$this_year->count
+					esc_html( _n( '%d donation <span class="time-period">this year</span>', '%d donations <span class="time-period">this year</span>', $this_year->count, 'charitable' ) ),
+					intval( $this_year->count )
 				);
 				?>
 		</p>
@@ -88,16 +88,16 @@ $this_year  = $table->get_donations_summary_by_period( apply_filters( 'charitabl
 <?php if ( count( $donations ) ) : ?>
 	<div class="recent-donations">
 		<table>
-			<caption><h3><?php _e( 'Recent Donations', 'charitable' ); ?></h3></caption>
+			<caption><h3><?php esc_html_e( 'Recent Donations', 'charitable' ); ?></h3></caption>
 			<?php
 			foreach ( $donations as $donation_id ) :
 				$donation = charitable_get_donation( $donation_id );
 				?>
 			<tr>
-				<td class="donation-date"><?php echo $donation->get_date(); ?></td>
-				<td class="donation-id">#<?php echo $donation->get_number(); ?></td>
-				<td class="donation-status"><?php echo $donation->get_status_label(); ?></td>
-				<td class="donation-total"><?php echo charitable_format_money( $donation->get_total(), false, true, $donation->get_currency() ); ?></td>
+				<td class="donation-date"><?php echo esc_html( $donation->get_date() ); ?></td>
+				<td class="donation-id">#<?php echo esc_html( $donation->get_number() ); ?></td>
+				<td class="donation-status"><?php echo esc_html( $donation->get_status_label() ); ?></td>
+				<td class="donation-total"><?php echo esc_html( charitable_format_money( $donation->get_total(), false, true, $donation->get_currency() ) ); ?></td>
 			</tr>
 				<?php
 			endforeach;

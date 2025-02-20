@@ -26,7 +26,7 @@ ob_start();
 
 	<h2 class="nav-tab-wrapper">
 		<?php foreach ( $sections as $the_tab => $name ) : ?>
-			<a href="<?php echo esc_url( add_query_arg( array( 'tab' => $the_tab ), admin_url( 'admin.php?page=charitable-reports' ) ) ); ?>" class="nav-tab <?php echo sanitize_title( $name ); ?> <?php echo $active_tab === $the_tab ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( $name ); ?></a>
+			<a href="<?php echo esc_url( add_query_arg( array( 'tab' => $the_tab ), admin_url( 'admin.php?page=charitable-reports' ) ) ); ?>" class="nav-tab <?php echo esc_attr( sanitize_title( $name ) ); ?> <?php echo $active_tab === $the_tab ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( $name ); ?></a>
 		<?php endforeach ?>
 	</h2>
 

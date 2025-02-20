@@ -113,7 +113,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 						''         => __( 'Single field', 'charitable' ),
 						'multiple' => __( 'Multiple fields', 'charitable' ),
 					),
-					'help'     => __( 'Single field (default) provides the card, expiration data, zip code, and CVC fields in one field. Multiple fields (beta) are seperated.', 'charitable' ),
+					'help'     => __( 'Single field (default) provides the card, expiration date, zip code, and CVC fields in one field. Multiple fields (beta) are seperated.', 'charitable' ),
 				],
 			);
 

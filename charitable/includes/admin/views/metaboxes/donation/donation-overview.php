@@ -35,25 +35,25 @@ $total = apply_filters( 'charitable_donation_details_table_total', $donation->ge
 			<div class="donation-erasure-notice">
 				<?php
 					/* translators: %s: erasure date */
-					printf( __( 'Personal data for this donation was erased on %s.', 'charitable' ), $data_erased );
+					printf( esc_html__( 'Personal data for this donation was erased on %s.', 'charitable' ), esc_html( $data_erased ) );
 				?>
 			</div>
 		</div>
 	<?php endif ?>
 	<div class="donation-banner-wrapper">
 		<div class="donation-banner">
-			<h3 class="donation-number"><?php printf( '%s #%d', __( 'Donation', 'charitable' ), $donation->get_number() ); ?></h3>
-			<span class="donation-date"><?php echo $date; ?></span>
-			<a href="<?php echo esc_url( add_query_arg( 'show_form', true ) ); ?>" class="donation-edit-link"><?php _e( 'Edit Donation', 'charitable' ); ?></a>
+			<h3 class="donation-number"><?php printf( '%s #%d', esc_html__( 'Donation', 'charitable' ), esc_html( $donation->get_number() ) ); ?></h3>
+			<span class="donation-date"><?php echo esc_html( $date ); ?></span>
+			<a href="<?php echo esc_url( add_query_arg( 'show_form', true ) ); ?>" class="donation-edit-link"><?php esc_html_e( 'Edit Donation', 'charitable' ); ?></a>
 		</div>
 	</div>
 	<div id="donor" class="charitable-media-block">
 		<div class="donor-avatar charitable-media-image">
-			<?php echo $donor->get_avatar( 80 ); ?>
+			<?php echo $donor->get_avatar( 80 ); // phpcs:ignore ?>
 		</div>
 		<div class="donor-facts charitable-media-body">
-			<h3 class="donor-name"><?php echo $donor->get_name(); ?></h3>
-			<p class="donor-email"><?php echo $donor->get_email(); ?></p>
+			<h3 class="donor-name"><?php echo esc_html( $donor->get_name() ); ?></h3>
+			<p class="donor-email"><?php echo esc_html( $donor->get_email() ); ?></p>
 			<?php
 			/**
 			 * Display additional details about the donor.
@@ -72,11 +72,11 @@ $total = apply_filters( 'charitable_donation_details_table_total', $donation->ge
 			<?php
 				printf(
 					'%s: <mark class="status %s">%s</mark>',
-					__( 'Status', 'charitable' ),
-					$donation->get_status(),
-					$donation->get_status_label()
+					esc_html__( 'Status', 'charitable' ),
+					$donation->get_status(), // phpcs:ignore
+					$donation->get_status_label() // phpcs:ignore
 				);
-			?>
+				?>
 		</span>
 		<?php if ( $donation->contact_consent_explicitly_set() || ! is_null( $donor->contact_consent ) ) : ?>
 			<span class="contact-consent">
@@ -85,9 +85,9 @@ $total = apply_filters( 'charitable_donation_details_table_total', $donation->ge
 
 					printf(
 						'%s: <span class="consent %s">%s</span>',
-						__( 'Contact Consent', 'charitable' ),
-						strtolower( str_replace( ' ', '-', $consent ) ),
-						$consent
+						esc_html__( 'Contact Consent', 'charitable' ),
+						strtolower( str_replace( ' ', '-', $consent ) ), // phpcs:ignore
+						$consent // phpcs:ignore
 					);
 				?>
 			</span>
@@ -107,8 +107,8 @@ $total = apply_filters( 'charitable_donation_details_table_total', $donation->ge
 	<table id="overview">
 		<thead>
 			<tr>
-				<th class="col-campaign-name"><?php _e( 'Campaign', 'charitable' ); ?></th>
-				<th class="col-campaign-donation-amount"><?php _e( 'Total', 'charitable' ); ?></th>
+				<th class="col-campaign-name"><?php esc_html_e( 'Campaign', 'charitable' ); ?></th>
+				<th class="col-campaign-donation-amount"><?php esc_html_e( 'Total', 'charitable' ); ?></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -125,7 +125,7 @@ $total = apply_filters( 'charitable_donation_details_table_total', $donation->ge
 					 * @param object              $campaign_donation The campaign donation object.
 					 * @param Charitable_Donation $donation          The Donation object.
 					 */
-					echo apply_filters( 'charitable_donation_details_table_campaign_donation_campaign', $campaign_donation->campaign_name, $campaign_donation, $donation )
+					echo apply_filters( 'charitable_donation_details_table_campaign_donation_campaign', $campaign_donation->campaign_name, $campaign_donation, $donation )  // phpcs:ignore
 				?>
 				</td>
 				<td class="campaign-donation-amount">
@@ -139,7 +139,7 @@ $total = apply_filters( 'charitable_donation_details_table_total', $donation->ge
 					 * @param object              $campaign_donation The campaign donation object.
 					 * @param Charitable_Donation $donation          The Donation object.
 					 */
-					echo apply_filters( 'charitable_donation_details_table_campaign_donation_amount', charitable_format_money( $campaign_donation->amount, false, false, $donation->get_currency() ), $campaign_donation, $donation )
+					echo apply_filters( 'charitable_donation_details_table_campaign_donation_amount', charitable_format_money( $campaign_donation->amount, false, false, $donation->get_currency() ), $campaign_donation, $donation ) // phpcs:ignore
 				?>
 				</td>
 			</tr>
@@ -157,8 +157,8 @@ $total = apply_filters( 'charitable_donation_details_table_total', $donation->ge
 			if ( apply_filters( 'charitable_donation_details_table_show_subtotal', false ) ) :
 				?>
 					<tr>
-						<th><?php _e( 'Subtotal', 'charitable' ); ?></th>
-						<td><?php echo charitable_format_money( $donation->get_subtotal(), false, true, $donation->get_currency() ); ?></td>
+						<th><?php esc_html_e( 'Subtotal', 'charitable' ); ?></th>
+						<td><?php echo esc_html( charitable_format_money( $donation->get_subtotal(), false, true, $donation->get_currency() ) ); ?></td>
 					</tr>
 				<?php
 			endif;
@@ -174,8 +174,8 @@ $total = apply_filters( 'charitable_donation_details_table_total', $donation->ge
 			do_action( 'charitable_donation_details_table_before_total', $donation, $total );
 			?>
 			<tr>
-				<th><?php _e( 'Total', 'charitable' ); ?></th>
-				<td><?php echo charitable_format_money( $total, false, true, $donation->get_currency() ); ?></td>
+				<th><?php esc_html_e( 'Total', 'charitable' ); ?></th>
+				<td><?php echo esc_html( charitable_format_money( $total, false, true, $donation->get_currency() ) ); ?></td>
 			</tr>
 			<?php
 			/**
@@ -188,8 +188,8 @@ $total = apply_filters( 'charitable_donation_details_table_total', $donation->ge
 			if ( apply_filters( 'charitable_donation_details_table_show_currency', false ) ) :
 				?>
 				<tr>
-					<th><?php _e( 'Currency', 'charitable' ); ?></th>
-					<td><?php echo $donation->get_currency(); ?></td>
+					<th><?php esc_html_e( 'Currency', 'charitable' ); ?></th>
+					<td><?php echo esc_html( $donation->get_currency() ); ?></td>
 				</tr>
 				<?php
 			endif;
@@ -203,8 +203,8 @@ $total = apply_filters( 'charitable_donation_details_table_total', $donation->ge
 			do_action( 'charitable_donation_details_table_before_payment_method', $donation );
 			?>
 			<tr>
-				<th><?php _e( 'Payment Method', 'charitable' ); ?></th>
-				<td><?php echo $donation->get_gateway_label(); ?></td>
+				<th><?php esc_html_e( 'Payment Method', 'charitable' ); ?></th>
+				<td><?php echo esc_html( $donation->get_gateway_label() ); ?></td>
 			</tr>
 			<?php
 			/**

@@ -77,7 +77,7 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 				return;
 			}
 
-			if ( ! isset( $_POST['charitable_nonce'] ) || ! wp_verify_nonce( $_POST['charitable_nonce'], 'import_campaign' ) ) {
+			if ( ! isset( $_POST['charitable_nonce'] ) || ! wp_verify_nonce( $_POST['charitable_nonce'], 'import_campaign' ) ) { // phpcs:ignore
 				return;
 			}
 
@@ -385,18 +385,18 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 					);
 					$donation_id        = wp_insert_post( $donation_post_args );
 
-					// import meta
+					// import meta.
 					foreach ( $donation_data['meta'] as $meta_import_id => $meta_to_import ) {
 						if ( is_serialized( $meta_to_import['meta_value'] ) ) {
-							$data_to_import = unserialize( $meta_to_import['meta_value'] );
+							$data_to_import = unserialize( $meta_to_import['meta_value'] ); // phpcs:ignore
 						} else {
 							$data_to_import = $meta_to_import['meta_value'];
 						}
 						if ( $meta_to_import['meta_key'] === 'donor' ) {
-							$donor_data = unserialize( $meta_to_import['meta_value'] );
+							$donor_data = unserialize( $meta_to_import['meta_value'] ); // phpcs:ignore
 						}
 						if ( $meta_to_import['meta_key'] === '_donation_log' ) {
-							$donation_log = unserialize( $meta_to_import['meta_value'] );
+							$donation_log = unserialize( $meta_to_import['meta_value'] ); // phpcs:ignore
 						}
 
 						add_post_meta( $donation_id, $meta_to_import['meta_key'], $data_to_import );
@@ -417,7 +417,7 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 						'amount'        => $campaign_donations_info['charitable_campaign_donations'][ $found_key ]['amount'], // ... and so on
 					);
 
-					$wpdb->insert( $table, $args );
+					$wpdb->insert( $table, $args ); // phpcs:ignore
 
 					// update log.
 					$donation_log[] = array(
@@ -465,13 +465,20 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 		 * @return string|bool JSON contents string if successful, false otherwise.
 		 */
 		public function get_file_contents( $import_what = 'import_campaign' ) {
+			$file = isset( $_FILES['charitable_settings']['tmp_name']['import'][ $import_what ] ) // phpcs:ignore
+				? wp_unslash( $_FILES['charitable_settings']['tmp_name']['import'][ $import_what ] ) // phpcs:ignore
+				: false; // phpcs:ignore
 
-			$file     = isset( $_FILES['charitable_settings']['tmp_name']['import'][ $import_what ] ) ? wp_unslash( $_FILES['charitable_settings']['tmp_name']['import'][ $import_what ] ) : false; // phpcs:ignore
-			$response = wp_remote_get( $file );
-			if ( is_wp_error( $response ) ) {
+			if ( ! $file || ! file_exists( $file ) ) {
 				return false;
 			}
-			return wp_remote_retrieve_body( $response );
+
+			$contents = file_get_contents( $file );
+			if ( $contents === false ) {
+				return false;
+			}
+
+			return $contents;
 		}
 
 		/**
@@ -510,6 +517,8 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
+		 * @param  array $donor_data The donor data.
+		 *
 		 * @return string|bool JSON contents string if successful, false otherwise.
 		 */
 		public function get_donor_id( $donor_data ) {
@@ -522,12 +531,12 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 			$table = $wpdb->prefix . 'charitable_donors';
 
 			// try finding if they still exist first.
-			$donor_id = $wpdb->get_var( "SELECT donor_id FROM $table WHERE email = '$email'" );
+			$donor_id = $wpdb->get_var( "SELECT donor_id FROM $table WHERE email = '$email'" ); // phpcs:ignore
 
 			// if not, create it in the table.
 			if ( $donor_id === null ) {
 
-				$donor_id = $wpdb->insert(
+				$donor_id = $wpdb->insert( // phpcs:ignore
 					$table,
 					array(
 						'donor_id'    => $donor_id,

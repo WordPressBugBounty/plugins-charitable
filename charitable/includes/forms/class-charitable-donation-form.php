@@ -1052,7 +1052,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			if ( $return ) {
 				return $message;
 			} else {
-				echo $message;
+				echo $message; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 		}
 
@@ -1082,7 +1082,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 					'type'      => 'checkbox',
 					'label'     => charitable_get_option( 'contact_consent_label', __( 'Yes, I am happy for you to contact me via email or phone.', 'charitable' ) ),
 					'priority'  => 8,
-					'required'  => false,
+					'required'  => charitable_get_option( 'contact_consent_required', false ),
 					'data_type' => 'meta',
 				);
 			}
@@ -1372,7 +1372,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		 */
 		protected function get_test_mode_active_notice() {
 			$notice = $this->get_credentialed_notice(
-				__( 'Test mode is active.', 'charitable' ),
+				__( 'Test mode is enabled.', 'charitable' ),
 				sprintf(
 					'<a href="%s">%s</a>.',
 					admin_url( 'admin.php?page=charitable-settings&tab=gateways' ),

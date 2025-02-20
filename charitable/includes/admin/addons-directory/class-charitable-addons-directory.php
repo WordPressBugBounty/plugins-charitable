@@ -361,7 +361,6 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 			// phpcs:disable
 			if ( defined( 'CHARITABLE_DEBUG_LICENSE' ) && CHARITABLE_DEBUG_LICENSE ) {
-				echo '<p>Plan type is: ' . $type . '</p>';
 				error_log( 'addons_directory_content' );
 				error_log( print_r( $type, true ) );
 				error_log( print_r( $installed_plugins, true ) );
@@ -459,7 +458,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				if ( isset( $addon['featured'] ) && in_array( 'recommended', $addon['featured'] ) ) {
 					$results['recommended'][] = (array) $addon;
 					continue;
-				} else {
+				} else { // phpcs:ignore
 					// Determine if the addon belongs licensed or unlicensed based on the confirmed plan.
 					if ( isset( $addon['license'] ) && in_array( $type, $addon['license'] ) ) {
 						$results['licensed'][] = (array) $addon;
@@ -615,7 +614,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			// Output the card.
 			?>
 
-			<div class="<?php echo implode( ' ', $css ); ?>">
+			<div class="<?php echo esc_attr( implode( ' ', $css ) ); ?>">
 				<div class="addon-item">
 					<?php if ( $is_recommended ) : ?>
 						<div class="recommended"><?php echo esc_html__( 'Recommended', 'charitable' ); ?></div>
@@ -624,7 +623,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					<div class="details charitable-clear">
 						<h5 class="addon-name">
 							<a href="<?php echo esc_url( $addon['upgrade_url'] ); ?>" title="Learn more" target="_blank" rel="noopener noreferrer" class="addon-link"><?php echo esc_html( $addon['name'] ); ?> Addon</a></h5>
-						<p class="addon-desc"><?php echo wpautop( $description ); ?></p>
+						<p class="addon-desc"><?php echo esc_html( wpautop( $description ) ); ?></p>
 					</div>
 					<div class="actions charitable-clear">
 					<?php

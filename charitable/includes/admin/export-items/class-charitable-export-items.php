@@ -71,7 +71,7 @@ if ( ! class_exists( 'Charitable_Export_Items' ) ) :
 
 			// Array ( [charitable_nonce] => 56a1cf267c [_wp_http_referer] => /wp-admin/admin.php?page=charitable-settings&tab=tools [charitable_settings] => Array ( [export] => Array ( [export_campaign] => 5 ) ) ) good
 
-			if ( ! isset( $_POST['charitable_nonce'] ) || ! wp_verify_nonce( $_POST['charitable_nonce'], 'export_campaign' ) ) {
+			if ( ! isset( $_POST['charitable_nonce'] ) || ! wp_verify_nonce( $_POST['charitable_nonce'], 'export_campaign' ) ) { //	 phpcs:ignore
 				return;
 			}
 
@@ -79,7 +79,7 @@ if ( ! class_exists( 'Charitable_Export_Items' ) ) :
 				return;
 			}
 
-			$export_args = $_POST['charitable_settings']['export'];
+			$export_args = $_POST['charitable_settings']['export']; // phpcs:ignore
 
 			if ( ! isset( $export_args['export_campaign'] ) || intval( $export_args['export_campaign'] ) === 0 ) {
 				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
@@ -98,7 +98,7 @@ if ( ! class_exists( 'Charitable_Export_Items' ) ) :
 
 			// Metadata rows.
 			$meta_sql = "SELECT * FROM $wpdb->postmeta WHERE meta_key LIKE '_campaign_%' AND post_id = " . intval( $campaign_id );
-			$meta_raw = $wpdb->get_results( $wpdb->prepare( $meta_sql ), OBJECT_K );
+			$meta_raw = $wpdb->get_results( $wpdb->prepare( $meta_sql ), OBJECT_K ); // phpcs:ignore
 
 			// author / campaign_creator.
 			$author_data = array();
@@ -153,7 +153,7 @@ if ( ! class_exists( 'Charitable_Export_Items' ) ) :
 				return;
 			}
 
-			if ( ! isset( $_POST['charitable_nonce'] ) || ! wp_verify_nonce( $_POST['charitable_nonce'], 'export_donations_from_campaign' ) ) {
+			if ( ! isset( $_POST['charitable_nonce'] ) || ! wp_verify_nonce( $_POST['charitable_nonce'], 'export_donations_from_campaign' ) ) { // phpcs:ignore
 				return;
 			}
 
@@ -161,7 +161,7 @@ if ( ! class_exists( 'Charitable_Export_Items' ) ) :
 				return;
 			}
 
-			$export_args = $_POST['charitable_settings']['export'];
+			$export_args = $_POST['charitable_settings']['export']; // phpcs:ignore
 
 			if ( ! isset( $export_args['export_donations'] ) || intval( $export_args['export_donations'] ) === 0 ) {
 				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
@@ -180,7 +180,7 @@ if ( ! class_exists( 'Charitable_Export_Items' ) ) :
 
 			// Metadata rows.
 			$meta_sql                = 'SELECT * FROM ' . $wpdb->prefix . 'charitable_campaign_donations WHERE campaign_id = ' . $campaign_id;
-			$meta_campaign_donations = $wpdb->get_results( $meta_sql, OBJECT_K );
+			$meta_campaign_donations = $wpdb->get_results( $meta_sql, OBJECT_K ); // phpcs:ignore
 
 			if ( empty( $meta_campaign_donations ) ) {
 				return;
@@ -197,7 +197,28 @@ if ( ! class_exists( 'Charitable_Export_Items' ) ) :
 				if ( $donation_post ) :
 					$campaigns[ $campaign_donation->campaign_id ]['donation_posts'][ $campaign_donation->donation_id ]['post'] = $donation_post;
 					$meta_sql = "SELECT * FROM $wpdb->postmeta WHERE post_id = " . $campaign_donation->donation_id;
-					$meta_raw = $wpdb->get_results( $meta_sql, ARRAY_A );
+					$meta_raw = $wpdb->get_results( $meta_sql, ARRAY_A ); // phpcs:ignore
+
+					// if 'meta_key' of '_donation_log' exists, then we need to dejson the value and remove any html, then rejson it.
+					foreach ( $meta_raw as $meta_key => $meta_value ) {
+						if ( ! empty( $meta_value['meta_key'] ) && $meta_value['meta_key'] === '_donation_log' ) {
+
+							if ( empty( $meta_value['meta_value'] ) ) {
+								continue;
+							}
+							$donation_log = maybe_unserialize( $meta_value['meta_value'] );
+							if ( ! empty( $donation_log ) ) {
+								// this is an array.
+								foreach ( $donation_log as $index => $log ) {
+									$donation_log[ $index ] = array_map( 'strip_tags', $log );
+								}
+								$donation_log                        = serialize( $donation_log );
+								$meta_raw[ $meta_key ]['meta_value'] = $donation_log; // phpcs:ignore
+							}
+
+						}
+					}
+
 					$campaigns[ $campaign_donation->campaign_id ]['donation_posts'][ $campaign_donation->donation_id ]['meta'] = $meta_raw;
 
 					$author_data = false;
@@ -214,7 +235,7 @@ if ( ! class_exists( 'Charitable_Export_Items' ) ) :
 				$campaigns[ $campaign_donation->campaign_id ]['charitable_campaign_donations'] = $meta_campaign_donations;
 			}
 
-			// Wrapper
+			// Wrapper.
 			$data = array( 'campaigns' => $campaigns );
 
 			// Allow Addons to add to the Campaign export.

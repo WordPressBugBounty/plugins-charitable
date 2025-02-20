@@ -37,20 +37,20 @@ if ( array_key_exists( 'attrs', $view_args ) ) {
 }
 
 ?>
-<ul class="charitable-checkbox-list <?php echo esc_attr( $view_args['classes'] ); ?>" <?php echo $setting_attributes; ?>>
+<ul class="charitable-checkbox-list <?php echo esc_attr( $view_args['classes'] ); ?>" <?php echo esc_attr( $setting_attributes ); ?>>
 	<?php foreach ( $view_args['options'] as $option => $label ) : ?>
 		<li><input type="checkbox"
-				id="<?php printf( 'charitable_settings_%s_%s', implode( '_', $view_args['key'] ), $option ); ?>"
-				name="<?php printf( 'charitable_settings[%s][]', $view_args['name'] ); ?>"
+				id="<?php printf( 'charitable_settings_%s_%s', esc_attr( implode( '_', $view_args['key'] ) ), esc_attr( $option ) ); ?>"
+				name="<?php printf( 'charitable_settings[%s][]', esc_attr( $view_args['name'] ) ); ?>"
 				value="<?php echo esc_attr( $option ); ?>"
 				<?php checked( in_array( $option, $value, true ) ); ?>
-				<?php echo charitable_get_arbitrary_attributes( $view_args ); ?>
+				<?php echo esc_attr( charitable_get_arbitrary_attributes( $view_args ) ); ?>
 			/>
-			<?php echo $label; ?>
+			<?php echo ( $label ); // phpcs:ignore ?>
 		</li>
 	<?php endforeach ?>
 </ul>
 <?php if ( isset( $view_args['help'] ) ) : ?>
-	<div class="charitable-help"><?php echo $view_args['help']; ?></div>
+	<div class="charitable-help"><?php echo esc_html( $view_args['help'] ); ?></div>
 	<?php
 endif;

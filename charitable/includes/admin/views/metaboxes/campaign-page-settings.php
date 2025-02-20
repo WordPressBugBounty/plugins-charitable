@@ -46,6 +46,6 @@ $_campaign_donate_button_text = trim( $_campaign_donate_button_text ) === '' ? f
 	<h4><?php echo esc_html__( 'Donation Button Text:', 'charitable' ); ?></h4>
 	<label class="screen-reader-text" for="campaign_minimum_donation_amount"><?php echo esc_html__( 'Donate', 'charitable' ); ?></label>
 	<input type="text" id="campaign_donate_button_text" name="_campaign_donate_button_text"  placeholder="<?php echo esc_html__( 'Donate', 'charitable' ); ?>" value="<?php echo esc_html( $_campaign_donate_button_text ); ?>" />
-	<?php echo $description; ?>
+	<?php echo $description; // phpcs:ignore ?>
 </div>
 

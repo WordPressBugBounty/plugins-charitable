@@ -2,9 +2,9 @@
 Contributors: WPCharitable, griffinjt, smub, dimensionmedia
 Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
-Tested up to: 6.7.1
+Tested up to: 6.7.2
 Requires PHP: 7.2
-Stable tag: 1.8.4.4
+Stable tag: 1.8.4.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -257,6 +257,12 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.4.5 =
+* NEW: A minimum number of characters is now required for a password for user registeration. Customize via the 'charitable_minimum_password_length' filter.
+* FIX: Resolved issues related to the campaign visual builder and several UI elements.
+* FIX: Improved methods of exporting and importing donations via Tools.
+* FIX: Updated code related to opt-in data collection, translations, CSS, UI, typos, and PHP standards.
 
 = Donation Form & Fundraising Campaigns v1.8.4.4 =
 * FIX: Adjusted escaping of setting labels resolving an issue rendering HTML beta tags.

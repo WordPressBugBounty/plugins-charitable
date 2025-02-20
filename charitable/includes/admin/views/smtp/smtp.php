@@ -18,7 +18,7 @@ ob_start();
 
 	<div class="charitable-intergrations-container intergration-smtp">
 
-		<img class="charitable-smtp-logo" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/integrations/smtp.png'; ?>" alt="<?php echo esc_html__( 'Integrate WP Mail SMTP Into Charitable For Improved Email Reliability', 'charitable' ); ?>">
+		<img class="charitable-smtp-logo" src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ) . 'images/integrations/smtp.png'; ?>" alt="<?php echo esc_html__( 'Integrate WP Mail SMTP Into Charitable For Improved Email Reliability', 'charitable' ); ?>">
 
 		<h1><?php echo esc_html__( 'Making Email Deliverability Easy for WordPress', 'charitable' ); ?></h1>
 
@@ -65,7 +65,7 @@ ob_start();
 				<div class="instructions">
 					<h3><?php echo esc_html__( 'Install and Activate WP Mail SMTP', 'charitable' ); ?></h3>
 					<p><?php echo esc_html__( 'Install the WP Mail SMTP plugin by clicking this button', 'charitable' ); ?></p>
-					<?php echo $install_button_html; ?>
+					<?php echo $install_button_html; // phpcs:ignore ?>
 				</div>
 				<div class="step">
 					<div class="vertical-wrapper">
@@ -89,7 +89,7 @@ ob_start();
 				<div class="instructions">
 					<h3><?php echo esc_html__( 'Activate WP Mail SMTP', 'charitable' ); ?></h3>
 					<p><?php echo esc_html__( 'Activate WP Mail SMTP by clicking this button:', 'charitable' ); ?></p>
-					<?php echo $activate_button_html; ?>
+					<?php echo $activate_button_html; // phpcs:ignore ?>
 				</div>
 				<div class="step">
 					<div class="vertical-wrapper">

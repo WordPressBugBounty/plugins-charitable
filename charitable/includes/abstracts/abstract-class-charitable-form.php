@@ -299,7 +299,8 @@ if ( ! class_exists( 'Charitable_Form' ) ) :
 		/**
 		 * Check the passed fields to ensure that all required fields have been submitted.
 		 *
-		 * @since  1.0.0
+		 * @since   1.0.0
+		 * @version 1.8.4.5 Added check for minimum password length.
 		 *
 		 * @param  array $fields    Array of form fields.
 		 * @param  array $submitted Submitted values.
@@ -340,7 +341,24 @@ if ( ! class_exists( 'Charitable_Form' ) ) :
 
 					$missing[] = $label;
 				}
-			}//end foreach
+			} // end foreach
+
+			// If the user_pass field is required we need to confirm a minimum number of characters for security reasons.
+			if ( isset( $fields['user_pass'] ) && ! empty( $fields['user_pass']['required'] ) ) {
+				$min_length = apply_filters( 'charitable_minimum_password_length', 8 );
+
+				if ( isset( $submitted['user_pass'] ) && strlen( $submitted['user_pass'] ) < $min_length ) {
+					charitable_get_notices()->add_error(
+						sprintf(
+							'%s',
+							sprintf(
+								__( 'Your password must be at least %d characters long.', 'charitable' ),
+								$min_length
+							)
+						)
+					);
+				}
+			}
 
 			$missing = apply_filters( 'charitable_form_missing_fields', $missing, $this, $fields, $submitted );
 

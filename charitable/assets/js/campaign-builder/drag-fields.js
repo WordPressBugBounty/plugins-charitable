@@ -533,7 +533,7 @@ Charitable.Admin.Builder.DragFields = Charitable.Admin.Builder.DragFields || ( f
 								},
 							} );
 
-						} else if ( numfieldsDonationForm > 0 ) {
+						} else if ( numfieldsDonationForm > 1 ) {
 
 							$('.ui-draggable-dragging').css('opacity', '0');
 

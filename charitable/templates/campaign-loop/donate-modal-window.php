@@ -33,7 +33,7 @@ wp_enqueue_style( 'lean-modal-css' );
 			return;
 		}
 
-		$wrapper.html( "<img src=\"<?php echo charitable()->get_path( 'assets', false ); ?>/images/charitable-loading.gif\" width=\"60\" height=\"60\" alt=\"<?php esc_attr_e( 'Loading&hellip;', 'charitable' ); ?>\" />" );
+		$wrapper.html( "<img src=\"<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>/images/charitable-loading.gif\" width=\"60\" height=\"60\" alt=\"<?php esc_attr_e( 'Loading&hellip;', 'charitable' ); ?>\" />" );
 
 		resize_modal();
 

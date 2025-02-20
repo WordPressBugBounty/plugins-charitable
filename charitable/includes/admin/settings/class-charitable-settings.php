@@ -760,7 +760,7 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 				<p><?php esc_html_e( 'Thanks for being a loyal Charitable Lite user. Upgrade to Charitable Pro to unlock all the awesome features and experience why Charitable is consistently rated a top WordPress donation and fundraising plugin.', 'charitable' ); ?></p>
 				<p>
 					<?php
-					printf( __( 'We know that you will truly love Charitable. Over 10,000+ non-profits who have chosen Charitable to get more donations from their website can\'t be wrong!', 'charitable' ) );
+					printf( esc_html__( 'We know that you will truly love Charitable. Over 10,000+ non-profits who have chosen Charitable to get more donations from their website can\'t be wrong!', 'charitable' ) );
 					?>
 				</p>
 				<h6><?php esc_html_e( 'Pro Features:', 'charitable' ); ?></h6>

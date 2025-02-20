@@ -112,7 +112,7 @@ if ( ! class_exists( 'Charitable_Public_Form_View' ) ) :
 		 * @param  string $path       The path to the template.
 		 * @return void
 		 */
-		public function register_custom_field_template( $field_type, $class, $path ) {
+		public function register_custom_field_template( $field_type, $class, $path ) { // phpcs:ignore
 			$this->custom_field_templates[ $field_type ] = array(
 				'class' => $class,
 				'path'  => $path,
@@ -211,7 +211,8 @@ if ( ! class_exists( 'Charitable_Public_Form_View' ) ) :
 		/**
 		 * Render all of a form's fields.
 		 *
-		 * @since  1.5.0
+		 * @since  1.8.3.4
+		 * @since  1.8.3.5
 		 *
 		 * @param  array $fields Optional. A set of fields to display. If not set,
 		 *                       we will look for fields in the form's `get_fields()`
@@ -237,10 +238,15 @@ if ( ! class_exists( 'Charitable_Public_Form_View' ) ) :
 
 			$form_template = charitable_get_option( 'donation_form_template', false );
 
+			$opening_div = false;
+
 			foreach ( $fields as $key => $field ) {
 				// insert div group for certain fields.
 				if ( $i === 1 && ( 'minimal' === $form_template && ( 'title' === strtolower( $key ) || 'first_name' === strtolower( $key ) ) ) ) {
 					echo '<div class="charitable-form-group charitable-form-group-number-' . $i . '" charitable-form-group-' . $key . '">';
+				} elseif ( 'minimal' === $form_template && 'first_name' === strtolower( $key ) ) {
+					echo '<div>';
+					$opening_div = true;
 				}
 				$this->render_field(
 					$field,
@@ -249,7 +255,7 @@ if ( ! class_exists( 'Charitable_Public_Form_View' ) ) :
 						'index' => $i,
 					)
 				);
-				if ( 'minimal' === $form_template && 'last_name' === strtolower( $key ) ) {
+				if ( 'minimal' === $form_template && 'last_name' === strtolower( $key ) && $opening_div ) {
 					echo '</div>';
 				}
 
@@ -282,7 +288,7 @@ if ( ! class_exists( 'Charitable_Public_Form_View' ) ) :
 				$attrs = charitable_get_arbitrary_attributes( array( 'attrs' => $args ) );
 			}
 
-			printf( '<input type="hidden" name="%s" value="%s" %s />', esc_attr( $key ), esc_attr( $value ), $attrs );
+			printf( '<input type="hidden" name="%s" value="%s" %s />', esc_attr( $key ), esc_attr( $value ), $attrs ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
@@ -330,11 +336,13 @@ if ( ! class_exists( 'Charitable_Public_Form_View' ) ) :
 				return false;
 			}
 
-			$template->set_view_args( array(
-				'form'    => $this->form,
-				'field'   => $field,
-				'classes' => $this->get_field_classes( $field, $index ),
-			) );
+			$template->set_view_args(
+				array(
+					'form'    => $this->form,
+					'field'   => $field,
+					'classes' => $this->get_field_classes( $field, $index ),
+				)
+			);
 
 			$template->render();
 
@@ -351,7 +359,7 @@ if ( ! class_exists( 'Charitable_Public_Form_View' ) ) :
 		 * @param  int         $index     The current index.
 		 * @return string
 		 */
-		protected function get_field_name( $key, $namespace = null, $index = 0 ) {
+		protected function get_field_name( $key, $namespace = null, $index = 0 ) { // phpcs:ignore
 			$name = $key;
 
 			if ( ! is_null( $namespace ) ) {
@@ -488,12 +496,15 @@ if ( ! class_exists( 'Charitable_Public_Form_View' ) ) :
 			 *
 			 * @param string[] $types Field types.
 			 */
-			$default_field_types = apply_filters( 'charitable_default_template_field_types', array(
-				'text',
-				'email',
-				'password',
-				'date',
-			) );
+			$default_field_types = apply_filters(
+				'charitable_default_template_field_types',
+				array(
+					'text',
+					'email',
+					'password',
+					'date',
+				)
+			);
 
 			return in_array( $field_type, $default_field_types );
 		}
@@ -581,7 +592,7 @@ if ( ! class_exists( 'Charitable_Public_Form_View' ) ) :
 		 * @param  int|null $index The current index. May be null.
 		 * @return int
 		 */
-		public function increment_index( $field, $key = '', $index = null) {
+		public function increment_index( $field, $key = '', $index = null ) {
 			if ( ! $this->should_increment( $field ) ) {
 				return 0;
 			}
@@ -633,36 +644,39 @@ if ( ! class_exists( 'Charitable_Public_Form_View' ) ) :
 			 *
 			 * @since 1.5.0
 			 */
-			$templates = apply_filters( 'charitable_public_form_view_custom_field_templates', array(
-				'donation-amount-wrapper' => array(
-					'class' => 'Charitable_Template',
-					'path'  => 'donation-form/donation-amount-wrapper.php',
-				),
-				'donation-amount'         => array(
-					'class' => 'Charitable_Template',
-					'path'  => 'donation-form/donation-amount.php',
-				),
-				'donor-fields'            => array(
-					'class' => 'Charitable_Template',
-					'path'  => 'donation-form/donor-fields.php',
-				),
-				'details-fields'          => array(
-					'class' => 'Charitable_Template',
-					'path'  => 'donation-form/details-fields.php',
-				),
-				'meta-fields'             => array(
-					'class' => 'Charitable_Template',
-					'path'  => 'donation-form/meta-fields.php',
-				),
-				'gateway-fields'          => array(
-					'class' => 'Charitable_Template',
-					'path'  => 'donation-form/gateway-fields.php',
-				),
-				'cc-expiration'           => array(
-					'class' => 'Charitable_Template',
-					'path'  => 'donation-form/cc-expiration.php',
-				),
-			) );
+			$templates = apply_filters(
+				'charitable_public_form_view_custom_field_templates',
+				array(
+					'donation-amount-wrapper' => array(
+						'class' => 'Charitable_Template',
+						'path'  => 'donation-form/donation-amount-wrapper.php',
+					),
+					'donation-amount'         => array(
+						'class' => 'Charitable_Template',
+						'path'  => 'donation-form/donation-amount.php',
+					),
+					'donor-fields'            => array(
+						'class' => 'Charitable_Template',
+						'path'  => 'donation-form/donor-fields.php',
+					),
+					'details-fields'          => array(
+						'class' => 'Charitable_Template',
+						'path'  => 'donation-form/details-fields.php',
+					),
+					'meta-fields'             => array(
+						'class' => 'Charitable_Template',
+						'path'  => 'donation-form/meta-fields.php',
+					),
+					'gateway-fields'          => array(
+						'class' => 'Charitable_Template',
+						'path'  => 'donation-form/gateway-fields.php',
+					),
+					'cc-expiration'           => array(
+						'class' => 'Charitable_Template',
+						'path'  => 'donation-form/cc-expiration.php',
+					),
+				)
+			);
 
 			return array_filter( $templates, array( $this, 'sanitize_custom_field_template' ) );
 		}
