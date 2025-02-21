@@ -81,6 +81,10 @@ if ( ! class_exists( 'Charitable_Field_Donation_Wall' ) ) :
 		 */
 		public function new_field_defaults( $field ) {
 
+			if ( isset( $field['type'] ) && 'donation-wall' !== $field['type'] ) {
+				return $field;
+			}
+
 			$field['show_name']   = 'show_name';
 			$field['show_amount'] = 'show_amount';
 			$field['show_avatar'] = 'show_avatar';
@@ -398,7 +402,7 @@ if ( ! class_exists( 'Charitable_Field_Donation_Wall' ) ) :
 					'name'            => array( '_fields', intval( $field_id ), 'show_hide' ),
 					'field_id'        => esc_attr( $field_id ),
 					'tooltip'         => esc_html( $this->tooltip ),
-					'default'         => array( 'show_amount', 'show_avatar' ),
+					'default'         => array( 'show_name', 'show_amount', 'show_avatar' ),
 					'container_class' => 'charitable-campaign-builder-donor-wall',
 					'options'         => array(
 						'Show Name'     => 'show_name',

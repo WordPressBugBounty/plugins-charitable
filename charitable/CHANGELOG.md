@@ -1,3 +1,7 @@
+# 1.8.4.6
+* FIX: Resolved an issue involving escaped text on addons page.
+* FIX: Tweaks to UI on certain element defaults in campaign builder.
+
 # 1.8.4.5
 * NEW: A minimum number of characters is now required for a password for user registeration. Customize via the 'charitable_minimum_password_length' filter.
 * FIX: Resolved issues related to the campaign visual builder and several UI elements.

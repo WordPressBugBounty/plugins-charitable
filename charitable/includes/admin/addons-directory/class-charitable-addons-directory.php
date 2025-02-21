@@ -612,6 +612,17 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			}
 
 			// Output the card.
+			$allowed_html = array(
+				'a' => array(
+					'href' => array(),
+					'title' => array(),
+				),
+				'br' => array(),
+				'em' => array(),
+				'strong' => array(),
+				'p' => array(),
+			);
+
 			?>
 
 			<div class="<?php echo esc_attr( implode( ' ', $css ) ); ?>">
@@ -623,7 +634,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					<div class="details charitable-clear">
 						<h5 class="addon-name">
 							<a href="<?php echo esc_url( $addon['upgrade_url'] ); ?>" title="Learn more" target="_blank" rel="noopener noreferrer" class="addon-link"><?php echo esc_html( $addon['name'] ); ?> Addon</a></h5>
-						<p class="addon-desc"><?php echo esc_html( wpautop( $description ) ); ?></p>
+						<p class="addon-desc"><?php echo wp_kses( wpautop( $description ), $allowed_html ); ?></p>
 					</div>
 					<div class="actions charitable-clear">
 					<?php

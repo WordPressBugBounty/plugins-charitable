@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.7.2
 Requires PHP: 7.2
-Stable tag: 1.8.4.5
+Stable tag: 1.8.4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -258,6 +258,10 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 
 == Changelog ==
 
+= Donation Form & Fundraising Campaigns v1.8.4.6 =
+* FIX: Resolved an issue involving escaped text on addons page.
+* FIX: Tweaks to UI on certain element defaults in campaign builder.
+
 = Donation Form & Fundraising Campaigns v1.8.4.5 =
 * NEW: A minimum number of characters is now required for a password for user registeration. Customize via the 'charitable_minimum_password_length' filter.
 * FIX: Resolved issues related to the campaign visual builder and several UI elements.
@@ -437,23 +441,5 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 * FIX: Resolved issue related to exporting recurring donations.
 * FIX: Added nonce and permissions check to checking licenses via AJAX.
 * FIX: Resolved typos and PHP warnings and notices.
-
-= Donation Form & Fundraising Campaigns v1.8.1.7 =
-* FIX: Resolve issue when incorrectly showing ("false alarm") dashboard security notice.
-* FIX: Dashboard Guide Tools notice no longer displays over populated donation charts when changing days.
-
-= Donation Form & Fundraising Campaigns v1.8.1.6 =
-* NEW: Tools page menu with Export and Import menus (previously located on the Settings page).
-* NEW: "System Info" tab on Tools page.
-* NEW: WPCode Intergration! Browse from all Charitable snippets on WPCode without leaving Charitable (Seen on Tools page and Dashboard page).
-* NEW: Growth Tools page.
-* NEW: Guide Tools recommendations on Charitable Dashboard.
-* NEW: Notice on Charitable Dashboard if Charitable detects recent failed donation attempts due to invalid security checks.
-* NEW: Improvements to allow third-party gateway providors a dedicated menu in the Payments tab in the campaign visual builder.
-* FIX: Improved display of currency on y axis on headline chart on dashboard and overview pages and print output.
-* FIX: Resolved issue where certain settings of the donor wall in the campaign visual builder weren't being reflected on the campaign page.
-* FIX: Tweaks to social sharing in campaign visual builder.
-* FIX: Resolve issue involving previewing Charitable emails while using newer Block themes.
-* FIX: Resolved typos and some PHP warnings and notices.
 
 **[View entire donation form and fundraising platform changelog](https://plugins.svn.wordpress.org/charitable/trunk/CHANGELOG.md)**

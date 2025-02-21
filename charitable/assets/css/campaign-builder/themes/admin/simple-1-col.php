@@ -101,6 +101,9 @@ $wrapper_no_fields = '.charitable-preview.charitable-builder-template-' . $slug 
     display: table;
     width: 100%;
 }
+<?php echo $wrapper; ?> .charitable-preview-align-center > div.charitable-field-preview-campaign-summary {
+    display: flex;
+}
 <?php echo $wrapper; ?> .charitable-preview-align-right > div {
     margin-left: auto;
     margin-right: 0;

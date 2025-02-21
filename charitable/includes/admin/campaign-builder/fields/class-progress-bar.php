@@ -50,7 +50,30 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 			// Define additional field properties.
 			add_action( 'charitable_builder_frontend_js', [ $this, 'frontend_js' ] );
 			add_action( 'charitable_builder_backend_scripts', [ $this, 'builder_js' ] );
+
+			// Defaults.
+			add_filter( 'charitable_field_new_default', [ $this, 'new_field_defaults' ] );
 		}
+
+		/**
+		 * Set default values for the field.
+		 *
+		 * @since 1.8.0
+		 *
+		 * @param array $field Field settings.
+		 */
+		public function new_field_defaults( $field ) {
+
+			if ( isset( $field['type'] ) && 'progress-bar' !== $field['type'] ) {
+				return $field;
+			}
+
+			$field['show_donated'] = 'show_donated';
+			$field['show_goal']    = 'show_goal';
+
+			return $field;
+		}
+
 
 		/**
 		 * ProgressBar options panel inside the builder.
@@ -115,8 +138,19 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 			}
 
 			// if the "show_goal" is set to "show_goal" then show the goal, otherise do not but hidding it by setting 'charitable-hidden' class.
-			$show_donated_css = ! empty( $field_data ) && ! empty( $field_data['show_hide'] ) && in_array( 'show_donated', $field_data['show_hide'] ) ? '' : 'charitable-hidden';
-			$show_goal_css    = ! empty( $field_data ) && ! empty( $field_data['show_hide'] ) && in_array( 'show_goal', $field_data['show_hide'] ) ? '' : 'charitable-hidden';
+			$show_donated_css = ! empty( $field_data ) &&
+								(
+									( is_array( $field_data['show_hide'] ) && ! empty( $field_data['show_hide'] ) && in_array( 'show_donated', $field_data['show_hide'] ) ) ||
+									( is_string( $field_data['show_donated'] ) && 'show_donated' === $field_data['show_donated'] )
+								)
+								? '' : 'charitable-hidden';
+			$show_goal_css    = ! empty( $field_data ) &&
+
+								(
+									( is_array( $field_data['show_hide'] ) && ! empty( $field_data['show_hide'] ) && in_array( 'show_goal', $field_data['show_hide'] ) ) ||
+									( is_string( $field_data['show_goal'] ) && 'show_goal' === $field_data['show_goal'] )
+								)
+								? '' : 'charitable-hidden';
 
 			$progress_bar_css = $show_progress_bar ? '' : ' charitable-campaign-preview-not-available charitable-hidden';
 
