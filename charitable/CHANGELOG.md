@@ -1,5 +1,9 @@
+# 1.8.4.7
+* UPDATED: Terms and consent options are also now under "Privacy" settings and any Charitable settings in WordPress customizer are depreciated and will soon be removed.
+* FIX: Made headers and spacing more consistent in settings area, along with tweaks in character output.
+
 # 1.8.4.6
-* FIX: Resolved an issue involving escaped text on addons page.
+* FIX: Resolved an issue involving escpaed text on addons page.
 * FIX: Tweaks to UI on certain element defaults in campaign builder.
 
 # 1.8.4.5

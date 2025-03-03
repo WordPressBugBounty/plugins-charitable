@@ -26,8 +26,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return boolean
  */
 function charitable_is_terms_and_conditions_activated() {
-	return 0 != charitable_get_option( 'terms_conditions_page', 0 )
-		&& '' != charitable_get_option( 'terms_conditions', __( 'I have read and agree to the website [terms].', 'charitable' ) );
+	return 0 !== charitable_get_option( 'terms_conditions_page', 0 )
+		&& 0 !== charitable_get_option( 'terms_and_conditions_enabled', 0 )
+		&& '' !== charitable_get_option( 'terms_conditions', __( 'I have read and agree to the website [terms].', 'charitable' ) );
 }
 
 /**
@@ -37,12 +38,20 @@ function charitable_is_terms_and_conditions_activated() {
  * settings are not empty.
  *
  * @since  1.6.2
+ * @version 1.8.4.7
  *
  * @return boolean
  */
 function charitable_is_privacy_policy_activated() {
-	return 0 != charitable_get_option( 'privacy_policy_page', 0 )
-		&& '' != charitable_get_option( 'privacy_policy', __( 'Your personal data will be used to process your donation, support your experience throughout this website, and for other purposes described in our [privacy_policy].', 'charitable' ) );
+	// if no 'privacy_policy_enabled' option has been saved, then go with legacy logic.
+	if ( 'not set' === charitable_get_option( 'privacy_policy_page', 'not set' ) ) {
+		return 0 !== intval( charitable_get_option( 'privacy_policy_page', 0 ) )
+			&& '' !== charitable_get_option( 'privacy_policy', __( 'Your personal data will be used to process your donation, support your experience throughout this website, and for other purposes described in our [privacy_policy].', 'charitable' ) );
+	} else {
+		return 0 !== intval( charitable_get_option( 'privacy_policy_page', 0 ) )
+			&& '' !== charitable_get_option( 'privacy_policy', __( 'Your personal data will be used to process your donation, support your experience throughout this website, and for other purposes described in our [privacy_policy].', 'charitable' ) )
+			&& charitable_get_option( 'privacy_policy_enabled', 0 );
+	}
 }
 
 /**

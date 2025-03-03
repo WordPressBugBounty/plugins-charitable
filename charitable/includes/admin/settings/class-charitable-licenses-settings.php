@@ -518,6 +518,10 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 				}
 				$output .= '</p>';
 			endif;
+
+			// Add help text to the license field.
+			$output .= '<div class="charitable-help">' . esc_html__( 'Your license key provides access to updates and addons.', 'charitable' ) . '</div>';
+
 			$output . '</div>';
 
 			return $output;

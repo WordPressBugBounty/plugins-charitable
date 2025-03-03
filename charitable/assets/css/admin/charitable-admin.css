@@ -4152,6 +4152,12 @@ body.charitable-show-notifications .charitable-main {
   left: -570px;
 }
 
+/* for print */
+@media print {
+  .charitable-plugin-notifications {
+    display: none;
+  }
+}
 /* notifications AM END */
 /* notifications */
 .charitable-dashboard-notifications {

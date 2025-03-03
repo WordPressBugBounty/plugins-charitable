@@ -77,31 +77,35 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 					'priority' => 10000,
 					'value'    => 'general',
 				),
+				'general_settings'   => array(
+					'title'    => __( 'General Settings', 'charitable' ),
+					'type'     => 'heading',
+					'priority' => 1,
+				),
 				'section_license'                        => array(
 					'title'    => __( 'License', 'charitable' ),
 					'type'     => 'heading',
-					'priority' => 1,
+					'priority' => 2,
 					'class'    => 'section-heading general-settings',
-					'help'     => __( 'Your license key provides access to updates and addons.', 'charitable' ),
 				),
 				'license_key'                            => array(
 					'title'    => __( 'License Key', 'charitable' ),
 					'type'     => 'content',
 					'class'    => 'general-settings',
 					'content'  => Charitable_Licenses_Settings::get_instance()->generate_license_check_html(),
-					'priority' => 2,
+					'priority' => 3,
 					'help'     => __( 'Your license key provides access to updates and addons.', 'charitable' ),
 				),
 				'section_locale'                         => array(
 					'title'    => __( 'Currency & Location', 'charitable' ),
 					'type'     => 'heading',
 					'class'    => 'section-heading general-setting currrency-location',
-					'priority' => 3,
+					'priority' => 4,
 				),
 				'country'                                => array(
 					'title'    => __( 'Base Country', 'charitable' ),
 					'type'     => 'select',
-					'priority' => 4,
+					'priority' => 8,
 					'default'  => 'US',
 					'class'    => 'general-setting',
 					'options'  => charitable_get_location_helper()->get_countries(),
@@ -244,7 +248,7 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 					'priority' => 28,
 					'default'  => false,
 					'class'    => 'general-settings charitable-color-field',
-					'help'     => __( 'Define a highlight color for form notices, errors, and other UI. Default is ', 'charitable' ) . apply_filters( 'charitable_default_highlight_colour', '#f89d35' ) . '. Templates built in Campaign Builder or CSS in your theme or plugins - might override this.',
+					'help'     => __( 'Define a highlight color for form notices, errors, and other UI. Default is ', 'charitable' ) . apply_filters( 'charitable_default_highlight_colour', '#f89d35' ) . '. Templates built in Campaign Builder or CSS in your theme or plugins might override this.',
 				),
 				'section_pages'                          => array(
 					'title'    => __( 'Pages', 'charitable' ),
@@ -304,6 +308,36 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 						),
 					),
 					'help'     => __( 'Choose the page that users will be redirected to after donating. Leave it set to automatic to use the built-in Charitable receipt. If you choose a static page, it should contain the <code>[donation_receipt]</code> shortcode.', 'charitable' ),
+				),
+				'privacy_policy_page'                             => array(
+					'title'    => __( 'Privacy Policy Page', 'charitable' ),
+					'type'     => 'select',
+					'class'    => 'general-settings',
+					'priority' => 40,
+					'default'  => '0',
+					'options'  => array(
+						'0'  => __( 'No Privacy Page', 'charitable' ),
+						'pages' => array(
+							'options' => charitable_get_admin_settings()->get_pages(),
+							'label'   => __( 'Choose a Static Page', 'charitable' ),
+						),
+					),
+					'help'     => __( 'Choose the page that contains your site\'s privacy policy.', 'charitable' ),
+				),
+				'terms_conditions_page'                  => array(
+					'title'    => __( 'Terms and Conditions Page', 'charitable' ),
+					'type'     => 'select',
+					'priority' => 45,
+					'default'  => '0',
+					'class'    => 'general-settings',
+					'options'  => array(
+						'0'  => __( 'No Terms Page', 'charitable' ),
+						'pages' => array(
+							'options' => charitable_get_admin_settings()->get_pages(),
+							'label'   => __( 'Choose a Static Page', 'charitable' ),
+						),
+					),
+					'help'     => __( 'Choose the page that contains your site\'s terms and conditions.', 'charitable' ),
 				),
 			);
 

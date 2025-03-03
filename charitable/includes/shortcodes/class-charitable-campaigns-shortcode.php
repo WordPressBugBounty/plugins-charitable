@@ -36,6 +36,7 @@ if ( ! class_exists( 'Charitable_Campaigns_Shortcode' ) ) :
 		public static function display( $atts ) {
 			$default = array(
 				'id'                => '',
+				'parent_campaigns'  => '', // only show child campaigns of the IDs provided.
 				'orderby'           => 'post_date',
 				'order'             => '',
 				'number'            => get_option( 'posts_per_page' ),
@@ -120,6 +121,7 @@ if ( ! class_exists( 'Charitable_Campaigns_Shortcode' ) ) :
 		 * Return campaigns to display in the campaigns shortcode.
 		 *
 		 * @since   1.0.0
+		 * @since   1.8.4.7
 		 *
 		 * @param  array $args The query arguments to be used to retrieve campaigns.
 		 * @return WP_Query
@@ -134,6 +136,13 @@ if ( ! class_exists( 'Charitable_Campaigns_Shortcode' ) ) :
 				$query_args['post__in'] = explode( ',', $args['id'] );
 			}
 
+			/* Only show child campaigns of the IDs provided, added in 1.8.4.7 */
+			if ( ! empty( $args['parent_campaigns'] ) ) {
+				$query_args['post_parent__in'] = explode( ',', $args['parent_campaigns'] );
+			}
+
+			/* Parent IDs */
+
 			/* Pagination */
 			if ( ! empty( $args['paged'] ) ) {
 				$query_args['paged'] = $args['paged'];
@@ -141,7 +150,7 @@ if ( ! class_exists( 'Charitable_Campaigns_Shortcode' ) ) :
 
 			/* Set category constraint */
 			if ( ! empty( $args['category'] ) ) {
-				$query_args['tax_query'] = array(
+				$query_args['tax_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 					array(
 						'taxonomy' => 'campaign_category',
 						'field'    => 'slug',
@@ -153,7 +162,7 @@ if ( ! class_exists( 'Charitable_Campaigns_Shortcode' ) ) :
 			/* Set tag constraint */
 			if ( ! empty( $args['tag'] ) ) {
 				if ( ! array_key_exists( 'tax_query', $query_args ) ) {
-					$query_args['tax_query'] = array();
+					$query_args['tax_query'] = array(); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 				}
 
 				$query_args['tax_query'][] = array(
@@ -170,11 +179,11 @@ if ( ! class_exists( 'Charitable_Campaigns_Shortcode' ) ) :
 
 			/* Only include active campaigns if flag is set */
 			if ( ! $args['include_inactive'] ) {
-				$query_args['meta_query'] = array(
+				$query_args['meta_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 					'relation' => 'OR',
 					array(
 						'key'     => '_campaign_end_date',
-						'value'   => date( 'Y-m-d H:i:s' ),
+						'value'   => date( 'Y-m-d H:i:s' ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 						'compare' => '>=',
 						'type'    => 'datetime',
 					),

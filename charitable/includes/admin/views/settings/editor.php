@@ -28,7 +28,7 @@ $editor_args         = wp_parse_args( $editor_args, $default_editor_args );
 
 	if ( isset( $view_args['help'] ) ) :
 		?>
-		<div class="charitable-help"><?php echo esc_html( $view_args['help'] ); ?></div>
+		<div class="charitable-help"><?php echo ( $view_args['help'] ); ?></div>
 		<?php
 	endif;
 	?>

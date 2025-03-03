@@ -26,6 +26,6 @@ endif;
 	data-default-color="<?php echo esc_attr( $default_color ); ?>"
 	<?php echo wp_kses_post( charitable_get_arbitrary_attributes( $view_args ) ); ?> />
 <?php if ( isset( $view_args['help'] ) ) : ?>
-	<div class="charitable-help"><?php echo esc_html( $view_args['help'] ); ?></div>
+	<div class="charitable-help"><?php echo ( $view_args['help'] ); ?></div>
 	<?php
 endif;
