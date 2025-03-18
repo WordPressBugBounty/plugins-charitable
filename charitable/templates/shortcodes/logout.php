@@ -21,4 +21,4 @@ if ( ! array_key_exists( 'redirect', $view_args ) || ! array_key_exists( 'text',
 }
 
 ?>
-<a href="<?php echo wp_logout_url( $view_args['redirect'] ) ?>"><?php echo $view_args['text'] ?></a>
+<a href="<?php echo esc_url( wp_logout_url( $view_args['redirect'] ) ); ?>"><?php echo esc_html( $view_args['text'] ); ?></a>

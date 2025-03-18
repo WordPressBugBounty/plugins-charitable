@@ -1,3 +1,6 @@
+# 1.8.4.8
+* FIX: Resolved security issue involving the logout template.
+
 # 1.8.4.7
 * UPDATED: Terms and consent options are also now under "Privacy" settings and any Charitable settings in WordPress customizer are depreciated and will soon be removed.
 * FIX: Made headers and spacing more consistent in settings area, along with tweaks in character output.
