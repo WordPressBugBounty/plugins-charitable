@@ -123,6 +123,9 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				'ajax_url'                        => admin_url( 'admin-ajax.php' ),
 				'admin_url'                       => admin_url(),
 				'ok'                              => esc_html__( 'OK', 'charitable' ),
+				'oops'                            => esc_html__( 'Oops!', 'charitable' ),
+				'please_enter_key'                => esc_html__( 'Please enter a valid license key.', 'charitable' ),
+				'manual_upgrade'                  => esc_html__( 'Manual Upgrade', 'charitable' ),
 				'cancel'                          => esc_html__( 'Cancel', 'charitable' ),
 				'close'                           => esc_html__( 'Close', 'charitable' ),
 				'plugin_install_activate_btn'     => esc_html__( 'Install and Activate', 'charitable' ),
@@ -369,12 +372,6 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			// phpcs:enable
 
 			?>
-
-			<?php if ( ! charitable_is_pro() ) { ?>
-
-				<?php echo Charitable_Settings::get_instance()->settings_cta(); // @codingStandardsIgnoreLine ?>
-
-			<?php } ?>
 
 			<div id="charitable-addons">
 

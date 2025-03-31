@@ -34,18 +34,6 @@ if ( ! class_exists( 'Charitable_Tools_System_Info' ) ) :
 		private static $instance = null;
 
 		/**
-		 * Determine if the class is allowed to load.
-		 *
-		 * @since 1.8.1.6
-		 *
-		 * @return bool
-		 */
-		public function allow_load() {
-
-			return charitable_is_admin_page( 'tools', 'wpcode' );
-		}
-
-		/**
 		 * Load the class.
 		 *
 		 * @since 1.8.1.6

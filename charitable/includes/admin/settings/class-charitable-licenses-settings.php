@@ -477,6 +477,7 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 		 *
 		 * @since   1.7.0.4
 		 * @version 1.8.3 added charitable_is_pro() check.
+		 * @version 1.8.5 added pro_connect flag.
 		 *
 		 * @param   string $has_valid_license Allows us to control HTML based on valid license already in the system.
 		 * @return  string
@@ -485,6 +486,7 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 
 			$slug              = (string) Charitable_Addons_Directory::get_current_plan_slug();
 			$is_legacy         = Charitable_Addons_Directory::is_current_plan_legacy();
+			$pro_connect       = $this->is_pro_connect();
 			$readonly          = false;
 			$show_license_form = true;
 
@@ -504,16 +506,22 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 					$output           .= $this->get_legacy_licensed_message();
 					$show_license_form = false;
 				} else {
-					$output .= $this->get_unlicensed_message();
+					// 1.8.5
+					if ( charitable_is_pro() ) {
+						$output .= $this->get_licensed_message();
+						$readonly = 'readonly value="xxxxxxxxxxxxxxxxxxxx"';
+						$has_valid_license = true;
+					} else {
+						$output .= $this->get_unlicensed_message();
+					}
 				}
 			}
 			if ( $show_license_form ) :
 				$output .= '<p>';
 				$output .= '<input type="password" autocomplete="off" name="license-key" id="charitable-settings-upgrade-license-key" ' . $readonly . ' placeholder="' . esc_attr__( 'Paste license key here', 'charitable' ) . '" value="" />';
 				if ( ! $has_valid_license ) {
-					$output .= '<button data-action="verify" type="button" class="charitable-btn charitable-btn-md charitable-btn-green charitable-btn-activate" id="charitable-settings-connect-btn">' . esc_html__( 'Verify Key', 'charitable' ) . '</button>';
-				}
-				if ( $has_valid_license ) {
+					$output .= '<button data-action="verify" type="button" class="charitable-btn charitable-btn-md charitable-btn-green charitable-btn-activate" id="charitable-settings-connect-btn" data-pro-connect="' . $pro_connect . '">' . esc_html__( 'Verify Key', 'charitable' ) . '</button>';
+				} elseif ( $has_valid_license ) {
 					$output .= '<button data-action="deactivate" type="button" class="charitable-btn charitable-btn-md charitable-btn-orange charitable-btn-deactivate" id="charitable-settings-connect-btn">' . esc_html__( 'Deactivate Key', 'charitable' ) . '</button>';
 				}
 				$output .= '</p>';
@@ -528,12 +536,74 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 		}
 
 		/**
+		 * Checks if the pro_connect flag is set. This decides if entering a license key will trigger Charitable Connect, an improved migration path to Charitable Pro.
+		 *
+		 * @since 1.8.5
+		 *
+		 * @return boolean
+		 */
+		public function is_pro_connect() {
+
+			if ( defined( 'CHARITABLE_FORCE_PRO_CONNECT' ) && CHARITABLE_FORCE_PRO_CONNECT ) {
+				return true;
+			}
+
+			if ( defined( 'CHARITABLE_MANUAL_LICENSE_ACTIVATION' ) && CHARITABLE_MANUAL_LICENSE_ACTIVATION ) {
+				return false;
+			}
+
+			// If the pro plugin is already installed (but not activated), then we don't need to do anything.
+			if ( file_exists( WP_PLUGIN_DIR . '/charitable-pro/charitable.php' ) ) {
+				return false;
+			}
+
+			$charitable_activated = (array) get_option( 'charitable_activated', array() );
+
+			// If pro connect has been done before, it can be done again.
+			if ( ! empty( $charitable_activated['pro_connect'] ) ) {
+				return true;
+			}
+
+			// If no campaigns or donations have been created, use Connect for Pro.
+			$count_campaigns = wp_count_posts( 'campaign' );
+			$total_campaigns = isset( $count_campaigns->publish ) ? $count_campaigns->publish : 0;
+			$count_donations = wp_count_posts( 'donation' );
+			$total_donations = isset( $count_donations->{'charitable-completed'} ) ? $count_donations->{'charitable-completed'} : 0;
+			if ( $total_campaigns === 0 && $total_donations === 0 ) {
+				return true;
+			}
+
+			// If activated in the last 14 days, use Connect for Pro. Check both wpcharitable_activated_datetime and charitable_activated['lite'].
+			$activation_date = get_option( 'wpcharitable_activated_datetime' );
+			if ( $activation_date ) {
+				// if the $activate_date is not a unix time stamp, convert it.
+				if ( ! is_numeric( $activation_date ) ) {
+					$activation_date = strtotime( $activation_date );
+				}
+				if ( (int) $activation_date > (int) strtotime( '-14 days' ) ) {
+					return true;
+				}
+			}
+			if ( ! empty( $charitable_activated['lite'] ) ) {
+				$activation_date = esc_html( $charitable_activated['lite'] );
+				if ( ! is_numeric( $activation_date ) ) {
+					$activation_date = strtotime( $activation_date );
+				}
+				if ( $activation_date > strtotime( '-14 days' ) ) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/**
 		 * Outputs a message for unlicnensed users for the general settings tab.
 		 *
 		 * @since   1.7.0.4
 		 *
 		 * @param   boolean $valid Valid license.
 		 * @param   array   $license_data Available license information.
+		 * @param   boolean $error Error flag.
 		 * @return  string
 		 */
 		public function get_unlicensed_message( $valid = false, $license_data = false, $error = true ) {
@@ -702,6 +772,21 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 			}
 
 			return $output;
+		}
+
+		/**
+		 * Outputs a message for deactivated licenses for the general settings tab.
+		 *
+		 * @since   1.8.5
+		 * @return  string
+		 */
+		public function get_deactivated_message() {
+
+			return sprintf(
+				'<p class="charitable-license-message-details">'
+				. '<strong>' . __( 'Your license key has been removed.', 'charitable' ) . '</strong>'
+				. '</p>'
+			);
 		}
 
 		/**

@@ -120,6 +120,7 @@ class CharitablePluginUpdater {
 							$name = 'Charitable';
 						}
 						printf(
+							// translators: %1$s is the plugin name, %2$s is the changelog link, %3$s is the new version number, %4$s is the update link.
 							__( '<p>There is a new version of %1$s available. <a target="_blank" class="thickbox" href="%2$s">View version %3$s details</a> or <a href="%4$s">update now</a>.</p>', 'charitable' ),
 							$name,
 							esc_url( $changelog_link ),
@@ -137,6 +138,7 @@ class CharitablePluginUpdater {
 					$name = 'Charitable';
 				}
 				printf(
+					// translators: %1$s is the plugin name, %2$s is the changelog link, %3$s is the new version number, %4$s is the update link.
 					__( '<p>There is a new version of %1$s available. <a target="_blank" class="thickbox" href="%2$s">View version %3$s details</a> or <a href="%4$s">update now</a>.</p>', 'charitable' ),
 					$name,
 					esc_url( $changelog_link ),

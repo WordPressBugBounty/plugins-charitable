@@ -248,3 +248,14 @@ add_filter( 'charitable_admin_notifications_update_data', array( Charitable_Even
  */
 add_action( 'admin_init', array( Charitable_Licenses_Settings::get_instance(), 'maybe_check_if_license_expired' ), 9999 );
 add_action( 'admin_init', array( Charitable_Licenses_Settings::get_instance(), 'maybe_check_if_license_expiring' ), 9998 );
+
+/**
+ * Connect for upgrade.wpcharitable.com.
+ *
+ * @see Charitable_Admin_Connect::settings_enqueues()
+ * @see Charitable_Admin_Connect::generate_url()
+ * @see Charitable_Admin_Connect::process()
+ */
+add_action( 'after_charitable_admin_enqueue_scripts', array( Charitable_Admin_Connect::get_instance(), 'settings_enqueues' ), 10, 3 );
+add_action( 'wp_ajax_charitable_connect_url', array( Charitable_Admin_Connect::get_instance(), 'generate_url' ) );
+add_action( 'wp_ajax_nopriv_charitable_connect_process', array( Charitable_Admin_Connect::get_instance(), 'process' ) );

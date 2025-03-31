@@ -1,3 +1,9 @@
+# 1.8.5.0
+* NEW: Compatibility with new Charitable Pro plugin (including automatic upgrading when entering a license).
+* NEW: "charitable_export_data" and "charitable_export_columns" filters for control in Charitable exporting in the admin.
+* UPDATED: CSS tweaks to admin and donation form UI.
+* FIX: Updated code related to translations, CSS, UI, and PHP standards.
+
 # 1.8.4.8
 * FIX: Resolved security issue involving the logout template.
 

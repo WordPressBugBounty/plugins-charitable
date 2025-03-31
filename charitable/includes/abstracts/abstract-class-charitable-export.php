@@ -110,11 +110,22 @@ if ( ! class_exists( 'Charitable_Export' ) ) :
 		 * Export the CSV file.
 		 *
 		 * @since   1.0.0
+		 * @version 1.8.5 - Added filter for columns and data.
 		 *
 		 * @return  void
 		 */
 		protected function export() {
 			$data = array_map( array( $this, 'map_data' ), $this->get_data() );
+
+			/**
+			 * Last chance for filtering the data to be exported.
+			 *
+			 * @since 1.8.5
+			 *
+			 * @param array $data The data to be exported.
+			 */
+			$data    = apply_filters( 'charitable_export_data', $data );
+			$columns = apply_filters( 'charitable_export_columns', $this->columns );
 
 			$this->print_headers();
 
@@ -122,14 +133,14 @@ if ( ! class_exists( 'Charitable_Export' ) ) :
 			$output = fopen( 'php://output', 'w' );
 
 			/* Print first row headers. */
-			fputcsv( $output, array_values( $this->columns ) );
+			fputcsv( $output, array_values( $columns ) );
 
 			/* Print the data */
 			foreach ( $data as $row ) {
 				fputcsv( $output, $row );
 			}
 
-			fclose( $output );
+			fclose( $output ); // phpcs:ignore
 
 			exit();
 		}

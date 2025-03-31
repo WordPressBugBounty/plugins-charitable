@@ -153,3 +153,5 @@ add_action( 'charitable_save_settings', array( Charitable_Checklist::get_instanc
 add_filter( 'admin_body_class', array( Charitable_Checklist::get_instance(), 'add_body_class' ), 10 );
 add_filter( 'charitable_submenu_pages', array( Charitable_Checklist::get_instance(), 'add_checklist_to_menu' ), 2 );
 add_action( 'admin_init', array( Charitable_Checklist::get_instance(), 'maybe_complete_checklist' ), 10 );
+
+add_action( 'admin_init', array( Charitable_Checklist::get_instance(), 'maybe_activate_pro_after_onboarding' ), 10 );

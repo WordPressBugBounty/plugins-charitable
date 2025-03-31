@@ -688,7 +688,7 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 		 * @since  1.7.0
 		 * @since  1.8.1 Added the Charitable reports page.
 		 * @since  1.8.1.6 Added the Charitable tools and guide tools page.
-		 *
+		 * @since  1.8.5 Added the Charitable donors page.
 		 * @return array
 		 */
 		public function get_charitable_screens() {
@@ -713,6 +713,7 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 					'edit-donation',
 					'toplevel_page_charitable',
 					'charitable_page_charitable-addons',
+					'charitable_page_charitable-donors',
 				)
 			);
 		}

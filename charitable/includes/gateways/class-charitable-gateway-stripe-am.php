@@ -377,6 +377,20 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 			if ( ! $this->check_keys_exist( $mode ) || ! charitable_using_stripe_connect() ) {
 				$html .= $this->get_stripe_connect_button();
 			} else {
+
+				if ( ! charitable_is_pro() ) {
+					$html .= '<div class="charitable-inline-notice info">
+							<p>
+							<strong>' . esc_html__( 'Pay as you go pricing:', 'charitable-pro' ) . '</strong> ' .
+							sprintf(
+								/* translators: %1$s: opening link tag, %2$s: closing link tag */
+								esc_html__( '3%% per transaction + Stripe fees. %1$sUpgrade to Pro%2$s for no added fees and priority support.', 'charitable-pro' ),
+								'<a target="_blank" href="' . esc_url( charitable_pro_upgrade_url( $medium ) ) . '">',
+								'</a>'
+							) . '</p>
+						</div>';
+				}
+
 				$html .= '<p id="wpcharitable-stripe-auth-error-account-actions" style="display: block;">' . sprintf(
 					/* translators: %1$s Stripe payment mode. %2$s Opening anchor tag for reconnecting to Stripe, do not translate. %3$s Opening anchor tag for disconnecting Stripe, do not translate. %4$s Closing anchor tag, do not translate. */
 					__( '%1$sDisconnect this account%2$s.', 'charitable' ),

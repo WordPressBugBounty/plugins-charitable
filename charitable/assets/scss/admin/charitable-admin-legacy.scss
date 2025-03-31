@@ -1226,6 +1226,25 @@ body.post-type-donation {
 	}
 }
 
+.charitable-inline-notice {
+	background: #fff;
+    border: 1px solid #c3c4c7;
+    border-left-width: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    margin: 5px 15px 15px 0;
+    padding: 10px 12px;
+	p:last-child {
+		margin-bottom: 0 !important;
+	}
+	&.info {
+		border-left-color: #00a0d2;
+	}
+	&.warning {
+		border-left-color: #ffb900;
+	}
+
+}
+
 input[type=number].charitable-settings-field {
 	height: auto;
 }
@@ -2276,88 +2295,617 @@ div#charitable-settings {
 			margin-right: 10px;
 		}
 	}
-}
-/* cta settings */
 
-#charitable-reports .reports-lite-cta,
-#charitable-settings .settings-lite-cta {
-	background-color: #fff;
-	border: 1px solid #dadada;
-	padding: 25px 20px;
-	margin: 10px 0 0 0;
+}
+
+
+
+body.charitable-admin-settings div.jconfirm *,
+body.charitable-admin-settings div.jconfirm *::before,
+body.charitable-admin-settings div.jconfirm *::after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+body.charitable-admin-settings {
+		div.jconfirm .jconfirm-box-container .jconfirm-box {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		justify-items: center;
+		animation: none;
+		background: #ffffff;
+		border-radius: 6px;
+		border-top-style: solid;
+		border-top-width: 4px;
+		box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+		padding-top: 34px;
+		max-width: 400px;
+	}
+
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-title-c,
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane,
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-buttons {
+		grid-column: 1 / -1;
+		text-align: center;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-default {
+		border-top-width: 0;
+		padding-top: 25px;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-default .jconfirm-title-c {
+		margin-bottom: 20px;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-default .jconfirm-title-c .jconfirm-icon-c {
+		font-size: 44px;
+		margin-bottom: -6px;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-default button.btn-confirm {
+		background-color: #e27730;
+		border-color: #e27730;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-default button.btn-confirm:hover {
+		background-color: #cd6622;
+		border-color: #cd6622;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-red {
+		border-top-color: #d63638 !important;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-red .jconfirm-title-c .jconfirm-icon-c {
+		color: #d63638 !important;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-red button.btn-confirm {
+		background-color: #d63638;
+		border-color: #d63638;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-red button.btn-confirm:hover {
+		background-color: #b32d2e;
+		border-color: #b32d2e;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-orange {
+		border-top-color: #e27730 !important;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-orange .jconfirm-title-c .jconfirm-icon-c {
+		color: #e27730 !important;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-orange button.btn-confirm {
+	background-color: #e27730;
+	border-color: #e27730;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-orange button.btn-confirm:hover {
+	background-color: #cd6622;
+	border-color: #cd6622;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-yellow {
+	border-top-color: #ffb900 !important;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-yellow .jconfirm-title-c .jconfirm-icon-c {
+	color: #ffb900 !important;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-yellow button.btn-confirm {
+	background-color: #ffb900;
+	border-color: #ffb900;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-yellow button.btn-confirm:hover {
+	background-color: #ffaa00;
+	border-color: #ffaa00;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-blue {
+	border-top-color: #0399ed !important;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-blue .jconfirm-title-c .jconfirm-icon-c {
+	color: #0399ed !important;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-blue button.btn-confirm {
+	background-color: #0399ed;
+	border-color: #0399ed;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-blue button.btn-confirm:hover {
+	background-color: #036aab;
+	border-color: #036aab;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-green {
+	border-top-color: #00a32a !important;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-green .jconfirm-title-c .jconfirm-icon-c {
+	color: #00a32a !important;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-green button.btn-confirm {
+	background-color: #00a32a;
+	border-color: #00a32a;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-green button.btn-confirm:hover {
+	background-color: #008a20;
+	border-color: #008a20;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-purple {
+	border-top-color: #7a30e2 !important;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-purple .jconfirm-title-c .jconfirm-icon-c {
+	color: #7a30e2 !important;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-purple button.btn-confirm {
+	background-color: #7a30e2;
+	border-color: #7a30e2;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box.jconfirm-type-purple button.btn-confirm:hover {
+	background-color: #5c24a9;
+	border-color: #5c24a9;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-closeIcon {
+	color: transparent;
+	font-family: FontAwesome;
+	height: 14px;
+	opacity: 1;
+	right: 10px;
+	top: 10px;
+	width: 14px;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-closeIcon:after {
+	color: #bbbbbb;
+	content: "\f00d";
+	font-size: 16px;
+	left: 0;
+	position: absolute;
+	top: 0;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-closeIcon:hover:after {
+	color: #777777 !important;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-title-c {
+	margin: 0 0 20px 0;
+	padding: 0;
+	font-weight: 600;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-title-c .jconfirm-icon-c {
+	font-size: 47px;
+	margin: 0;
+	-ms-transform: none !important;
+	transform: none !important;
+	-webkit-transition: none !important;
+	transition: none !important;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-title-c .jconfirm-icon-c + .jconfirm-title {
+	margin-top: 20px;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-title-c .jconfirm-title {
+	color: #444444;
+	display: block;
+	line-height: 30px;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane {
+	display: block;
+	margin-bottom: 20px;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane .jconfirm-content {
+	color: #444444;
+	font-size: 16px;
+	line-height: 24px;
+	margin-bottom: 0;
+	overflow: inherit;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane .jconfirm-content.lite-upgrade p {
+	color: #777777;
+	font-size: 18px;
+	padding: 0 20px;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane .jconfirm-content p {
+	font-size: inherit;
+	line-height: inherit;
+	margin: 0 0 16px;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane .jconfirm-content p:last-of-type {
+	margin: 0;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane .jconfirm-content p.large {
+	font-size: 18px;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane .jconfirm-content p.small {
+	font-size: 14px;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane .jconfirm-content input[type=text],
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane .jconfirm-content input[type=number],
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane .jconfirm-content input[type=email],
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane .jconfirm-content input[type=url],
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane .jconfirm-content input[type=password],
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane .jconfirm-content input[type=search],
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane .jconfirm-content input[type=tel],
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane .jconfirm-content textarea,
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane .jconfirm-content select {
+	margin: 10px 2px;
+	width: calc(100% - 4px);
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .already-purchased {
+	display: block;
+	grid-row: 5;
+	grid-column: 1 / -1;
+	color: #bbbbbb;
+	font-size: 14px;
+	margin-top: 15px;
+	text-decoration: underline;
+	text-align: center;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .already-purchased:hover {
+	color: #777777;
+	text-decoration: underline;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .discount-note {
+	grid-row: 4;
+	grid-column: 1 / -1;
+	margin: 25px 0 0 0;
+	text-align: center;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .discount-note p {
+	background-color: #fcf9e8;
+	color: #777777;
+	font-size: 16px;
+	margin: 0 -30px;
+	padding: 22px 52px 12px 52px;
+	position: relative;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .discount-note p:after {
+	top: -16px;
+	background-color: #ffffff;
+	border-radius: 50%;
+	color: #00a32a;
+	content: "\f058";
+	display: inline-block;
+	font: normal normal normal 14px FontAwesome;
+	font-size: 26px;
+	margin-right: -18px;
+	padding: 5px 6px;
+	position: absolute;
+	right: 50%;
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .discount-note span {
+	color: #00a32a;
+	font-weight: 700;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .discount-note a {
+	color: #777777;
+	display: block;
+	margin-top: 12px;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .feature-video {
+	margin: 30px 0 0 0;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .pro-feature-video {
+	margin: 15px 0 10px 0;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box input[type=text]:not(.choices__input) {
+	display: block;
+	width: 99%;
+	border: 1px solid #d6d6d6;
+	padding: 10px !important;
+	box-shadow: none;
+	margin: 10px 1px 1px 1px !important;
+	line-height: 1 !important;
+	outline: 0;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box input[type=text]:not(.choices__input):focus {
+	border-color: #007cba;
+	box-shadow: 0 0 0 1px #007cba;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-buttons {
+	margin-top: -10px;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-buttons button {
+	min-width: 83px;
+	background: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 4px;
+	color: #777777;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 20px;
+	outline: none;
+	padding: 11px 17px;
+	text-transform: none;
+	margin: 10px;
+	transition-property: all;
+	transition-duration: 0.15s;
+	transition-timing-function: ease-out;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-buttons button:hover {
+	background: #eeeeee;
+	border-color: #cccccc;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-buttons button[disabled] {
+	cursor: no-drop;
+	pointer-events: none;
+	opacity: .25;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-buttons button.btn-confirm {
+	color: #ffffff;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-buttons button.hidden + button {
+	margin-left: 0;
+	margin-right: 0;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-buttons button.btn-block {
+	display: block;
+	margin: 0 0 10px 0 !important;
+	text-align: center;
+	width: 100%;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-buttons button.btn-normal-case {
+	text-transform: none !important;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-buttons button i {
+	margin: 0 10px 0 0;
+	}
+
+	div.jconfirm .jconfirm-box-container .jconfirm-box .error {
+	color: #d63638;
+	display: none;
+	}
+
+}
+
+/* cta settings */
+.charitable-report-table-container-wrapper {
 	position: relative;
 }
-#charitable-reports .reports-lite-cta .dismiss,
-#charitable-settings .settings-lite-cta .dismiss {
-	position: absolute;
-	top: 10px;
-	right: 10px;
-	color: #666;
-	font-size: 16px;
-	text-decoration: none;
-}
-#charitable-reports .reports-lite-cta h5,
-#charitable-settings .settings-lite-cta h5 {
-	margin: 0 0 16px;
-	font-size: 18px;
-	font-weight: 600;
-}
-#charitable-reports .reports-lite-cta h6,
-#charitable-settings .settings-lite-cta h6 {
-	font-weight: 700;
-	font-size: 14px;
-	margin: 0 0 16px;
-}
-#charitable-reports .reports-lite-cta p,
-#charitable-settings .settings-lite-cta p {
-	color: #555;
-	font-size: 14px;
-	margin: 0 0 16px;
-}
-#charitable-reports .reports-lite-cta p:last-of-type,
-#charitable-settings .settings-lite-cta p:last-of-type {
-	margin: 0;
-}
-#charitable-reports .reports-lite-cta p a,
-#charitable-settings .settings-lite-cta p a {
-	color: #e27730;
-}
-#charitable-reports .reports-lite-cta p a:hover,
-#charitable-settings .settings-lite-cta p a:hover {
-	color: #b85a1b;
-}
-#charitable-reports .reports-lite-cta ul,
-#charitable-settings .settings-lite-cta ul {
-	margin: 0;
-	padding: 0;
-	width: 50%;
-	float: left;
-}
-@media (max-width: 600px) {
-	#charitable-reports .reports-lite-cta ul,
-	#charitable-settings .settings-lite-cta ul {
-		width: 100%;
-		float: none;
-	}
-}
+.charitable-cta-lite-to-pro {
+	max-width: 1000px;
+	border: 1px solid #dadada;
+	padding: 0 !important;
+	background-color: #fff;
+	background-image: url('../../images/lite-to-pro/cta.png' );
+	background-size: 100%;
+	background-repeat: no-repeat;
+	background-position: 500px 0;
 
-#charitable-reports {
-	.reports-lite-cta {
-		ul {
-			li {
-				margin: 0;
-				padding: 0 0 2px 16px;
-				color: #555;
-				font-size: 14px;
-				position: relative;
-				&:before {
-					content: "+";
-					position: absolute;
-					top: -1px;
-					left: 0;
+	.charitable-cta-content {
+		margin-top: 40px !important;
+		display: flex;
+		flex-wrap: wrap;
+		flex-direction: row;
+		width: 100%;
+		justify-content: space-between;
+		align-items: center;
+
+		gap: 50px;
+
+		// border-top: 20px solid #fff;
+		// border-bottom: 20px solid #fff;
+
+		h5 {
+			font-size: 20px;
+			line-height: 24px;
+			font-weight: 700;
+			margin: 0px 0 10px 0;
+		}
+		> div {
+			flex: 1.5;
+		}
+		> div:first-child {
+			flex: 1.5;
+		}
+		.charitable-cta-content-left {
+			padding: 0px 25px 0px 25px;
+			.charitable-cta-list {
+				margin: 20px 0 0 0 !important;
+				ul {
+					display: flex;
+					margin-bottom: 20px !important;
+					float: none !important;
+					flex-direction: row;
+					justify-content: space-between;
+					align-items: center;
+					flex-wrap: wrap;
+					width: 100% !important;
+					padding: 10px 0;
+					gap: 10px;
+					li {
+						margin: 0 0 10px 0 !important;
+						padding: 0 0 0 30px !important;
+						color: #555;
+						font-size: 13px;
+						line-height: 14px;
+						position: relative;
+						width: calc(50% - 40px);
+						&:before {
+							content: "\2713" !important;
+							position: absolute;
+							width: 16px;
+							height: 16px;
+							background: transparent;
+							border: 2px solid #218900;
+							border-radius: 50%;
+							display: inline-flex;
+							align-items: center;
+							justify-content: center;
+							color: #218900;
+							font-size: 10px;
+							left: 0;
+							top: 2px;
+						}
+					}
+				}
+			}
+			a.button-primary {
+				background-color: #218900;
+				color: #fff;
+				border: none;
+				font-weight: 600;
+				padding: 15px 20px !important;
+				border-radius: 5px !important;
+				line-height: normal !important;
+				min-height: 50px !important;
+				height: 50px !important;
+				&:hover {
+					background-color: #1a6d00;
 				}
 			}
 		}
+		.charitable-cta-featured-image {
+			img {
+				width: 100%;
+				height: 120%;
+				object-fit: cover;
+				max-width: 100%;
+				border: 1px solid #dadada;
+			}
+			display: flex;
+		}
+		.charitable-cta-button-container {
+			display: flex;
+			justify-content: start;
+			align-items: center;
+			flex-direction: row;
+			gap: 20px;
+			p {
+				color: #555;
+			}
+		}
+	}
+	&.no-close-button {
+		.charitable-cta-content {
+			margin-top: 30px !important;
+			margin-bottom: 20px !important;
+		}
+	}
+}
+body.charitable_page_charitable-reports {
+	.charitable-cta-lite-to-pro {
+		max-width: 100%;
+		margin-left: auto;
+		margin-right: auto;
+		overflow: hidden;
+		background-image: none !important;
+		.charitable-cta-content {
+			padding-bottom: 20px !important;
+			.charitable-cta-content-left {
+				ul {
+					li:before {
+						top: -1px !important;
+					}
+				}
+			}
+			.charitable-cta-featured-image {
+				display: none !important;
+			}
+		}
+	}
+}
+body.charitable_page_charitable-addons,
+body.charitable_page_charitable-dashboard {
+	.charitable-cta-lite-to-pro {
+		max-width: 1000px;
+		overflow: hidden;
+
+		.charitable-cta-content {
+			> div {
+
+			}
+			justify-content: flex-start;
+			.charitable-cta-content-left {
+				margin-bottom: -10px !important;
+			}
+			.charitable-cta-featured-image {
+				max-height: 400px;
+				img {
+					max-height: 100%;
+				}
+			}
+		}
+	}
+}
+
+@media (max-width: 1100px) {
+	.charitable-cta-lite-to-pro {
+		.charitable-cta-content {
+			background-image: none;
+			flex-direction: column;
+		}
+	}
+}
+
+#charitable-reports .reports-lite-cta {
+	position: absolute !important;
+	z-index: 9999999;
+	top: 50%;
+	left: 0;
+	right: 0;
+	transform: translateY(-50%);
+	margin: 25px !important;
+}
+#charitable-reports .dashboard-lite-cta {
+	position: relative !important;
+	margin: 0 !important;
+	transform: none !important;
+}
+#charitable-reports {
+	.reports-lite-cta {
 		.list {
 			margin: 0 0 16px 0;
 			overflow: auto;
@@ -2421,6 +2969,8 @@ div#charitable-settings {
 	}
 }
 
+
+
 /* settings */
 select#charitable_settings_import_donations {
 	margin-bottom: 10px;
@@ -2472,4 +3022,59 @@ form.form-contains-file {
 
 table.charitable-donor-history-table td p {
 	margin: 0;
+}
+
+body.charitable-admin-reports-dashboard #charitable-reports .reports-lite-cta,
+body.charitable-admin-settings #charitable-settings .settings-lite-cta {
+	position: relative !important;
+	top: 0;
+	transform: none !important;
+	margin-left: 0 !important;
+}
+#charitable-reports .reports-lite-cta .dismiss,
+#charitable-settings .settings-lite-cta .dismiss {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	color: #666;
+	font-size: 16px;
+	text-decoration: none;
+}
+#charitable-reports .reports-lite-cta h5,
+#charitable-settings .settings-lite-cta h5 {
+	margin: 0 0 16px;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 24px;
+}
+#charitable-reports .reports-lite-cta h6,
+#charitable-settings .settings-lite-cta h6 {
+	font-weight: 700;
+	font-size: 14px;
+	margin: 0 0 16px;
+}
+#charitable-reports .reports-lite-cta p,
+#charitable-settings .settings-lite-cta p {
+	color: #555;
+	font-size: 14px;
+	margin: 0 0 16px;
+}
+#charitable-reports .reports-lite-cta p:last-of-type,
+#charitable-settings .settings-lite-cta p:last-of-type {
+	margin: 0;
+}
+#charitable-reports .reports-lite-cta p a,
+#charitable-settings .settings-lite-cta p a {
+	color: #e27730;
+}
+#charitable-reports .reports-lite-cta p a:hover,
+#charitable-settings .settings-lite-cta p a:hover {
+	color: #b85a1b;
+}
+#charitable-reports .reports-lite-cta ul,
+#charitable-settings .settings-lite-cta ul {
+	margin: 0;
+	padding: 0;
+	width: 50%;
+	float: left;
 }

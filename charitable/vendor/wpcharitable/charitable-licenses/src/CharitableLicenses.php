@@ -46,6 +46,13 @@ class CharitableLicenses {
 	private $update_data;
 
 	/**
+	 * The pro plugin.
+	 *
+	 * @var string
+	 */
+	const PRO_PLUGIN = 'charitable-pro/charitable-pro.php';
+
+	/**
 	 * Private constructor to prevent multiple instances.
 	 */
 	private function __construct() {
@@ -59,6 +66,7 @@ class CharitableLicenses {
 
 		add_action( 'init', array( $this, 'ajax_license_check' ) );
 		add_action( 'wp_ajax_charitable_license_check', array( $this, 'ajax_license_check' ) );
+		add_action( 'wp_ajax_charitable_license_check', array( $this, 'ajax_license_deactivate' ) );
 	}
 
 	/**
@@ -1037,9 +1045,11 @@ class CharitableLicenses {
 			return;
 		}
 
-		if ( ! isset( $_REQUEST['charitable_action'] ) && 'verify' !== $_REQUEST['charitable_action'] ) {
+		if ( ! isset( $_REQUEST['charitable_action'] ) || 'verify' !== $_REQUEST['charitable_action'] ) {
 			return;
 		}
+
+		$download_pro = isset( $_REQUEST['download_pro'] ) && 'true' === $_REQUEST['download_pro'] ? true : false;
 
 		// to-do: adjust spelling of charitable_action?
 
@@ -1059,7 +1069,65 @@ class CharitableLicenses {
 			'valid'           => isset( $license_data['plan_id'] ) ? 1 === intval( $license_data['valid'] ) : false,
 		);
 
+		if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			error_log( 'ajax_license_check: settings' );
+			error_log( print_r( $settings, true ) );
+			error_log( print_r( $_POST, true ) );
+			error_log( print_r( $_REQUEST, true ) );
+		}
+
 		update_option( 'charitable_settings', $settings );
+
+		if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			error_log( 'download_pro: ' . $download_pro );
+		}
+
+		if ( $download_pro ) {
+			// Get the download url from the server.
+			$response = wp_remote_get(
+				'https://wpcharitable.com/',
+				array(
+					'timeout'   => 15,
+					'sslverify' => false,
+					'body'      => array(
+						'edd_action' => 'get_version',
+						'item_id'    => '13035026',
+						'license'    => $license,
+						'url'        => site_url(),
+					),
+				)
+			);
+
+			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				error_log( 'ajax_license_check: download pro response' );
+				error_log( print_r( $response, true ) );
+			}
+
+			// Check if the response is HTTP valid and not an error.
+			if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					error_log( 'ajax_license_check: download pro response error' );
+					error_log( print_r( $response, true ) );
+				}
+				return;
+			}
+
+			// Get the body of the response.
+			$body = wp_remote_retrieve_body( $response );
+
+			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				error_log( 'ajax_license_check: download pro body' );
+				error_log( print_r( $body, true ) );
+			}
+
+			// Get the download link from the response.
+			$download_link = json_decode( $body )->download_link;
+
+			// If the download link is a real url, then download the plugin.
+			if ( $download_link ) {
+				$this->download_pro( $download_link, $license );
+			}
+		}
 
 		if ( isset( $license_data['valid'] ) && intval( $license_data['valid'] ) === 1 ) {
 			$license_data['message'] = \Charitable_Licenses_Settings::get_instance()->get_licensed_message();
@@ -1068,5 +1136,167 @@ class CharitableLicenses {
 		}
 
 		wp_send_json_success( $license_data );
+	}
+
+	/**
+	 * Download the pro plugin.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @return string
+	 */
+	public function download_pro( $download_link = false, $license = false ) {
+
+		if ( ! $download_link ) {
+			error_log( 'download_pro: no download link provided' );
+			return array(
+				'success' => false,
+				'message' => \esc_html__( 'No download link provided.', 'charitable' ),
+			);
+		}
+
+		// Include required WordPress core files
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+		require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+		require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+		require_once plugin_dir_path( CHARITABLE_DIRECTORY_PATH ) . 'charitable/includes/utilities/Skin.php';
+
+		// Set the current screen to avoid undefined notices.
+		// require_once ABSPATH . 'wp-admin/includes/screen.php';
+		// \set_current_screen( 'charitable_page_charitable-settings' );
+
+		// Prepare variables.
+		$url = \esc_url_raw(
+			\add_query_arg(
+				array( 'page' => 'charitable-settings' ),
+				\admin_url( 'admin.php' )
+			)
+		);
+
+		// Verify pro not activated.
+		if ( \function_exists( 'charitable_is_pro_addon_version' ) && \charitable_is_pro_addon_version() ) {
+			error_log( 'download_pro: pro addon version already installed and activated' );
+			return array(
+				'success' => false,
+				'message' => \esc_html__( 'Plugin already installed.', 'charitable' ),
+			);
+		}
+
+		// Verify the plugin is not installed.
+		if (!\function_exists('get_plugins')) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		$all_plugins = \get_plugins();
+		$is_installed = array_key_exists(self::PRO_PLUGIN, $all_plugins);
+
+		if ($is_installed) {
+			error_log( 'download_pro: pro plugin already installed' );
+			return array(
+				'success' => false,
+				'message' => \esc_html__( 'Plugin already installed.', 'charitable' ),
+			);
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		$creds = \request_filesystem_credentials( $url, '', false, false );
+
+		// Check for file system permissions.
+		if ( $creds === false || ! \WP_Filesystem( $creds ) ) {
+			\wp_send_json_error(
+				\esc_html__( 'There was an error while installing an upgrade. Please check file system permissions and try again. Also, you can download the plugin from charitable.com and install it manually.', 'charitable' )
+			);
+		}
+
+		/*
+		 * We do not need any extra credentials if we have gotten this far, so let's install the plugin.
+		 */
+
+		// Do not allow WordPress to search/download translations, as this will break JS output.
+		\remove_action( 'upgrader_process_complete', array( 'Language_Pack_Upgrader', 'async_upgrade' ), 20 );
+
+		// We do not need any extra credentials if we have gotten this far, so let's install the plugin.
+		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+		require_once plugin_dir_path( CHARITABLE_DIRECTORY_PATH ) . 'charitable/includes/utilities/Skin.php';
+
+		// Create the plugin upgrader with our custom skin.
+		$installer = new \Plugin_Upgrader( new \Charitable_Skin() );
+
+		// Error check.
+		if ( ! method_exists( $installer, 'install' ) ) {
+			wp_send_json_error( esc_html__( 'No install method found.', 'charitable' ) );
+		}
+
+		$installer->install( $download_link ); // phpcs:ignore
+
+		if ( charitable_is_debug() ) {
+			error_log( 'Charitable Admin Connect process install' ); // phpcs:ignore
+			error_log( $url ); // phpcs:ignore
+			error_log( print_r( $installer->plugin_info(), true ) ); // phpcs:ignore
+		}
+
+		// Flush the cache and return the newly installed plugin basename.
+		wp_cache_flush();
+
+		$plugin_basename = $installer->plugin_info();
+
+		return $plugin_basename;
+	}
+
+
+	/**
+	 * AJAX handler for license deactivation.
+	 *
+	 * @since  1.8.5
+	 *
+	 * @return void
+	 */
+	public function ajax_license_deactivate() {
+
+		if ( charitable_is_debug( 'vendor' ) ) {
+			error_log( 'CHARITABLE: NEW VENDOR CALL RECEIVED: ajax_license_deactivate()' ); // phpcs:ignore
+		}
+
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		// check for nonce.
+		if ( ! isset( $_REQUEST['nonce'] ) || ! wp_verify_nonce( $_REQUEST['nonce'], 'charitable_settings-options' ) ) { // phpcs:ignore
+			return;
+		}
+
+		// Check for permissions.
+		if ( ! charitable_current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		if ( ! isset( $_REQUEST['license'] ) ) {
+			return;
+		}
+
+		if ( ! isset( $_REQUEST['action'] ) && 'charitable_license_check' !== $_REQUEST['action'] ) {
+			return;
+		}
+
+		if ( ! isset( $_REQUEST['charitable_action'] ) || 'deactivate' !== $_REQUEST['charitable_action'] ) {
+			return;
+		}
+
+		$this->flush_update_cache();
+
+		$settings = get_option( 'charitable_settings' );
+
+		$product_key  = 'charitable';
+		$settings['licenses'][ $product_key . '-v2' ] = array();
+
+		update_option( 'charitable_settings', $settings );
+
+		$license_data['message'] = \Charitable_Licenses_Settings::get_instance()->get_deactivated_message();
+
+		wp_send_json_success( $license_data );
+
 	}
 }

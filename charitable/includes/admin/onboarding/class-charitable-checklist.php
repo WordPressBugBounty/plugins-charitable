@@ -33,6 +33,13 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 		private $checklist_option_name = 'charitable_onboarding_checklist';
 
 		/**
+		 * The name of the option value.
+		 *
+		 * @var array
+		 */
+		const PRO_PLUGIN = 'charitable-pro/charitable.php';
+
+		/**
 		 * The steps in the checklist.
 		 *
 		 * @var array
@@ -1119,6 +1126,66 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 					exit;
 				}
 			}
+		}
+
+		/**
+		 * Activate the pro plugin after onboarding.
+		 * This includes needed flushing of cache so Pro can be updated instantly if need be.
+		 *
+		 * @since 1.8.5
+		 */
+		public function maybe_activate_pro_after_onboarding() {
+
+			// Are we about to visit'charitable-setup-checklist'?
+			if ( ! isset( $_GET['page'] ) || 'charitable-setup-checklist' !== $_GET['page'] ) { // phpcs:ignore
+				return;
+			}
+
+			// Is the option for installing pro after onboarding set?
+			$activate_pro = get_option( 'charitable_activate_pro', false );
+
+			if ( ! $activate_pro ) {
+				return;
+			}
+
+			// Confirm the pro plugin is installed (and not activated).
+			if ( ! is_plugin_inactive( self::PRO_PLUGIN ) ) {
+				return;
+			}
+
+			// Deactivate the lite version first.
+			$plugin = plugin_basename( charitable()->get_path( 'plugin-directory' ) . '/charitable/charitable.php' );
+
+			deactivate_plugins( $plugin );
+
+			// phpcs:ignore Charitable.Comments.PHPDocHooks.RequiredHookDocumentation, Charitable.PHP.ValidateHooks.InvalidHookName
+			do_action( 'charitable_plugin_deactivated', $plugin );
+
+			// Activate the plugin silently.
+			$activated = activate_plugin( self::PRO_PLUGIN, '', false, true );
+
+			if ( ! is_wp_error( $activated ) ) {
+
+				// Add the pro_connect activation date to the activated array.
+				$activated = (array) get_option( 'charitable_activated', array() );
+
+				if ( empty( $activated['pro_connect'] ) ) {
+					$activated['pro_connect'] = time();
+					update_option( 'charitable_activated', $activated );
+				}
+			}
+
+			// remove the option.
+			delete_option( 'charitable_activate_pro' );
+
+			set_site_transient( 'update_plugins', null );
+			delete_site_option( 'wpc_plugin_versions' );
+			update_option( 'charitable_connect_completed', true );
+
+			// redirect again to the checklist page.
+			wp_safe_redirect( admin_url( 'admin.php?page=charitable-setup-checklist' ) );
+			exit;
+
 		}
 
 		/**

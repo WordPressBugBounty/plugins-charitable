@@ -197,6 +197,7 @@ if ( ! class_exists( 'Charitable_Post_Types' ) ) :
 		 * @since 1.8.1 Add reporting screen.
 		 * @since 1.8.1.6 Add tools and guide tools screen.
 		 * @version 1.8.1.12 Add setup checklist screen.
+		 * @version 1.8.5 Add donors screen.
 		 *
 		 * @return void
 		 */
@@ -207,7 +208,7 @@ if ( ! class_exists( 'Charitable_Post_Types' ) ) :
 			// Get the current screen, and check whether we're viewing the campaign post types.
 			$screen = get_current_screen();
 
-			$applicable_post_types = [ 'campaign', 'donation', 'charitable_page_charitable-settings', 'charitable_page_charitable-addons', 'charitable_page_charitable-reports', 'charitable_page_charitable-tools', 'charitable_page_charitable-dashboard', 'charitable_page_charitable-growth-tools', 'charitable_page_charitable-setup-checklist' ];
+			$applicable_post_types = [ 'campaign', 'donation', 'charitable_page_charitable-settings', 'charitable_page_charitable-addons', 'charitable_page_charitable-reports', 'charitable_page_charitable-tools', 'charitable_page_charitable-dashboard', 'charitable_page_charitable-growth-tools', 'charitable_page_charitable-setup-checklist', 'charitable_page_charitable-donors' ];
 
 			if ( in_array( $screen->post_type, $applicable_post_types, true ) || in_array( $screen->base, $applicable_post_types, true ) ) {
 				$is_charitable_page = true;
@@ -249,7 +250,7 @@ if ( ! class_exists( 'Charitable_Post_Types' ) ) :
 						'singular_name'      => __( 'Campaign', 'charitable' ),
 						'menu_name'          => _x( 'Campaigns', 'Admin menu name', 'charitable' ),
 						'add_new'            => __( 'Add New', 'charitable' ),
-						'add_new_item'       => __( 'Add New Campaign', 'charitable' ),
+						'add_new_item'       => __( 'Add Campaign', 'charitable' ),
 						'edit'               => __( 'Edit', 'charitable' ),
 						'edit_item'          => __( 'Edit Campaign', 'charitable' ),
 						'new_item'           => __( 'New Campaign', 'charitable' ),
@@ -303,7 +304,7 @@ if ( ! class_exists( 'Charitable_Post_Types' ) ) :
 						'singular_name'      => __( 'Donation', 'charitable' ),
 						'menu_name'          => _x( 'Donations', 'Admin menu name', 'charitable' ),
 						'add_new'            => __( 'Add Donation', 'charitable' ),
-						'add_new_item'       => __( 'Add New Donation', 'charitable' ),
+						'add_new_item'       => __( 'Add Donation', 'charitable' ),
 						'edit'               => __( 'Edit', 'charitable' ),
 						'edit_item'          => __( 'Donation Details', 'charitable' ),
 						'new_item'           => __( 'New Donation', 'charitable' ),

@@ -463,7 +463,6 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 					$stripe_connect_url = ! $stripe_gateway->maybe_stripe_connected() ? $stripe_gateway->get_stripe_connect_url( $this->stripe_redirect_url ) : '';
 					$stripe_connected   = $stripe_gateway->maybe_stripe_connected();
 				}
-
 			}
 
 			// The "continue" or "return" URL should the checklist by default, but on the chance the checklist is completed, we'll send them to the dashboard.
@@ -1503,7 +1502,8 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 		/**
 		 * Clean up and mark the setup as complete.
 		 *
-		 * @since 1.8.4
+		 * @since   1.8.4
+		 * @version 1.8.5 - Added charitable_activate_pro option.
 		 *
 		 * @return void
 		 */
@@ -1522,6 +1522,7 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 			// remove the transient, set the option.
 			delete_transient( 'charitable_ss_onboarding' );
 			update_option( 'charitable_ss_complete', true );
+			update_option( 'charitable_activate_pro', true );
 
 			wp_send_json_success(
 				array(

@@ -204,6 +204,7 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 ( function($){
 
 	var setup_license_check = function() {
+
 		$('#charitable-settings-connect-btn').on( 'click', function( e ){
 			var data = {
 					action 			    : 'charitable_license_check',
@@ -212,6 +213,11 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 					'charitable_action' : $(this).data('action'),
 				};
 
+
+			// If the button contains the 'data-pro-connect' attribute and it's true, don't show the button.
+			if ( $('#charitable-settings-connect-btn').data( 'pro-connect' ) && $('#charitable-settings-connect-btn').data( 'pro-connect' ) == '1' ) {
+				return;
+			}
 
 			if ( data.charitable_action === 'verify' ) {
 				$(this).html('Verifying...');

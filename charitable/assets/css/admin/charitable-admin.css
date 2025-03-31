@@ -85,6 +85,13 @@
 }
 
 /* v2 header */
+body[class*=charitable_page_] #wpbody-content .wrap,
+body.post-type-charitable #wpbody-content .wrap,
+body.post-type-donation #wpbody-content .wrap {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
 #charitable-admin-header {
   background-color: #ffffff;
   margin: 0 0 0 -20px;
@@ -550,20 +557,30 @@ body.post-type-campaign.charitable-trash #delete_all {
     margin-right: 0px;
   }
 }
-#wpbody-content .search-box input[name=s] {
+body[class*=charitable_page_] .search-box input[name=s],
+body.post-type-campaign .search-box input[name=s],
+body.post-type-donation .search-box input[name=s] {
   margin: 2px 4px 0 0;
   height: 34px;
 }
-#wpbody-content input#search-submit {
+body[class*=charitable_page_] input#search-submit,
+body.post-type-campaign input#search-submit,
+body.post-type-donation input#search-submit {
   margin-top: 2px;
   height: 34px;
 }
-#wpbody-content .alignleft.actions input[type=submit],
-#wpbody-content .alignleft.actions select {
+body[class*=charitable_page_] .alignleft.actions input[type=submit],
+body[class*=charitable_page_] .alignleft.actions select,
+body.post-type-campaign .alignleft.actions input[type=submit],
+body.post-type-campaign .alignleft.actions select,
+body.post-type-donation .alignleft.actions input[type=submit],
+body.post-type-donation .alignleft.actions select {
   min-height: 32px;
   height: 38px;
 }
-#wpbody-content .charitable-campaign-action-button {
+body[class*=charitable_page_] .charitable-campaign-action-button,
+body.post-type-campaign .charitable-campaign-action-button,
+body.post-type-donation .charitable-campaign-action-button {
   cursor: pointer;
   padding: 5px 4px;
   border: 1px solid #E1E3E5;
@@ -578,7 +595,9 @@ body.post-type-campaign.charitable-trash #delete_all {
   margin-right: 10px;
   line-height: 23px;
 }
-#wpbody-content .charitable-campaign-action-button:hover {
+body[class*=charitable_page_] .charitable-campaign-action-button:hover,
+body.post-type-campaign .charitable-campaign-action-button:hover,
+body.post-type-donation .charitable-campaign-action-button:hover {
   color: white;
 }
 
@@ -946,6 +965,11 @@ body.post-type-donation .charitable-blank-slate .charitable-blank-slate-buttons 
 }
 body.post-type-donation .charitable-blank-slate .charitable-blank-slate-buttons .charitable-blank-slate-cta:hover {
   color: black;
+}
+
+/* Campaigns Page */
+body.wp-admin.charitable-campaigns table.wp-list-table td.column-creator a {
+  display: flex;
 }
 
 /* Blank Slate */
@@ -4457,4 +4481,146 @@ body.post-type-donation.charitable-admin-donation-edit #postbox-container-2 .pos
     column-gap: 0;
     display: block;
   }
+}
+body.charitable_page_charitable-settings .charitable-education-page .charitable-settings-heading-pro h4 {
+  margin-top: 40px;
+}
+
+.charitable-education-page {
+  max-width: 1000px;
+  margin-bottom: 30px;
+  padding: 0;
+}
+.charitable-education-page .charitable-education-page-heading h4,
+.charitable-education-page .charitable-settings-heading-pro h4 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 20px 0 6px 0;
+  line-height: 20px;
+}
+.charitable-education-page .charitable-education-page-heading h4:after,
+.charitable-education-page .charitable-settings-heading-pro h4:after {
+  background-color: #F99E36;
+  color: white;
+  content: "Pro";
+  padding: 3px 7px;
+  font-size: 9px;
+  line-height: 9px;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-left: 5px;
+  margin-right: 5px;
+  margin-top: 0;
+  position: relative;
+  top: -3px;
+}
+.charitable-education-page .charitable-education-page-images {
+  display: flex;
+  gap: 25px;
+  margin: 25px 0px;
+}
+.charitable-education-page .charitable-education-page-images figure {
+  margin: 0;
+}
+.charitable-education-page .charitable-education-page-images figcaption {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+  text-align: center;
+  color: rgb(119, 119, 119);
+  margin-top: 10px;
+}
+.charitable-education-page .charitable-education-page-images .charitable-education-page-images-image {
+  display: inline-block;
+  position: relative;
+  background-color: rgb(255, 255, 255);
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px 0px;
+  padding: 5px;
+  border-radius: 3px;
+}
+.charitable-education-page .charitable-education-page-images .charitable-education-page-images-image img {
+  max-width: 100%;
+  display: block;
+}
+.charitable-education-page .charitable-education-page-images .charitable-education-page-images-image .hover {
+  position: absolute;
+  opacity: 0;
+  height: calc(100% - 10px);
+  width: calc(100% - 10px);
+  top: 0;
+  left: 0;
+  border: 5px solid #ffffff;
+  background-color: rgba(0, 0, 0, 0.15);
+  background-image: url(../../images/pro/icons/zoom.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 50px;
+  transition: all 0.3s;
+  box-sizing: initial;
+}
+.charitable-education-page .charitable-education-page-images .charitable-education-page-images-image:hover .hover {
+  opacity: 1;
+  transition: all 0.3s;
+}
+.charitable-education-page .charitable-education-page-caps {
+  max-width: 986px;
+  box-sizing: content-box;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 4px;
+  background: rgb(255, 255, 255);
+  border-radius: 6px;
+  padding: 20px 20px 0 20px;
+  overflow: auto;
+}
+.charitable-education-page .charitable-education-page-caps p {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 23px;
+  color: #32373c;
+  margin-bottom: 20px;
+  margin-top: 0;
+}
+.charitable-education-page .charitable-education-page-caps ul {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+}
+.charitable-education-page .charitable-education-page-caps ul li {
+  flex: 0 0 calc(33.333% - 40px);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgb(80, 87, 94);
+  margin-bottom: 20px;
+  position: relative;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.charitable-education-page .charitable-education-page-caps ul li i {
+  margin-right: 10px;
+  position: absolute;
+  top: 2px;
+  left: 0;
+}
+.charitable-education-page .charitable-education-page-button {
+  margin-top: 25px;
+}
+.charitable-education-page .charitable-education-page-button a {
+  font-size: 16px;
+  font-weight: 600;
+  padding: 16px 28px !important;
+  background-color: #5AA152 !important;
+  color: #ffffff !important;
+}
+.charitable-education-page .charitable-education-page-button a:hover {
+  /* background color darker */
+  background-color: #4a8742 !important;
+}
+.charitable-education-page .charitable-education-page-disabled-download {
+  margin-top: 25px;
+}
+.charitable-education-page .charitable-education-page-disabled-download p {
+  font-size: 16px;
+  font-weight: 600;
+  color: #d63638;
 }

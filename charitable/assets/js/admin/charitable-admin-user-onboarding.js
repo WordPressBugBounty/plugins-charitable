@@ -423,6 +423,7 @@ var CharitableSetup = window.CharitableSetup || (function (document, window, $) 
                 'license' 	        : s.key,
                 'nonce'			    : charitable_setup.key_nonce,
                 'charitable_action' : 'verify',
+                'download_pro'      : true
             };
 
             // update the text.

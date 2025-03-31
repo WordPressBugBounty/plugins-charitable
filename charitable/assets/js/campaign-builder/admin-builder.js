@@ -6275,7 +6275,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 				$.confirm( {
 					title     : false,
-					content   : charitable_builder.exit_confirm,
+					content   : '<p>' + charitable_builder.exit_confirm + '</p>',
 					icon      : 'fa fa-exclamation-circle',
 					type      : 'orange',
 					closeIcon : true,

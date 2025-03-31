@@ -210,6 +210,7 @@ $array_to_return = array(
 	'Charitable_User_Onboarding'                     => 'admin/class-charitable-user-onboarding.php', // v1.8.4.
 	'Charitable_Setup'                               => 'admin/onboarding/class-charitable-setup.php', // v1.8.4.
 	'Charitable_Tracking'                            => 'admin/tracking/class-charitable-tracking.php', // v1.8.4.
+	'Charitable_Admin_Connect'                       => 'admin/class-charitable-admin-connect.php', // v1.8.5.
 );
 
 return $array_to_return;

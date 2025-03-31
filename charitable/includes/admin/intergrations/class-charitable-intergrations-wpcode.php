@@ -62,20 +62,6 @@ if ( ! class_exists( 'Charitable_Intergrations_WPCode' ) ) :
 		public $pro_plugin_slug = 'wpcode-premium/wpcode.php';
 
 		/**
-		 * Determine if the class is allowed to load.
-		 *
-		 * @since 1.8.1.6
-		 *
-		 * @return bool
-		 * @noinspection  PhpMissingReturnTypeInspection
-		 * @noinspection  ReturnTypeCanBeDeclaredInspection
-		 */
-		public function allow_load() {
-
-			return charitable_is_admin_page( 'tools', 'wpcode' );
-		}
-
-		/**
 		 * Load the class.
 		 *
 		 * @since 1.8.1.6

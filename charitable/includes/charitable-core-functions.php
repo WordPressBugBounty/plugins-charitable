@@ -811,6 +811,7 @@ function charitable_get_charitable_screens() {
 	 * @version 1.8.1 Added `charitable_page_charitable-dashboard` and 'charitable_page_charitable-reports' to the list of screens.
 	 * @version 1.8.1.6 Added 'charitable_page_charitable-tools' and 'charitable_page_charitable-growth-tool' to the list of screens.
 	 * @version 1.8.1.15 Added to core functions, added 'charitable_page_charitable-setup-checklist' to the list of screens.
+	 * @version 1.8.5 Added 'charitable_page_charitable-donors' to the list of screens.
 	 *
 	 * @param string[] $screens List of screen ids.
 	 */
@@ -829,6 +830,7 @@ function charitable_get_charitable_screens() {
 			'toplevel_page_charitable',
 			'charitable_page_charitable-addons',
 			'charitable_page_charitable-setup-checklist',
+			'charitable_page_charitable-donors',
 		)
 	);
 }

@@ -460,6 +460,21 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 					false
 				);
 
+				wp_enqueue_style(
+					'lity',
+					charitable()->get_path( 'directory', false ) . 'assets/lib/lity/lity.min.css',
+					null,
+					'3.0.0'
+				);
+
+				wp_enqueue_script(
+					'lity',
+					charitable()->get_path( 'directory', false ) . 'assets/lib/lity/lity.min.js',
+					array( 'jquery' ),
+					'3.0.0',
+					false
+				);
+
 				wp_register_script(
 					'charitable-admin-2.0',
 					$assets_dir . 'js/admin/charitable-admin-2.0' . $min . '.js',
@@ -641,16 +656,18 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		/**
 		 * Set admin body classes.
 		 *
-		 * @since  1.5.0
+		 * @since   1.5.0
 		 * @version 1.8.1.6
 		 * @version 1.8.1.16 Added pro/lite check.
 		 * @version 1.8.3
+		 * @version 1.8.5 Added dashboard and reports classes.
 		 *
 		 * @param  string $classes Existing list of classes.
 		 * @return string
 		 */
 		public function set_body_class( $classes ) {
 			$screen = get_current_screen();
+
 
 			if ( 'donation' === $screen->post_type && ( 'add' === $screen->action || isset( $_GET['show_form'] ) ) ) { // phpcs:ignore.
 				$classes .= ' charitable-admin-donation-form';
@@ -662,6 +679,18 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 			if ( isset( $_GET['page'] ) && 'charitable-settings' === $_GET['page'] && isset( $_GET['tab'] ) && '' !== $_GET['tab'] ) { // phpcs:ignore.
 				$classes .= ' charitable-admin-settings-' . esc_attr( $_GET['tab'] ); // phpcs:ignore.
+			}
+
+			if ( isset( $_GET['page'] ) && 'charitable-reports' === $_GET['page'] ) { // phpcs:ignore.
+				$classes .= ' charitable-admin-reports';
+			}
+
+			if ( isset( $_GET['page'] ) && 'charitable-dashboard' === $_GET['page'] && ! isset( $_GET['tab'] ) ) { // phpcs:ignore.
+				$classes .= ' charitable-admin-reports-dashboard';
+			}
+
+			if ( isset( $_GET['page'] ) && 'charitable-reports' === $_GET['page'] && isset( $_GET['tab'] ) && '' !== $_GET['tab'] ) { // phpcs:ignore.
+				$classes .= ' charitable-admin-reports charitable-admin-reports-' . esc_attr( $_GET['tab'] ); // phpcs:ignore.
 			}
 
 			if ( function_exists( 'charitable_use_legacy_dashboard' ) && charitable_use_legacy_dashboard() ) {
@@ -1211,6 +1240,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 			 * @since 1.8.0
 			 * @since 1.8.1 Added `charitable_page_charitable-dashboard` and 'charitable_page_charitable-reports' to the list of screens.
 			 * @since 1.8.1.6 Added 'charitable_page_charitable-tools' and 'charitable_page_charitable-growth-tool' to the list of screens.
+			 * @since 1.8.5 Added 'charitable_page_charitable-donors' to the list of screens.
 			 *
 			 * @param string[] $screens List of screen ids.
 			 */
@@ -1229,6 +1259,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 					'dashboard',
 					'toplevel_page_charitable',
 					'charitable_page_charitable-addons',
+					'charitable_page_charitable-donors',
 				)
 			);
 		}

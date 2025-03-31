@@ -103,8 +103,6 @@ class Charitable_EventDriven {
 		if ( ! $this->allow_load() ) {
 			return;
 		}
-
-		// $this->hooks();
 	}
 
 	/**

@@ -1418,7 +1418,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		 *
 		 * @param string $view Current view inside the plugin settings page.
 		 */
-		public function dashboard_cta( $view = false ) { // phpcs:ignore
+		public function dashboard_cta( $view = false, $css_class = 'reports-lite-cta', $show_close_button = false ) { // phpcs:ignore
 
 			if ( charitable_is_pro() ) {
 				// no need to display this cta since they have a valid license.
@@ -1429,50 +1429,60 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 				return;
 			}
 			?>
-			<div class="reports-lite-cta">
-				<button type="button" class="button-link charitable-banner-dismiss dismiss">x</button>
-				<h5><?php esc_html_e( 'Get Charitable Pro and Unlock all the Powerful Features', 'charitable' ); ?></h5>
-				<p><?php esc_html_e( 'Thanks for being a loyal Charitable Lite user. Upgrade to Charitable Pro to unlock all the awesome features and experience why Charitable is consistently rated a top WordPress donation and fundraising plugin.', 'charitable' ); ?></p>
-				<p>
-					<?php
-					printf( esc_html__( 'We know that you will truly love Charitable. Over 10,000+ non-profits who have chosen Charitable to get more donations from their website can\'t be wrong!', 'charitable' ) );
-					?>
-				</p>
-				<h6><?php esc_html_e( 'Pro Features:', 'charitable' ); ?></h6>
-				<div class="list">
-					<ul>
-						<li><?php esc_html_e( 'Offer recurring donations to donors', 'charitable' ); ?></li>
-						<li><?php esc_html_e( 'Use fee relief to keep more donation dollars', 'charitable' ); ?></li>
-						<li><?php esc_html_e( 'Integrate with popular email marketing platforms', 'charitable' ); ?></li>
-						<li><?php esc_html_e( 'Expand your reach with peer-to-peer fundraising', 'charitable' ); ?></li>
-						<li><?php esc_html_e( 'Allow donors to crowdfund donations', 'charitable' ); ?></li>
-					</ul>
-					<ul>
-						<li><?php esc_html_e( 'Automate common tasks with Zapier and smart workflows', 'charitable' ); ?></li>
-						<li><?php esc_html_e( 'Run campaigns with ambassador and team support', 'charitable' ); ?></li>
-						<li><?php esc_html_e( 'Advanced donation management with annual receipts', 'charitable' ); ?></li>
-						<li><?php esc_html_e( 'Allow donors to give donations anonymously', 'charitable' ); ?></li>
-						<li><?php esc_html_e( 'Add videos and updates to all campaigns', 'charitable' ); ?></li>
-					</ul>
+			<div class="charitable-cta-lite-to-pro <?php echo esc_attr( $css_class ); ?> <?php echo $show_close_button ? 'show-close-button' : 'no-close-button'; ?>">
+				<?php if ( $show_close_button ) : ?>
+					<button type="button" class="button-link charitable-banner-dismiss dismiss">x</button>
+				<?php endif; ?>
+				<div class="charitable-cta-content">
+					<div class="charitable-cta-content-left">
+						<h5><?php esc_html_e( 'Upgrade Charitable to Pro and Unlock all Features!', 'charitable' ); ?></h5>
+						<p><?php esc_html_e( 'Thanks for being a loyal Charitable Lite user. Upgrade to Charitable Pro and take your fundraising to the next level!', 'charitable' ); ?></p>
+						<div class="charitable-cta-list">
+							<ul>
+								<li><?php esc_html_e( 'Manage donations in a centralized dashboard', 'charitable' ); ?></li>
+								<li><?php esc_html_e( 'View, edit, and export your donor database', 'charitable' ); ?></li>
+								<li><?php esc_html_e( 'Allow donors to give anonymously', 'charitable' ); ?></li>
+								<li><?php esc_html_e( 'Give donors their own dashboard', 'charitable' ); ?></li>
+								<li><?php esc_html_e( 'Send automated thank you and confirmation emails', 'charitable' ); ?></li>
+								<li><?php esc_html_e( 'Get powerful insights with built-in analytics & reports', 'charitable' ); ?></li>
+								<li><?php esc_html_e( 'Build steady income with recurring donations', 'charitable' ); ?></li>
+								<li><?php esc_html_e( 'Auto-generate PDF & Annual receipts', 'charitable' ); ?></li>
+								<li><?php esc_html_e( 'Ask donors to cover transaction fees', 'charitable' ); ?></li>
+								<li><?php esc_html_e( 'Give donors their preferred payment methods', 'charitable' ); ?></li>
+								<li><?php esc_html_e( 'Integrate with your email marketing service', 'charitable' ); ?></li>
+								<li><?php esc_html_e( 'Raise more funds with peer-to-peer fundraising', 'charitable' ); ?></li>
+							</ul>
+							<div class="charitable-cta-button-container">
+								<a class="button button-primary" href="<?php echo esc_url( charitable_pro_upgrade_url( 'settings-upgrade' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Get Charitable Pro', 'charitable' ); ?></a>
+								<p>
+										<?php
+
+										$bonus_text = sprintf(
+											/* translators: %1$s: HTML-wrapped "Bonus:" text, %2$s: HTML-wrapped discount amount */
+											__( '%1$s Get up to %2$s off regular price', 'charitable' ),
+											'<strong>' . esc_html__( 'Bonus:', 'charitable' ) . '</strong><br/>',
+											'<span class="green">$300</span>'
+										);
+
+										echo wp_kses(
+											$bonus_text,
+											array(
+												'br'     => array(),
+												'strong' => array(),
+												'span'   => array(
+													'class' => array(),
+												),
+											)
+										);
+										?>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="charitable-cta-featured-image">
+
+					</div>
 				</div>
-				<p>
-					<a href="<?php echo esc_url( charitable_pro_upgrade_url( 'settings-upgrade' ) ); ?>" target="_blank" rel="noopener noreferrer">
-						<?php esc_html_e( 'Get Charitable Pro Today and Unlock all the Powerful Features »', 'charitable' ); ?>
-					</a>
-				</p>
-				<p>
-					<?php
-					echo wp_kses(
-						__( '<strong>Bonus:</strong> Charitable Lite users get up to <span class="green">$300 off regular price</span>, automatically applied at checkout.', 'charitable' ),
-						[
-							'strong' => [],
-							'span'   => [
-								'class' => [],
-							],
-						]
-					);
-					?>
-				</p>
 			</div>
 			<script type="text/javascript">
 				jQuery( function ( $ ) {

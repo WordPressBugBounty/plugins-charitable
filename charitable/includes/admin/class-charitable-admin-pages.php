@@ -166,7 +166,7 @@ if ( ! class_exists( 'Charitable_Admin_Pages' ) ) :
 			 * @param array $pages Every page is an array with at least a page_title,
 			 *                     menu_title and menu_slug set.
 			 */
-			return apply_filters(
+			$pages = apply_filters(
 				'charitable_submenu_pages',
 				array(
 					array(
@@ -195,6 +195,13 @@ if ( ! class_exists( 'Charitable_Admin_Pages' ) ) :
 						'capability' => 'edit_donations',
 					),
 					array(
+						'page_title' => __( 'Charitable Donors', 'charitable' ),
+						'menu_title' => __( 'Donors', 'charitable' ) . ' <span class="charitable-menu-new-indicator">&nbsp;' . esc_html__( 'NEW', 'charitable' ) . '!</span>',
+						'menu_slug'  => 'charitable-donors',
+						'function'   => array( $this, 'render_donors_page' ),
+						'capability' => 'manage_charitable_settings',
+					),
+					array(
 						'page_title' => __( 'Charitable Reports', 'charitable' ),
 						'menu_title' => __( 'Reports', 'charitable' ),
 						'menu_slug'  => 'charitable-reports',
@@ -203,7 +210,7 @@ if ( ! class_exists( 'Charitable_Admin_Pages' ) ) :
 					),
 					array(
 						'page_title' => __( 'Charitable Tools', 'charitable' ),
-						'menu_title' => __( 'Tools', 'charitable' ) . ' <span class="charitable-menu-new-indicator">&nbsp;' . esc_html__( 'NEW', 'charitable' ) . '!</span>',
+						'menu_title' => __( 'Tools', 'charitable' ),
 						'menu_slug'  => 'charitable-tools',
 						'function'   => array( $this, 'render_tools_page' ),
 						'capability' => 'manage_charitable_settings',
@@ -238,6 +245,11 @@ if ( ! class_exists( 'Charitable_Admin_Pages' ) ) :
 					),
 				)
 			);
+
+			// Remove the item in the array that has the menu_slug 'charitable-donors'.
+			unset( $pages[ array_search( 'charitable-donors', array_column( $pages, 'menu_slug' ) ) ] );
+
+			return $pages;
 		}
 
 		/**
@@ -261,6 +273,17 @@ if ( ! class_exists( 'Charitable_Admin_Pages' ) ) :
 		public function redirect_to_welcome() {
 			wp_safe_redirect( admin_url( 'admin.php?page=charitable&install=true' ) );
 			exit;
+		}
+
+		/**
+		 * Display the Charitable donors page.
+		 *
+		 * @since  1.8.5
+		 *
+		 * @return void
+		 */
+		public function render_donors_page() {
+			charitable_admin_view( 'donors/donors' );
 		}
 
 		/**
