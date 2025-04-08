@@ -1132,7 +1132,8 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 		 * Activate the pro plugin after onboarding.
 		 * This includes needed flushing of cache so Pro can be updated instantly if need be.
 		 *
-		 * @since 1.8.5
+		 * @since   1.8.5
+		 * @version 1.8.5.1
 		 */
 		public function maybe_activate_pro_after_onboarding() {
 
@@ -1178,7 +1179,8 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 			// remove the option.
 			delete_option( 'charitable_activate_pro' );
 
-			set_site_transient( 'update_plugins', null );
+			$empty_transient = new \stdClass();
+			set_site_transient( 'update_plugins', $empty_transient ); // Depreciated item.
 			delete_site_option( 'wpc_plugin_versions' );
 			update_option( 'charitable_connect_completed', true );
 

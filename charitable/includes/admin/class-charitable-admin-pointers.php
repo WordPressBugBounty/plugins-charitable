@@ -73,20 +73,22 @@ if ( ! class_exists( 'Charitable_Admin_Pointers' ) ) :
 			}
 
 			// Don't show this immediately for new users.
-			$slug = 'help-pointers';
+			$slug = 'donor-pointers';
 
 			// determine when to display this message. for now, there should be some sensible boundaries before showing the notification: a minimum of 14 days of use, created one donation form and received at least one donation.
 			$activated_datetime = ( false !== get_option( 'wpcharitable_activated_datetime' ) ) ? get_option( 'wpcharitable_activated_datetime' ) : false;
-			$days               = 0;
+			$activated_datetime = ( false === $activated_datetime ) ? get_option( 'charitable_activated', 0 ) : $activated_datetime;
+			$days = 0;
 			if ( $activated_datetime ) {
 				$diff = current_time( 'timestamp' ) - $activated_datetime;
-				$days = abs( round( $diff / 86400 ) );
+				$days = abs(ceil($diff / 86400));
 			}
 
 			$count_campaigns = wp_count_posts( 'campaign' );
 			$total_campaigns = isset( $count_campaigns->publish ) ? $count_campaigns->publish : 0;
 
-			if ( $days >= apply_filters( 'charitable_days_since_activated', 21 ) && $total_campaigns >= 1 ) {
+			// If days is at least 1 and the user isn't already on the 'charitable-donors' page, show the pointer.
+			if ( $days >= apply_filters( 'charitable_days_since_activated', 1 ) && isset( $_GET['page'] ) && $_GET['page'] !== 'charitable-donors' ) { // phpcs:ignore
 				// check transient.
 				$help_pointers = get_transient( 'charitable_' . $slug . '_onboarding' );
 
@@ -94,10 +96,8 @@ if ( ! class_exists( 'Charitable_Admin_Pointers' ) ) :
 				if ( ! $help_pointers ) {
 					wp_enqueue_style( 'wp-pointer' );
 					wp_enqueue_script( 'wp-pointer' );
-
 					$this->create_new_features_showoff();
 				}
-
 			}
 		}
 
@@ -105,6 +105,7 @@ if ( ! class_exists( 'Charitable_Admin_Pointers' ) ) :
 		 * Pointers for creating a feature show off!
 		 *
 		 * @version 1.8.1.5
+		 * @version 1.8.5.1
 		 *
 		 * @return void
 		 */
@@ -113,6 +114,7 @@ if ( ! class_exists( 'Charitable_Admin_Pointers' ) ) :
 			if ( ! current_user_can( 'manage_options' ) ) {
 				return;
 			}
+
 			if ( defined( 'CHARITABLE_DISABLE_ADMIN_POINTERS' ) && CHARITABLE_DISABLE_ADMIN_POINTERS ) {
 				return;
 			}
@@ -121,18 +123,22 @@ if ( ! class_exists( 'Charitable_Admin_Pointers' ) ) :
 			$this->pointers = array(
 				'pointers' => array(
 					'tools'     => array(
-						'target'       => '#toplevel_page_charitable ul li.tools',
+						'target'       => '#toplevel_page_charitable ul li.donors',
 						'next'         => false,
 						'next_trigger' => array(),
 						'options'      => array(
-							'content'      => '<h3>' . esc_html__( 'New Tool Page Updates', 'charitable' ) . '</h3>' .
-											'<p>' . esc_html__( 'The categories, tags, and customize menu items have moved into the Tools area.', 'charitable' ) . '</p>',
+							'content'      => '<h3>' . esc_html__( 'New Donor Management', 'charitable' ) . '</h3>' .
+											'<p>' . sprintf(
+												/* translators: %s: URL to upgrade to Pro */
+												esc_html__( 'Maintain detailed donor profiles, monitor donation histories, and streamline your communication with supporters. Consider upgrading to %s.', 'charitable' ),
+												'<a href="' . charitable_utm_link( 'https://wpcharitable.com/pricing/', 'donor-pointers', 'upgrade-to-pro' ) . '">Charitable Pro</a>'
+											) . '</p>',
 							'position'     => array(
 								'edge'  => 'left',
 								'align' => 'left',
 							),
 							'visit_button' => array(
-								'url'   => admin_url( 'admin.php?page=charitable-tools' ),
+								'url'   => admin_url( 'admin.php?page=charitable-donors' ),
 								'label' => esc_html__( 'Go Here', 'charitable' ),
 							),
 						),
@@ -153,7 +159,7 @@ if ( ! class_exists( 'Charitable_Admin_Pointers' ) ) :
 						}
 					}
 					// if any of the pointer keys are found in dismissed remove all the keys.
-					if ( in_array( array_keys( $this->pointers['pointers'] ), $dismissed ) ) {
+					if ( in_array( array_keys( $this->pointers['pointers'] ), $dismissed, true ) ) {
 						foreach ( $this->pointers['pointers'] as $pointer => $pointer_info ) {
 							unset( $this->pointers['pointers'][ $pointer ] );
 						}

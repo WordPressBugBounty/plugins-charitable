@@ -87,27 +87,60 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 			/**
 			 * Filter the settings tabs.
 			 *
-			 * @since 1.0.0
+			 * @since   1.0.0
 			 * @version 1.8.1.6 removed 'tools' tab
+			 * @version 1.8.5.1 added marketing and security tabs depending on addon status.
 			 *
 			 * @param string[] $tabs List of tabs in key=>label format.
 			 */
-			return apply_filters(
-				'charitable_settings_tabs',
-				array(
-					'general'  => __( 'General', 'charitable' ),
-					'gateways' => __( 'Payment Gateways', 'charitable' ),
-					'emails'   => __( 'Emails', 'charitable' ),
-					'privacy'  => __( 'Privacy', 'charitable' ),
-					'advanced' => __( 'Advanced', 'charitable' ),
-				)
+			$tabs = array(
+				'general'   => __( 'General', 'charitable' ),
+				'gateways'  => __( 'Payment Gateways', 'charitable' ),
+				'emails'    => __( 'Emails', 'charitable' ),
+				'donors'    => __( 'Donors', 'charitable' ),
+				'privacy'   => __( 'Privacy', 'charitable' ),
+				'advanced'  => __( 'Advanced', 'charitable' ),
 			);
+
+			// Only show marketing tab if newsletter connect addon is not active.
+			if ( ! class_exists( 'Charitable_Newsletter_Connect' ) ) {
+				$tabs = charitable_add_settings_tab(
+					$tabs,
+					'marketing',
+					__( 'Marketing', 'charitable' ),
+					array(
+						'index' => 5,
+					)
+				);
+			}
+
+			// Only show security tab if security addon is not active.
+			if ( ! defined( 'CHARITABLE_SPAMBLOCKER_FEATURE_PLUGIN' ) ) {
+				$tabs = charitable_add_settings_tab(
+					$tabs,
+					'security',
+					__( 'Security', 'charitable' ),
+					array(
+						'index' => 6,
+					)
+				);
+			}
+
+			// Ensure the advanced tab is always last by moving it to the end of the array.
+			if ( isset( $tabs['advanced'] ) ) {
+				$advanced_tab = $tabs['advanced'];
+				unset( $tabs['advanced'] );
+				$tabs['advanced'] = $advanced_tab;
+			}
+
+			return apply_filters( 'charitable_settings_tabs', $tabs );
 		}
 
 		/**
 		 * Optionally add the extensions tab.
 		 *
-		 * @since  1.3.0
+		 * @since   1.3.0
+		 * @version 1.8.5.1 Adjust index so it comes before the advanced tab.
 		 *
 		 * @param  string[] $tabs The existing set of tabs.
 		 * @return string[]
@@ -136,9 +169,16 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 					'extensions',
 					__( 'Extensions', 'charitable' ),
 					array(
-						'index' => 4,
+						'index' => 7,
 					)
 				);
+			}
+
+			// Ensure the advanced tab is always last by moving it to the end of the array.
+			if ( isset( $tabs['advanced'] ) ) {
+				$advanced_tab = $tabs['advanced'];
+				unset( $tabs['advanced'] );
+				$tabs['advanced'] = $advanced_tab;
 			}
 
 			return $tabs;
@@ -742,8 +782,20 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 		 * @since 1.7.0.4
 		 *
 		 * @param string $view Current view inside the plugin settings page.
+		 * @param string $css_class CSS class for the cta.
+		 * @param bool   $show_close_button Whether to show the close button.
 		 */
 		public function settings_cta( $view = false, $css_class = 'reports-lite-cta', $show_close_button = false ) { // phpcs:ignore
+
+			$no_show_cta = array(
+				'donors',
+				'security',
+				'marketing',
+			);
+
+			if ( in_array( $view, $no_show_cta ) ) {
+				return;
+			}
 
 			if ( charitable_is_pro() ) {
 				// no need to display this cta since they have a valid license.
@@ -821,6 +873,223 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 					} );
 				} );
 			</script>
+			<?php
+		}
+
+		/**
+		 * Show the settings CTA.
+		 *
+		 * @since 1.8.5.1
+		 *
+		 * @return void
+		 */
+		public function show_settings_cta() {
+
+			$tab_values_to_check = array(
+				'marketing',
+				'donors',
+				'security',
+			);
+
+			$tab_value = isset( $_GET['tab'] ) ? esc_attr( $_GET['tab'] ) : ''; // phpcs:ignore
+
+			if ( in_array( $tab_value, $tab_values_to_check ) ) { // phpcs:ignore
+				ob_start();
+				?>
+
+				<div class="charitable-education-page">
+
+					<?php
+					if ( 'marketing' === $tab_value ) {
+						$this->get_settings_cta_education_content_marketing_settings();
+					} elseif ( 'donors' === $tab_value ) {
+						$this->get_settings_cta_education_content_donor_settings();
+					} elseif ( 'security' === $tab_value && ! defined( 'CHARITABLE_SPAMBLOCKER_FEATURE_PLUGIN' ) ) {
+						$this->get_settings_cta_education_content_security_settings();
+					}
+					?>
+					<?php if ( charitable_is_pro() ) : ?>
+						<div class="charitable-education-page-disabled-download">
+							<p><?php esc_html_e( 'In order to access the settings for this feature, you need to upgrade from Charitable to the Charitable Pro plugin.', 'charitable' ); ?></p>
+						</div>
+					<?php else : ?>
+					<div class="charitable-education-page-button">
+						<a href="<?php echo esc_url( charitable_utm_link( 'https://wpcharitable.com/lite-upgrade/', 'pdf-receipts', 'Upgrade to Charitable Pro' ) ); ?>" class="button button-primary" target="_blank">Upgrade to Charitable Pro</a>
+					</div>
+					<?php endif; ?>
+				</div>
+				<?php
+				echo ob_get_clean(); // phpcs:ignore
+			}
+		}
+
+		/**
+		 * Get the settings CTA education content for the donor referrals sub tab.
+		 *
+		 * @since 1.8.5.1
+		 *
+		 * @return void
+		 */
+		public function get_settings_cta_education_content_donor_settings() {
+			?>
+
+			<div class="charitable-education-page-heading">
+				<h4><?php esc_html_e( 'New Donor Features', 'charitable' ); ?></h4>
+				<p><?php esc_html_e( 'Give donors the power to manage their contributions to your organization with a new donor dashboard. Encourage donors to spread the word about your organization by offering rewards for successful referrals. And give donors the ability to post comments to campaigns when they donate.', 'charitable' ); ?></p>
+				<p><?php esc_html_e( 'All of this is possible with the Charitable Pro plugin.', 'charitable' ); ?></p>
+			</div>
+
+			<div class="charitable-education-page-media">
+				<div class="charitable-education-page-images">
+					<figure>
+						<div class="charitable-education-page-images-image">
+							<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/donor-dashboard/education-1.png" alt="<?php esc_attr_e( 'Donor Dashboard', 'charitable' ); ?>">
+							<a href="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/donor-dashboard/education-1.png" class="hover" data-lity="" data-lity-desc="<?php esc_attr_e( 'Donor Dashboard', 'charitable' ); ?>"></a>
+						</div>
+						<figcaption><?php esc_html_e( 'Donor Dashboard', 'charitable' ); ?></figcaption>
+					</figure>
+					<figure>
+						<div class="charitable-education-page-images-image">
+							<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/donor-referrals/education-2.png" alt="<?php esc_attr_e( 'Donor Referrals', 'charitable' ); ?>">
+							<a href="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/donor-referrals/education-2.png" class="hover" data-lity="" data-lity-desc="<?php esc_attr_e( 'Donor Referrals', 'charitable' ); ?>"></a>
+						</div>
+						<figcaption><?php esc_html_e( 'Donor Referrals', 'charitable' ); ?></figcaption>
+					</figure>
+					<figure>
+						<div class="charitable-education-page-images-image">
+							<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/donor-comments/education-3.png" alt="<?php esc_attr_e( 'Donor Comments', 'charitable' ); ?>">
+							<a href="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/donor-comments/education-3.png" class="hover" data-lity="" data-lity-desc="<?php esc_attr_e( 'Donor Comments', 'charitable' ); ?>"></a>
+						</div>
+						<figcaption><?php esc_html_e( 'Donor Comments', 'charitable' ); ?></figcaption>
+					</figure>
+				</div>
+			</div>
+
+			<div class="charitable-education-page-caps">
+				<p><?php esc_html_e( 'Give donors the power to manage their contributions to your organization.', 'charitable' ); ?></p>
+				<ul>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Increased Donor Engagement', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Customizable Dashboard', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Donation History', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'View Campaigns', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'View Comments', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Download Donation Receipts', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Tracking Personalized Notifications', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Donor Profile Management', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'See Each Donor\'s Referrals', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Track Referral Success Rates', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Customizable Referral Rewards', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Easy Promotion of Campaigns', 'charitable' ); ?></li>
+
+				</ul>
+			</div>
+			<?php
+		}
+
+		/**
+		 * Get the settings CTA education content for the donor referrals sub tab.
+		 *
+		 * @since 1.8.5.1
+		 *
+		 * @return void
+		 */
+		public function get_settings_cta_education_content_marketing_settings() {
+			?>
+
+			<div class="charitable-education-page-heading">
+				<h4><?php esc_html_e( 'Marketing', 'charitable' ); ?></h4>
+				<p><?php esc_html_e( 'Turn one-time donors into ongoing supporters with your newsletter list. This feature allows you to connect to your email marketing account and automatically add donors to your email newsletter list. You can integrate your campaigns seamlessly with MailChimp, Campaign Monitor, MailerLite, ActiveCampaign, Mailster and MailPoet, allowing you to enable one or more providers.', 'charitable' ); ?></p>
+			</div>
+
+			<div class="charitable-education-page-media">
+				<div class="charitable-education-page-images">
+					<figure>
+						<div class="charitable-education-page-images-image">
+							<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/marketing/education-1.png" alt="<?php esc_attr_e( 'Marketing', 'charitable' ); ?>">
+							<a href="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/marketing/education-1.png" class="hover" data-lity="" data-lity-desc="<?php esc_attr_e( 'Marketing', 'charitable' ); ?>"></a>
+						</div>
+						<figcaption><?php esc_html_e( 'Choose a default list', 'charitable' ); ?></figcaption>
+					</figure>
+					<figure>
+						<div class="charitable-education-page-images-image">
+							<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/marketing/education-2.png" alt="<?php esc_attr_e( 'Marketing', 'charitable' ); ?>">
+							<a href="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/marketing/education-2.png" class="hover" data-lity="" data-lity-desc="<?php esc_attr_e( 'Marketing', 'charitable' ); ?>"></a>
+						</div>
+						<figcaption><?php esc_html_e( 'Sync lists', 'charitable' ); ?></figcaption>
+					</figure>
+					<figure>
+						<div class="charitable-education-page-images-image">
+							<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/marketing/education-3.png" alt="<?php esc_attr_e( 'Marketing', 'charitable' ); ?>">
+							<a href="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/marketing/education-3.png" class="hover" data-lity="" data-lity-desc="<?php esc_attr_e( 'Marketing', 'charitable' ); ?>"></a>
+						</div>
+						<figcaption><?php esc_html_e( 'Donation form options', 'charitable' ); ?></figcaption>
+					</figure>
+				</div>
+			</div>
+
+			<div class="charitable-education-page-caps">
+				<p><?php esc_html_e( 'Turn one-time donors into ongoing supporters.', 'charitable' ); ?></p>
+				<ul>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Easy Integration', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Built-in contact consent options', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Automatically add donors to your email list', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Organize donors with tags', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Send email series to keep donors engaged', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Enable multiple email services', 'charitable' ); ?></li>
+				</ul>
+			</div>
+			<?php
+		}
+
+		/**
+		 * Get the settings CTA education content for the donor referrals sub tab.
+		 *
+		 * @since 1.8.5.1
+		 *
+		 * @return void
+		 */
+		public function get_settings_cta_education_content_security_settings() {
+			?>
+
+			<div class="charitable-education-page-heading">
+				<h4><?php esc_html_e( 'Security', 'charitable' ); ?></h4>
+				<p><?php esc_html_e( 'It is important to protect against potential misuse while maintaining donor trust. Built-in rate limiting prevents rapid-fire submissions, while CAPTCHA integration adds an essential layer of protection against automated attacks and spam donations. Every transaction is meticulously logged with IP address documentation and timestamp verification, providing a clear audit trail and helping prevent fraudulent activities.', 'charitable' ); ?></p>
+			</div>
+
+			<div class="charitable-education-page-media">
+				<div class="charitable-education-page-images">
+					<figure>
+						<div class="charitable-education-page-images-image">
+							<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/security/education-1.png" alt="<?php esc_attr_e( 'Security', 'charitable' ); ?>">
+							<a href="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/security/education-1.png" class="hover" data-lity="" data-lity-desc="<?php esc_attr_e( 'Security', 'charitable' ); ?>"></a>
+						</div>
+						<figcaption><?php esc_html_e( 'Captchas', 'charitable' ); ?></figcaption>
+					</figure>
+					<figure>
+						<div class="charitable-education-page-images-image">
+							<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/security/education-2.png" alt="<?php esc_attr_e( 'Security', 'charitable' ); ?>">
+							<a href="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/security/education-2.png" class="hover" data-lity="" data-lity-desc="<?php esc_attr_e( 'Security', 'charitable' ); ?>"></a>
+						</div>
+						<figcaption><?php esc_html_e( 'Rate limiting', 'charitable' ); ?></figcaption>
+					</figure>
+					<figure>
+						<div class="charitable-education-page-images-image">
+							<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/security/education-3.png" alt="<?php esc_attr_e( 'Security', 'charitable' ); ?>">
+							<a href="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/security/education-3.png" class="hover" data-lity="" data-lity-desc="<?php esc_attr_e( 'Security', 'charitable' ); ?>"></a>
+						</div>
+						<figcaption><?php esc_html_e( 'Form options', 'charitable' ); ?></figcaption>
+					</figure>
+				</div>
+			</div>
+
+			<div class="charitable-education-page-caps">
+				<p><?php esc_html_e( 'Protect against potential misuse while maintaining donor trust.', 'charitable' ); ?></p>
+				<ul>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Easy Activation', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Record IP Addresses', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Block Bad Bots', 'charitable' ); ?></li>
+				</ul>
+			</div>
 			<?php
 		}
 

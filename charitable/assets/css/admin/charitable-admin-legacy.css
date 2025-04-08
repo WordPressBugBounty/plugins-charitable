@@ -304,12 +304,23 @@
   font-weight: normal;
 }
 
-.charitable-checkbox-list label,
+.charitable-checkbox-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 75% !important;
+  gap: 8px;
+}
+.charitable-checkbox-list li {
+  font-size: 15px;
+  line-height: 15px;
+  width: calc(50% - 5px);
+}
+
 .charitable-radio-list label {
   display: inline-block;
   font-weight: normal;
 }
-.charitable-checkbox-list li,
 .charitable-radio-list li {
   margin-bottom: 8px;
 }
@@ -1147,7 +1158,7 @@ select#charitable_settings_export_donations {
 }
 
 .charitable-settings-object {
-  max-width: 860px;
+  max-width: 1000px;
   padding: 10px 20px;
   margin-bottom: 4px;
   border: 1px solid #e1e1e1;
@@ -1258,6 +1269,10 @@ select#charitable_settings_export_donations {
     min-width: 250px;
   }
 }
+body.charitable_page_charitable-settings div#charitable-settings table.form-table {
+  max-width: 1000px;
+}
+
 .charitable_page_charitable-settings .form-table th label {
   font-size: 13px;
 }

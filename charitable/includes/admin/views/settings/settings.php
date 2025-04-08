@@ -8,13 +8,14 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
  * @version   1.6.19
+ * @version   1.8.5.1
  */
 
-$active_tab      = isset( $_GET['tab'] ) ? esc_html( $_GET['tab'] ) : 'general';
+$active_tab      = isset( $_GET['tab'] ) ? esc_html( $_GET['tab'] ) : 'general'; // phpcs:ignore
 $tab_no_form_tag = array( 'import', 'export', 'tools' );
-$group           = isset( $_GET['group'] ) ? esc_html( $_GET['group'] ) : $active_tab;
+$group           = isset( $_GET['group'] ) ? esc_html( $_GET['group'] ) : $active_tab; // phpcs:ignore
 $sections        = charitable_get_admin_settings()->get_sections();
-$show_return     = $group != $active_tab;
+$show_return     = $group !== $active_tab;
 
 if ( $show_return ) {
 	/**
@@ -64,8 +65,16 @@ ob_start();
 	<h1><?php echo get_admin_page_title(); ?></h1>
 	<?php do_action( 'charitable_maybe_show_notification' ); ?>
 	<h2 class="nav-tab-wrapper">
-		<?php foreach ( $sections as $tab => $name ) : ?>
-			<a href="<?php echo esc_url( add_query_arg( array( 'tab' => $tab ), admin_url( 'admin.php?page=charitable-settings' ) ) ); ?>" class="nav-tab <?php echo $active_tab == $tab ? 'nav-tab-active' : ''; ?>"><?php echo $name; ?></a>
+		<?php foreach ( $sections as $section_key => $section_name ) : ?>
+			<?php
+
+			$url_query_arg_array = array( 'tab' => $section_key );
+			if ( 'security' === $section_key && defined( 'CHARITABLE_SPAMBLOCKER_FEATURE_PLUGIN' ) ) {
+				$css = 'no-pro-tab';
+			}
+
+			?>
+			<a href="<?php echo esc_url( add_query_arg( $url_query_arg_array, admin_url( 'admin.php?page=charitable-settings' ) ) ); ?>" class="nav-tab nav-tab-<?php echo esc_attr( $section_key ); ?> <?php echo $css; ?> <?php echo ( esc_attr( $active_tab ) === esc_attr( $section_key ) ) ? ' nav-tab-active' : ''; ?>"><?php echo esc_html( $section_name ); ?></a>
 		<?php endforeach ?>
 	</h2>
 	<?php if ( $show_return ) : ?>
@@ -82,32 +91,40 @@ ob_start();
 		 */
 		do_action( 'charitable_before_admin_settings', $group );
 	?>
-	<?php if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) : ?>
-	<form method="post" action="options.php">
-	<?php endif; ?>
-		<table class="form-table">
-		<?php
-			 if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) :
-				settings_fields( 'charitable_settings' );
-			 endif;
+	<?php
+	if ( 'marketing' === $active_tab || 'donors' === $active_tab || ( ! defined( 'CHARITABLE_SPAMBLOCKER_FEATURE_PLUGIN' ) && 'security' === $active_tab ) ) :
+	?>
+		<?php do_action( 'charitable_pro_settings_cta', $active_tab ); ?>
+	<?php else : ?>
 
-			charitable_do_settings_fields( 'charitable_settings_' . $group, 'charitable_settings_' . $group );
-		?>
-		</table>
 		<?php if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) : ?>
-			<?php
-				/**
-				 * Filter the submit button at the bottom of the settings table.
-				 *
-				 * @since 1.6.0
-				 *
-				 * @param string $button The button output.
-				 */
-				echo apply_filters( 'charitable_settings_button_' . $group, get_submit_button( null, 'primary', 'submit', true, null ) );
-			?>
+		<form method="post" action="options.php">
 		<?php endif; ?>
-	<?php if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) : ?>
-	</form>
+			<table class="form-table">
+			<?php
+				if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) :
+					settings_fields( 'charitable_settings' );
+				endif;
+
+				charitable_do_settings_fields( 'charitable_settings_' . $group, 'charitable_settings_' . $group );
+			?>
+			</table>
+			<?php if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) : ?>
+				<?php
+					/**
+					 * Filter the submit button at the bottom of the settings table.
+					 *
+					 * @since 1.6.0
+					 *
+					 * @param string $button The button output.
+					 */
+					echo apply_filters( 'charitable_settings_button_' . $group, get_submit_button( null, 'primary', 'submit', true, null ) );
+				?>
+			<?php endif; ?>
+		<?php if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) : ?>
+		</form>
+		<?php endif; ?>
+
 	<?php endif; ?>
 	<?php
 		/**

@@ -92,6 +92,11 @@ body.post-type-donation #wpbody-content .wrap {
   padding-right: 10px;
 }
 
+body.charitable_page_charitable-addons #wpbody-content .wrap {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
 #charitable-admin-header {
   background-color: #ffffff;
   margin: 0 0 0 -20px;
@@ -110,6 +115,7 @@ body.post-type-donation #wpbody-content .wrap {
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 80px;
 }
 #charitable-admin-header h1 {
   flex: 1;
@@ -1517,6 +1523,49 @@ body.charitable_page_charitable-settings h2.nav-tab-wrapper a.nav-tab.nav-tab-ac
   color: #2F3241;
   font-weight: 600;
   border-bottom: 2px solid #5AA152;
+}
+body.charitable_page_charitable-reports h2.nav-tab-wrapper a.nav-tab.nav-tab-marketing::after, body.charitable_page_charitable-reports h2.nav-tab-wrapper a.nav-tab.nav-tab-donors::after, body.charitable_page_charitable-reports h2.nav-tab-wrapper a.nav-tab.nav-tab-security::after,
+body.charitable_page_charitable-tools h2.nav-tab-wrapper a.nav-tab.nav-tab-marketing::after,
+body.charitable_page_charitable-tools h2.nav-tab-wrapper a.nav-tab.nav-tab-donors::after,
+body.charitable_page_charitable-tools h2.nav-tab-wrapper a.nav-tab.nav-tab-security::after,
+body.post-type-charitable.edit-tags-php h2.nav-tab-wrapper a.nav-tab.nav-tab-marketing::after,
+body.post-type-charitable.edit-tags-php h2.nav-tab-wrapper a.nav-tab.nav-tab-donors::after,
+body.post-type-charitable.edit-tags-php h2.nav-tab-wrapper a.nav-tab.nav-tab-security::after,
+body.term-php.taxonomy-campaign_category h2.nav-tab-wrapper a.nav-tab.nav-tab-marketing::after,
+body.term-php.taxonomy-campaign_category h2.nav-tab-wrapper a.nav-tab.nav-tab-donors::after,
+body.term-php.taxonomy-campaign_category h2.nav-tab-wrapper a.nav-tab.nav-tab-security::after,
+body.term-php.taxonomy-campaign_tag h2.nav-tab-wrapper a.nav-tab.nav-tab-marketing::after,
+body.term-php.taxonomy-campaign_tag h2.nav-tab-wrapper a.nav-tab.nav-tab-donors::after,
+body.term-php.taxonomy-campaign_tag h2.nav-tab-wrapper a.nav-tab.nav-tab-security::after,
+body.charitable_page_charitable-growth-tools h2.nav-tab-wrapper a.nav-tab.nav-tab-marketing::after,
+body.charitable_page_charitable-growth-tools h2.nav-tab-wrapper a.nav-tab.nav-tab-donors::after,
+body.charitable_page_charitable-growth-tools h2.nav-tab-wrapper a.nav-tab.nav-tab-security::after,
+body.charitable_page_charitable-settings h2.nav-tab-wrapper a.nav-tab.nav-tab-marketing::after,
+body.charitable_page_charitable-settings h2.nav-tab-wrapper a.nav-tab.nav-tab-donors::after,
+body.charitable_page_charitable-settings h2.nav-tab-wrapper a.nav-tab.nav-tab-security::after {
+  content: "Pro";
+  background-color: #F99E36;
+  padding: 3px 7px;
+  font-size: 11px;
+  line-height: 11px;
+  text-transform: uppercase;
+  color: white;
+  font-weight: 600;
+  margin-left: 5px;
+  margin-right: 5px;
+  margin-top: 0;
+  position: relative;
+  top: -7px;
+}
+body.charitable_page_charitable-reports h2.nav-tab-wrapper a.nav-tab.no-pro-tab::after,
+body.charitable_page_charitable-tools h2.nav-tab-wrapper a.nav-tab.no-pro-tab::after,
+body.post-type-charitable.edit-tags-php h2.nav-tab-wrapper a.nav-tab.no-pro-tab::after,
+body.term-php.taxonomy-campaign_category h2.nav-tab-wrapper a.nav-tab.no-pro-tab::after,
+body.term-php.taxonomy-campaign_tag h2.nav-tab-wrapper a.nav-tab.no-pro-tab::after,
+body.charitable_page_charitable-growth-tools h2.nav-tab-wrapper a.nav-tab.no-pro-tab::after,
+body.charitable_page_charitable-settings h2.nav-tab-wrapper a.nav-tab.no-pro-tab::after {
+  /* undo the content css above */
+  display: none;
 }
 body.charitable_page_charitable-reports h2.nav-tab-wrapper a.nav-tab:hover,
 body.charitable_page_charitable-tools h2.nav-tab-wrapper a.nav-tab:hover,

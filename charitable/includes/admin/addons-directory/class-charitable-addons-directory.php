@@ -298,7 +298,8 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		/**
 		 * Callback for displaying the UI for Addons.
 		 *
-		 * @since 1.7.0
+		 * @since   1.7.0
+		 * @version 1.8.5.1
 		 */
 		public function addons_directory_content() {
 
@@ -322,6 +323,25 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				}
 
 				return;
+			}
+
+			if ( ! empty( $temp_addons ) ) {
+				foreach ( array( 'unlicensed', 'licensed' ) as $addon_type ) {
+					if ( ! empty( $temp_addons[ $addon_type ] ) ) {
+						foreach ( $temp_addons[ $addon_type ] as $i => $addon ) {
+							if ( 'charitable-pro-plugin' === $addon['slug'] ) {
+								// Remove from current location
+								unset( $temp_addons[ $addon_type ][ $i ] );
+
+								// Add to start of recommended array
+								if ( ! isset( $temp_addons['recommended'] ) ) {
+									$temp_addons['recommended'] = array();
+								}
+								array_unshift( $temp_addons['recommended'], $addon );
+							}
+						}
+					}
+				}
 			}
 
 			$recommended_addons = array_map( array( $this, 'prepare_addon_data' ), ! empty( $temp_addons['recommended'] ) ? $temp_addons['recommended'] : array() );
@@ -370,7 +390,6 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				error_log( print_r( $upgrade_url, true ) );
 			}
 			// phpcs:enable
-
 			?>
 
 			<div id="charitable-addons">
@@ -590,7 +609,11 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				}
 			}
 
-			$button = $this->get_addon_button_html( $addon );
+			if ( 'charitable-pro-plugin' === $addon['slug'] ) {
+				$button = '<a href="https://www.wpcharitable.com/charitable-pro/" target="_blank" rel="noopener noreferrer" class="charitable-btn charitable-btn-orange">Download Pro</a>';
+			} else {
+				$button = $this->get_addon_button_html( $addon );
+			}
 
 			$status_label = $this->get_addon_status_label( $addon['status'] );
 
@@ -604,7 +627,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 			// css.
 			$css = array( 'addon-container' );
-			if ( $is_recommended ) {
+			if ( $is_recommended || 'charitable-pro-plugin' === $addon['slug'] ) {
 				$css[] = 'recommended';
 			}
 
@@ -624,14 +647,23 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 			<div class="<?php echo esc_attr( implode( ' ', $css ) ); ?>">
 				<div class="addon-item">
-					<?php if ( $is_recommended ) : ?>
+					<?php if ( $is_recommended || 'charitable-pro-plugin' === $addon['slug'] ) : ?>
 						<div class="recommended"><?php echo esc_html__( 'Recommended', 'charitable' ); ?></div>
 					<?php endif; ?>
 					<img src="<?php echo esc_url( $icon ); ?>" alt="<?php echo esc_html( $addon['name'] ); ?> Addon logo">
 					<div class="details charitable-clear">
 						<h5 class="addon-name">
-							<a href="<?php echo esc_url( $addon['upgrade_url'] ); ?>" title="Learn more" target="_blank" rel="noopener noreferrer" class="addon-link"><?php echo esc_html( $addon['name'] ); ?> Addon</a></h5>
-						<p class="addon-desc"><?php echo wp_kses( wpautop( $description ), $allowed_html ); ?></p>
+						<?php if ( 'charitable-pro-plugin' === $addon['slug'] ) : ?>
+							<a href="https://www.wpcharitable.com/charitable-pro/" title="Learn more" target="_blank" rel="noopener noreferrer" class="addon-link"><?php echo esc_html( $addon['name'] ); ?></a>
+						<?php else : ?>
+							<a href="<?php echo esc_url( $addon['upgrade_url'] ); ?>" title="Learn more" target="_blank" rel="noopener noreferrer" class="addon-link"><?php echo esc_html( $addon['name'] ); ?> Addon</a>
+						<?php endif; ?>
+						</h5>
+						<?php if ( 'charitable-pro-plugin' === $addon['slug'] ) : ?>
+							<p class="addon-desc"><?php echo esc_html__( 'A new and powerful way to run donation and fundraising websites.', 'charitable' ); ?></p>
+						<?php else : ?>
+							<p class="addon-desc"><?php echo wp_kses( wpautop( $description ), $allowed_html ); ?></p>
+						<?php endif; ?>
 					</div>
 					<div class="actions charitable-clear">
 					<?php

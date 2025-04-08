@@ -164,7 +164,7 @@ if ( ! class_exists( 'Charitable_Tools_System_Info' ) ) :
 		/**
 		 * Get Charitable info.
 		 *
-		 * @since 1.8.1.6
+		 * @since  1.8.1.6
 		 * @version 1.8.3 added version upgraded from.
 		 * @version 1.8.4.5
 		 *

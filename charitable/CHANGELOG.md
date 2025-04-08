@@ -1,3 +1,8 @@
+# 1.8.5.1
+* FIX: Resolved fatal error in some scenarios upon activation/deactivation of license and installing Pro with third-party plugins.
+* FIX: Resolved a JS error in settings due to incorrect sanitization.
+* UPDATED: CTA related updates, including Marketing and Security tabs.
+
 # 1.8.5.0
 * NEW: Compatibility with new Charitable Pro plugin (including automatic upgrading when entering a license).
 * NEW: "charitable_export_data" and "charitable_export_columns" filters for control in Charitable exporting in the admin.

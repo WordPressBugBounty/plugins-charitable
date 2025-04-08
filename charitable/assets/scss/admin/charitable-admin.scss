@@ -23,6 +23,15 @@ body.post-type-donation {
     }
 }
 
+body.charitable_page_charitable-addons {
+    #wpbody-content {
+        .wrap {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+    }
+}
+
 #charitable-admin-header {
 
     background-color: $color_white;
@@ -44,6 +53,7 @@ body.post-type-donation {
         display: flex;
         justify-content: center;
         align-items: center;
+        min-height: 80px;
     }
 
     h1 {
@@ -1741,6 +1751,28 @@ body.charitable_page_charitable-settings {
                 color: #2F3241;
                 font-weight: 600;
                 border-bottom: 2px solid #5AA152;
+            }
+            &.nav-tab-marketing::after,
+            &.nav-tab-donors::after,
+            &.nav-tab-security::after {
+                // insert content before element.
+                content: "Pro";
+                background-color: #F99E36;
+                padding: 3px 7px;
+                font-size: 11px;
+                line-height: 11px;
+                text-transform: uppercase;
+                color: white;
+                font-weight: 600;
+                margin-left: 5px;
+                margin-right: 5px;
+                margin-top: 0;
+                position: relative;
+                top: -7px;
+            }
+            &.no-pro-tab::after {
+                /* undo the content css above */
+                display: none;
             }
 
         }

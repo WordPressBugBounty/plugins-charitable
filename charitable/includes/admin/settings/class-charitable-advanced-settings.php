@@ -230,7 +230,8 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 			// Licenses info, added in v1.8.1.6.
 			delete_site_option( 'wpc_plugin_versions' );
 			wp_cache_delete( 'plugin_versions', 'charitable' ); // Depreciated item.
-			set_site_transient( 'update_plugins', null ); // Depreciated item.
+			$empty_transient = new \stdClass();
+			set_site_transient( 'update_plugins', $empty_transient ); // Depreciated item.
 
 			// Allow an addon to hook into this.
 			do_action( 'charitable_after_clear_expired_options' );

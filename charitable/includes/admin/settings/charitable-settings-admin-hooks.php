@@ -109,6 +109,14 @@ add_filter( 'charitable_settings_button_advanced', array( Charitable_Licenses_Se
 add_filter( 'charitable_settings_tab_fields_privacy', array( Charitable_Privacy_Settings::get_instance(), 'add_privacy_fields' ), 5 );
 
 /**
+ * Add the Pro settings CTA.
+ *
+ * @see Charitable_Settings::show_settings_cta()
+ */
+add_action( 'charitable_pro_settings_cta', array( Charitable_Settings::get_instance(), 'show_settings_cta' ), 10, 1 );
+
+
+/**
  * Add settings to the Advanced tab.
  *
  * @see Charitable_Advanced_Settings::add_advanced_fields()

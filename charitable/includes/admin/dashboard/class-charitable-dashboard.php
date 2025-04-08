@@ -1417,6 +1417,8 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		 * @since 1.8.1
 		 *
 		 * @param string $view Current view inside the plugin settings page.
+		 * @param string $css_class CSS class for the cta.
+		 * @param bool   $show_close_button Whether to show the close button.
 		 */
 		public function dashboard_cta( $view = false, $css_class = 'reports-lite-cta', $show_close_button = false ) { // phpcs:ignore
 

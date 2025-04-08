@@ -162,6 +162,7 @@ if ( ! class_exists( 'Charitable_Admin_Pages' ) ) :
 			 * @version 1.8.1.6 Added tools.
 			 * @version 1.8.1.8 Added SMTP.
 			 * @version 1.8.2 Remove categories, tags, and customize.
+			 * @version 1.8.5.1 Added donors.
 			 *
 			 * @param array $pages Every page is an array with at least a page_title,
 			 *                     menu_title and menu_slug set.
@@ -245,9 +246,6 @@ if ( ! class_exists( 'Charitable_Admin_Pages' ) ) :
 					),
 				)
 			);
-
-			// Remove the item in the array that has the menu_slug 'charitable-donors'.
-			unset( $pages[ array_search( 'charitable-donors', array_column( $pages, 'menu_slug' ) ) ] );
 
 			return $pages;
 		}

@@ -842,9 +842,9 @@ class CharitableLicenses {
 
 		delete_site_option( 'wpc_plugin_versions' );
 
-		// depreciated items.
-		wp_cache_delete( 'plugin_versions', 'charitable' );
-		set_site_transient( 'update_plugins', null );
+		// Create an empty update transient object instead of null
+		$empty_transient = new \stdClass();
+		set_site_transient( 'update_plugins', $empty_transient );
 	}
 
 	/**

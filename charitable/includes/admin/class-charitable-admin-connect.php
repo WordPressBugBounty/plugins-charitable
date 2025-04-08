@@ -181,7 +181,8 @@ class Charitable_Admin_Connect {
 	/**
 	 * Process Charitable Connect.
 	 *
-	 * @since 1.8.5
+	 * @since   1.8.5
+	 * @version 1.8.5.1
 	 */
 	public function process() {
 
@@ -380,7 +381,7 @@ class Charitable_Admin_Connect {
 							$settings['licenses']['charitable-v2'] = array(
 								'license'         => $key,
 								'expiration_date' => isset( $license_data['expires'] ) ? $license_data['expires'] : false,
-								'plan_id'         => 1, // isset( $license_data['price_id'] ) ? $license_data['price_id'] : false,
+								'plan_id'         => isset( $license_data['price_id'] ) ? $license_data['price_id'] : false,
 								'valid'           => true,
 							);
 
@@ -393,7 +394,9 @@ class Charitable_Admin_Connect {
 								error_log( print_r( $license_data, true ) ); // phpcs:ignore
 							}
 
-							set_site_transient( 'update_plugins', null );
+							// Create an empty update transient object instead of null.
+							$empty_transient = new \stdClass();
+							set_site_transient( 'update_plugins', $empty_transient );
 							delete_site_option( 'wpc_plugin_versions' );
 							update_option( 'charitable_connect_complete', true );
 							update_option( 'charitable_connect_completed', true );
