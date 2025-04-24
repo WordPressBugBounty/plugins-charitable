@@ -6608,13 +6608,24 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 			} );
 
-			$builder.on( 'focusout', 'input#charitable-panel-field-settings-campaign_minimum_donation_amount, input#charitable-panel-field-settings-campaign_goal', function( e ) { // eslint-disable-line
+			$builder.on( 'focusout', 'input#charitable-panel-field-settings-campaign_minimum_donation_amount, input#charitable-panel-field-settings-campaign_maximum_donation_amount, input#charitable-panel-field-settings-campaign_goal', function( e ) { // eslint-disable-line
 				// add a decimal point followed by two zeros (.00) if the user clicks out of the input box and the money value is a whole number.
 				var $this = $( this ),
-					val   = $this.val();
+					val   = $this.val(),
+					decimal_separator = charitable_builder.currency_decimal_separator,
+					thousands_separator = charitable_builder.currency_thousands_separator;
 
-				if ( val.length > 0 && val.indexOf('.') === -1 ) {
-					$this.val( val + '.00' );
+				// if undefined or empty, return.
+				if ( typeof decimal_separator === 'undefined' || decimal_separator.length === 0 ) {
+					return;
+				}
+
+				if ( typeof thousands_separator === 'undefined' || thousands_separator.length === 0 ) {
+					return;
+				}
+
+				if ( val.length > 0 && val.indexOf( decimal_separator ) === -1 ) {
+					$this.val( val + decimal_separator + '00' );
 				}
 
 			} );

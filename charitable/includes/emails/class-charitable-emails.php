@@ -49,6 +49,22 @@ if ( ! class_exists( 'Charitable_Emails' ) ) :
 		private function __construct() {
 			/* 3rd party hook for overriding anything we've done so far. */
 			do_action( 'charitable_emails_start', $this );
+
+			add_action( 'init', array( $this, 'register_email_hooks' ) );
+		}
+
+		/**
+		 * Register email hooks for donation status changes.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @return void
+		 */
+		public function register_email_hooks() {
+			foreach ( charitable_get_approval_statuses() as $approval_status ) {
+				add_action( $approval_status . '_' . Charitable::DONATION_POST_TYPE, array( 'Charitable_Email_Donation_Receipt', 'send_with_donation_id' ) );
+				add_action( $approval_status . '_' . Charitable::DONATION_POST_TYPE, array( 'Charitable_Email_New_Donation', 'send_with_donation_id' ) );
+			}
 		}
 
 		/**

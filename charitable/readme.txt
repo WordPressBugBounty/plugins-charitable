@@ -2,9 +2,9 @@
 Contributors: WPCharitable, griffinjt, smub, dimensionmedia
 Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
-Tested up to: 6.7.2
+Tested up to: 6.8.0
 Requires PHP: 7.2
-Stable tag: 1.8.5.1
+Stable tag: 1.8.5.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -191,8 +191,6 @@ Love Charitable? [Leave us a review](https://wordpress.org/support/plugin/charit
 
 Visit [WPBeginner](https://www.wpbeginner.com/ "WPBeginner") to learn from their [free WordPress video courses](https://videos.wpbeginner.com/courses/) and see their pick for [best WordPress plugins](https://www.wpbeginner.com/showcase/24-must-have-wordpress-plugins-for-business-websites/).
 
-
-
 == Installation ==
 
 1. Install Charitable either via the WordPress.org plugin repository or by uploading the files to your server. (See instructions on [how to install a WordPress plugin](https://www.wpbeginner.com/beginners-guide/step-by-step-guide-to-install-a-wordpress-plugin-for-beginners))
@@ -257,6 +255,11 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.5.2 =
+* FIX: Improved sanitation in decimal count in admin general settings.
+* FIX: Improved support for certain currency settings when auto formatting certain fields in the campaign builder.
+* FIX: Addressed some PHP notices that involved translations.
 
 = Donation Form & Fundraising Campaigns v1.8.5.1 =
 * FIX: Resolved fatal error in some scenarios upon activation/deactivation of license and installing Pro with third-party plugins.

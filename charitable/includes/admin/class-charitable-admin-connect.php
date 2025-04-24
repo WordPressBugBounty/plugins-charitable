@@ -98,7 +98,7 @@ class Charitable_Admin_Connect {
 				array(
 					'show_manual_upgrade' => true,
 					'url'                 => 'https://www.wpcharitable.com/documentation/installing-extensions/',
-					'message'             => esc_html__( 'This upgrade is not available on localhost.', 'charitable' ),
+					'message'             => esc_html__( 'The automatic upgrade to Charitable Pro is not available on localhost. We suggest you install the plugin manually.', 'charitable' ),
 				)
 			);
 		}
@@ -118,7 +118,7 @@ class Charitable_Admin_Connect {
 
 		// Whether it is the pro version.
 		if ( $is_pro ) {
-			wp_send_json_error( array( 'message' => esc_html__( 'Only the Lite version can be upgraded.', 'charitable' ) ) );
+			wp_send_json_error( array( 'message' => esc_html__( 'Only the Lite version of Charitable can be upgraded.', 'charitable' ) ) );
 		}
 
 		// Verify pro version is not installed.

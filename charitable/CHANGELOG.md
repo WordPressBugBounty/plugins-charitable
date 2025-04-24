@@ -1,3 +1,8 @@
+# 1.8.5.2
+* FIX: Improved sanitation in decimal count in admin general settings.
+* FIX: Improved support for certain currency settings when auto formatting certain fields in the campaign builder.
+* FIX: Addressed some PHP notices that involved translations.
+
 # 1.8.5.1
 * FIX: Resolved fatal error in some scenarios upon activation/deactivation of license and installing Pro with third-party plugins.
 * FIX: Resolved a JS error in settings due to incorrect sanitization.

@@ -119,7 +119,16 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 			if ( strlen( $db_version ) && strlen( $edge_version ) ) {
 				return $this->legacy_upgrade_mode( $db_version, $edge_version );
 			}
+		}
 
+		/**
+		 * Initialize the upgrade actions.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @return void
+		 */
+		public function init() {
 			$this->upgrade_actions = array(
 				'update_upgrade_system'                   => array(
 					'version' => '1.3.0',
@@ -279,6 +288,8 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 				),
 			);
 
+			$this->init();
+
 			foreach ( $this->upgrade_actions as $key => $notes ) {
 				$log[ $key ] = array(
 					'time'    => time(),
@@ -370,7 +381,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 		 * @return void
 		 */
 		public function do_immediate_upgrades() {
-			if ( is_admin() && isset( $_GET['page'] ) && 'charitable-upgrades' == $_GET['page'] ) {
+			if ( is_admin() && isset( $_GET['page'] ) && 'charitable-upgrades' == $_GET['page'] ) { // phpcs:ignore
 				return;
 			}
 
@@ -401,15 +412,21 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 		 * Walk over the array of upgrade actions, performing the callback
 		 * for any upgrades that have not been completed yet.
 		 *
-		 * @since  1.5.0
+		 * @since   1.5.0
+		 * @version 1.8.5.6
 		 *
 		 * @param  callback $callback Callback method to perform if the
 		 *                            upgrade has not been completed.
 		 * @return void
 		 */
 		protected function walk_upgrade_actions( $callback ) {
+
 			if ( ! is_callable( $callback ) ) {
 				return;
+			}
+
+			if ( $this->upgrade_log_key === 'charitable_upgrade_log' ) {
+				$this->init();
 			}
 
 			foreach ( $this->upgrade_actions as $action => $upgrade ) {
@@ -423,7 +440,9 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 					}
 
 					call_user_func( $callback, $action, $upgrade );
+
 				}
+
 			}
 		}
 
@@ -438,7 +457,6 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 		 */
 		public function upgrade_has_been_completed( $action ) {
 			$log = get_option( $this->upgrade_log_key );
-
 			return is_array( $log ) && array_key_exists( $action, $log );
 		}
 
@@ -464,7 +482,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 		 */
 		public function show_upgrade_in_progress_notice( $upgrade_progress ) {
 			/* Fixes a bug that incorrectly set the page as charitable-upgrade */
-			if ( isset( $upgrade_progress['page'] ) && 'charitable-upgrade' == $upgrade_progress['page'] ) {
+			if ( isset( $upgrade_progress['page'] ) && 'charitable-upgrade' == $upgrade_progress['page'] ) { //phpcs:ignore
 				$upgrade_progress['page'] = 'charitable-upgrades';
 			}
 			?>
@@ -556,8 +574,8 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 
 			ignore_user_abort( true );
 
-			if ( ! charitable_is_func_disabled( 'set_time_limit' ) && ! ini_get( 'safe_mode' ) ) {
-				@set_time_limit( 0 );
+			if ( ! charitable_is_func_disabled( 'set_time_limit' ) && ! ini_get( 'safe_mode' ) ) { // phpcs:ignore
+				@set_time_limit( 0 ); // phpcs:ignore
 			}
 
 			/**
@@ -1366,6 +1384,8 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 			 *  '1.2.0' => 'flush_permalinks',
 			 * );
 			 */
+
+			$this->init();
 
 			if ( empty( $this->upgrade_actions ) || ! is_array( $this->upgrade_actions ) ) {
 				return;

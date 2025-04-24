@@ -58,7 +58,7 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 		private function __construct() {
 			do_action( 'charitable_admin_settings_start', $this );
 
-			add_action( 'charitable_after_admin_settings', [ $this, 'settings_cta' ] );
+			add_action( 'charitable_after_admin_settings', array( $this, 'settings_cta' ) );
 		}
 
 		/**
@@ -94,12 +94,12 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 			 * @param string[] $tabs List of tabs in key=>label format.
 			 */
 			$tabs = array(
-				'general'   => __( 'General', 'charitable' ),
-				'gateways'  => __( 'Payment Gateways', 'charitable' ),
-				'emails'    => __( 'Emails', 'charitable' ),
-				'donors'    => __( 'Donors', 'charitable' ),
-				'privacy'   => __( 'Privacy', 'charitable' ),
-				'advanced'  => __( 'Advanced', 'charitable' ),
+				'general'  => __( 'General', 'charitable' ),
+				'gateways' => __( 'Payment Gateways', 'charitable' ),
+				'emails'   => __( 'Emails', 'charitable' ),
+				'donors'   => __( 'Donors', 'charitable' ),
+				'privacy'  => __( 'Privacy', 'charitable' ),
+				'advanced' => __( 'Advanced', 'charitable' ),
 			);
 
 			// Only show marketing tab if newsletter connect addon is not active.
@@ -394,6 +394,13 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 			}
 
 			$values = wp_parse_args( $new_values, $old_values );
+
+			// Sanitize decimal_count to prevent XSS attacks.
+			if ( isset( $values['decimal_count'] ) ) {
+				$values['decimal_count'] = absint( $values['decimal_count'] );
+				// Ensure decimal_count is between 0 and 10.
+				$values['decimal_count'] = min( max( $values['decimal_count'], 0 ), 10 );
+			}
 
 			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
 				error_log( 'santiize_settings values updated' );
@@ -910,7 +917,15 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 					?>
 					<?php if ( charitable_is_pro() ) : ?>
 						<div class="charitable-education-page-disabled-download">
-							<p><?php esc_html_e( 'In order to access the settings for this feature, you need to upgrade from Charitable to the Charitable Pro plugin.', 'charitable' ); ?></p>
+							<p>
+							<?php
+							printf(
+								/* translators: %s: Documentation URL */
+								esc_html__( 'This feature is only available in Charitable Pro. Please %s on how to download Charitable Pro.', 'charitable' ),
+								'<a href="https://wpcharitable.com/docs/download-charitable-pro/" target="_blank">' . esc_html__( 'see our documentation', 'charitable' ) . '</a>'
+							);
+							?>
+							</p>
 						</div>
 					<?php else : ?>
 					<div class="charitable-education-page-button">

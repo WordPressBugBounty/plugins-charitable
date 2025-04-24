@@ -508,8 +508,8 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 				} else {
 					// 1.8.5
 					if ( charitable_is_pro() ) {
-						$output .= $this->get_licensed_message();
-						$readonly = 'readonly value="xxxxxxxxxxxxxxxxxxxx"';
+						$output           .= $this->get_licensed_message();
+						$readonly          = 'readonly value="xxxxxxxxxxxxxxxxxxxx"';
 						$has_valid_license = true;
 					} else {
 						$output .= $this->get_unlicensed_message();
@@ -538,7 +538,8 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 		/**
 		 * Checks if the pro_connect flag is set. This decides if entering a license key will trigger Charitable Connect, an improved migration path to Charitable Pro.
 		 *
-		 * @since 1.8.5
+		 * @since   1.8.5
+		 * @version 1.8.5.2
 		 *
 		 * @return boolean
 		 */
@@ -617,15 +618,15 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 					wp_kses(
 						/* translators: %s - charitable.com upgrade URL. */
 						__( 'To unlock more features consider <strong><a href="%s" target="_blank" rel="noopener noreferrer" class="charitable-upgrade-modal">upgrading to PRO</a></strong>.', 'charitable' ),
-						[
-							'a'      => [
-								'href'   => [],
-								'class'  => [],
-								'target' => [],
-								'rel'    => [],
-							],
-							'strong' => [],
-						]
+						array(
+							'a'      => array(
+								'href'   => array(),
+								'class'  => array(),
+								'target' => array(),
+								'rel'    => array(),
+							),
+							'strong' => array(),
+						)
 					),
 					esc_url( charitable_pro_upgrade_url( 'settings-upgrade' ) )
 				) .
@@ -634,10 +635,10 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 				'<p class="discount-note">' .
 					wp_kses(
 						__( 'As a valued Charitable Lite user, you receive up to <strong>$300 off</strong>, automatically applied at checkout!', 'charitable' ),
-						[
-							'strong' => [],
-							'br'     => [],
-						]
+						array(
+							'strong' => array(),
+							'br'     => array(),
+						)
 					) .
 				'</p>';
 
@@ -698,16 +699,16 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 						wp_kses(
 							/* translators: %s - charitable.com upgrade URL. */
 							__( 'Your license may be expiring soon. Please renew to continue receiving updates and support. <a target="_blank" href="%s">Learn more</a>.', 'charitable' ),
-							[
-								'a'      => [
-									'href'   => [],
-									'class'  => [],
-									'target' => [],
-									'rel'    => [],
-								],
-								'br'     => [],
-								'strong' => [],
-							]
+							array(
+								'a'      => array(
+									'href'   => array(),
+									'class'  => array(),
+									'target' => array(),
+									'rel'    => array(),
+								),
+								'br'     => array(),
+								'strong' => array(),
+							)
 						),
 						'https://wpcharitable.com/documentation/expired-expiring-license'
 					) . '</p>';
@@ -717,16 +718,16 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 						wp_kses(
 							/* translators: %s - charitable.com upgrade URL. */
 							__( 'It appears your license may have expired. Please renew to continue receiving updates and support. <a target="_blank" href="%s">Learn more</a>.', 'charitable' ),
-							[
-								'a'      => [
-									'href'   => [],
-									'class'  => [],
-									'target' => [],
-									'rel'    => [],
-								],
-								'br'     => [],
-								'strong' => [],
-							]
+							array(
+								'a'      => array(
+									'href'   => array(),
+									'class'  => array(),
+									'target' => array(),
+									'rel'    => array(),
+								),
+								'br'     => array(),
+								'strong' => array(),
+							)
 						),
 						'https://wpcharitable.com/documentation/expired-expiring-license'
 					) . '</p>';
@@ -741,7 +742,6 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 								$license_data .= '<p>' . $k . ' : ' . $v . '</p>';
 							}
 						}
-
 					}
 
 					$output .= '<p><strong>' . esc_html__( 'License data:', 'charitable' ) . '</strong> ' . $license_data . '</p>';
@@ -768,7 +768,6 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 					error_log( 'get_licensed_message - not valid' ); // phpcs:ignore
 					error_log( print_r( $valid, true ) ); // phpcs:ignore
 				}
-
 			}
 
 			return $output;
@@ -817,16 +816,16 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 					wp_kses(
 						/* translators: %s - charitable.com upgrade URL. */
 						__( 'You\'re using <strong>Charitable</strong> with one or more <a href="%s">activated legacy licenses</a>. Enjoy! 🙂', 'charitable' ),
-						[
-							'a'      => [
-								'href'   => [],
-								'class'  => [],
-								'target' => [],
-								'rel'    => [],
-							],
-							'br'     => [],
-							'strong' => [],
-						]
+						array(
+							'a'      => array(
+								'href'   => array(),
+								'class'  => array(),
+								'target' => array(),
+								'rel'    => array(),
+							),
+							'br'     => array(),
+							'strong' => array(),
+						)
 					),
 					esc_url( admin_url( 'admin.php?page=charitable-settings&tab=advanced' ) )
 				) .

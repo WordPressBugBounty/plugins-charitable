@@ -85,12 +85,19 @@
 			<div class="charitable-education-page-button">
 				<a href="<?php echo esc_url( charitable_utm_link( 'https://wpcharitable.com/account/', 'donors', 'Download Charitable Pro' ) ); ?>" class="button button-primary" target="_blank"><?php esc_html_e( 'Download Charitable Pro', 'charitable' ); ?></a>
 			</div>
-			<p>
-				<?php /* translators: %1$s: Opening link tag, %2$s: Closing link tag */ ?>
-				<?php printf( esc_html__( 'This feature requires %1$supgrading from Charitable to the new Charitable Pro plugin%2$s.', 'charitable' ), '<a href="' . esc_url( charitable_utm_link( 'https://www.wpcharitable.com/documentation/how-to-upgrade-to-charitable-pro/', 'donors', 'Upgrade to Charitable Pro' ) ) . '" target="_blank">', '</a>' ); ?>
-				<?php /* translators: %1$s: Opening link tag, %2$s: Closing link tag */ ?>
-				<?php printf( esc_html__( 'Read more about the %1$snew Charitable Pro plugin%2$s.', 'charitable' ), '<a href="' . esc_url( charitable_utm_link( 'https://www.wpcharitable.com/about-charitable-pro/', 'donors', 'Read more about the new Charitable Pro' ) ) . '" target="_blank">', '</a>' ); ?>
-			</p>
+
+			<div class="charitable-education-page-disabled-download">
+				<p>
+				<?php
+				printf(
+					/* translators: %s: Documentation URL */
+					esc_html__( 'This feature is only available in Charitable Pro. Please %s on how to download Charitable Pro.', 'charitable' ),
+					'<a href="https://wpcharitable.com/docs/download-charitable-pro/" target="_blank">' . esc_html__( 'see our documentation', 'charitable' ) . '</a>'
+				);
+				?>
+				</p>
+			</div>
+
 		<?php endif; ?>
 
 	</div>

@@ -141,8 +141,6 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 		 * @since 1.8.0
 		 */
 		private function __construct() {
-
-			$this->get_campaign_settings();
 		}
 
 		/**
@@ -277,6 +275,8 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 		 * @since 1.8.0
 		 */
 		public function enqueues() {
+
+			$this->get_campaign_settings();
 
 			// Remove conflicting scripts.
 			wp_deregister_script( 'serialize-object' );
@@ -648,8 +648,9 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 		/**
 		 * Get localized strings.
 		 *
-		 * @since 1.8.0
+		 * @since   1.8.0
 		 * @version 1.8.1.12 Added error_no_title.
+		 * @version 1.8.5.2 Added currency_decimal_separator and currency_thousands_separator.
 		 *
 		 * @return array
 		 */
@@ -664,8 +665,10 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 			$currency_helper = charitable_get_currency_helper();
 
 			$strings = array(
-				'version'                           => '1.8.1.15',
+				'version'                           => '1.8.5.2',
 				'currency_symbol'                   => $currency_helper->get_currency_symbol(),
+				'currency_decimal_separator'        => $currency_helper->get_decimal_separator(),
+				'currency_thousands_separator'      => $currency_helper->get_thousands_separator(),
 				'and'                               => esc_html__( 'And', 'charitable' ),
 				'assets_url'                        => admin_url( 'admin-ajax.php' ),
 				'ajax_url'                          => admin_url( 'admin-ajax.php' ),
@@ -1267,6 +1270,8 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 			if ( ! (bool) apply_filters( 'charitable_builder_output', true ) ) {
 				return;
 			}
+
+			$this->get_campaign_settings();
 
 			if ( ! $this->campaign_data && intval( $_GET['campaign_id'] ) > 0 ) { // phpcs:ignore
 				$this->campaign_data = $this->get_campaign_settings( intval( $_GET['campaign_id'] ) ); // phpcs:ignore
