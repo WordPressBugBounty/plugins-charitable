@@ -248,6 +248,7 @@ add_filter( 'charitable_admin_notifications_update_data', array( Charitable_Even
  */
 add_action( 'admin_init', array( Charitable_Licenses_Settings::get_instance(), 'maybe_check_if_license_expired' ), 9999 );
 add_action( 'admin_init', array( Charitable_Licenses_Settings::get_instance(), 'maybe_check_if_license_expiring' ), 9998 );
+add_action( 'admin_init', array( Charitable_Licenses_Settings::get_instance(), 'activate_pro_plugin_after_license_activation' ), 1 );
 
 /**
  * Connect for upgrade.wpcharitable.com.

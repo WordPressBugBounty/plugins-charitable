@@ -1,3 +1,8 @@
+# 1.8.5.3
+* NEW: Added dialog box upon entering license that activates Pro if already installed.
+* FIX: Improve santization of donor widget and video alt text in campaign builder.
+* FIX: Tweak first/last/email field CSS on a "minimal" format form.
+
 # 1.8.5.2
 * FIX: Improved sanitation in decimal count in admin general settings.
 * FIX: Improved support for certain currency settings when auto formatting certain fields in the campaign builder.

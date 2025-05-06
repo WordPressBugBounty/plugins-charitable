@@ -134,7 +134,8 @@ if ( ! class_exists( 'Charitable_Donors_Widget' ) ) :
 		/**
 		 * Update the widget settings in the admin.
 		 *
-		 * @since  1.0.0
+		 * @since   1.0.0
+		 * @version 1.8.5.3
 		 *
 		 * @param  array $new_instance The updated settings.
 		 * @param  array $old_instance The old settings.
@@ -148,6 +149,10 @@ if ( ! class_exists( 'Charitable_Donors_Widget' ) ) :
 						? charitable_sanitize_checkbox( $instance[ $key ] )
 						: 0;
 			}
+
+			$instance['title']       = sanitize_text_field( $instance['title'] );
+			$instance['campaign_id'] = sanitize_text_field( $instance['campaign_id'] );
+			$instance['order']       = sanitize_text_field( $instance['order'] );
 
 			/**
 			 * Filter the instance arguments.

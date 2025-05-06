@@ -239,12 +239,45 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 					if ( response.success ) {
 
 						if ( response.data.valid === true ) {
+
+							var is_pro_plugin_installed = 'undefined' !== typeof charitable_admin.is_pro_installed && charitable_admin.is_pro_installed === '1' ? true : false;
+
 							$('#charitable-license-message').html( response.data.message );
-							if ( 'undefined' === typeof charitable_admin.admin_url ) {
-								window.location.href = charitable_admin.admin_url + 'admin.php?page=charitable-settings&tab=general&valid=valid';
+
+							// If the pro plugin is installed, redirect to a page that will activate it.
+							if ( is_pro_plugin_installed ) {
+
+								// Generate an alert modal to confirm we are about to activate the pro plugin.
+
+								$.alert( {
+									title: charitable_admin.activated_title,
+									content: charitable_admin.activated_content,
+									icon: 'fa fa-check-circle',
+									type: 'green',
+									boxWidth: '800px',
+									buttons: {
+										confirmActivate: {
+											text    : charitable_admin.plugin_activate_btn,
+											btnClass: 'btn-confirm',
+											keys    : [ 'enter' ],
+											action: function( confirmActivateButton ) {
+												window.location.href = charitable_admin.admin_url + 'admin.php?page=charitable-settings&tab=general&valid=valid&pro=activate';
+												return false;
+											}
+										}
+									},
+
+								} );
+
+
 							} else {
-								location.reload();
+								if ( 'undefined' !== typeof charitable_admin.admin_url ) {
+									window.location.href = charitable_admin.admin_url + 'admin.php?page=charitable-settings&tab=general&valid=valid';
+								} else {
+									location.reload();
+								}
 							}
+
 						} else {
 							$('#charitable-license-message').html( response.data.message );
 

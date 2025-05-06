@@ -1265,9 +1265,11 @@ h3.charitable-header {
   align-content: center;
   width: 100%;
   gap: 15px;
+  flex-wrap: wrap;
 }
 .charitable-donation-form.charitable-template-minimal #charitable-donor-fields #charitable-user-fields .charitable-form-group.charitable-form-group-number-1 div#charitable_field_first_name,
-.charitable-donation-form.charitable-template-minimal #charitable-donor-fields #charitable-user-fields .charitable-form-group.charitable-form-group-number-1 div#charitable_field_last_name {
+.charitable-donation-form.charitable-template-minimal #charitable-donor-fields #charitable-user-fields .charitable-form-group.charitable-form-group-number-1 div#charitable_field_last_name,
+.charitable-donation-form.charitable-template-minimal #charitable-donor-fields #charitable-user-fields .charitable-form-group.charitable-form-group-number-1 div#charitable_field_email {
   flex: 1;
 }
 .charitable-donation-form.charitable-template-minimal #charitable-gateway-fields #charitable-gateway-selector-header {

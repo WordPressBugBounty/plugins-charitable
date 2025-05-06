@@ -1543,3 +1543,19 @@ function charitable_santitize_setting_labels( $content ) {
 
 	return wp_kses( $content, $allowed_tags );
 }
+
+/**
+ * Check if the pro plugin is installed.
+ *
+ * @since 1.8.5.3
+ *
+ * @return bool
+ */
+function charitable_is_pro_installed() {
+	$pro_plugin_path = 'charitable-pro/charitable.php';
+	if ( ! file_exists( WP_PLUGIN_DIR . '/' . $pro_plugin_path ) ) {
+		return false;
+	}
+
+	return true;
+}

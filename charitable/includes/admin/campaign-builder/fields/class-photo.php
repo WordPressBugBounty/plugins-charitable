@@ -106,7 +106,7 @@ if ( ! class_exists( 'Charitable_Field_Photo' ) ) :
 				$image_url  = '' === $image_url && filter_var( $field_data['default'], FILTER_VALIDATE_URL ) ? esc_url( $field_data['default'] ) : $image_url;
 				$image_url  = '' === $image_url && ! empty( $field_data['default'] && ! empty( $campaign_data['template_id'] ) ) ? esc_url( charitable()->get_path( 'directory', false ) . 'assets/images/campaign-builder/templates/' . esc_attr( $campaign_data['template_id'] ) . '/' . $field_data['default'] ) : $image_url;
 				$image_url  = '' === $image_url ? apply_filters( 'charitable_campaign_builder_photo_image_placeholder_url', charitable()->get_path( 'directory', false ) . 'assets/images/campaign-builder/photo-default-image.png' ) : $image_url;
-				$alt_text   = ! empty( $field_data['alt_text'] ) ? wp_strip_all_tags( trim( $field_data['alt_text'] ) ) : '';
+				$alt_text   = ! empty( $field_data['alt_text'] ) ? trim( wp_strip_all_tags( $field_data['alt_text'] ) ): '';
 				$css_class  = ! empty( $field_data['css_class'] ) ? ' class="' . esc_attr( $field_data['css_class'] ) . '" ' : '';
 				$photo_attr = apply_filters( 'charitable_campaign_builder_photo_image_attributes', false );
 
@@ -115,7 +115,7 @@ if ( ! class_exists( 'Charitable_Field_Photo' ) ) :
 				?>
 
 				<div class="charitable-campaign-primary-image">
-					<img <?php echo $css_class; ?> src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo $alt_text; ?>" <?php echo esc_attr( $photo_attr ); ?> />
+					<img <?php echo $css_class; ?> src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $alt_text ); ?>" <?php echo esc_attr( $photo_attr ); ?> />
 				</div>
 
 

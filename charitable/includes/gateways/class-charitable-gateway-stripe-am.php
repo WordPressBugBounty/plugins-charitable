@@ -381,10 +381,10 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 				if ( ! charitable_is_pro() ) {
 					$html .= '<div class="charitable-inline-notice info">
 							<p>
-							<strong>' . esc_html__( 'Pay as you go pricing:', 'charitable-pro' ) . '</strong> ' .
+							<strong>' . esc_html__( 'Pay as you go pricing:', 'charitable' ) . '</strong> ' .
 							sprintf(
 								/* translators: %1$s: opening link tag, %2$s: closing link tag */
-								esc_html__( '3%% per transaction + Stripe fees. %1$sUpgrade to Pro%2$s for no added fees and priority support.', 'charitable-pro' ),
+								esc_html__( '3%% per transaction + Stripe fees. %1$sUpgrade to Pro%2$s for no added fees and priority support.', 'charitable' ),
 								'<a target="_blank" href="' . esc_url( charitable_pro_upgrade_url( $medium ) ) . '">',
 								'</a>'
 							) . '</p>

@@ -86,8 +86,9 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		/**
 		 * Add JS text scripts and load admin scripts.
 		 *
-		 * @since 1.8.0
+		 * @since   1.8.0
 		 * @version 1.8.1.15 - Added upgrade_modal.
+		 * @version 1.8.5.3  - Added is_pro_installed.
 		 */
 		public function charitable_admin_scripts() {
 
@@ -151,6 +152,9 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				'thanks_for_interest'             => esc_html__( 'Thanks for your interest in Charitable Pro!', 'charitable' ),
 				'upgrade_modal'                   => charitable_get_upgrade_modal_text(),
 				'autoshow_plugin_notifications'   => charitable_get_autoshow_plugin_notifications(),
+				'is_pro_installed'                => (int) charitable_is_pro_installed(),
+				'activated_title'                 => esc_html__( 'Almost Done', 'charitable' ),
+				'activated_content'               => esc_html__( 'Charitable Pro is installed but not activated.', 'charitable' ),
 			];
 
 			wp_enqueue_script(
@@ -330,10 +334,10 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					if ( ! empty( $temp_addons[ $addon_type ] ) ) {
 						foreach ( $temp_addons[ $addon_type ] as $i => $addon ) {
 							if ( 'charitable-pro-plugin' === $addon['slug'] ) {
-								// Remove from current location
+								// Remove from current location.
 								unset( $temp_addons[ $addon_type ][ $i ] );
 
-								// Add to start of recommended array
+								// Add to start of recommended array.
 								if ( ! isset( $temp_addons['recommended'] ) ) {
 									$temp_addons['recommended'] = array();
 								}

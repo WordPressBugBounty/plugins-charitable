@@ -2,9 +2,9 @@
 Contributors: WPCharitable, griffinjt, smub, dimensionmedia
 Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
-Tested up to: 6.8.0
+Tested up to: 6.8.1
 Requires PHP: 7.2
-Stable tag: 1.8.5.2
+Stable tag: 1.8.5.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -255,6 +255,11 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.5.3 =
+* NEW: Added dialog box upon entering license that activates Pro if already installed.
+* FIX: Improve santization of donor widget and video alt text in campaign builder.
+* FIX: Tweak first/last/email field CSS on a "minimal" format form.
 
 = Donation Form & Fundraising Campaigns v1.8.5.2 =
 * FIX: Improved sanitation in decimal count in admin general settings.

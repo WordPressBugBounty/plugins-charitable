@@ -1375,11 +1375,13 @@ h3.charitable-header {
           align-content: center;
           width: 100%;
           gap: 15px;
+          flex-wrap: wrap;
 
           #charitable_field_title {}
 
           div#charitable_field_first_name,
-          div#charitable_field_last_name {
+          div#charitable_field_last_name,
+          div#charitable_field_email {
             flex: 1;
           }
 

@@ -309,11 +309,11 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 		 * @return void
 		 */
 		public function add_upgrade_notice() {
-			if ( isset( $_GET['page'] ) && 'charitable-upgrades' == $_GET['page'] ) {
+			if ( isset( $_GET['page'] ) && 'charitable-upgrades' == $_GET['page'] ) { // phpcs:ignore
 				return;
 			}
 
-			if ( ! current_user_can( 'manage_charitable_settings' ) ) {
+			if ( ! current_user_can( 'manage_charitable_settings' ) ) { // phpcs:ignore
 				return;
 			}
 
@@ -334,7 +334,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 		/**
 		 * Show upgrade notice for a particular upgrade notice.
 		 *
-		 * @since  1.5.0
+		 * @since   1.5.0
 		 * @version 1.8.1 // added nonce.
 		 *
 		 * @param  string $action  The upgrade action key.

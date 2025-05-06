@@ -539,7 +539,7 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 		 * Checks if the pro_connect flag is set. This decides if entering a license key will trigger Charitable Connect, an improved migration path to Charitable Pro.
 		 *
 		 * @since   1.8.5
-		 * @version 1.8.5.2
+		 * @version 1.8.5.3
 		 *
 		 * @return boolean
 		 */
@@ -565,36 +565,8 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 				return true;
 			}
 
-			// If no campaigns or donations have been created, use Connect for Pro.
-			$count_campaigns = wp_count_posts( 'campaign' );
-			$total_campaigns = isset( $count_campaigns->publish ) ? $count_campaigns->publish : 0;
-			$count_donations = wp_count_posts( 'donation' );
-			$total_donations = isset( $count_donations->{'charitable-completed'} ) ? $count_donations->{'charitable-completed'} : 0;
-			if ( $total_campaigns === 0 && $total_donations === 0 ) {
-				return true;
-			}
-
-			// If activated in the last 14 days, use Connect for Pro. Check both wpcharitable_activated_datetime and charitable_activated['lite'].
-			$activation_date = get_option( 'wpcharitable_activated_datetime' );
-			if ( $activation_date ) {
-				// if the $activate_date is not a unix time stamp, convert it.
-				if ( ! is_numeric( $activation_date ) ) {
-					$activation_date = strtotime( $activation_date );
-				}
-				if ( (int) $activation_date > (int) strtotime( '-14 days' ) ) {
-					return true;
-				}
-			}
-			if ( ! empty( $charitable_activated['lite'] ) ) {
-				$activation_date = esc_html( $charitable_activated['lite'] );
-				if ( ! is_numeric( $activation_date ) ) {
-					$activation_date = strtotime( $activation_date );
-				}
-				if ( $activation_date > strtotime( '-14 days' ) ) {
-					return true;
-				}
-			}
-			return false;
+			// Allows special cases to be handled by other plugins.
+			return apply_filters( 'charitable_allow_pro_connect', true );
 		}
 
 		/**
@@ -832,6 +804,35 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 				'</p>';
 
 			return $output;
+		}
+
+		/**
+		 * Activates the pro plugin after a license is activated.
+		 *
+		 * @since   1.8.5.3
+		 * @return  void
+		 */
+		public function activate_pro_plugin_after_license_activation() {
+
+			// Check query params.
+			if ( ! isset( $_GET['valid'] ) || 'valid' !== $_GET['valid'] ) { // phpcs:ignore
+				return;
+			}
+
+			if ( ! isset( $_GET['pro'] ) || 'activate' !== $_GET['pro'] ) { // phpcs:ignore
+				return;
+			}
+			// Confirm pro plugin is installed.
+			if ( ! file_exists( WP_PLUGIN_DIR . '/charitable-pro/charitable.php' ) ) {
+				return;
+			}
+
+			// Activate the pro plugin.
+			activate_plugin( 'charitable-pro/charitable.php' );
+
+			// Redirect to the settings page.
+			wp_redirect( admin_url( 'admin.php?page=charitable-settings&tab=general&valid=valid' ) );
+			exit;
 		}
 	}
 
