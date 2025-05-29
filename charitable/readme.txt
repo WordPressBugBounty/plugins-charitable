@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.8.1
 Requires PHP: 7.2
-Stable tag: 1.8.5.3
+Stable tag: 1.8.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -150,7 +150,7 @@ Allow your users to donate with the payment solution of their choice to reach yo
 
 You can see why Charitable is the best WordPress donation plugin on the market! Want to unlock all the features? [Upgrade to our Pro version](https://wpcharitable.com/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin).
 
-= Who is Charitable Donation Platform Built for? =
+= Who is Charitable Donation Platform Built For? =
 
 We built Charitable to help anyone who wants to fundraise online, and Charitable supports both one-time donations and recurring donations. Below are the common use-cases:
 
@@ -255,6 +255,15 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.6 =
+* NEW: Admins can directly reply to donors via donation notification emails.
+* NEW: Four new Elementor widgets: Campaign, Donor Form, Donor Button, Campaign List.
+* NEW: Ability to round donations in the campaign builder's progress bar.
+* FIX: Resolved issue when tabs in visual campaigns not appearing in certain scenarios.
+* FIX: Resolved issue with loading of frontend scripts in certain scenarios.
+* FIX: Resolved Facebook sharing w/ sharing button on campaigns.
+* FIX: Updated code related to translations, CSS, UI, and PHP standards.
 
 = Donation Form & Fundraising Campaigns v1.8.5.3 =
 * NEW: Added dialog box upon entering license that activates Pro if already installed.

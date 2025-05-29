@@ -544,7 +544,18 @@ if ( ! function_exists( 'charitable_template_responsive_styles' ) ) :
 	 * @return void
 	 */
 	function charitable_template_responsive_styles( $campaigns, $args ) {
-		if ( ! isset( $args['responsive'] ) || ! $args['responsive'] ) {
+		if ( ! isset( $args['responsive'] ) || ! $args['responsive'] || is_admin() ) {
+			return;
+		}
+
+		// Check if we're in Elementor editor or preview mode
+		$is_elementor = false;
+		if ( class_exists( '\Elementor\Plugin' ) ) {
+			$is_elementor = \Elementor\Plugin::$instance->editor->is_edit_mode() || \Elementor\Plugin::$instance->preview->is_preview_mode();
+		}
+
+		// If we're in Elementor, don't output inline styles
+		if ( $is_elementor ) {
 			return;
 		}
 

@@ -22,7 +22,7 @@
   .charitable-modal .charitable-fieldset {
     padding: 0 0 1em;
     border-width: 0 0 1px 0; }
-    .charitable-modal .charitable-fieldset:last-of-type {
+    .charitable-modal .charitable-fieldset:not(#charitable-gateway-fields):last-of-type {
       border: none; }
 
 /*# sourceMappingURL=modal.css.map */

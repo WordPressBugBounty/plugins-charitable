@@ -8,6 +8,7 @@
  * @package Charitable/Templates/Donation Form
  * @since   1.5.0
  * @version 1.6.49
+ * @version 1.8.6 - Added filter to allow customizing the suggested donation amount text.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -74,7 +75,7 @@ if ( count( $suggested ) ) :
 					<?php
 						printf(
 							'<span class="amount">%s</span> <span class="description">%s</span>',
-							charitable_format_money( $suggestion['amount'], false, true ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+							apply_filters( 'charitable_donation_amount_form_suggested_amount_text', charitable_format_money( $suggestion['amount'], false, true ), $suggestion ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 							isset( $suggestion['description'] ) ? wp_kses_post( $suggestion['description'] ) : ''
 						);
 					?>
@@ -87,6 +88,7 @@ if ( count( $suggested ) ) :
 	<ul class="donation-amounts donation-suggested-amount">
 		<?php
 		if ( $custom ) :
+			$amount = apply_filters( 'charitable_donation_amount_form_custom_amount', $amount );
 			$has_custom_donation_amount = $active_period && ( ! $amount_is_suggestion && $amount );
 			?>
 			<li class="donation-amount custom-donation-amount">
@@ -110,7 +112,8 @@ if ( count( $suggested ) ) :
 			</li>
 		<?php endif ?>
 	</ul><!-- .donation-amounts -->
-<?php elseif ( $custom ) : ?>
+<?php elseif ( $custom ) :
+	$amount = apply_filters( 'charitable_donation_amount_form_custom_amount', $amount ); ?>
 	<div id="custom-donation-amount-field" class="charitable-form-field charitable-custom-donation-field-alone">
 		<input
 			type="text"

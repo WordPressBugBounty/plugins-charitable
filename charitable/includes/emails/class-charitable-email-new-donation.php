@@ -249,6 +249,32 @@ if ( ! class_exists( 'Charitable_Email_New_Donation' ) ) :
 			 */
 			return apply_filters( 'charitable_email_new_donation_default_body', ob_get_clean(), $this );
 		}
+
+		/**
+		 * Get from address for email.
+		 * For this particular email, we allow a reply-to address of the person who made the donation.
+		 *
+		 * @since  1.8.6
+		 *
+		 * @return string
+		 */
+		public function get_from_address( $email_id = '' ) {
+
+			$email_settings = array();
+
+			if ( 'offline_donation_notification' === $email_id ) {
+				$email_settings = charitable_get_option( 'emails_offline_donation_notification' );
+			} elseif ( 'new_donation' === $email_id ) {
+				$email_settings = charitable_get_option( 'emails_new_donation' );
+			}
+
+			if ( '' !== $email_id && isset( $email_settings['reply_to_donor'] ) && $email_settings['reply_to_donor'] ) {
+				return $this->get_donation()->get_donor()->get_email();
+			}
+
+			return charitable_get_option( 'email_from_email', get_option( 'admin_email' ) );
+		}
+
 	}
 
 endif;

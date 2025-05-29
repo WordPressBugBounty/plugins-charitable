@@ -190,7 +190,8 @@
   #charitable-admin-addons .addon-item .upgrade-button {
    text-align:center
   }
-  #charitable-admin-addons .addon-item .upgrade-button a {
+  #charitable-admin-addons .addon-item .upgrade-button a,
+  #charitable-admin-addons .addon-item .action-button-charitable-pro-plugin a {
    font-weight:600;
    width:140px;
    text-align:center;

@@ -16,6 +16,7 @@ $tab_no_form_tag = array( 'import', 'export', 'tools' );
 $group           = isset( $_GET['group'] ) ? esc_html( $_GET['group'] ) : $active_tab; // phpcs:ignore
 $sections        = charitable_get_admin_settings()->get_sections();
 $show_return     = $group !== $active_tab;
+$css             = '';
 
 if ( $show_return ) {
 	/**

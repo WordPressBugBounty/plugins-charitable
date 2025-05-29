@@ -96,6 +96,7 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 		 * @since 1.8.0
 		 * @version 1.8.1.12
 		 * @version 1.8.4.2 updated infinity display / goal.
+		 * @version 1.8.6 added round_donation option.
 		 *
 		 * @param array   $field_data     Any field data.
 		 * @param array   $campaign_data  Amount data and settings.
@@ -123,6 +124,17 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 			$campaign       = 0 === intval( $campaign_id ) ? false : charitable_get_campaign( $campaign_id );
 			$amount_donated = false !== $campaign ? $campaign->get_donated_amount_formatted() : charitable_format_money( '0' );
 			$percent        = false !== $campaign ? $campaign->get_percent_donated() : 0;
+			// Round the percent to 0 decimal places if the round_donation is checked. But if there is a percent and it's below 1, round to 1.
+			if ( isset( $field_data['round_donation'] ) && $field_data['round_donation'] ) {
+				// remove the % sign from the percent.
+				$percent = str_replace( '%', '', $percent );
+				if ( $percent < 1 ) {
+					$percent = 1;
+				} else {
+					$percent = round( $percent, 0 );
+				}
+				$percent = $percent . '%';
+			}
 
 			$label_donated     = ! empty( $field_data['label_donate'] ) ? '<span>' . esc_html( $field_data['label_donate'] ) . '</span> ' : '<span>' . esc_html__( 'Donated: ', 'charitable' ) . '</span> ';
 			$show_donated      = $label_donated . $amount_donated;
@@ -272,6 +284,19 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 						'show_goal',
 					),
 					'use_defaults'    => ( false === $settings ) ? true : false,
+				)
+			);
+
+			/* 1.8.x */
+			echo $charitable_builder_form_fields->generate_checkbox(
+				isset( $settings['round_donation'] ) ? $settings['round_donation'] : false,
+				esc_html__( 'Round Amounts', 'charitable' ),
+				array(
+					'id'            => 'field_' . esc_attr( $this->type ) . '_round_donation' . '_' . intval( $field_id ), // phpcs:ignore
+					'name'          => array( '_fields', intval( $field_id ), 'round_donation' ),
+					'checked_value' => 'show',
+					'field_id'      => $field_id,
+					'value'         => '1',
 				)
 			);
 

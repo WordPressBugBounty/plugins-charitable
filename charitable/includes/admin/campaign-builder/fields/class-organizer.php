@@ -218,7 +218,10 @@ if ( ! class_exists( 'Charitable_Field_Organizer' ) ) :
 
 			$campaign_creator_id = ! empty( $campaign_data['settings']['general']['campaign_creator_id'] ) ? intval( $campaign_data['settings']['general']['campaign_creator_id'] ) : false;
 
-			$users = get_users();
+			$users = apply_filters( 'charitable_allowed_campaign_creators', [] );
+			if ( empty( $users ) ) {
+				$users = get_users();
+			}
 			foreach ( $users as $user ) {
 				$users_to_pass[ $user->data->ID ] = array(
 					'avatar' => esc_url( get_avatar_url( $user->data->ID ) ),

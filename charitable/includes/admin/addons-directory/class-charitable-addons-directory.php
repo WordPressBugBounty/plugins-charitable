@@ -614,7 +614,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			}
 
 			if ( 'charitable-pro-plugin' === $addon['slug'] ) {
-				$button = '<a href="https://www.wpcharitable.com/charitable-pro/" target="_blank" rel="noopener noreferrer" class="charitable-btn charitable-btn-orange">Download Pro</a>';
+				$button = '<a href="https://www.wpcharitable.com/charitable-pro/" target="_blank" rel="noopener noreferrer" class="charitable-btn charitable-btn-orange">' . esc_html__( 'Download Pro', 'charitable' ) . '</a>';
 			} else {
 				$button = $this->get_addon_button_html( $addon );
 			}
@@ -672,7 +672,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					<div class="actions charitable-clear">
 					<?php
 					if ( ! empty( $addon['status'] ) && $addon['action'] !== 'upgrade' && $addon['action'] !== 'license' && $addon['plugin_allow'] ) :
-						$action_class = 'action-button';
+						$action_class = 'action-button action-button-' . $addon['slug'];
 						?>
 						<div class="status">
 							<strong>

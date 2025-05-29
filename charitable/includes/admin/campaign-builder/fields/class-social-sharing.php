@@ -487,7 +487,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Sharing' ) ) :
 						'field_id'     => 'facebook_url',
 						'public_label' => esc_html__( 'Facebook', 'charitable' ),
 						'icon_url'     => charitable()->get_path( 'directory', false ) . 'assets/images/campaign-builder/fields/social-sharing/facebook' . $suffix . '.svg',
-						'share_url'    => 'https://www.facebook.com/sharer/sharer.php?u=#{$url}',
+						'share_url'    => 'https://www.facebook.com/sharer/sharer.php?u={$url}',
 					),
 					'linkedin'  => array(
 						'label'        => esc_html__( 'LinkedIn', 'charitable' ),

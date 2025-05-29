@@ -399,6 +399,18 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 				),
 			);
 
+			// We need to add 'reply_to_donor' to the email settings if it's not already there but only for the new donation email.
+			if ( 'new_donation' === $this->get_email_id() || 'offline_donation_notification' === $this->get_email_id() ) {
+				$email_settings['reply_to_donor'] = array(
+					'type'     => 'checkbox',
+					'title'    => __( 'Reply To Donor', 'charitable-pro' ),
+					'help'     => __( 'If active the recipient will be able to thank the donor by replying to the email.', 'charitable-pro' ),
+					'priority' => 8,
+					'class'    => 'wide',
+					'default'  => 1,
+				);
+			}
+
 			/* Add the recipients field if applicable to this email. */
 			$email_settings = $this->add_recipients_field( $email_settings );
 

@@ -15,12 +15,48 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( is_admin() ) {
-	return;
+// Data related to the template (and therefore the defining layout) to be used.
+
+$campaign = $view_args['campaign']; // Charitable_Campaign Instance of `Charitable_Campaign`.
+
+if ( ! empty( $_GET['charitable_campaign_preview'] ) ) { //phpcs:ignore
+	// get the transient that is storing the temp settings information, as this is what we will use to display the preview.
+	$campaign_data = get_transient( 'charitable_campaign_preview_' . intval( $_GET['charitable_campaign_preview'] ) ); //phpcs:ignore
+} else {
+	$campaign_data = empty( $view_args['campaign_data'] ) && ! empty( $view_args['id'] ) ? get_post_meta( intval( $view_args['id'] ), 'campaign_settings_v2', true ) : $view_args['campaign_data'];
 }
 
-// Data related to the template (and therefore the defining layout) to be used.
-$template_data = $view_args['template'];
+$template_data   = $view_args['template'];
+$template_id     = isset( $campaign_data['template_id'] ) && ! empty( $campaign_data['template_id'] ) ? sanitize_key( $campaign_data['template_id'] ) : charitable_campaign_builder_default_template();
+$template_layout = $template_data['layout'];
+
+if ( is_admin() ) {
+
+    // Check if Elementor is installed and activated.
+    if (! did_action('elementor/loaded')) {
+        return;
+    }
+
+	// load the Campaign Builder Preview class.
+	require_once charitable()->get_path( 'includes', true ) . 'admin/campaign-builder/class-campaign-builder-preview.php';
+
+	$assets_dir    = charitable()->get_path( 'assets', false );
+	$min           = charitable_get_min_suffix();
+
+	if ( charitable_is_debug( 'elementor' ) ) {
+		echo 'Charitable Elementor template id is ' . $template_id;
+	}
+
+	// Directly link and load the CSS files.
+	$version       = charitable_is_break_cache() ? charitable()->get_version() . '.' . time() : charitable()->get_version();
+	$css_theme_file = $assets_dir . 'css/campaign-builder/themes/frontend/' . $template_id . '.php';
+
+	echo '<link rel="stylesheet" id="charitable-campaign-theme-' . esc_attr( $template_id ) . '-css" href="' . esc_url( $css_theme_file ) . '" media="all" />';
+	echo '<link rel="stylesheet" id="charitable-campaign-theme-base-css" href="' . esc_url( $assets_dir . 'css/campaign-builder/themes/frontend/base' . $min . '.css' ) . '" media="all" />';
+
+	// Add inline CSS to prevent clicks on '.charitable-campaign-wrapper'.
+	echo '<style type="text/css">.charitable-campaign-wrapper { pointer-events: none; }</style>';
+}
 
 /* preview page check */
 $content_preview = new Campaign_Builder_Preview();
@@ -32,42 +68,38 @@ $enabled_tabs = isset( $campaign_data['layout']['advanced']['enable_tabs'] ) && 
 
 /* The Setup */
 
-	/* Campaign Related */
+/* Campaign Related */
 
-	$campaign = $view_args['campaign']; // Charitable_Campaign Instance of `Charitable_Campaign`.
-
+$campaign = $view_args['campaign']; // Charitable_Campaign Instance of `Charitable_Campaign`.
 
 if ( ! empty( $_GET['charitable_campaign_preview'] ) ) { //phpcs:ignore
 	// get the transient that is storing the temp settings information, as this is what we will use to display the preview.
 	$campaign_data = get_transient( 'charitable_campaign_preview_' . intval( $_GET['charitable_campaign_preview'] ) ); //phpcs:ignore
-
 } else {
 	$campaign_data = empty( $view_args['campaign_data'] ) && ! empty( $view_args['id'] ) ? get_post_meta( intval( $view_args['id'] ), 'campaign_settings_v2', true ) : $view_args['campaign_data'];
 }
 
-	/* Template Related */
+/* Template Related */
 
-	$template_id     = isset( $campaign_data['template_id'] ) && ! empty( $campaign_data['template_id'] ) ? sanitize_key( $campaign_data['template_id'] ) : charitable_campaign_builder_default_template();
-	$template_layout = $template_data['layout'];
+$template_parent_id = ! empty( $template_data['meta']['parent_theme'] ) ? esc_attr( $template_data['meta']['parent_theme'] ) : false;
+$template_wrap_css  = false !== $template_parent_id ? 'template-' . $template_parent_id : '';
+$template_wrap_css .= false !== $template_id ? ' template-' . $template_id : '';
+$template_wrap_css .= ! empty( $view_args['campaign_data']['settings']['general']['form_css_class'] ) ? ' ' . esc_attr( $view_args['campaign_data']['settings']['general']['form_css_class'] ) : false;
+$template_wrap_css .= 'draft' === get_post_status( $campaign_data['id'] ) ? ' is-charitable-preview' : false; // this to give a css class only when the campaign is previewed.
 
-	$template_parent_id = ! empty( $template_data['meta']['parent_theme'] ) ? esc_attr( $template_data['meta']['parent_theme'] ) : false;
-	$template_wrap_css  = false !== $template_parent_id ? 'template-' . $template_parent_id : '';
-	$template_wrap_css .= false !== $template_id ? ' template-' . $template_id : '';
-	$template_wrap_css .= ! empty( $view_args['campaign_data']['settings']['general']['form_css_class'] ) ? ' ' . esc_attr( $view_args['campaign_data']['settings']['general']['form_css_class'] ) : false;
-	$template_wrap_css .= 'draft' === get_post_status( $campaign_data['id'] ) ? ' is-charitable-preview' : false; // this to give a css class only when the campaign is previewed.
+/* Layout Related */
 
-	/* Layout Related */
+$row_counter = 0;
 
-	$row_counter = 0;
+$rows = (array) isset( $campaign_data['layout'] ) && ! empty( $campaign_data['layout']['rows'] ) ? $campaign_data['layout']['rows'] : array();
 
-	$rows = (array) isset( $campaign_data['layout'] ) && ! empty( $campaign_data['layout']['rows'] ) ? $campaign_data['layout']['rows'] : array();
+/* css: wrap and containers */
 
-	/* css: wrap and containers */
-
-	$css_classes                   = array();
-	$css_classes['container-wrap'] = 'charitable-campaign-wrap ' . trim( $template_wrap_css );
-	$css_classes                   = apply_filters( 'charitable_builder_campaign_content_css_classes', $css_classes, $template_data, $campaign_data );
-	$css_classes_output            = implode( ' ', $css_classes );
+$css_classes                    = array();
+$css_classes['container-wrap']  = 'charitable-campaign-wrap ' . trim( $template_wrap_css );
+$css_classes['container-wrap'] .= ! empty( $view_args['id'] ) ? ' charitable-campaign-wrap-id-' . intval( $view_args['id'] ) : '';
+$css_classes                    = apply_filters( 'charitable_builder_campaign_content_css_classes', $css_classes, $template_data, $campaign_data );
+$css_classes_output             = implode( ' ', $css_classes );
 
 // Get the post status - if this is a draft, we will display a notice to the admin or author, and not show this to the public.
 $post_status = get_post_status( $campaign_data['id'] );

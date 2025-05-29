@@ -93,6 +93,13 @@ if ( ! class_exists( 'Charitable_Campaign_Shortcode' ) ) :
 
 			$template->render();
 
+			$html = ob_get_clean();
+
+			// If the $args['elementor'] is true, then replace the campaign-loop with the elementor campaign-loop
+			if ( isset( $args['elementor'] ) && $args['elementor'] ) {
+				$html = str_replace( 'campaign-loop', 'elementor-campaign-loop', $html );
+			}
+
 			/**
 			 * Customize the output of the shortcode.
 			 *
@@ -102,7 +109,7 @@ if ( ! class_exists( 'Charitable_Campaign_Shortcode' ) ) :
 			 * @param  array  $args    All the parsed arguments.
 			 * @return string
 			 */
-			return apply_filters( 'charitable_campaign_shortcode', ob_get_clean(), $args );
+			return apply_filters( 'charitable_campaign_shortcode', $html, $args );
 		}
 
 		/**

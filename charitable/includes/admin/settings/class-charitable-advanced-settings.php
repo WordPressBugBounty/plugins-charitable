@@ -175,6 +175,7 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 		 * @version 1.8.1.12 Added expiringlicense and expiredlicense.
 		 * @version 1.8.3 Added charitable_notifications.
 		 * @version 1.8.3.1 Added charitable_cache_cleared.
+		 * @version 1.8.6 Added charitable_splash_version.
 		 *
 		 * @param   mixed[] $values The parsed values combining old values & new values.
 		 * @param   mixed[] $new_values The newly submitted values.
@@ -199,6 +200,7 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 			delete_option( 'charitable_notifications' ); // v1.8.3.
 			delete_option( 'charitable_usage_tracking_last_checkin' ); // v1.8.4.
 			delete_option( 'charitable_tracking_last_checkin' ); // v1.8.4.
+			delete_option( 'charitable_splash_version' ); // v1.8.6.
 
 			// Delete transients (related to notices).
 			$notice_slugs = array( 'campaign-builder', 'dashboard-reporting', 'five-star-review', 'expiringlicense', 'expiredlicense' );

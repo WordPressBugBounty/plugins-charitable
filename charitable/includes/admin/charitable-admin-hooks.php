@@ -260,3 +260,12 @@ add_action( 'admin_init', array( Charitable_Licenses_Settings::get_instance(), '
 add_action( 'after_charitable_admin_enqueue_scripts', array( Charitable_Admin_Connect::get_instance(), 'settings_enqueues' ), 10, 3 );
 add_action( 'wp_ajax_charitable_connect_url', array( Charitable_Admin_Connect::get_instance(), 'generate_url' ) );
 add_action( 'wp_ajax_nopriv_charitable_connect_process', array( Charitable_Admin_Connect::get_instance(), 'process' ) );
+
+/**
+ * Initialize splash data.
+ *
+ * @see Charitable_Admin_Splash::initialize_splash_data()
+ */
+add_action( 'admin_init', [ Charitable_Admin_Splash::get_instance(), 'initialize_splash_data' ], 15 );
+add_action( 'admin_enqueue_scripts', [ Charitable_Admin_Splash::get_instance(), 'admin_enqueue_scripts' ] );
+add_action( 'admin_footer', [ Charitable_Admin_Splash::get_instance(), 'admin_footer' ] );

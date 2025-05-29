@@ -1,3 +1,12 @@
+# 1.8.6
+* NEW: Admins can directly reply to donors via donation notification emails.
+* NEW: Four new Elementor widgets: Campaign, Donor Form, Donor Button, Campaign List.
+* NEW: Ability to round donations in the campaign builder's progress bar.
+* FIX: Resolved issue when tabs in visual campaigns not appearing in certain scenarios.
+* FIX: Resolved issue with loading of frontend scripts in certain scenarios.
+* FIX: Resolved Facebook sharing w/ sharing button on campaigns.
+* FIX: Updated code related to translations, CSS, UI, and PHP standards.
+
 # 1.8.5.3
 * NEW: Added dialog box upon entering license that activates Pro if already installed.
 * FIX: Improve santization of donor widget and video alt text in campaign builder.

@@ -278,63 +278,63 @@ if ( ! class_exists( 'Charitable_Public' ) ) :
 				$keys     = $gateway->get_keys();
 				$settings = get_option( 'charitable_settings' );
 
-				// If there is no public key, do not load the scripts. Added in 1.8.2.
-				if ( ! isset( $keys['public_key'] ) || empty( $keys['public_key'] ) ) {
-					return;
-				}
+				// If there is no public key, skip loading Stripe scripts but continue
+				if ( isset( $keys['public_key'] ) && ! empty( $keys['public_key'] ) ) {
 
-				$cc_fields_format = ( ! empty( $settings['gateways_stripe']['cc_fields_format'] ) && '' !== $settings['gateways_stripe']['cc_fields_format'] ) ? $settings['gateways_stripe']['cc_fields_format'] : '';
+					$cc_fields_format = ( ! empty( $settings['gateways_stripe']['cc_fields_format'] ) && '' !== $settings['gateways_stripe']['cc_fields_format'] ) ? $settings['gateways_stripe']['cc_fields_format'] : '';
 
-				$stripe_vars = array(
-					'key'              => $keys['public_key'],
-					'currency'         => charitable_get_currency(),
-					'site_name'        => get_option( 'blogname' ),
-					'zero_decimal'     => Charitable_Gateway_Stripe_AM::is_zero_decimal_currency(),
-					'cc_fields_format' => esc_attr( $cc_fields_format ),
-				);
+					$stripe_vars = array(
+						'key'              => $keys['public_key'],
+						'currency'         => charitable_get_currency(),
+						'site_name'        => get_option( 'blogname' ),
+						'zero_decimal'     => Charitable_Gateway_Stripe_AM::is_zero_decimal_currency(),
+						'cc_fields_format' => esc_attr( $cc_fields_format ),
+					);
 
-				/* Register Stripe JS script. */
-				wp_register_script(
-					'stripe-v3',
-					'https://js.stripe.com/v3/',
-					array(),
-					$version,
-					true
-				);
+					/* Register Stripe JS script. */
+					wp_register_script(
+						'stripe-v3',
+						'https://js.stripe.com/v3/',
+						array(),
+						$version,
+						true
+					);
 
-				$dependencies = array( 'charitable-script', 'stripe-v3', 'jquery' );
+					$dependencies = array( 'charitable-script', 'stripe-v3', 'jquery' );
 
-				if ( charitable_get_option( array( 'gateways_stripe', 'enable_stripe_checkout' ) ) ) {
-					$stripe_vars['mode'] = 'checkout';
-				} else {
-					$stripe_vars['mode'] = 'payment-intents';
-				}
-
-				wp_register_script(
-					'charitable-stripe',
-					$assets_dir . 'js/stripe/charitable-stripe' . $min . '.js',
-					$dependencies,
-					$version,
-					true
-				);
-
-				wp_localize_script(
-					'charitable-stripe',
-					'CHARITABLE_STRIPE_VARS',
-					$stripe_vars
-				);
-
-				if ( 'payment-intents' == $stripe_vars['mode'] ) {
-					/**
-					 * Prevent the Stripe script from loading site-wide.
-					 *
-					 * @since 1.4.3
-					 *
-					 * @param boolean $load Whether to load the scripts sitewide. Defaults to true.
-					 */
-					if ( apply_filters( 'charitable_stripe_load_stripe_scripts_sitewide', true ) ) {
-						wp_enqueue_script( 'stripe-v3' );
+					if ( charitable_get_option( array( 'gateways_stripe', 'enable_stripe_checkout' ) ) ) {
+						$stripe_vars['mode'] = 'checkout';
+					} else {
+						$stripe_vars['mode'] = 'payment-intents';
 					}
+
+					wp_register_script(
+						'charitable-stripe',
+						$assets_dir . 'js/stripe/charitable-stripe' . $min . '.js',
+						$dependencies,
+						$version,
+						true
+					);
+
+					wp_localize_script(
+						'charitable-stripe',
+						'CHARITABLE_STRIPE_VARS',
+						$stripe_vars
+					);
+
+					if ( 'payment-intents' == $stripe_vars['mode'] ) {
+						/**
+						 * Prevent the Stripe script from loading site-wide.
+						 *
+						 * @since 1.4.3
+						 *
+						 * @param boolean $load Whether to load the scripts sitewide. Defaults to true.
+						 */
+						if ( apply_filters( 'charitable_stripe_load_stripe_scripts_sitewide', true ) ) {
+							wp_enqueue_script( 'stripe-v3' );
+						}
+					}
+
 				}
 
 			endif;

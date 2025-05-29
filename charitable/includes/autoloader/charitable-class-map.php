@@ -211,6 +211,8 @@ $array_to_return = array(
 	'Charitable_Setup'                               => 'admin/onboarding/class-charitable-setup.php', // v1.8.4.
 	'Charitable_Tracking'                            => 'admin/tracking/class-charitable-tracking.php', // v1.8.4.
 	'Charitable_Admin_Connect'                       => 'admin/class-charitable-admin-connect.php', // v1.8.5.
+	'Charitable_Elementor'                           => 'elementor/class-charitable-elementor.php', // v1.8.6.
+	'Charitable_Admin_Splash'                        => 'admin/splash/class-charitable-admin-splash.php', // v1.8.6.
 );
 
 return $array_to_return;

@@ -205,6 +205,11 @@ function charitable_get_users_as_campaign_creators( $by = 'permissions', $additi
 		return $allowed_users;
 	}
 
+	$allowed_users = apply_filters( 'charitable_allowed_campaign_creators', [] );
+	if ( ! empty( $allowed_users ) ) {
+		return $allowed_users;
+	}
+
 	if ( 'roles' === $by ) {
 
 		$allowed_users = get_users( [ 'role__in' => [ 'administrator', 'campaign_manager' ] ] );

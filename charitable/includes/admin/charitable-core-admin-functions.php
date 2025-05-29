@@ -450,6 +450,10 @@ add_filter( 'admin_footer_text', 'charitable_add_footer_text' );
 function charitable_is_admin_screen() {
 	$screen = \get_current_screen();
 
+	if ( ! $screen ) {
+		return false;
+	}
+
 	if (
 		'charitable' === $screen->post_type ||
 		'campaign' === $screen->post_type ||
