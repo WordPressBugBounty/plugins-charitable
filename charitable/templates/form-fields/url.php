@@ -33,14 +33,14 @@ if ( ! wp_script_is( 'charitable-url-sanitizer', 'enqueued' ) ) {
 }
 
 ?>
-<div id="charitable_field_<?php echo $field['key'] ?>" class="<?php echo $classes ?>">
+<div id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>" class="<?php echo esc_attr( $classes ); ?>">
 	<?php if ( isset( $field['label'] ) ) : ?>
-		<label for="charitable_field_<?php echo $field['key'] ?>_element">
-			<?php echo $field['label'] ?>
+		<label for="charitable_field_<?php echo esc_attr( $field['key'] ); ?>_element">
+			<?php echo wp_kses_post( $field['label'] ); ?>
 			<?php if ( $is_required ) : ?>
-				<abbr class="required" title="required">*</abbr>
+				<abbr class="required" title="<?php esc_html_e( 'Required', 'charitable' ); ?>">*</abbr>
 			<?php endif ?>
 		</label>
 	<?php endif ?>
-	<input type="url" name="<?php echo $field['key'] ?>" id="charitable_field_<?php echo $field['key'] ?>_element" value="<?php echo esc_attr( stripslashes( $value ) ) ?>" <?php echo charitable_get_arbitrary_attributes( $field ) ?>/>
+	<input type="url" name="<?php echo esc_attr( $field['key'] ); ?>" id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>_element" value="<?php echo esc_attr( stripslashes( $value ) ); ?>" <?php echo charitable_get_arbitrary_attributes( $field ); // phpcs:ignore ?>/>
 </div>

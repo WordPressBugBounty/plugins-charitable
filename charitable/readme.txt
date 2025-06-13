@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.8.1
 Requires PHP: 7.2
-Stable tag: 1.8.6
+Stable tag: 1.8.6.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -255,6 +255,12 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.6.1 =
+* FIX: Resolve security issue with public checkbox template.
+* FIX: Resolve fatal error involving Elementor constants.
+* FIX: Resolve issue involving some non-english translations and the campaign builder payment page.
+* FIX: Resolved a CSS rendering issue with Youth Sports campaign template.
 
 = Donation Form & Fundraising Campaigns v1.8.6 =
 * NEW: Admins can directly reply to donors via donation notification emails.

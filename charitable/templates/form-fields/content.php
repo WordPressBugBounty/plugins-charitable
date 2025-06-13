@@ -14,4 +14,4 @@ if ( ! array_key_exists( 'content', $view_args['field'] ) ) {
 	return;
 }
 
-echo $view_args['field']['content'];
+echo $view_args['field']['content']; // phpcs:ignore

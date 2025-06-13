@@ -5,6 +5,7 @@
  * @author  WP Charitable LLC
  * @since   1.0.0
  * @version 1.5.0
+ * @package Charitable/Templates/Form Fields
  */
 
 if ( ! array_key_exists( 'errors', $view_args ) || empty( $view_args['errors'] ) ) {
@@ -14,8 +15,8 @@ if ( ! array_key_exists( 'errors', $view_args ) || empty( $view_args['errors'] )
 ?>
 <div class="charitable-form-errors charitable-notice">
 	<ul class="errors">
-		<?php foreach ( $view_args['errors'] as $error ) : ?>
-			<li><?php echo $error ?></li>
+		<?php foreach ( $view_args['errors'] as $error ) : // phpcs:ignore ?>
+			<li><?php echo $error; // phpcs:ignore ?></li>
 		<?php endforeach ?>
 	</ul>
 </div>

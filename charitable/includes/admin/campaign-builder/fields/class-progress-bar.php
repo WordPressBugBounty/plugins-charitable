@@ -287,7 +287,7 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 				)
 			);
 
-			/* 1.8.x */
+			/* 1.8.6.1 */
 			echo $charitable_builder_form_fields->generate_checkbox(
 				isset( $settings['round_donation'] ) ? $settings['round_donation'] : false,
 				esc_html__( 'Round Amounts', 'charitable' ),

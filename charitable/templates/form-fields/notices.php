@@ -18,15 +18,15 @@ if ( empty( $notices ) ) {
 	return;
 }
 
-foreach ( $notices as $type => $messages ) :
-	if ( 'error' == $type ) :
-		$type = 'errors';
+foreach ( $notices as $type => $messages ) : // phpcs:ignore
+	if ( 'error' == $type ) : // phpcs:ignore
+		$type = 'errors'; // phpcs:ignore
 	endif;
 	?>
 	<div class="charitable-notice charitable-form-<?php echo esc_attr( $type ); ?>">
 		<ul class="charitable-notice-<?php echo esc_attr( $type ); ?> <?php echo esc_attr( $type ); ?>">
 			<?php foreach ( $messages as $message ) : ?>
-				<li><?php echo $message; ?></li>
+				<li><?php echo $message; // phpcs:ignore ?></li>
 			<?php endforeach ?>
 		</ul><!-- charitable-notice-<?php esc_attr( $type ); ?> -->
 	</div><!-- .charitable-notices -->

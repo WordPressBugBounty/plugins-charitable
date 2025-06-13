@@ -1,3 +1,9 @@
+# 1.8.6.1
+* FIX: Resolve security issue with public checkbox template.
+* FIX: Resolve fatal error involving Elementor constants.
+* FIX: Resolve issue involving some non-english translations and the campaign builder payment page.
+* FIX: Resolved a CSS rendering issue with Youth Sports campaign template.
+
 # 1.8.6
 * NEW: Admins can directly reply to donors via donation notification emails.
 * NEW: Four new Elementor widgets: Campaign, Donor Form, Donor Button, Campaign List.

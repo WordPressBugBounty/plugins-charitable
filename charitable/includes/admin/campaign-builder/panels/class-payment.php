@@ -275,7 +275,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 					<li>
 							<?php
 							// translators: %s is the name of the addon.
-							printf( esc_html__( 'With the %s addon, a tax incentive for UK charities, you can boost your donations by 25 percent.', 'charitable' ), '<strong>Gift Aid</strong>' );
+							echo esc_html__( 'With the <strong>Gift Aid</strong> addon, a tax incentive for UK charities, you can boost your donations by 25 percent.', 'charitable' );
 
 							?>
 					</li>
@@ -306,7 +306,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 					<li>
 					<?php
 					// translators: %s is the name of the addon.
-					printf( esc_html__( 'With the %s addon, a tax incentive for UK charities, you can boost your donations by 25 percent.', 'charitable' ), '<strong>Gift Aid</strong>' );
+					echo esc_html__( 'With the <strong>Gift Aid</strong> addon, a tax incentive for UK charities, you can boost your donations by 25 percent.', 'charitable' );
 
 					?>
 					</li>

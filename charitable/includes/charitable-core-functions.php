@@ -316,8 +316,8 @@ function charitable_is_break_cache() {
 /**
  * Returns if charitable is in debug mode, mostly by checking the constant.
  *
- * @since  1.8.0
- * @since  1.8.3 Added 'vendor' mode.
+ * @since   1.8.0
+ * @version 1.8.6.1 Revisited to allow for more granular debug modes.
  *
  * @param string $mode Optional. 'vendor' to check for vendor debug mode.
  *
@@ -325,8 +325,11 @@ function charitable_is_break_cache() {
  */
 function charitable_is_debug( $mode = '' ) {
 
-	if ( 'vendor' === $mode ) {
-		return ( defined( 'CHARITABLE_DEBUG_VENDOR' ) && CHARITABLE_DEBUG_VENDOR ) ? true : false;
+	if ( ! empty( $mode ) ) {
+		$constant = 'CHARITABLE_DEBUG_' . strtoupper( $mode );
+		if ( defined( $constant ) ) {
+			return constant( $constant ) ? true : false;
+		}
 	}
 
 	return ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) ? true : false;

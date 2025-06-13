@@ -6,6 +6,7 @@
  * @package Charitable/Templates/Form Fields
  * @since   1.0.0
  * @version 1.6.40
+ * @version 1.8.6.1 Added description output.
  */
 
 if ( ! isset( $view_args['form'] ) || ! isset( $view_args['field'] ) ) {
@@ -58,9 +59,9 @@ wp_enqueue_style( 'charitable-datepicker' );
 <div id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>" class="<?php echo esc_attr( $classes ); ?>">
 	<?php if ( isset( $field['label'] ) ) : ?>
 		<label for="charitable_field_<?php echo esc_attr( $field['key'] ); ?>_element">
-			<?php echo $field['label']; ?>
+			<?php echo wp_kses_post( $field['label'] ); ?>
 			<?php if ( $is_required ) : ?>
-				<abbr class="required" title="required">*</abbr>
+				<abbr class="required" title="<?php esc_html_e( 'Required', 'charitable' ); ?>">*</abbr>
 			<?php endif ?>
 		</label>
 	<?php endif ?>
@@ -70,6 +71,14 @@ wp_enqueue_style( 'charitable-datepicker' );
 		name="<?php echo esc_attr( $field['key'] ); ?>"
 		value="<?php echo esc_attr( $value ); ?>"
 		id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>_element"
-		<?php echo charitable_get_arbitrary_attributes( $field ); ?>
+		<?php echo charitable_get_arbitrary_attributes( $field ); // phpcs:ignore ?>
 	/>
+	<?php
+
+	// If there is a description, add it after the input.
+	if ( isset( $field['description'] ) && ! empty( $field['description'] ) ) {
+		echo '<p class="charitable-field-description">' . wp_kses_post( $field['description'] ) . '</p>';
+	}
+
+	?>
 </div>

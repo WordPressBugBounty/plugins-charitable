@@ -57,11 +57,11 @@ if ( ! function_exists( 'charitable_get_constracting_text_color' ) ) {
 	 *
 	 * @since  1.5.0
 	 *
-	 * @param  string $hexColor The background color.
+	 * @param  string $hex_color The background color.
 	 * @return string
 	 */
-	function charitable_get_constracting_text_color( $hexColor ) {
-		$rgb        = charitable_hex_to_rgb( $hexColor );
+	function charitable_get_constracting_text_color( $hex_color ) {
+		$rgb        = charitable_hex_to_rgb( $hex_color );
 		$brightness = charitable_get_brightness( $rgb );
 
 		// If brightness is below 175, use white text, otherwise use black.

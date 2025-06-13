@@ -177,7 +177,7 @@ require_once '../../../../../includes/admin/campaign-builder/templates/functions
 <?php echo $wrapper; // phpcs:ignore ?> a.charitable-button {
 	background-color: <?php echo $button; // phpcs:ignore ?> !important;
 	border-color: <?php echo $button; // phpcs:ignore ?> !important;
-	color: <?php echo esc_attr( charitable_get_constracting_text_color( $button ) ); ?>;
+	color: <?php echo ( charitable_get_constracting_text_color( $button ) ); ?>;
 	text-transform: none;
 	border-radius: 0px;
 	text-transform: uppercase;

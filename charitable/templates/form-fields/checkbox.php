@@ -8,6 +8,7 @@
  * @package Charitable/Templates/Form Fields
  * @since   1.0.0
  * @version 1.2.0
+ * @version 1.8.6.1 Added description.
  */
 
 if ( ! isset( $view_args['form'] ) || ! isset( $view_args['field'] ) ) {
@@ -26,24 +27,32 @@ if ( isset( $field['checked'] ) ) {
 	$checked = isset( $field['default'] ) ? $field['default'] : 0;
 }
 ?>
-<div id="charitable_field_<?php echo $field['key']; ?>" class="<?php echo $classes; ?>">
+<div id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>" class="<?php echo esc_attr( $classes ); ?>">
 	<input
 		type="checkbox"
-		name="<?php echo $field['key']; ?>"
-		value="<?php echo $value; ?>"
-		id="charitable_field_<?php echo $field['key']; ?>_element"
+		name="<?php echo esc_attr( $field['key'] ); ?>"
+		value="<?php echo esc_attr( $value ); ?>"
+		id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>_element"
 		<?php checked( $checked ); ?>
 		<?php echo charitable_get_arbitrary_attributes( $field ); ?>
 	/>
 	<?php if ( isset( $field['label'] ) ) : ?>
-		<label for="charitable_field_<?php echo $field['key']; ?>_element">
-			<?php echo $field['label']; ?>
+		<label for="charitable_field_<?php echo esc_attr( $field['key'] ); ?>_element">
+		<?php echo wp_kses_post( $field['label'] ); ?>
 			<?php if ( $is_required ) : ?>
-				<abbr class="required" title="required">*</abbr>
+				<abbr class="required" title="<?php esc_html_e( 'Required', 'charitable' ); ?>">*</abbr>
 			<?php endif ?>
 		</label>
 	<?php endif ?>
 	<?php if ( isset( $field['help'] ) ) : ?>
 		<p class="charitable-field-help"><?php echo $field['help']; ?></p>
 	<?php endif ?>
+	<?php
+
+	// If there is a description, add it after the input.
+	if ( isset( $field['description'] ) && ! empty( $field['description'] ) ) {
+		echo '<p class="charitable-field-description">' . wp_kses_post( $field['description'] ) . '</p>';
+	}
+
+	?>
 </div>

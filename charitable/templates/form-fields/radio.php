@@ -8,6 +8,8 @@
  * @package Charitable/Templates/Form Fields
  * @since   1.0.0
  * @version 1.0.0
+ * @version 1.8.6.1 Added description output.
+ * @version 1.8.6.1 Added SVG support to label.
  */
 
 // Exit if accessed directly.
@@ -31,13 +33,13 @@ if ( empty( $options ) ) {
 }
 
 ?>
-<div id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>" class="<?php echo $classes; ?>">
+<div id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>" class="<?php echo esc_attr( $classes ); ?>">
 	<fieldset class="charitable-fieldset-field-wrapper">
 		<?php if ( isset( $field['label'] ) ) : ?>
 			<div class="charitable-fieldset-field-header" id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>_label">
-				<?php echo $field['label']; ?>
+				<?php echo wp_kses_post( $field['label'] ); ?>
 				<?php if ( $is_required ) : ?>
-					<abbr class="required" title="required">*</abbr>
+					<abbr class="required" title="<?php esc_html_e( 'Required', 'charitable' ); ?>">*</abbr>
 				<?php endif ?>
 			</div>
 		<?php endif ?>
@@ -49,10 +51,39 @@ if ( empty( $options ) ) {
 						value="<?php echo esc_attr( $option ); ?>"
 						aria-describedby="charitable_field_<?php echo esc_attr( $field['key'] ); ?>_label"
 						<?php checked( $value, $option ); ?>
-						<?php echo charitable_get_arbitrary_attributes( $field ); ?> />
-					<label for="<?php echo esc_attr( $field['key'] . '-' . $option ); ?>"><?php echo $label; ?></label>
+						<?php echo charitable_get_arbitrary_attributes( $field ); // phpcs:ignore ?> />
+					<?php
+					$allowed_html = array_merge(
+						wp_kses_allowed_html( 'post' ),
+						array(
+							'svg' => array(
+								'class' => true,
+								'aria-hidden' => true,
+								'aria-labelledby' => true,
+								'role' => true,
+								'xmlns' => true,
+								'width' => true,
+								'height' => true,
+								'viewbox' => true
+							),
+							'path' => array(
+								'd' => true,
+								'fill' => true
+							)
+						)
+					);
+					?>
+					<label for="<?php echo esc_attr( $field['key'] . '-' . $option ); ?>"><?php echo wp_kses( $label, $allowed_html ); ?></label>
 				</li>
 			<?php endforeach ?>
 		</ul>
+		<?php
+
+		// If there is a description, add it after the input.
+		if ( isset( $field['description'] ) && ! empty( $field['description'] ) ) {
+			echo '<p class="charitable-field-description">' . wp_kses_post( $field['description'] ) . '</p>';
+		}
+
+		?>
 	</fieldset>
 </div>

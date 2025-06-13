@@ -76,9 +76,9 @@ wp_enqueue_style( 'charitable-plup-styles' );
 <div id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>" class="<?php echo esc_attr( $classes ); ?>">
 	<?php if ( isset( $field['label'] ) ) : ?>
 		<label>
-			<?php echo esc_html( $field['label'] ); ?>
+			<?php echo wp_kses_post( $field['label'] ); ?>
 			<?php if ( $is_required ) : ?>
-				<abbr class="required" title="required">*</abbr>
+				<abbr class="required" title="<?php esc_html_e( 'Required', 'charitable' ); ?>">*</abbr>
 			<?php endif ?>
 		</label>
 	<?php endif ?>

@@ -79,6 +79,8 @@ body.taxonomy-campaign_tag #adminmenu a[href^="edit-tags.php?taxonomy=campaign_t
 #adminmenu li#toplevel_page_charitable ul li.checklist {
   color: #fff;
   margin-bottom: -10px;
+  overflow: hidden;
+  margin-left: -5px;
 }
 #adminmenu li#toplevel_page_charitable ul li.checklist:after {
   border-bottom: 1px solid hsla(0,0%,100%,.2);
@@ -91,7 +93,7 @@ body.taxonomy-campaign_tag #adminmenu a[href^="edit-tags.php?taxonomy=campaign_t
 #adminmenu li#toplevel_page_charitable ul li.checklist a {
   color: #fff !important;
   font-weight: 500;
-  /* margin-top: -7px; */
+  margin-left: 5px;
 }
 #adminmenu li#toplevel_page_charitable ul li.checklist span.charitable-checklist-progress-bar-container {
 

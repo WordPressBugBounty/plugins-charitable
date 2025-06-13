@@ -5,6 +5,7 @@
  * @author  WP Charitable LLC
  * @since   1.0.0
  * @version 1.0.0
+ * @package Charitable/Templates/Form Fields
  */
 
 if ( ! isset( $view_args['form'] ) || ! isset( $view_args['field'] ) ) {
@@ -19,6 +20,6 @@ if ( ! isset( $field['content'] ) ) {
 	return;
 }
 ?>
-<p class="<?php echo $classes; ?>">
-	<?php echo $field['content']; ?>
+<p class="<?php echo esc_attr( $classes ); ?>">
+	<?php echo $field['content']; // phpcs:ignore ?>
 </p>
