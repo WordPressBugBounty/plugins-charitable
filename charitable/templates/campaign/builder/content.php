@@ -237,9 +237,7 @@ if ( 'publish' === $post_status || ( ( false === $post_status || 'draft' === $po
 										}
 
 										// If there are no fields in any tabs, don't show the tabs.
-										if ( ! empty( $fields_in_tabs ) ) {
-											echo '</div>';
-											echo '<!-- section END -->';
+										if ( empty( $fields_in_tabs ) ) {
 											continue;
 										}
 

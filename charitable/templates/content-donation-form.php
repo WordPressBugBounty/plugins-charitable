@@ -30,16 +30,26 @@ if ( ! $form ) {
 }
 
 /**
- * @hook 	charitable_donation_form_before
+ * Add something before the donation form.
+ *
+ * @hook    charitable_donation_form_before
+ *
+ * @param Charitable_Donation_Form_Interface $form The donation form object.
  */
 do_action( 'charitable_donation_form_before', $form );
 
 /**
  * Render the donation form.
+ *
+ * @param Charitable_Donation_Form_Interface $form The donation form object.
  */
 $form->render();
 
 /**
- * @hook 	charitable_donation_form_after
+ * Add something after the donation form.
+ *
+ * @hook    charitable_donation_form_after
+ *
+ * @param Charitable_Donation_Form_Interface $form The donation form object.
  */
 do_action( 'charitable_donation_form_after', $form );

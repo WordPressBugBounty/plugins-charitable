@@ -27,7 +27,7 @@ $content  = $view_args['content'];
  */
 do_action( 'charitable_campaign_content_before', $campaign );
 
-echo $content;
+echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 /**
  * Add something after the campaign content.

@@ -94,7 +94,7 @@ ob_start();
 
 						printf(
 							/* translators: Suggestion on completion of checklist on checklist page. */
-							__( 'Don\'t forget to visit the <a href="%1$s" target="_blank">%2$s</a> and <a href="%3$s" target="_blank">%4$s</a> to see your fundraising stats and grow your campaigns.', 'charitable' ),
+							__( 'Don\'t forget to visit the <a href="%1$s" target="_blank">%2$s</a> and <a href="%3$s" target="_blank">%4$s</a> to see your fundraising stats and grow your campaigns.', 'charitable' ), // phpcs:ignore
 							esc_url( admin_url( 'admin.php?page=charitable-dashboard' ) ),
 							esc_html__( 'dashboard', 'charitable' ),
 							esc_url( admin_url( 'admin.php?page=charitable-reports' ) ),
@@ -117,7 +117,7 @@ ob_start();
 						<li><span class="dashicons dashicons-yes"></span>
 						<?php
 						// translators: Suggestion on completion of checklist on checklist page.
-						printf( __( '<a href="%1$s">%2$s</a> to unlock more features, get priority support, and take your campaigns to the next level!', 'charitable' ), esc_url( charitable_admin_upgrade_link( 'welcome', 'Upgrade Now CTA Section' ) ), esc_html__( 'Upgrade to Pro', 'charitable' ) );
+						printf( __( '<a href="%1$s">%2$s</a> to unlock more features, get priority support, and take your campaigns to the next level!', 'charitable' ), esc_url( charitable_admin_upgrade_link( 'welcome', 'Upgrade Now CTA Section' ) ), esc_html__( 'Upgrade to Pro', 'charitable' ) ); // phpcs:ignore
 						?>
 						</li>
 					</ul>

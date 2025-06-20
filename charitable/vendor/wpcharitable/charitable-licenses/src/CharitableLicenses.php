@@ -759,6 +759,7 @@ class CharitableLicenses {
 	 * Deactivate a license.
 	 *
 	 * @since  1.0.0
+	 * @version 1.8.6.2 - clear transient _charitable_plugin_versions
 	 *
 	 * @return void
 	 */
@@ -822,6 +823,9 @@ class CharitableLicenses {
 
 		update_option( 'charitable_settings', $settings );
 
+		// Delete transients (related to plugin versions).
+		delete_transient( '_charitable_plugin_versions' );
+
 		wp_redirect( add_query_arg( array( 'tab' => 'advanced' ), admin_url( 'admin.php?page=charitable-settings' ) ) );
 		exit;
 	}
@@ -841,6 +845,7 @@ class CharitableLicenses {
 		}
 
 		delete_site_option( 'wpc_plugin_versions' );
+		delete_transient( '_charitable_plugin_versions' );
 
 		// Create an empty update transient object instead of null
 		$empty_transient = new \stdClass();
@@ -1249,7 +1254,8 @@ class CharitableLicenses {
 	/**
 	 * AJAX handler for license deactivation.
 	 *
-	 * @since  1.8.5
+	 * @since   1.8.5
+	 * @version 1.8.6.2 - clear transient _charitable_plugin_versions
 	 *
 	 * @return void
 	 */
@@ -1293,6 +1299,9 @@ class CharitableLicenses {
 		$settings['licenses'][ $product_key . '-v2' ] = array();
 
 		update_option( 'charitable_settings', $settings );
+
+		// Delete transients (related to plugin versions).
+		delete_transient( '_charitable_plugin_versions' );
 
 		$license_data['message'] = \Charitable_Licenses_Settings::get_instance()->get_deactivated_message();
 

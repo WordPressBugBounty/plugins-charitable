@@ -220,6 +220,9 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 			// Delete transients (related to notifications).
 			delete_transient( 'charitable_autoshow_plugin_notifications' ); // v1.8.3.
 
+			// Delete transients (related to plugin versions).
+			delete_transient( '_charitable_plugin_versions' ); // v1.8.6.2.
+
 			// Delete all transients whose names start with "charitable-report".
 			charitable_delete_transients_from_keys( charitable_search_database_for_transients_by_prefix( 'charitable-report', '-' ) );
 
@@ -366,6 +369,7 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 		 * Checks for updated license and invalidates status field if not set.
 		 *
 		 * @since   1.0.0
+		 * @version 1.8.6.2 - clear transient _charitable_plugin_versions
 		 *
 		 * @param   mixed[] $values The parsed values combining old values & new values.
 		 * @param   mixed[] $new_values The newly submitted values.
@@ -379,6 +383,9 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 
 			$re_check = array_key_exists( 'recheck', $_POST ); // phpcs:ignore
 			$licenses = $new_values['licenses'];
+
+			// Delete transients (related to plugin versions).
+			delete_transient( '_charitable_plugin_versions' );
 
 			foreach ( $licenses as $product_key => $license ) {
 				$license = trim( $license );

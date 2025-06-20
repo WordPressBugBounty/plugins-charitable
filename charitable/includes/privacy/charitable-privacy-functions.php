@@ -106,6 +106,7 @@ function charitable_get_terms_and_conditions() {
  * Returns the checkbox label for the Terms and Conditions field.
  *
  * @since  1.6.2
+ * @since  1.8.6.2 - added additional sanitization
  *
  * @return string
  */
@@ -116,8 +117,12 @@ function charitable_get_terms_and_conditions_field_label() {
 		return '';
 	}
 
-	$text    = charitable_get_option( 'terms_conditions', __( 'I have read and agree to the website [terms].', 'charitable' ) );
-	$replace = sprintf( '<a href="%s" target="_blank" class="charitable-terms-link">%s</a>',
+	$text = charitable_get_option( 'terms_conditions', __( 'I have read and agree to the website [terms].', 'charitable' ) );
+	// Sanitize and remove XSS.
+	$text = wp_kses_post( $text );
+
+	$replace = sprintf(
+		'<a href="%s" target="_blank" class="charitable-terms-link">%s</a>',
 		$url,
 		__( 'terms and conditions', 'charitable' )
 	);
@@ -129,6 +134,7 @@ function charitable_get_terms_and_conditions_field_label() {
  * Returns the Privacy Policy text.
  *
  * @since  1.6.2
+ * @since  1.8.6.2 - added additional sanitization
  *
  * @return string
  */
@@ -139,8 +145,12 @@ function charitable_get_privacy_policy_field_text() {
 		return '';
 	}
 
-	$text    = charitable_get_option( 'privacy_policy', __( 'Your personal data will be used to process your donation, support your experience throughout this website, and for other purposes described in our [privacy_policy].', 'charitable' ) );
-	$replace = sprintf( '<a href="%s" target="_blank" class="charitable-privacy-policy-link">%s</a>',
+	$text = charitable_get_option( 'privacy_policy', __( 'Your personal data will be used to process your donation, support your experience throughout this website, and for other purposes described in our [privacy_policy].', 'charitable' ) );
+	// Sanitize and remove XSS.
+	$text = wp_kses_post( $text );
+
+	$replace = sprintf(
+		'<a href="%s" target="_blank" class="charitable-privacy-policy-link">%s</a>',
 		$url,
 		__( 'privacy policy', 'charitable' )
 	);

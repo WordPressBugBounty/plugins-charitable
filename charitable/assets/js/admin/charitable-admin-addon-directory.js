@@ -294,6 +294,13 @@
 						.removeClass( 'status-active status-installed status-missing' )
 						.removeClass( 'button button-primary button-secondary disabled' )
 						.addClass( cssClass ).html( buttonText );
+
+					// Check if this is Charitable Pro activation and redirect if needed.
+					if ( 'activate' === state && plugin === 'charitable-pro/charitable.php' && $btn.attr( 'data-redirect' ) ) {
+						setTimeout( function() {
+							window.location.href = $btn.attr( 'data-redirect' );
+						}, 1500 );
+					}
 				} else {
 					if ( 'object' === typeof res.data ) {
 						if ( pluginType === 'addon' ) {

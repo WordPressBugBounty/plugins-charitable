@@ -130,6 +130,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Addons' ) ) :
 		 * Generate sidebar html.
 		 *
 		 * @since 1.8.0
+		 * @since 1.8.6.2 - Tweak recurring add-on + not available logic.
 		 */
 		public function sidebar_tab() {
 
@@ -150,7 +151,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Addons' ) ) :
 			$installed_plugins = get_plugins();
 
 			// get license stuff once.
-			$charitable_addons = get_transient( '_charitable_addons' ); // @codingStandardsIgnoreLine - testing.
+			$charitable_addons = get_transient( '_charitable_addons' );
 
 			// Get addons data from transient or perform API query if no transient.
 			if ( false === $charitable_addons ) {
@@ -170,7 +171,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Addons' ) ) :
 
 				if ( ! empty( $charitable_addons ) ) :
 					foreach ( $charitable_addons as $charitable_addon ) {
-						if ( ! empty( $charitable_addon['slug'] ) && $addon_slug === $charitable_addon['slug'] ) {
+						if ( ! empty( $charitable_addon['slug'] ) && strpos( $charitable_addon['slug'], $addon_slug ) !== false ) {
 							$charitable_addon_info = (array) $charitable_addon;
 							break;
 						}
@@ -178,7 +179,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Addons' ) ) :
 					if ( ! empty( $charitable_addon_info['license'] ) && ( in_array( 'agency', $charitable_addon_info['license'], true ) || in_array( 'elite', $charitable_addon_info['license'], true ) ) ) {
 						$license = 'pro';
 					} elseif ( ! empty( $charitable_addon_info['license'] ) ) {
-						$license = reset( $charitable_addon_info['license'] ); // $charitable_addon_info['license'][0]; // 'pro';
+						$license = reset( $charitable_addon_info['license'] );
 					}
 
 				endif;
@@ -210,12 +211,13 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Addons' ) ) :
 				// Setup an attribute for a url to download the addon, in case we need it.
 				$install_url = false;
 
-				// Determine if the addon is installed, active, or needs to be installed based on license and other factors.
-
-				if ( ! charitable_is_pro() && in_array( $addon_slug . '/' . $addon_slug . '.php', $active_plugins, true ) ) {
+				// If the addon requires an upgrade of the current (valid) plan.
+				if ( ! in_array( $license, $valid_plans, true ) ) {
+					$classes[] = 'charitable-not-available';
+					// Determine if the addon is installed, active, or needs to be installed based on license and other factors.
+				} elseif ( ! charitable_is_pro() && in_array( $addon_slug . '/' . $addon_slug . '.php', $active_plugins, true ) ) {
 					// if pro isn't active but it's in the plugin directory, that's a special case.
 					$classes[] = 'charitable-addon-installed-charitable-lite charitable-addon-' . $slug;
-
 				} elseif ( charitable_is_pro() && in_array( $addon_slug . '/' . $addon_slug . '.php', $active_plugins, true ) ) {
 					// if paid version is installed but somehow user has the addon installed, that's a special case.
 					$classes[] = 'charitable-addon-installed-charitable-pro charitable-addon-' . $slug;
@@ -239,8 +241,12 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Addons' ) ) :
 					// if pro is active AND the plugin is NOT activated, then that's another CSS class to encourage an install.
 					$classes[] = 'charitable-not-installed';
 
-					$install_url = ! empty( $charitable_addon_info['install'] ) ? esc_url( $charitable_addon_info['install'] ) : false;
+					$install_url = ! empty( $charitable_addon_info['download_link'] ) ? esc_url( $charitable_addon_info['download_link'] ) : false;
 
+					// If the install url is not a valid URL, then set it to false.
+					if ( ! filter_var( $install_url, FILTER_VALIDATE_URL ) ) {
+						$install_url = false;
+					}
 				} else {
 
 					// where do we load the class, this has to be supplied by the addon.

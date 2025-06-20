@@ -376,6 +376,9 @@ class Charitable_Admin_Connect {
 						}
 					} elseif ( ! empty( $license_data['success'] ) && 1 === intval( $license_data['success'] ) && ! empty( $license_data['license'] ) && 'valid' === $license_data['license'] && ! empty( $license_data['expires'] ) ) {
 
+							// Delete transients (related to plugin versions).
+							// delete_transient( '_charitable_plugin_versions' );
+
 							$settings = get_option( 'charitable_settings' );
 
 							$settings['licenses']['charitable-v2'] = array(

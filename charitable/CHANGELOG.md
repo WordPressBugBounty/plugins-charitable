@@ -1,3 +1,8 @@
+# 1.8.6.2
+* NEW: Add ‘allow_unfiltered’ setting for CHARITABLE_ADMIN javascript variables for use in campaign builder.
+* FIX: Improved realiablity of some license checks.
+* FIX: Updated code related to improve security and PHP standards.
+
 # 1.8.6.1
 * FIX: Resolve security issue with public checkbox template.
 * FIX: Resolve fatal error involving Elementor constants.

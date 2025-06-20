@@ -995,7 +995,8 @@ add_action( 'wp_ajax_charitable_activate_addon', 'charitable_ajax_activate_addon
 /**
  * Installs an Charitable addon.
  *
- * @since 1.0.0
+ * @since   1.0.0
+ * @version 1.8.6.2
  */
 function charitable_ajax_install_addon() {
 
@@ -1011,6 +1012,17 @@ function charitable_ajax_install_addon() {
 	if ( isset( $_POST['plugin'] ) ) {
 		$download_url = esc_url_raw( wp_unslash( $_POST['plugin'] ) );
 		global $hook_suffix;
+
+		// If the url doesn't start with 'https://www.wpcharitable.com', then return an error.
+		if ( 0 !== intval( strpos( $download_url, 'https://www.wpcharitable.com' ) ) ) {
+			wp_send_json_error(
+				array(
+					'basename'     => $download_url,
+					'is_activated' => false,
+					'msg'          => esc_html__( 'Addon not installed. Invalid download URL.', 'charitable-pro' ),
+				)
+			);
+		}
 
 		if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
 			error_log( 'charitable_ajax_install_addon' ); // phpcs:ignore

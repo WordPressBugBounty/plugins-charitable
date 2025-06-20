@@ -9,9 +9,8 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.2.0
- * @version   1.6.0
- * @version   1.8.2
- * @version   1.8.4 - added user tracking option.
+ * @version   1.8.4   - added user tracking option.
+ * @version   1.8.6.2 - added sanitization functions for privacy policy, terms and conditions, and contact consent label fields.
  */
 
 // Exit if accessed directly.
@@ -162,4 +161,30 @@ add_filter( 'admin_body_class', array( Charitable_Checklist::get_instance(), 'ad
 add_filter( 'charitable_submenu_pages', array( Charitable_Checklist::get_instance(), 'add_checklist_to_menu' ), 2 );
 add_action( 'admin_init', array( Charitable_Checklist::get_instance(), 'maybe_complete_checklist' ), 10 );
 
+/**
+ * Maybe activate the Pro plugin after onboarding.
+ *
+ * @see Charitable_Checklist::maybe_activate_pro_after_onboarding()
+ */
 add_action( 'admin_init', array( Charitable_Checklist::get_instance(), 'maybe_activate_pro_after_onboarding' ), 10 );
+
+/**
+ * Hook the sanitization function for the privacy_policy field.
+ *
+ * @see Charitable_Privacy_Settings::sanitize_privacy_policy_field()
+ */
+add_filter( 'charitable_sanitize_value_privacy_privacy_policy', array( Charitable_Privacy_Settings::get_instance(), 'sanitize_privacy_policy_field' ), 10, 3 );
+
+/**
+ * Hook the sanitization function for the terms_conditions field.
+ *
+ * @see Charitable_Privacy_Settings::sanitize_terms_conditions_field()
+ */
+add_filter( 'charitable_sanitize_value_privacy_terms_conditions', array( Charitable_Privacy_Settings::get_instance(), 'sanitize_terms_conditions_field' ), 10, 3 );
+
+/**
+ * Hook the sanitization function for the contact_consent_label field.
+ *
+ * @see Charitable_Privacy_Settings::sanitize_contact_consent_label_field()
+ */
+add_filter( 'charitable_sanitize_value_privacy_contact_consent_label', array( Charitable_Privacy_Settings::get_instance(), 'sanitize_contact_consent_label_field' ), 10, 3 );

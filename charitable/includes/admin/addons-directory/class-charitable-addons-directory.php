@@ -25,7 +25,11 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 	 */
 	final class Charitable_Addons_Directory {
 
-		/* @var string */
+		/**
+		 * The update URL.
+		 *
+		 * @var string
+		 */
 		const UPDATE_URL = 'https://wpcharitable.com';
 
 		/**
@@ -57,6 +61,20 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		 * @var bool
 		 */
 		private $can_install;
+
+		/**
+		 * The available addons.
+		 *
+		 * @var array
+		 */
+		private $available_addons;
+
+		/**
+		 * The addons.
+		 *
+		 * @var array
+		 */
+		private $addons;
 
 		/**
 		 * Create object instance.
@@ -97,7 +115,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 			$assets_dir = charitable()->get_path( 'assets', false );
 
-			$strings = [
+			$strings = array(
 				'nonce'                           => wp_create_nonce( 'charitable-admin' ),
 				'addon_activate'                  => esc_html__( 'Activate', 'charitable' ),
 				'addon_activated'                 => esc_html__( 'Activated', 'charitable' ),
@@ -108,13 +126,13 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				'addon_error'                     => sprintf(
 					wp_kses( /* translators: %1$s - An addon download URL, %2$s - Link to manual installation guide. */
 						__( 'Could not install the addon. Please <a href="%1$s" target="_blank" rel="noopener noreferrer">download it from wpcharitable.com</a> and <a href="%2$s" target="_blank" rel="noopener noreferrer">install it manually</a>.', 'charitable' ),
-						[
-							'a' => [
+						array(
+							'a' => array(
 								'href'   => true,
 								'target' => true,
 								'rel'    => true,
-							],
-						]
+							),
+						)
 					),
 					'https://wpcharitable.com/account/licenses/',
 					'https://wpcharitable.com/docs/how-to-manually-install-addons-in-charitable/'
@@ -155,12 +173,12 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				'is_pro_installed'                => (int) charitable_is_pro_installed(),
 				'activated_title'                 => esc_html__( 'Almost Done', 'charitable' ),
 				'activated_content'               => esc_html__( 'Charitable Pro is installed but not activated.', 'charitable' ),
-			];
+			);
 
 			wp_enqueue_script(
 				'listjs',
 				$assets_dir . 'js/libraries/list.min.js',
-				[ 'jquery' ],
+				array( 'jquery' ),
 				$version,
 				false
 			);
@@ -473,7 +491,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 				$addon['path'] = ( '' === $addon['path'] ) ? sprintf( '%1$s/%1$s.php', $addon['slug'] ) : $addon['path'];
 
-				$type = ( isset( $_GET['license'] ) ) ? $_GET['license'] : $this->get_current_plan_slug();
+				$type = ( isset( $_GET['license'] ) ) ? esc_html( $_GET['license'] ) : $this->get_current_plan_slug(); // phpcs:ignore
 
 				if ( isset( $addon['featured'] ) && in_array( 'recommended', $addon['featured'] ) ) {
 					$results['recommended'][] = (array) $addon;
@@ -578,6 +596,9 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 			if ( ! isset( $installed_plugins[ $plugin_basename ] ) ) {
 				switch ( $this->get_current_plan_slug() ) {
+					case 'basic':
+						$the_plans = array( 'basic' );
+						break;
 					case 'plus':
 						$the_plans = array( 'basic', 'plus' );
 						break;
@@ -597,6 +618,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				$addon['action'] = 'license';
 
 				foreach ( $addon['license'] as $license_to_check ) {
+					// Check if $license_to_check is a vaule in the $the_plans array.
 					if ( in_array( $license_to_check, $the_plans ) ) {
 						$addon['status'] = 'missing';
 						$addon['action'] = 'install';
@@ -614,7 +636,18 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			}
 
 			if ( 'charitable-pro-plugin' === $addon['slug'] ) {
-				$button = '<a href="https://www.wpcharitable.com/charitable-pro/" target="_blank" rel="noopener noreferrer" class="charitable-btn charitable-btn-orange">' . esc_html__( 'Download Pro', 'charitable' ) . '</a>';
+				// Check if Charitable Pro is installed.
+				$charitable_pro_basename = 'charitable-pro/charitable.php';
+				$is_pro_installed        = isset( $installed_plugins[ $charitable_pro_basename ] );
+				$is_pro_active           = is_plugin_active( $charitable_pro_basename );
+
+				if ( $is_pro_installed && ! $is_pro_active ) {
+					// Plugin is installed but not activated - show activate button.
+					$button = '<button class="status-installed" data-plugin="' . esc_attr( $charitable_pro_basename ) . '" data-type="addon" data-redirect="' . admin_url( 'admin.php?page=charitable-dashboard' ) . '">' . esc_html__( 'Activate Pro', 'charitable' ) . '</button>';
+				} else {
+					// Plugin is not installed or is active - show download link.
+					$button = '<a href="https://www.wpcharitable.com/charitable-pro/" target="_blank" rel="noopener noreferrer" class="charitable-btn charitable-btn-orange">' . esc_html__( 'Download Pro', 'charitable' ) . '</a>';
+				}
 			} else {
 				$button = $this->get_addon_button_html( $addon );
 			}
@@ -625,7 +658,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			$icon = isset( $addon['icon'] ) ? esc_url( $addon['icon'] ) : 'placeholder';
 
 			// get the plugin description.
-			$sections       = unserialize( $addon['sections'] );
+			$sections       = unserialize( $addon['sections'] ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize
 			$description    = wp_strip_all_tags( ( $sections['description'] ) );
 			$is_recommended = ( isset( $addon['featured'] ) && is_array( $addon['featured'] ) && in_array( 'recommended', $addon['featured'] ) ) ? true : false;
 
@@ -637,14 +670,14 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 			// Output the card.
 			$allowed_html = array(
-				'a' => array(
-					'href' => array(),
+				'a'      => array(
+					'href'  => array(),
 					'title' => array(),
 				),
-				'br' => array(),
-				'em' => array(),
+				'br'     => array(),
+				'em'     => array(),
 				'strong' => array(),
-				'p' => array(),
+				'p'      => array(),
 			);
 
 			?>
@@ -739,8 +772,8 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 						$upgrade_url = charitable_ga_url(
 							// pid = plan_id.
 							self::UPDATE_URL . '/?license_upgrade=true&license_key=' . $license_data_to_send['license'] . '&upid=' . $upid . '&pid=' . $license_data_to_send['plan_id'] . '&addon=' . esc_html( $addon['name'] ),
-							urlencode( 'Plugin Addon Page' ),
-							urlencode( $addon['name'] . ' Upgrade' )
+							urlencode( 'Plugin Addon Page' ), // phpcs:ignore
+							urlencode( $addon['name'] . ' Upgrade' ) // phpcs:ignore
 						);
 
 					} else {
@@ -748,8 +781,8 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 						// they may be on 'pro' mode but they don't have a license we can send, so fall back to sending them to the pricing page.
 						$upgrade_url = charitable_ga_url(
 							'https://www.wpcharitable.com/pricing/',
-							urlencode( 'Plugin Addon Page' ),
-							urlencode( $addon['name'] . ' Upgrade' )
+							urlencode( 'Plugin Addon Page' ), // phpcs:ignore
+							urlencode( $addon['name'] . ' Upgrade' ) // phpcs:ignore
 						);
 
 					}
@@ -757,8 +790,8 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					// they are on lite, with no license so send them to the pricing page.
 					$upgrade_url = charitable_ga_url(
 						'https://www.wpcharitable.com/pricing/',
-						urlencode( 'Plugin Addon Page' ),
-						urlencode( $addon['name'] . ' Upgrade' )
+						urlencode( 'Plugin Addon Page' ), // phpcs:ignore
+						urlencode( $addon['name'] . ' Upgrade' ) // phpcs:ignore
 					);
 				}
 
@@ -794,7 +827,12 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					if ( ! $this->can_install ) {
 						break;
 					}
-					$html  = '<button class="status-' . esc_attr( $addon['status'] ) . '" data-plugin="' . esc_url( $addon['install'] ) . '" data-type="addon">';
+
+					// Testing backup links for download.
+					$download_url = ! empty( $addon['download_link'] ) ? esc_url( $addon['download_link'] ) : false;
+					$download_url = ( false === $download_url ) && ! empty( $addon['install'] ) ? esc_url( $addon['install'] ) : $download_url;
+
+					$html  = '<button class="status-' . esc_attr( $addon['status'] ) . '" data-plugin="' . esc_url( $download_url ) . '" data-type="addon">';
 					$html .= esc_html__( 'Install Addon', 'charitable' );
 					$html .= '</button>';
 					break;
@@ -815,11 +853,11 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		 */
 		private function get_addon_status_label( $status ) {
 
-			$label = [
+			$label = array(
 				'active'    => esc_html__( 'Active', 'charitable' ),
 				'installed' => esc_html__( 'Inactive', 'charitable' ),
 				'missing'   => esc_html__( 'Not Installed', 'charitable' ),
-			];
+			);
 
 			return isset( $label[ $status ] ) ? $label[ $status ] : '';
 		}
@@ -837,7 +875,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		protected function prepare_addon_data( $addon ) {
 
 			if ( empty( $addon ) ) {
-				return [];
+				return array();
 			}
 
 			$addon['title'] = ! empty( $addon['title'] ) ? $addon['title'] : '';
@@ -847,7 +885,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			$addon['modal_name']    = sprintf( esc_html__( '%s addon', 'charitable' ), $addon['name'] );
 			$addon['clear_slug']    = str_replace( 'charitable-', '', $addon['slug'] );
 			$addon['utm_content']   = ucwords( str_replace( '-', ' ', $addon['clear_slug'] ) );
-			$addon['license']       = empty( $addon['license'] ) ? [] : (array) $addon['license'];
+			$addon['license']       = empty( $addon['license'] ) ? array() : (array) $addon['license'];
 			$addon['license_level'] = $this->get_license_level( $addon );
 			$addon['icon']          = ! empty( $addon['icon'] ) ? $addon['icon'] : '';
 			$addon['path']          = sprintf( '%1$s/%1$s.php', $addon['slug'] );
@@ -880,11 +918,11 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 			$slug = 'charitable-' . str_replace( 'charitable-', '', sanitize_key( $slug ) );
 
-			$addon = ! empty( $this->available_addons[ $slug ] ) ? $this->available_addons[ $slug ] : [];
+			$addon = ! empty( $this->available_addons[ $slug ] ) ? $this->available_addons[ $slug ] : array();
 
 			// In case if addon is "not available" let's try to get and prepare addon data from all addons.
 			if ( empty( $addon ) ) {
-				$addon = ! empty( $this->addons[ $slug ] ) ? $this->prepare_addon_data( $this->addons[ $slug ] ) : [];
+				$addon = ! empty( $this->addons[ $slug ] ) ? $this->prepare_addon_data( $this->addons[ $slug ] ) : array();
 			}
 
 			return $addon;
@@ -906,10 +944,10 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			}
 
 			$addon            = is_string( $addon ) ? $this->get_addon( $addon ) : $addon;
-			$addon['license'] = empty( $addon['license'] ) ? [] : (array) $addon['license'];
+			$addon['license'] = empty( $addon['license'] ) ? array() : (array) $addon['license'];
 
 			// TODO: convert to a class constant when we will drop PHP 5.5.
-			$levels  = [ 'basic', 'plus', 'pro', 'elite', 'agency', 'ultimate' ];
+			$levels  = array( 'basic', 'plus', 'pro', 'elite', 'agency', 'ultimate' );
 			$license = '';
 
 			foreach ( $levels as $level ) {
@@ -924,7 +962,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				return '';
 			}
 
-			return in_array( $license, [ 'basic', 'plus', 'pro' ], true ) ? 'pro' : 'elite';
+			return in_array( $license, array( 'basic', 'plus', 'pro' ), true ) ? 'pro' : 'elite';
 		}
 
 		/**
@@ -941,7 +979,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			$settings = get_option( 'charitable_settings' );
 			if ( isset( $settings['licenses']['charitable-v2']['license'] ) && ! empty( $settings['licenses']['charitable-v2']['license'] ) ) {
 
-				// attempt to grab the "v2" license
+				// attempt to grab the "v2" license.
 				$license = esc_html( $settings['licenses']['charitable-v2']['license'] );
 				$plan_id = isset( $settings['licenses']['charitable-v2']['plan_id'] ) && ! empty( $settings['licenses']['charitable-v2']['plan_id'] ) ? intval( $settings['licenses']['charitable-v2']['plan_id'] ) : false;
 				return array(
@@ -1125,7 +1163,6 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 						)
 					);
 				}
-
 			} else {
 				$versions = $versions['data'];
 			}

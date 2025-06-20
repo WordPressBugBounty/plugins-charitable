@@ -404,7 +404,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 				$('#charitable-field-' + cookieActiveFieldId ).click();
 
-			} else if ( cookieContentSection && $('.charitable-tabs').is(':visible') && $('.charitable-tabs li#' + cookieContentSection + ' a').is(':visible') ) { // design tabs
+			} else if ( $('.charitable-panel-sidebar').is(':visible') && cookieContentSection && $('.charitable-tabs').is(':visible') && $('.charitable-tabs li#' + cookieContentSection + ' a').is(':visible') ) { // design tabs
 
 				$('.charitable-tabs li#' + cookieContentSection + ' a').click();
 
@@ -2950,6 +2950,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 				wpCookies.set( cookieName, panel, 2592000 ); // 1 month.
 				wpCookies.set( 'charitable_panel_content_section', '', 2592000 );
+				wpCookies.set( 'charitable_panel_active_field_id', '', 2592000 );
 			}
 		},
 
@@ -8833,6 +8834,15 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 						keys    : [ 'enter' ],
 						action: function( saveRefreshButton ) {
 
+							// Check for campaign title first
+							if ( $('#charitable_settings_title').val().length === 0 ) {
+								// Close this modal
+								this.close();
+								// Show the title error modal
+								app.formSaveCheck();
+								return false;
+							}
+
 							saveRefreshButton.setText( charitable_builder.standby );
 							saveRefreshButton.disable();
 							this.$$confirm.prop('disabled', true);
@@ -8879,6 +8889,15 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 						btnClass: 'btn-confirm',
 						keys    : [ 'enter' ],
 						action: function( saveRefreshButton ) {
+
+							// Check for campaign title first
+							if ( $('#charitable_settings_title').val().length === 0 ) {
+								// Close this modal
+								this.close();
+								// Show the title error modal
+								app.formSaveCheck();
+								return false;
+							}
 
 							saveRefreshButton.setText( charitable_builder.standby );
 							saveRefreshButton.disable();

@@ -436,6 +436,7 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 		 *
 		 * @since   1.0.0
 		 * @version 1.7.0.4
+		 * @version 1.8.6.2 - clear transient _charitable_plugin_versions
 		 *
 		 * @param   mixed[] $values The parsed values combining old values & new values.
 		 * @param   mixed[] $new_values The newly submitted values.
@@ -450,6 +451,9 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 
 			$re_check = array_key_exists( 'recheck', $_POST );
 			$licenses = $new_values['licenses_legacy'];
+
+			// Delete transients (related to plugin versions).
+			delete_transient( '_charitable_plugin_versions' );
 
 			// Remember that legacy licenses are passed into values differently in this hook. $values[licenses_legacy].
 			foreach ( $licenses as $product_key => $license ) {

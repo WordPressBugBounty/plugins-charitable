@@ -1,4 +1,37 @@
 <?php
+/**
+ * Display basic CSS.
+ *
+ * @package Charitable
+ * @author  WP Charitable LLC
+ * @since   1.8.0
+ */
+
+if ( ! function_exists( 'wp_unslash' ) ) {
+	/**
+	 * Unslash a value.
+	 *
+	 * @param mixed $value The value to unslash.
+	 * @return mixed The unslashed value.
+	 */
+	function wp_unslash( $value ) {
+		return is_array( $value ) ? array_map( 'wp_unslash', $value ) : stripslashes( $value );
+	}
+}
+
+if ( ! function_exists( 'sanitize_text_field' ) ) {
+	/**
+	 * Sanitize a text field.
+	 *
+	 * @param string $str The string to sanitize.
+	 * @return string The sanitized string.
+	 */
+	function sanitize_text_field( $str ) {
+		$filtered = preg_replace( '/[\r\n\t\0\x0B]/', '', $str );
+		$filtered = filter_var( $filtered, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH );
+		return trim( $filtered );
+	}
+}
 
 header( 'Content-type: text/css; charset: UTF-8' );
 

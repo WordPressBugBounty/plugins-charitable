@@ -373,3 +373,25 @@
   margin-left:0 !important;
   margin-right:0 !important
  }
+
+ /* Ensure Charitable Pro button matches other addon buttons */
+ #charitable-admin-addons .addon-item button[data-plugin="charitable-pro/charitable.php"] {
+  background:none;
+  border:1px solid #ddd;
+  border-radius:3px;
+  box-shadow:none;
+  font-weight:600;
+  width:140px;
+  text-align:center;
+  padding:8px 5px;
+  cursor:pointer;
+ }
+ #charitable-admin-addons .addon-item button[data-plugin="charitable-pro/charitable.php"]:hover,
+ #charitable-admin-addons .addon-item button[data-plugin="charitable-pro/charitable.php"]:focus {
+  background-color:#e9e9e9;
+ }
+ #charitable-admin-addons .addon-item button[data-plugin="charitable-pro/charitable.php"]:focus {
+  border-color:#2271b1;
+  box-shadow:0 0 0 1px #2271b1;
+  outline:none;
+ }

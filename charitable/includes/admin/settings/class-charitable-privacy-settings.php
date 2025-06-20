@@ -197,6 +197,48 @@ if ( ! class_exists( 'Charitable_Privacy_Settings' ) ) :
 				wp_list_pluck( $fields, 'label' )
 			);
 		}
+
+		/**
+		 * Sanitize the privacy policy field to prevent XSS attacks.
+		 *
+		 * @since  1.8.6.2
+		 *
+		 * @param  mixed $value     The submitted value.
+		 * @param  array $field     The field configuration.
+		 * @param  array $submitted All submitted data.
+		 * @return string
+		 */
+		public function sanitize_privacy_policy_field( $value, $field, $submitted ) { // phpcs:ignore
+			return wp_kses_post( $value );
+		}
+
+		/**
+		 * Sanitize the terms and conditions field to prevent XSS attacks.
+		 *
+		 * @since  1.8.6.2
+		 *
+		 * @param  mixed $value     The submitted value.
+		 * @param  array $field     The field configuration.
+		 * @param  array $submitted All submitted data.
+		 * @return string
+		 */
+		public function sanitize_terms_conditions_field( $value, $field, $submitted ) { // phpcs:ignore
+			return wp_kses_post( $value );
+		}
+
+		/**
+		 * Sanitize the contact consent label field to prevent XSS attacks.
+		 *
+		 * @since  1.8.6.2
+		 *
+		 * @param  mixed $value     The submitted value.
+		 * @param  array $field     The field configuration.
+		 * @param  array $submitted All submitted data.
+		 * @return string
+		 */
+		public function sanitize_contact_consent_label_field( $value, $field, $submitted ) { // phpcs:ignore
+			return wp_kses_post( $value );
+		}
 	}
 
 endif;
