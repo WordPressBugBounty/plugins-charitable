@@ -155,6 +155,46 @@ if ( ! class_exists( 'Charitable_Install' ) ) :
 				// Default advanced settings.
 				$this->set_initial_charitable_option( 'disable_campaign_legacy_mode', 1 );
 			}
+
+			// Clean up Square gateway settings if charitable-square plugin is not active.
+			$this->cleanup_square_gateway_settings();
+		}
+
+		/**
+		 * Clean up Square gateway settings if charitable-square plugin is not active.
+		 *
+		 * @since 1.8.7
+		 *
+		 * @return void
+		 */
+		private function cleanup_square_gateway_settings() {
+			// Check if charitable-square plugin is active.
+			if ( ! $this->is_square_addon_active() ) {
+				$settings = get_option( 'charitable_settings', array() );
+
+				// If 'square' gateway exists in active_gateways, remove it.
+				if ( isset( $settings['active_gateways']['square'] ) ) {
+					unset( $settings['active_gateways']['square'] );
+
+					// If 'square' was the default gateway, set a new default.
+					if ( isset( $settings['default_gateway'] ) && 'square' === $settings['default_gateway'] ) {
+						$settings['default_gateway'] = count( $settings['active_gateways'] ) ? key( $settings['active_gateways'] ) : '';
+					}
+
+					update_option( 'charitable_settings', $settings );
+				}
+			}
+		}
+
+		/**
+		 * Check if charitable-square plugin is active.
+		 *
+		 * @since 1.8.7
+		 *
+		 * @return boolean
+		 */
+		private function is_square_addon_active() {
+			return is_plugin_active( 'charitable-square/charitable-square.php' );
 		}
 
 		/**

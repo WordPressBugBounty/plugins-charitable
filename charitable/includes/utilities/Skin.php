@@ -33,9 +33,7 @@ class Charitable_Skin extends WP_Upgrader_Skin {
 	 * @param array $args Empty array of args (we will use defaults).
 	 */
 	public function __construct( $args = array() ) {
-
 		parent::__construct();
-
 	}
 
 	/**
@@ -46,11 +44,9 @@ class Charitable_Skin extends WP_Upgrader_Skin {
 	 * @param object $upgrader The upgrader object (passed by reference).
 	 */
 	public function set_upgrader( &$upgrader ) {
-
 		if ( is_object( $upgrader ) ) {
 			$this->upgrader =& $upgrader;
 		}
-
 	}
 
 	/**
@@ -61,9 +57,7 @@ class Charitable_Skin extends WP_Upgrader_Skin {
 	 * @param object $result The result of the install process.
 	 */
 	public function set_result( $result ) {
-
 		$this->result = $result;
-
 	}
 
 	/**
@@ -96,8 +90,10 @@ class Charitable_Skin extends WP_Upgrader_Skin {
 			/* log this for API issues */
 
 			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				// phpcs:disable
 				error_log( 'Charitable: There was an error installing the addon' );
 				error_log( print_r( $errors, true ) ); // phpcs:ignore
+				// phpcs:enable
 			}
 
 			die;

@@ -69,6 +69,7 @@ ob_start();
 		<?php foreach ( $sections as $section_key => $section_name ) : ?>
 			<?php
 
+			$css = '';
 			$url_query_arg_array = array( 'tab' => $section_key );
 			if ( 'security' === $section_key && defined( 'CHARITABLE_SPAMBLOCKER_FEATURE_PLUGIN' ) ) {
 				$css = 'no-pro-tab';

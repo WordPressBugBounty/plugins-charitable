@@ -932,7 +932,7 @@ if ( ! class_exists( 'Charitable_Abstract_Donation' ) ) :
 				/**
 				 * Log a warning if the status is not valid.
 				 */
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( charitable_is_debug() ) {
 					// @codingStandardsIgnoreStart
 					error_log('update_status-------');
 					error_log( print_r( $new_status, true ) );
@@ -1067,10 +1067,37 @@ if ( ! class_exists( 'Charitable_Abstract_Donation' ) ) :
 			return $this->donation_plan;
 		}
 
+
+
+		/**
+		 * Save the gateway's payment ID
+		 *
+		 * @since  1.8.7
+		 *
+		 * @param  string $value The payment ID.
+		 * @return bool
+		 */
+		public function set_gateway_payment_id( $value ) {
+			$key   = '_gateway_payment_id';
+			$value = charitable_sanitize_donation_meta( $value, $key );
+			return update_post_meta( $this->donation_id, $key, $value );
+		}
+
+		/**
+		 * Get the gateway's payment ID
+		 *
+		 * @since  1.8.7
+		 *
+		 * @return string
+		 */
+		public function get_gateway_payment_id() {
+			return get_post_meta( $this->donation_id, '_gateway_payment_id', true );
+		}
+
 		/**
 		 * Save the gateway's transaction ID
 		 *
-		 * @since  1.4.6
+		 * @since  1.8.7
 		 *
 		 * @param  string $value The transaction ID.
 		 * @return bool
@@ -1084,7 +1111,7 @@ if ( ! class_exists( 'Charitable_Abstract_Donation' ) ) :
 		/**
 		 * Get the gateway's transaction ID
 		 *
-		 * @since  1.4.6
+		 * @since  1.8.7
 		 *
 		 * @return mixed
 		 */
@@ -1095,6 +1122,110 @@ if ( ! class_exists( 'Charitable_Abstract_Donation' ) ) :
 
 			return $this->gateway_transaction_id;
 		}
+
+		/**
+		 * Save the gateway's transaction URL
+		 *
+		 * @since  1.8.7
+		 *
+		 * @param  string $value The transaction URL.
+		 * @return bool
+		 */
+		public function set_gateway_transaction_url( $value ) {
+			$key   = '_gateway_transaction_url';
+			$value = charitable_sanitize_donation_meta( $value, $key );
+			return update_post_meta( $this->donation_id, $key, $value );
+		}
+
+		/**
+		 * Get the gateway's transaction URL
+		 *
+		 * @since  1.8.7
+		 *
+		 * @return mixed
+		 */
+		public function get_gateway_transaction_url() {
+			return get_post_meta( $this->donation_id, '_gateway_transaction_url', true );
+		}
+
+		/**
+		 * Save the receipt URL
+		 *
+		 * @since  1.8.7
+		 *
+		 * @param  string $value The receipt URL.
+		 * @return bool
+		 */
+		public function set_receipt_url( $value ) {
+			$key   = '_donation_receipt_url';
+			$value = charitable_sanitize_donation_meta( $value, $key );
+			return update_post_meta( $this->donation_id, $key, $value );
+		}
+
+		/**
+		 * Get the receipt URL
+		 *
+		 * @since  1.8.7
+		 *
+		 * @return string
+		 */
+		public function get_receipt_url() {
+			return get_post_meta( $this->donation_id, '_donation_receipt_url', true );
+		}
+
+
+		/**
+		 * Save the gateway's subscription ID
+		 *
+		 * @since  1.8.7
+		 *
+		 * @param  string $value The subscription ID.
+		 * @return bool
+		 */
+		public function set_gateway_subscription_id( $value ) {
+			$key   = '_gateway_subscription_id';
+			$value = charitable_sanitize_donation_meta( $value, $key );
+			return update_post_meta( $this->donation_id, $key, $value );
+		}
+
+		/**
+		 * Get the gateway's subscription ID
+		 *
+		 * @since  1.8.7
+		 *
+		 * @return string
+		 */
+		public function get_gateway_subscription_id() {
+			return get_post_meta( $this->donation_id, '_gateway_subscription_id', true );
+		}
+
+		/**
+		 * Save the gateway's plan variation ID
+		 *
+		 * @since  1.8.7
+		 *
+		 * @param  string $value The plan variation ID.
+		 * @return bool
+		 */
+		public function set_gateway_plan_variation_id( $value ) {
+			$key   = '_gateway_plan_variation_id';
+			$value = charitable_sanitize_donation_meta( $value, $key );
+			return update_post_meta( $this->donation_id, $key, $value );
+		}
+
+		/**
+		 * Get the gateway's plan variation ID
+		 *
+		 * @since  1.8.7
+		 *
+		 * @return string
+		 */
+		public function get_gateway_plan_variation_id() {
+			return get_post_meta( $this->donation_id, '_gateway_plan_variation_id', true );
+		}
+
+
+
 
 		/**
 		 * Return the date that the donation data was erased.

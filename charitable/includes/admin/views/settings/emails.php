@@ -7,8 +7,8 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
- * @version   1.0.0
  * @version   1.8.2 Added checklist querystring value to action_url.
+ * @version   1.8.7 Removed cf class from the email settings table.
  */
 
 $helper = charitable_get_helper( 'emails' );
@@ -36,7 +36,7 @@ if ( count( $emails ) ) :
 		}
 
 		?>
-		<div class="charitable-settings-object charitable-email cf">
+		<div class="charitable-settings-object charitable-email">
 			<h4><?php echo esc_html( $email->get_name() ); ?></h4>
 			<span class="actions">
 				<?php

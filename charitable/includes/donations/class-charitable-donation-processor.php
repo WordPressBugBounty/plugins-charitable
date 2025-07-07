@@ -183,7 +183,7 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 			$processor = self::get_instance();
 			$campaign  = $processor->get_campaign();
 
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( charitable_is_debug() ) {
 				error_log( 'process_donation start' ); // phpcs:ignore
 			}
 
@@ -193,7 +193,7 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 
 			/* Check to ensure the donation is not going to an inactive campaign post. */
 			if ( ! $campaign->can_receive_donations() ) {
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( charitable_is_debug() ) {
 					error_log( 'Campaign cannot receive donations' ); // phpcs:ignore
 				}
 				return;
@@ -201,8 +201,19 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 
 			/* Validate the form submission and retrieve the values. */
 			$form = $campaign->get_donation_form();
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-				error_log( print_r( $form, true ) ); // phpcs:ignore
+			if ( charitable_is_debug() ) {
+				// phpcs:disable
+				error_log( 'process_donation - form' );
+				error_log( print_r( $form, true ) );
+				// phpcs:enable
+			}
+
+			if ( charitable_is_debug() ) {
+				// phpcs:disable
+				error_log( '=== FORM DATA DEBUG ===' );
+				error_log( 'POST data available to form: ' . print_r( $_POST, true ) );
+				error_log( 'REQUEST data available to form: ' . print_r( $_REQUEST, true ) );
+				// phpcs:enable
 			}
 
 			/**
@@ -216,14 +227,25 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 			do_action( 'charitable_before_process_donation_form', $processor, $form );
 
 			if ( ! $form->validate_submission() ) {
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-					error_log( 'Validation form not valid' ); // phpcs:ignore
+				if ( charitable_is_debug() ) {
+					// phpcs:disable
+					error_log( 'Validation form not valid' );
+					// phpcs:enable
 				}
 				return false;
 			}
 
 			$values  = $form->get_donation_values();
 			$gateway = $values['gateway'];
+
+			if ( charitable_is_debug() ) {
+				// phpcs:disable
+				error_log( '=== DONATION PROCESSOR DEBUG ===' );
+				error_log( 'Gateway from form values: ' . $gateway );
+				error_log( 'All form values: ' . print_r( $values, true ) );
+				error_log( 'POST data: ' . print_r( $_POST, true ) );
+				// phpcs:enable
+			}
 
 			/**
 			 * Validate the gateway values.
@@ -235,7 +257,7 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 			 * @param array   $values  The values submitted by the user.
 			 */
 			if ( ! apply_filters( 'charitable_validate_donation_form_submission_gateway', true, $gateway, $values ) ) {
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( charitable_is_debug() ) {
 					// phpcs:disable
 					error_log( 'process_donation not valid' );
 					error_log( print_r( $gateway, true ) );
@@ -279,15 +301,17 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 				 * @param  Charitable_Donation_Processor $processor   The Donation Processor object.
 				 * @return mixed
 				 */
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( charitable_is_debug() ) {
 					// phpcs:disable
-					error_log( 'gateway_is_130_compatible' );
-					error_log( print_r( $gateway, true ) );
-					error_log( print_r( $this->donation_id, true ) );
-					error_log( print_r( $processor, true ) );
+					error_log( 'This Gateway is Charitable version 1.3.0 compatible... The gateway is ' . $gateway );
+					error_log( 'The donation id is ' . $this->donation_id );
+					error_log( 'Charitable_Donation_Processor Object is: [commented out] ' );
 					// phpcs:enable
 				}
-				return apply_filters( 'charitable_process_donation_' . $gateway, true, $this->donation_id, $processor );
+
+				$hook_name = 'charitable_process_donation_' . $gateway;
+
+				return apply_filters( $hook_name, true, $this->donation_id, $processor );
 
 			} else {
 				/**
@@ -329,13 +353,14 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 		/**
 		 * Add a donation with AJAX.
 		 *
-		 * @since  1.3.0
+		 * @since   1.3.0
+		 * @version 1.8.7
 		 *
 		 * @return void
 		 */
 		public static function ajax_process_donation_form_submission() {
 			/* Prevent any displayed errors from messing with the AJAX response. */
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) { // phpcs:ignore
+			if ( charitable_is_debug() ) { // phpcs:ignore
 				// do nothing, allow php/server settings to determine php logging.
 			} else {
 				ini_set( 'display_errors', 0 ); // phpcs:ignore
@@ -346,14 +371,7 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 			}
 
 			$processor = self::get_instance();
-			$result   = $processor->process_donation();
-
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-				error_log( '(inside?) ajax_process_donation_form_submission - processor' );
-				error_log( print_r( $processor, true ) );
-				error_log( 'ajax_process_donation_form_submission - result' );
-				error_log( print_r( $result, true ) );
-			}
+			$result    = $processor->process_donation();
 
 			$response = is_array( $result ) ? $result : array();
 
@@ -361,7 +379,18 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 				$response['success']     = true;
 				$response['redirect_to'] = $processor->get_redirection_after_gateway_processing( $result );
 			} else {
+
+				// Start with getting errors from the notices class.
 				$errors = charitable_get_notices()->get_errors();
+				// If there is no errors, set the errors to an empty array.
+				if ( empty( $errors ) || ! is_array( $errors ) ) {
+					$errors = array();
+				}
+
+				// Check and see if there are errors in the response too.
+				if ( ! empty( $response['errors'] ) ) {
+					$errors = array_merge( $errors, $response['errors'] );
+				}
 
 				if ( empty( $errors ) ) {
 					$errors = array( __( 'Unable to process donation.', 'charitable' ) );
@@ -370,13 +399,39 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 				$response['success']     = false;
 				$response['errors']      = $errors;
 				$response['donation_id'] = (int) $processor->get_donation_id();
+
+				// get the gateway from the processor.
+				$gateway = $processor->get_donation_data_value( 'gateway' );
+
+				// If the gateway is square, we need to add to add errors to the donation log.
+				if ( 'square' === $gateway ) {
+					// If we are in test mode, remove the first error because that reads "Test mode is enabled".
+					if ( charitable_get_option( 'test_mode' ) ) {
+						// If there is at least one element, check the first one for a value that contains "Test mode is enabled".
+						if ( count( $errors ) > 0 ) {
+							if ( strpos( $errors[0], 'Test mode is enabled' ) !== false ) {
+								$errors = array_slice( $errors, 1 );
+							}
+						}
+					}
+					$errors = implode( ', ', $errors );
+					$processor->update_donation_log( $processor->get_donation_id(), 'Payment attempt failed.' );
+				}
 			}
 
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( charitable_is_debug() ) {
+				// phpcs:disable
 				error_log( 'ajax_process_donation_form_submission - response' );
 				error_log( print_r( $response, true ) );
+				// phpcs:enable
 			}
 
+			// Experimenting with a different response structure.
+			// These are errors displayed to the user (and hopefully not loggeD).
+			if ( ! empty( $response['errors'] ) ) {
+				// Insert an element into the first position of the array.
+				$response['errors'] = array_merge( array( 'An error occurred while processing your donation.' ), $response['errors'] );
+			}
 			wp_send_json( $response );
 
 			exit();

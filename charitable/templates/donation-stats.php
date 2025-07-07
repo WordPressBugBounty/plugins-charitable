@@ -25,7 +25,7 @@ $campaigns_count = Charitable_Campaigns::query(
 		'fields'         => 'ids',
 	)
 )->found_posts;
-$campaigns_text  = 1 === $campaigns_count ? __( 'Campaign', 'charitable-pro' ) : __( 'Campaigns', 'charitable-pro' );
+$campaigns_text  = 1 === $campaigns_count ? __( 'Campaign', 'charitable' ) : __( 'Campaigns', 'charitable' );
 
 /**
  * Filter the donation stats to show.
@@ -44,11 +44,11 @@ $donation_stats = apply_filters(
 		),
 		'donated'        => array(
 			'amount'      => charitable_format_money( charitable_get_table( 'campaign_donations' )->get_total() ),
-			'description' => __( 'Donated', 'charitable-pro' ),
+			'description' => __( 'Donated', 'charitable' ),
 		),
 		'donor_count'    => array(
 			'amount'      => charitable_get_table( 'donors' )->count_donors_with_donations(),
-			'description' => __( 'Donors', 'charitable-pro' ),
+			'description' => __( 'Donors', 'charitable' ),
 		),
 	),
 	$view_args

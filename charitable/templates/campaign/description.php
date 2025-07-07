@@ -35,5 +35,5 @@ if ( $description === false ) {
 
 ?>
 <div class="campaign-description">
-	<?php echo apply_filters( 'charitable_campaign_description_template_content', $description, $campaign ); ?>
+	<?php echo apply_filters( 'charitable_campaign_description_template_content', $description, $campaign ); // phpcs:ignore ?>
 </div>

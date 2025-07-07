@@ -16,10 +16,6 @@
                 width = 100;
             }
 
-            // console.log( $this.val() );
-            // console.log( field_id );
-            // console.log( $('.charitable-field.charitable-field-progress-bar[data-field-id="' + field_id + '"]') );
-
             $('.charitable-field[data-field-id="' + field_id + '"]').find('.charitable-preview-field-container').css('width', width + '%' );
 
         } );

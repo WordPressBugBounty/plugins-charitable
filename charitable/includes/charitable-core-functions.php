@@ -261,6 +261,135 @@ function charitable_using_stripe_connect() {
 }
 
 /**
+ * Returns if Charitable is currently using built-in Square "Connect". Similar to charitable_using_stripe_connect().
+ * But the difference is that it can check for a specific mode.
+ *
+ * @since  1.8.7
+ *
+ * @param  string $mode_to_check The mode to check for. Should be 'test' or 'live'. If it's sandbox, rename it to 'test'.
+ * @return boolean
+ */
+function charitable_using_square_connect( $mode_to_check = '' ) {
+	if ( '' === $mode_to_check ) {
+		return null;
+	}
+
+	if ( charitable_is_debug( 'square' ) ) {
+		// phpcs:disable
+		error_log( 'USING AND BEING FORCED charitable_using_square_connect: ' . $mode_to_check );
+		// phpcs:enable
+	}
+
+	return true;
+}
+
+/**
+ * A top level fundtion to get Access Token for Square.
+ *
+ * @since 1.8.7
+ *
+ * @param string $mode The mode to get the access token for.
+ * @return string
+ */
+function charitable_square_get_access_token( $mode = '' ) {
+	// If there is no $mode being "forced", we get the mode from the settings.
+	if ( empty( $mode ) ) {
+		$mode = charitable_get_option( 'test_mode' ) ? 'test' : 'live';
+	}
+	if ( 1 == $mode ) { // phpcs:ignore
+		$mode = 'test';
+	}
+	// Now that we have a mode, let's see if we are using Square connect or legacy settings.
+	if ( charitable_using_square_connect( $mode ) ) {
+		$square_settings = charitable_get_option( 'gateways_square' );
+		$access_token    = ! empty( $square_settings[ $mode ]['access_token'] ) ? $square_settings[ $mode ]['access_token'] : '';
+		// This is an encrypted token.
+		$access_token = charitable_crypto_decrypt( $access_token );
+	} else {
+		$access_token = charitable_get_option( array( 'gateways_square', $mode, 'access_token' ) );
+	}
+	return esc_html( $access_token );
+}
+
+/**
+ * Get the refresh token for Square.
+ *
+ * @since 1.8.7
+ *
+ * @param string $mode The mode to get the refresh token for.
+ * @return string
+ */
+function charitable_square_get_refresh_token( $mode = '' ) {
+	// If there is no $mode being "forced", we get the mode from the settings.
+	if ( empty( $mode ) ) {
+		$mode = charitable_get_option( 'test_mode' ) ? 'test' : 'live';
+	}
+	if ( 1 == $mode ) { // phpcs:ignore
+		$mode = 'test';
+	}
+	// Now that we have a mode, let's see if we are using Square connect or legacy settings.
+	if ( charitable_using_square_connect( $mode ) ) {
+		$square_settings = charitable_get_option( 'gateways_square' );
+		$access_token    = ! empty( $square_settings[ $mode ]['refresh_token'] ) ? $square_settings[ $mode ]['refresh_token'] : '';
+		// This is an encrypted token.
+		$access_token = charitable_crypto_decrypt( $access_token );
+	} else {
+		$access_token = charitable_get_option( array( 'gateways_square', $mode, 'refresh_token' ) );
+	}
+	return esc_html( $access_token );
+}
+
+/**
+ * Check if Square is connected.
+ *
+ * @since 1.8.7
+ *
+ * @param string $mode The mode to check for.
+ */
+function charitable_square_is_connected( $mode = '' ) {
+	if ( empty( $mode ) ) {
+		$mode = charitable_get_option( 'test_mode' ) ? 'test' : 'live';
+	}
+
+	return charitable_square_get_access_token( $mode ) ? true : false;
+}
+
+/**
+ * A top level function to get Application ID for Square.
+ *
+ * @since 1.8.7
+ *
+ * @return mixed
+ */
+function charitable_square_get_application_id( $mode = 'test' ) {
+
+	if ( empty( $mode ) ) {
+		$mode = charitable_get_option( 'test_mode' ) ? 'test' : 'live';
+	}
+
+	if ( 'sandbox' === $mode ) {
+		$mode = 'test';
+	}
+
+	// Are we overridng with legacy settings?
+	if ( charitable_square_legacy_mode() ) {
+		$application_id = charitable_get_option( 'gateways_square', $mode . '_application_id' );
+		return $application_id['application_id'];
+	}
+
+	// Get from settings or use default.
+	$settings       = charitable_get_option( 'gateways_square' );
+	$application_id = ! empty( $settings[ $mode ]['application_id'] ) ? esc_html( $settings[ $mode ]['application_id'] ) : '';
+
+	if ( empty( $application_id ) ) {
+		// Default to sandbox application ID.
+		$application_id = 'sandbox-sq0idb-xxxxxxxxxxxxxxxxxxxxxxxx';
+	}
+
+	return $application_id;
+}
+
+/**
  * Returns if should load the core stripe functionality.
  *
  * @since  1.7.0
@@ -269,13 +398,13 @@ function charitable_using_stripe_connect() {
  */
 function charitable_load_core_stripe() {
 
-	if ( false !== ( defined( 'USE_NEW_STRIPE' ) && USE_NEW_STRIPE ) ) {
+	if ( false !== ( defined( 'USE_NEW_STRIPE' ) && USE_NEW_STRIPE ) ) { // phpcs:ignore
 		return true;
 	}
 
 	// check for stripe addon.
 
-	if ( in_array( 'charitable-stripe/charitable-stripe.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+	if ( in_array( 'charitable-stripe/charitable-stripe.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) { // phpcs:ignore
 		return false;
 	}
 
@@ -315,6 +444,7 @@ function charitable_is_break_cache() {
 
 /**
  * Returns if charitable is in debug mode, mostly by checking the constant.
+ * Supports 'vendor', 'settings', 'stripe', and 'square' modes and whatever is passed in.
  *
  * @since   1.8.0
  * @version 1.8.6.1 Revisited to allow for more granular debug modes.
@@ -332,8 +462,9 @@ function charitable_is_debug( $mode = '' ) {
 		}
 	}
 
-	return ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) ? true : false;
+	return ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) ? true : false; // phpcs:ignore
 }
+
 
 /**
  * Returns if charitable is in script debug mode, mostly by checking the constant.
@@ -344,7 +475,7 @@ function charitable_is_debug( $mode = '' ) {
  */
 function charitable_is_script_debug() {
 
-	return ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? true : false;
+	return ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? true : false; // phpcs:ignore
 }
 
 /**
@@ -770,7 +901,7 @@ function charitable_current_user_can( $caps = array(), $id = 0 ) {
  */
 function charitable_get_min_suffix() {
 
-	return ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) || ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) || ( ! charitable_is_script_minification_enabled() ) ? '' : '.min';
+	return ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) || ( charitable_is_debug() ) || ( ! charitable_is_script_minification_enabled() ) ? '' : '.min';
 }
 
 /**
@@ -781,7 +912,7 @@ function charitable_get_min_suffix() {
  * @return string
  */
 function charitable_get_style_version() {
-	return ( charitable_is_break_cache() || ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) || ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) ) ? time() : charitable()->get_version();
+	return ( charitable_is_break_cache() || ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) || ( charitable_is_debug() ) ) ? time() : charitable()->get_version();
 }
 
 /**
@@ -857,4 +988,73 @@ function charitable_get_autoshow_plugin_notifications() {
 	} else {
 		return false;
 	}
+}
+
+/**
+ * Check if Square legacy mode is enabled.
+ *
+ * @since 1.8.7
+ *
+ * @return boolean
+ */
+function charitable_square_legacy_mode() {
+
+	$settings = charitable_get_option( 'gateways_square' );
+
+	// Debug: Log the settings and plugin status.
+	if ( charitable_is_debug( 'square' ) ) {
+		// phpcs:disable
+		error_log( '[Square Legacy Mode] Settings: ' . print_r( $settings, true ) );
+		error_log( '[Square Legacy Mode] Plugin active: ' . ( is_plugin_active( 'charitable-square/charitable-square.php' ) ? 'true' : 'false' ) );
+		error_log( '[Square Legacy Mode] square_legacy_settings: ' . ( isset( $settings['square_legacy_settings'] ) ? $settings['square_legacy_settings'] : 'not set' ) );
+		// phpcs:enable
+	}
+
+	// Check if the legacy Square plugin is installed and activated.
+	if ( ! is_plugin_active( 'charitable-square/charitable-square.php' ) ) {
+		if ( charitable_is_debug( 'square' ) ) {
+			// phpcs:disable
+			error_log( '[Square Legacy Mode] Returning false - plugin not active' );
+			// phpcs:enable
+		}
+		return false;
+	}
+
+	// Check if Square Legacy gateway is active.
+	$active_gateways      = charitable_get_helper( 'gateways' )->get_active_gateways();
+	$square_legacy_active = isset( $active_gateways['square'] );
+
+	if ( charitable_is_debug( 'square' ) ) {
+		// phpcs:disable
+		error_log( '[Square Legacy Mode] Square Legacy gateway active: ' . ( $square_legacy_active ? 'true' : 'false' ) );
+		// phpcs:enable
+	}
+
+	// Return true if either the settings option is set OR the gateway is active.
+	if ( ( isset( $settings['square_legacy_settings'] ) && $settings['square_legacy_settings'] ) || $square_legacy_active ) {
+		if ( charitable_is_debug( 'square' ) ) {
+			// phpcs:disable
+			error_log( '[Square Legacy Mode] Returning true - settings or gateway active' );
+			// phpcs:enable
+		}
+		return true;
+	}
+
+	if ( charitable_is_debug( 'square' ) ) {
+		// phpcs:disable
+		error_log( '[Square Legacy Mode] Returning false' );
+		// phpcs:enable
+	}
+	return false;
+}
+
+/**
+ * Check if charitable-square plugin is active.
+ *
+ * @since 1.8.7
+ *
+ * @return boolean
+ */
+function charitable_is_square_addon_active() {
+	return is_plugin_active( 'charitable-square/charitable-square.php' );
 }

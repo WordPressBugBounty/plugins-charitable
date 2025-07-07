@@ -528,13 +528,13 @@ function charitable_get_minimum_donation_amount( $campaign_id = 0 ) {
 
 		$minimum_amount_to_check = get_post_meta( $campaign_id, '_campaign_minimum_donation_amount', true );
 
-		if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+		if ( charitable_is_debug() ) {
 			error_log( print_r( $minimum_amount_to_check, true ) );
 		}
 
 		if ( false !== $minimum_amount_to_check && '' !== trim( $minimum_amount_to_check ) ) {
 			$minimum_amount = charitable_sanitize_amount( $minimum_amount_to_check, true ); // converts a format like $1.05 to 1.05, per the dev note below.
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( charitable_is_debug() ) {
 				error_log( print_r( $minimum_amount, true ) );
 			}
 		}

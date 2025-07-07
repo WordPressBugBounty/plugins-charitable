@@ -17,8 +17,8 @@ $campaign = $view_args['campaign'];
 	<?php
 	printf(
 		/* translators: %s: percentage raised */
-		_x( '%s Raised', 'percentage raised', 'charitable' ),
-		'<span class="amount">' . $campaign->get_percent_donated() . '</span>'
+		esc_html_x( '%s Raised', 'percentage raised', 'charitable' ),
+		'<span class="amount">' . esc_html( $campaign->get_percent_donated() ) . '</span>'
 	);
 	?>
 </div>

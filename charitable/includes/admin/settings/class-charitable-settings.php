@@ -285,7 +285,7 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 
 			$settings_keys = array_keys( $new_values );
 
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( charitable_is_debug() ) {
 				error_log( 'santiize_settings' );
 				error_log( 'values:' );
 				error_log( print_r( $values, true ) );
@@ -295,15 +295,48 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 				error_log( print_r( $new_values, true ) );
 			}
 
-			// determine if Charitable gateway "test mode" is being changed, and if so add a notice to the user.
+			// determine if Charitable gateway "test_mode" is being changed, and if so add a notice to the user.
 			if ( array_key_exists( 'test_mode', $new_values ) && array_key_exists( 'test_mode', $old_values ) && $old_values['test_mode'] !== $new_values['test_mode'] ) {
 				$old_settings_keys = array_keys( $old_values );
 				$dismissible       = true;
+
+				// Check if Square has connection issues for the new mode
+				$square_has_issues = $this->check_square_connection_for_mode_change( $new_values['test_mode'] );
+
+				// Determine notice type and message
+				$notice_type = $square_has_issues ? 'error' : 'warning';
+				$gateway_list = array();
+
 				if ( in_array( 'gateways_stripe', $old_settings_keys ) ) {
-					charitable_get_admin_notices()->add_notice( 'Some active payment gateways <strong>(including Stripe)</strong> might have reset their connections due to an update in the test mode. Please check your active payment gateways in ensure they are still connected.', 'warning', false, $dismissible );
-				} else {
-					charitable_get_admin_notices()->add_notice( 'Some active payment gateways might have reset their connections due to an update in the test mode. Please check your active payment gateways in ensure they are still connected.', 'warning', false, $dismissible );
+					$gateway_list[] = 'Stripe';
 				}
+
+				if ( $square_has_issues ) {
+					$gateway_list[] = 'Square';
+				}
+
+				if ( ! empty( $gateway_list ) ) {
+					$gateway_text = implode( ' and ', $gateway_list );
+					$message = sprintf(
+						/* translators: %s: comma-separated list of gateway names */
+						__( 'Some active payment gateways <strong>(including %s)</strong> might have reset their connections due to an update in the test mode. Please check your active payment gateways to ensure they are still connected.', 'charitable' ),
+						$gateway_text
+					);
+				} else {
+					$message = __( 'Some active payment gateways might have reset their connections due to an update in the test mode. Please check your active payment gateways to ensure they are still connected.', 'charitable' );
+				}
+
+				// Add additional Square-specific message if Square has connection issues
+				if ( $square_has_issues ) {
+					$mode_label = $new_values['test_mode'] ? __( 'test', 'charitable' ) : __( 'live', 'charitable' );
+					$message .= '<br><br><strong>' . sprintf(
+						/* translators: %s: mode (test or live) */
+						__( 'Square payment gateway is enabled but not connected in %s mode. Please connect your Square account to continue processing payments.', 'charitable' ),
+						$mode_label
+					) . '</strong>';
+				}
+
+				charitable_get_admin_notices()->add_notice( $message, $notice_type, false, $dismissible );
 			}
 
 			if ( in_array( 'gateways_stripe', $settings_keys ) && charitable()->is_stripe_connect_addon() && false === charitable_using_stripe_connect() ) {
@@ -320,7 +353,7 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 				if ( ! array_key_exists( 'test_public_key', $values['gateways_stripe'] ) && isset( $old_values['gateways_stripe']['test_public_key'] ) && ( false !== $old_values['gateways_stripe']['test_public_key'] ) ) {
 					$values['gateways_stripe']['test_public_key'] = $old_values['gateways_stripe']['test_public_key'];
 				}
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( charitable_is_debug() ) {
 					error_log( 'update:' );
 					error_log( print_r( $values, true ) );
 				}
@@ -328,7 +361,7 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 
 			// determine if stripe is being returned as new values - if so, then perform the API key save workaround.
 			if ( in_array( 'gateways_stripe', $settings_keys ) && charitable()->is_stripe_connect_addon() && false === charitable_using_stripe_connect() ) {
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( charitable_is_debug() ) {
 					error_log( 'there is a stripe connect addon but we are not using stripe connect' );
 				}
 				// the stripe connect addon is installed AND the AM Stripe Connect isn't being used... so it's possible the keys could be manual and the user could be updating them... therefore let's just make sure the new values match the values incoming.
@@ -338,7 +371,7 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 				$new_values['gateways_stripe']['test_public_key'] = ( isset( $values['gateways_stripe']['test_public_key'] ) && ( false !== $values['gateways_stripe']['test_public_key'] ) ) ? $values['gateways_stripe']['test_public_key'] : null;
 			} elseif ( in_array( 'gateways_stripe', $settings_keys ) ) {
 				// otherwise we preserve the keys.
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( charitable_is_debug() ) {
 					error_log( 'charitable debug, final with debug on:' );
 					$new_values['gateways_stripe']['live_secret_key'] = ( isset( $values['gateways_stripe']['live_secret_key'] ) && ( false !== $values['gateways_stripe']['live_secret_key'] ) ) ? $values['gateways_stripe']['live_secret_key'] : null;
 					$new_values['gateways_stripe']['live_public_key'] = ( isset( $values['gateways_stripe']['live_public_key'] ) && ( false !== $values['gateways_stripe']['live_public_key'] ) ) ? $values['gateways_stripe']['live_public_key'] : null;
@@ -500,7 +533,8 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 		/**
 		 * Recursively add settings fields, given an array.
 		 *
-		 * @since  1.0.0
+		 * @since   1.0.0
+		 * @version 1.8.7
 		 *
 		 * @param  array $field The setting field.
 		 * @param  array $keys  Array containing the section key and field key.
@@ -521,7 +555,8 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 			}
 
 			$field['key']     = $keys;
-			$field['classes'] = $this->get_field_classes( $field );
+			$field['classes'] = $this->get_field_classes( $field ); // deprecated?
+			$field['class']   = $this->get_field_classes( $field );
 			$callback         = isset( $field['callback'] ) ? $field['callback'] : array( $this, 'render_field' );
 			$label            = $this->get_field_label( $field, end( $keys ) );
 
@@ -1124,6 +1159,45 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 			update_option( 'charitable_lite_settings_upgrade', time() );
 
 			wp_send_json_success();
+		}
+
+		/**
+		 * Check Square connection for the new mode.
+		 *
+		 * @since 1.8.5
+		 *
+		 * @param string $new_mode The new test mode.
+		 * @return boolean True if Square has connection issues, false otherwise.
+		 */
+		private function check_square_connection_for_mode_change( $new_mode ) {
+			// Check if Square gateway is active.
+			$active_gateways = charitable_get_helper( 'gateways' )->get_active_gateways();
+
+			if ( ! is_array( $active_gateways ) || ! in_array( 'Charitable_Gateway_Square', $active_gateways ) ) {
+				return false;
+			}
+
+			// Determine the mode string.
+			$mode = $new_mode ? 'test' : 'live';
+
+			// Check if there's a Square connection for this mode.
+			$connection = Charitable_Square_Connection::get( $mode );
+
+			// Check if connection exists and is properly configured.
+			if ( ! $connection || ! $connection->is_configured() || ! $connection->is_valid() ) {
+
+				// Set a warning flag that will be checked on the payment page.
+				update_option( 'charitable_square_mode_connection_warning', array(
+					'mode' => $mode,
+					'timestamp' => time(),
+				) );
+
+				return true; // Square has connection issues.
+			} else {
+				// Clear the warning if connection exists.
+				delete_option( 'charitable_square_mode_connection_warning' );
+				return false; // Square has no connection issues.
+			}
 		}
 	}
 

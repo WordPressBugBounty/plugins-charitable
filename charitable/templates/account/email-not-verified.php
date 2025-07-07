@@ -16,15 +16,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$redirect = array_key_exists( 'redirect_url', $_GET ) ? $_GET['redirect_url'] : false;
-$user     = get_user_by( 'login', $_GET['login'] );
+$redirect = array_key_exists( 'redirect_url', $_GET ) ? esc_html( $_GET['redirect_url'] ) : false; // phpcs:ignore
+$user     = get_user_by( 'login', esc_html( $_GET['login'] ) ); // phpcs:ignore
 
 if ( ! empty( $user ) ) {
-	$link = charitable_get_email_verification_link( $user, $redirect, true );
+	$link = charitable_get_email_verification_link( $user, $redirect, true ); // phpcs:ignore
 }
 
 ?>
-<p><?php _e( 'We were unable to verify your email address.', 'charitable' ); ?></p>
+<p><?php esc_html_e( 'We were unable to verify your email address.', 'charitable' ); ?></p>
 <?php if ( ! empty( $user ) ) : ?>
-	<p><a href="<?php echo esc_url_raw( $link ); ?>"><?php _e( 'Resend verification email', 'charitable' ); ?></a></p>
+	<p><a href="<?php echo esc_url_raw( $link ); ?>"><?php esc_html_e( 'Resend verification email', 'charitable' ); ?></a></p>
 <?php endif ?>

@@ -354,9 +354,6 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 
 							echo '<a class="button-link" href="' . esc_url( $action_url ) . '" target="_blank">' . esc_html__( 'Enable Stripe', 'charitable' ) . '</a>';
 						}
-
-						// $link = admin_url('admin.php?page=charitable-settings&tab=gateways&group=gateways_stripe');
-
 					}
 
 					if ( $slug === 'paypal' ) {
@@ -385,7 +382,6 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 
 							echo '<a class="button-link" href="' . esc_url( $action_url ) . '" target="_blank">' . esc_html__( 'Enable Paypal', 'charitable' ) . '</a>';
 						}
-
 					}
 
 					?>
@@ -514,8 +510,6 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 
 				<?php
 
-					// $button_label = $generic_button ? $button_label : $button_label . ' ' . $marketing_item_label;
-
 					echo '<a class="button-link" href="' . esc_url( $button_url ) . '" target="_blank">' . esc_html( $button_label ) . '</a>';
 
 				?>
@@ -576,7 +570,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 				$settings_url = esc_url(
 					add_query_arg(
 						array(
-							'group' => 'gateways_' . $gateway_id, // $gateway->get_gateway_id(),
+							'group' => 'gateways_' . $gateway_id,
 						),
 						admin_url( 'admin.php?page=charitable-settings&tab=gateways' )
 					)
@@ -588,7 +582,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 					add_query_arg(
 						array(
 							'charitable_action' => 'enable_gateway',
-							'gateway_id'        => $gateway_id, // $gateway->get_gateway_id(),
+							'gateway_id'        => $gateway_id,
 							'_nonce'            => wp_create_nonce( 'gateway' ),
 						),
 						admin_url( 'admin.php?page=charitable-settings&tab=gateways' )

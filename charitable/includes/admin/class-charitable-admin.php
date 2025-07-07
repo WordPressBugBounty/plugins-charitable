@@ -219,14 +219,12 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 							exit;
 
 					}
-
 				} else {
 
 					wp_safe_redirect( admin_url( 'admin.php?page=charitable-dashboard' ) );
 					exit;
 
 				}
-
 			}
 		}
 
@@ -306,7 +304,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				return new WP_Error( __( 'Action from an unknown action type executed.', 'charitable' ) );
 			}
 
-			return $this->donation_actions->do_action( $_GET['charitable_admin_action'], $_GET['object_id'] );
+			return $this->donation_actions->do_action( esc_html( $_GET['charitable_admin_action'] ), esc_html( $_GET['object_id'] ) ); // phpcs:ignore.
 		}
 
 		/**
@@ -323,7 +321,21 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 			$assets_dir = charitable()->get_path( 'assets', false );
 
-			$localized_vars = array();
+			$localized_vars = array(
+				'suggested_amount_placeholder'             => __( 'Amount', 'charitable' ),
+				'suggested_amount_description_placeholder' => __( 'Optional Description', 'charitable' ),
+				'ajax_url'                                 => admin_url( 'admin-ajax.php' ),
+				'nonce'                                    => wp_create_nonce( 'charitable_admin_nonce' ),
+				'heads_up'                                 => __( 'Heads Up!', 'charitable' ),
+				'square_legacy_modal_message'              => __( 'Square (Legacy) is currently active. Activating the Square (Core) payment method will deactivate the Square (Legacy) payment and you will need to reconnect your Square account.<br><br>Click <strong><span style="color: #ff6b35;">Ok</span></strong> to deactivate Square (Legacy) and activate Square (Core) payment. Click <strong><span style="color: #000000;">Cancel</span></strong> to keep Square (Legacy) payment active.</strong><br><br><a href="https://wpcharitable.com/documentation/square-legacy" target="_blank">Read our documentation</a>', 'charitable' ),
+				'square_core_modal_message'                => __( 'Square (Core) is currently active. Activating the Square (Legacy) payment method will deactivate the Square (Core) payment and you will need to reconnect your Square account.<br><br>Click <strong><span style="color: #ff6b35;">Ok</span></strong> to deactivate Square (Core) and activate Square (Legacy) payment. Click <strong><span style="color: #000000;">Cancel</span></strong> to keep Square (Core) payment active.<br><br><a href="https://wpcharitable.com/documentation/square-legacy" target="_blank">Read our documentation</a>', 'charitable' ),
+				'oops'                                     => __( 'Oops!', 'charitable' ),
+				'square_legacy_switch_error'               => __( 'There was an error switching the payment gateways. Please try again.', 'charitable' ),
+				'ok'                                       => __( 'OK', 'charitable' ),
+				'cancel'                                   => __( 'Cancel', 'charitable' ),
+				'square_legacy_active'                     => charitable_get_helper( 'gateways' )->is_active_gateway( 'square' ),
+				'square_core_active'                       => charitable_get_helper( 'gateways' )->is_active_gateway( 'square_core' ),
+			);
 
 			/* Menu styles are loaded everywhere in the WordPress dashboard. */
 			wp_register_style(
@@ -399,11 +411,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 			if ( ! is_null( $screen ) && in_array( $screen->id, charitable_get_charitable_screens() ) ) {
 
-				$dependencies   = array( 'jquery-ui-datepicker', 'jquery-ui-tabs', 'jquery-ui-sortable' );
-				$localized_vars = array(
-					'suggested_amount_placeholder' => __( 'Amount', 'charitable' ),
-					'suggested_amount_description_placeholder' => __( 'Optional Description', 'charitable' ),
-				);
+				$dependencies = array( 'jquery-ui-datepicker', 'jquery-ui-tabs', 'jquery-ui-sortable' );
 
 				if ( 'donation' === $screen->id ) {
 					wp_register_script(
@@ -455,7 +463,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				wp_enqueue_script(
 					'jquery-confirm',
 					charitable()->get_path( 'directory', false ) . 'assets/lib/jquery.confirm/jquery-confirm.min.js',
-					[ 'jquery' ],
+					array( 'jquery' ),
 					'3.3.4',
 					false
 				);
@@ -566,7 +574,6 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 					do_action( 'charitable_admin_enqueue_analytics_scripts' );
 
 				}
-
 			}
 
 			// Register these scripts only for checklist, onboarding, and similar pages.
@@ -668,7 +675,6 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		public function set_body_class( $classes ) {
 			$screen = get_current_screen();
 
-
 			if ( 'donation' === $screen->post_type && ( 'add' === $screen->action || isset( $_GET['show_form'] ) ) ) { // phpcs:ignore.
 				$classes .= ' charitable-admin-donation-form';
 			}
@@ -679,6 +685,10 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 			if ( isset( $_GET['page'] ) && 'charitable-settings' === $_GET['page'] && isset( $_GET['tab'] ) && '' !== $_GET['tab'] ) { // phpcs:ignore.
 				$classes .= ' charitable-admin-settings-' . esc_attr( $_GET['tab'] ); // phpcs:ignore.
+			}
+
+			if ( isset( $_GET['page'] ) && 'charitable-settings' === $_GET['page'] && isset( $_GET['tab'] ) && 'gateways' === $_GET['tab'] && empty( $_GET['group'] ) ) { // phpcs:ignore.
+				$classes .= ' charitable-admin-settings-gateways-main'; // phpcs:ignore.
 			}
 
 			if ( isset( $_GET['page'] ) && 'charitable-reports' === $_GET['page'] ) { // phpcs:ignore.
@@ -697,7 +707,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				$classes .= ' charitable_legacy_dashboard';
 			}
 
-			$classes .= function_exists( 'charitable_is_pro' ) && charitable_is_pro() ? ' charitable-pro' : ' charitable-lite';
+			$classes .= function_exists( 'charitable_is_pro' ) && charitable_is_pro() ? ' charitable-pro' : ' charitable';
 
 			return $classes;
 		}
@@ -711,16 +721,27 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		 * @return void
 		 */
 		public function add_notices() {
+			if ( charitable_is_debug( 'square' ) ) {
+				error_log( 'Charitable_Admin::add_notices() - Starting to render admin notices' );
+			}
 
-			// We will be deprecating these versions of PHP in the future, so let's let the user know.
-			if ( version_compare( PHP_VERSION, '7.4.0', '<' ) ) {
+			// Render notices.
+			charitable_get_admin_notices()->render();
+
+			if ( charitable_is_debug( 'square' ) ) {
+				error_log( 'Charitable_Admin::add_notices() - Current admin notices: ' . print_r( charitable_get_admin_notices()->get_notices(), true ) ); // phpcs:ignore
+			}
+
+			// Check for PHP version deprecation.
+			if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 				$this->php_notice_deprecated();
 			}
 
+			// Add third party notices.
 			$this->add_third_party_notices();
 
-			/* Render notices. */
-			charitable_get_admin_notices()->render();
+			// Add version update notices.
+			$this->add_version_update_notices();
 		}
 
 		/**
@@ -868,7 +889,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		/**
 		 * Dismiss a notice.
 		 *
-		 * @since  1.4.0
+		 * @since  1.4.6
 		 *
 		 * @return void
 		 */
@@ -877,7 +898,16 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				wp_send_json_error();
 			}
 
-			$ret = ( 'noted' === charitable_get_third_party_warning_option( 'code-snippets/code-snippets.php' ) ) ? charitable_set_third_party_warning_option( 'code-snippets/code-snippets.php', 'dismissed' ) : delete_transient( 'charitable_' . filter_input( INPUT_POST, 'notice', FILTER_SANITIZE_STRING ) . '_notice', true );
+			$notice = sanitize_text_field( wp_unslash( $_POST['notice'] ) ); // phpcs:ignore.
+
+			// Handle Square connection error notice.
+			if ( 'square_connection_error' === $notice ) {
+				delete_option( 'charitable_square_connection_error_notice' );
+				wp_send_json_success();
+				return;
+			}
+
+			$ret = ( 'noted' === charitable_get_third_party_warning_option( 'code-snippets/code-snippets.php' ) ) ? charitable_set_third_party_warning_option( 'code-snippets/code-snippets.php', 'dismissed' ) : delete_transient( 'charitable_' . $notice . '_notice', true );
 
 			do_action( 'charitable_dismiss_notice', $_POST ); // phpcs:ignore.
 
@@ -1170,7 +1200,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 			 * @param string $report_type The type of report.
 			 * @param array  $args        Export arguments.
 			 */
-			$export_class = apply_filters( 'charitable_donations_export_class', 'Charitable_Export_Donations', $_GET['report_type'], $export_args );
+			$export_class = apply_filters( 'charitable_donations_export_class', 'Charitable_Export_Donations', esc_attr( $_GET['report_type'] ), $export_args ); // phpcs:ignore
 
 			new $export_class( $export_args );
 
@@ -1186,7 +1216,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		 */
 		public function export_campaigns() {
 
-			if ( ! isset( $_GET['_charitable_export_nonce'] ) || ! wp_verify_nonce( $_GET['_charitable_export_nonce'], 'charitable_export_campaigns' ) ) {
+			if ( ! isset( $_GET['_charitable_export_nonce'] ) || ! wp_verify_nonce( $_GET['_charitable_export_nonce'], 'charitable_export_campaigns' ) ) { // phpcs:ignore
 				return false;
 			}
 
@@ -1216,7 +1246,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 			 * @param string $report_type The type of report.
 			 * @param array  $args        Export arguments.
 			 */
-			$export_class = apply_filters( 'charitable_campaigns_export_class', 'Charitable_Export_Campaigns', $_GET['report_type'], $export_args );
+			$export_class = apply_filters( 'charitable_campaigns_export_class', 'Charitable_Export_Campaigns', esc_attr( $_GET['report_type'] ), $export_args ); // phpcs:ignore
 
 			new $export_class( $export_args );
 
@@ -1314,7 +1344,6 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 					: $actions_show_id + $actions_edit_legacy + $actions;
 
 				}
-
 			}
 
 			return $actions;

@@ -139,7 +139,6 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 				$donation_amount_in_session = $campaign->get_donation_amount_in_session();
 
 				if ( ! $campaign ) :
-					// if ( ! $campaign || ! $campaign->can_receive_donations() ) :
 					echo '<p>Cannot recieve donations.</p>';
 					echo '</div> <!-- placeholder -->';
 					$html = ob_get_clean();

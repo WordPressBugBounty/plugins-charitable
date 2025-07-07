@@ -1584,8 +1584,112 @@ h3.charitable-header {
   }
 }
 
+
+#google-pay-button {
+  min-height: 40px; /* Minimum height for the button */
+  margin: 10px 0;
+  button {
+    width: 100%;
+  }
+}
+
 .charitable-privacy-policy-text {
   font-size: 16px;
   line-height: 21px;
   font-weight: 400;
+}
+
+#charitable-square-wallet-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 0px;
+  margin: 0;
+}
+
+/* When empty, hide the container */
+#charitable-square-wallet-buttons:empty {
+  display: none;
+}
+
+/* All direct child divs */
+#charitable-square-wallet-buttons > div {
+  flex: 1;  /* This makes divs share space equally */
+}
+
+/* When exactly one div child */
+#charitable-square-wallet-buttons > div:only-child {
+  width: 100%;
+}
+
+/* When exactly two div children */
+#charitable-square-wallet-buttons > div:first-child:nth-last-child(2),
+#charitable-square-wallet-buttons > div:first-child:nth-last-child(2) ~ div {
+  width: 50%;
+}
+
+
+#google-pay-button,
+#apple-pay-button {
+  min-height: 40px;
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 14px;
+  width: 100%;
+  /* border: 1px solid #ddd; */
+}
+
+#google-pay-button:before,
+#apple-pay-button:before {
+  content: "Google Pay";
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+#apple-pay-button:before {
+  content: "Apple Pay";
+}
+
+.wallet-enabled #google-pay-button:before,
+.wallet-enabled #apple-pay-button:before {
+  display: none;
+}
+
+#charitable-square-wallet-separator {
+  text-align: center;
+  width: 100%;
+  display: block;
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  position: relative;
+}
+
+#charitable-square-wallet-separator:before,
+#charitable-square-wallet-separator:after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 33%;
+  height: 1px;
+  background: #ddd;
+}
+
+#charitable-square-wallet-separator:before {
+  left: 0;
+}
+
+#charitable-square-wallet-separator:after {
+  right: 0;
+}
+
+#charitable-square-card-payment-fields {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  &.no-wallets {
+    padding: 0;
+    border: none;
+  }
 }

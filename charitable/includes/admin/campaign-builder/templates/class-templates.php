@@ -1444,7 +1444,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 		 */
 		public function get_templates_data( $template_id = false, $campaign_data = array(), $no_cache = false ) {
 
-			$templates_data = $no_cache || ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) || ( defined( 'CHARITABLE_BUILDER_NO_CACHE_TEMPLATE' ) && CHARITABLE_BUILDER_NO_CACHE_TEMPLATE ) ? false : get_option( 'charitable_campaign_builder_templates' );
+			$templates_data = $no_cache || ( charitable_is_debug() ) || ( defined( 'CHARITABLE_BUILDER_NO_CACHE_TEMPLATE' ) && CHARITABLE_BUILDER_NO_CACHE_TEMPLATE ) ? false : get_option( 'charitable_campaign_builder_templates' );
 
 			if ( empty( $templates_data ) ) {
 
@@ -1462,7 +1462,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 					endif;
 				endforeach;
 
-				if ( ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) || ( defined( 'CHARITABLE_BUILDER_NO_CACHE_TEMPLATE' ) && CHARITABLE_BUILDER_NO_CACHE_TEMPLATE ) ) {
+				if ( ( charitable_is_debug() ) || ( defined( 'CHARITABLE_BUILDER_NO_CACHE_TEMPLATE' ) && CHARITABLE_BUILDER_NO_CACHE_TEMPLATE ) ) {
 					delete_option( 'charitable_campaign_builder_templates', $templates_data );
 				} else {
 					// update the WordPress option.
@@ -1550,7 +1550,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 							/* translators: 1: Template ID */
 							'<a href="#" class="send-feedback">%1$s</a> %2$s',
 							esc_html__( 'Let us know', 'charitable' ),
-							esc_html__( 'what templates to add in the future.', 'charitable' ),
+							esc_html__( 'what templates to add in the future.', 'charitable' ) // do not add comma to help with older php versions.
 						);
 						?>
 						</p>

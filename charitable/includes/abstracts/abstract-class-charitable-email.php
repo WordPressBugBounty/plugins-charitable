@@ -403,8 +403,8 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 			if ( 'new_donation' === $this->get_email_id() || 'offline_donation_notification' === $this->get_email_id() ) {
 				$email_settings['reply_to_donor'] = array(
 					'type'     => 'checkbox',
-					'title'    => __( 'Reply To Donor', 'charitable-pro' ),
-					'help'     => __( 'If active the recipient will be able to thank the donor by replying to the email.', 'charitable-pro' ),
+					'title'    => __( 'Reply To Donor', 'charitable' ),
+					'help'     => __( 'If active the recipient will be able to thank the donor by replying to the email.', 'charitable' ),
 					'priority' => 8,
 					'class'    => 'wide',
 					'default'  => 1,

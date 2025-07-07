@@ -129,6 +129,9 @@ var CharitableAdminUI = window.CharitableAdminUI || ( function( document, window
             // Notifications (AM)
             app.initAMNotifications();
 
+            // Square Legacy Modal.
+            app.initSquareLegacyModal();
+
         },
 
         /**
@@ -723,6 +726,154 @@ var CharitableAdminUI = window.CharitableAdminUI || ( function( document, window
                         }, // eslint-disable-line
                     },
                 } );
+            } );
+
+        },
+
+        /**
+         * Initialize the Square legacy modal.
+         *
+         * @since 1.8.7
+         *
+         * @return {void}
+         *
+        */
+        initSquareLegacyModal: function() {
+
+            // Check if we're on the gateway settings page and Square Core enable button is clicked.
+            $( document ).on( 'click', 'a[href*="charitable_action=enable_gateway"][href*="gateway_id=square_core"]', function( e ) {
+
+                // Check if Square Legacy is active and Square Core is not active.
+                if ( typeof CHARITABLE !== 'undefined' && CHARITABLE.square_legacy_active && !CHARITABLE.square_core_active ) {
+                    e.preventDefault();
+
+                    $.alert( {
+                        title: CHARITABLE.heads_up,
+                        content: CHARITABLE.square_legacy_modal_message,
+                        icon: 'fa fa-exclamation-circle',
+                        type: 'orange',
+                        buttons: {
+                            confirm: {
+                                text: CHARITABLE.ok,
+                                btnClass: 'btn-confirm',
+                                keys: [ 'enter' ],
+                                action: function() {
+                                    // Perform AJAX call to switch gateways.
+                                    $.post( CHARITABLE.ajax_url, {
+                                        action: 'charitable_switch_square_gateways',
+                                        nonce: CHARITABLE.nonce
+                                    }, function( response ) {
+                                        if ( response.success ) {
+                                            window.location.href = response.data.redirect_url;
+                                        } else {
+                                            // Show error message if AJAX fails.
+                                            $.alert( {
+                                                title: CHARITABLE.oops,
+                                                content: CHARITABLE.square_legacy_switch_error,
+                                                icon: 'fa fa-exclamation-circle',
+                                                type: 'red',
+                                                buttons: {
+                                                    confirm: {
+                                                        text: CHARITABLE.ok,
+                                                        btnClass: 'btn-confirm',
+                                                        keys: [ 'enter' ]
+                                                    }
+                                                }
+                                            } );
+                                        }
+                                    } ).fail( function() {
+                                        // Show error message if AJAX request fails.
+                                        $.alert( {
+                                            title: CHARITABLE.oops,
+                                            content: CHARITABLE.square_legacy_switch_error,
+                                            icon: 'fa fa-exclamation-circle',
+                                            type: 'red',
+                                            buttons: {
+                                                confirm: {
+                                                    text: CHARITABLE.ok,
+                                                    btnClass: 'btn-confirm',
+                                                    keys: [ 'enter' ]
+                                                }
+                                            }
+                                        } );
+                                    } );
+                                }
+                            },
+                            cancel: {
+                                text: CHARITABLE.cancel,
+                                keys: [ 'esc' ]
+                            }
+                        }
+                    } );
+                }
+            } );
+
+            // Check if we're on the gateway settings page and Square Legacy enable button is clicked.
+            $( document ).on( 'click', 'a[href*="charitable_action=enable_gateway"][href*="gateway_id=square"]', function( e ) {
+
+                // Check if Square Core is active and Square Legacy is not active.
+                if ( typeof CHARITABLE !== 'undefined' && CHARITABLE.square_core_active && !CHARITABLE.square_legacy_active ) {
+                    e.preventDefault();
+
+                    $.alert( {
+                        title: CHARITABLE.heads_up,
+                        content: CHARITABLE.square_core_modal_message,
+                        icon: 'fa fa-exclamation-circle',
+                        type: 'orange',
+                        buttons: {
+                            confirm: {
+                                text: CHARITABLE.ok,
+                                btnClass: 'btn-confirm',
+                                keys: [ 'enter' ],
+                                action: function() {
+                                    // Perform AJAX call to switch gateways.
+                                    $.post( CHARITABLE.ajax_url, {
+                                        action: 'charitable_switch_square_core_to_legacy',
+                                        nonce: CHARITABLE.nonce
+                                    }, function( response ) {
+                                        if ( response.success ) {
+                                            window.location.href = response.data.redirect_url;
+                                        } else {
+                                            // Show error message if AJAX fails.
+                                            $.alert( {
+                                                title: CHARITABLE.oops,
+                                                content: CHARITABLE.square_legacy_switch_error,
+                                                icon: 'fa fa-exclamation-circle',
+                                                type: 'red',
+                                                buttons: {
+                                                    confirm: {
+                                                        text: CHARITABLE.ok,
+                                                        btnClass: 'btn-confirm',
+                                                        keys: [ 'enter' ]
+                                                    }
+                                                }
+                                            } );
+                                        }
+                                    } ).fail( function() {
+                                        // Show error message if AJAX request fails.
+                                        $.alert( {
+                                            title: CHARITABLE.oops,
+                                            content: CHARITABLE.square_legacy_switch_error,
+                                            icon: 'fa fa-exclamation-circle',
+                                            type: 'red',
+                                            buttons: {
+                                                confirm: {
+                                                    text: CHARITABLE.ok,
+                                                    btnClass: 'btn-confirm',
+                                                    keys: [ 'enter' ]
+                                                }
+                                            }
+                                        } );
+                                    } );
+                                }
+                            },
+                            cancel: {
+                                text: CHARITABLE.cancel,
+                                keys: [ 'esc' ]
+                            }
+                        }
+                    } );
+                }
             } );
 
         },

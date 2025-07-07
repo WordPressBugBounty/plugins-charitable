@@ -1623,6 +1623,11 @@ body.charitable_page_charitable-tools .charitable-settings-object h4,
 body.charitable_page_charitable-settings .charitable-settings-object h4 {
   line-height: 40px;
 }
+body.charitable_page_charitable-reports .charitable-settings-object.charitable-gateway,
+body.charitable_page_charitable-tools .charitable-settings-object.charitable-gateway,
+body.charitable_page_charitable-settings .charitable-settings-object.charitable-gateway {
+  min-height: 40px;
+}
 body.charitable_page_charitable-reports .charitable-settings-object .gateway-logo,
 body.charitable_page_charitable-tools .charitable-settings-object .gateway-logo,
 body.charitable_page_charitable-settings .charitable-settings-object .gateway-logo {
@@ -1632,8 +1637,6 @@ body.charitable_page_charitable-settings .charitable-settings-object .gateway-lo
 body.charitable_page_charitable-reports .charitable-settings-object .gateway-badge,
 body.charitable_page_charitable-tools .charitable-settings-object .gateway-badge,
 body.charitable_page_charitable-settings .charitable-settings-object .gateway-badge {
-  margin-left: 10px;
-  float: left;
   background-color: #347d39 !important;
   font-weight: 500;
   color: white;
@@ -1647,15 +1650,13 @@ body.charitable_page_charitable-settings .charitable-settings-object .gateway-ba
 body.charitable_page_charitable-reports .charitable-settings-object .make-default-gateway,
 body.charitable_page_charitable-tools .charitable-settings-object .make-default-gateway,
 body.charitable_page_charitable-settings .charitable-settings-object .make-default-gateway {
-  position: relative;
-  top: 10px;
-  margin-left: 15px;
   display: inline-block;
   color: #2B66D1;
   text-transform: capitalize;
   font-weight: 500;
   font-size: 12px;
   line-height: 12px;
+  margin-left: 0 !important;
   text-decoration: underline;
 }
 body.charitable_page_charitable-reports .charitable-settings-object .make-default-gateway i,
@@ -1683,28 +1684,71 @@ body.charitable_page_charitable-tools .charitable-settings-object > .charitable-
 body.charitable_page_charitable-settings .charitable-settings-object > .charitable-badge ~ .charitable-badge {
   margin-left: 5px;
 }
-body.charitable_page_charitable-reports .charitable-settings-object.stripe .gateway-logo,
-body.charitable_page_charitable-tools .charitable-settings-object.stripe .gateway-logo,
-body.charitable_page_charitable-settings .charitable-settings-object.stripe .gateway-logo {
-  padding: 15px 0 0 20px;
+body.charitable_page_charitable-reports .charitable-settings-object,
+body.charitable_page_charitable-tools .charitable-settings-object,
+body.charitable_page_charitable-settings .charitable-settings-object {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
 }
-body.charitable_page_charitable-reports .charitable-settings-object.stripe .gateway-badge,
-body.charitable_page_charitable-tools .charitable-settings-object.stripe .gateway-badge,
-body.charitable_page_charitable-settings .charitable-settings-object.stripe .gateway-badge {
-  margin-top: 12px;
+body.charitable_page_charitable-reports .charitable-settings-object .gateway-logo,
+body.charitable_page_charitable-tools .charitable-settings-object .gateway-logo,
+body.charitable_page_charitable-settings .charitable-settings-object .gateway-logo {
+  padding: 0;
 }
-body.charitable_page_charitable-reports .charitable-settings-object.stripe .charitable-badge,
-body.charitable_page_charitable-tools .charitable-settings-object.stripe .charitable-badge,
-body.charitable_page_charitable-settings .charitable-settings-object.stripe .charitable-badge {
-  top: 12px;
+body.charitable_page_charitable-reports .charitable-settings-object .gateway-logo-name,
+body.charitable_page_charitable-tools .charitable-settings-object .gateway-logo-name,
+body.charitable_page_charitable-settings .charitable-settings-object .gateway-logo-name {
+  padding: 0 0 0 10px;
 }
-body.charitable_page_charitable-reports .charitable-settings-object.stripe .make-default-gateway,
-body.charitable_page_charitable-tools .charitable-settings-object.stripe .make-default-gateway,
-body.charitable_page_charitable-settings .charitable-settings-object.stripe .make-default-gateway {
-  position: relative;
-  top: 12px;
-  display: inline-block;
-  margin-left: 5px;
+body.charitable_page_charitable-reports .charitable-settings-object .gateway-logo-name .charitable-badge,
+body.charitable_page_charitable-tools .charitable-settings-object .gateway-logo-name .charitable-badge,
+body.charitable_page_charitable-settings .charitable-settings-object .gateway-logo-name .charitable-badge {
+  margin-right: 10px;
+}
+body.charitable_page_charitable-reports .charitable-settings-object .gateway-logo,
+body.charitable_page_charitable-reports .charitable-settings-object .gateway-logo-name h4,
+body.charitable_page_charitable-tools .charitable-settings-object .gateway-logo,
+body.charitable_page_charitable-tools .charitable-settings-object .gateway-logo-name h4,
+body.charitable_page_charitable-settings .charitable-settings-object .gateway-logo,
+body.charitable_page_charitable-settings .charitable-settings-object .gateway-logo-name h4 {
+  width: 130px;
+}
+body.charitable_page_charitable-reports .charitable-settings-object .gateway-logo,
+body.charitable_page_charitable-tools .charitable-settings-object .gateway-logo,
+body.charitable_page_charitable-settings .charitable-settings-object .gateway-logo {
+  margin-bottom: -5px;
+}
+body.charitable_page_charitable-reports .charitable-settings-object .gateway-logo-name,
+body.charitable_page_charitable-tools .charitable-settings-object .gateway-logo-name,
+body.charitable_page_charitable-settings .charitable-settings-object .gateway-logo-name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+}
+body.charitable_page_charitable-reports .charitable-settings-object.square .gateway-logo,
+body.charitable_page_charitable-tools .charitable-settings-object.square .gateway-logo,
+body.charitable_page_charitable-settings .charitable-settings-object.square .gateway-logo {
+  margin-bottom: -5px;
+}
+body.charitable_page_charitable-reports tr.charitable-test-mode-checkbox th h4,
+body.charitable_page_charitable-tools tr.charitable-test-mode-checkbox th h4,
+body.charitable_page_charitable-settings tr.charitable-test-mode-checkbox th h4 {
+  margin-left: 30px !important;
+}
+body.charitable_page_charitable-reports .square-business-locations.square-disconnected,
+body.charitable_page_charitable-tools .square-business-locations.square-disconnected,
+body.charitable_page_charitable-settings .square-business-locations.square-disconnected {
+  display: none !important;
+}
+
+body.charitable-admin-settings-gateways.charitable-admin-settings-gateways-main table.form-table tbody tr:last-child {
+  display: none;
+}
+body.charitable-admin-settings-gateways.charitable-admin-settings-gateways-main p.submit {
+  margin-bottom: 40px;
 }
 
 /* buttons */

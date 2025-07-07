@@ -15,6 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; } // Exit if accessed directly
 
 /**
+ * Reset password form.
+ *
  * @var     Charitable_Reset_Password_Form
  */
 $form = $view_args['form'];
@@ -36,13 +38,13 @@ $form = $view_args['form'];
 
 			<div class="charitable-form-fields cf">
 				<?php $form->view()->render(); ?>
-				<p class="description"><?php echo wp_get_password_hint(); ?></p>
+				<p class="description"><?php echo wp_get_password_hint(); // phpcs:ignore ?></p>
 			</div><!-- .charitable-form-fields -->
 
 			<?php do_action( 'charitable_form_after_fields', $form ); ?>
 
 			<div class="charitable-form-field charitable-submit-field resetpass-submit">
-				<button id="resetpass-button" class="button button-primary lostpassword-button" type="submit"><?php _e( 'Reset Password', 'charitable' ); ?></button>
+				<button id="resetpass-button" class="button button-primary lostpassword-button" type="submit"><?php esc_html_e( 'Reset Password', 'charitable' ); ?></button>
 			</div>
 		</form>
 		<?php
@@ -54,7 +56,7 @@ $form = $view_args['form'];
 
 	else :
 
-		$errors = charitable_get_notices()->get_errors();
+		$errors = charitable_get_notices()->get_errors(); // phpcs:ignore
 
 		if ( ! empty( $errors ) ) {
 			charitable_template(

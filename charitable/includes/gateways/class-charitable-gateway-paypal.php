@@ -339,7 +339,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 			$gateway = new Charitable_Gateway_Paypal();
 			$data    = $gateway->get_encoded_ipn_data();
 
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( charitable_is_debug() ) {
 				error_log( var_export( $data, true ) );
 			}
 
@@ -733,7 +733,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 				'httpversion' => '1.1',
 			);
 
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( charitable_is_debug() ) {
 				error_log( var_export( $args, true ) );
 			}
 
@@ -756,7 +756,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 
 			wp_parse_str( wp_remote_retrieve_body( $request ), $body );
 
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( charitable_is_debug() ) {
 				error_log( var_export( $body, true ) );
 				error_log( 'Response Code: ' . $code );
 				error_log( 'Response Message: ' . $message );

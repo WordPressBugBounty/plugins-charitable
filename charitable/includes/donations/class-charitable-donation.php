@@ -47,6 +47,14 @@ if ( ! class_exists( 'Charitable_Donation' ) ) :
 			$total_refund         = isset( $refund_log['total_refund'] ) ? $refund_log['total_refund'] : 0;
 			$refunds_per_campaign = isset( $refund_log['campaign_refunds'] ) ? $refund_log['campaign_refunds'] : array();
 
+			if ( charitable_is_debug( 'square' ) ) {
+				// phpcs:disable
+				error_log( 'process_refund - Refund amount: ' . $refund_amount );
+				error_log( 'process_refund - Total refund: ' . $total_refund );
+				error_log( 'process_refund - Refunds per campaign: ' . print_r( $refunds_per_campaign, true ) );
+				// phpcs:enable
+			}
+
 			foreach ( $this->get_campaign_donations() as $campaign_donation ) {
 
 				if ( 0 === $refund_amount ) {
@@ -88,6 +96,12 @@ if ( ! class_exists( 'Charitable_Donation' ) ) :
 			);
 
 			update_post_meta( $this->ID, 'donation_refund', $refund_log );
+
+			if ( charitable_is_debug( 'square' ) ) {
+				// phpcs:disable
+				error_log( 'process_refund - Refund log: ' . print_r( $refund_log, true ) );
+				// phpcs:enable
+			}
 
 			$this->update_status( 'charitable-refunded' );
 		}

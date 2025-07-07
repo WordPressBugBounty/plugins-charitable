@@ -1833,14 +1833,17 @@ body.charitable_page_charitable-settings {
     }
 
     .charitable-settings-object {
+
+        &.charitable-gateway {
+            min-height: 40px;
+        }
+
         .gateway-logo {
             float: left;
             padding: 5px 0 0 20px;
         }
 
         .gateway-badge {
-            margin-left: 10px;
-            float: left;
             background-color: #347d39 !important;
             font-weight: 500;
             color: white;
@@ -1853,15 +1856,14 @@ body.charitable_page_charitable-settings {
         }
 
         .make-default-gateway {
-            position: relative;
-            top: 10px;
-            margin-left: 15px;
+
             display: inline-block;
             color: #2B66D1;
             text-transform: capitalize;
             font-weight: 500;
             font-size: 12px;
             line-height: 12px;
+            margin-left: 0 !important;
             text-decoration: underline;
 
             i {
@@ -1875,7 +1877,6 @@ body.charitable_page_charitable-settings {
             margin-top: 6px;
             display: inline-block;
         }
-
     }
 
     .charitable-settings-object>.charitable-badge {
@@ -1888,29 +1889,59 @@ body.charitable_page_charitable-settings {
         margin-left: 5px;
     }
 
-    .charitable-settings-object.stripe {
+    .charitable-settings-object {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
         .gateway-logo {
-            padding: 15px 0 0 20px;
+            padding: 0;
+        }
+        .gateway-logo-name {
+            padding: 0 0 0 10px;
+            .charitable-badge {
+                margin-right: 10px;
+            }
+        }
+        .gateway-logo,
+        .gateway-logo-name h4 {
+            width: 130px;
+        }
+        .gateway-logo {
+            margin-bottom: -5px;
+        }
+        .gateway-logo-name {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: row;
+        }
+    }
+    .charitable-settings-object.square {
+        .gateway-logo {
+            margin-bottom: -5px;
         }
 
-        .gateway-badge {
-            margin-top: 12px;
-        }
-
-        .charitable-badge {
-            top: 12px;
-        }
-
-        .make-default-gateway {
-            position: relative;
-            top: 12px;
-            display: inline-block;
-            margin-left: 5px;
+    }
+    tr.charitable-test-mode-checkbox th {
+        h4 {
+            margin-left: 30px !important;
         }
     }
 
+    .square-business-locations.square-disconnected {
+        display: none !important;
+    }
 
+}
 
+body.charitable-admin-settings-gateways.charitable-admin-settings-gateways-main {
+    table.form-table tbody tr:last-child {
+        display: none;
+    }
+    p.submit {
+        margin-bottom: 40px;
+    }
 }
 
 /* buttons */

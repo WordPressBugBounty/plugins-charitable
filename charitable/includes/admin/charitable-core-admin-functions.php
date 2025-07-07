@@ -915,7 +915,7 @@ function charitable_deactivate_addon() {
 	if ( isset( $_POST['plugin'] ) ) {
 		$plugin = sanitize_text_field( wp_unslash( $_POST['plugin'] ) );
 
-		if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+		if ( charitable_is_debug() ) {
 			error_log( 'charitable_deactivate_addon' ); // phpcs:ignore
 			error_log( print_r( $plugin, true ) ); // phpcs:ignore
 			error_log( print_r( $_POST, true ) ); // phpcs:ignore
@@ -1019,7 +1019,7 @@ function charitable_ajax_install_addon() {
 				array(
 					'basename'     => $download_url,
 					'is_activated' => false,
-					'msg'          => esc_html__( 'Addon not installed. Invalid download URL.', 'charitable-pro' ),
+					'msg'          => esc_html__( 'Addon not installed. Invalid download URL.', 'charitable' ),
 				)
 			);
 		}
@@ -1052,7 +1052,7 @@ function charitable_ajax_install_addon() {
 			die;
 		}
 
-		if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+		if ( charitable_is_debug() ) {
 			error_log( 'charitable_ajax_install_addon creds' ); // phpcs:ignore
 			error_log( print_r( $creds, true ) ); // phpcs:ignore
 		}

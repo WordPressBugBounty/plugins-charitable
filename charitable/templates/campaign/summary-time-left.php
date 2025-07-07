@@ -14,5 +14,5 @@ $campaign = $view_args['campaign'];
 
 ?>
 <div class="campaign-time-left campaign-summary-item">
-	<?php echo $campaign->get_time_left(); ?>
+	<?php echo wp_kses_post( $campaign->get_time_left() ); ?>
 </div>

@@ -19,11 +19,11 @@ $label    = sprintf(
 
 ?>
 <div class="campaign-donation">
-	<a data-trigger-modal="charitable-donation-form-modal-<?php echo $campaign->ID; ?>"
+	<a data-trigger-modal="charitable-donation-form-modal-<?php echo esc_attr( $campaign->ID ); ?>"
 		class="<?php echo esc_attr( charitable_get_button_class( 'donate' ) ); ?>"
-		href="<?php echo charitable_get_permalink( 'campaign_donation_page', array( 'campaign_id' => $campaign->ID ) ); ?>"
-		aria-label="<?php echo $label; ?>"
+		href="<?php echo esc_url( charitable_get_permalink( 'campaign_donation_page', array( 'campaign_id' => $campaign->ID ) ) ); ?>"
+		aria-label="<?php echo esc_attr( $label ); ?>"
 	>
-	<?php _e( 'Donate', 'charitable' ); ?>
+		<?php esc_html_e( 'Donate', 'charitable' ); ?>
 	</a>
 </div>

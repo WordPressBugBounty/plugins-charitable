@@ -15,8 +15,8 @@ $button_style      = array_key_exists( 'button_colour', $view_args ) ? 'style="b
 $button_text       = array_key_exists( 'button_text', $view_args ) ? $view_args['button_text'] : __( 'Donate', 'charitable' );
 $show_amount_field = array_key_exists( 'show_amount_field', $view_args ) && $view_args['show_amount_field'];
 
-$button_text       = esc_html( get_post_meta( $campaign->ID, '_campaign_donate_button_text', true ) );
-$button_text       = false === $button_text || '' === trim( $button_text ) ? __( 'Donate', 'charitable' ) : $button_text;
+$button_text = esc_html( get_post_meta( $campaign->ID, '_campaign_donate_button_text', true ) );
+$button_text = false === $button_text || '' === trim( $button_text ) ? __( 'Donate', 'charitable' ) : $button_text;
 
 ?>
 <form class="campaign-donation" method="post">

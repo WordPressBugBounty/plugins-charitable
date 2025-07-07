@@ -12,7 +12,7 @@
 
 $campaign = $view_args['campaign'];
 
-if ( ! class_exists('Charitable_Campaign') || ! $campaign instanceof Charitable_Campaign ) {
+if ( ! class_exists( 'Charitable_Campaign' ) || ! $campaign instanceof Charitable_Campaign ) {
 	return;
 }
 
@@ -21,8 +21,8 @@ if ( ! class_exists('Charitable_Campaign') || ! $campaign instanceof Charitable_
 	<?php
 	printf(
 		/* translators: %s: number of donors */
-		_x( '%s Donors', 'number of donors', 'charitable' ),
-		'<span class="donors-count">' . $campaign->get_donor_count() . '</span>'
+		esc_html_x( '%s Donors', 'number of donors', 'charitable' ),
+		'<span class="donors-count">' . esc_html( $campaign->get_donor_count() ) . '</span>'
 	);
 	?>
 </div>

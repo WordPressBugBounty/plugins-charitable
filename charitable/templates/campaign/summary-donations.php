@@ -12,16 +12,16 @@
 
 $campaign = $view_args['campaign'];
 
-if ( ! class_exists('Charitable_Campaign') || ! $campaign instanceof Charitable_Campaign ) {
+if ( ! class_exists( 'Charitable_Campaign' ) || ! $campaign instanceof Charitable_Campaign ) {
 	return;
 }
 $donation_summary_content = $campaign->get_donation_summary();
 
 if ( '' !== trim( $donation_summary_content ) ) :
 
-?>
+	?>
 <div class="campaign-figures campaign-summary-item">
-	<?php echo $campaign->get_donation_summary(); ?>
+	<?php echo $campaign->get_donation_summary(); // phpcs:ignore ?>
 </div>
 
 <?php endif; ?>

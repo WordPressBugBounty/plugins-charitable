@@ -2142,7 +2142,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 			if ( $force_cache ) {
 				return true;
 			}
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( charitable_is_debug() ) {
 				return false;
 			}
 			if ( defined( 'CHARITABLE_REPORTS_NO_CACHE' ) && CHARITABLE_REPORTS_NO_CACHE ) { // phpcs:ignore

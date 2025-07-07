@@ -25,5 +25,5 @@ endif;
 
 ?>
 <div class="campaign-finished">
-	<?php echo $notice; ?>
+	<?php echo wp_kses_post( $notice ); ?>
 </div>

@@ -41,7 +41,7 @@ $version       = charitable()->get_version(); // phpcs:ignore
 					<path d="M6.09782 20.3151L6.42855 18L6.92639 14.5151C6.96862 14.2196 7.22177 14 7.52036 14H16.4796C16.7782 14 17.0313 14.2196 17.0736 14.5151L17.5714 18L17.9021 20.3151C17.9538 20.6766 17.6733 21 17.3082 21H6.69179C6.32666 21 6.04618 20.6766 6.09782 20.3151Z" stroke="currentColor" stroke-width="1.5"></path>
 					<path d="M17 10.01L17.01 9.99889" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
 				</svg>
-				<?php esc_html_e( 'Print', 'charitable-pro' ); ?>
+				<?php esc_html_e( 'Print', 'charitable' ); ?>
 			</a>
 		</nav>
 		<article>

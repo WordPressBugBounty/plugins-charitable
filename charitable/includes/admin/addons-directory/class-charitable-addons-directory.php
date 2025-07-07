@@ -107,6 +107,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		 * @since   1.8.0
 		 * @version 1.8.1.15 - Added upgrade_modal.
 		 * @version 1.8.5.3  - Added is_pro_installed.
+		 * @version 1.8.6.2  - Added filter for strings.
 		 */
 		public function charitable_admin_scripts() {
 
@@ -115,64 +116,67 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 			$assets_dir = charitable()->get_path( 'assets', false );
 
-			$strings = array(
-				'nonce'                           => wp_create_nonce( 'charitable-admin' ),
-				'addon_activate'                  => esc_html__( 'Activate', 'charitable' ),
-				'addon_activated'                 => esc_html__( 'Activated', 'charitable' ),
-				'addon_active'                    => esc_html__( 'Active', 'charitable' ),
-				'addon_deactivate'                => esc_html__( 'Deactivate', 'charitable' ),
-				'addon_inactive'                  => esc_html__( 'Inactive', 'charitable' ),
-				'addon_install'                   => esc_html__( 'Install Addon', 'charitable' ),
-				'addon_error'                     => sprintf(
-					wp_kses( /* translators: %1$s - An addon download URL, %2$s - Link to manual installation guide. */
-						__( 'Could not install the addon. Please <a href="%1$s" target="_blank" rel="noopener noreferrer">download it from wpcharitable.com</a> and <a href="%2$s" target="_blank" rel="noopener noreferrer">install it manually</a>.', 'charitable' ),
-						array(
-							'a' => array(
-								'href'   => true,
-								'target' => true,
-								'rel'    => true,
-							),
-						)
+			$strings = apply_filters(
+				'charitable_admin_strings',
+				array(
+					'nonce'                           => wp_create_nonce( 'charitable-admin' ),
+					'addon_activate'                  => esc_html__( 'Activate', 'charitable' ),
+					'addon_activated'                 => esc_html__( 'Activated', 'charitable' ),
+					'addon_active'                    => esc_html__( 'Active', 'charitable' ),
+					'addon_deactivate'                => esc_html__( 'Deactivate', 'charitable' ),
+					'addon_inactive'                  => esc_html__( 'Inactive', 'charitable' ),
+					'addon_install'                   => esc_html__( 'Install Addon', 'charitable' ),
+					'addon_error'                     => sprintf(
+						wp_kses( /* translators: %1$s - An addon download URL, %2$s - Link to manual installation guide. */
+							__( 'Could not install the addon. Please <a href="%1$s" target="_blank" rel="noopener noreferrer">download it from wpcharitable.com</a> and <a href="%2$s" target="_blank" rel="noopener noreferrer">install it manually</a>.', 'charitable' ),
+							array(
+								'a' => array(
+									'href'   => true,
+									'target' => true,
+									'rel'    => true,
+								),
+							)
+						),
+						'https://wpcharitable.com/account/licenses/',
+						'https://wpcharitable.com/docs/how-to-manually-install-addons-in-charitable/'
 					),
-					'https://wpcharitable.com/account/licenses/',
-					'https://wpcharitable.com/docs/how-to-manually-install-addons-in-charitable/'
-				),
-				'plugin_error'                    => esc_html__( 'Could not install the plugin automatically. Please download and install it manually.', 'charitable' ),
-				'addon_search'                    => esc_html__( 'Searching Addons', 'charitable' ),
-				'ajax_url'                        => admin_url( 'admin-ajax.php' ),
-				'admin_url'                       => admin_url(),
-				'ok'                              => esc_html__( 'OK', 'charitable' ),
-				'oops'                            => esc_html__( 'Oops!', 'charitable' ),
-				'please_enter_key'                => esc_html__( 'Please enter a valid license key.', 'charitable' ),
-				'manual_upgrade'                  => esc_html__( 'Manual Upgrade', 'charitable' ),
-				'cancel'                          => esc_html__( 'Cancel', 'charitable' ),
-				'close'                           => esc_html__( 'Close', 'charitable' ),
-				'plugin_install_activate_btn'     => esc_html__( 'Install and Activate', 'charitable' ),
-				'plugin_install_activate_confirm' => esc_html__( 'needs to be installed and activated to import its forms. Would you like us to install and activate it for you?', 'charitable' ),
-				'plugin_activate_btn'             => esc_html__( 'Activate', 'charitable' ),
-				'plugin_activate_confirm'         => esc_html__( 'needs to be activated to import its forms. Would you like us to activate it for you?', 'charitable' ),
-				'connecting'                      => esc_html__( 'Connecting...', 'charitable' ),
-				'save_refresh'                    => esc_html__( 'Save and Refresh', 'charitable' ),
-				'server_error'                    => esc_html__( 'Unfortunately there was a server connection error.', 'charitable' ),
-				'testing'                         => esc_html__( 'Testing', 'charitable' ),
-				'upgrade_completed'               => esc_html__( 'Upgrade was successfully completed!', 'charitable' ),
-				'edit_license'                    => esc_html__( 'To edit the License Key, please first click the Deactivate Key button. Please note that deactivating this key will remove access to updates, addons, and support.', 'charitable' ),
-				'something_went_wrong'            => esc_html__( 'Something went wrong', 'charitable' ),
-				'success'                         => esc_html__( 'Success', 'charitable' ),
-				'loading'                         => esc_html__( 'Loading...', 'charitable' ),
-				'use_simple_contact_form'         => esc_html__( 'Use Simple Contact Form Template', 'charitable' ),
-				'error_select_template'           => esc_html__( 'Something went wrong while applying the template.', 'charitable' ),
-				'plugin_asset_dir'                => charitable()->get_path( 'assets', false ),
-				'install'                         => esc_html__( 'Install', 'charitable' ),
-				'activate'                        => esc_html__( 'Activate', 'charitable' ),
-				'setup'                           => esc_html__( 'Setup', 'charitable' ),
-				'settings'                        => esc_html__( 'Settings', 'charitable' ),
-				'thanks_for_interest'             => esc_html__( 'Thanks for your interest in Charitable Pro!', 'charitable' ),
-				'upgrade_modal'                   => charitable_get_upgrade_modal_text(),
-				'autoshow_plugin_notifications'   => charitable_get_autoshow_plugin_notifications(),
-				'is_pro_installed'                => (int) charitable_is_pro_installed(),
-				'activated_title'                 => esc_html__( 'Almost Done', 'charitable' ),
-				'activated_content'               => esc_html__( 'Charitable Pro is installed but not activated.', 'charitable' ),
+					'plugin_error'                    => esc_html__( 'Could not install the plugin automatically. Please download and install it manually.', 'charitable' ),
+					'addon_search'                    => esc_html__( 'Searching Addons', 'charitable' ),
+					'ajax_url'                        => admin_url( 'admin-ajax.php' ),
+					'admin_url'                       => admin_url(),
+					'ok'                              => esc_html__( 'OK', 'charitable' ),
+					'oops'                            => esc_html__( 'Oops!', 'charitable' ),
+					'please_enter_key'                => esc_html__( 'Please enter a valid license key.', 'charitable' ),
+					'manual_upgrade'                  => esc_html__( 'Manual Upgrade', 'charitable' ),
+					'cancel'                          => esc_html__( 'Cancel', 'charitable' ),
+					'close'                           => esc_html__( 'Close', 'charitable' ),
+					'plugin_install_activate_btn'     => esc_html__( 'Install and Activate', 'charitable' ),
+					'plugin_install_activate_confirm' => esc_html__( 'needs to be installed and activated to import its forms. Would you like us to install and activate it for you?', 'charitable' ),
+					'plugin_activate_btn'             => esc_html__( 'Activate', 'charitable' ),
+					'plugin_activate_confirm'         => esc_html__( 'needs to be activated to import its forms. Would you like us to activate it for you?', 'charitable' ),
+					'connecting'                      => esc_html__( 'Connecting...', 'charitable' ),
+					'save_refresh'                    => esc_html__( 'Save and Refresh', 'charitable' ),
+					'server_error'                    => esc_html__( 'Unfortunately there was a server connection error.', 'charitable' ),
+					'testing'                         => esc_html__( 'Testing', 'charitable' ),
+					'upgrade_completed'               => esc_html__( 'Upgrade was successfully completed!', 'charitable' ),
+					'edit_license'                    => esc_html__( 'To edit the License Key, please first click the Deactivate Key button. Please note that deactivating this key will remove access to updates, addons, and support.', 'charitable' ),
+					'something_went_wrong'            => esc_html__( 'Something went wrong', 'charitable' ),
+					'success'                         => esc_html__( 'Success', 'charitable' ),
+					'loading'                         => esc_html__( 'Loading...', 'charitable' ),
+					'use_simple_contact_form'         => esc_html__( 'Use Simple Contact Form Template', 'charitable' ),
+					'error_select_template'           => esc_html__( 'Something went wrong while applying the template.', 'charitable' ),
+					'plugin_asset_dir'                => charitable()->get_path( 'assets', false ),
+					'install'                         => esc_html__( 'Install', 'charitable' ),
+					'activate'                        => esc_html__( 'Activate', 'charitable' ),
+					'setup'                           => esc_html__( 'Setup', 'charitable' ),
+					'settings'                        => esc_html__( 'Settings', 'charitable' ),
+					'thanks_for_interest'             => esc_html__( 'Thanks for your interest in Charitable Pro!', 'charitable' ),
+					'upgrade_modal'                   => charitable_get_upgrade_modal_text(),
+					'autoshow_plugin_notifications'   => charitable_get_autoshow_plugin_notifications(),
+					'is_pro_installed'                => (int) charitable_is_pro_installed(),
+					'activated_title'                 => esc_html__( 'Almost Done', 'charitable' ),
+					'activated_content'               => esc_html__( 'Charitable Pro is installed but not activated.', 'charitable' ),
+				)
 			);
 
 			wp_enqueue_script(
@@ -340,8 +344,10 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					</div>
 				<?php
 
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) { // @codingStandardsIgnoreLine
-					error_log( 'addons_directory_content - communication issue' ); // @codingStandardsIgnoreLine
+				if ( charitable_is_debug() ) {
+					// phpcs:disable
+					error_log( 'addons_directory_content - communication issue' );
+					// phpcs:enable
 				}
 
 				return;
@@ -404,14 +410,14 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 			<?php
 
-			// phpcs:disable
-			if ( defined( 'CHARITABLE_DEBUG_LICENSE' ) && CHARITABLE_DEBUG_LICENSE ) {
+			if ( charitable_is_debug() ) {
+				// phpcs:disable
 				error_log( 'addons_directory_content' );
 				error_log( print_r( $type, true ) );
 				error_log( print_r( $installed_plugins, true ) );
 				error_log( print_r( $upgrade_url, true ) );
+				// phpcs:enable
 			}
-			// phpcs:enable
 			?>
 
 			<div id="charitable-addons">
@@ -1099,8 +1105,10 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				* Regardless this means we're allowed to try again for a while.
 				*/
 				if ( $this->request_recently_failed() ) {
-					if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-						error_log( 'WPCharitable Debug Error: get_versions (licenses) API call aborted because it recently failed' ); // @codingStandardsIgnoreLine
+					if ( charitable_is_debug() ) {
+						// phpcs:disable
+						error_log( 'WPCharitable Debug Error: get_versions (licenses) API call aborted because it recently failed' );
+						// phpcs:enable
 					}
 					return false;
 				}
@@ -1131,9 +1139,11 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					// Log this failure so we don't keep trying.
 					$this->log_failed_request();
 
-					if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-						error_log( 'WPCharitable Debug Error: get_versions (licenses) API call failed' ); // @codingStandardsIgnoreLine
-						error_log( print_r( $response, true ) ); // @codingStandardsIgnoreLine
+					if ( charitable_is_debug() ) {
+						// phpcs:disable
+						error_log( 'WPCharitable Debug Error: get_versions (licenses) API call failed' );
+						error_log( print_r( $response, true ) );
+						// phpcs:enable
 					}
 
 					return ( false !== $versions && isset( $versions['data'] ) ) ? $versions['data'] : array();
@@ -1151,7 +1161,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					)
 				);
 
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( charitable_is_debug() ) {
 					error_log( 'WPCharitable Debug Notice: get_versions (licenses) API call in addons directory successful and added to site option.' ); // @codingStandardsIgnoreLine
 					error_log( // @codingStandardsIgnoreLine
 						print_r( // @codingStandardsIgnoreLine

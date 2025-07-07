@@ -1,3 +1,8 @@
+# 1.8.7
+* NEW: Square added as a default payment gateway. [More Information](https://www.wpcharitable.com/get-started/square/)
+* NEW: ErrorHandler class that will suppress _load_textdomain_just_in_time messages.
+* FIX: Updated code related to translations and PHP standards.
+
 # 1.8.6.2
 * NEW: Add ‘allow_unfiltered’ setting for CHARITABLE_ADMIN javascript variables for use in campaign builder.
 * FIX: Improved realiablity of some license checks.

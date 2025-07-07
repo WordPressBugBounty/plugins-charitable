@@ -149,7 +149,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 			 */
 			$webhook = $this->get_webhook();
 
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( charitable_is_debug() ) {
 				error_log( 'add_webook' );
 				error_log( print_r( $webhook, true ) );
 			}
@@ -157,14 +157,14 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 			if ( false === $webhook ) {
 				try {
 
-					if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					if ( charitable_is_debug() ) {
 						error_log( 'add_webook false' );
 						error_log( print_r( $this->secret_key, true ) );
 					}
 
 					$this->gateway->setup_api( $this->secret_key );
 
-					if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					if ( charitable_is_debug() ) {
 						error_log( 'add_webook after setup_api' );
 					}
 
@@ -177,7 +177,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 						]
 					);
 
-					if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					if ( charitable_is_debug() ) {
 						error_log( 'add_webook after WebhookEndpoint' );
 						error_log( print_r( $webhook, true ) );
 					}
@@ -185,13 +185,13 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 					if ( defined( 'CHARITABLE_WEBHOOK_SIGNING_SECRET' ) && CHARITABLE_WEBHOOK_SIGNING_SECRET ) {
 						$webhook->secret = CHARITABLE_WEBHOOK_SIGNING_SECRET;
 					}
-					if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					if ( charitable_is_debug() ) {
 						error_log( 'add_webook after WebhookEndpoint UPDATED FOR CLI' );
 						error_log( print_r( $webhook, true ) );
 					}
 
 				} catch ( Exception $e ) {
-					if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					if ( charitable_is_debug() ) {
 						error_log(
 							sprintf(
 								// translators: %s is the error message.
@@ -201,7 +201,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 						);
 					}
 
-					if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					if ( charitable_is_debug() ) {
 						error_log( 'add_webhook ERROR' );
 						error_log( print_r( $e->getMessage(), true ) );
 					}
@@ -210,7 +210,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 				}
 			}
 
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( charitable_is_debug() ) {
 				error_log( 'add_webook returning $webhook->id' );
 				error_log( print_r( $webhook->id, true ) );
 			}
@@ -229,21 +229,21 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 			$webhook_id = charitable_get_option( [ 'gateways_stripe', $this->setting_key ], '' );
 
 			if ( ! $webhook_id ) {
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( charitable_is_debug() ) {
 					error_log( 'get_webhook ! $webhook_id' );
 				}
 				return $this->has_webhook();
 			}
 
 			try {
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( charitable_is_debug() ) {
 					error_log( 'get_webhook try setup_api using secret key ' . $this->secret_key );
 				}
 				$this->gateway->setup_api( $this->secret_key );
 
 				return \Stripe\WebhookEndpoint::retrieve( $webhook_id );
 			} catch ( Exception $e ) {
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( charitable_is_debug() ) {
 					error_log( 'get_webhook try setup_api catch' );
 				}
 				return false;
@@ -266,7 +266,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 
 				$endpoint_urls = $this->get_possible_endpoint_urls();
 
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( charitable_is_debug() ) {
 					error_log( 'has_webhook endpoint_urls' );
 					error_log( print_r( $endpoint_urls, true ) );
 					error_log( print_r( $endpoints, true ) );
@@ -288,7 +288,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 					return $webhook;
 				}
 			} catch ( Exception $e ) {
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( charitable_is_debug() ) {
 					error_log( var_export( $e, true ) );
 				}
 

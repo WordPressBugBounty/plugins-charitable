@@ -235,7 +235,7 @@ if ( ! class_exists( 'Charitable_Form' ) ) :
 			if ( ! $validated ) {
 				charitable_get_notices()->add_error( __( 'Unable to submit form. Please try again.', 'charitable' ) );
 
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( charitable_is_debug() ) {
 					error_log(
 						sprintf(
 							/* translators: %1$s: nonce name; %2$s: nonce action; %3$s: submitted nonce */

@@ -697,7 +697,7 @@ class CharitableLicenses {
 			)
 		);
 
-		if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+		if ( charitable_is_debug() ) {
 			error_log( 'verify_license' );
 			error_log( print_r( $api_params, true ) );
 			error_log( print_r( $product_details, true ) );
@@ -759,7 +759,6 @@ class CharitableLicenses {
 	 * Deactivate a license.
 	 *
 	 * @since  1.0.0
-	 * @version 1.8.6.2 - clear transient _charitable_plugin_versions
 	 *
 	 * @return void
 	 */
@@ -891,7 +890,7 @@ class CharitableLicenses {
 			* Regardless this means we're allowed to try again for a while.
 			*/
 			if ( $this->request_recently_failed() ) {
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( charitable_is_debug() ) {
 					error_log( 'WPCharitable Debug Error: get_versions (licenses) API call aborted because it recently failed' );
 				}
 				return false;
@@ -923,7 +922,7 @@ class CharitableLicenses {
 				// Log this failure so we don't keep trying.
 				$this->log_failed_request();
 
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( charitable_is_debug() ) {
 					error_log( 'WPCharitable Debug Error: get_versions (licenses) API call failed' );
 					error_log( print_r( $response, true ) );
 				}
@@ -943,7 +942,7 @@ class CharitableLicenses {
 				)
 			);
 
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( charitable_is_debug() ) {
 				error_log( 'WPCharitable Debug Notice v1.8.2: get_versions (licenses) API call successful in licensing and added to site option.' );
 				error_log(
 					print_r(
@@ -1074,7 +1073,7 @@ class CharitableLicenses {
 			'valid'           => isset( $license_data['plan_id'] ) ? 1 === intval( $license_data['valid'] ) : false,
 		);
 
-		if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+		if ( charitable_is_debug() ) {
 			error_log( 'ajax_license_check: settings' );
 			error_log( print_r( $settings, true ) );
 			error_log( print_r( $_POST, true ) );
@@ -1083,7 +1082,7 @@ class CharitableLicenses {
 
 		update_option( 'charitable_settings', $settings );
 
-		if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+		if ( charitable_is_debug() ) {
 			error_log( 'download_pro: ' . $download_pro );
 		}
 
@@ -1103,14 +1102,14 @@ class CharitableLicenses {
 				)
 			);
 
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( charitable_is_debug() ) {
 				error_log( 'ajax_license_check: download pro response' );
 				error_log( print_r( $response, true ) );
 			}
 
 			// Check if the response is HTTP valid and not an error.
 			if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( charitable_is_debug() ) {
 					error_log( 'ajax_license_check: download pro response error' );
 					error_log( print_r( $response, true ) );
 				}
@@ -1120,7 +1119,7 @@ class CharitableLicenses {
 			// Get the body of the response.
 			$body = wp_remote_retrieve_body( $response );
 
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( charitable_is_debug() ) {
 				error_log( 'ajax_license_check: download pro body' );
 				error_log( print_r( $body, true ) );
 			}
@@ -1254,8 +1253,7 @@ class CharitableLicenses {
 	/**
 	 * AJAX handler for license deactivation.
 	 *
-	 * @since   1.8.5
-	 * @version 1.8.6.2 - clear transient _charitable_plugin_versions
+	 * @since  1.8.5
 	 *
 	 * @return void
 	 */

@@ -278,7 +278,7 @@ if ( ! class_exists( 'Charitable_Public' ) ) :
 				$keys     = $gateway->get_keys();
 				$settings = get_option( 'charitable_settings' );
 
-				// If there is no public key, skip loading Stripe scripts but continue
+				// If there is no public key, skip loading Stripe scripts but continue.
 				if ( isset( $keys['public_key'] ) && ! empty( $keys['public_key'] ) ) {
 
 					$cc_fields_format = ( ! empty( $settings['gateways_stripe']['cc_fields_format'] ) && '' !== $settings['gateways_stripe']['cc_fields_format'] ) ? $settings['gateways_stripe']['cc_fields_format'] : '';
@@ -334,7 +334,6 @@ if ( ! class_exists( 'Charitable_Public' ) ) :
 							wp_enqueue_script( 'stripe-v3' );
 						}
 					}
-
 				}
 
 			endif;

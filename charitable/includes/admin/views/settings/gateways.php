@@ -8,9 +8,8 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
  * @version   1.6.38
- * @version   1.8.0
- * @version   1.8.1.10 - Cleanup
  * @version   1.8.2 - Add Stripe Warning
+ * @version   1.8.7 - Add Square Legacy gateway and sanitize gateway logos.
  */
 
 $helper   = charitable_get_helper( 'gateways' );
@@ -22,22 +21,65 @@ $upgrades = $helper->get_recommended_gateways();
 
 if ( class_exists( 'Charitable_Gateway_Stripe_AM' ) ) {
 
-	if ( ( ! defined( 'CHARITABLE_DISABLE_STRIPE_KEY_CHECK' ) || ! CHARITABLE_DISABLE_STRIPE_KEY_CHECK ) && is_array( $gateways ) && ! empty( $gateways ) && in_array( 'Charitable_Gateway_Stripe_AM', $gateways, true ) && $helper->is_active_gateway( 'Charitable_Gateway_Stripe_AM' ) ) {
+	if ( ( ! defined( 'CHARITABLE_DISABLE_STRIPE_KEY_CHECK' ) || ! CHARITABLE_DISABLE_STRIPE_KEY_CHECK ) && is_array( $gateways ) && ! empty( $gateways ) && in_array( 'Charitable_Gateway_Stripe_AM', $gateways, true ) && $helper->is_active_gateway( 'Charitable_Gateway_Stripe_AM' ) ) { // phpcs:ignore
 		$stripe_gateway = new Charitable_Gateway_Stripe_AM();
 		$stripe_keys    = $stripe_gateway->get_keys();
 
 		if ( ! isset( $stripe_keys['public_key'] ) || empty( $stripe_keys['public_key'] ) ) {
 			// Display the warning message HTML.
 			/* translators: %s: URL to the Stripe settings page */
-			echo '<div class="charitable-settings-notice charitable-stripe-key-notice"> ' . ( sprintf( __( '<strong>Note:</strong> Stripe is enabled but it does not appear to be connected or API keys are missing. <a href="%s">Confirm Stripe settings to keep using this gateway</a>.', 'charitable' ), admin_url( 'admin.php?page=charitable-settings&tab=gateways&group=gateways_stripe' ) ) ) . '</div>';
+			echo wp_kses(
+				sprintf(
+					'<div class="charitable-settings-notice charitable-stripe-key-notice"> %s</div>',
+					sprintf(
+						/* translators: %s: URL to the Stripe settings page */
+						esc_html__( '<strong>Note:</strong> Stripe is enabled but it does not appear to be connected or API keys are missing. <a href="%s">Confirm Stripe settings to keep using this gateway</a>.', 'charitable' ),
+						esc_url( admin_url( 'admin.php?page=charitable-settings&tab=gateways&group=gateways_stripe' ) )
+					)
+				),
+				array(
+					'div'    => array( 'class' => array() ),
+					'strong' => array(),
+					'a'      => array( 'href' => array() ),
+				)
+			);
 		}
-
 	}
+}
+
+// We need to make sure the 'square_core' gateway always follows the 'stripe' gateway.
+$gateway_keys = array_keys( $gateways );
+$stripe_index = array_search( 'stripe', $gateway_keys, true );
+$square_index = array_search( 'square_core', $gateway_keys, true );
+
+if ( false !== $stripe_index && false !== $square_index && $square_index !== $stripe_index + 1 ) {
+	// Remove square_core from its current position.
+	$square_gateway = $gateways['square_core'];
+	unset( $gateways['square_core'] );
+
+	// Rebuild the array with square_core after stripe.
+	$reordered_gateways = array();
+	$gateway_keys       = array_keys( $gateways );
+
+	foreach ( $gateway_keys as $key ) {
+		$reordered_gateways[ $key ] = $gateways[ $key ];
+
+		// Insert square_core after stripe.
+		if ( 'stripe' === $key ) {
+			$reordered_gateways['square_core'] = $square_gateway;
+		}
+	}
+
+	$gateways = $reordered_gateways;
 }
 
 foreach ( $gateways as $gateway ) :
 
-	$gateway   = new $gateway();
+	$gateway = class_exists( $gateway ) ? new $gateway() : null;
+	if ( ! $gateway ) {
+		continue;
+	}
+
 	$is_active = $helper->is_active_gateway( $gateway->get_gateway_id() );
 
 	if ( $is_active ) {
@@ -91,26 +133,62 @@ foreach ( $gateways as $gateway ) :
 	$gateway_name = null !== $gateway->get_name() ? $gateway->get_name() : '';
 
 	?>
-	<div class="charitable-settings-object charitable-gateway cf <?php echo esc_attr( strtolower( $gateway_name ) ); ?>" style="position: relative;">
-		<?php if ( $gateway->get_badge() ) : ?>
-		<span class="gateway-logo"><svg width="49" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M48.4718 10.3338c0-3.41791-1.6696-6.11484-4.8607-6.11484-3.2045 0-5.1434 2.69693-5.1434 6.08814 0 4.0187 2.289 6.048 5.5743 6.048 1.6023 0 2.8141-.3604 3.7296-.8678v-2.6702c-.9155.4539-1.9658.7343-3.2987.7343-1.3061 0-2.464-.4539-2.6121-2.0294h6.5841c0-.1735.0269-.8678.0269-1.1882Zm-6.6514-1.26838c0-1.50868.929-2.13618 1.7773-2.13618.8213 0 1.6965.6275 1.6965 2.13618h-3.4738Zm-8.5499-4.84646c-1.3195 0-2.1678.61415-2.639 1.04139l-.1751-.82777h-2.9621V20l3.3661-.7076.0134-3.7784c.4847.3471 1.1984.8411 2.3832.8411 2.4102 0 4.6048-1.9225 4.6048-6.1548-.0134-3.87186-2.235-5.98134-4.5913-5.98134Zm-.8079 9.19894c-.7944 0-1.2656-.2804-1.5888-.6275l-.0134-4.95328c.35-.38719.8348-.65421 1.6022-.65421 1.2253 0 2.0735 1.36182 2.0735 3.11079 0 1.7891-.8347 3.1242-2.0735 3.1242Zm-9.6001-9.98666 3.3796-.72096V0l-3.3796.70761v2.72363Zm0 1.01469h3.3796V16.1282h-3.3796V4.44593Zm-3.6219.98798-.2154-.98798h-2.9083V16.1282h3.3661V8.21095c.7944-1.02804 2.1408-.84112 2.5582-.69426V4.44593c-.4309-.16022-2.0062-.45394-2.8006.98798Zm-6.7322-3.88518-3.2853.69426-.01346 10.69421c0 1.976 1.49456 3.4313 3.48726 3.4313 1.1041 0 1.912-.2003 2.3563-.4406v-2.7103c-.4309.1736-2.5583.7877-2.5583-1.1882V7.28972h2.5583V4.44593h-2.5583l.0135-2.8972ZM3.40649 7.83712c0-.5207.43086-.72096 1.14447-.72096 1.0233 0 2.31588.30707 3.33917.85447V4.83311c-1.11755-.44059-2.22162-.61415-3.33917-.61415C1.81769 4.21896 0 5.63418 0 7.99733c0 3.68487 5.11647 3.09747 5.11647 4.68627 0 .6141-.53858.8144-1.29258.8144-1.11755 0-2.54477-.4539-3.675782-1.0681v3.1776c1.252192.534 2.517842.761 3.675782.761 2.80059 0 4.72599-1.3752 4.72599-3.765-.01346-3.97867-5.14339-3.27106-5.14339-4.76638Z" fill="#635BFF"/></svg></span>
-		<?php else : ?>
-		<h4 style="padding-left: 20px;"><?php echo esc_html( $gateway->get_name() ); ?></h4>
-		<?php endif; ?>
+	<div class="charitable-settings-object charitable-gateway <?php echo esc_attr( strtolower( $gateway_name ) ); ?>">
+		<span class="gateway-logo-name">
+			<?php
+				// if method get_logo() exists, use it.
+			if ( method_exists( $gateway, 'get_logo' ) ) {
+				$logo = $gateway->get_logo();
+				if ( is_string( $logo ) && ( strpos( $logo, '<img' ) !== false || strpos( $logo, '<svg' ) !== false ) ) {
+					echo '<span class="gateway-logo">' . wp_kses(
+						$logo,
+						array(
+							'img'  => array(
+								'src'    => array(),
+								'alt'    => array(),
+								'class'  => array(),
+								'width'  => array(),
+								'height' => array(),
+							),
+							'svg'  => array(
+								'xmlns'   => array(),
+								'viewBox' => array(),
+								'width'   => array(),
+								'height'  => array(),
+								'class'   => array(),
+							),
+							'path' => array(
+								'd'    => array(),
+								'fill' => array(),
+							),
+						)
+					) . '</span>';
+				} else {
+					echo '<span class="gateway-logo">' . esc_html( $logo ) . '</span>';
+				}
+			} else {
+				$name = esc_html( $gateway->get_name() );
+				if ( 'square' === strtolower( $name ) ) {
+					$name .= ' ' . __( '(Legacy)', 'charitable' );
+				}
+				echo '<h4>' . esc_html( $name ) . '</h4>';
+			}
+			?>
 
-		<?php if ( $gateway->get_recommended() ) : ?>
-			<span class="charitable-badge charitable-badge-sm charitable-badge-inline charitable-badge-green charitable-badge-rounded"><i class="fa fa-star" aria-hidden="true"></i><?php esc_html_e( 'Recommended', 'charitable' ); ?></span>
-		<?php endif ?>
+			<?php if ( $gateway->get_recommended() ) : ?>
+				<span class="charitable-badge charitable-badge-sm charitable-badge-inline charitable-badge-green charitable-badge-rounded"><i class="fa fa-star" aria-hidden="true"></i><?php esc_html_e( 'Recommended', 'charitable' ); ?></span>
+			<?php endif ?>
 
-		<?php if ( (string) $gateway->get_gateway_id() === (string) $default ) : ?>
+			<?php if ( (string) $gateway->get_gateway_id() === (string) $default ) : ?>
 
-			<span class="charitable-badge charitable-badge-sm charitable-badge-inline charitable-badge-orange charitable-badge-rounded"><i class="fa fa-check" aria-hidden="true"></i><?php esc_html_e( 'Default Gateway', 'charitable' ); ?></span>
+				<span class="charitable-badge charitable-badge-sm charitable-badge-inline charitable-badge-orange charitable-badge-rounded"><i class="fa fa-check" aria-hidden="true"></i><?php esc_html_e( 'Default Gateway', 'charitable' ); ?></span>
 
-		<?php elseif ( $is_active ) : ?>
+			<?php elseif ( $is_active ) : ?>
 
-			<a href="<?php echo esc_url( $make_default_url ); ?>" class="make-default-gateway"><i class="fa fa-check" aria-hidden="true"></i><?php esc_html_e( 'Make default', 'charitable' ); ?></a>
+				<a href="<?php echo esc_url( $make_default_url ); ?>" class="make-default-gateway"><i class="fa fa-check" aria-hidden="true"></i><?php esc_html_e( 'Make default', 'charitable' ); ?></a>
 
-		<?php endif ?>
+			<?php endif ?>
+		</span>
 		<span class="actions">
 			<?php
 			if ( $is_active ) :
@@ -126,10 +204,52 @@ foreach ( $gateways as $gateway ) :
 
 				<a href="<?php echo esc_url( $settings_url ); ?>" class="button button-primary"><?php esc_html_e( 'Gateway Settings', 'charitable' ); ?></a>
 			<?php endif ?>
-			<a href="<?php echo $action_url; ?>" class="button"><?php echo $action_text; ?></a>
+			<a href="<?php echo esc_url( $action_url ); ?>" class="button"><?php echo esc_html( $action_text ); ?></a>
 		</span>
 	</div>
-<?php endforeach ?>
+
+	<?php
+	// Display Square gateway row after Stripe if the class isn't loaded.
+	if ( 'stripe' === $gateway->get_gateway_id() && ! class_exists( 'Charitable_Gateway_Square' ) ) :
+		$php_version_check = version_compare( PHP_VERSION, '8.1.0', '>=' );
+
+		if ( ! $php_version_check ) {
+			$error_message = sprintf(
+				/* translators: %s: URL to documentation */
+				__( 'Requires PHP 8.1.0 or higher. <a href="%s" target="_blank">See our documentation</a>.', 'charitable' ),
+				'https://www.wpcharitable.com/documentation/php-version-compatibility-square/'
+			);
+		} else {
+			$error_message = __( 'Square gateway could not be loaded.', 'charitable' );
+		}
+		?>
+		<div class="charitable-settings-object charitable-gateway square">
+			<span class="gateway-logo-name">
+				<span class="gateway-logo"><?php echo '<svg width="88" height="22" viewBox="0 0 88 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.6761 1.54849e-07H18.3239C19.299 -0.000282679 20.2344 0.386894 20.924 1.07633C21.6136 1.76576 22.0011 2.70095 22.0011 3.6761V18.3228C22.0011 20.3537 20.3547 22 18.3239 22H3.6761C1.64567 21.9994 0 20.3533 0 18.3228V3.6761C0 1.64584 1.64584 1.54849e-07 3.6761 1.54849e-07ZM16.8434 18.0005C17.4842 18.0005 18.0037 17.481 18.0037 16.8402L18.0005 5.16083C18.0005 4.52004 17.481 4.00058 16.8402 4.00058H5.1619C4.854 4.00058 4.55872 4.12297 4.3411 4.34079C4.12348 4.55861 4.00137 4.854 4.00165 5.1619V16.8402C4.00165 17.481 4.52111 18.0005 5.1619 18.0005H16.8434Z" fill="#3E4348"/><path d="M8.66615 13.9828C8.30039 13.9799 8.00543 13.6826 8.00544 13.3168V8.65442C8.00459 8.47722 8.07438 8.30698 8.19939 8.18138C8.32439 8.05578 8.49429 7.98517 8.67149 7.98517H13.3403C13.5174 7.98545 13.6871 8.05615 13.8121 8.18169C13.937 8.30724 14.0069 8.47731 14.0063 8.65442V13.3157C14.0069 13.4928 13.937 13.6629 13.8121 13.7884C13.6871 13.914 13.5174 13.9847 13.3403 13.985L8.66615 13.9828Z" fill="#3E4348"/><path d="M33.1959 10.0196C32.5149 9.83388 31.8702 9.65883 31.3696 9.43575C30.4431 9.0216 30.0119 8.44734 30.0119 7.62972C30.0119 6.08414 31.5062 5.3882 32.9942 5.3882C34.4084 5.3882 35.6434 5.97313 36.4728 7.03412L36.5293 7.1067L37.7248 6.17167L37.6672 6.09908C36.5646 4.69653 34.9315 3.92801 33.0667 3.92801C31.8254 3.92801 30.6875 4.26317 29.8646 4.87265C28.9381 5.55044 28.4492 6.53351 28.4492 7.70657C28.4492 10.4338 31.0173 11.0987 33.0817 11.6335C35.1706 12.1843 36.4504 12.6027 36.4504 14.1952C36.4504 15.7632 35.1823 16.7762 33.2204 16.7762C32.2502 16.7762 30.4538 16.519 29.3245 14.7941L29.2722 14.7129L28.0148 15.6234L28.0639 15.6971C29.1313 17.3131 30.9736 18.2407 33.1244 18.2407C36.0458 18.2407 38.0098 16.5915 38.0098 14.1387C38.0098 11.3314 35.3392 10.6045 33.1959 10.0196Z" fill="#3E4348"/><path fill-rule="evenodd" clip-rule="evenodd" d="M47.5395 9.45282V7.97662H48.9452V21.9979H47.5395V16.52C46.7368 17.6205 45.5328 18.2225 44.1174 18.2225C41.4447 18.2225 39.5767 16.0824 39.5767 12.9923C39.5767 9.90219 41.4489 7.745 44.1174 7.745C45.5232 7.745 46.7272 8.35021 47.5395 9.45282ZM41.0583 12.9752C41.0583 15.8358 42.6967 16.8552 44.2305 16.8552L44.2337 16.8562C46.2415 16.8562 47.5395 15.3192 47.5395 12.9752C47.5395 10.6312 46.2394 9.11552 44.2305 9.11552C41.8919 9.11552 41.0583 11.1094 41.0583 12.9752Z" fill="#3E4348"/><path d="M58.239 7.97662V13.511C58.239 15.4484 56.9122 16.8552 55.0848 16.8552C53.567 16.8552 52.8284 15.9543 52.8284 14.1024V7.97662H51.4226V14.3895C51.4226 16.7911 52.728 18.2246 54.914 18.2246C56.276 18.2246 57.4459 17.6472 58.24 16.5915V17.9962H59.6458V7.97662H58.239Z" fill="#3E4348"/><path fill-rule="evenodd" clip-rule="evenodd" d="M62.293 9.02907C63.3294 8.21465 64.7362 7.7482 66.1505 7.7482C68.3846 7.7482 69.7177 8.85935 69.7135 10.723V17.9984H68.3067V16.8872C67.5968 17.7763 66.57 18.2268 65.2486 18.2268C63.0956 18.2268 61.7571 17.0494 61.7571 15.1559C61.7571 12.6934 64.0776 12.307 65.0661 12.1426C65.2272 12.116 65.3937 12.0904 65.5601 12.0647L65.5603 12.0647L65.5663 12.0638C66.9168 11.8559 68.3109 11.6414 68.3109 10.4957C68.3109 9.19878 66.6276 9.09845 66.1121 9.09845C65.2016 9.09845 63.9154 9.3685 63.0412 10.1263L62.9612 10.1957L62.2268 9.08137L62.293 9.02907ZM63.2248 15.0769C63.2248 16.6823 64.7362 16.8562 65.3863 16.8562H65.3873C66.8006 16.8562 68.3131 16.1027 68.3099 13.985V12.5354C67.6242 12.9685 66.6483 13.1377 65.7778 13.2886L65.7631 13.2912L65.3265 13.3691C63.9325 13.6274 63.2248 13.9604 63.2248 15.0769Z" fill="#3E4348"/><path d="M77.8577 8.16554C77.5236 7.92752 76.9974 7.78555 76.4487 7.78555C75.3213 7.80037 74.2664 8.34386 73.5998 9.25322V7.97235H72.1941V17.9909H73.5998V12.6326C73.5998 10.2566 74.9352 9.19237 76.2576 9.19237C76.6447 9.1872 77.0279 9.26852 77.3795 9.4304L77.4745 9.48057L77.9196 8.20611L77.8577 8.16554Z" fill="#3E4348"/><path fill-rule="evenodd" clip-rule="evenodd" d="M78.2697 13.0136C78.2697 9.91394 80.2027 7.7482 82.9662 7.7482C85.6282 7.7482 87.4887 9.67057 87.4834 12.4276C87.4826 12.6673 87.4694 12.9067 87.4439 13.1449L87.4353 13.2271H79.7501C79.7853 15.4334 81.1132 16.8562 83.1508 16.8562C84.3186 16.8562 85.3304 16.3813 85.9997 15.5177L86.0605 15.4388L87.0788 16.346L87.0223 16.4143C86.3455 17.2394 85.1116 18.2236 83.0729 18.2236C80.2016 18.2236 78.2697 16.1304 78.2697 13.0136ZM82.9277 9.09738C81.2103 9.09738 79.9924 10.2277 79.8024 11.9879H85.9976C85.8759 10.5725 85.0113 9.09738 82.9277 9.09738Z" fill="#3E4348"/></svg>'; ?></span>
+
+				<span class="charitable-badge charitable-badge-sm charitable-badge-inline charitable-badge-green charitable-badge-rounded"><i class="fa fa-star" aria-hidden="true"></i><?php esc_html_e( 'Recommended', 'charitable' ); ?></span>
+			</span>
+			<span class="actions">
+				<span class="gateway-error">
+					<?php
+					echo wp_kses(
+						$error_message,
+						array(
+							'a' => array(
+								'href'   => array(),
+								'target' => array(),
+							),
+						)
+					);
+					?>
+				</span>
+			</span>
+		</div>
+		<?php
+	endif;
+endforeach
+?>
+
 <?php
 if ( ! empty( $upgrades ) ) :
 	if ( 1 === count( $upgrades ) ) {

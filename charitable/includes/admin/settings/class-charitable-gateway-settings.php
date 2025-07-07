@@ -89,6 +89,7 @@ if ( ! class_exists( 'Charitable_Gateway_Settings' ) ) :
 					'title'    => __( 'Turn on Test Mode', 'charitable' ),
 					'type'     => 'checkbox',
 					'priority' => 15,
+					'class'    => 'charitable-test-mode-checkbox',
 				),
 			);
 		}
@@ -98,9 +99,11 @@ if ( ! class_exists( 'Charitable_Gateway_Settings' ) ) :
 		 *
 		 * @since   1.0.0
 		 *
-		 * @return  array[]
+		 * @param array $fields The existing fields.
+		 * @return array
 		 */
 		public function add_individual_gateway_fields( $fields ) {
+
 			foreach ( charitable_get_helper( 'gateways' )->get_active_gateways() as $gateway ) {
 				if ( ! class_exists( $gateway ) ) {
 					continue;
@@ -119,7 +122,7 @@ if ( ! class_exists( 'Charitable_Gateway_Settings' ) ) :
 		 *
 		 * @since  1.0.0
 		 *
-		 * @param  string[] $groups
+		 * @param  string[] $groups The existing groups.
 		 * @return string[]
 		 */
 		public function add_gateway_settings_dynamic_groups( $groups ) {
@@ -139,6 +142,7 @@ if ( ! class_exists( 'Charitable_Gateway_Settings' ) ) :
 		 *
 		 * @since   1.0.0
 		 *
+		 * @param array $args The arguments.
 		 * @return  void
 		 */
 		public function render_gateways_table( $args ) {

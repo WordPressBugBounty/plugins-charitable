@@ -158,8 +158,17 @@ CHARITABLE = window.CHARITABLE || {};
          * @access private
          */
         var on_change_payment_gateway = function() {
+            var selectedGateway = $(this).val();
+
             self.hide_inactive_payment_methods();
-            self.show_active_payment_methods( $(this).val() );
+            self.show_active_payment_methods( selectedGateway );
+
+            // Trigger resize event for Square gateway to fix iframe height issue
+            if ( selectedGateway === 'square' || selectedGateway === 'square_core' ) {
+                setTimeout(function() {
+                    window.dispatchEvent(new Event('resize'));
+                }, 100);
+            }
         };
 
         /**
@@ -240,7 +249,9 @@ CHARITABLE = window.CHARITABLE || {};
          * @param   object Donation_Form
          */
         var process_donation = function( event, helper ) {
+
             var data = helper.get_data();
+
             var form = helper.form;
 
             /* Cancel the default Charitable action, but pass it along as the form_action variable */

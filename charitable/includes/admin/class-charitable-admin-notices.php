@@ -62,9 +62,11 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 			add_action( 'admin_notices', array( $this, 'render_license_expiring_banner' ) );
 			add_action( 'admin_notices', array( $this, 'render_license_expired_banner' ) );
 			add_action( 'admin_notices', array( $this, 'render_five_star_rating' ) );
+			add_action( 'admin_notices', array( $this, 'render_square_connection_error' ) );
 			add_action( 'charitable_dismiss_notice', array( $this, 'dismiss_five_star_notice' ), 10, 1 );
 			add_action( 'charitable_dismiss_notice', array( $this, 'dismiss_campaign_builder_notice' ), 10, 1 );
 			add_action( 'charitable_dismiss_notice', array( $this, 'dismiss_dashboard_reporting_notice' ), 10, 1 );
+			add_action( 'charitable_dismiss_notice', array( $this, 'dismiss_square_connection_error_notice' ), 10, 1 );
 			add_filter( 'charitable_localized_javascript_vars', array( $this, 'render_campaign_upgrade_banner_html' ), 10, 1 );
 		}
 
@@ -187,7 +189,9 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 		public function render() {
 			foreach ( charitable_get_admin_notices()->get_notices() as $type => $notices ) {
 				foreach ( $notices as $key => $notice ) {
-					$this->render_notice( $notice['message'], $type, $notice['dismissible'], $key );
+					if ( ! empty( $notice['message'] ) ) {
+						$this->render_notice( $notice['message'], $type, $notice['dismissible'], $key );
+					}
 				}
 			}
 		}
@@ -280,7 +284,6 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 						true
 					);
 				}
-
 			}
 		}
 
@@ -320,7 +323,6 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 							'charitable-license-expiring-banner'
 						);
 					}
-
 				}
 			}
 		}
@@ -360,7 +362,6 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 							'charitable-license-expiring-banner'
 						);
 					}
-
 				}
 			}
 		}
@@ -382,8 +383,19 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 				if ( ! $banner ) {
 					$nonce             = wp_create_nonce( 'charitable_dismiss_list_banner' );
 					$banner_text       = '<p><strong>Unlock More Donations with Peer-to-Peer Fundraising!</strong><br/>Harness the power of supporter networks and friends to reach more people and raise more money for your cause.</p>';
-					$strings['banner'] = '<div data-id="charitable_ltp_lb" data-nonce="' . $nonce . '" class="charitable-campaign-list-banner"><button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button><div class="charitable-campaign-list-banner-icon-text"><div class="charitable-campaign-list-banner-icon"><img src="' . charitable()->get_path( 'assets', false ) . 'images/icons/ambassador.png' . '" /></div><div class="charitable-campaign-list-banner-text">' . $banner_text . '</div></div><div class="charitable-campaign-list-banner-button"><a class="button-link" href="#">Learn More</a></li>
-					</div>';
+					$strings['banner'] = sprintf(
+						'<div data-id="charitable_ltp_lb" data-nonce="%1$s" class="charitable-campaign-list-banner">' .
+						'<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>' .
+						'<div class="charitable-campaign-list-banner-icon-text">' .
+						'<div class="charitable-campaign-list-banner-icon"><img src="%2$s" /></div>' .
+						'<div class="charitable-campaign-list-banner-text">%3$s</div>' .
+						'</div>' .
+						'<div class="charitable-campaign-list-banner-button"><a class="button-link" href="#">Learn More</a></div>' .
+						'</div>',
+						$nonce,
+						charitable()->get_path( 'assets', false ) . 'images/icons/ambassador.png',
+						$banner_text
+					);
 				} else {
 					$strings['banner'] = '';
 				}
@@ -433,10 +445,26 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 						$key     = 'five-star-review';
 						$this->render_notice( $message, 'five-star-review', true, $key, false );
 					}
-
 				}
-
 			}
+		}
+
+		/**
+		 * Render a notice when the Square connection fails.
+		 *
+		 * @since 1.8.7
+		 */
+		public function render_square_connection_error() {
+
+			$admin_notice = get_option( 'charitable_square_connection_error_notice' );
+
+			if ( false === $admin_notice ) {
+				return;
+			}
+
+			$message = charitable_admin_view( 'notices/admin-notice-square-connection-error', array( 'message' => $admin_notice['message'], 'status_code' => $admin_notice['status_code'] ), true ); // phpcs:ignore
+			$key     = 'square-connection-error';
+			$this->render_notice( $message, 'error', true, $key, false );
 		}
 
 		/**
@@ -467,7 +495,6 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 					$key     = 'campaign-builder';
 					$this->render_notice( $message, 'campaign-builder', true, $key, false );
 				}
-
 			}
 		}
 
@@ -495,7 +522,7 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 				$activated_datetime = ( false !== get_option( 'wpcharitable_activated_datetime' ) ) ? get_option( 'wpcharitable_activated_datetime' ) : false;
 				$days               = 0;
 				if ( $activated_datetime ) {
-					$diff = current_time( 'timestamp' ) - $activated_datetime;
+					$diff = current_time( 'timestamp' ) - $activated_datetime; // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
 					$days = abs( round( $diff / 86400 ) );
 				}
 
@@ -509,7 +536,6 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 						$key     = 'dashboard-reporting';
 						$this->render_notice( $message, 'dashboard-reporting', true, $key, false );
 					}
-
 				}
 			}
 		}
@@ -566,6 +592,22 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 		}
 
 		/**
+		 * Dismiss the Square connection error notice.
+		 *
+		 * @since 1.8.7
+		 * @param array $postdata $_POST data.
+		 */
+		public function dismiss_square_connection_error_notice( $postdata ) {
+			if ( empty( $postdata['notice'] ) || 'square-connection-error' !== $postdata['notice'] ) {
+				return;
+			}
+
+			delete_option( 'charitable_square_connection_error_notice' );
+			wp_send_json_success();
+			exit;
+		}
+
+		/**
 		 * Render a banner.
 		 *
 		 * @since 1.7.0
@@ -574,8 +616,8 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 		 * @param string  $message The message to display.
 		 * @param string  $type    The type of notice. Accepts 'top-of-page'.
 		 * @param boolean $dismissible Optional. Whether the notice can be dismissed. Defaults to false.
-		 * @param mixed  $data_nonce Optional. The nonce to use for the notice.
-		 * @param mixed  $data_id Optional. The id to use for the notice.
+		 * @param mixed   $data_nonce Optional. The nonce to use for the notice.
+		 * @param mixed   $data_id Optional. The id to use for the notice.
 		 * @param string  $data_lifespan Optional. The lifespan of the notice.
 		 * @param string  $additional_css_class Optional. The CSS class to use for the notice.
 		 *
@@ -598,7 +640,7 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 					break;
 			}
 
-			if ( $dismissible ) {
+			if ( $dismissible ) { // phpcs:ignore
 				// $class .= ' is-dismissible';
 			}
 
@@ -621,6 +663,13 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 		 * @return void
 		 */
 		public function shutdown() {
+			if ( charitable_is_debug( 'square' ) ) {
+				// phpcs:disable
+				error_log( 'Saving admin notices to transient' );
+				error_log( 'Notices to save: ' . print_r( $this->notices, true ) );
+				// phpcs:enable
+			}
+
 			set_transient( 'charitable_notices', $this->notices );
 		}
 

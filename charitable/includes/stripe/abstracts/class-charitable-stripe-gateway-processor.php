@@ -1098,7 +1098,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 
 			$campaign_donations = $this->donation->get_campaign_donations();
 
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( charitable_is_debug() ) {
 				error_log( 'setup_stripe_connect in embedded stripe' );
 				error_log( print_r( $campaign_donations, true ) );
 			}
@@ -1109,7 +1109,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 			);
 
 			if ( ! class_exists( 'Charitable_Stripe_Connect' ) ) {
-				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				if ( charitable_is_debug() ) {
 					error_log( 'Charitable_Stripe_Connect not found' );
 					return;
 				}
@@ -1186,7 +1186,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 			$fee    = 0;
 			$amount = str_replace( ',', '.', $amount );
 
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( charitable_is_debug() ) {
 				error_log( 'get_application_fee_amount' );
 				error_log( print_r( $amount, true ) );
 				error_log( print_r( $application_fee, true ) );
@@ -1212,7 +1212,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 
 			}
 
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( charitable_is_debug() ) {
 				error_log( 'get_application_fee_amount fee' );
 				error_log( print_r( $fee, true ) );
 				error_log( print_r( $amount, true ) );

@@ -617,3 +617,159 @@ function charitable_is_installed_mi_pro() {
 
 	return false;
 }
+
+/**
+ * Get the secret key for the crypto functions.
+ *
+ * @since 1.8.7
+ *
+ * @return string
+ */
+function charitable_crypto_get_secret_key() {
+
+	$secret_key = get_option( 'charitable_crypto_secret_key' );
+
+	error_log( 'charitable_crypto_get_secret_key: secret_key: ' . $secret_key );
+
+	// If we already have the secret, send it back.
+	if ( false !== $secret_key ) {
+		error_log( 'charitable_crypto_get_secret_key: secret_key already exists: ' . $secret_key );
+		error_log( 'charitable_crypto_get_secret_key: secret_key decoded: ' . base64_decode( $secret_key ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
+		return base64_decode( $secret_key ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
+	}
+
+	// We don't have a secret, so let's generate one.
+	$secret_key = sodium_crypto_secretbox_keygen();
+	add_option( 'charitable_crypto_secret_key', base64_encode( $secret_key ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+
+	error_log( 'charitable_crypto_get_secret_key: secret_key returned: ' . $secret_key );
+
+	return $secret_key;
+}
+
+/**
+ * Encrypt a message.
+ *
+ * @since 1.6.1.2
+ *
+ * @param string $message Message to encrypt.
+ * @param string $key     Encryption key.
+ *
+ * @return string
+ */
+function charitable_crypto_encrypt( $message, $key = '' ) {
+
+	error_log( 'charitable_crypto_encrypt: message: ' . $message );
+	error_log( 'charitable_crypto_encrypt: key: ' . $key );
+
+	// Create a nonce for this operation. It will be stored and recovered in the message itself.
+	$nonce = random_bytes(
+		SODIUM_CRYPTO_SECRETBOX_NONCEBYTES
+	);
+
+	if ( empty( $key ) ) {
+		$key = charitable_crypto_get_secret_key();
+	}
+
+	error_log( 'charitable_crypto_encrypt: key: ' . $key );
+
+	// Encrypt message and combine with nonce.
+	$cipher = base64_encode( // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+		$nonce .
+		sodium_crypto_secretbox(
+			$message,
+			$nonce,
+			$key
+		)
+	);
+
+	try {
+		sodium_memzero( $message );
+		sodium_memzero( $key );
+		error_log( 'charitable_crypto_encrypt: cipher: ' . $cipher );
+	} catch ( \Exception $e ) {
+		error_log( 'charitable_crypto_encrypt: error: ' . $e->getMessage() );
+		return $cipher;
+	}
+
+	return $cipher;
+}
+
+/**
+ * Decrypt a message.
+ *
+ * @since 1.6.1.2
+ *
+ * @param string $encrypted Encrypted message.
+ * @param string $key       Encryption key.
+ *
+ * @return string
+ */
+function charitable_crypto_decrypt( $encrypted, $key = '' ) {
+
+	// Unpack base64 message.
+	$decoded = base64_decode( $encrypted ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
+
+	if ( false === $decoded ) {
+		return false;
+	}
+
+	if ( mb_strlen( $decoded, '8bit' ) < ( SODIUM_CRYPTO_SECRETBOX_NONCEBYTES + SODIUM_CRYPTO_SECRETBOX_MACBYTES ) ) {
+		return false;
+	}
+
+	// Pull nonce and ciphertext out of unpacked message.
+	$nonce      = mb_substr( $decoded, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES, '8bit' );
+	$ciphertext = mb_substr( $decoded, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES, null, '8bit' );
+
+	if ( empty( $key ) ) {
+		$key = charitable_crypto_get_secret_key();
+	}
+
+	// Decrypt it.
+	$message = sodium_crypto_secretbox_open(
+		$ciphertext,
+		$nonce,
+		$key
+	);
+
+	// Check for decrpytion failures.
+	if ( false === $message ) {
+		return false;
+	}
+
+	try {
+		sodium_memzero( $ciphertext );
+		sodium_memzero( $key );
+		error_log( 'charitable_crypto_decrypt: message: ' . $message );
+	} catch ( \Exception $e ) {
+		error_log( 'charitable_crypto_decrypt: error: ' . $e->getMessage() );
+		return $message;
+	}
+
+	return $message;
+}
+
+if ( ! function_exists( 'charitable_array_key_first' ) ) {
+	/**
+	 * The `array_key_first` polyfill.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param array $arr Input array.
+	 *
+	 * @return mixed|null
+	 */
+	function charitable_array_key_first( array $arr ) {
+
+		if ( function_exists( 'array_key_first' ) ) {
+			return array_key_first( $arr );
+		}
+
+		foreach ( $arr as $key => $unused ) {
+			return $key;
+		}
+
+		return null;
+	}
+}

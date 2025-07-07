@@ -126,13 +126,17 @@ if ( ! class_exists( 'Charitable_Webhook_Listener_Endpoint' ) ) :
 		 */
 		public function process_incoming_webhook( WP_Query $wp_query ) {
 
-			if ( defined( 'CHARITABLE_DEBUG_WEBHOOK' ) && CHARITABLE_DEBUG_WEBHOOK ) {
+			if ( charitable_is_debug( 'webhook' ) ) {
+				// phpcs:disable
 				error_log( 'process_incoming_webhook' );
+				// phpcs:enable
 			}
 
 			if ( ! $wp_query->is_main_query() ) {
-				if ( defined( 'CHARITABLE_DEBUG_WEBHOOK' ) && CHARITABLE_DEBUG_WEBHOOK ) {
+				if ( charitable_is_debug( 'webhook' ) ) {
+					// phpcs:disable
 					error_log( 'process_incoming_webhook is_main_query = false' );
+					// phpcs:enable
 				}
 				return false;
 			}
@@ -144,16 +148,37 @@ if ( ! class_exists( 'Charitable_Webhook_Listener_Endpoint' ) ) :
 
 			$gateway = get_query_var( 'charitable-listener', false );
 
-			if ( defined( 'CHARITABLE_DEBUG_WEBHOOK' ) && CHARITABLE_DEBUG_WEBHOOK ) {
-				error_log( 'process_incoming_webhook testing for gateway start' );
+			if ( charitable_is_debug( 'webhook' ) ) {
+				// phpcs:disable
+				error_log( 'process_incoming_webhook - starting to process webhook for gateway ' . $gateway );
+				// phpcs:enable
+			}
+
+			if ( ! $gateway ) {
+				if ( charitable_is_debug( 'webhook' ) ) {
+					// phpcs:disable
+					error_log( 'process_incoming_webhook no gateway found' );
+					// Show the request URL.
+					error_log( 'process_incoming_webhook - request URL is ' . $_SERVER['REQUEST_URI'] );
+					// phpcs:enable
+				}
 			}
 
 			if ( $gateway ) {
 
-				if ( defined( 'CHARITABLE_DEBUG_WEBHOOK' ) && CHARITABLE_DEBUG_WEBHOOK ) {
-					error_log( 'process_incoming_webhook GATEWAY' );
-					error_log( print_r( $wp_query, true ) );
-					error_log( print_r( $gateway, true ) );
+				if ( charitable_is_debug( 'webhook' ) ) {
+					// phpcs:disable
+					error_log( 'process_incoming_webhook for gateway ***' . $gateway . '***' );
+					// Show the request URL.
+					error_log( 'process_incoming_webhook - request URL is ' . $_SERVER['REQUEST_URI'] );
+					// phpcs:enable
+				}
+
+				// Debug: Log the hook that will be fired.
+				if ( charitable_is_debug( 'webhook' ) ) {
+					// phpcs:disable
+					error_log( 'process_incoming_webhook - will fire hook: charitable_process_ipn_' . $gateway );
+					// phpcs:enable
 				}
 
 				/**
@@ -166,8 +191,10 @@ if ( ! class_exists( 'Charitable_Webhook_Listener_Endpoint' ) ) :
 				return true;
 			}
 
-			if ( defined( 'CHARITABLE_DEBUG_WEBHOOK' ) && CHARITABLE_DEBUG_WEBHOOK ) {
+			if ( charitable_is_debug( 'webhook' ) ) {
+				// phpcs:disable
 				error_log( 'process_incoming_webhook testing for gateway end' );
+				// phpcs:enable
 			}
 
 			return false;

@@ -122,14 +122,15 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			$this->setup_payment_fields();
 			$this->check_test_mode();
 			$this->stripe_key_check();
+			$this->square_connection_check();
 
 			/* For backwards-compatibility */
 			add_action( 'charitable_form_field', array( $this, 'render_field' ), 10, 6 );
 			/* added in 1.7.0.4 */
 			if ( 'below_donation_title' === charitable_get_option( 'donation_form_minimal_amount_notice_display', false ) ) {
-				add_action( 'charitable_after_donation_amount_wrapper_header', array( $this, 'minimum_donation_amount_notice' ), 10, 2 );
+				add_action( 'charitable_after_donation_amount_wrapper_header', array( $this, 'minimum_max_donation_amount_notice' ), 10, 2 );
 			} elseif ( 'above_donation_title' === charitable_get_option( 'donation_form_minimal_amount_notice_display', false ) || 'after_donation_title' === charitable_get_option( 'donation_form_minimal_amount_notice_display', false ) ) {
-				add_action( 'charitable_before_donation_amount_wrapper_header', array( $this, 'minimum_donation_amount_notice' ), 10, 2 );
+				add_action( 'charitable_before_donation_amount_wrapper_header', array( $this, 'minimum_max_donation_amount_notice' ), 10, 2 );
 			}
 		}
 
@@ -1005,7 +1006,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			$fields['donation_fields']['fields']['minimum_donation_amount'] = array(
 				'legend'   => __( 'Mininum Donation', 'charitable' ),
 				'type'     => 'content',
-				'content'  => $this->minimum_donation_amount_notice( true, $minimum_amount ),
+				'content'  => $this->minimum_max_donation_amount_notice( true, $minimum_amount ),
 				'priority' => 80,
 			);
 
@@ -1036,7 +1037,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		 * @param  string $minimum_amount Minimum amount likely set by user in admin settings.
 		 * @return array
 		 */
-		public function minimum_donation_amount_notice( $return = true, $minimum_amount = false ) {
+		public function minimum_max_donation_amount_notice( $return = true, $minimum_amount = false ) {
 
 			if ( false === $minimum_amount ) {
 				$minimum_amount = get_post_meta( $this->get_campaign()->ID, '_campaign_minimum_donation_amount', true );
@@ -1439,6 +1440,64 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			);
 
 			return apply_filters( 'charitable_stripe_key_check_notice', $notice, current_user_can( 'manage_charitable_settings' ) );
+		}
+
+		/**
+		 * Check if Square connection is available for the current mode.
+		 *
+		 * @since  1.8.5
+		 *
+		 * @return void
+		 */
+		protected function square_connection_check() {
+			// Check if there's a Square mode connection warning
+			$warning = get_option( 'charitable_square_mode_connection_warning' );
+
+			if ( ! $warning ) {
+				return;
+			}
+
+			// Check if Square gateway is active
+			$active_gateways = charitable_get_helper( 'gateways' )->get_active_gateways();
+
+			if ( ! is_array( $active_gateways ) || ! in_array( 'Charitable_Gateway_Square', $active_gateways ) ) {
+				return;
+			}
+
+			// Only show warning to admins
+			if ( ! current_user_can( 'manage_charitable_settings' ) ) {
+				return;
+			}
+
+			// Display the warning
+			charitable_get_notices()->add_error( $this->get_square_connection_warning_notice( $warning['mode'] ) );
+		}
+
+		/**
+		 * A formatted notice to advise that Square connection is missing for the current mode.
+		 *
+		 * @since  1.8.5
+		 *
+		 * @param string $mode The mode that's missing connection.
+		 * @return string
+		 */
+		protected function get_square_connection_warning_notice( $mode ) {
+			$mode_label = 'test' === $mode ? __( 'test', 'charitable' ) : __( 'live', 'charitable' );
+
+			$notice = $this->get_credentialed_notice(
+				sprintf(
+					/* translators: %s: mode (test or live) */
+					__( 'Square is enabled but not connected in %s mode.', 'charitable' ),
+					$mode_label
+				),
+				sprintf(
+					'<a href="%s">%s</a>.',
+					admin_url( 'admin.php?page=charitable-settings&tab=gateways&group=gateways_square_core' ),
+					__( 'Connect Square Account', 'charitable' )
+				)
+			);
+
+			return apply_filters( 'charitable_square_connection_warning_notice', $notice, current_user_can( 'manage_charitable_settings' ) );
 		}
 
 		/**

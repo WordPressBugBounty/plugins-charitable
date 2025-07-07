@@ -169,7 +169,7 @@ if ( ! class_exists( 'Charitable_Campaign_Embed_Wizard' ) ) :
 		/**
 		 * Output HTML.
 		 *
-		 * @since 1.8.0
+		 * @since   1.8.0
 		 * @version 1.8.1
 		 *
 		 * @return void

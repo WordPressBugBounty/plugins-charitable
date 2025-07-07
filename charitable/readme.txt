@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.8.1
 Requires PHP: 7.2
-Stable tag: 1.8.6.2
+Stable tag: 1.8.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -103,7 +103,7 @@ We also know that our developer friends may want more control, so we have added 
 * 100% mobile responsive.
 * GDPR & CCPA friendly - full privacy compliance tools
 * [Pre-built Fundraising Templates](https://www.wpcharitable.com/templates/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - Get access to sleek modern fundraising templates that are optimized to help you raise more donations.
-* Secure Credit Card Payments - securely accept credit card donations on your website with Stripe donations, PayPal donations, and dozens of other payment gateways.
+* Secure Credit Card Payments - securely accept credit card donations on your website with Stripe donations, Square donations, PayPal donations, and dozens of other payment gateways.
 * [Recurring Donations](https://www.wpcharitable.com/features/recurring-donations/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - accept recurring donations on your website with Stripe, PayPal, and other payment solutions. Turn one-time donors into repeat supporters.
 - [Offline Donations](https://www.wpcharitable.com/features/offline-donations/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - accept offline donations from donors through other payment methods like cash, check, and wire transfer while keeping track of it in Charitable donation platform.
 * [Automatic Donation Receipts](https://www.wpcharitable.com/extensions/charitable-pdf-receipts/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - automatically send PDF receipts for each donation to your donors (save time).
@@ -125,7 +125,7 @@ Allow your users to donate with the payment solution of their choice to reach yo
 
 * [Stripe](https://www.wpcharitable.com/integrations/stripe/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - We're a Stripe Verified Partner for Stripe Donation payments. Easily accept credit card donations on your website with Stripe.
 * PayPal - Easily accept PayPal donations on your website.
-* [Square](https://www.wpcharitable.com/extensions/charitable-square/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - Accept credit card donations with Square.
+* [Square](https://www.wpcharitable.com/extensions/charitable-square/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - Square donation payments are now built-in. Accept credit card donations with Square.
 * [Braintree](https://www.wpcharitable.com/extensions/charitable-braintree/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin)
 * [Authorize.net](https://www.wpcharitable.com/extensions/charitable-authorize-net/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin)
 * [Mollie](https://www.wpcharitable.com/extensions/charitable-mollie/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin)
@@ -255,6 +255,11 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.7 =
+* NEW: Square added as a default payment gateway. [More Information](https://www.wpcharitable.com/get-started/square/)
+* NEW: ErrorHandler class that will suppress _load_textdomain_just_in_time messages.
+* FIX: Updated code related to translations and PHP standards.
 
 = Donation Form & Fundraising Campaigns v1.8.6.2 =
 * NEW: Add ‘allow_unfiltered’ setting for CHARITABLE_ADMIN javascript variables for use in campaign builder.

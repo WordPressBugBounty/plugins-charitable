@@ -20,15 +20,15 @@ $rows = isset( $field['rows'] ) ? $field['rows'] : 4;
 ?>
 
 <textarea
-	id="<?php printf( 'charitable_settings_%s', implode( '_', $view_args['key'] ) ); ?>"
-	name="<?php printf( 'charitable_settings[%s]', $view_args['name'] ); ?>"
+	id="<?php printf( 'charitable_settings_%s', implode( '_', ( $view_args['key'] ) ) ); // phpcs:ignore ?>"
+	name="<?php printf( 'charitable_settings[%s]', esc_attr( $view_args['name'] ) ); ?>"
 	class="<?php echo esc_attr( $view_args['classes'] ); ?>"
 	rows="<?php echo absint( $rows ); ?>"
-	<?php echo charitable_get_arbitrary_attributes( $view_args ); ?>><?php echo esc_textarea( $value ); ?></textarea>
+	<?php echo charitable_get_arbitrary_attributes( $view_args ); // phpcs:ignore ?>><?php echo esc_textarea( $value ); ?></textarea>
 
 <?php if ( isset( $view_args['help'] ) ) : ?>
 
-	<div class="charitable-help"><?php echo $view_args['help']; ?></div>
+	<div class="charitable-help"><?php echo $view_args['help']; // phpcs:ignore ?></div>
 
-<?php
+	<?php
 endif;

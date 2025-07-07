@@ -932,6 +932,29 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 
 			$('table.wp-list-table.posts').append('<tr class="child"><td colspan="' + ( col_count ) + '">' + CHARITABLE.banner + '</td></tr>');
 		}
+
+		// Handle Square webhooks checkbox visibility
+		// Removed webhook checkbox functionality - now using conditional display in PHP
+		var $legacyCheckbox = $('#charitable_settings_gateways_square_square_legacy_settings');
+		var $legacyNonLegacyContent = $('tr.square-non-legacy');
+		var $legacyLegacyContent = $('tr.square-legacy');
+
+		if ($legacyCheckbox.is(':checked')) {
+			$legacyNonLegacyContent.hide();
+			$legacyLegacyContent.show();
+		} else {
+			$legacyNonLegacyContent.show();
+			$legacyLegacyContent.hide();
+		}
+		$legacyCheckbox.on('change', function() {
+			if (!$(this).is(':checked')) {
+				$legacyNonLegacyContent.show();
+				$legacyLegacyContent.hide();
+			} else {
+				$legacyNonLegacyContent.hide();
+				$legacyLegacyContent.show();
+			}
+		});
 	});
 
 })( jQuery );

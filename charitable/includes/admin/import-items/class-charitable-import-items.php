@@ -220,14 +220,14 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 				// If we cannot get the image or determine the type, bail.
 				if ( is_wp_error( $stream ) ) {
 
-					if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					if ( charitable_is_debug() ) {
 						error_log( 'admin_accept_import_campaign_request:: ' );
 						error_log( print_r( $stream, true ) );
 					}
 
 				} elseif ( ! $type || strpos( $type, 'text/html' ) !== false ) {
 
-					if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					if ( charitable_is_debug() ) {
 						error_log( 'admin_accept_import_campaign_request type: ' );
 						error_log( print_r( $type, true ) );
 					}
@@ -239,7 +239,7 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 					// If there is an error, bail.
 					if ( ! empty( $mirror['error'] ) ) {
 
-						if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+						if ( charitable_is_debug() ) {
 							error_log( 'admin_accept_import_campaign_request:: ' );
 							error_log( print_r( $stream, true ) );
 						}
@@ -356,7 +356,7 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 					}
 
 					if ( ! isset( $donation_data['post'] ) ) {
-						if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+						if ( charitable_is_debug() ) {
 							error_log( 'import post fail donation data: ' );
 							error_log( print_r( $donation_data, true ) );
 						}

@@ -37,7 +37,7 @@ if ( array_key_exists( 'attrs', $view_args ) ) {
 }
 
 ?>
-<ul class="charitable-checkbox-list <?php echo esc_attr( $view_args['classes'] ); ?>" <?php echo esc_attr( $setting_attributes ); ?>>
+<ul class="charitable-checkbox-list <?php echo esc_attr( $view_args['classes'] ); ?>" <?php echo wp_kses_post( $setting_attributes ); ?>>
 	<?php foreach ( $view_args['options'] as $option => $label ) : ?>
 		<li><input type="checkbox"
 				id="<?php printf( 'charitable_settings_%s_%s', esc_attr( implode( '_', $view_args['key'] ) ), esc_attr( $option ) ); ?>"

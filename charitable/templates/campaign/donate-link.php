@@ -30,8 +30,8 @@ $label = sprintf(
 <div class="campaign-donation">
 	<a href="#charitable-donation-form"
 		class="<?php echo esc_attr( charitable_get_button_class( 'donate' ) ); ?>"
-		aria-label="<?php echo $label; ?>"
+		aria-label="<?php echo esc_attr( $label ); ?>"
 	>
-	<?php _e( 'Donate', 'charitable' ); ?>
+	<?php esc_html_e( 'Donate', 'charitable' ); ?>
 	</a>
 </div>

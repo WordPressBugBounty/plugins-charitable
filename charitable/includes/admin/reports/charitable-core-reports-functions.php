@@ -174,7 +174,7 @@ function charitable_reports_get_donor_report_type( $report_default = 'donors-top
 function charitable_reports_maybe_cache( $force_cache = false ) {
 
 	// Check the globals to see if caching is enabled specifically for reports.
-	if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+	if ( charitable_is_debug() ) {
 		return false;
 	}
 	if ( defined( 'CHARITABLE_REPORTS_NO_CACHE' ) && CHARITABLE_REPORTS_NO_CACHE ) {

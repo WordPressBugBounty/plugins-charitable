@@ -23,5 +23,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 ?>
-<p><?php _e( 'Your email address has been verified.', 'charitable' ) ?></p>
-<p><a href="<?php home_url() ?>"><?php _e( 'Return home', 'charitable' ) ?></a></p>
+<p><?php esc_html_e( 'Your email address has been verified.', 'charitable' ); ?></p>
+<p><a href="<?php echo esc_url( home_url() ); ?>"><?php esc_html_e( 'Return home', 'charitable' ); ?></a></p>

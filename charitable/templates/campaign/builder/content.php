@@ -32,27 +32,27 @@ $template_layout = $template_data['layout'];
 
 if ( is_admin() ) {
 
-    // Check if Elementor is installed and activated.
-    if (! did_action('elementor/loaded')) {
-        return;
-    }
+	// Check if Elementor is installed and activated.
+	if ( ! did_action( 'elementor/loaded' ) ) {
+		return;
+	}
 
 	// load the Campaign Builder Preview class.
 	require_once charitable()->get_path( 'includes', true ) . 'admin/campaign-builder/class-campaign-builder-preview.php';
 
-	$assets_dir    = charitable()->get_path( 'assets', false );
-	$min           = charitable_get_min_suffix();
+	$assets_dir = charitable()->get_path( 'assets', false );
+	$min        = charitable_get_min_suffix();
 
 	if ( charitable_is_debug( 'elementor' ) ) {
-		echo 'Charitable Elementor template id is ' . $template_id;
+		echo 'Charitable Elementor template id is ' . esc_html( $template_id );
 	}
 
 	// Directly link and load the CSS files.
-	$version       = charitable_is_break_cache() ? charitable()->get_version() . '.' . time() : charitable()->get_version();
+	$version        = charitable_is_break_cache() ? charitable()->get_version() . '.' . time() : charitable()->get_version();
 	$css_theme_file = $assets_dir . 'css/campaign-builder/themes/frontend/' . $template_id . '.php';
 
-	echo '<link rel="stylesheet" id="charitable-campaign-theme-' . esc_attr( $template_id ) . '-css" href="' . esc_url( $css_theme_file ) . '" media="all" />';
-	echo '<link rel="stylesheet" id="charitable-campaign-theme-base-css" href="' . esc_url( $assets_dir . 'css/campaign-builder/themes/frontend/base' . $min . '.css' ) . '" media="all" />';
+	echo '<link rel="stylesheet" id="charitable-campaign-theme-' . esc_attr( $template_id ) . '-css" href="' . esc_url( $css_theme_file ) . '" media="all" />'; //phpcs:ignore
+	echo '<link rel="stylesheet" id="charitable-campaign-theme-base-css" href="' . esc_url( $assets_dir . 'css/campaign-builder/themes/frontend/base' . $min . '.css' ) . '" media="all" />'; //phpcs:ignore
 
 	// Add inline CSS to prevent clicks on '.charitable-campaign-wrapper'.
 	echo '<style type="text/css">.charitable-campaign-wrapper { pointer-events: none; }</style>';
@@ -80,6 +80,9 @@ if ( ! empty( $_GET['charitable_campaign_preview'] ) ) { //phpcs:ignore
 }
 
 /* Template Related */
+
+$template_id     = isset( $campaign_data['template_id'] ) && ! empty( $campaign_data['template_id'] ) ? sanitize_key( $campaign_data['template_id'] ) : charitable_campaign_builder_default_template();
+$template_layout = $template_data['layout'];
 
 $template_parent_id = ! empty( $template_data['meta']['parent_theme'] ) ? esc_attr( $template_data['meta']['parent_theme'] ) : false;
 $template_wrap_css  = false !== $template_parent_id ? 'template-' . $template_parent_id : '';

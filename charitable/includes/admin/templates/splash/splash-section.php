@@ -10,6 +10,7 @@
  * @var string $new Is new feature.
  * @var array $buttons Section buttons.
  * @var string $layout Section layout.
+ * @package Charitable
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,13 +24,18 @@ $classes = [
 ];
 ?>
 
-<section class="<?php echo charitable_sanitize_classes( $classes, true ); ?>">
+<section class="<?php echo charitable_sanitize_classes( $classes, true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>">
 	<div class="charitable-splash-section-content">
 		<?php
 		if ( ! empty( $section['new'] ) ) {
 			printf(
 				'<span class="charitable-splash-badge">%s</span>',
-				esc_html__( 'New Feature', 'charitable-lite' )
+				esc_html__( 'New Feature', 'charitable' )
+			);
+		} elseif ( ! empty( $section['new-addon'] ) ) {
+			printf(
+				'<span class="charitable-splash-badge">%s</span>',
+				esc_html__( 'New Addon', 'charitable' )
 			);
 		}
 		?>
@@ -55,7 +61,7 @@ $classes = [
 	</div>
 
 	<?php if ( ! empty( $section['img'] ) ) : ?>
-		<div class="charitable-splash-section-image charitable-image-shadow-<?php echo charitable_sanitize_classes( $section['img']['shadow'] ?? 'none' ); ?>">
+		<div class="charitable-splash-section-image charitable-image-shadow-<?php echo charitable_sanitize_classes( $section['img']['shadow'] ?? 'none' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>">
 			<img src="<?php echo esc_url( $section['img']['url'] ); ?>" alt="">
 		</div>
 	<?php endif; ?>

@@ -118,7 +118,7 @@ if ( false !== $slug && strtolower( $slug ) !== 'lite' && ! $is_legacy ) {
 		}
 
 		?>
-	<div class="charitable-settings-object charitable-licensed-product cf">
+	<div class="charitable-settings-object charitable-licensed-product">
 		<h4><?php echo $product['name']; ?></h4>
 		<input type="text" name="charitable_settings[legacy_licenses][<?php echo $key; ?>]" id="charitable_settings_licenses_<?php echo $key; ?>" class="charitable-settings-field" placeholder="<?php _e( 'Add your license key', 'charitable' ); ?>" value="<?php echo $license_key; ?>" />
 		<?php if ( $license ) : ?>

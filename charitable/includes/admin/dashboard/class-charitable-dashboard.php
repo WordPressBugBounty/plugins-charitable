@@ -882,7 +882,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 			if ( $force_cache === 'no' ) {
 				return false;
 			}
-			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+			if ( charitable_is_debug() ) {
 				return false;
 			}
 			if ( defined( 'CHARITABLE_REPORTS_NO_CACHE' ) && CHARITABLE_REPORTS_NO_CACHE ) {

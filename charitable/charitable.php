@@ -3,11 +3,11 @@
  * Plugin Name: Charitable
  * Plugin URI: https://www.wpcharitable.com
  * Description: The best WordPress donation plugin. Fundraising with recurring donations, and powerful features to help you raise more money online.
- * Version: 1.8.6.2
+ * Version: 1.8.7
  * Author: Charitable Donations & Fundraising Team
  * Author URI: https://wpcharitable.com
  * Requires at least: 5.0
- * Stable tag: 1.8.6.2
+ * Stable tag: 1.8.7
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
@@ -39,7 +39,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		const AUTHOR = 'WP Charitable';
 
 		/* Plugin version. */
-		const VERSION = '1.8.6.2';
+		const VERSION = '1.8.7';
 
 		/* Version of database schema. */
 		const DB_VERSION = '20180522';
@@ -141,6 +141,17 @@ if ( ! class_exists( 'Charitable' ) ) :
 			add_action( 'plugins_loaded', array( $this, 'start' ), 3 );
 
 			add_action( 'plugins_loaded', array( $this, 'check_for_version_conflicts' ), 2 );
+
+			// Initialize error handler early.
+			add_action(
+				'plugins_loaded',
+				function () {
+					require_once $this->get_path( 'includes' ) . 'class-charitable-error-handler.php';
+					$error_handler = new Charitable_Error_Handler();
+					$error_handler->init();
+				},
+				1
+			);
 		}
 
 		/**
@@ -219,13 +230,16 @@ if ( ! class_exists( 'Charitable' ) ) :
 			require_once $includes_path . 'utilities/charitable-utility-functions.php';
 			require_once $includes_path . 'elementor/charitable-elementor-hooks.php';
 
-			/* Load Stripe SDK */
-			require_once $this->get_path( 'directory' ) . 'vendor/autoload.php'; // todo: move to load_dependencies()?
+			/* Load vendor/autoload.php - our modified platform_check.php and autoload_real.php will handle conditional loading */
+			require_once $this->get_path( 'directory' ) . 'vendor/autoload.php';
+
+			/* Square Compatibility Wrapper - always load this regardless of PHP version */
+			require_once $includes_path . 'square/class-charitable-square-compatibility.php';
+
+			/* Initialize Square conditionally - will check for compatibility internally */
+			Charitable_Square_Compatibility::init();
 
 			if ( $this->load_core_stripe() ) :
-
-				/* Load Stripe SDK */
-				require_once $this->get_path( 'directory' ) . 'vendor/autoload.php';
 
 				/* Interfaces */
 				require_once $includes_path . 'stripe/interfaces/interface-charitable-stripe-gateway-processor.php';
@@ -479,7 +493,6 @@ if ( ! class_exists( 'Charitable' ) ) :
 
 			// Stripe.
 			require_once $this->get_path( 'includes' ) . 'stripe/admin/class-charitable-stripe-admin.php';
-
 			new Charitable_Stripe_Admin();
 
 			return $admin;
@@ -970,7 +983,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 			if ( is_multisite() && $network_wide ) {
 				global $wpdb;
 
-				foreach ( $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs" ) as $blog_id ) {
+				foreach ( $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs" ) as $blog_id ) { // phpcs:ignore
 					switch_to_blog( $blog_id );
 					new Charitable_Install( $this->includes_path );
 					restore_current_blog();
@@ -1005,9 +1018,9 @@ if ( ! class_exists( 'Charitable' ) ) :
 		 * @return void
 		 */
 		public function do_charitable_actions() {
-			if ( isset( $_REQUEST['charitable_action'] ) ) {
+			if ( isset( $_REQUEST['charitable_action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-				$action = esc_attr( $_REQUEST['charitable_action'] );
+				$action = esc_attr( $_REQUEST['charitable_action'] ); // phpcs:ignore
 
 				/**
 				 * Handle Charitable action.
@@ -1232,13 +1245,13 @@ if ( ! class_exists( 'Charitable' ) ) :
 
 				// if this isn't pro, add the upgrade link which is visible on the plugins page until the plugin name.
 
-				$action_links = [
-					'proupgrade' => [
+				$action_links = array(
+					'proupgrade' => array(
 						// Translators: This is an action link users can click to purchase a license for All in One SEO Pro.
 						'label' => __( 'Upgrade to Pro', 'charitable' ),
 						'url'   => 'https://wpcharitable.com/lite-vs-pro/?utm_source=WordPress&utm_campaign=WP+Charitable&utm_medium=Action+Link+Plugins+Page&utm_content=Upgrade+to+Pro',
-					],
-				];
+					),
+				);
 
 			endif;
 
@@ -1255,21 +1268,21 @@ if ( ! class_exists( 'Charitable' ) ) :
 		 * @since 1.7.0
 		 *
 		 * @param array  $actions   An array of existing actions.
-		 * @param string $pluginFile The plugin file we are modifying.
+		 * @param string $plugin_file The plugin file we are modifying.
 		 * @param array  $action_links An array of action links to add.
 		 * @param string $position  The position to add the action links.
 		 * @return array
 		 */
-		protected function parse_action_links( $actions, $pluginFile, $action_links = [], $position = 'after' ) {
+		protected function parse_action_links( $actions, $plugin_file, $action_links = array(), $position = 'after' ) {
 			if ( empty( $this->plugin ) ) {
 				$this->plugin = CHARITABLE_PLUGIN_BASENAME;
 			}
 
-			if ( $this->plugin === $pluginFile && ! empty( $action_links ) ) {
+			if ( $this->plugin === $plugin_file && ! empty( $action_links ) ) {
 				foreach ( $action_links as $key => $value ) {
-					$link = [
+					$link = array(
 						$key => '<a href="' . $value['url'] . '">' . $value['label'] . '</a>',
-					];
+					);
 
 					$actions = 'after' === $position ? array_merge( $actions, $link ) : array_merge( $link, $actions );
 				}

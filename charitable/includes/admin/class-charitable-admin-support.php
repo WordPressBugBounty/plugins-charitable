@@ -53,7 +53,7 @@ if ( ! class_exists( 'Charitable_Admin_Support' ) ) :
 			switch ( esc_html( $_GET['charitable-support'] ) ) {
 				case 'clear-notifications':
 					delete_option( 'charitable_notifications' ); // delete the entire option in the database.
-					if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					if ( charitable_is_debug() ) {
 						error_log( 'charitable-support: clear-notification' );
 					}
 					break;
