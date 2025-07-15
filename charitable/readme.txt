@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.8.1
 Requires PHP: 7.2
-Stable tag: 1.8.7
+Stable tag: 1.8.7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -62,6 +62,8 @@ Charitable makes it easy to manage day-to-day donor management operations. This 
 Charitable integrates with all the top payment providers including Stripe donations, PayPal donations, Braintree, Square payments, and 10+ more to ensure you can accept both one-time donations as well as recurring donations using the payment solution of your choice.
 
 We’re proud to be a Stripe Verified Partner. This partnership allows us to build the best Stripe integration with early access to features. You can use our Stripe integration to accept both one-time payments as well as recurring donations while syncing all donation data to your Stripe account.
+
+We’re also proud to be a Square Verified Partner. This partnership allows us to build the best Square integration with early access to features. You can use our Square integration to accept both one-time payments as well as recurring donations while syncing all donation data to your Square account.
 
 Our full list of payment integrations include: Stripe, PayPal, Square, Authorize.net, Braintree, PayFast, Payrexx, Mollie, PayUMoney, GoCardless, Paystack, and Windcave.
 
@@ -125,7 +127,7 @@ Allow your users to donate with the payment solution of their choice to reach yo
 
 * [Stripe](https://www.wpcharitable.com/integrations/stripe/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - We're a Stripe Verified Partner for Stripe Donation payments. Easily accept credit card donations on your website with Stripe.
 * PayPal - Easily accept PayPal donations on your website.
-* [Square](https://www.wpcharitable.com/extensions/charitable-square/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - Square donation payments are now built-in. Accept credit card donations with Square.
+* [Square](https://www.wpcharitable.com/extensions/charitable-square/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - We're a Square Verified Partner for Square Donation payments. Easily accept credit card donations on your website with Square.
 * [Braintree](https://www.wpcharitable.com/extensions/charitable-braintree/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin)
 * [Authorize.net](https://www.wpcharitable.com/extensions/charitable-authorize-net/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin)
 * [Mollie](https://www.wpcharitable.com/extensions/charitable-mollie/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin)
@@ -255,6 +257,10 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.7.1 =
+* FIX: Minor CSS issues in CTA areas.
+* FIX: Resolved an issue with Elementor embedded campaigns with the modal donation form setting selected.
 
 = Donation Form & Fundraising Campaigns v1.8.7 =
 * NEW: Square added as a default payment gateway. [More Information](https://www.wpcharitable.com/get-started/square/)
@@ -476,21 +482,6 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 * NEW: Deactivate legacy campaigns now an option in advanced settings.
 * NEW: Added and updated several items in the Growth Tools page.
 * FIX: Addressed security for ajax functions related to reporting.
-* FIX: Resolved typos and PHP warnings and notices.
-
-= Donation Form & Fundraising Campaigns v1.8.1.9 =
-* FIX: Added nonce and permissions check for depreciated function to show Stripe keys.
-* FIX: Fixed typo in a permissions check for viewing a campaign builder preview.
-
-= Donation Form & Fundraising Campaigns v1.8.1.8 =
-* NEW: Add three WordPress hooks to allow developers to add custom content in the gateway fieldset in the donation form.
-* NEW: Add 'charitable_stripe_payment_intent_data' filter for the "payment_intent_data" attribute sent to Stripe (example: use to remove "setup_future_usage" value for payment integrations).
-* NEW: New menu item "SMTP" with ability to download and install WP Mail SMTP.
-* NEW: Added hooks 'charitable_gateway_fields_front', 'charitable_gateway_fields_after_legend', and 'charitable_gateway_fields_end' to insert text into gateway fields area in donation form.
-* NEW: Updated charitable.pot.
-* FIX: Resolved a security issue when checking to see if a campaign can recieve donation.
-* FIX: Resolved issue related to exporting recurring donations.
-* FIX: Added nonce and permissions check to checking licenses via AJAX.
 * FIX: Resolved typos and PHP warnings and notices.
 
 **[View entire donation form and fundraising platform changelog](https://plugins.svn.wordpress.org/charitable/trunk/CHANGELOG.md)**

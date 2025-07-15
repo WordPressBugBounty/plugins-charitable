@@ -13,6 +13,6 @@
 $notice_type = isset( $view_args['notice_type'] ) ? $view_args['notice_type'] : 'error';
 
 ?>
-<div class="notice <?php echo $notice_type; ?>" <?php echo charitable_get_arbitrary_attributes( $view_args ); ?>>
-	<p><?php echo $view_args['content']; ?></p>
+<div class="notice <?php echo esc_attr( $notice_type ); ?>" <?php echo charitable_get_arbitrary_attributes( $view_args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+	<p><?php echo wp_kses_post( $view_args['content'] ); ?></p>
 </div>

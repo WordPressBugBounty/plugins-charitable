@@ -499,6 +499,110 @@ if ( ! function_exists( 'charitable_template_campaign_modal_donation_window' ) )
 
 endif;
 
+if ( ! function_exists( 'charitable_template_elementor_campaign_modal_donation_window' ) ) :
+
+	/**
+	 * Adds the modal donation window for Elementor widgets.
+	 *
+	 * @since  1.8.7.1
+	 *
+	 * @global WP_Post $post
+	 * @return boolean
+	 */
+	function charitable_template_elementor_campaign_modal_donation_window() {
+		global $post;
+
+		// Only run if Elementor is active.
+		if ( ! did_action( 'elementor/loaded' ) ) {
+			return false;
+		}
+
+		// Only run on pages/posts.
+		if ( ! $post || ! in_array( $post->post_type, array( 'page', 'post' ) ) ) {
+			return false;
+		}
+
+		// Get Elementor data.
+		$elementor_data = get_post_meta( $post->ID, '_elementor_data', true );
+		if ( empty( $elementor_data ) ) {
+			return false;
+		}
+
+		// Decode JSON data.
+		$data = json_decode( $elementor_data, true );
+		if ( ! is_array( $data ) ) {
+			return false;
+		}
+
+		$campaign_ids = array();
+
+		// Recursively search for Charitable widgets.
+		$campaign_ids = charitable_extract_campaign_ids_from_elementor_data( $data );
+
+		if ( empty( $campaign_ids ) ) {
+			return false;
+		}
+
+		// Remove duplicates.
+		$campaign_ids = array_unique( $campaign_ids );
+
+		foreach ( $campaign_ids as $campaign_id ) {
+
+			$campaign = charitable_get_campaign( $campaign_id );
+
+			if ( $campaign->can_receive_donations() && 'modal' === charitable_get_option( 'donation_form_display', 'separate_page' ) ) {
+				charitable_template( 'campaign/donate-modal-window.php', array( 'campaign' => $campaign ) );
+			}
+
+		}
+
+		return true;
+	}
+
+endif;
+
+if ( ! function_exists( 'charitable_extract_campaign_ids_from_elementor_data' ) ) :
+
+	/**
+	 * Recursively extract campaign IDs from Elementor data.
+	 *
+	 * @since  1.8.7.1
+	 *
+	 * @param  array $data Elementor data array.
+	 * @return array
+	 */
+	function charitable_extract_campaign_ids_from_elementor_data( $data ) {
+		$campaign_ids = array();
+
+		foreach ( $data as $element ) {
+			if ( ! is_array( $element ) ) {
+				continue;
+			}
+
+			// Check if this is a Charitable widget.
+			if ( isset( $element['widgetType'] ) ) {
+				$widget_type = $element['widgetType'];
+
+				// Check for Charitable campaign widgets.
+				if ( in_array( $widget_type, array( 'charitable_campaign', 'charitable_button', 'charitable_donation_form' ) ) ) {
+					if ( isset( $element['settings']['campaign_id'] ) && ! empty( $element['settings']['campaign_id'] ) ) {
+						$campaign_ids[] = absint( $element['settings']['campaign_id'] );
+					}
+				}
+			}
+
+			// Recursively check child elements.
+			if ( isset( $element['elements'] ) && is_array( $element['elements'] ) ) {
+				$child_campaign_ids = charitable_extract_campaign_ids_from_elementor_data( $element['elements'] );
+				$campaign_ids = array_merge( $campaign_ids, $child_campaign_ids );
+			}
+		}
+
+		return $campaign_ids;
+	}
+
+endif;
+
 // //////////////////////////////
 // CAMPAIGN LOOP
 // //////////////////////////////

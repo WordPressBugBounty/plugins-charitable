@@ -95,7 +95,7 @@ if ( ! class_exists( 'Charitable_Campaign_Shortcode' ) ) :
 
 			$html = ob_get_clean();
 
-			// If the $args['elementor'] is true, then replace the campaign-loop with the elementor campaign-loop
+			// If the $args['elementor'] is true, then replace the campaign-loop with the elementor campaign-loop.
 			if ( isset( $args['elementor'] ) && $args['elementor'] ) {
 				$html = str_replace( 'campaign-loop', 'elementor-campaign-loop', $html );
 			}
@@ -151,20 +151,18 @@ if ( ! class_exists( 'Charitable_Campaign_Shortcode' ) ) :
 		 *
 		 * @since   1.0.0
 		 *
-		 * @param  array $args The query arguments to be used to retrieve campaigns.
-		 * @return WP_Query
+		 * @param  string $template_id The template ID.
+		 * @return array|false
 		 */
-		public static function get_template_data( $template_id ) { // phpcs:ignore
+		public static function get_template_data( $template_id ) {
 
-			$settings = get_post_meta( $args['id'], 'campaign_settings_v2', true );
+			$settings = get_post_meta( $template_id, 'campaign_settings_v2', true );
 
 			if ( ! empty( $settings ) ) {
 				return $settings;
 			}
 
-			return $args;
-
-			// return Charitable_Campaigns::query( $query_args );
+			return false;
 		}
 
 		/**
@@ -196,7 +194,7 @@ if ( ! class_exists( 'Charitable_Campaign_Shortcode' ) ) :
 			);
 
 			// Now check for overrides in the settings.
-			$layout_theme_settings = $campaign_data['layout']['advanced'];
+			$layout_theme_settings = isset( $campaign_data['layout']['advanced'] ) ? $campaign_data['layout']['advanced'] : array();
 
 			$query_args['p'] = ! empty( $layout_theme_settings['theme_color_primary'] ) ? charitable_sanitize_hex( $layout_theme_settings['theme_color_primary'], false ) : $query_args['p'];
 			$query_args['s'] = ! empty( $layout_theme_settings['theme_color_secondary'] ) ? charitable_sanitize_hex( $layout_theme_settings['theme_color_secondary'], false ) : $query_args['s'];
@@ -229,14 +227,17 @@ if ( ! class_exists( 'Charitable_Campaign_Shortcode' ) ) :
 				'charitable-campaign-theme-' . $template_id,
 				$template_frontend_css_url,
 				array( 'charitable-campaign-theme-base' ),
-				false
+				false // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.NoExplicitVersion
 			);
 		}
 
 		/**
 		 * Load template classes.
 		 *
-		 * @since 1.8.0
+		 * @since   1.8.0
+		 *
+		 * @param  string $template_id The template ID.
+		 * @return array|false
 		 */
 		public static function get_template( $template_id = 'basic' ) {
 

@@ -455,7 +455,8 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		/**
 		 * Retrieves addons from the stored transient or remote server.
 		 *
-		 * @since 1.7.0
+		 * @since   1.7.0
+		 * @version 1.8.7.1 - Added Square to the list of gateways that are built in.
 		 *
 		 * @return bool | array false | Array of licensed and unlicensed Addons.
 		 */
@@ -488,6 +489,11 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			foreach ( (array) $addons as $i => $addon ) {
 
 				if ( ! isset( $addon['slug'] ) || $addon['slug'] === '' || strtolower( $addon['slug'] ) === 'auto draft' ) {
+					continue;
+				}
+
+				// Filter out the Square addon since it's now built into the core plugin.
+				if ( 'charitable-square' === $addon['slug'] ) {
 					continue;
 				}
 

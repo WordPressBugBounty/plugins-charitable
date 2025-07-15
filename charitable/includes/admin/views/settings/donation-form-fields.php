@@ -27,15 +27,15 @@ if ( empty( $options ) ) {
 ?>
 <div id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>" class="<?php echo esc_attr( $classes ); ?>">
 	<?php if ( isset( $field['label'] ) ) : ?>
-		<label for="charitable_field_<?php echo $field['key']; ?>">
-			<?php echo $field['label']; ?>
+		<label for="charitable_field_<?php echo esc_attr( $field['key'] ); ?>">
+			<?php echo wp_kses_post( $field['label'] ); ?>
 		</label>
 	<?php endif ?>
 	<ul class="options">
 	<?php foreach ( $options as $val => $label ) : ?>
 		<li>
-			<input type="checkbox" name="<?php echo $field['key']; ?>[]" value="<?php echo $val; ?>" <?php checked( in_array( $val, $value ) ); ?> />
-			<?php echo $label; ?>
+			<input type="checkbox" name="<?php echo esc_attr( $field['key'] ); ?>[]" value="<?php echo esc_attr( $val ); ?>" <?php checked( in_array( $val, $value ) ); ?> />
+			<?php echo wp_kses_post( $label ); ?>
 		</li>
 	<?php endforeach ?>
 	</ul>

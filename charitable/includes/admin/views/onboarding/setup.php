@@ -36,7 +36,7 @@ $campaign_created     = get_option( 'charitable_setup_campaign_created', false )
 					printf(
 						'<p>%1$s</p>',
 						// translators: %s - getting started guide link.
-						sprintf( __( 'In order to install and activate some of the features you requested (%1$s) you need to activate your PRO license after setup is complete.', 'charitable' ), $charitable_setup->get_requested_feature_string() )
+						esc_html( sprintf( __( 'In order to install and activate some of the features you requested (%1$s) you need to activate your PRO license after setup is complete.', 'charitable' ), $charitable_setup->get_requested_feature_string() ) )
 					);
 
 					?>
@@ -61,7 +61,7 @@ $campaign_created     = get_option( 'charitable_setup_campaign_created', false )
 					printf(
 						'<p>%1$s</p>',
 						// translators: %s - getting started guide link.
-						sprintf( __( 'Activating license and installing addons requested (%1$s)...', 'charitable' ), $charitable_setup->get_requested_feature_string() )
+						esc_html( sprintf( __( 'Activating license and installing addons requested (%1$s)...', 'charitable' ), $charitable_setup->get_requested_feature_string() ) )
 					);
 
 					?>

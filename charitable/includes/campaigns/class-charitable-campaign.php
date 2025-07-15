@@ -1029,7 +1029,8 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 		/**
 		 * Returns the percentage donated as a number.
 		 *
-		 * @since  1.0.0
+		 * @since   1.0.0
+		 * @version 1.8.7.1
 		 *
 		 * @return int
 		 */
@@ -1038,7 +1039,12 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 				return false;
 			}
 
-			return ( $this->get_donated_amount( true ) / $this->get_goal() ) * 100;
+			$donated = (float) $this->get_donated_amount( true );
+			$goal    = (float) $this->get_goal();
+			if ( $goal <= 0 ) {
+				return 0;
+			}
+			return ( $donated / $goal ) * 100;
 		}
 
 		/**

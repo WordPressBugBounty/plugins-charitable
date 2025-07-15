@@ -257,7 +257,7 @@ if ( ! class_exists( 'Charitable_Square_Subscription_Plan' ) ) :
 			$amount_description    = strval( $zero_decimal_currency ? $amount : $amount / 100 );
 			$plan_name             = sprintf(
 				/* translators: %1$s: campaign title; %2$s: amount; %3$s: currency; %4$s: period */
-				_x( '%1$s - %2$s %3$s every %4$s', 'campaign title — amount every period', 'charitable-square' ),
+				_x( '%1$s - %2$s %3$s every %4$s', 'campaign title — amount every period', 'charitable' ),
 				str_replace( '&ndash;', '-', get_post( $this->campaign_id )->post_title ),
 				charitable_sanitize_amount( $amount_description ),
 				$currency,
@@ -329,14 +329,14 @@ if ( ! class_exists( 'Charitable_Square_Subscription_Plan' ) ) :
 				$decoded_response = json_decode( $response_body );
 				if ( json_last_error() !== JSON_ERROR_NONE ) {
 					error_log( 'JSON Decode Error: ' . json_last_error_msg() );
-					charitable_get_notices()->add_error( __( 'Invalid response from Square API', 'charitable-square' ) );
+					charitable_get_notices()->add_error( __( 'Invalid response from Square API', 'charitable' ) );
 					return false;
 				}
 
 				if ( isset( $decoded_response->errors ) ) {
 					$this->handle_errors( $decoded_response->errors );
 				} else {
-					charitable_get_notices()->add_error( __( 'Unknown error occurred while creating subscription plan', 'charitable-square' ) );
+					charitable_get_notices()->add_error( __( 'Unknown error occurred while creating subscription plan', 'charitable' ) );
 				}
 				return false;
 			}
@@ -521,7 +521,7 @@ if ( ! class_exists( 'Charitable_Square_Subscription_Plan' ) ) :
 		 */
 		private function handle_errors( $errors ) {
 			if ( 0 === count( $errors ) ) {
-				charitable_get_notices()->add_error( __( 'An unexpected error occurred trying to process your payment', 'charitable-square' ) );
+				charitable_get_notices()->add_error( __( 'An unexpected error occurred trying to process your payment', 'charitable' ) );
 				return;
 			}
 
@@ -530,7 +530,7 @@ if ( ! class_exists( 'Charitable_Square_Subscription_Plan' ) ) :
 
 			// For authentication errors, keep the message generic.
 			if ( 'AUTHENTICATION_ERROR' === $error->category ) {
-				charitable_get_notices()->add_error( __( 'Unable to connect to Square. If you are an administrator, please check your Square Gateway settings.', 'charitable-square' ) );
+				charitable_get_notices()->add_error( __( 'Unable to connect to Square. If you are an administrator, please check your Square Gateway settings.', 'charitable' ) );
 				return;
 			}
 
@@ -538,7 +538,7 @@ if ( ! class_exists( 'Charitable_Square_Subscription_Plan' ) ) :
 			charitable_get_notices()->add_error(
 				sprintf(
 				/* translators: %s: error message from Square */
-					__( 'Payment request failed with error: %s.', 'charitable-square' ),
+					__( 'Payment request failed with error: %s.', 'charitable' ),
 					$error->code
 				)
 			);

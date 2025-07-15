@@ -8,6 +8,7 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
  * @version   1.8.1.4
+ * @version   1.8.7.1 - Added Square to the list of gateways that are built in.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -72,7 +73,8 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 		/**
 		 * Load panels.
 		 *
-		 * @since 1.8.0
+		 * @since   1.8.0
+		 * @version 1.8.7.1 - Square below Stripe.
 		 */
 		public function load_submenu_panels() {
 
@@ -80,6 +82,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 				'charitable_builder_panels_payment',
 				array(
 					'stripe',
+					'square',
 					'paypal',
 					'braintree',
 					'mollie',
@@ -90,7 +93,6 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 					'paystack',
 					'payumoney',
 					'windcave',
-					'square',
 					'request',
 				)
 			);
@@ -137,7 +139,8 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 		/**
 		 * Process education payment text.
 		 *
-		 * @since 1.8.0
+		 * @since   1.8.0
+		 * @version 1.8.7.1 - Added Square to the list of gateways that are built in.
 		 *
 		 * @param string $label Reader friendly output of object.
 		 * @param string $slug Object slug.
@@ -164,7 +167,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 
 			<section class="header-content">
 
-				<?php if ( $slug === 'stripe' || $slug === 'paypal' ) : ?>
+				<?php if ( $slug === 'stripe' || $slug === 'paypal' || $slug === 'square' ) : ?>
 
 				<h2>
 					<?php
@@ -176,7 +179,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 					?>
 				</h2>
 
-				<p><?php echo esc_html( $label ); ?> <?php echo esc_html__( 'allows you to easily reach more supporters and increase donations with payment platforms including PayPal, Venmo, Apple Pay and Google Pay.', 'charitable' ); ?></p>
+				<p><?php echo esc_html( $label ); ?> <?php echo esc_html__( 'allows you to easily reach more supporters and increase donations.', 'charitable' ); ?></p>
 
 				<?php elseif ( 'request' === $type ) : ?>
 
@@ -197,7 +200,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 
 			</section>
 
-			<?php if ( $slug === 'stripe' || $slug === 'paypal' ) : ?>
+			<?php if ( $slug === 'stripe' || $slug === 'paypal' || $slug === 'square' ) : ?>
 
 						<?php
 				elseif ( 'request' === $type ) :
@@ -322,7 +325,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 
 			<div class="education-buttons">
 
-				<?php if ( $slug === 'stripe' || $slug === 'paypal' ) { ?>
+				<?php if ( $slug === 'stripe' || $slug === 'paypal' || $slug === 'square' ) { ?>
 
 					<?php
 
@@ -353,6 +356,34 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 							);
 
 							echo '<a class="button-link" href="' . esc_url( $action_url ) . '" target="_blank">' . esc_html__( 'Enable Stripe', 'charitable' ) . '</a>';
+						}
+					}
+
+					if ( $slug === 'square' ) {
+
+						$gateway   = new Charitable_Gateway_Square();
+						$is_active = $helper->is_active_gateway( $gateway->get_gateway_id() );
+
+						if ( $is_active ) {
+
+							$action_url = admin_url( 'admin.php?page=charitable-settings&tab=gateways&group=gateways_square_core' );
+
+							echo '<a class="button-link" href="' . esc_url( $action_url ) . '" target="_blank">' . esc_html__( 'Go To Payment Gateway Settings', 'charitable' ) . '</a>';
+
+						} else {
+
+							$action_url = esc_url(
+								add_query_arg(
+									array(
+										'charitable_action' => 'enable_gateway',
+										'gateway_id' => $gateway->get_gateway_id(),
+										'_nonce'     => wp_create_nonce( 'gateway' ),
+									),
+									admin_url( 'admin.php?page=charitable-settings&tab=gateways' )
+								)
+							);
+
+							echo '<a class="button-link" href="' . esc_url( $action_url ) . '" target="_blank">' . esc_html__( 'Enable Square', 'charitable' ) . '</a>';
 						}
 					}
 

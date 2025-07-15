@@ -14,11 +14,11 @@ $campaign = Charitable_Campaigns::query(
 		'posts_per_page' => 1,
 		'post_status'    => 'publish',
 		'fields'         => 'ids',
-		'meta_query'     => array(
+		'meta_query'     => array( // phpcs:ignore
 			'relation' => 'OR',
 			array(
 				'key'     => '_campaign_end_date',
-				'value'   => date( 'Y-m-d H:i:s' ),
+				'value'   => date( 'Y-m-d H:i:s' ), // phpcs:ignore
 				'compare' => '>=',
 				'type'    => 'datetime',
 			),
@@ -54,10 +54,10 @@ $customize_link = rawurlencode( $url );
 			<?php
 			printf(
 				'<p>%s <a target="_blank" href="%s">%s</a> %s</p>',
-				__( 'Previously Charitable had an option in the menu that linked to the ', 'charitable' ),
-				'https://www.wpcharitable.com/documentation/customizer-settings/',
-				__( 'WordPress Customizer', 'charitable' ),
-				__( 'for a few select settings. That menu link has been moved here.', 'charitable' ),
+				esc_html__( 'Previously Charitable had an option in the menu that linked to the ', 'charitable' ),
+				esc_url( 'https://www.wpcharitable.com/documentation/customizer-settings/' ),
+				esc_html__( 'WordPress Customizer', 'charitable' ),
+				esc_html__( 'for a few select settings. That menu link has been moved here.', 'charitable' ),
 			);
 			?>
 		</p>

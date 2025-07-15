@@ -36,7 +36,7 @@ $fields = apply_filters(
 	)
 );
 
-$title               = isset( $view_args['label'] ) ? $view_args['label'] : '';
+$title               = isset( $view_args['label'] ) ? $view_args['label'] : ''; // phpcs:ignore
 $tooltip             = isset( $view_args['tooltip'] ) ? '<span class="tooltip"> ' . $view_args['tooltip'] . '</span>' : '';
 $description         = isset( $view_args['description'] ) ? '<span class="charitable-helper">' . $view_args['description'] . '</span>' : '';
 $suggested_donations = charitable_get_campaign( $post->ID )->get_suggested_donations();
@@ -69,7 +69,7 @@ array_push( $suggested_donations, $default );
 			<tr>
 				<?php $i = 1; ?>
 				<?php foreach ( $fields as $key => $field ) : ?>
-					<th <?php echo $i === 1 ? 'colspan="2"' : ''; ?> class="<?php echo esc_attr( $key ); ?>-col"><?php echo ( $field['column_header'] ); ?></th>
+					<th <?php echo $i === 1 ? 'colspan="2"' : ''; ?> class="<?php echo esc_attr( $key ); ?>-col"><?php echo wp_kses_post( $field['column_header'] ); ?></th>
 					<?php ++$i; ?>
 				<?php endforeach ?>
 				<th class="remove-col"></th>
@@ -77,7 +77,7 @@ array_push( $suggested_donations, $default );
 		</thead>
 		<tbody>
 			<tr class="no-suggested-amounts <?php echo ( count( $suggested_donations ) > 1 ) ? 'hidden' : ''; ?>">
-				<td colspan="<?php echo count( $fields ) + 2; ?>"><?php _e( 'No suggested amounts have been created yet.', 'charitable' ); ?></td>
+				<td colspan="<?php echo count( $fields ) + 2; ?>"><?php esc_html_e( 'No suggested amounts have been created yet.', 'charitable' ); ?></td>
 			</tr>
 		<?php
 
@@ -86,7 +86,7 @@ array_push( $suggested_donations, $default );
 		foreach ( $suggested_donations as $i => $donation ) :
 
 			?>
-			<tr data-index="<?php echo $i; ?>" class="<?php echo ( $donation === end( $suggested_donations ) ) ? 'to-copy hidden' : 'default'; ?>">
+			<tr data-index="<?php echo esc_attr( $i ); ?>" class="<?php echo ( $donation === end( $suggested_donations ) ) ? 'to-copy hidden' : 'default'; ?>">
 				<td class="reorder-col"><span class="charitable-icon charitable-icon-donations-grab handle"></span></td>
 				<?php
 
@@ -111,7 +111,7 @@ array_push( $suggested_donations, $default );
 						checked="checked"
 						<?php endif; ?>
 						name="_campaign_suggested_donations_default[]"
-						value="<?php echo $i; ?>" />
+						value="<?php echo esc_attr( $i ); ?>" />
 					</td>
 
 						<?php
@@ -120,20 +120,20 @@ array_push( $suggested_donations, $default );
 
 						if ( is_array( $donation ) && isset( $donation[ $key ] ) ) {
 							$value = $donation[ $key ];
-						} elseif ( 'amount' == $key ) {
+						} elseif ( 'amount' == $key ) { // phpcs:ignore
 							$value = $donation;
 						} else {
 							$value = '';
 						}
 
-						if ( 'amount' == $key && strlen( $value ) ) {
+						if ( 'amount' == $key && strlen( $value ) ) { // phpcs:ignore
 							$value = charitable_format_money( $value, false, true );
 						}
 						?>
-					<td class="<?php echo $key; ?>-col"><input
+					<td class="<?php echo esc_attr( $key ); ?>-col"><input
 						type="text"
 						class="campaign_suggested_donations"
-						name="_campaign_suggested_donations[<?php echo $i; ?>][<?php echo $key; ?>]"
+						name="_campaign_suggested_donations[<?php echo esc_attr( $i ); ?>][<?php echo esc_attr( $key ); ?>]"
 						value="<?php echo esc_attr( $value ); ?>"
 						placeholder="<?php echo esc_attr( $field['placeholder'] ); ?>" />
 					</td>
@@ -153,7 +153,7 @@ array_push( $suggested_donations, $default );
 		</tbody>
 		<tfoot>
 			<tr>
-				<td colspan="<?php echo count( $fields ) + 2; ?>"><a class="button" href="#" data-charitable-add-row="suggested-amount"><?php _e( '+ Add a Suggested Amount', 'charitable' ); ?></a></td>
+				<td colspan="<?php echo count( $fields ) + 2; ?>"><a class="button" href="#" data-charitable-add-row="suggested-amount"><?php esc_html_e( '+ Add a Suggested Amount', 'charitable' ); ?></a></td>
 			</tr>
 		</tfoot>
 	</table>

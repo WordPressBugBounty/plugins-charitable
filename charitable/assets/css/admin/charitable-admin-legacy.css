@@ -2574,8 +2574,10 @@ body.charitable_page_charitable-dashboard .charitable-cta-lite-to-pro .charitabl
 }
 
 @media (max-width: 1100px) {
-  .charitable-cta-lite-to-pro .charitable-cta-content {
+  .charitable-cta-lite-to-pro {
     background-image: none;
+  }
+  .charitable-cta-lite-to-pro .charitable-cta-content {
     flex-direction: column;
   }
 }
@@ -2756,25 +2758,4 @@ body.charitable-admin-settings #charitable-settings .settings-lite-cta {
   padding: 0;
   width: 50%;
   float: left;
-}
-
-.charitable-admin-notice-square-connection-error {
-  padding: 10px 15px;
-  margin: 15px 0;
-  border-left: 4px solid #dc3232;
-  background: #fff;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
-}
-.charitable-admin-notice-square-connection-error p {
-  margin: 0;
-  padding: 0;
-  font-size: 13px;
-  line-height: 1.5;
-}
-.charitable-admin-notice-square-connection-error a {
-  color: #0073aa;
-  text-decoration: none;
-}
-.charitable-admin-notice-square-connection-error a:hover {
-  color: #00a0d2;
 }

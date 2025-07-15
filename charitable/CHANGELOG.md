@@ -1,3 +1,7 @@
+# 1.8.7.1
+* FIX: Minor CSS issues in CTA areas.
+* FIX: Resolved an issue with Elementor embedded campaigns with the modal donation form setting selected.
+
 # 1.8.7
 * NEW: Square added as a default payment gateway. [More Information](https://www.wpcharitable.com/get-started/square/)
 * NEW: ErrorHandler class that will suppress _load_textdomain_just_in_time messages.

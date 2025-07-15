@@ -62,14 +62,14 @@ if ( $show_return ) {
 ob_start();
 ?>
 <div id="charitable-settings" class="wrap">
-	<h1 class="screen-reader-text"><?php echo get_admin_page_title(); ?></h1>
-	<h1><?php echo get_admin_page_title(); ?></h1>
+	<h1 class="screen-reader-text"><?php echo get_admin_page_title(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></h1>
+	<h1><?php echo get_admin_page_title(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></h1>
 	<?php do_action( 'charitable_maybe_show_notification' ); ?>
 	<h2 class="nav-tab-wrapper">
 		<?php foreach ( $sections as $section_key => $section_name ) : ?>
 			<?php
 
-			$css = '';
+			$css                 = '';
 			$url_query_arg_array = array( 'tab' => $section_key );
 			if ( 'security' === $section_key && defined( 'CHARITABLE_SPAMBLOCKER_FEATURE_PLUGIN' ) ) {
 				$css = 'no-pro-tab';
@@ -95,23 +95,23 @@ ob_start();
 	?>
 	<?php
 	if ( 'marketing' === $active_tab || 'donors' === $active_tab || ( ! defined( 'CHARITABLE_SPAMBLOCKER_FEATURE_PLUGIN' ) && 'security' === $active_tab ) ) :
-	?>
+		?>
 		<?php do_action( 'charitable_pro_settings_cta', $active_tab ); ?>
 	<?php else : ?>
 
-		<?php if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) : ?>
+		<?php if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) : // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict ?>
 		<form method="post" action="options.php">
 		<?php endif; ?>
 			<table class="form-table">
 			<?php
-				if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) :
-					settings_fields( 'charitable_settings' );
+			if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) : // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
+				settings_fields( 'charitable_settings' );
 				endif;
 
 				charitable_do_settings_fields( 'charitable_settings_' . $group, 'charitable_settings_' . $group );
 			?>
 			</table>
-			<?php if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) : ?>
+			<?php if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) : // phpcs:ignore ?>
 				<?php
 					/**
 					 * Filter the submit button at the bottom of the settings table.
@@ -123,7 +123,7 @@ ob_start();
 					echo apply_filters( 'charitable_settings_button_' . $group, get_submit_button( null, 'primary', 'submit', true, null ) );
 				?>
 			<?php endif; ?>
-		<?php if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) : ?>
+		<?php if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) : // phpcs:ignore ?>
 		</form>
 		<?php endif; ?>
 

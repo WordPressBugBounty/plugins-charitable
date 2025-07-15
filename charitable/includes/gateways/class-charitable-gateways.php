@@ -848,6 +848,7 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 
 			// Don't show the success message if we are on the welcome / getting started page (otherwise it's fine).
 			if ( ! isset( $_GET['page'] ) || 'charitable-getting-started' !== $_GET['page'] ) { // phpcs:ignore
+				// translators: %s is the mode of the connection.
 				charitable_get_admin_notices()->add_success( sprintf( __( 'You have reconnected and updated your access token for Square in %s mode.', 'charitable' ), charitable_get_option( 'test_mode' ) ? 'test' : 'live' ) );
 			}
 
@@ -1212,6 +1213,7 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 				update_option( 'charitable_using_square_connect', $charitable_using_square_connect );
 			}
 
+			// translators: %s is the mode of the connection.
 			charitable_get_admin_notices()->add_success( sprintf( __( 'Your connection to Square in %s mode has been removed.', 'charitable' ), $mode ) );
 
 			do_action( 'charitable_remove_connection_gateway_square', $settings );

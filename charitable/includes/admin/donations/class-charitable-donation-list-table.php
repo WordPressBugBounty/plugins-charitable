@@ -595,8 +595,8 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 		 *
 		 * @since  1.5.0
 		 *
-		 * @param  array $bulk_messages
-		 * @param  array $bulk_counts
+		 * @param  array $bulk_messages Bulk messages.
+		 * @param  array $bulk_counts Bulk counts.
 		 * @return array
 		 */
 		public function bulk_messages( $bulk_messages, $bulk_counts ) {
@@ -977,7 +977,7 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 					</div>
 						<?php if ( false !== $recommendations ) : ?>
 						<div class="charitable-intergration-steps">
-							<?php echo $recommendations; ?>
+							<?php echo $recommendations; // phpcs:ignore ?>
 						</div>
 					<?php endif; ?>
 					<div class="marketplace-suggestions-container marketplace-suggestions-container-footer showing-suggestion">
@@ -1016,7 +1016,7 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 			if ( ! empty( $user_recommended_list ) ) {
 
 				foreach ( $user_recommended_list as $slug => $item ) {
-					echo $this->render_blank_slate_recommendation( $slug );
+					echo $this->render_blank_slate_recommendation( $slug ); // phpcs:ignore
 				}
 
 			} else {
@@ -1085,8 +1085,8 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 								<span class="badge"><a href="#">Pro</a></span>
 							</div>
 						</header>
-						<p class="description"><?php echo wp_strip_all_tags( $description ); ?></p>
-						<a href="<?php echo admin_url( 'admin.php?page=charitable-addons&search=' . esc_attr( str_replace( '-', ' ', $slug ) ) ); ?>" class="charitable-button button-link charitable-addons"><?php esc_html_e( 'View Addons', 'charitable' ); ?></a>
+						<p class="description"><?php echo wp_strip_all_tags( $description ); // phpcs:ignore ?></p>
+						<a href="<?php echo admin_url( 'admin.php?page=charitable-addons&search=' . esc_attr( str_replace( '-', ' ', $slug ) ) ); // phpcs:ignore ?>" class="charitable-button button-link charitable-addons"><?php esc_html_e( 'View Addons', 'charitable' ); ?></a>
 					</div>
 					<div class="step">
 						<div class="vertical-wrapper">

@@ -13,4 +13,4 @@
  * @version   1.6.18
  */
 
-echo $view_args['content'];
+echo $view_args['content']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

@@ -51,6 +51,6 @@ if ( array_key_exists( 'attrs', $view_args ) ) {
 	<?php endforeach ?>
 </ul>
 <?php if ( isset( $view_args['help'] ) ) : ?>
-	<div class="charitable-help"><?php echo ( $view_args['help'] ); ?></div>
+	<div class="charitable-help"><?php echo wp_kses_post( $view_args['help'] ); ?></div>
 	<?php
 endif;

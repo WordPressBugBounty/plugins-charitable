@@ -112,6 +112,13 @@ add_action( 'charitable_donation_receipt', 'charitable_template_donation_receipt
 add_action( 'wp_footer', 'charitable_template_campaign_modal_donation_window' );
 
 /**
+ * Footer, right before the closing body tag (for Elementor widgets).
+ *
+ * @see charitable_template_elementor_campaign_modal_donation_window()
+ */
+add_action( 'wp_footer', 'charitable_template_elementor_campaign_modal_donation_window' );
+
+/**
  * Add the login form before the donation form, outside the <form> tags
  *
  * @see charitable_template_donation_form_login()
@@ -131,5 +138,3 @@ add_action( 'charitable_donation_form_donor_fields_before', 'charitable_template
  * @see charitable_template_form_login_link()
  */
 add_action( 'charitable_user_registration_after', 'charitable_template_form_login_link' );
-
-

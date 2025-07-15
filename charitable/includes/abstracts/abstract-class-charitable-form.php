@@ -203,7 +203,7 @@ if ( ! class_exists( 'Charitable_Form' ) ) :
 				'charitable_form_hidden_fields',
 				array(
 					$this->nonce_name   => wp_create_nonce( $this->nonce_action ),
-					'_wp_http_referer'  => wp_unslash( $_SERVER['REQUEST_URI'] ),
+					'_wp_http_referer'  => wp_unslash( $_SERVER['REQUEST_URI'] ), // phpcs:ignore
 					'charitable_action' => $this->form_action,
 				),
 				$this
@@ -352,6 +352,7 @@ if ( ! class_exists( 'Charitable_Form' ) ) :
 						sprintf(
 							'%s',
 							sprintf(
+								/* translators: %d is the minimum password length required. */
 								__( 'Your password must be at least %d characters long.', 'charitable' ),
 								$min_length
 							)
@@ -424,7 +425,7 @@ if ( ! class_exists( 'Charitable_Form' ) ) :
 		 */
 		public function get_submitted_values() {
 			if ( ! isset( $this->submitted ) ) {
-				$submitted = $_POST;
+				$submitted = $_POST; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 				$fields    = $this->get_fields_by_data_type();
 				$options   = $this->get_valid_field_options();
 
@@ -474,9 +475,9 @@ if ( ! class_exists( 'Charitable_Form' ) ) :
 		 * @return int|WP_Error ID of the attachment or a WP_Error object on failure.
 		 */
 		public function upload_post_attachment( $file_key, $post_id, $post_data = array(), $overrides = array() ) {
-			require_once( ABSPATH . 'wp-admin/includes/image.php' );
-			require_once( ABSPATH . 'wp-admin/includes/file.php' );
-			require_once( ABSPATH . 'wp-admin/includes/media.php' );
+			require_once ABSPATH . 'wp-admin/includes/image.php';
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			require_once ABSPATH . 'wp-admin/includes/media.php';
 
 			$overrides = $this->get_file_overrides( $file_key, $overrides );
 
@@ -497,7 +498,7 @@ if ( ! class_exists( 'Charitable_Form' ) ) :
 		 *                        or array( 'error'=>$message ).
 		 */
 		public function upload_file( $file_key, $overrides = array() ) {
-			require_once( ABSPATH . 'wp-admin/includes/file.php' );
+			require_once ABSPATH . 'wp-admin/includes/file.php';
 
 			$overrides = $this->get_file_overrides( $file_key, $overrides );
 			$file      = wp_handle_upload( $_FILES[ $file_key ], $overrides );
@@ -592,7 +593,7 @@ if ( ! class_exists( 'Charitable_Form' ) ) :
 				/* The field has a specific set of options. */
 				if ( isset( $field['options'] ) ) {
 					$options[ $key ] = array_keys( $field['options'] );
-				/* Checkbox fields without a value set should be either 1 or nothing. */
+					/* Checkbox fields without a value set should be either 1 or nothing. */
 				} elseif ( isset( $field['type'] ) && 'checkbox' === $field['type'] ) {
 					$checked_value   = isset( $field['value'] ) ? $field['value'] : 1;
 					$options[ $key ] = array( $checked_value );

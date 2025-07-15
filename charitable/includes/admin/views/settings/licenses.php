@@ -29,16 +29,16 @@ if ( false !== $slug && strtolower( $slug ) !== 'lite' && ! $is_legacy ) {
 		wp_kses(
 		/* translators: %s - charitable.com upgrade URL. */
 			__( 'You already have a non-legacy license activated on this install, which you can deactivate <a href="%s">in the "General" tab</a>.', 'charitable' ),
-			[
-				'a'      => [
-					'href'   => [],
-					'class'  => [],
-					'target' => [],
-					'rel'    => [],
-				],
-				'br'     => [],
-				'strong' => [],
-			]
+			array(
+				'a'      => array(
+					'href'   => array(),
+					'class'  => array(),
+					'target' => array(),
+					'rel'    => array(),
+				),
+				'br'     => array(),
+				'strong' => array(),
+			)
 		),
 		esc_url( admin_url( 'admin.php?page=charitable-settings&tab=general' ) )
 	) .
@@ -47,8 +47,8 @@ if ( false !== $slug && strtolower( $slug ) !== 'lite' && ! $is_legacy ) {
 	?>
 
 <div class="charitable-settings-notice license-notice" style="margin-bottom: 20px;">
-<p><?php _e( 'This area is reserved for older (legacy) license keys.', 'charitable' ); ?></p>
-<p><?php echo $new_tab_notification; ?></p>
+<p><?php esc_html_e( 'This area is reserved for older (legacy) license keys.', 'charitable' ); ?></p>
+<p><?php echo $new_tab_notification; // phpcs:ignore ?></p>
 </div>
 
 	<?php
@@ -61,16 +61,16 @@ if ( false !== $slug && strtolower( $slug ) !== 'lite' && ! $is_legacy ) {
 		wp_kses(
 		/* translators: %s - charitable.com upgrade URL. */
 			__( 'If you have purchased your license key for <strong>Basic</strong>, <strong>Plus</strong>, <strong>Pro</strong>, or <strong>Agency / Elite</strong> recently, please enter your charitable license key <a href="%s">in the "General" tab</a>.', 'charitable' ),
-			[
-				'a'      => [
-					'href'   => [],
-					'class'  => [],
-					'target' => [],
-					'rel'    => [],
-				],
-				'br'     => [],
-				'strong' => [],
-			]
+			array(
+				'a'      => array(
+					'href'   => array(),
+					'class'  => array(),
+					'target' => array(),
+					'rel'    => array(),
+				),
+				'br'     => array(),
+				'strong' => array(),
+			)
 		),
 		esc_url( admin_url( 'admin.php?page=charitable-settings&tab=general' ) )
 	) .
@@ -78,9 +78,9 @@ if ( false !== $slug && strtolower( $slug ) !== 'lite' && ! $is_legacy ) {
 
 	?>
 <div class="charitable-settings-notice license-notice" style="margin-bottom: 20px;">
-	<p><?php _e( 'This area is reserved for older (legacy) license keys.', 'charitable' ); ?></p>
-	<p><?php echo $new_tab_notification; ?></p>
-	<p><?php _e( 'By adding your license keys, you agree for your website to send requests to wpcharitable.com to check license details and provide automatic plugin updates. Your license(s) can be disconnected at any time.', 'charitable' ); ?></p>
+	<p><?php esc_html_e( 'This area is reserved for older (legacy) license keys.', 'charitable' ); ?></p>
+	<p><?php echo $new_tab_notification; // phpcs:ignore ?></p>
+	<p><?php esc_html_e( 'By adding your license keys, you agree for your website to send requests to wpcharitable.com to check license details and provide automatic plugin updates. Your license(s) can be disconnected at any time.', 'charitable' ); ?></p>
 </div>
 	<?php
 
@@ -118,22 +118,22 @@ if ( false !== $slug && strtolower( $slug ) !== 'lite' && ! $is_legacy ) {
 		}
 
 		?>
-	<div class="charitable-settings-object charitable-licensed-product">
-		<h4><?php echo $product['name']; ?></h4>
-		<input type="text" name="charitable_settings[legacy_licenses][<?php echo $key; ?>]" id="charitable_settings_licenses_<?php echo $key; ?>" class="charitable-settings-field" placeholder="<?php _e( 'Add your license key', 'charitable' ); ?>" value="<?php echo $license_key; ?>" />
+	<div class="charitable-settings-object charitable-licensed-product cf">
+		<h4><?php echo esc_html( $product['name'] ); ?></h4>
+		<input type="text" name="charitable_settings[legacy_licenses][<?php echo esc_attr( $key ); ?>]" id="charitable_settings_licenses_<?php echo esc_attr( $key ); ?>" class="charitable-settings-field" placeholder="<?php esc_attr_e( 'Add your license key', 'charitable' ); ?>" value="<?php echo esc_attr( $license_key ); ?>" />
 		<?php if ( $license ) : ?>
 			<div class="license-meta">
 				<?php if ( $is_active ) : ?>
-					<a href="<?php echo $helper->get_license_deactivation_url( $key ); ?>" class="button-secondary license-deactivation"><?php _e( 'Deactivate License', 'charitable' ); ?></a>
-					<?php if ( 'lifetime' == $license['expiration_date'] ) : ?>
-						<span class="license-expiration-date"><?php _e( 'Lifetime license', 'charitable' ); ?></span>
+					<a href="<?php echo esc_url( $helper->get_license_deactivation_url( $key ) ); ?>" class="button-secondary license-deactivation"><?php esc_html_e( 'Deactivate License', 'charitable' ); ?></a>
+					<?php if ( 'lifetime' === $license['expiration_date'] ) : ?>
+						<span class="license-expiration-date"><?php esc_html_e( 'Lifetime license', 'charitable' ); ?></span>
 					<?php else : ?>
-						<span class="license-expiration-date"><?php printf( '%s %s.', __( 'Expiring in', 'charitable' ), human_time_diff( strtotime( $license['expiration_date'] ), time() ) ); ?></span>
+						<span class="license-expiration-date"><?php printf( '%s %s.', esc_html__( 'Expiring in', 'charitable' ), human_time_diff( strtotime( $license['expiration_date'] ), time() ) ); // phpcs:ignore ?></span>
 					<?php endif ?>
 				<?php elseif ( is_array( $license ) ) : ?>
-					<span class="license-invalid"><?php echo $invalid_message; ?></span>
+					<span class="license-invalid"><?php echo $invalid_message; // phpcs:ignore ?></span>
 				<?php else : ?>
-					<span class="license-invalid"><?php _e( 'We could not validate this license.', 'charitable' ); ?></span>
+					<span class="license-invalid"><?php esc_html_e( 'We could not validate this license.', 'charitable' ); ?></span>
 				<?php endif ?>
 			</div>
 		<?php endif ?>

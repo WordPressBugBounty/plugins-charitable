@@ -8,8 +8,8 @@
  * @version 1.8.1
  */
 
-$page   = $view_args['page'];
-$action = $page->get_action();
+$page   = $view_args['page']; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+$action = $page->get_action(); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 $step   = $page->get_step();
 $total  = $page->get_total();
 $number = $page->get_number();

@@ -24,5 +24,5 @@ endif;
 	class="<?php echo esc_attr( $view_args['classes'] ); ?>"
 	<?php echo wp_kses_post( charitable_get_arbitrary_attributes( $view_args ) ); ?> />
 <?php if ( isset( $view_args['help'] ) ) : ?>
-	<div class="charitable-help"><?php echo ( $view_args['help'] ); ?></div>
+	<div class="charitable-help"><?php echo wp_kses_post( $view_args['help'] ); ?></div>
 <?php endif; ?>

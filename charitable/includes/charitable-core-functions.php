@@ -448,6 +448,7 @@ function charitable_is_break_cache() {
  *
  * @since   1.8.0
  * @version 1.8.6.1 Revisited to allow for more granular debug modes.
+ * @version 1.8.7.1 Revisited so if modes are passed in and the constant is not defined, it will return false.
  *
  * @param string $mode Optional. 'vendor' to check for vendor debug mode.
  *
@@ -460,6 +461,7 @@ function charitable_is_debug( $mode = '' ) {
 		if ( defined( $constant ) ) {
 			return constant( $constant ) ? true : false;
 		}
+		return false;
 	}
 
 	return ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) ? true : false; // phpcs:ignore

@@ -22,7 +22,7 @@ wp_enqueue_style( 'charitable-admin-user-onboarding' );
 
 // Has this user already completed the onboarding process?
 $onboarding_completed = get_option( 'charitable_ss_complete', false ) ? true : false;
-$onboarding_welcome   = ! empty( $_GET['f'] ) ? intval( $_GET['f'] ) : false;
+$onboarding_welcome   = ! empty( $_GET['f'] ) ? intval( $_GET['f'] ) : false; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 $welcome_headline  = $onboarding_completed ? __( 'Welcome back to the Charitable Setup Wizard!', 'charitable' ) : __( 'Welcome to the Charitable Setup Wizard!', 'charitable' );
 $introduction_text = $onboarding_completed ? __( 'You have already completed the setup wizard. If you need to make any changes, you can restart this process or adjust your Charitable settings.', 'charitable' ) : __( 'Your first fundraising begins with a creating a campaign. Ready to get started? Your first campaign is just 5 minutes away!', 'charitable' );

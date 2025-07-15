@@ -77,7 +77,7 @@ if ( ! class_exists( 'Charitable_Privacy_Settings' ) ) :
 					'priority' => 10000,
 					'value'    => 'privacy',
 				),
-				'section_privacy'            => array(
+				'section_privacy'               => array(
 					'title'    => __( 'Privacy', 'charitable' ),
 					'type'     => 'heading',
 					'class'    => 'section-heading',
@@ -130,14 +130,14 @@ if ( ! class_exists( 'Charitable_Privacy_Settings' ) ) :
 						'data-trigger-value' => '!0',
 					),
 				),
-				'contact_consent'  => array(
+				'contact_consent'               => array(
 					'title'    => __( 'Contact Consent Field', 'charitable' ),
 					'type'     => 'checkbox',
 					'priority' => 32,
 					'default'  => '0',
 					'help'     => __( 'Display a checkbox asking people for their consent to being contacted when they donate, register an account, or manage their profile.', 'charitable' ),
 				),
-				'contact_consent_required'     => array(
+				'contact_consent_required'      => array(
 					'label_for' => __( 'Make Consent Field Required For Donation Forms', 'charitable' ),
 					'type'      => 'checkbox',
 					'help'      => __( 'Requires the user acknowledge consent before submitting a donation, which might be required for some countries or situations.', 'charitable' ),
@@ -151,7 +151,7 @@ if ( ! class_exists( 'Charitable_Privacy_Settings' ) ) :
 					'default'  => __( 'Yes, I am happy for you to contact me via email or phone.', 'charitable' ),
 					'help'     => __( 'A short statement describing how you would like to contact people.', 'charitable' ),
 				),
-				'privacy_policy_enabled'  => array(
+				'privacy_policy_enabled'        => array(
 					'title'    => __( 'Privacy Policy Field', 'charitable' ),
 					'type'     => 'checkbox',
 					'priority' => 40,
@@ -163,7 +163,11 @@ if ( ! class_exists( 'Charitable_Privacy_Settings' ) ) :
 					'type'     => 'textarea',
 					'priority' => 45,
 					'default'  => __( 'Your personal data will be used to process your donation, support your experience throughout this website, and for other purposes described in our [privacy_policy].', 'charitable' ),
-					'help'     => __( 'Privacy policy information to be seen when individuals donate, register an account, or manage their profile. Use <code>[privacy_policy]</code> to link to the page assigned in <a href="' . esc_url( admin_url( 'admin.php?page=charitable-settings&tab=general' ) ) . '">general settings</a>.', 'charitable' ),
+					'help'     => sprintf(
+						/* translators: %1$s: HTML code tag. %2$s: HTML closing code tag. %3$s: HTML anchor tag. %4$s: HTML closing anchor tag. */
+						__( 'Privacy policy information to be seen when individuals donate, register an account, or manage their profile. Use <code>[privacy_policy]</code> to link to the page assigned in <a href="%s">general settings</a>.', 'charitable' ),
+						esc_url( admin_url( 'admin.php?page=charitable-settings&tab=general' ) )
+					),
 				),
 				'terms_and_conditions_enabled'  => array(
 					'title'    => __( 'Terms And Conditions Field', 'charitable' ),
@@ -172,12 +176,16 @@ if ( ! class_exists( 'Charitable_Privacy_Settings' ) ) :
 					'default'  => charitable_get_option( 'terms_conditions_page', 0 ) ? true : false,
 					'help'     => __( 'Display a field showing the terms and conditions (must have a terms page set and terms added below).', 'charitable' ),
 				),
-				'terms_conditions'   => array(
+				'terms_conditions'              => array(
 					'title'    => __( 'Terms And Conditions', 'charitable' ),
 					'type'     => 'textarea',
 					'priority' => 55,
 					'default'  => __( 'I have read and agree to the website [terms].', 'charitable' ),
-					'help'     => __( 'Terms and conditions statement to display on donation forms. Use <code>[terms]</code> to link to the page assigned in <a href="' . esc_url( admin_url( 'admin.php?page=charitable-settings&tab=general' ) ) . '">general settings</a>.', 'charitable' ),
+					'help'     => sprintf(
+						/* translators: %1$s: HTML code tag. %2$s: HTML closing code tag. %3$s: HTML anchor tag. %4$s: HTML closing anchor tag. */
+						__( 'Terms and conditions statement to display on donation forms. Use <code>[terms]</code> to link to the page assigned in <a href="%s">general settings</a>.', 'charitable' ),
+						esc_url( admin_url( 'admin.php?page=charitable-settings&tab=general' ) )
+					),
 				),
 			);
 		}

@@ -26,9 +26,9 @@ if ( ! empty( $_GET['charitable_campaign_preview'] ) ) { //phpcs:ignore
 	$campaign_data = empty( $view_args['campaign_data'] ) && ! empty( $view_args['id'] ) ? get_post_meta( intval( $view_args['id'] ), 'campaign_settings_v2', true ) : $view_args['campaign_data'];
 }
 
-$template_data   = $view_args['template'];
+$template_data   = isset( $view_args['template'] ) && is_array( $view_args['template'] ) ? $view_args['template'] : array();
 $template_id     = isset( $campaign_data['template_id'] ) && ! empty( $campaign_data['template_id'] ) ? sanitize_key( $campaign_data['template_id'] ) : charitable_campaign_builder_default_template();
-$template_layout = $template_data['layout'];
+$template_layout = isset( $template_data['layout'] ) ? $template_data['layout'] : array();
 
 if ( is_admin() ) {
 
@@ -82,9 +82,9 @@ if ( ! empty( $_GET['charitable_campaign_preview'] ) ) { //phpcs:ignore
 /* Template Related */
 
 $template_id     = isset( $campaign_data['template_id'] ) && ! empty( $campaign_data['template_id'] ) ? sanitize_key( $campaign_data['template_id'] ) : charitable_campaign_builder_default_template();
-$template_layout = $template_data['layout'];
+$template_layout = isset( $template_data['layout'] ) ? $template_data['layout'] : array();
 
-$template_parent_id = ! empty( $template_data['meta']['parent_theme'] ) ? esc_attr( $template_data['meta']['parent_theme'] ) : false;
+$template_parent_id = ( isset( $template_data['meta']['parent_theme'] ) && ! empty( $template_data['meta']['parent_theme'] ) ) ? esc_attr( $template_data['meta']['parent_theme'] ) : false;
 $template_wrap_css  = false !== $template_parent_id ? 'template-' . $template_parent_id : '';
 $template_wrap_css .= false !== $template_id ? ' template-' . $template_id : '';
 $template_wrap_css .= ! empty( $view_args['campaign_data']['settings']['general']['form_css_class'] ) ? ' ' . esc_attr( $view_args['campaign_data']['settings']['general']['form_css_class'] ) : false;

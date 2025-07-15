@@ -21,12 +21,12 @@ ob_start();
 ?>
 
 <div id="charitable-tools" class="wrap">
-	<h1 class="screen-reader-text"><?php echo get_admin_page_title(); ?></h1>
-	<h1><?php echo get_admin_page_title(); ?></h1>
+	<h1 class="screen-reader-text"><?php echo get_admin_page_title(); // phpcs:ignore ?></h1>
+	<h1><?php echo get_admin_page_title(); // phpcs:ignore ?></h1>
 	<?php do_action( 'charitable_maybe_show_notification' ); ?>
 	<h2 class="nav-tab-wrapper">
-		<?php foreach ( $sections as $tab => $name ) : ?>
-			<a href="<?php echo esc_url( add_query_arg( array( 'tab' => $tab ), admin_url( 'admin.php?page=charitable-tools' ) ) ); ?>" class="nav-tab <?php echo $active_tab == $tab ? 'nav-tab-active' : ''; ?>"><?php echo $name; ?></a>
+		<?php foreach ( $sections as $tab => $name ) : // phpcs:ignore ?>
+			<a href="<?php echo esc_url( add_query_arg( array( 'tab' => $tab ), admin_url( 'admin.php?page=charitable-tools' ) ) ); ?>" class="nav-tab <?php echo $active_tab == $tab ? 'nav-tab-active' : ''; ?>"><?php echo $name; // phpcs:ignore ?></a>
 		<?php endforeach ?>
 	</h2>
 	<?php
@@ -86,4 +86,4 @@ ob_start();
 	?>
 </div>
 <?php
-echo ob_get_clean();
+echo ob_get_clean(); // phpcs:ignore

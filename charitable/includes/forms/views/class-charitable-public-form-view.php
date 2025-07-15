@@ -243,7 +243,7 @@ if ( ! class_exists( 'Charitable_Public_Form_View' ) ) :
 			foreach ( $fields as $key => $field ) {
 				// insert div group for certain fields.
 				if ( $i === 1 && ( 'minimal' === $form_template && ( 'title' === strtolower( $key ) || 'first_name' === strtolower( $key ) ) ) ) {
-					echo '<div class="charitable-form-group charitable-form-group-number-' . $i . '" charitable-form-group-' . $key . '">';
+					echo '<div class="charitable-form-group charitable-form-group-number-' . esc_attr( $i ) . '" charitable-form-group-' . esc_attr( $key ) . '">';
 				} elseif ( 'minimal' === $form_template && 'first_name' === strtolower( $key ) ) {
 					echo '<div>';
 					$opening_div = true;
