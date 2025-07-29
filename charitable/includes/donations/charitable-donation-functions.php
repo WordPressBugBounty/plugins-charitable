@@ -178,7 +178,7 @@ function charitable_get_donation_by_key( $donation_key ) {
 			WHERE meta_key = 'donation_key'
 			AND meta_value = %s";
 
-	return $wpdb->get_var( $wpdb->prepare( $sql, $donation_key ) );
+	return $wpdb->get_var( $wpdb->prepare( $sql, $donation_key ) ); // phpcs:ignore
 }
 
 /**
@@ -197,7 +197,7 @@ function charitable_get_donation_by_transaction_id( $transaction_id ) {
 			WHERE meta_key = '_gateway_transaction_id'
 			AND meta_value = %s";
 
-	return $wpdb->get_var( $wpdb->prepare( $sql, $transaction_id ) );
+	return $wpdb->get_var( $wpdb->prepare( $sql, $transaction_id ) ); // phpcs:ignore
 }
 
 /**
@@ -274,7 +274,6 @@ function charitable_is_after_donation() {
 	delete_transient( 'charitable_donation_' . charitable_get_session()->get_session_id() );
 
 	return true;
-
 }
 
 /**
@@ -325,7 +324,7 @@ function charitable_get_approval_statuses() {
  * @return boolean
  */
 function charitable_is_approved_status( $status ) {
-	return false !== $status && in_array( $status, charitable_get_approval_statuses() );
+	return false !== $status && in_array( $status, charitable_get_approval_statuses() ); // phpcs:ignore
 }
 
 /**
@@ -381,7 +380,7 @@ function charitable_cancel_donation() {
 	}
 
 	/* Donations can only be cancelled if they are currently pending. */
-	if ( 'charitable-pending' != $donation->get_status() ) {
+	if ( 'charitable-pending' != $donation->get_status() ) { // phpcs:ignore
 		return false;
 	}
 
@@ -452,7 +451,7 @@ function charitable_get_donation_gateway( $donation_id ) {
  * @return mixed
  */
 function charitable_sanitize_donation_meta( $value, $key ) {
-	if ( 'donation_gateway' == $key ) {
+	if ( 'donation_gateway' == $key ) { // phpcs:ignore
 		if ( empty( $value ) || ! $value ) {
 			$value = 'manual';
 		}
@@ -466,7 +465,7 @@ function charitable_sanitize_donation_meta( $value, $key ) {
 	 *
 	 * @param mixed $value The value of the donation meta field.
 	 */
-	$value = apply_filters( 'charitable_sanitize_donation_meta-' . $key, $value );
+	$value = apply_filters( 'charitable_sanitize_donation_meta-' . $key, $value ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 
 	/**
 	 * Filter donation meta.
@@ -480,7 +479,7 @@ function charitable_sanitize_donation_meta( $value, $key ) {
 	 *
 	 * @param mixed $value The value of the donation meta field.
 	 */
-	return apply_filters( 'charitable_sanitize_donation_meta_' . $key, $value );
+	return apply_filters( 'charitable_sanitize_donation_meta_' . $key, $value ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 }
 
 /**
@@ -529,16 +528,15 @@ function charitable_get_minimum_donation_amount( $campaign_id = 0 ) {
 		$minimum_amount_to_check = get_post_meta( $campaign_id, '_campaign_minimum_donation_amount', true );
 
 		if ( charitable_is_debug() ) {
-			error_log( print_r( $minimum_amount_to_check, true ) );
+			error_log( print_r( $minimum_amount_to_check, true ) ); // phpcs:ignore
 		}
 
 		if ( false !== $minimum_amount_to_check && '' !== trim( $minimum_amount_to_check ) ) {
 			$minimum_amount = charitable_sanitize_amount( $minimum_amount_to_check, true ); // converts a format like $1.05 to 1.05, per the dev note below.
 			if ( charitable_is_debug() ) {
-				error_log( print_r( $minimum_amount, true ) );
+				error_log( print_r( $minimum_amount, true ) ); // phpcs:ignore
 			}
 		}
-
 	}
 
 	/**

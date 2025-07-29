@@ -120,7 +120,7 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 					"SELECT * FROM $this->table_name WHERE $this->primary_key = %d LIMIT 1;",
 					$row_id
 				)
-			);
+			); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -137,7 +137,7 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 					"SELECT * FROM $this->table_name WHERE $column = {$this->get_column_format($column)} LIMIT 1;",
 					$row_id
 				)
-			);
+			); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -155,7 +155,7 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 					"SELECT $column FROM $this->table_name WHERE $this->primary_key = %d LIMIT 1;",
 					$row_id
 				)
-			);
+			); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -176,7 +176,7 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 					"SELECT $column FROM $this->table_name WHERE $column_where = {$this->get_column_format($column_where)} LIMIT 1;",
 					$column_value
 				)
-			);
+			); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -197,7 +197,7 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 					"SELECT $column FROM $this->table_name WHERE $column_where = {$this->get_column_format($column_where)};",
 					$column_value
 				)
-			);
+			); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -212,7 +212,7 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 
 			return $wpdb->get_var(
 				"SELECT COUNT( * ) FROM $this->table_name;"
-			);
+			); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -230,7 +230,7 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 					"SELECT COUNT( * ) FROM $this->table_name WHERE $column = {$this->get_column_format($column)};",
 					$column_value
 				)
-			);
+			); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**

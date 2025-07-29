@@ -58,8 +58,8 @@ class Charitable_Admin_Getting_Started {
 	 */
 	public function __construct() {
 
-		add_action( 'plugins_loaded', [ $this, 'hooks' ] );
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueues' ] );
+		add_action( 'plugins_loaded', array( $this, 'hooks' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueues' ) );
 	}
 
 	/**
@@ -81,7 +81,7 @@ class Charitable_Admin_Getting_Started {
 		$style_version  = charitable_get_style_version();
 		$script_version = charitable()->get_version();
 		$assets_dir     = charitable()->get_path( 'assets', false );
-		$dependencies   = [ 'jquery' ];
+		$dependencies   = array( 'jquery' );
 
 		wp_enqueue_style(
 			'charitable-admin-getting-started',
@@ -107,7 +107,7 @@ class Charitable_Admin_Getting_Started {
 		wp_enqueue_script(
 			'jquery-confirm',
 			charitable()->get_path( 'directory', false ) . 'assets/lib/jquery.confirm/jquery-confirm.min.js',
-			[ 'jquery' ],
+			array( 'jquery' ),
 			'3.3.4',
 			false
 		);
@@ -140,8 +140,8 @@ class Charitable_Admin_Getting_Started {
 			return;
 		}
 
-		add_action( 'admin_menu', [ $this, 'register' ] );
-		add_action( 'admin_head', [ $this, 'hide_menu' ] );
+		add_action( 'admin_menu', array( $this, 'register' ) );
+		add_action( 'admin_head', array( $this, 'hide_menu' ) );
 	}
 
 	/**
@@ -160,7 +160,7 @@ class Charitable_Admin_Getting_Started {
 			esc_html__( 'Welcome to Charitable', 'charitable' ),
 			'manage_charitable_settings', // phpcs:ignore
 			self::SLUG,
-			[ $this, 'output' ]
+			array( $this, 'output' )
 		);
 	}
 
@@ -287,7 +287,24 @@ class Charitable_Admin_Getting_Started {
 								?>
 							<div class="charitable-gateway-footer">
 								<?php // translators: %s is the URL. ?>
-								<p><?php printf( __( '<strong>Stripe not available in your country?</strong> Charitable works with payment gateways like PayPal, Authorize.net, Braintree, Payrexx, PayUMoney, GoCardless, and others. <a target="_blank" href="%s">View additional payment options</a> available with PRO extensions.', 'charitable' ), esc_url( admin_url( 'admin.php?page=charitable-addons' ) ) ); ?></p>
+								<p>
+								<?php
+								echo wp_kses(
+									sprintf(
+									/* translators: %s is the URL */
+										__( '<strong>Stripe not available in your country?</strong> Charitable works with payment gateways like PayPal, Authorize.net, Braintree, Payrexx, PayUMoney, GoCardless, and others. <a target="_blank" href="%s">View additional payment options</a> available with PRO extensions.', 'charitable' ),
+										esc_url( admin_url( 'admin.php?page=charitable-addons' ) )
+									),
+									array(
+										'strong' => array(),
+										'a'      => array(
+											'href'   => array(),
+											'target' => array(),
+										),
+									)
+								);
+								?>
+								</p>
 							</div>
 							<?php endif; ?>
 						<?php endif; ?>

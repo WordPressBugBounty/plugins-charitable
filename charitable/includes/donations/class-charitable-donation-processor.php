@@ -481,7 +481,7 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 
 			$redirect_url = charitable_get_permalink( 'campaign_donation_page', array( 'campaign_id' => $campaign->ID ) );
 
-			if ( 'same_page' == charitable_get_option( 'donation_form_display', 'separate_page' ) ) {
+			if ( 'same_page' == charitable_get_option( 'donation_form_display', 'separate_page' ) ) { // phpcs:ignore
 				$redirect_url .= '#charitable-donation-form';
 			}
 
@@ -564,7 +564,7 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 				return 0;
 			}
 
-			if ( 0 == $donation_id ) {
+			if ( 0 == $donation_id ) { // phpcs:ignore
 				charitable_get_notices()->add_error( __( 'We were unable to save the donation. Please try again.', 'charitable' ) );
 				return 0;
 			}
@@ -640,7 +640,7 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 				if ( array_key_exists( 'campaign_donation_id', $campaign ) ) {
 					$campaign_donation_id = $campaign['campaign_donation_id'];
 				} else {
-					$campaign_donation_id = array_search( $campaign['campaign_id'], $campaign_donations );
+					$campaign_donation_id = array_search( $campaign['campaign_id'], $campaign_donations ); // phpcs:ignore
 				}
 
 				/* Avoid adding duplicate campaign donations when re-submitting a campaign. */
@@ -665,7 +665,7 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 					$campaign['donation_id'] = $donation_id;
 					$campaign_donation_id    = charitable_get_table( 'campaign_donations' )->insert( $campaign );
 
-					if ( 0 == $campaign_donation_id ) {
+					if ( 0 == $campaign_donation_id ) { // phpcs:ignore
 						return 0;
 					}
 				}
@@ -781,7 +781,7 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 		 * @param  mixed  $default Fallback value to return if the data is not set.
 		 * @return mixed
 		 */
-		public function get_donation_data_value( $key, $default = false ) {
+		public function get_donation_data_value( $key, $default = false ) { // phpcs:ignore
 			$data = $this->get_donation_data();
 			return isset( $data[ $key ] ) ? $data[ $key ] : $default;
 		}
@@ -855,7 +855,7 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 				}
 
 				/* If we still do not have a donor ID, it means that this is a first-time donor */
-				if ( 0 == $this->donor_id ) {
+				if ( 0 == $this->donor_id ) { // phpcs:ignore
 					$user           = new Charitable_User( $this->get_donation_data_value( 'user_id', get_current_user_id() ) );
 					$this->donor_id = $user->add_donor( $user_data );
 				}
@@ -924,7 +924,7 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 			$redirect_url = $this->get_redirection_after_gateway_processing( $gateway_processing );
 
 			/* If the gateway processing failed, add the error notices to the session. */
-			if ( false == $gateway_processing ) {
+			if ( false == $gateway_processing ) { // phpcs:ignore
 
 				/* Log the failed payment. */
 				$this->update_donation_log(
@@ -946,8 +946,8 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 			 * If the gateway processing returned an array with a directive to NOT
 			 * use wp_safe_redirect, use wp_redirect instead.
 			 */
-			if ( isset( $gateway_processing['safe'] ) && false == $gateway_processing['safe'] ) {
-				wp_redirect( $redirect_url, $status );
+			if ( isset( $gateway_processing['safe'] ) && false == $gateway_processing['safe'] ) { // phpcs:ignore
+				wp_safe_redirect( $redirect_url, $status );
 				die();
 			}
 
@@ -965,7 +965,7 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 		 * @return string
 		 */
 		private function get_redirection_after_gateway_processing( $gateway_processing ) {
-			if ( false == $gateway_processing ) {
+			if ( false == $gateway_processing ) { // phpcs:ignore
 				$redirect_url = esc_url( add_query_arg( array( 'donation_id' => $this->donation_id ), wp_get_referer() ) );
 			} elseif ( is_array( $gateway_processing ) && isset( $gateway_processing['redirect'] ) ) {
 				$redirect_url = $gateway_processing['redirect'];

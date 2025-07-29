@@ -215,6 +215,9 @@ var CharitableAdminUI = window.CharitableAdminUI || ( function( document, window
                                     $('#charitable-plugin-notifications').find('.dismiss-all').remove();
                                 } else {
                                     $('#charitable-plugin-notifications').find('#new-notifications-count').html( active_notification_count );
+                                    
+                                    // Update the header badge count
+                                    $('.charitable-notification-inbox').find('.number').html( active_notification_count );
 
                                     // Get the number of active notifications for the dashboard.
                                     var active_notification_count_dashboard = $('#charitable-dashboard-report-sections').find('.charitable-dashboard-notifications .charitable-notification').length;

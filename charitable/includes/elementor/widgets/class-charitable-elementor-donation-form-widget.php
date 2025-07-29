@@ -187,6 +187,6 @@ class Charitable_Elementor_Donation_Form_Widget extends \Elementor\Widget_Base
 
         $output .= '</div>';
 
-        echo ($output);
+        echo wp_kses_post( $output );
     }
 }

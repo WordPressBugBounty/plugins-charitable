@@ -439,6 +439,106 @@ function charitable_add_footer_text( $footer_text ) {
 add_filter( 'admin_footer_text', 'charitable_add_footer_text' );
 
 /**
+ * Check if the promotion footer should be displayed.
+ *
+ * @since 1.8.7.2
+ *
+ * @return bool
+ */
+function charitable_show_promotion_footer() {
+
+	// Some 3rd-party addons may use page slugs that start with `charitable-`
+	// so we should define exact pages we want the footer to be displayed on instead
+	// of targeting any page that looks like a WPForms page.
+	$plugin_pages = [
+		'charitable-dashboard',
+		'charitable-reports',
+		'charitable-tools',
+		'charitable-settings',
+		'charitable-about',
+		'charitable-education',
+		'charitable-growth-tools',
+		'charitable-intergration-wpcode',
+		'charitable-system-info',
+		'charitable-notices',
+	];
+
+	$allowed_page = false;
+
+	// Is this a post_type page of 'campaign' or 'donation'?
+	if ( isset( $_REQUEST['post_type'] ) && in_array( $_REQUEST['post_type'], [ 'campaign', 'donation' ], true ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+		$allowed_page = true;
+	}
+
+	if ( charitable_is_admin_screen() ) {
+		$allowed_page = true;
+	}
+
+	if ( ! $allowed_page ) {
+		// phpcs:ignore WordPress.Security.NonceVerification
+		$current_page = isset( $_REQUEST['page'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['page'] ) ) : '';
+
+		if ( ! in_array( $current_page, $plugin_pages, true ) ) {
+			$allowed_page = false;
+		}
+	}
+
+	return apply_filters( 'charitable_show_promotion_footer', $allowed_page );
+}
+
+/**
+ * Pre-footer promotion block, displayed on all Charitable admin pages except Form Builder.
+ *
+ * @since 1.8.7.2
+ */
+function charitable_promote_footer() {
+
+	if ( ! charitable_show_promotion_footer() ) {
+		return;
+	}
+
+	$links = [
+		[
+			'url'    => charitable_is_pro() ?
+				charitable_utm_link(
+					'https://charitable.com/account/support/',
+					'Plugin Footer',
+					'Contact Support'
+				) : 'https://wordpress.org/support/plugin/charitable/',
+			'text'   => __( 'Support', 'charitable' ),
+			'target' => '_blank',
+		],
+		[
+			'url'    => charitable_utm_link(
+				'https://wpcharitable.com/documentation/',
+				'Plugin Footer',
+				'Plugin Documentation'
+			),
+			'text'   => __( 'Docs', 'charitable' ),
+			'target' => '_blank',
+		],
+		[
+			'url'  => admin_url( 'admin.php?page=charitable-growth-tools' ),
+			'text' => __( 'Free Plugins', 'charitable' ),
+		],
+	];
+
+	echo charitable_render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		'admin/templates/promotion',
+		[
+			'title' => sprintf(
+				/* translators: %s: Heart icon */
+				__( 'Made with %s by the Charitable Team', 'charitable' ),
+				'<span style="color: #d63638;">♥</span>'
+			),
+			'links' => $links,
+		],
+		true
+	);
+}
+add_action( 'in_admin_footer', 'charitable_promote_footer' );
+
+/**
  * Check if a screen is a plugin admin view.
  * Returns the screen id if true, false (bool) if not.
  *

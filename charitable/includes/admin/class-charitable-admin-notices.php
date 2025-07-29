@@ -252,10 +252,10 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 			$body_text = ( $paragraph_tags ) ? '<p>%s</p>' : '%s';
 
 			printf(
-				'<div class="%s" %s>' . $body_text . '</div>',
+				'<div class="%s" %s>' . wp_kses_post( $body_text ) . '</div>',
 				esc_attr( $class ),
 				strlen( $notice_key ) ? 'data-notice="' . esc_attr( $notice_key ) . '"' : '',
-				$notice
+				wp_kses_post( $notice )
 			);
 
 			if ( strlen( $notice_key ) ) {
@@ -426,7 +426,7 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 				$activated_datetime = ( false !== get_option( 'wpcharitable_activated_datetime' ) ) ? get_option( 'wpcharitable_activated_datetime' ) : false;
 				$days               = 0;
 				if ( $activated_datetime ) {
-					$diff = current_time( 'timestamp' ) - $activated_datetime;
+					$diff = current_time( 'timestamp' ) - $activated_datetime; // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
 					$days = abs( round( $diff / 86400 ) );
 				}
 
@@ -650,7 +650,7 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 				strlen( $data_nonce ) ? 'data-notice="' . esc_attr( $data_nonce ) . '"' : '',
 				strlen( $data_id ) ? 'data-id="' . esc_attr( $data_id ) . '"' : '',
 				strlen( $data_lifespan ) ? 'data-lifespan="' . esc_attr( $data_lifespan ) . '"' : '',
-				$message
+				wp_kses_post( $message )
 			);
 		}
 

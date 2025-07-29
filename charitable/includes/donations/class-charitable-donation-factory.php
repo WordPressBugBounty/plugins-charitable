@@ -63,7 +63,7 @@ if ( ! class_exists( 'Charitable_Donation_Factory' ) ) :
 				)
 			);
 
-			if ( ! in_array( $donation->post_type, $valid_post_types ) ) {
+			if ( ! in_array( $donation->post_type, $valid_post_types ) ) { // phpcs:ignore
 				return false;
 			}
 
@@ -74,7 +74,6 @@ if ( ! class_exists( 'Charitable_Donation_Factory' ) ) :
 			}
 
 			return new $classname( $donation );
-
 		}
 
 		/**
@@ -82,24 +81,24 @@ if ( ! class_exists( 'Charitable_Donation_Factory' ) ) :
 		 *
 		 * @since   1.4.0
 		 *
-		 * @param  	string $donation_type
-		 * @return 	string|false
+		 * @param  string $donation_type The type of donation (e.g. 'charitable-donation').
+		 * @return string|false The generated class name or false if invalid.
 		 */
 		private function get_classname_from_donation_type( $donation_type ) {
 			return 'Charitable_' . implode( '_', array_map( 'ucfirst', explode( '-', $donation_type ) ) );
 		}
 
 		/**
-		 * Get the product class name.
+		 * Get the donation class name.
 		 *
 		 * @since   1.4.0
 		 *
-		 * @param  	WP_Post $the_donation
-		 * @return 	string
+		 * @param   WP_Post $the_donation The donation post object.
+		 * @return  string The donation class name.
 		 */
 		private function get_donation_class( $the_donation ) {
-			$donation_id = absint( $the_donation->ID );
-			$donation_type  = $the_donation->post_type;
+			$donation_id   = absint( $the_donation->ID );
+			$donation_type = $the_donation->post_type;
 
 			$classname = $this->get_classname_from_donation_type( $donation_type );
 

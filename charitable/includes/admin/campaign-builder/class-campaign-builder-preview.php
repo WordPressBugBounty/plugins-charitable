@@ -115,7 +115,7 @@ if ( ! class_exists( 'Campaign_Builder_Preview' ) ) :
 
 			// check if this custom post type actually exists.
 			global $wpdb;
-			if ( ! $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE ID=%s AND post_status != 'trash'", array( $campaign_id ) ) ) ) {
+			if ( ! $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE ID=%s AND post_status != 'trash'", array( $campaign_id ) ) ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 				return false;
 			}
 

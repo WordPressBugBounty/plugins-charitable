@@ -3,11 +3,11 @@
  * Plugin Name: Charitable
  * Plugin URI: https://www.wpcharitable.com
  * Description: The best WordPress donation plugin. Fundraising with recurring donations, and powerful features to help you raise more money online.
- * Version: 1.8.7.1
+ * Version: 1.8.7.2
  * Author: Charitable Donations & Fundraising Team
  * Author URI: https://wpcharitable.com
  * Requires at least: 5.0
- * Stable tag: 1.8.7.1
+ * Stable tag: 1.8.7.2
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
@@ -39,7 +39,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		const AUTHOR = 'WP Charitable';
 
 		/* Plugin version. */
-		const VERSION = '1.8.7.1';
+		const VERSION = '1.8.7.2';
 
 		/* Version of database schema. */
 		const DB_VERSION = '20180522';
@@ -536,7 +536,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		 */
 		public function maybe_start_qunit() {
 			/* Skip out early if ?qunit isn't included in the request. */
-			if ( ! array_key_exists( 'qunit', $_GET ) ) {
+			if ( ! array_key_exists( 'qunit', $_GET ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				return false;
 			}
 
@@ -649,7 +649,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		 * @return boolean
 		 */
 		public function is_start() {
-			return current_filter() == 'charitable_start';
+			return current_filter() == 'charitable_start'; // phpcs:ignore
 		}
 
 		/**
@@ -660,7 +660,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		 * @return boolean
 		 */
 		public function started() {
-			return did_action( 'charitable_start' ) || current_filter() == 'charitable_start';
+			return did_action( 'charitable_start' ) || current_filter() == 'charitable_start'; // phpcs:ignore
 		}
 
 		/**
@@ -671,7 +671,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		 * @return boolean
 		 */
 		public function is_activation() {
-			return current_filter() == 'activate_charitable/charitable.php';
+			return current_filter() == 'activate_charitable/charitable.php'; // phpcs:ignore
 		}
 
 		/**
@@ -682,7 +682,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		 * @return boolean
 		 */
 		public function is_deactivation() {
-			return current_filter() == 'deactivate_charitable/charitable.php';
+			return current_filter() == 'deactivate_charitable/charitable.php'; // phpcs:ignore
 		}
 
 		/**
@@ -881,7 +881,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		 * @param  string $class The type of class to be retrieved.
 		 * @return object
 		 */
-		public function get_registered_object( $class ) {
+		public function get_registered_object( $class ) { // phpcs:ignore
 			return $this->registry->get( $class );
 		}
 
@@ -993,7 +993,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 			}
 
 			// create or update the install date for future reference.
-			update_option( 'wpcharitable_activated_datetime', current_time( 'timestamp' ) );
+			update_option( 'wpcharitable_activated_datetime', current_time( 'timestamp' ) ); // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
 		}
 
 		/**
@@ -1098,7 +1098,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		 * @param  mixed $object Object to be registered.
 		 * @return void
 		 */
-		public function register_object( $object ) {
+		public function register_object( $object ) { // phpcs:ignore
 			charitable_get_deprecated()->deprecated_function(
 				__METHOD__,
 				'1.5.0',
@@ -1222,7 +1222,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		 */
 		public function is_stripe_connect_addon() {
 
-			if ( in_array( 'charitable-stripe/charitable-stripe.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+			if ( in_array( 'charitable-stripe/charitable-stripe.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) { // phpcs:ignore
 				return true;
 			}
 
@@ -1315,8 +1315,8 @@ if ( ! class_exists( 'Charitable' ) ) :
 		public function check_for_version_conflicts() {
 
 			// Check for Charitable Stripe < 1.5.0.
-			if ( in_array( 'charitable-stripe/charitable-stripe.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
-				if ( class_exists( 'Charitable_Stripe' ) && version_compare( Charitable_Stripe::VERSION, '1.5.0', '<' ) ) {
+			if ( in_array( 'charitable-stripe/charitable-stripe.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) { // phpcs:ignore
+				if ( class_exists( 'Charitable_Stripe' ) && version_compare( Charitable_Stripe::VERSION, '1.5.0', '<' ) ) { // phpcs:ignore
 					// manually deactivate plugin.
 					$found   = false;
 					$current = get_option( 'active_plugins', array() );

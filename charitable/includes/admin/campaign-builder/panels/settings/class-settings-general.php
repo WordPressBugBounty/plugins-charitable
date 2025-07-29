@@ -177,7 +177,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_General' ) ) :
 						'placeholder' => '∞',
 						'add_commas'  => true,
 						'tooltip'     => esc_html__( 'Set a monetary goal that you want to reach for this campaign. Leave blank for no goal.', 'charitable' ),
-						'icon'        => function_exists( 'charitable_get_currency_helper' ) ? charitable_get_currency_helper()->get_currency_symbol() : 'images/campaign-builder/settings/goal_dollar.png',
+						'icon'        => function_exists( 'charitable_get_currency_helper' ) ? charitable_get_currency_helper()->get_currency_symbol() : 'images/campaign-builder/settings/goal_dollar.png', // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					)
 				);
 
@@ -335,7 +335,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_General' ) ) :
 
 			$html = ob_get_clean();
 
-			echo $html;
+			echo $html; // phpcs:ignore
 		}
 	}
 

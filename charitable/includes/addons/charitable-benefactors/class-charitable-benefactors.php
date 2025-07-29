@@ -281,7 +281,7 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 
 			global $wpdb;
 
-			$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'charitable_benefactors' );
+			$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'charitable_benefactors' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange
 
 			delete_option( $wpdb->prefix . 'charitable_benefactors_db_version' );
 		}

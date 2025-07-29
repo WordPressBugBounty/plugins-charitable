@@ -67,7 +67,7 @@ if ( ! class_exists( 'Charitable_Uninstall' ) ) :
 		private function remove_post_data() {
 			global $wpdb;
 
-			$posts = $wpdb->get_col( "SELECT ID FROM $wpdb->posts WHERE post_type IN ( 'donation', 'campaign' );" );
+			$posts = $wpdb->get_col( "SELECT ID FROM $wpdb->posts WHERE post_type IN ( 'donation', 'campaign' );" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			foreach ( $posts as $post_id ) {
 				wp_delete_post( $post_id, true );
@@ -86,12 +86,12 @@ if ( ! class_exists( 'Charitable_Uninstall' ) ) :
 		private function remove_tables() {
 			global $wpdb;
 
-			$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'charitable_campaign_donations' );
-			$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'charitable_donors' );
-			$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'charitable_donormeta' );
-			$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'charitable_benefactors' );
-			$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'charitable_donation_activities' );
-			$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'charitable_campaign_activities' );
+			$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'charitable_campaign_donations' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange
+			$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'charitable_donors' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange
+			$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'charitable_donormeta' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange
+			$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'charitable_benefactors' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange
+			$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'charitable_donation_activities' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange
+			$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'charitable_campaign_activities' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange
 
 			delete_option( $wpdb->prefix . 'charitable_campaign_donations_db_version' );
 			delete_option( $wpdb->prefix . 'charitable_donors_db_version' );

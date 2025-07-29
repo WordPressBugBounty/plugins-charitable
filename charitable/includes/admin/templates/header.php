@@ -5,11 +5,13 @@
  * @package Charitable
  * @since   1.8.0
  * @version 1.8.0.3
- * @version 1.8.3
+ * @version 1.8.7.2
  */
 
 // if there are new notifications add the indicator to the menu title.
-$indictor_html = class_exists( 'Charitable_Notifications' ) && Charitable_Notifications::get_instance()->get_new_notifications_count() ? '<span class="round number">!</span>' : '';
+$notification_count = class_exists( 'Charitable_Notifications' ) ? Charitable_Notifications::get_instance()->get_new_notifications_count() : 0;
+$display_text = $notification_count > 0 ? ( $notification_count > 9 ? '9+' : $notification_count ) : '';
+$indictor_html = $notification_count > 0 ? '<span class="round number">' . $display_text . '</span>' : '';
 ?>
 
 <?php do_action( 'charitable_admin_before_header' ); ?>

@@ -216,7 +216,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
                     ON p.ID = cd.donation_id
                     $where_sql";
 
-			$total = $wpdb->get_var( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore
+			$total = $wpdb->get_var( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			if ( $this->is_comma_decimal() ) {
 				$total = Charitable_Currency::get_instance()->sanitize_database_amount( $total );
@@ -279,7 +279,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
                     FROM $this->table_name
                     WHERE $where_column IN ( $in );";
 
-			return $wpdb->get_col( $wpdb->prepare( $sql, $parameters ) );
+			return $wpdb->get_col( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -362,7 +362,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
                     FROM $this->table_name
                     WHERE donation_id = %d;";
 
-			return $wpdb->get_col( $wpdb->prepare( $sql, intval( $donation_id ) ) );
+			return $wpdb->get_col( $wpdb->prepare( $sql, intval( $donation_id ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**

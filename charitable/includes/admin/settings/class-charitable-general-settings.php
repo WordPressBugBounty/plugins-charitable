@@ -194,7 +194,7 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 					'help'     => __( 'The minimal template has a more compact and simplified layout. It is most effective with "only show required fields" set to "Yes".', 'charitable' ),
 				),
 				'donation_form_minimal_fields'           => array(
-					'title'    => __( 'Only show required fields', 'charitable' ),
+					'title'    => __( 'Only Show Required Fields', 'charitable' ),
 					'type'     => 'radio',
 					'priority' => 24,
 					'class'    => 'general-settings',
@@ -206,7 +206,7 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 					'help'     => __( 'Choose if you wish fields not required on the donation form to be hidden.', 'charitable' ),
 				),
 				'donation_form_show_login_message'       => array(
-					'title'    => __( 'Show login form <span class="badge beta">Beta</span>', 'charitable' ),
+					'title'    => __( 'Show Login Form <span class="badge beta">Beta</span>', 'charitable' ),
 					'type'     => 'radio',
 					'priority' => 25,
 					'class'    => 'general-settings',
@@ -218,20 +218,20 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 					'help'     => __( 'Choose if you wish to display a register reminder or login form at the top of the donation form.', 'charitable' ),
 				),
 				'donation_form_minimal_amount_notice_display' => array(
-					'title'    => __( 'Minimum donation location', 'charitable' ),
+					'title'    => __( 'Minimum Donation Location', 'charitable' ),
 					'type'     => 'select',
 					'priority' => 26,
 					'class'    => 'general-settings',
 					'default'  => 'below_amount_selection',
 					'options'  => array(
-						'below_amount_selection' => __( 'Below donation choices / amounts', 'charitable' ),
-						'below_donation_title'   => __( 'Below donation title', 'charitable' ),
-						'above_donation_title'   => __( 'Above donation title', 'charitable' ),
+						'below_amount_selection' => __( 'Below Donation Choices / Amounts', 'charitable' ),
+						'below_donation_title'   => __( 'Below Donation Title', 'charitable' ),
+						'above_donation_title'   => __( 'Above Donation Title', 'charitable' ),
 					),
 					'help'     => __( 'Choose where you wish the minimum donation message to appear on the donation form, if a minimum is set for the campaign.', 'charitable' ),
 				),
 				'donation_form_notices_display'          => array(
-					'title'    => __( 'Notice display location', 'charitable' ),
+					'title'    => __( 'Notice Display Location', 'charitable' ),
 					'type'     => 'select',
 					'priority' => 27,
 					'default'  => 'top',
@@ -243,7 +243,7 @@ if ( ! class_exists( 'Charitable_General_Settings' ) ) :
 					'help'     => __( 'Choose where notice and validation errors appear on the donation form.', 'charitable' ),
 				),
 				'donation_form_default_highlight_colour' => array(
-					'title'    => __( 'Default highlight color', 'charitable' ),
+					'title'    => __( 'Default Highlight Color', 'charitable' ),
 					'type'     => 'color-picker',
 					'priority' => 28,
 					'default'  => false,

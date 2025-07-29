@@ -116,7 +116,7 @@ if ( ! class_exists( 'Charitable_Customizer' ) ) :
 								),
 								'control' => array(
 									'type'     => 'radio',
-									'label'    => __( 'Only show required fields', 'charitable' ),
+									'label'    => __( 'Only Show Required Fields', 'charitable' ),
 									'priority' => 1024,
 									'choices'  => array(
 										1 => __( 'Yes', 'charitable' ),

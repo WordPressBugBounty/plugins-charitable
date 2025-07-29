@@ -3,7 +3,9 @@
  * Admin Notifications template.
  *
  * @since 1.8.3
+ * @version 1.8.7.2
  *
+ * @package Charitable/Admin/Templates
  * @var array $notifications
  */
 
@@ -12,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $active_count           = intval( $args['notifications']['active_count'] );
+$active_count_string    = esc_html( $args['notifications']['active_count'] );
 $remaining_active_count = $active_count > 4 ? $active_count - 3 : 0;
 $dismissed_count        = intval( $args['notifications']['dismissed_count'] );
 $no_items_css           = ( $active_count > 0 ) ? 'charitable-hidden' : '';
@@ -24,7 +27,7 @@ $notifications_title    = $active_count > 1 ? esc_html__( 'New Notifications', '
 <div class="charitable-container charitable-report-card charitable-dashboard-notifications">
 	<div class="header">
 		<?php if ( $active_count ) : ?>
-			<h4>(<span id="new-notifications-count-dashboard"><?php echo esc_html( $active_count ); ?></span>) <?php echo esc_html( $notifications_title ); ?></h4>
+			<h4>(<span id="new-notifications-count-dashboard"><?php echo esc_html( $active_count_string ); ?></span>) <?php echo esc_html( $notifications_title ); ?></h4>
 		<?php else : ?>
 			<h4><?php echo esc_html__( 'Notifications', 'charitable' ); ?></h4>
 		<?php endif; ?>

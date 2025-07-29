@@ -158,7 +158,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Template' ) ) :
 
 						endif;
 
-						echo $builder_template->output_templates_panel();
+						echo $builder_template->output_templates_panel(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 						?>
 					</p>

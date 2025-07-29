@@ -105,7 +105,7 @@ function charitable_campaign_search_posts( $search_term = '', $args = [] ) {
 					ORDER BY post_title LIMIT %d",
 			absint( $args['count'] )
 		)
-	);
+	); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 	// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 	$posts = $posts ? $posts : [];

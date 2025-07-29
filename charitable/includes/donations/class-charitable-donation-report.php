@@ -82,7 +82,7 @@ if ( ! class_exists( 'Charitable_Donation_Report' ) ) :
 				}
 
 				foreach ( $this->types as $type ) {
-					if ( in_array( $type, $this->args['report_type'] ) ) {
+					if ( in_array( $type, $this->args['report_type'] ) ) { // phpcs:ignore
 						$this->reports[ $type ] = $this->run_report_query( $type );
 					}
 				}
@@ -228,7 +228,7 @@ if ( ! class_exists( 'Charitable_Donation_Report' ) ) :
 		 * @return array|false
 		 */
 		private function parse_report_type( $report_type ) {
-			if ( 'all' == $report_type ) {
+			if ( 'all' == $report_type ) { // phpcs:ignore
 				return $this->types;
 			}
 
@@ -236,7 +236,7 @@ if ( ! class_exists( 'Charitable_Donation_Report' ) ) :
 				return $report_type;
 			}
 
-			if ( ! in_array( $report_type, $this->types ) ) {
+			if ( ! in_array( $report_type, $this->types ) ) { // phpcs:ignore
 				charitable_get_deprecated()->doing_it_wrong(
 					__METHOD__,
 					/* translators: %s: report type */

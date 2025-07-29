@@ -16,15 +16,17 @@ if ( empty( $value ) ) :
 	$value = isset( $view_args['default'] ) ? $view_args['default'] : '';
 endif;
 
+$escaped_key  = implode( '_', $view_args['key'] );
+$escaped_name = $view_args['name'];
+
 ?>
 <input type="email"
-	id="<?php printf( 'charitable_settings_%s', implode( '_', $view_args['key'] ) ); ?>"
-	name="<?php printf( 'charitable_settings[%s]', $view_args['name'] ); ?>"
+	id="charitable_settings_<?php echo esc_attr( $escaped_key ); ?>"
+	name="charitable_settings[<?php echo esc_attr( $escaped_name ); ?>]"
 	value="<?php echo esc_attr( $value ); ?>"
 	class="<?php echo esc_attr( $view_args['classes'] ); ?>"
 	<?php echo charitable_get_arbitrary_attributes( $view_args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 />
 <?php if ( isset( $view_args['help'] ) ) : ?>
 	<div class="charitable-help"><?php echo wp_kses_post( $view_args['help'] ); ?></div>
-<?php
-endif;
+<?php endif; ?>

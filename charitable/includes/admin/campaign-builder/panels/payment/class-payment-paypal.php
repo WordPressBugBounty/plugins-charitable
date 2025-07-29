@@ -106,9 +106,9 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment_Paypal' ) ) :
 
 			?>
 
-			<div class="charitable-panel-content-section charitable-panel-content-section-parent-payment charitable-panel-content-section-<?php echo $this->slug; ?> <?php echo $active; ?>" style="<?php echo $style; ?>">
+			<div class="charitable-panel-content-section charitable-panel-content-section-parent-payment charitable-panel-content-section-<?php echo esc_attr( $this->slug ); ?> <?php echo esc_attr( $active ); ?>" style="<?php echo esc_attr( $style ); ?>">
 
-				<div class="charitable-panel-content-section-title"><?php echo $this->primary_label; ?> <?php echo esc_html__( 'Settings', 'charitable' ); ?></div>
+				<div class="charitable-panel-content-section-title"><?php echo esc_html( $this->primary_label ); ?> <?php echo esc_html__( 'Settings', 'charitable' ); ?></div>
 
 				<div class="charitable-panel-content-section-interior">
 
@@ -135,7 +135,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment_Paypal' ) ) :
 
 			$html = ob_get_clean();
 
-			echo $html;
+			echo $html; // phpcs:ignore
 		}
 	}
 

@@ -16,6 +16,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 
+	/**
+	 * Design class management panel.
+	 *
+	 * @package   Charitable
+	 * @author    David Bisset
+	 * @copyright Copyright (c) 2023, WP Charitable LLC
+	 * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
+	 * @since     1.8.0
+	 * @version   1.8.0
+	 */
 	class Charitable_Builder_Panel_Design extends Charitable_Builder_Panel {
 
 		/**
@@ -176,7 +186,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 					</div>
 					<div class="charitable-preview-top-bar-inner-right">
 							<?php if ( 0 !== intval( $campaign_id ) && $campaign_status && 'draft' !== $campaign_status ) : ?>
-							<span class="charitable-view-campaign-external-link"><a href="<?php echo get_permalink( $campaign_id ); ?>" target="_blank" title="View Campaign Page"><?php /* <i class="fa fa-eye"></i> */ ?></a></span>
+							<span class="charitable-view-campaign-external-link"><a href="<?php echo esc_url( get_permalink( $campaign_id ) ); ?>" target="_blank" title="View Campaign Page"><?php /* <i class="fa fa-eye"></i> */ ?></a></span>
 						<?php endif; ?>
 					</div>
 				</div>
@@ -342,7 +352,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 						echo '<div class="charitable-check ' . $checked_or_not . '"></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
 
-					echo '<button ' . charitable_html_attributes( $atts['id'], $atts['class'], $atts['data'], $atts['atts'] ) . '>';
+					echo '<button ' . charitable_html_attributes( $atts['id'], $atts['class'], $atts['data'], $atts['atts'] ) . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					if ( $field['icon'] ) {
 						echo '<i class="' . esc_attr( $atts['font-prefix'] ) . ' ' . esc_attr( $field['icon'] ) . '"></i> ';
 					}
@@ -446,7 +456,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 
 				$class = apply_filters( 'charitable_builder_field_option_class', '', $field );
 
-				printf( '<div class="charitable-design-option charitable-design-option-%s %s" id="charitable-design-option-%d" data-design-id="%d">', sanitize_html_class( $field['type'] ), charitable_sanitize_classes( $class ), (int) $field['id'], (int) $field['id'] );
+				printf( '<div class="charitable-design-option charitable-design-option-%s %s" id="charitable-design-option-%d" data-design-id="%d">', sanitize_html_class( $field['type'] ), charitable_sanitize_classes( $class ), (int) $field['id'], (int) $field['id'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 				printf( '<input type="hidden" name="fields[%d][id]" value="%d" class="charitable-design-option-hidden-id">', (int) $field['id'], (int) $field['id'] );
 
@@ -555,11 +565,10 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 									if ( class_exists( $type ) ) :
 										$class = new $type();
 										if ( method_exists( $class, 'settings_display' ) ) {
-											echo $class->settings_display( $field_id, $this->campaign_data );
+											echo $class->settings_display( $field_id, $this->campaign_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 										}
 										endif;
 								}
-
 							} elseif ( 'tabs' === $row_type ) {
 
 								foreach ( $row['tabs'] as $tab_id => $tab ) {
@@ -573,16 +582,12 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 										if ( class_exists( $type ) ) :
 											$class = new $type();
 											if ( method_exists( $class, 'settings_display' ) ) {
-												echo $class->settings_display( $field_id, $this->campaign_data );
+												echo $class->settings_display( $field_id, $this->campaign_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 											}
 											endif;
-
 									}
-
 								}
-
 							}
-
 						}
 
 						endforeach;
@@ -605,7 +610,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 						<input type="checkbox" id="charitable-panel-field-settings-charitable-campaign-enable-tabs" name="layout__advanced__enable_tabs" data-advanced-field-id="enable_tabs" value="disabled" <?php checked( $enable_tabs, 'disabled' ); ?> />
 						<label class="charitable-toggle-control-icon" for="charitable-panel-field-settings-charitable-campaign-enable-tabs"></label>
 						<label for="charitable-panel-field-settings-charitable-campaign-enable-tabs"><?php echo esc_html__( 'Hide All Tabs.', 'charitable' ); ?> </label>
-						<?php echo charitable_get_tooltip_html( __( 'Turn this on to remove tabs from your campaign page.', 'charitable' ), 'tooltipstered' ); ?>
+						<?php echo charitable_get_tooltip_html( __( 'Turn this on to remove tabs from your campaign page.', 'charitable' ), 'tooltipstered' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					</span>
 				</div>
 
@@ -625,7 +630,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 						<!-- row -->
 						<div class="charitable-group-row charitable-tab-title-row" id="tabs_xxx_row_title" data-field-id="">
 							<label for=""><?php echo esc_html__( 'Title', 'charitable' ); ?>
-							<?php echo charitable_get_tooltip_html( __( 'Title appears on the tab in the tab navigation.', 'charitable' ), 'tooltipstered' ); ?>
+							<?php echo charitable_get_tooltip_html( __( 'Title appears on the tab in the tab navigation.', 'charitable' ), 'tooltipstered' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							<input type="text" class="" id="tabs_xxx_title" name="tabs__xxx__title" value="" placeholder="<?php echo esc_html__( 'Tab Title', 'charitable' ); ?> " maxlength="<?php echo intval( $max_tab_title_length ); ?>">
 						</div>
 						<div class="charitable-group-row charitable-tab-title-row" id="tabs_xxx_row_visible_nav" data-tab-id="">
@@ -633,7 +638,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 								<input type="checkbox" id="tabs_xxx_visible_nav" class="charitable-settings-tab-visible-nav" name="tabs__xxx__visible_nav" value="invisible" />
 								<label class="charitable-toggle-control-icon" for="tabs_xxx_visible_nav"></label>
 								<label for="tabs_xxx_visible_nav"><?php echo esc_html__( 'Hide tab navigation.', 'charitable' ); ?></label>
-								<?php echo charitable_get_tooltip_html( __( 'Hide the tab in the navigation bar (only if you have one tab in your design).', 'charitable' ), 'tooltipstered' ); ?>
+								<?php echo charitable_get_tooltip_html( __( 'Hide the tab in the navigation bar (only if you have one tab in your design).', 'charitable' ), 'tooltipstered' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							</span>
 						</div>
 					</div>
@@ -658,7 +663,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 							$group_header   = ( $tab_id === 'campaign' ) ? 'Campaign' : $group_title;
 							$group_desc     = isset( $tab_info['desc'] ) && '' !== trim( $tab_info['desc'] ) ? $tab_info['desc'] : false;
 							$group_classes  = isset( $tab_info['title'] ) && '' !== trim( $tab_info['title'] ) ? false : 'charitable-new-tab';
-							$data_group     = ( $tab_id === 'campaign' ) ? 'general-layout-tab' : 'general-layout-tab'; // general-layout-campaign
+							$data_group     = ( $tab_id === 'campaign' ) ? 'general-layout-tab' : 'general-layout-tab';
 							$active         = $counter === 0 ? 'active' : false;
 							$closed         = $counter === 0 ? 'charitable-open' : 'charitable-closed';
 							$arrow_icon     = ! $active ? 'fa fa-angle-down charitable-angle-right' : 'fa fa-angle-down charitable-angle-down';
@@ -673,28 +678,28 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 							?>
 
 							<!-- group -->
-							<div class="charitable-group charitable-layout-options-tab-group <?php echo $group_classes; ?> <?php echo $closed; ?> <?php echo $active; ?>" data-group_id="<?php echo $group_id; ?>">
-								<div class="charitable-general-layout-heading" data-group="<?php echo $data_group; ?>">
+							<div class="charitable-group charitable-layout-options-tab-group <?php echo esc_attr( $group_classes ); ?> <?php echo esc_attr( $closed ); ?> <?php echo esc_attr( $active ); ?>" data-group_id="<?php echo esc_attr( $group_id ); ?>">
+								<div class="charitable-general-layout-heading" data-group="<?php echo esc_attr( $data_group ); ?>">
 									<a href="#" class="charitable-draggable"><i class="fa fa-bars"></i></a>
-									<span><?php echo $group_header; ?></span>
-									<a href="#" class="charitable-toggleable-group"><i class="<?php echo $arrow_icon; ?>"></i></a>
+									<span><?php echo esc_html( $group_header ); ?></span>
+									<a href="#" class="charitable-toggleable-group"><i class="<?php echo esc_attr( $arrow_icon ); ?>"></i></a>
 									<a href="#" class="charitable-tab-group-delete" title="Delete Tab"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
 
 								</div>
 								<!-- rows -->
 								<div class="charitable-group-rows">
 									<!-- row -->
-									<div class="charitable-group-row charitable-tab-title-row" id="row_tabs__<?php echo $group_name_var; ?>__title" data-tab-id="<?php echo $group_name_var; ?>">
-										<label for=""><?php echo esc_html__( 'Title', 'charitable' ); ?> <?php echo charitable_get_tooltip_html( false, 'tooltipstered' ); ?>
-										<input type="text" class="" id="" name="tabs__<?php echo $group_name_var; ?>__title" value="<?php echo $group_title; ?>" placeholder="" maxlength="<?php echo intval( $max_tab_title_length ); ?>">
+									<div class="charitable-group-row charitable-tab-title-row" id="row_tabs__<?php echo esc_attr( $group_name_var ); ?>__title" data-tab-id="<?php echo esc_attr( $group_name_var ); ?>">
+										<label for=""><?php echo esc_html__( 'Title', 'charitable' ); ?> <?php echo charitable_get_tooltip_html( false, 'tooltipstered' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+										<input type="text" class="" id="" name="tabs__<?php echo esc_attr( $group_name_var ); ?>__title" value="<?php echo esc_attr( $group_title ); ?>" placeholder="" maxlength="<?php echo intval( $max_tab_title_length ); ?>">
 									</div>
-									<div class="charitable-group-row charitable-tab-title-row" id="row_tabs__<?php echo $group_name_var; ?>__visible_nav" data-tab-id="<?php echo $group_name_var; ?>">
+									<div class="charitable-group-row charitable-tab-title-row" id="row_tabs__<?php echo esc_attr( $group_name_var ); ?>__visible_nav" data-tab-id="<?php echo esc_attr( $group_name_var ); ?>">
 										<span class="charitable-toggle-control">
-											<input type="checkbox" id="charitable-panel-field-settings-charitable-campaign-<?php echo $group_name_var; ?>__visible_nav" class="charitable-settings-tab-visible-nav"
-											name="tabs__<?php echo $group_name_var; ?>__visible_nav" value="invisible" <?php echo $visible_nav_checked; ?> />
-											<label class="charitable-toggle-control-icon" for="charitable-panel-field-settings-charitable-campaign-<?php echo $group_name_var; ?>__visible_nav"></label>
-											<label class="<?php echo $disabled_css; ?>" for="charitable-panel-field-settings-charitable-campaign-<?php echo $group_name_var; ?>__visible_nav"><?php echo esc_html__( 'Hide tab navigation.', 'charitable' ); ?></label>
-											<?php echo charitable_get_tooltip_html( __( 'Hide the tab in the navigation bar (only if you have one tab in your design).', 'charitable' ), 'tooltipstered' ); ?>
+											<input type="checkbox" id="charitable-panel-field-settings-charitable-campaign-<?php echo esc_attr( $group_name_var ); ?>__visible_nav" class="charitable-settings-tab-visible-nav"
+											name="tabs__<?php echo esc_attr( $group_name_var ); ?>__visible_nav" value="invisible" <?php echo esc_attr( $visible_nav_checked ); ?> />
+											<label class="charitable-toggle-control-icon" for="charitable-panel-field-settings-charitable-campaign-<?php echo esc_attr( $group_name_var ); ?>__visible_nav"></label>
+											<label class="<?php echo esc_attr( $disabled_css ); ?>" for="charitable-panel-field-settings-charitable-campaign-<?php echo esc_attr( $group_name_var ); ?>__visible_nav"><?php echo esc_html__( 'Hide tab navigation.', 'charitable' ); ?></label>
+											<?php echo charitable_get_tooltip_html( __( 'Hide the tab in the navigation bar (only if you have one tab in your design).', 'charitable' ), 'tooltipstered' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 										</span>
 									</div>
 									<!-- row -->
@@ -707,36 +712,6 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 							<?php
 						endforeach;
 
-					} else {
-
-						/*
-						?>
-
-						<!-- group -->
-						<div class="charitable-group charitable-layout-options-tab-group charitable-layout-options-general-group active" data-group_id="0"> <!-- open or closed -->
-							<a href="#" class="charitable-general-layout-heading charitable-toggleable-group" data-group="general-layout-campaign">
-								<span><?php echo esc_html__( 'Campaign', 'charitable' ); ?></span>
-								<i class="fa fa-angle-down"></i>
-							</a>
-							<!-- rows -->
-							<div class="charitable-group-rows">
-								<input type="hidden" name="tabs__campaign__type" value="html" />
-								<!-- row -->
-								<div class="charitable-group-row" id="" data-field-id="">
-									<label for=""><?php echo esc_html__( 'Title', 'charitable' ); ?> 3<?php echo charitable_get_tooltip_html( false, 'tooltipstered' ); ?>
-									<input type="text" class="" id="charitable-field-option-4-name" name="tabs__campaign__title" value="<?php echo $this->campaign_data['tabs']['campaign']['title']; ?>" placeholder="">
-								</div>
-								<!-- row -->
-								<div class="charitable-group-row" id="" data-field-id="">
-									<label for=""><?php echo esc_html__( 'Description', 'charitable' ); ?> <?php echo charitable_get_tooltip_html( false, 'tooltipstered' ); ?>
-									<textarea class="" id="" name="tabs__campaign__desc" rows="3"><?php echo $this->campaign_data['tabs']['campaign']['desc']; ?></textarea>
-								</div>
-							</div>
-							<!-- end rows -->
-						</div> <!-- end group --> */
-						?>
-
-						<?php
 					}
 
 					?>
@@ -778,9 +753,9 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 					<div class="charitable-group-rows row-first">
 						<!-- row -->
 						<div class="charitable-group-row" id="charitable-group-row-design-layout-options-advanced-tab-style">
-							<label for="charitable-design-layout-options-advanced-tab-style"><?php echo esc_html__( 'Tab Style', 'charitable' ); ?> <?php echo charitable_get_tooltip_html( esc_html__( 'Overall tab size in the template.', 'charitable' ) ); ?>
+							<label for="charitable-design-layout-options-advanced-tab-style"><?php echo esc_html__( 'Tab Style', 'charitable' ); ?> <?php echo charitable_get_tooltip_html( esc_html__( 'Overall tab size in the template.', 'charitable' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							</label>
-							<select class="charitable-design-layout-options-advanced-tab-style <?php echo $enable_tabs_css; ?>" id="charitable-design-layout-options-advanced-tab-style" name="layout__advanced__tab_style" data-advanced-field-id="tab_style" <?php echo $enable_tabs_css; ?>>
+							<select class="charitable-design-layout-options-advanced-tab-style <?php echo esc_attr( $enable_tabs_css ); ?>" id="charitable-design-layout-options-advanced-tab-style" name="layout__advanced__tab_style" data-advanced-field-id="tab_style" <?php echo esc_attr( $enable_tabs_css ); ?>>
 							<option value="boxed" <?php selected( $tab_style, 'boxed' ); ?>><?php echo esc_html__( 'Boxed', 'charitable' ); ?></option>
 							<option value="rounded" <?php selected( $tab_style, 'rounded' ); ?>><?php echo esc_html__( 'Rounded', 'charitable' ); ?></option>
 							<option value="minimum" <?php selected( $tab_style, 'minimum' ); ?>><?php echo esc_html__( 'Minimum', 'charitable' ); ?></option>
@@ -788,9 +763,9 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 						</div>
 						<!-- row -->
 						<div class="charitable-group-row" id="charitable-group-row-design-layout-options-advanced-tab-size">
-							<label for="charitable-design-layout-options-advanced-tab-size"><?php echo esc_html__( 'Tab Size', 'charitable' ); ?> <?php echo charitable_get_tooltip_html( esc_html__( 'Overall text size inside the tab.', 'charitable' ) ); ?>
+							<label for="charitable-design-layout-options-advanced-tab-size"><?php echo esc_html__( 'Tab Size', 'charitable' ); ?> <?php echo charitable_get_tooltip_html( esc_html__( 'Overall text size inside the tab.', 'charitable' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							</label>
-							<select class="charitable-design-layout-options-advanced-tab-size <?php echo $enable_tabs_css; ?>" id="charitable-design-layout-options-advanced-tab-size" name="layout__advanced__tab_size"  data-advanced-field-id="tab_size" <?php echo $enable_tabs_css; ?>>
+							<select class="charitable-design-layout-options-advanced-tab-size <?php echo esc_attr( $enable_tabs_css ); ?>" id="charitable-design-layout-options-advanced-tab-size" name="layout__advanced__tab_size"  data-advanced-field-id="tab_size" <?php echo esc_attr( $enable_tabs_css ); ?>>
 							<option value="small" <?php selected( $tab_size, 'small' ); ?>><?php echo esc_html__( 'Small', 'charitable' ); ?></option>
 							<option value="medium" <?php selected( $tab_size, 'medium' ); ?>><?php echo esc_html__( 'Medium', 'charitable' ); ?></option>
 							<option value="large" <?php selected( $tab_size, 'large' ); ?>><?php echo esc_html__( 'Large', 'charitable' ); ?></option>
@@ -798,7 +773,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 						</div>
 						<!-- row -->
 						<div class="charitable-group-row" id="charitable-group-row-design-layout-options-advanced-show-field-names">
-							<label for="charitable-design-layout-options-advanced-show-field-names"><?php echo esc_html__( 'Field Names', 'charitable' ); ?> <?php echo charitable_get_tooltip_html( esc_html__( 'Show the text that shows the field types in the preview area..', 'charitable' ) ); ?>
+							<label for="charitable-design-layout-options-advanced-show-field-names"><?php echo esc_html__( 'Field Names', 'charitable' ); ?> <?php echo charitable_get_tooltip_html( esc_html__( 'Show the text that shows the field types in the preview area..', 'charitable' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							</label>
 							<select class="charitable-design-layout-options-show-field-names" id="charitable-design-layout-options-show-field-names" name="layout__advanced__show_field_names"  data-advanced-field-id="show_field_names">
 								<option value="show" <?php selected( $show_field_names, 'show' ); ?>><?php echo esc_html__( 'Show', 'charitable' ); ?></option>
@@ -807,7 +782,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 						</div>
 						<!-- row -->
 						<div class="charitable-group-row" id="charitable-group-row-design-layout-options-advanced-preview-mode">
-							<label for="charitable-design-layout-options-advanced-preview-mode"><?php echo esc_html__( 'Preview Mode', 'charitable' ); ?> <?php echo charitable_get_tooltip_html( esc_html__( 'Show the text that shows the field types in the preview area..', 'charitable' ) ); ?>
+							<label for="charitable-design-layout-options-advanced-preview-mode"><?php echo esc_html__( 'Preview Mode', 'charitable' ); ?> <?php echo charitable_get_tooltip_html( esc_html__( 'Show the text that shows the field types in the preview area..', 'charitable' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							</label>
 							<select class="charitable-design-layout-options-preview-mode" id="charitable-design-layout-options-preview-mode" name="layout__advanced__preview_mode"  data-advanced-field-id="preview_mode">
 								<option value="normal" <?php selected( $preview_mode, 'normal' ); ?>><?php echo esc_html__( 'Normal', 'charitable' ); ?></option>
@@ -817,29 +792,29 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 						<!-- row -->
 						<div class="charitable-group-row" id="charitable-group-row-design-layout-options-advanced-theme-colors">
 
-							<label for="charitable-design-layout-options-advanced-theme-colors"><?php echo esc_html__( 'Theme Colors', 'charitable' ); ?> <?php echo charitable_get_tooltip_html( esc_html__( 'Adjust the primary colors of the theme.', 'charitable' ) ); ?>
+							<label for="charitable-design-layout-options-advanced-theme-colors"><?php echo esc_html__( 'Theme Colors', 'charitable' ); ?> <?php echo charitable_get_tooltip_html( esc_html__( 'Adjust the primary colors of the theme.', 'charitable' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							</label>
 
 							<div class="charitable-group-row">
 
 								<div class="charitable-design-layout-options-advanced-theme-color coloris-layout primary" data-label="<?php echo esc_html__( 'Primary:', 'charitable' ); ?>">
 									<label for="layout__advanced__theme_color_primary"><?php echo esc_html__( 'Primary', 'charitable' ); ?></label>
-									<input type="text" class="coloris instance2 primary" name="layout__advanced__theme_color_primary" data-label="primary" value="<?php echo $theme_color_primary; ?>"  />
+									<input type="text" class="coloris instance2 primary" name="layout__advanced__theme_color_primary" data-label="primary" value="<?php echo esc_attr( $theme_color_primary ); ?>"  />
 									<!-- <a class="reset-link" href="#"><?php echo esc_html__( 'Reset', 'charitable' ); ?></a> -->
 								</div>
 								<div class="charitable-design-layout-options-advanced-theme-color coloris-layout secondary" data-label="<?php echo esc_html__( 'Secondary:', 'charitable' ); ?>">
 									<label for="layout__advanced__theme_color_secondary"><?php echo esc_html__( 'Secondary', 'charitable' ); ?></label>
-									<input type="text" class="coloris instance2 secondary" name="layout__advanced__theme_color_secondary" data-label="secondary" value="<?php echo $theme_color_secondary; ?>"  />
+									<input type="text" class="coloris instance2 secondary" name="layout__advanced__theme_color_secondary" data-label="secondary" value="<?php echo esc_attr( $theme_color_secondary ); ?>"  />
 									<!-- <a class="reset-link" href="#"><?php echo esc_html__( 'Reset', 'charitable' ); ?></a> -->
 								</div>
 								<div class="charitable-design-layout-options-advanced-theme-color coloris-layout tertiary" data-label="<?php echo esc_html__( 'Tertiary:', 'charitable' ); ?>">
 									<label for="layout__advanced__theme_color_tertiary"><?php echo esc_html__( 'Tertiary', 'charitable' ); ?></label>
-									<input type="text" class="coloris instance2 tertiary" name="layout__advanced__theme_color_tertiary" data-label="tertiary" value="<?php echo $theme_color_tertiary; ?>"  />
+									<input type="text" class="coloris instance2 tertiary" name="layout__advanced__theme_color_tertiary" data-label="tertiary" value="<?php echo esc_attr( $theme_color_tertiary ); ?>"  />
 									<!-- <a class="reset-link" href="#"><?php echo esc_html__( 'Reset', 'charitable' ); ?></a> -->
 								</div>
 								<div class="charitable-design-layout-options-advanced-theme-color coloris-layout button-color" data-label="<?php echo esc_html__( 'Button:', 'charitable' ); ?>">
 									<label for="layout__advanced__theme_color_button"><?php echo esc_html__( 'Button', 'charitable' ); ?></label>
-									<input type="text" class="coloris instance2 button-color" name="layout__advanced__theme_color_button" data-label="button" value="<?php echo $theme_color_button; ?>"  />
+									<input type="text" class="coloris instance2 button-color" name="layout__advanced__theme_color_button" data-label="button" value="<?php echo esc_attr( $theme_color_button ); ?>"  />
 									<!-- <a class="reset-link" href="#"><?php echo esc_html__( 'Reset', 'charitable' ); ?></a> -->
 								</div>
 							</div>
@@ -908,6 +883,10 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 		 * Create closing HTML tags based on the type.
 		 *
 		 * @since 1.8.0
+		 *
+		 * @param string $type The type of template element to retrieve.
+		 * @param int    $counter The counter for the template element.
+		 * @return string The closing HTML element for the given template type.
 		 */
 		public function get_template_element_end( $type = 'row', $counter = 1 ) {
 
@@ -957,7 +936,6 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 
 			ob_start();
 
-			// $theme = $this->campaign_data['template_id'];
 			$rows  = (array) isset( $this->campaign_data['layout'] ) && ! empty( $this->campaign_data['layout']['rows'] ) ? $this->campaign_data['layout']['rows'] : array();
 			$theme = ! empty( $rows ) && ! empty( $this->campaign_data['template_id'] ) ? $builder_template->get_template_data( $this->campaign_data['template_id'] ) : false;
 
@@ -1005,7 +983,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 								$section_css_class_no_wrap = empty( $row['css_class'] ) || strpos( $row['css_class'], 'no-field-wrap' ) === false ? ' charitable-field-wrap' : '';
 								$section_css_class_no_wrap = ( $section['type'] === 'tabs' ) ? '' : $section_css_class_no_wrap;
 
-								echo '<div data-section-id="' . intval( $section_counter ) . '" data-section-type="' . $section['type'] . '" class="section charitable-field-section ' . esc_attr( $section_css_class ) . ' ' . esc_attr( $section_css_class_no_wrap ) . '">';
+								echo '<div data-section-id="' . intval( $section_counter ) . '" data-section-type="' . esc_attr( $section['type'] ) . '" class="section charitable-field-section ' . esc_attr( $section_css_class ) . ' ' . esc_attr( $section_css_class_no_wrap ) . '">';
 
 								echo '<div class="charitable-drag-new-block-here"><p>Drag New Block Here.</p></div>';
 
@@ -1017,10 +995,10 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 										$this->render_fields( $section['fields'], $theme, $this->campaign_data, $row['fields'] );
 										break;
 									case 'tabs':
-										echo $this->get_template_element_start( 'tabs', null, null, $this->campaign_data );
-										echo $builder_template->get_template_tab_nav( $section['tabs'], $theme, $this->campaign_data );
+										echo $this->get_template_element_start( 'tabs', null, null, $this->campaign_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+										echo $builder_template->get_template_tab_nav( $section['tabs'], $theme, $this->campaign_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 										$last_field_id = $builder_template->get_template_tab_content( $section['tabs'], $theme, $this->campaign_data, $row['fields'], $last_field_id );
-										echo $this->get_template_element_end( 'tabs' );
+										echo $this->get_template_element_end( 'tabs' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 										break;
 									default:
 										do_action( 'charitable_campaign_builder_preview_section_' . $section['type'], $section, $row, $theme, $this->campaign_data );
@@ -1034,12 +1012,11 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 								echo '<!-- section END -->';
 
 							}
-
 						} else {
 
 							$section_css_class = ( empty( $row['css_class'] ) || strpos( $row['css_class'], 'no-field-target' ) === false ) ? 'charitable-field-target' : false;
 
-							echo '<div data-section-id="' . intval( $section_counter ) . '" data-section-type="fields" class="section charitable-field-section charitable-field-wrap ' . $section_css_class . '">';
+							echo '<div data-section-id="' . intval( $section_counter ) . '" data-section-type="fields" class="section charitable-field-section charitable-field-wrap ' . esc_attr( $section_css_class ) . '">';
 
 							echo '<div class="charitable-drag-new-block-here"><p>Drag New Block Here.</p></div>';
 
@@ -1059,7 +1036,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 
 					endforeach;
 
-					echo $this->get_template_element_end( $row['type'], intval( $element_counter ) );
+					echo $this->get_template_element_end( $row['type'], intval( $element_counter ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 					++$element_counter;
 
@@ -1075,7 +1052,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 
 			$preview = ob_get_clean();
 
-			echo $preview;
+			echo $preview; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
@@ -1122,7 +1099,6 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 						if ( false !== $theme_thumbnail && file_exists( $theme_thumbnail ) ) {
 							$field_settings['default'] = charitable()->get_path( 'assets', false ) . 'images/campaign-builder/templates/' . $campaign_template_slug . '/' . $default_filename;
 						}
-
 					}
 
 					$field_settings['id'] = $field_id;
@@ -1135,9 +1111,9 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 						$class->can_be_deleted ? 'charitable-can-delete' : 'charitable-no-delete',
 					);
 
-					echo '<div class="' . implode( ' ', $charitable_field_css_classes ) . '" id="charitable-field-' . intval( $field_id ) . '" data-field-id="' . intval( $field_id ) . '" data-field-type="' . esc_attr( $field_type ) . '" data-field-max="' . $class->max_allowed . '" style="">';
+					echo '<div class="' . implode( ' ', $charitable_field_css_classes ) . '" id="charitable-field-' . intval( $field_id ) . '" data-field-id="' . intval( $field_id ) . '" data-field-type="' . esc_attr( $field_type ) . '" data-field-max="' . esc_attr( $class->max_allowed ) . '" style="">'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					if ( $class->can_be_edited ) :
-						echo '<a href="#" class="charitable-field-edit" data-type="' . $class->edit_type . '" data-section="' . $class->edit_section . '" data-edit-field-id="' . $class->edit_field_id . '" title="' . $class->edit_label . '"><i class="fa fa-pencil"></i></a>';
+						echo '<a href="#" class="charitable-field-edit" data-type="' . esc_attr( $class->edit_type ) . '" data-section="' . esc_attr( $class->edit_section ) . '" data-edit-field-id="' . esc_attr( $class->edit_field_id ) . '" title="' . esc_attr( $class->edit_label ) . '"><i class="fa fa-pencil"></i></a>';
 					endif;
 					if ( $class->can_be_duplicated ) :
 						echo '<a href="#" class="charitable-field-duplicate" title="Duplicate Field"><i class="fa fa-files-o" aria-hidden="true"></i></a>';
@@ -1146,7 +1122,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 						echo '<a href="#" class="charitable-field-delete" title="Delete Field"><i class="fa fa-trash-o"></i></a>';
 					endif;
 
-					echo $class->field_preview( $field_settings, $campaign_data, $field_id, $theme );
+					echo $class->field_preview( $field_settings, $campaign_data, $field_id, $theme ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					echo '</div>';
 
 				else :
@@ -1164,7 +1140,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 		 * Get addoon field label.
 		 *
 		 * @since 1.8.0
-		 * * @param string $field_type Field type.
+		 * @param string $field_type Field type.
 		 *
 		 * @return array
 		 */

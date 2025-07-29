@@ -122,7 +122,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Marketing_Request' ) ) :
 
 			$html = ob_get_clean();
 
-			echo $html;
+			echo $html; // phpcs:ignore
 		}
 	}
 

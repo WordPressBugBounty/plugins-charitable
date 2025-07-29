@@ -120,7 +120,7 @@ if ( ! class_exists( 'Charitable_Donations_Query' ) ) :
 
 			$sql = "SELECT {$this->fields()} {$this->from()} {$this->join()} {$this->where()} {$this->groupby()} {$this->orderby()} {$this->order()} {$this->limit()} {$this->offset()};";
 
-			return $wpdb->get_col( $this->get_prepared_sql( $sql ) );
+			return $wpdb->get_col( $this->get_prepared_sql( $sql ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**

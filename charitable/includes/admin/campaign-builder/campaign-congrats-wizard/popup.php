@@ -36,7 +36,7 @@ $show_url     = apply_filters( 'charitable_show_campaign_url_in_popup', false );
 
 
 			<div class="charitable-admin-popup-section charitable-admin-popup-section-view">
-				<a href="<?php echo esc_url( $campaign_url ); ?>" target="_blank" class="charitable-admin-congrats-popup-btn"><?php esc_html_e( 'View Campaign', 'charitable' ); ?> <img class="popup_icon" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/view_live.svg'; ?>" /></a>
+				<a href="<?php echo esc_url( $campaign_url ); ?>" target="_blank" class="charitable-admin-congrats-popup-btn"><?php esc_html_e( 'View Campaign', 'charitable' ); ?> <img class="popup_icon" src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/icons/view_live.svg' ); ?>" /></a>
 
 				<?php if ( $show_url ) : ?>
 
@@ -129,6 +129,6 @@ $show_url     = apply_filters( 'charitable_show_campaign_url_in_popup', false );
 				?>
 			</p>
 		</div>
-		<div class="charitable-admin-popup-close"><img class="popup_icon" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/close.svg'; ?>" /></div>
+		<div class="charitable-admin-popup-close"><img class="popup_icon" src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/icons/close.svg' ); ?>" /></div>
 	</div>
 </div>

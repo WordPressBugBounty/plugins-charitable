@@ -687,7 +687,7 @@ class Charitable_Notifications {
 							<div>
 								%7$s
 								<div class="body">
-									<div class="title">
+									<div class="title dashboard-title">
 										<div>%1$s</div>
 										<div class="date">%3$s</div>
 									</div>
@@ -719,8 +719,8 @@ class Charitable_Notifications {
 								%7$s
 								<div class="body">
 									<div class="title">
-										<div>%1$s</div>
 										<div class="date">%3$s</div>
+										<div>%1$s</div>
 									</div>
 									<div class="notification-content">%2$s</div>
 									<div class="actions">
@@ -754,8 +754,8 @@ class Charitable_Notifications {
 							%7$s
 							<div class="body">
 								<div class="title">
-									<div>%1$s</div>
 									<div class="date">%3$s</div>
+									<div>%1$s</div>
 								</div>
 								<div class="notification-content">%2$s</div>
 								<div class="actions">
@@ -786,12 +786,24 @@ class Charitable_Notifications {
 			}
 		}
 
+		// For dashboard, we need to show the actual count being displayed (limited), not the total count
+		$display_count = $active_notifications_count;
+		if ( 'dashboard' === $location ) {
+			// Get the total count for comparison
+			$total_count = $this->get_new_notifications_count();
+
+			// If we have more than the limit, show the limit with a "+"
+			if ( $total_count > $limit_active ) {
+				$display_count = $limit_active . '+';
+			}
+		}
+
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo charitable_render(
 			$template_location,
 			[
 				'notifications' => [
-					'active_count'    => $active_notifications_count,
+					'active_count'    => $display_count,
 					'dismissed_count' => $dismissed_notifications_count,
 					'active_html'     => $active_notifications_html,
 					'dismissed_html'  => $dismissed_notifications_html,

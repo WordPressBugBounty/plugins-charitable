@@ -1,3 +1,8 @@
+# 1.8.7.2
+* NEW: Added footer on Charitable admin pages with quick links to support and documentation.
+* FIX: CSS tweaks to notifications displays and admin settings.
+* UPDATE: Notification alert dot in header shows number of notifications.
+
 # 1.8.7.1
 * FIX: Minor CSS issues in CTA areas.
 * FIX: Resolved an issue with Elementor embedded campaigns with the modal donation form setting selected.

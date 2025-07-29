@@ -2,9 +2,9 @@
 Contributors: WPCharitable, griffinjt, smub, dimensionmedia
 Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
-Tested up to: 6.8.1
+Tested up to: 6.8.2
 Requires PHP: 7.2
-Stable tag: 1.8.7.1
+Stable tag: 1.8.7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -64,6 +64,8 @@ Charitable integrates with all the top payment providers including Stripe donati
 We’re proud to be a Stripe Verified Partner. This partnership allows us to build the best Stripe integration with early access to features. You can use our Stripe integration to accept both one-time payments as well as recurring donations while syncing all donation data to your Stripe account.
 
 We’re also proud to be a Square Verified Partner. This partnership allows us to build the best Square integration with early access to features. You can use our Square integration to accept both one-time payments as well as recurring donations while syncing all donation data to your Square account.
+
+Our PayPal integration is just as robust, allowing you to easily accept PayPal donations and manage them directly within Charitable. This makes offering PayPal as a payment option seamless for both you and your donors.
 
 Our full list of payment integrations include: Stripe, PayPal, Square, Authorize.net, Braintree, PayFast, Payrexx, Mollie, PayUMoney, GoCardless, Paystack, and Windcave.
 
@@ -126,7 +128,7 @@ We also know that our developer friends may want more control, so we have added 
 Allow your users to donate with the payment solution of their choice to reach your donation goals faster.
 
 * [Stripe](https://www.wpcharitable.com/integrations/stripe/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - We're a Stripe Verified Partner for Stripe Donation payments. Easily accept credit card donations on your website with Stripe.
-* PayPal - Easily accept PayPal donations on your website.
+* PayPal - Paypal is a trusted and familiar way for donors to contribute. Easily accept PayPal donations on your website.
 * [Square](https://www.wpcharitable.com/extensions/charitable-square/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - We're a Square Verified Partner for Square Donation payments. Easily accept credit card donations on your website with Square.
 * [Braintree](https://www.wpcharitable.com/extensions/charitable-braintree/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin)
 * [Authorize.net](https://www.wpcharitable.com/extensions/charitable-authorize-net/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin)
@@ -257,6 +259,11 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.7.2 =
+* NEW: Added footer on Charitable admin pages with quick links to support and documentation.
+* FIX: CSS tweaks to notifications displays and admin settings.
+* UPDATE: Notification alert dot in header shows number of notifications.
 
 = Donation Form & Fundraising Campaigns v1.8.7.1 =
 * FIX: Minor CSS issues in CTA areas.

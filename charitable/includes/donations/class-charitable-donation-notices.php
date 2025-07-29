@@ -115,14 +115,14 @@ if ( ! class_exists( 'Charitable_Donation_Notices' ) ) :
 					$dashboard_notices = array();
 				}
 				$dashboard_notices['donation_security_checks'] = array(
-					'type'    => 'warning',
-					'dismiss' => false,
-					'title'   => esc_html__( 'Important', 'charitable' ),
+					'type'       => 'warning',
+					'dismiss'    => false,
+					'title'      => esc_html__( 'Important', 'charitable' ), // phpcs:ignore
 					'custom_css' => 'charitable-notification-type-important',
-					'message' => sprintf( '<p><strong>%s</strong></p>', esc_html__( 'Charitable has noticed some recent donation attempts via a donation form have failed due to invalid security checks.', 'charitable' ) ) .
+					'message'    => sprintf( '<p><strong>%s</strong></p>', esc_html__( 'Charitable has noticed some recent donation attempts via a donation form have failed due to invalid security checks.', 'charitable' ) ) .
 								sprintf( '<ul class="charitable-notice-recommendations"><li>%s</li>', esc_html__( 'If you have any caching plugins installed, try deactivating to test or add any relevant URLs to any "bypass" list in the cache plugin\'s settings.', 'charitable' ) ) .
 								sprintf( '<li>%s <strong>%s</strong>.</li>', esc_html__( 'Depending on your theme and/or plugins you can manually clear cache on pages to test the donation form. Example: ', 'charitable' ), esc_html__( 'test.com/campaign/donate?cache=123', 'charitable' ) ) .
-								sprintf( '<li><a href="%s">%s</a> %s <a href="%s">%s</a> %s</li>', 'https://www.wpcharitable.com/documentation/charitable-has-noticed-some-recent-donation-attempts-via-the-donation-form-have-failed-due-to-invalid-security-checks/', esc_html__( 'Please read our documentation.', 'charitable' ),  esc_html__( 'Also feel free to ', 'charitable' ), 'https://www.wpcharitable.com/support/', esc_html__( 'contact our support team', 'charitable' ), esc_html__( 'if you need further assistance.', 'charitable' ) ) .
+								sprintf( '<li><a href="%s">%s</a> %s <a href="%s">%s</a> %s</li>', 'https://www.wpcharitable.com/documentation/charitable-has-noticed-some-recent-donation-attempts-via-the-donation-form-have-failed-due-to-invalid-security-checks/', esc_html__( 'Please read our documentation.', 'charitable' ), esc_html__( 'Also feel free to ', 'charitable' ), 'https://www.wpcharitable.com/support/', esc_html__( 'contact our support team', 'charitable' ), esc_html__( 'if you need further assistance.', 'charitable' ) ) .
 								sprintf( '</ul>' ),
 				);
 			}

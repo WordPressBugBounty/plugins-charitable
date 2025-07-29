@@ -707,6 +707,10 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				$classes .= ' charitable_legacy_dashboard';
 			}
 
+			if ( charitable_show_promotion_footer() ) {
+				$classes .= ' charitable-admin-promotion-footer';
+			}
+
 			$classes .= function_exists( 'charitable_is_pro' ) && charitable_is_pro() ? ' charitable-pro' : ' charitable';
 
 			return $classes;

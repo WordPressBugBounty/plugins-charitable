@@ -3891,7 +3891,11 @@ body.modal-open {
   color: #141b38;
   margin-bottom: 9px;
   display: flex;
-  align-items: center;
+  align-items: left;
+  flex-direction: column;
+}
+.charitable-notification > div .body .title.dashboard-title {
+  flex-direction: row;
 }
 .charitable-notification > div .body .title div:first-child {
   flex: 1;
@@ -4716,4 +4720,69 @@ body.charitable_page_charitable-settings .charitable-education-page .charitable-
   font-size: 16px;
   font-weight: 600;
   color: #d63638;
+}
+
+/* Footer Promotion Styles */
+body.charitable-admin-promotion-footer #wpbody {
+  padding-bottom: 150px !important;
+}
+
+#wpfooter .charitable-footer-promotion {
+  text-align: center;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: normal;
+  color: #646970;
+  padding: 30px 0;
+  margin-bottom: 20px;
+}
+#wpfooter .charitable-footer-promotion p {
+  font-weight: 600;
+}
+#wpfooter .charitable-footer-promotion .charitable-footer-promotion-links,
+#wpfooter .charitable-footer-promotion .charitable-footer-promotion-social {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#wpfooter .charitable-footer-promotion .charitable-footer-promotion-links {
+  margin: 10px 0;
+  color: #646970;
+}
+#wpfooter .charitable-footer-promotion .charitable-footer-promotion-links a {
+  color: #056aab;
+}
+#wpfooter .charitable-footer-promotion .charitable-footer-promotion-links a:hover {
+  color: #04558a;
+}
+#wpfooter .charitable-footer-promotion .charitable-footer-promotion-links span {
+  color: #c3c4c7;
+  padding: 0 7px;
+}
+#wpfooter .charitable-footer-promotion .charitable-footer-promotion-social {
+  gap: 10px;
+  margin: 0;
+}
+#wpfooter .charitable-footer-promotion .charitable-footer-promotion-social li {
+  margin-bottom: 0;
+}
+#wpfooter .charitable-footer-promotion .charitable-footer-promotion-social li path {
+  color: #646970;
+}
+#wpfooter .charitable-footer-promotion .charitable-footer-promotion-social li:hover path {
+  fill: #50575e;
+}
+#wpfooter .charitable-footer-promotion .charitable-footer-promotion-social li a {
+  display: block;
+  height: 16px;
+}
+#wpfooter #footer-left {
+  color: #50575e;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+#wpfooter #footer-left strong {
+  font-weight: 600;
 }

@@ -124,9 +124,9 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 
 			do_action( 'charitable_admin_reports_start', $this );
 
-			add_action( 'charitable_after_admin_dashboard', [ $this, 'dashboard_cta' ] );
+			add_action( 'charitable_after_admin_dashboard', array( $this, 'dashboard_cta' ) );
 
-			add_action( 'charitable_admin_dashboard_notifications', [ $this, 'display_notifications' ] );
+			add_action( 'charitable_admin_dashboard_notifications', array( $this, 'display_notifications' ) );
 
 			$this->init( $args );
 		}
@@ -232,8 +232,8 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 				$notifications,
 				function ( $a, $b ) {
 					$types = array( 'error', 'warning', 'notice' );
-					$pos_a = array_search( $a['type'], $types );
-					$pos_b = array_search( $b['type'], $types );
+					$pos_a = array_search( $a['type'], $types ); // phpcs:ignore
+					$pos_b = array_search( $b['type'], $types ); // phpcs:ignore
 
 					return $pos_a - $pos_b;
 				}
@@ -639,7 +639,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 											<?php endforeach; ?>
 										</div>
 										<div class="no-items">
-									<p class="link"><a href="<?php echo admin_url( 'admin.php?page=charitable-tools&tab=snippets' ); ?>"><?php esc_html_e( 'View All Snippets', 'charitable' ); ?> <img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ) . 'images/icons/east.svg'; ?>" /> </a></p>
+									<p class="link"><a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=snippets' ) ); ?>"><?php esc_html_e( 'View All Snippets', 'charitable' ); ?> <img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ) . 'images/icons/east.svg'; ?>" /> </a></p>
 								</div>
 									</div>
 								</div>
@@ -994,7 +994,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 			// Add Javascript vars at the footer of the WordPress admin, at the dashboard and the overview tab of reporting.
 			if ( ! is_null( $screen ) && $screen->id === 'charitable_page_charitable-dashboard' ) {
 				// Specific styles for the "dashboard".
-				add_action( 'admin_footer', [ $this, 'report_vars' ], 100 );
+				add_action( 'admin_footer', array( $this, 'report_vars' ), 100 );
 			}
 		}
 
@@ -1403,7 +1403,6 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 				if ( ! $help_pointers ) {
 					return apply_filters( 'charitable_show_dashboard_growth_tool_chart_notice', $ret );
 				}
-
 			}
 
 			return false;

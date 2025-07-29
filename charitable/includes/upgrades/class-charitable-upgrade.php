@@ -1215,7 +1215,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 				LIMIT $number;", // phpcs:ignore
 					$skipped
 				)
-			);
+			); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**

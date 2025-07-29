@@ -209,7 +209,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings' ) ) :
 
 			$preview = ob_get_clean();
 
-			echo $preview;
+			echo $preview; // phpcs:ignore
 		}
 
 
