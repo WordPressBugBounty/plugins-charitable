@@ -1519,10 +1519,21 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 				);
 			}
 
+			// CRITICAL SAFETY CHECK: Only set Pro activation if Pro plugin actually exists
+			$pro_plugin_path     = WP_PLUGIN_DIR . '/charitable-pro/charitable-pro.php';
+			$should_activate_pro = file_exists( $pro_plugin_path );
+
 			// remove the transient, set the option.
 			delete_transient( 'charitable_ss_onboarding' );
 			update_option( 'charitable_ss_complete', true );
-			update_option( 'charitable_activate_pro', true );
+
+			// Only set Pro activation if Pro is actually available
+			if ( $should_activate_pro ) {
+				update_option( 'charitable_activate_pro', true );
+			} else {
+				// Log this for debugging
+				error_log( 'Charitable: Pro plugin not found during setup completion - skipping Pro activation' );
+			}
 
 			wp_send_json_success(
 				array(

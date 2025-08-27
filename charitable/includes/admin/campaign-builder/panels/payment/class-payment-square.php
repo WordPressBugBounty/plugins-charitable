@@ -102,7 +102,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment_Square' ) ) :
 		/**
 		 * Generate sidebar html.
 		 *
-		 * @since 1.8.0
+		 * @since   1.8.0
 		 * @version 1.8.1.12 Added logic to show popup message if user is on lite version.
 		 */
 		public function sidebar_tab() {
@@ -169,6 +169,9 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment_Square' ) ) :
 		}
 	}
 
+// Only instantiate if PHP version is compatible and Square gateway class exists
+if ( version_compare( PHP_VERSION, '8.1.0', '>=' ) && class_exists( 'Charitable_Gateway_Square' ) ) {
 	new Charitable_Builder_Panel_Payment_Square();
+}
 
 endif;

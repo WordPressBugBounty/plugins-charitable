@@ -359,7 +359,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment' ) ) :
 						}
 					}
 
-					if ( $slug === 'square' ) {
+					if ( $slug === 'square' && version_compare( PHP_VERSION, '8.1.0', '>=' ) && class_exists( 'Charitable_Gateway_Square' ) ) {
 
 						$gateway   = new Charitable_Gateway_Square();
 						$is_active = $helper->is_active_gateway( $gateway->get_gateway_id() );

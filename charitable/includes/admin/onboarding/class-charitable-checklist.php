@@ -1149,6 +1149,17 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 				return;
 			}
 
+			// CRITICAL SAFETY CHECK: Verify Pro plugin actually exists before proceeding
+			$pro_plugin_path = WP_PLUGIN_DIR . '/' . self::PRO_PLUGIN;
+			if ( ! file_exists( $pro_plugin_path ) ) {
+				// Pro plugin doesn't exist - don't deactivate Lite version
+				// Clear the option to prevent future attempts
+				delete_option( 'charitable_activate_pro' );
+				// Log this for debugging
+				error_log( 'Charitable: Pro plugin not found at ' . $pro_plugin_path . ' - preventing Lite deactivation' );
+				return;
+			}
+
 			// Confirm the pro plugin is installed (and not activated).
 			if ( ! is_plugin_inactive( self::PRO_PLUGIN ) ) {
 				return;

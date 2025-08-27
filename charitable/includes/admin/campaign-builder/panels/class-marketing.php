@@ -67,6 +67,39 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Marketing' ) ) :
 		 * @since 1.8.0
 		 */
 		public function enqueues() {
+			// Add custom CSS for the upgrade button
+			$this->add_custom_styles();
+		}
+
+		/**
+		 * Add custom CSS styles for the upgrade button.
+		 *
+		 * @since 1.8.0
+		 */
+		private function add_custom_styles() {
+			?>
+			<style>
+				.charitable-upgrade-to-pro-button {
+					background-color: #df7739 !important;
+					color: #ffffff !important;
+					border: 2px solid #df7739 !important;
+					padding: 10px 20px !important;
+					border-radius: 5px !important;
+					text-decoration: none !important;
+					display: inline-block !important;
+					font-weight: 600 !important;
+					transition: all 0.3s ease !important;
+				}
+
+				.charitable-upgrade-to-pro-button:hover {
+					background-color: #c66a32 !important;
+					border-color: #c66a32 !important;
+					color: #ffffff !important;
+					transform: translateY(-2px) !important;
+					box-shadow: 0 4px 8px rgba(223, 119, 57, 0.3) !important;
+				}
+			</style>
+			<?php
 		}
 
 		/**
@@ -573,7 +606,14 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Marketing' ) ) :
 			<div class="education-buttons education-buttons- bottom">
 
 				<div class="action-button">
-					<?php echo '<a class="button-link ' . esc_attr( $action_css_class ) . '" data-settings-url="' . esc_url( $settings_url ) . '" data-plugin-url="' . esc_attr( $addon_information_install ) . '" data-name="' . esc_attr( $addon_information_name ) . '" data-plugin-slug="' . $addon_url . '" data-field-icon="">' . $button_label . '</a>'; ?>
+					<?php
+					// Check if this is MailChimp specifically and show upgrade button instead of install button
+					if ( strpos( $addon_url, 'charitable-newsletter-connect' ) !== false && $marketing_item_slug === 'mailchimp' ) {
+						echo '<a class="button-link charitable-upgrade-to-pro-button" target="_blank" href="https://wpcharitable.com/lite-vs-pro/?utm_source=WordPress&utm_campaign=WP+Charitable&utm_medium=Upgrade+From+Lite+Top+Banner+Link&utm_content=To+unlock+more+features+consider+upgrading+to+Pro">' . esc_html__( 'Upgrade to PRO', 'charitable' ) . '</a>';
+					} else {
+						echo '<a class="button-link ' . esc_attr( $action_css_class ) . '" data-settings-url="' . esc_url( $settings_url ) . '" data-plugin-url="' . esc_attr( $addon_information_install ) . '" data-name="' . esc_attr( $addon_information_name ) . '" data-plugin-slug="' . $addon_url . '" data-field-icon="">' . $button_label . '</a>';
+					}
+					?>
 				</div>
 
 			</div>

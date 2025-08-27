@@ -932,9 +932,6 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 						</h2>
 						<div class="charitable-blank-slate-buttons">
 							<a class="charitable-blank-slate-cta charitable-button" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=donation' ) ); ?>"><?php esc_html_e( 'Add A Manual Donation', 'charitable' ); ?></a>
-							<div class="charitable-blank-slate-buttons-legacy">
-								<div><a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=donation' ) ); ?>"><?php esc_html_e( 'Create A Donation Manually', 'charitable' ); ?></a></div>
-							</div>
 						</div>
 					<?php else : ?>
 						<h2 class="charitable-blank-slate-message">

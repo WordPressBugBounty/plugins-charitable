@@ -1,3 +1,6 @@
+# 1.8.7.4
+* FIX: Resolve a fatal error in PHP 8.0 in campaign visual builder in certain scenarios.
+
 # 1.8.7.3
 * FIX: Updated code related to translations and PHP standards.
 * FIX: Bug in license detection to display certain text in certain scenarios.

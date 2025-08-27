@@ -121,6 +121,15 @@ class Charitable_Admin_Connect {
 			wp_send_json_error( array( 'message' => esc_html__( 'Only the Lite version of Charitable can be upgraded.', 'charitable' ) ) );
 		}
 
+		// CRITICAL SAFETY CHECK: Verify Pro plugin actually exists before attempting activation
+		$pro_plugin_path = WP_PLUGIN_DIR . '/' . self::PRO_PLUGIN;
+		if ( ! file_exists( $pro_plugin_path ) ) {
+			wp_send_json_error( array(
+				'message' => esc_html__( 'Charitable Pro plugin not found. Please ensure it is properly installed before upgrading.', 'charitable' ),
+				'error'   => 'pro-not-found'
+			) );
+		}
+
 		// Verify pro version is not installed.
 		$active = activate_plugin( self::PRO_PLUGIN, false, false, true );
 
@@ -233,6 +242,12 @@ class Charitable_Admin_Connect {
 			wp_send_json_success( esc_html__( 'Plugin installed & activated.', 'charitable' ) );
 		}
 
+		// CRITICAL SAFETY CHECK: Verify Pro plugin actually exists before attempting activation
+		$pro_plugin_path = WP_PLUGIN_DIR . '/' . self::PRO_PLUGIN;
+		if ( ! file_exists( $pro_plugin_path ) ) {
+			wp_send_json_error( esc_html__( 'Charitable Pro plugin not found. Please ensure it is properly installed before upgrading.', 'charitable' ) );
+		}
+
 		// Verify pro not installed.
 		$active = activate_plugin( self::PRO_PLUGIN, $url, false, true );
 
@@ -300,6 +315,12 @@ class Charitable_Admin_Connect {
 		$plugin_basename = $installer->plugin_info();
 
 		if ( $plugin_basename ) {
+
+			// CRITICAL SAFETY CHECK: Verify the newly installed plugin actually exists before deactivating Lite
+			$new_plugin_path = WP_PLUGIN_DIR . '/' . $plugin_basename;
+			if ( ! file_exists( $new_plugin_path ) ) {
+				wp_send_json_error( esc_html__( 'Newly installed plugin not found. Cannot safely deactivate Lite version.', 'charitable' ) );
+			}
 
 			// Deactivate the lite version first.
 			$plugin = plugin_basename( charitable()->get_path( 'plugin-directory' ) . '/charitable/charitable.php' );
