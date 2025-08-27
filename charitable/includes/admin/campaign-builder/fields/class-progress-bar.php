@@ -152,14 +152,14 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 			// if the "show_goal" is set to "show_goal" then show the goal, otherise do not but hidding it by setting 'charitable-hidden' class.
 			$show_donated_css = ! empty( $field_data ) &&
 								(
-									( is_array( $field_data['show_hide'] ) && ! empty( $field_data['show_hide'] ) && in_array( 'show_donated', $field_data['show_hide'] ) ) ||
+									( is_array( $field_data['show_hide'] ) && ! empty( $field_data['show_hide'] ) && in_array( 'show_donated', $field_data['show_hide'] ) ) || // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
 									( is_string( $field_data['show_donated'] ) && 'show_donated' === $field_data['show_donated'] )
 								)
 								? '' : 'charitable-hidden';
 			$show_goal_css    = ! empty( $field_data ) &&
 
 								(
-									( is_array( $field_data['show_hide'] ) && ! empty( $field_data['show_hide'] ) && in_array( 'show_goal', $field_data['show_hide'] ) ) ||
+									( is_array( $field_data['show_hide'] ) && ! empty( $field_data['show_hide'] ) && in_array( 'show_goal', $field_data['show_hide'] ) ) || // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
 									( is_string( $field_data['show_goal'] ) && 'show_goal' === $field_data['show_goal'] )
 								)
 								? '' : 'charitable-hidden';
@@ -206,7 +206,7 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 			$html  = $this->field_title( $this->name );
 			$html .= $this->field_wrapper( $this->render( $field_data, $campaign_data, $field_id, 'preview' ), $field_data );
 
-			echo $html;
+			echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
@@ -222,7 +222,7 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 
 			$html = $this->field_display_wrapper( $this->render( $field_data, $campaign_data ), $field_data );
 
-			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data );
+			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
@@ -247,7 +247,7 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_headline(
+			echo $charitable_builder_form_fields->generate_headline( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				esc_html__( 'Note: Progress bars will be visible only when there is a goal set for the campaign.', 'charitable' ),
 				array(
 					'field_id' => esc_attr( $field_id ),
@@ -255,7 +255,7 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['headline'] ) ? $settings['headline'] : false,
 				esc_html__( 'Headline', 'charitable' ),
 				array(
@@ -266,7 +266,7 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_toggles(
+			echo $charitable_builder_form_fields->generate_toggles( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['show_hide'] ) ? $settings['show_hide'] : false,
 				esc_html__( 'Campaign Information', 'charitable' ),
 				array(
@@ -288,19 +288,19 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 			);
 
 			/* 1.8.6.1 */
-			echo $charitable_builder_form_fields->generate_checkbox(
+			echo $charitable_builder_form_fields->generate_checkbox( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['round_donation'] ) ? $settings['round_donation'] : false,
 				esc_html__( 'Round Amounts', 'charitable' ),
 				array(
 					'id'            => 'field_' . esc_attr( $this->type ) . '_round_donation' . '_' . intval( $field_id ), // phpcs:ignore
 					'name'          => array( '_fields', intval( $field_id ), 'round_donation' ),
 					'checked_value' => 'show',
-					'field_id'      => $field_id,
+					'field_id'      => intval( $field_id ),
 					'value'         => '1',
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_hidden_field(
+			echo $charitable_builder_form_fields->generate_hidden_field( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['meta_position'] ) ? $settings['meta_position'] : false,
 				array(
 					'id'       => 'field_' . esc_attr( $this->type ) . '_meta_position' . '_' . intval( $field_id ), // phpcs:ignore
@@ -309,7 +309,7 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['label_donate'] ) ? $settings['label_donate'] : esc_html__( 'Donated:', 'charitable' ),
 				esc_html__( 'Donate Label:', 'charitable' ),
 				array(
@@ -320,7 +320,7 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['label_goal'] ) ? $settings['label_goal'] : esc_html__( 'Goal:', 'charitable' ),
 				esc_html__( 'Goal Label:', 'charitable' ),
 				array(
@@ -331,9 +331,9 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_divider( false, false, array( 'field_id' => $field_id ) );
+			echo $charitable_builder_form_fields->generate_divider( false, false, array( 'field_id' => $field_id ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
-			echo $charitable_builder_form_fields->generate_number_slider(
+			echo $charitable_builder_form_fields->generate_number_slider( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['width_percentage'] ) ? $settings['width_percentage'] : 100,
 				esc_html__( 'Width', 'charitable' ),
 				array(
@@ -349,7 +349,7 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_align(
+			echo $charitable_builder_form_fields->generate_align( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['align'] ) ? $settings['align'] : esc_attr( $this->align_default ),
 				esc_html__( 'Align', 'charitable' ),
 				array(
@@ -359,11 +359,11 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['css_class'] ) ? $settings['css_class'] : false,
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(
-					'id'       => 'field_' . esc_attr( $this->type ) . '_css_class' . '_' . intval( $field_id ),
+					'id'       => 'field_' . esc_attr( $this->type ) . '_css_class' . '_' . intval( $field_id ), // phpcs:ignore
 					'name'     => array( '_fields', intval( $field_id ), 'css_class' ),
 					'field_id' => intval( $field_id ),
 					'tooltip'  => esc_html__( 'Add CSS classes (seperated by a space) for this field to customize it\'s appearance in your theme.', 'charitable' ),

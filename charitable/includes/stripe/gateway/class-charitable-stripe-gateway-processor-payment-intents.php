@@ -38,7 +38,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor_Payment_Intents' ) ) :
 			}
 
 			/* Collect our payment method & create/get customer. */
-			$payment_method = array_key_exists( 'stripe_payment_method', $_POST ) ? $_POST['stripe_payment_method'] : null;
+			$payment_method = array_key_exists( 'stripe_payment_method', $_POST ) ? $_POST['stripe_payment_method'] : null; // phpcs:ignore
 			$customer_id    = $this->get_stripe_customer( $payment_method );
 
 			if ( ! $customer_id ) {
@@ -188,7 +188,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor_Payment_Intents' ) ) :
 					$cancel_at = charitable_recurring_calculate_future_date(
 						$length,
 						$recurring->get_donation_period(),
-						date( 'Y-m-d 00:00:00' ),
+						date( 'Y-m-d 00:00:00' ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 						'U'
 					);
 

@@ -1,5 +1,9 @@
+# 1.8.7.3
+* FIX: Updated code related to translations and PHP standards.
+* FIX: Bug in license detection to display certain text in certain scenarios.
+* FIX: JavaScript errors related to campaign visual builder when Charitable is in debug mode.
+
 # 1.8.7.2
-* NEW: Added footer on Charitable admin pages with quick links to support and documentation.
 * FIX: CSS tweaks to notifications displays and admin settings.
 * UPDATE: Notification alert dot in header shows number of notifications.
 

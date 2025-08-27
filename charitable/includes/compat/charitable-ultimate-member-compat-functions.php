@@ -25,11 +25,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return void
  */
 function charitable_um_after_user_verified_email( $user_id ) {
-	if ( ! array_key_exists( 'act', $_REQUEST ) || ! array_key_exists( 'hash', $_REQUEST ) ) {
+	if ( ! array_key_exists( 'act', $_REQUEST ) || ! array_key_exists( 'hash', $_REQUEST ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		return;
 	}
 
-	if ( 'activate_via_email' != $_REQUEST['act'] || ! is_string( $_REQUEST['hash'] ) ) {
+	if ( 'activate_via_email' !== $_REQUEST['act'] || ! is_string( $_REQUEST['hash'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		return;
 	}
 
@@ -53,7 +53,7 @@ add_action( 'um_after_user_is_approved', 'charitable_um_after_user_verified_emai
  * @return boolean
  */
 function charitable_um_is_page_charitable_endpoint( $is_page ) {
-	if ( UM()->options()->get( 'core_user' ) != charitable_get_option( 'profile_page' ) ) {
+	if ( UM()->options()->get( 'core_user' ) !== charitable_get_option( 'profile_page' ) ) {
 		return $is_page;
 	}
 
@@ -62,7 +62,7 @@ function charitable_um_is_page_charitable_endpoint( $is_page ) {
 	switch ( current_filter() ) {
 		case 'charitable_is_page_email_verification_page':
 			return $wp_query->is_main_query()
-				&& array_key_exists( 'um_user', $wp_query->query_vars ) && 'email-verification' == $wp_query->query_vars['um_user'];
+				&& array_key_exists( 'um_user', $wp_query->query_vars ) && 'email-verification' === $wp_query->query_vars['um_user'];
 	}
 
 	return $is_page;

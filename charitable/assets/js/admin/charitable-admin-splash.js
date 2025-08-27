@@ -93,7 +93,6 @@ const CharitableAdminSplash = window.CharitableAdminSplash || ( function( docume
 				onOpen() {
 					$( '.jconfirm' ).css( 'bottom', 0 );
 					$( '.charitable-dash-widget-welcome-block' ).remove();
-					app.dismissDashboardWidgetBanner();
 				},
 				onDestroy() {
 					$( 'body' )
@@ -101,22 +100,6 @@ const CharitableAdminSplash = window.CharitableAdminSplash || ( function( docume
 						.css( '--charitable-body-scrollbar-width', null );
 				},
 			} );
-		},
-
-		/**
-		 * Dismiss the dashboard widget banner.
-		 *
-		 * @since 1.8.6
-		 */
-		dismissDashboardWidgetBanner() {
-			const data = {
-				_wpnonce: charitable_admin_splash_data.nonce,
-				action  : 'charitable_dash_widget_save_widget_meta',
-				meta: 'hide_welcome_block',
-				value: 1,
-			};
-
-			$.post( ajaxurl, data );
 		},
 	};
 

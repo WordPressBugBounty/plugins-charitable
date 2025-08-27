@@ -34,7 +34,7 @@ if ( is_null( $benefactor ) ) {
 		'contribution_amount'             => $benefactor->get_contribution_amount(),
 		'contribution_amount_is_per_item' => $benefactor->contribution_amount_is_per_item,
 		'date_created'                    => date_i18n( $php_format, strtotime( $benefactor->date_created ) ),
-		'date_deactivated'                => '0000-00-00 00:00:00' == $benefactor->date_deactivated ? '' : date_i18n( $php_format, strtotime( $benefactor->date_deactivated ) ),
+		'date_deactivated'                => '0000-00-00 00:00:00' == $benefactor->date_deactivated ? '' : date_i18n( $php_format, strtotime( $benefactor->date_deactivated ) ), // phpcs:ignore
 	);
 }
 
@@ -44,32 +44,32 @@ $name_base = '_campaign_benefactor[' . $args['index'] . ']';
 ?>
 <div id="<?php echo esc_attr( $id_base ); ?>" class="charitable-metabox-wrap charitable-benefactor-wrap" style="display: none;">
 	<?php if ( is_null( $benefactor ) ) : ?>
-		<a class="charitable-benefactor-form-cancel" href="#"><?php _e( 'Cancel', 'charitable' ); ?></a>
+		<a class="charitable-benefactor-form-cancel" href="#"><?php esc_html_e( 'Cancel', 'charitable' ); ?></a>
 	<?php endif ?>
-	<p><strong><?php _e( 'Contribution Amount', 'charitable' ); ?></strong></p>
+	<p><strong><?php esc_html_e( 'Contribution Amount', 'charitable' ); ?></strong></p>
 	<fieldset class="charitable-benefactor-contribution-amount">
-		<input type="text" id="<?php echo esc_attr( $id_base ); ?>_contribution_amount" class="contribution-amount" name="<?php echo esc_attr( $name_base ); ?>[contribution_amount]" value="<?php echo $args['contribution_amount']; ?>" placeholder="<?php _e( 'Enter amount. e.g. 10%, $2', 'charitable' ); ?>" />
+		<input type="text" id="<?php echo esc_attr( $id_base ); ?>_contribution_amount" class="contribution-amount" name="<?php echo esc_attr( $name_base ); ?>[contribution_amount]" value="<?php echo esc_attr( $args['contribution_amount'] ); ?>" placeholder="<?php esc_html_e( 'Enter amount. e.g. 10%, $2', 'charitable' ); ?>" />
 		<select id="<?php echo esc_attr( $id_base ); ?>_contribution_amount_is_per_item" class="contribution-type" name="<?php echo esc_attr( $name_base ); ?>[contribution_amount_is_per_item]">
-			<option value="1" <?php selected( 1, $args['contribution_amount_is_per_item'] ); ?>><?php _e( 'Apply to every matching item', 'charitable' ); ?></option>
-			<option value="0" <?php selected( 0, $args['contribution_amount_is_per_item'] ); ?>><?php _e( 'Apply only once per purchase', 'charitable' ); ?></option>
+			<option value="1" <?php selected( 1, $args['contribution_amount_is_per_item'] ); ?>><?php esc_html_e( 'Apply to every matching item', 'charitable' ); ?></option>
+			<option value="0" <?php selected( 0, $args['contribution_amount_is_per_item'] ); ?>><?php esc_html_e( 'Apply only once per purchase', 'charitable' ); ?></option>
 		</select>
 	</fieldset>
 	<?php
 		do_action( 'charitable_campaign_benefactor_form_extension_fields', $benefactor, $extension, $args['index'] );
 	?>
 	<div class="charitable-benefactor-date-wrap cf">
-		<label for="<?php echo esc_attr( $id_base ); ?>_date_created"><?php _e( 'Starting From:', 'charitable' ); ?>
+		<label for="<?php echo esc_attr( $id_base ); ?>_date_created"><?php esc_html_e( 'Starting From:', 'charitable' ); ?>
 			<input type="text"
 				id="<?php echo esc_attr( $id_base ); ?>_date_created"
 				name="<?php echo esc_attr( $name_base ); ?>[date_created]"
 				tabindex="3"
 				class="charitable-datepicker"
 				autocomplete="off"
-				data-date="<?php echo $args['date_created']; ?>"
-				data-format="<?php echo $js_format; ?>"
+				data-date="<?php echo esc_attr( $args['date_created'] ); ?>"
+				data-format="<?php echo esc_attr( $js_format ); ?>"
 			/>
 		</label>
-		<label for="<?php echo esc_attr( $id_base ); ?>_date_deactivated"><?php _e( 'Ending:', 'charitable' ); ?>
+		<label for="<?php echo esc_attr( $id_base ); ?>_date_deactivated"><?php esc_html_e( 'Ending:', 'charitable' ); ?>
 			<input type="text"
 				id="<?php echo esc_attr( $id_base ); ?>_date_deactivated"
 				name="<?php echo esc_attr( $name_base ); ?>[date_deactivated]"
@@ -77,8 +77,8 @@ $name_base = '_campaign_benefactor[' . $args['index'] . ']';
 				tabindex="3"
 				class="charitable-datepicker"
 				autocomplete="off"
-				data-date="<?php echo $args['date_deactivated']; ?>"
-				data-format="<?php echo $js_format; ?>"
+				data-date="<?php echo esc_attr( $args['date_deactivated'] ); ?>"
+				data-format="<?php echo esc_attr( $js_format ); ?>"
 			/>
 		</label>
 	</div>

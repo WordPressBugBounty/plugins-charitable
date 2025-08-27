@@ -1,7 +1,16 @@
+<?php
+/**
+ * Display the MonsterInsights integration step for the Analytics report.
+ *
+ * @author  WP Charitable LLC
+ * @since   1.0.0
+ * @package Charitable/Admin Views/Reports
+ */
 
+?>
 <div class="charitable-analytics-container intergration-monsterinsights">
 
-	<img class="charitable-monsterinsights-logo" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/reports/analytics/logos.png'; ?>" alt="<?php echo esc_html__( 'Integrate Monster Insights Into Charitable For Analytics', 'charitable' ); ?>">
+	<img class="charitable-monsterinsights-logo" src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/reports/analytics/logos.png' ); ?>" alt="<?php echo esc_html__( 'Integrate Monster Insights Into Charitable For Analytics', 'charitable' ); ?>">
 
 	<h1><?php echo esc_html__( 'Increase Donations with MonsterInsights', 'charitable' ); ?></h1>
 
@@ -10,7 +19,7 @@
 	<div class="bullets-thumbnail">
 
 		<div>
-			<img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/reports/analytics/monsterinsights.jpg'; ?>" alt="<?php echo esc_html__( 'Integrate MonsterInsights Into Charitable For Analytics', 'charitable' ); ?>">
+			<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/reports/analytics/monsterinsights.jpg' ); ?>" alt="<?php echo esc_html__( 'Integrate MonsterInsights Into Charitable For Analytics', 'charitable' ); ?>">
 		</div>
 		<div>
 			<div class="vertical-wrapper">
@@ -37,7 +46,7 @@
 
 		if ( ! $is_monsterinsights_installed ) {
 
-			$install_button_html = $charitable_plugins_third_party->get_install_button_html( 'monsterinsights', esc_html__('Install MonsterInsights', 'charitable' ) );
+			$install_button_html = $charitable_plugins_third_party->get_install_button_html( 'monsterinsights', esc_html__( 'Install MonsterInsights', 'charitable' ) );
 
 			?>
 
@@ -45,11 +54,11 @@
 			<div class="instructions">
 				<h3><?php echo esc_html__( 'Install and Activate MonsterInsights', 'charitable' ); ?></h3>
 				<p><?php echo esc_html__( 'Install the MonsterInsights plugin by clicking this button', 'charitable' ); ?></p>
-				<?php echo $install_button_html; ?>
+				<?php echo $install_button_html; // phpcs:ignore ?>
 			</div>
 			<div class="step">
 				<div class="vertical-wrapper">
-					<div class="step-image"><img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/reports/analytics/step-1.png'; ?>" alt="<?php echo esc_html__( 'Step 1', 'charitable' ); ?>" /></div>
+					<div class="step-image"><img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/reports/analytics/step-1.png' ); ?>" alt="<?php echo esc_html__( 'Step 1', 'charitable' ); ?>" /></div>
 				</div>
 			</div>
 		</div>
@@ -69,11 +78,11 @@
 			<div class="instructions">
 				<h3><?php echo esc_html__( 'Activate MonsterInsights', 'charitable' ); ?></h3>
 				<p><?php echo esc_html__( 'Activate MonsterInsights plugin by clicking this button:', 'charitable' ); ?></p>
-				<?php echo $activate_button_html; ?>
+				<?php echo $activate_button_html; // phpcs:ignore ?>
 			</div>
 			<div class="step">
 				<div class="vertical-wrapper">
-					<div class="step-image"><img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/reports/analytics/step-1.png'; ?>" alt="<?php echo esc_html__( 'Step 1', 'charitable' ); ?>" /></div>
+					<div class="step-image"><img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/reports/analytics/step-1.png' ); ?>" alt="<?php echo esc_html__( 'Step 1', 'charitable' ); ?>" /></div>
 				</div>
 			</div>
 		</div>
@@ -96,7 +105,7 @@
 			</div>
 			<div class="step">
 				<div class="vertical-wrapper">
-					<div class="step-image"><img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/reports/analytics/step-1.png'; ?>" alt="<?php echo esc_html__( 'Step 1', 'charitable' ); ?>" /></div>
+					<div class="step-image"><img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/reports/analytics/step-1.png' ); ?>" alt="<?php echo esc_html__( 'Step 1', 'charitable' ); ?>" /></div>
 				</div>
 			</div>
 		</div>
@@ -113,7 +122,7 @@
 			</div>
 			<div class="step">
 				<div class="vertical-wrapper">
-					<div class="step-image"><img src="<?php echo charitable()->get_path( 'assets', false ) . 'images/reports/analytics/step-2.png'; ?>" alt="<?php echo esc_html__( 'Step 2', 'charitable' ); ?>" /></div>
+					<div class="step-image"><img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/reports/analytics/step-2.png' ); ?>" alt="<?php echo esc_html__( 'Step 2', 'charitable' ); ?>" /></div>
 				</div>
 			</div>
 		</div>

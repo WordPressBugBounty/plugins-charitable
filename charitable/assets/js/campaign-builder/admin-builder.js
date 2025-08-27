@@ -1291,7 +1291,9 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 						wpchar.debug( 'previewAdvancedOptions is false or not defined' );
 					}
 
-					Charitable.Admin.Builder.DragFields.ready();
+					if ( Charitable.Admin.Builder.DragFields && typeof Charitable.Admin.Builder.DragFields.ready === 'function' ) {
+						Charitable.Admin.Builder.DragFields.ready();
+					}
 
 					app.updateFormHiddenFields();
 					app.updateFormHiddenFieldID();
@@ -4890,7 +4892,10 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 			adding = true;
 
-			Charitable.Admin.Builder.DragFields.disableDragAndDrop();
+			if ( Charitable.Admin.Builder.DragFields && typeof Charitable.Admin.Builder.DragFields.disableDragAndDrop === 'function' ) {
+				Charitable.Admin.Builder.DragFields.disableDragAndDrop();
+			}
+
 			app.disableFormActions();
 
 			let defaults = {
@@ -5076,7 +5081,9 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 				$builder.find( '.charitable-add-fields .charitable-add-fields-button' ).prop( 'disabled', false );
 
 				if ( ! adding ) {
-					Charitable.Admin.Builder.DragFields.enableDragAndDrop();
+					if ( Charitable.Admin.Builder.DragFields && typeof Charitable.Admin.Builder.DragFields.enableDragAndDrop === 'function' ) {
+						Charitable.Admin.Builder.DragFields.enableDragAndDrop();
+					}
 					app.enableFormActions();
 				}
 			} );

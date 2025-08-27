@@ -26,6 +26,6 @@ endif;
 	<?php $form->view()->render_field( $fields['meta_fields'], 'meta_fields' ); ?>
 </div>
 <div class="charitable-form-field charitable-submit-field">
-	<a href="<?php echo esc_url( $cancel_url ); ?>" class="alignright" title="<?php esc_attr_e( 'Return to donation page', 'charitable' ); ?>" tabindex="401"><?php _e( 'Cancel', 'charitable' ); ?></a>
-	<button class="button button-primary" type="submit" name="donate" tabindex="400"><?php echo $button_text; ?></button>
+	<a href="<?php echo esc_url( $cancel_url ); ?>" class="alignright" title="<?php esc_attr_e( 'Return to donation page', 'charitable' ); ?>" tabindex="401"><?php esc_html_e( 'Cancel', 'charitable' ); ?></a>
+	<button class="button button-primary" type="submit" name="donate" tabindex="400"><?php echo wp_kses_post( $button_text ); ?></button>
 </div><!-- .charitable-submit-field -->

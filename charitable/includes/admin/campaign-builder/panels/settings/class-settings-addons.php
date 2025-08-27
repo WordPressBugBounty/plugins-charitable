@@ -231,6 +231,10 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Addons' ) ) :
 					// if pro is active and the plan isn't high enough, add the CSS class.
 					$classes[] = 'charitable-need-upgrade';
 
+					// Set the license to the required plan level for upgrade, not the user's current plan.
+					if ( ! empty( $addon_info['plan-to-upgrade-to'] ) ) {
+						$license = $addon_info['plan-to-upgrade-to'];
+					}
 				} elseif ( isset( $installed_plugins[ $plugin_basename ] ) && ! is_plugin_active( $plugin_basename ) ) {
 
 					// if the plugin exists (installed, visible in the plugin list in WP admin) but not activated.

@@ -182,8 +182,8 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		 * @param  string $default Optional. The value that will be used if none is set.
 		 * @return mixed
 		 */
-		public function get_user_value( $key, $default = '' ) {
-			if ( isset( $_POST[ $key ] ) ) {
+		public function get_user_value( $key, $default = '' ) { // phpcs:ignore
+			if ( isset( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 				return $_POST[ $key ];
 			}
 
@@ -1576,7 +1576,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		 * @since  1.0.0
 		 * @since  1.5.0 Deprecated. This is handled by `Charitable_Public_Form_View` now.
 		 *
-		 * @param  string|false $custom_template
+		 * @param  string|false $custom_template Custom template.
 		 * @return string|false|Charitable_Template
 		 */
 		public function use_custom_templates( $custom_template ) {

@@ -31,8 +31,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function charitable_compat_woocommerce_prevent_wc_reset_redirect() {
 	/* This is a password reset. */
-	if ( isset( $_GET['key'] ) && ( isset( $_GET['id'] ) || isset( $_GET['login'] ) ) ) {
-		if ( isset( $_GET['charitable'] ) ) {
+	if ( isset( $_GET['key'] ) && ( isset( $_GET['id'] ) || isset( $_GET['login'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['charitable'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			remove_action( 'template_redirect', array( 'WC_Form_Handler', 'redirect_reset_password_link' ) );
 		}
 	}

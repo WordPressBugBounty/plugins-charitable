@@ -11,4 +11,4 @@
 
 $level = array_key_exists( 'level', $view_args ) ? $view_args['level'] : 'h4';
 ?>
-<<?php echo $level; ?> class="charitable-metabox-header" <?php echo charitable_get_arbitrary_attributes( $view_args ); ?>><?php echo esc_html( $view_args['title'] ); ?></<?php echo $level; ?>>
+<<?php echo wp_kses_post( $level ); ?> class="charitable-metabox-header" <?php echo charitable_get_arbitrary_attributes( $view_args ); // phpcs:ignore ?>><?php echo esc_html( $view_args['title'] ); ?></<?php echo wp_kses_post( $level ); ?>>

@@ -213,7 +213,7 @@ $array_to_return = array(
 	'Charitable_Admin_Connect'                       => 'admin/class-charitable-admin-connect.php', // v1.8.5.
 	'Charitable_Elementor'                           => 'elementor/class-charitable-elementor.php', // v1.8.6.
 	'Charitable_Admin_Splash'                        => 'admin/splash/class-charitable-admin-splash.php', // v1.8.6.
-	'Charitable_Gateway_Square_Legacy'              => 'gateways/class-charitable-gateway-square-legacy.php', // v1.8.7.
+	'Charitable_Gateway_Square_Legacy'               => 'gateways/class-charitable-gateway-square-legacy.php', // v1.8.7.
 );
 
 return $array_to_return;

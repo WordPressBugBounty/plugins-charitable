@@ -10,9 +10,9 @@
  * @version 1.6.54
  */
 
-$taxonomy_name = isset( $view_args['taxonomy'] ) ? $view_args['taxonomy'] : 'campaign_category';
-$taxonomy      = get_taxonomies( array( 'name' => $taxonomy_name ), 'objects' );
-$title         = ! empty( $view_args['title'] ) ? $view_args['title'] : '';
+$taxonomy_name = isset( $view_args['taxonomy'] ) ? $view_args['taxonomy'] : 'campaign_category'; // phpcs:ignore
+$taxonomy      = get_taxonomies( array( 'name' => $taxonomy_name ), 'objects' ); // phpcs:ignore
+$title         = ! empty( $view_args['title'] ) ? $view_args['title'] : ''; // phpcs:ignore
 $dropdown_id   = $view_args['widget_id'] . '-dropdown';
 $dropdown_args = array(
 	'taxonomy'         => $taxonomy_name,
@@ -29,11 +29,11 @@ $dropdown_args = array(
 	'selected'         => is_tax( $taxonomy_name ) ? get_query_var( $taxonomy_name ) : 0,
 );
 
-echo $view_args['before_widget'];
+echo $view_args['before_widget']; // phpcs:ignore
 
 if ( ! empty( $title ) ) :
 
-	echo $view_args['before_title'] . esc_html( $title ) . $view_args['after_title'];
+	echo $view_args['before_title'] . esc_html( $title ) . $view_args['after_title']; // phpcs:ignore
 
 endif;
 ?>
@@ -56,4 +56,4 @@ endif;
 </script>
 <?php
 
-echo $view_args['after_widget'];
+echo $view_args['after_widget']; // phpcs:ignore

@@ -43,8 +43,8 @@ $currency_helper = Charitable_Currency::get_instance();
 	<table id="charitable-campaign-donations" class="widefat">
 		<thead>
 			<tr class="table-header">
-				<th><label id="<?php echo esc_attr( $view_args['id'] ); ?>-campaign-label"><?php _e( 'Campaign', 'charitable' ); ?></label></th>
-				<th><label id="<?php echo esc_attr( $view_args['id'] ); ?>-amount-label"><?php _e( 'Amount', 'charitable' ); ?></label></th>
+				<th><label id="<?php echo esc_attr( $view_args['id'] ); ?>-campaign-label"><?php esc_html_e( 'Campaign', 'charitable' ); ?></label></th>
+				<th><label id="<?php echo esc_attr( $view_args['id'] ); ?>-amount-label"><?php esc_html_e( 'Amount', 'charitable' ); ?></label></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -52,9 +52,9 @@ $currency_helper = Charitable_Currency::get_instance();
 			<tr>
 				<td>
 					<select name="<?php echo esc_attr( sprintf( '%s[%d][campaign_id]', $view_args['key'], $i ) ); ?>" labelledby="<?php echo esc_attr( $view_args['id'] ); ?>-campaign-label" tabindex="<?php echo esc_attr( $view_args['tabindex'] ); ?>">
-						<option value=""><?php _e( 'Select a campaign', 'charitable' ); ?></option>
+						<option value=""><?php esc_html_e( 'Select a campaign', 'charitable' ); ?></option>
 						<?php foreach ( $campaigns as $campaign_id ) : ?>
-							<option value="<?php echo $campaign_id; ?>" <?php selected( $campaign_id, $campaign_donation->campaign_id ); ?>><?php echo get_the_title( $campaign_id ); ?></option>
+							<option value="<?php echo esc_attr( $campaign_id ); ?>" <?php selected( $campaign_id, $campaign_donation->campaign_id ); ?>><?php echo esc_html( get_the_title( $campaign_id ) ); ?></option>
 						<?php endforeach ?>
 					</select>
 				</td>
@@ -69,7 +69,7 @@ $currency_helper = Charitable_Currency::get_instance();
 					<?php if ( isset( $campaign_donation->campaign_donation_id ) ) : ?>
 						<input type="hidden"
 							name="<?php echo esc_attr( sprintf( '%s[%d][campaign_donation_id]', $view_args['key'], $i ) ); ?>"
-							value="<?php echo $campaign_donation->campaign_donation_id; ?>"
+							value="<?php echo esc_attr( $campaign_donation->campaign_donation_id ); ?>"
 						/>
 					<?php endif ?>
 				</td>

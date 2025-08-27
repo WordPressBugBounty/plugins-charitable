@@ -15,7 +15,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/* @var Charitable_Campaign */
 $campaign = $view_args['campaign'];
 
 ?>

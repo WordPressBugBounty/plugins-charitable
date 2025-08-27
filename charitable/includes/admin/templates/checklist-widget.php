@@ -4,6 +4,7 @@
  *
  * @since 1.8.1.15
  *
+ * @package Charitable/Admin/Templates
  */
 
 if ( ! \defined( 'ABSPATH' ) ) {
@@ -66,7 +67,7 @@ $closed_css = $checklist_class->get_checklist_option( 'window_closed' ) ? 'close
 	</div>
 
 	<div class="charitable-checklist-block-timer">
-		<img src="<?php echo charitable()->get_path( 'assets', false ) . '/images/charitable-logo.svg'; ?>" alt="<?php esc_html_e( 'Charitable', 'charitable' ); ?>">
+		<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . '/images/charitable-logo.svg' ); ?>" alt="<?php esc_attr_e( 'Charitable', 'charitable' ); ?>">
 		<div>
 			<h3><?php esc_html_e( 'Charitable Checklist', 'charitable' ); ?></h3>
 
@@ -119,7 +120,7 @@ $closed_css = $checklist_class->get_checklist_option( 'window_closed' ) ? 'close
 				<?php
 				printf(
 					/* translators: %1$s Opening strong tag, do not translate. %2$s Closing strong tag, do not translate. %3$s Opening anchor tag, do not translate. %4$s Closing anchor tag, do not translate. */
-					__( 'Please rate %1$sCharitable%2$s %3$s★★★★★%4$s on %3$sWordPress.org%4$s!', 'charitable' ),
+					__( 'Please rate %1$sCharitable%2$s %3$s★★★★★%4$s on %3$sWordPress.org%4$s!', 'charitable' ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					'<strong>',
 					'</strong>',
 					'<a href="https://wordpress.org/support/plugin/charitable/reviews/?filter=5#new-post" rel="noopener noreferrer" target="_blank">',

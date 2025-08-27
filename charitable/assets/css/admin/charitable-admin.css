@@ -2047,7 +2047,7 @@ body.post-type-campaign.edit-php.post-type-charitable .charitable-modal button.b
 body.post-type-campaign.edit-php.post-type-charitable .charitable-modal input.charitable-datepicker {
   width: 48%;
   display: inline-block;
-  background-image: url("../images/icons/calendar.png");
+  background-image: url("../../images/icons/calendar.png");
   background-repeat: no-repeat;
   background-position: 163px center;
   background-size: 15px 15px;
@@ -2200,7 +2200,7 @@ body.post-type-donation.edit-php.post-type-charitable .charitable-modal button.b
 body.post-type-donation.edit-php.post-type-charitable .charitable-modal input.charitable-datepicker {
   width: 48%;
   display: inline-block;
-  background-image: url("../images/icons/calendar.png");
+  background-image: url("../../images/icons/calendar.png");
   background-repeat: no-repeat;
   background-position: 163px center;
   background-size: 15px 15px;
@@ -3134,7 +3134,7 @@ body.charitable_page_charitable-dashboard .tablenav button.charitable-report-pri
 body.charitable_page_charitable-dashboard .tablenav input.charitable-datepicker {
   width: 115px;
   display: inline-block;
-  background-image: url("../images/icons/calendar.png");
+  background-image: url("../../images/icons/calendar.png");
   background-repeat: no-repeat;
   background-position: 90px center;
   background-size: 15px 15px;
@@ -3153,7 +3153,7 @@ body.charitable_page_charitable-dashboard .tablenav input.charitable-datepicker-
 body.charitable_page_charitable-dashboard .tablenav input.charitable-reports-datepicker {
   width: 195px;
   display: inline-block;
-  background-image: url("../images/icons/calendar.png");
+  background-image: url("../../images/icons/calendar.png");
   background-repeat: no-repeat;
   background-position: 170px center;
   background-size: 15px 15px;

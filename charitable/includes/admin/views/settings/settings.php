@@ -76,12 +76,12 @@ ob_start();
 			}
 
 			?>
-			<a href="<?php echo esc_url( add_query_arg( $url_query_arg_array, admin_url( 'admin.php?page=charitable-settings' ) ) ); ?>" class="nav-tab nav-tab-<?php echo esc_attr( $section_key ); ?> <?php echo $css; ?> <?php echo ( esc_attr( $active_tab ) === esc_attr( $section_key ) ) ? ' nav-tab-active' : ''; ?>"><?php echo esc_html( $section_name ); ?></a>
+			<a href="<?php echo esc_url( add_query_arg( $url_query_arg_array, admin_url( 'admin.php?page=charitable-settings' ) ) ); ?>" class="nav-tab nav-tab-<?php echo esc_attr( $section_key ); ?> <?php echo ( esc_attr( $active_tab ) === esc_attr( $section_key ) ) ? ' nav-tab-active' : ''; ?>"><?php echo esc_html( $section_name ); ?></a>
 		<?php endforeach ?>
 	</h2>
 	<?php if ( $show_return ) : ?>
 		<?php /* translators: %s: active settings tab label */ ?>
-		<p><a href="<?php echo esc_url( $return_tab_url ); ?>"><?php echo $return_tab_text; ?></a></p>
+		<p><a href="<?php echo esc_url( $return_tab_url ); ?>"><?php echo $return_tab_text; // phpcs:ignore ?></a></p>
 	<?php endif ?>
 	<?php
 		/**
@@ -120,7 +120,7 @@ ob_start();
 					 *
 					 * @param string $button The button output.
 					 */
-					echo apply_filters( 'charitable_settings_button_' . $group, get_submit_button( null, 'primary', 'submit', true, null ) );
+					echo apply_filters( 'charitable_settings_button_' . $group, get_submit_button( null, 'primary', 'submit', true, null ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				?>
 			<?php endif; ?>
 		<?php if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) : // phpcs:ignore ?>
@@ -140,4 +140,5 @@ ob_start();
 	?>
 </div>
 <?php
-echo ob_get_clean();
+
+echo ob_get_clean(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

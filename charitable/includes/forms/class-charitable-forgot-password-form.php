@@ -54,8 +54,6 @@ if ( ! class_exists( 'Charitable_Forgot_Password_Form' ) ) :
 		 * Create class object.
 		 *
 		 * @since 1.4.0
-		 *
-		 * @param array $args User-defined shortcode attributes.
 		 */
 		public function __construct() {
 			$this->id = uniqid();
@@ -72,14 +70,17 @@ if ( ! class_exists( 'Charitable_Forgot_Password_Form' ) ) :
 		 * @return array
 		 */
 		public function get_fields() {
-			$fields = apply_filters( 'charitable_forgot_password_fields', array(
-				'user_login' => array(
-					'label'    => __( 'Email Address', 'charitable' ),
-					'type'     => 'email',
-					'required' => true,
-					'priority' => 10,
-				),
-			) );
+			$fields = apply_filters(
+				'charitable_forgot_password_fields',
+				array(
+					'user_login' => array(
+						'label'    => __( 'Email Address', 'charitable' ),
+						'type'     => 'email',
+						'required' => true,
+						'priority' => 10,
+					),
+				)
+			);
 
 			uasort( $fields, 'charitable_priority_sort' );
 
@@ -101,14 +102,19 @@ if ( ! class_exists( 'Charitable_Forgot_Password_Form' ) ) :
 				return;
 			}
 
-			if ( empty( $_POST['user_login'] ) ) {
+			if ( empty( $_POST['user_login'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 				charitable_get_notices()->add_error( __( '<strong>ERROR</strong>: Enter a username or email address.', 'charitable' ) );
 				return;
-			} elseif ( strpos( $_POST['user_login'], '@' ) ) {
-				$user = get_user_by( 'email', trim( $_POST['user_login'] ) );
+			}
+
+			/* Sanitize and unslash the user input. */
+			$user_login = sanitize_text_field( wp_unslash( $_POST['user_login'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+			if ( strpos( $user_login, '@' ) ) {
+				$user = get_user_by( 'email', trim( $user_login ) );
 			} else {
-				$login = trim( $_POST['user_login'] );
-				$user = get_user_by( 'login', $login );
+				$login = trim( $user_login );
+				$user  = get_user_by( 'login', $login );
 			}
 
 			do_action( 'lostpassword_post' );

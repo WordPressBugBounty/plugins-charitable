@@ -677,7 +677,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 									$secondary_info = $this->get_activity_secondary_info( $activity );
 								}
 
-								echo $secondary_info;
+								echo $secondary_info; // phpcs:ignore
 
 								// phpcs:ignore ?>
 							</div>

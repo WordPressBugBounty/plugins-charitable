@@ -18,7 +18,7 @@ unset( $fields['meta_fields'] );
 ?>
 <div class="donation-banner-wrapper">
 	<div class="donation-banner">
-		<h3 class="donation-number"><?php printf( '%s #%d', __( 'Donation', 'charitable' ), $form->get_donation()->get_number() ); ?></h3>
+		<h3 class="donation-number"><?php printf( '%s #%d', esc_html__( 'Donation', 'charitable' ), esc_html( $form->get_donation()->get_number() ) ); ?></h3>
 	</div>
 </div>
 <div class="charitable-form-fields primary">

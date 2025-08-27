@@ -22,11 +22,11 @@ if ( ! class_exists( 'Charitable_Checker' ) ) :
 	 * Charitable_Updater
 	 */
 	class Charitable_Checker {
-		private $api_url  = '';
-		private $api_data = array();
-		private $name     = '';
-		private $slug     = '';
-		private $version  = '';
+		private $api_url  = ''; // phpcs:ignore
+		private $api_data = array(); // phpcs:ignore
+		private $name     = ''; // phpcs:ignore
+		private $slug     = ''; // phpcs:ignore
+		private $version  = ''; // phpcs:ignore
 
 		/**
 		 * Class constructor.
@@ -46,9 +46,7 @@ if ( ! class_exists( 'Charitable_Checker' ) ) :
 			}
 
 			$updater = new CharitablePluginUpdater( $_api_url, $_plugin_file, $_api_data );
-
 		}
-
 	}
 
 endif;

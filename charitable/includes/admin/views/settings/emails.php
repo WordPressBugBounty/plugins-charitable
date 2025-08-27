@@ -50,13 +50,13 @@ if ( count( $emails ) ) :
 						)
 					);
 					?>
-					<a href="<?php echo $settings_url; ?>" class="button button-primary"><?php _e( 'Email Settings', 'charitable' ); ?></a>
+					<a href="<?php echo esc_url( $settings_url ); ?>" class="button button-primary"><?php esc_html_e( 'Email Settings', 'charitable' ); ?></a>
 				<?php endif ?>
 				<?php if ( ! $email->is_required() ) : ?>
 					<?php if ( $is_enabled ) : ?>
-						<a href="<?php echo $action_url; ?>" class="button"><?php _e( 'Disable Email', 'charitable' ); ?></a>
+						<a href="<?php echo esc_url( $action_url ); ?>" class="button"><?php esc_html_e( 'Disable Email', 'charitable' ); ?></a>
 					<?php else : ?>
-						<a href="<?php echo $action_url; ?>" class="button"><?php _e( 'Enable Email', 'charitable' ); ?></a>
+						<a href="<?php echo esc_url( $action_url ); ?>" class="button"><?php esc_html_e( 'Enable Email', 'charitable' ); ?></a>
 					<?php endif ?>
 				<?php endif ?>
 			</span>
@@ -64,5 +64,5 @@ if ( count( $emails ) ) :
 	<?php endforeach ?>
 	<?php
 else :
-	_e( 'There are no emails available in your system.', 'charitable' );
+	esc_html_e( 'There are no emails available in your system.', 'charitable' );
 endif;

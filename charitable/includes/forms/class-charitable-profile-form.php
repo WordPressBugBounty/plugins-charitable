@@ -565,13 +565,13 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 		 */
 		public function validate_password_change() {
 			/* The current password must be correct. */
-			if ( false == wp_check_password( $_POST['current_pass'], $this->get_user()->user_pass ) ) {
+			if ( false == wp_check_password( $_POST['current_pass'], $this->get_user()->user_pass ) ) { // phpcs:ignore
 				charitable_get_notices()->add_error( __( 'Current password is incorrect.', 'charitable' ) );
 				return false;
 			}
 
 			/* The new password must match the repeat (if set). */
-			if ( isset( $_POST['user_pass_repeat'] ) && $_POST['user_pass_repeat'] != $_POST['user_pass'] ) {
+			if ( isset( $_POST['user_pass_repeat'] ) && $_POST['user_pass_repeat'] != $_POST['user_pass'] ) { // phpcs:ignore
 				charitable_get_notices()->add_error( __( 'New passwords did not match.', 'charitable' ) );
 				return false;
 			}
@@ -650,7 +650,7 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 				'1.4.0'
 			);
 
-			if ( 'Charitable_Profile_Form' == get_class( $form ) ) {
+			if ( 'Charitable_Profile_Form' == get_class( $form ) ) { // phpcs:ignore Universal.Operators.StrictComparisons.LooseEqual
 				do_action( 'charitable_user_profile_after_fields', $form );
 			}
 		}

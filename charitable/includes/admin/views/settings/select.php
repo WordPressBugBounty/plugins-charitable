@@ -16,29 +16,29 @@ if ( false === $value ) {
 	$value = isset( $view_args['default'] ) ? $view_args['default'] : '';
 }
 ?>
-<select id="<?php printf( 'charitable_settings_%s', implode( '_', $view_args['key'] ) ); ?>"
-	name="<?php printf( 'charitable_settings[%s]', $view_args['name'] ); ?>"
+<select id="<?php printf( 'charitable_settings_%s', implode( '_', $view_args['key'] ) ); // phpcs:ignore ?>"
+	name="<?php printf( 'charitable_settings[%s]', $view_args['name'] ); // phpcs:ignore ?>"
 	class="<?php echo esc_attr( $view_args['classes'] ); ?>"
-	<?php echo charitable_get_arbitrary_attributes( $view_args ); ?>
+	<?php echo charitable_get_arbitrary_attributes( $view_args ); // phpcs:ignore ?>
 	>
 	<?php
 	foreach ( $view_args['options'] as $key => $option ) :
 		if ( is_array( $option ) ) :
 			$label = isset( $option['label'] ) ? $option['label'] : '';
 			?>
-			<optgroup label="<?php echo $label; ?>">
+			<optgroup label="<?php echo wp_kses_post( $label ); ?>">
 			<?php foreach ( $option['options'] as $k => $opt ) : ?>
-				<option value="<?php echo $k; ?>" <?php selected( $k, $value ); ?>><?php echo $opt; ?></option>
+				<option value="<?php echo esc_attr( $k ); ?>" <?php selected( $k, $value ); ?>><?php echo esc_html( $opt ); ?></option>
 			<?php endforeach ?>
 			</optgroup>
 		<?php else : ?>
-			<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $key, $value ); ?>><?php echo $option; ?></option>
+			<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $key, $value ); ?>><?php echo $option; // phpcs:ignore ?></option>
 			<?php
 		endif;
 	endforeach
 	?>
 </select>
 <?php if ( isset( $view_args['help'] ) ) : ?>
-	<div class="charitable-help"><?php echo $view_args['help']; ?></div>
+	<div class="charitable-help"><?php echo $view_args['help']; // phpcs:ignore ?></div>
 	<?php
 endif;

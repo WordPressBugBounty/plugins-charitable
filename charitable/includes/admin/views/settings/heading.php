@@ -11,7 +11,7 @@
  */
 
 if ( isset( $view_args['description'] ) ) : ?>
-	<div class="charitable-description"><?php echo $view_args['description']; ?></div>
+	<div class="charitable-description"><?php echo $view_args['description']; // phpcs:ignore ?></div>
 <?php else : ?>
-<hr <?php echo charitable_get_arbitrary_attributes( $view_args ); ?> />
+<hr <?php echo charitable_get_arbitrary_attributes( $view_args ); // phpcs:ignore ?> />
 <?php endif; ?>

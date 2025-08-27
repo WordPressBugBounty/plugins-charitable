@@ -15,5 +15,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 <div class="campaign-donation-stats">
-<?php echo $view_args['campaign']->get_donation_summary(); ?>
+<?php echo $view_args['campaign']->get_donation_summary(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 </div>

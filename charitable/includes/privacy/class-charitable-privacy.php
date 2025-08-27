@@ -43,6 +43,24 @@ if ( ! class_exists( 'Charitable_Privacy' ) ) :
 		protected $data_retention_fields;
 
 		/**
+		 * Whether data was retained during erasure.
+		 *
+		 * @since 1.6.0
+		 *
+		 * @var   boolean
+		 */
+		protected $retained;
+
+		/**
+		 * Whether data was removed during erasure.
+		 *
+		 * @since 1.6.0
+		 *
+		 * @var   boolean
+		 */
+		protected $removed;
+
+		/**
 		 * Set up class instance.
 		 *
 		 * @since  1.6.0
@@ -130,11 +148,11 @@ if ( ! class_exists( 'Charitable_Privacy' ) ) :
 		public function is_donation_in_data_retention_period( $donation_id ) {
 			$period = $this->get_data_retention_period();
 
-			if ( '0' == (string) $period ) {
+			if ( '0' == (string) $period ) { // phpcs:ignore Universal.Operators.StrictComparisons.LooseEqual
 				return false;
 			}
 
-			if ( 'endless' == $period ) {
+			if ( 'endless' == $period ) { // phpcs:ignore Universal.Operators.StrictComparisons.LooseEqual
 				return true;
 			}
 
@@ -152,12 +170,15 @@ if ( ! class_exists( 'Charitable_Privacy' ) ) :
 		 * @return array
 		 */
 		public function register_exporter( $exporters ) {
-			return array_merge( $exporters, array(
+			return array_merge(
+				$exporters,
 				array(
-					'exporter_friendly_name' => __( 'Charitable Donor Data', 'charitable' ),
-					'callback'               => array( $this, 'export_user_data' ),
-				),
-			) );
+					array(
+						'exporter_friendly_name' => __( 'Charitable Donor Data', 'charitable' ),
+						'callback'               => array( $this, 'export_user_data' ),
+					),
+				)
+			);
 		}
 
 		/**
@@ -169,12 +190,15 @@ if ( ! class_exists( 'Charitable_Privacy' ) ) :
 		 * @return array
 		 */
 		public function register_eraser( $erasers ) {
-			return array_merge( $erasers, array(
+			return array_merge(
+				$erasers,
 				array(
-					'eraser_friendly_name' => __( 'Charitable Donor Data Eraser', 'charitable' ),
-					'callback'             => array( $this, 'erase_user_data' ),
-				),
-			) );
+					array(
+						'eraser_friendly_name' => __( 'Charitable Donor Data Eraser', 'charitable' ),
+						'callback'             => array( $this, 'erase_user_data' ),
+					),
+				)
+			);
 		}
 
 		/**
@@ -196,7 +220,12 @@ if ( ! class_exists( 'Charitable_Privacy' ) ) :
 			 *
 			 * @param string $content The privacy policy content.
 			 */
-			$content = wp_kses_post( apply_filters( 'charitable_privacy_policy_content', wpautop( __( '
+			$content = wp_kses_post(
+				apply_filters(
+					'charitable_privacy_policy_content',
+					wpautop(
+						__(
+							'
 We collect information about you during the donation process on our website. This information may include, but is not limited to, your name, address, phone number, credit card/payment details and any other details that might be requested from you for the purpose of processing your donations.
 
 Handling this data allows us to:
@@ -212,7 +241,12 @@ Additionally, we may also collect the following information:
 - Cookies which are essential to keep track of your donation history whilst your session is active. This allows you to access your donation receipt without being a registered, logged in user.
 - Account email/password to allow access to your account, if you have one.
 - If you choose to create an account with us, your name, address, email and phone number, which will be used to populate the donation form for future donations.
-', 'charitable' ) ) ) );
+',
+							'charitable'
+						)
+					)
+				)
+			);
 
 			wp_add_privacy_policy_content( 'Charitable', $content );
 		}
@@ -289,7 +323,7 @@ Additionally, we may also collect the following information:
 		 * @param  int    $page  The page of data to retrieve.
 		 * @return array
 		 */
-		public function erase_user_data( $email, $page = 1 ) {
+		public function erase_user_data( $email, $page = 1 ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 			$this->retained = false;
 			$this->removed  = false;
 
@@ -346,7 +380,7 @@ Additionally, we may also collect the following information:
 		 */
 		public function get_registered_donor_data( $user ) {
 			$data    = array();
-			$form    = new Charitable_Profile_Form;
+			$form    = new Charitable_Profile_Form();
 			$methods = array(
 				'get_user_fields',
 				'get_address_fields',
@@ -410,20 +444,23 @@ Additionally, we may also collect the following information:
 			 * @param array  $data    Set of personal donor data.
 			 * @param object $profile The profile record.
 			 */
-			$data = apply_filters( 'charitable_privacy_export_personal_donor_profile_data', array(
+			$data = apply_filters(
+				'charitable_privacy_export_personal_donor_profile_data',
 				array(
-					'name'  => __( 'First Name', 'charitable' ),
-					'value' => $profile->first_name,
-				),
-				array(
-					'name'  => __( 'Last Name', 'charitable' ),
-					'value' => $profile->last_name,
-				),
-				array(
-					'name'  => __( 'Email', 'charitable' ),
-					'value' => $profile->email,
-				),
-			) );
+					array(
+						'name'  => __( 'First Name', 'charitable' ),
+						'value' => $profile->first_name,
+					),
+					array(
+						'name'  => __( 'Last Name', 'charitable' ),
+						'value' => $profile->last_name,
+					),
+					array(
+						'name'  => __( 'Email', 'charitable' ),
+						'value' => $profile->email,
+					),
+				)
+			);
 
 			return array(
 				'item_id'     => 'donor-' . $profile->donor_id,
@@ -489,7 +526,7 @@ Additionally, we may also collect the following information:
 		 * @return void
 		 */
 		protected function erase_registered_donor_personal_data( WP_User $user ) {
-			$form    = new Charitable_Profile_Form;
+			$form    = new Charitable_Profile_Form();
 			$methods = array(
 				'get_user_fields',
 				'get_address_fields',
@@ -570,14 +607,16 @@ Additionally, we may also collect the following information:
 			update_post_meta( $donation_id, 'data_erased', current_time( 'mysql', 0 ) );
 
 			/* Change the post_title since that otherwise has the donor's name. */
-			wp_update_post( array(
-				'ID'         => $donation_id,
-				'post_title' => sprintf(
+			wp_update_post(
+				array(
+					'ID'         => $donation_id,
+					'post_title' => sprintf(
 					/* translators: %s: campaign names */
-					__( 'Anonymous &ndash; %s', 'charitable' ),
-					charitable_get_donation( $donation_id )->get_campaigns_donated_to()
-				),
-			) );
+						__( 'Anonymous &ndash; %s', 'charitable' ),
+						charitable_get_donation( $donation_id )->get_campaigns_donated_to()
+					),
+				)
+			);
 
 			$log = new Charitable_Donation_Log( $donation_id );
 			$log->add( __( 'Personal data erased.', 'charitable' ) );
@@ -592,10 +631,14 @@ Additionally, we may also collect the following information:
 		 * @return boolean
 		 */
 		protected function has_erasable_fields_within_data_retention_period() {
-			return 0 < count( array_unique(
-				array_keys( $this->get_user_donation_fields() ),
-				$this->get_data_retention_fields()
-			) );
+			return 0 < count(
+				array_unique(
+					array_merge(
+						array_keys( $this->get_user_donation_fields() ),
+						$this->get_data_retention_fields()
+					)
+				)
+			);
 		}
 
 		/**

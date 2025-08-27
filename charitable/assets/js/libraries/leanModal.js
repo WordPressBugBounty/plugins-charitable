@@ -24,8 +24,14 @@
             $overlay = $( '#lean_overlay' );
 
             $trigger.on( 'click', function(e) {
-                var modal_id = methods.get_target($(this)),
-                    $modal = $(modal_id);
+                var modal_id = methods.get_target($(this));
+
+                // If no valid modal target, don't proceed
+                if ( ! modal_id ) {
+                    return;
+                }
+
+                var $modal = $(modal_id);
 
                 methods.open( $modal, e );
 
@@ -95,10 +101,16 @@
          * Return the ID of the modal to open.
          */
         get_target : function( $trigger ) {
-            var id = '#' + $trigger.data( 'trigger-modal' );
+            var id = $trigger.data( 'trigger-modal' );
 
-            if ( 1 === id.length ) {
-                id = $trigger.attr( "href" );
+            // If data-trigger-modal is empty or undefined, don't use href as fallback
+            if ( ! id || id.length === 0 ) {
+                return null;
+            }
+
+            // Ensure it starts with # for proper selector
+            if ( id.charAt( 0 ) !== '#' ) {
+                id = '#' + id;
             }
 
             return id;

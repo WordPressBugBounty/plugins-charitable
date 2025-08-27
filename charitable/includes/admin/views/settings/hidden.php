@@ -12,7 +12,7 @@
 
 ?>
 <input type="hidden"
-	id="<?php printf( 'charitable_settings_%s', implode( '_', $view_args['key'] ) ); ?>"
-	name="<?php printf( 'charitable_settings[%s]', $view_args['name'] ); ?>"
+	id="<?php printf( 'charitable_settings_%s', implode( '_', $view_args['key'] ) ); // phpcs:ignore ?>"
+	name="<?php printf( 'charitable_settings[%s]', $view_args['name'] ); // phpcs:ignore ?>"
 	value="<?php echo esc_attr( $view_args['value'] ); ?>"
 />

@@ -76,36 +76,44 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 		 */
 		public static function process() {
 
+			// phpcs:disable
 			if ( charitable_is_debug() ) {
-				error_log( 'Charitable_Stripe_Webhook_Processor PROCESS FUNCTION ');
+				error_log( 'Charitable_Stripe_Webhook_Processor PROCESS FUNCTION ' );
 			}
+			// phpcs:enable
 
 			/* Retrieve and validate the request's body. */
 			$event = self::get_validated_incoming_event();
 
+			// phpcs:disable
 			if ( charitable_is_debug() ) {
 				error_log( print_r( $event, true ) );
 			}
+			// phpcs:enable
 
 			if ( ! $event ) {
 				status_header( 500 );
-				die( __( 'Invalid Stripe event.', 'charitable' ) );
+				die( __( 'Invalid Stripe event.', 'charitable' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 
 			try {
+				// phpcs:disable
 				if ( charitable_is_debug() ) {
-					error_log( 'Charitable_Stripe_Webhook_Processor PROCESS FUNCTION TRY');
+					error_log( 'Charitable_Stripe_Webhook_Processor PROCESS FUNCTION TRY' );
 				}
+				// phpcs:enable
 				$event = \Stripe\Event::constructFrom( $event );
 			} catch( \UnexpectedValueException $e ) {
 				status_header( 400 );
-				die( __( 'Unable to construct Stripe object with payload.', 'charitable' ) );
+				die( __( 'Unable to construct Stripe object with payload.', 'charitable' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 
 			$processor = new Charitable_Stripe_Webhook_Processor( $event );
+			// phpcs:disable
 			if ( charitable_is_debug() ) {
-				error_log( 'Charitable_Stripe_Webhook_Processor PROCESS FUNCTION RUN');
+				error_log( 'Charitable_Stripe_Webhook_Processor PROCESS FUNCTION RUN' );
 			}
+			// phpcs:enable
 			$processor->run();
 		}
 
@@ -124,21 +132,23 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 
 				/* This is Stripe's test webhook, so just die with a success message. */
 				if ( 'evt_00000000000000' == $this->event->id ) {
-					die( __( 'Test webhook successfully received.', 'charitable' ) );
+					die( __( 'Test webhook successfully received.', 'charitable' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				}
 
 				$this->run_event_processors();
 
-				die( __( 'Webhook processed.', 'charitable' ) );
+				die( __( 'Webhook processed.', 'charitable' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 			} catch ( Exception $e ) {
 				$body = $e->getJsonBody();
+				// phpcs:disable
 				if ( charitable_is_debug() ) {
 					error_log( $body['error']['message'] );
 				}
+				// phpcs:enable
 				status_header( 500 );
 
-				die( __( 'Error while retrieving event.', 'charitable' ) );
+				die( __( 'Error while retrieving event.', 'charitable' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}//end try
 		}
 
@@ -198,13 +208,15 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 		 * @return boolean
 		 */
 		public function is_connect_webhook_for_site_account_id() {
+			// phpcs:disable
 			if ( charitable_is_debug() ) {
 				error_log( 'is_connect_webhook_for_site_account_id' );
 				error_log( print_r( $this->event->account, true ) );
 				error_log( print_r( $this->get_site_account_id(), true ) );
 				error_log( print_r( isset( $this->event->account ) && $this->get_site_account_id() == $this->event->account, true ) );
 			}
-			return isset( $this->event->account ) && $this->get_site_account_id() == $this->event->account;
+			// phpcs:enable
+			return isset( $this->event->account ) && $this->get_site_account_id() == $this->event->account; // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
 		}
 
 		/**
@@ -216,7 +228,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 		 * @return boolean
 		 */
 		public function is_connect_webhook_for_connected_account() {
-			return isset( $this->event->account ) && $this->get_site_account_id() != $this->event->account;
+			return isset( $this->event->account ) && $this->get_site_account_id() != $this->event->account; // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
 		}
 
 		/**
@@ -266,20 +278,24 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 				]
 			);
 
+			// phpcs:disable
 			if ( charitable_is_debug() ) {
-				error_log( 'run_event_processors');
-				error_log( 'default_processors');
+				error_log( 'run_event_processors' );
+				error_log( 'default_processors' );
 				error_log( print_r( $default_processors, true ) );
-				error_log( '$this->event->type');
+				error_log( '$this->event->type' );
 				error_log( print_r( $this->event->type, true ) );
 			}
+			// phpcs:enable
 
 			/* Check if this event can be handled by one of our built-in event processors. */
 			if ( array_key_exists( $this->event->type, $default_processors ) ) {
 
+				// phpcs:disable
 				if ( charitable_is_debug() ) {
-					error_log( 'array_key_exists');
+					error_log( 'array_key_exists' );
 				}
+				// phpcs:enable
 
 				/**
 				 * Double-check that this isn't a Connect webhook for the site account.
@@ -292,14 +308,16 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 				 */
 				if ( ! $this->is_connect_webhook_for_site_account_id() ) {
 
+					// phpcs:disable
 					if ( charitable_is_debug() ) {
-						error_log( '! $this->is_connect_webhook_for_site_account_id()');
+						error_log( '! $this->is_connect_webhook_for_site_account_id()' );
 					}
+					// phpcs:enable
 
 					$message = call_user_func( $default_processors[ $this->event->type ], $this->event );
 
 					/* Kill processing with a message returned by the event processor. */
-					die( $message );
+					die( $message ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				}
 			}
 
@@ -314,13 +332,17 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			 * @param string        $event_type Type of event.
 			 * @param \Stripe\Event $event      Stripe event object.
 			 */
+			// phpcs:disable
 			if ( charitable_is_debug() ) {
-				error_log( 'before charitable_stripe_ipn_event');
+				error_log( 'before charitable_stripe_ipn_event' );
 			}
+			// phpcs:enable
 			do_action( 'charitable_stripe_ipn_event', $this->event->type, $this->event );
+			// phpcs:disable
 			if ( charitable_is_debug() ) {
-				error_log( 'after charitable_stripe_ipn_event');
+				error_log( 'after charitable_stripe_ipn_event' );
 			}
+			// phpcs:enable
 		}
 
 		/**
@@ -513,15 +535,19 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 		 */
 		public function process_payment_intent_succeeded( $event ) {
 
+			// phpcs:disable
 			if ( charitable_is_debug() ) {
 				error_log( 'process_payment_intent_succeeded' );
 			}
+			// phpcs:enable
 
 			$payment_intent = $event->data->object;
 
+			// phpcs:disable
 			if ( charitable_is_debug() ) {
 				error_log( print_r( $payment_intent, true ) );
 			}
+			// phpcs:enable
 
 			if ( ! isset( $payment_intent->metadata->donation_id ) ) {
 				return __( 'Donation Webhook: Missing donation ID', 'charitable' );
@@ -529,9 +555,11 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 
 			$donation_id = $payment_intent->metadata->donation_id;
 
+			// phpcs:disable
 			if ( charitable_is_debug() ) {
 				error_log( print_r( $donation_id, true ) );
 			}
+			// phpcs:enable
 
 			if ( Charitable::DONATION_POST_TYPE !== get_post_type( $donation_id ) ) {
 				return __( 'Donation Webhook: Donation ID not valid', 'charitable' );
@@ -549,24 +577,30 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 
 			$donation = new Charitable_Donation( $donation_id );
 
+			// phpcs:disable
 			if ( charitable_is_debug() ) {
 				error_log( print_r( $donation, true ) );
 			}
+			// phpcs:enable
 
 			/* Update the donation log. */
 			$log = new Charitable_Stripe_Donation_Log( $donation );
 
 			if ( $this->is_connect_webhook_for_connected_account() ) {
+				// phpcs:disable
 				if ( charitable_is_debug() ) {
-					error_log('is_connect_webhook_for_connected_account');
+					error_log( 'is_connect_webhook_for_connected_account' );
 				}
+				// phpcs:enable
 				$log->log_connected_account( $this->event->account );
 				$log->log_connect_details( $payment_intent );
 			} else {
+				// phpcs:disable
 				if ( charitable_is_debug() ) {
-					error_log('NOT is_connect_webhook_for_connected_account');
+					error_log( 'NOT is_connect_webhook_for_connected_account' );
 					error_log( print_r( $payment_intent->charges->data[0]->id, true ) );
 				}
+				// phpcs:enable
 				$log->log_charge( $payment_intent->charges->data[0]->id );
 
 				/**
@@ -578,9 +612,11 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 				}
 			}
 
+			// phpcs:disable
 			if ( charitable_is_debug() ) {
-				error_log('made it to charitable-completed');
+				error_log( 'made it to charitable-completed' );
 			}
+			// phpcs:enable
 			/* Finally, update the donation status. */
 			$donation->update_status( 'charitable-completed' );
 

@@ -66,8 +66,8 @@ function charitable_is_privacy_policy_activated() {
  * @return boolean
  */
 function charitable_is_contact_consent_activated() {
-	return 0 != charitable_get_option( 'contact_consent', 0 )
-		&& '' != charitable_get_option( 'contact_consent_label', __( 'Yes, I am happy for you to contact me via email or phone.', 'charitable' ) )
+	return 0 != charitable_get_option( 'contact_consent', 0 ) // phpcs:ignore Universal.Operators.StrictComparisons.LooseNotEqual
+		&& '' != charitable_get_option( 'contact_consent_label', __( 'Yes, I am happy for you to contact me via email or phone.', 'charitable' ) ) // phpcs:ignore Universal.Operators.StrictComparisons.LooseNotEqual
 		&& Charitable_Upgrade::get_instance()->upgrade_has_been_completed( 'upgrade_donor_tables' );
 }
 

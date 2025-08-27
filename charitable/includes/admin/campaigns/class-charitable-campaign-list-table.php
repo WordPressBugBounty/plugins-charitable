@@ -101,7 +101,6 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 				'charitable_campaign_dashboard_column_names',
 				array(
 					'cb'           => '<input type="checkbox"/>',
-					// 'ID'       => __( '#', 'charitable' ),
 					'title'        => __( 'Title', 'charitable' ),
 					'creator'      => __( 'Creator', 'charitable' ),
 					'donated'      => __( 'Donations', 'charitable' ),
@@ -163,7 +162,7 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 				case 'date_created':
 					$date_format = get_option( 'date_format' );
 					$date_format = ( '' === trim( $date_format ) ) ? 'd/m/Y' : $date_format;
-					$display     = date( $date_format, strtotime( $campaign->post_date ) );
+					$display     = date( $date_format, strtotime( $campaign->post_date ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 					break;
 
 				case 'end_date':
@@ -188,7 +187,7 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 				case 'status':
 					$status = $campaign->get_status();
 
-					if ( 'finished' == $status && $campaign->has_goal() ) {
+					if ( 'finished' === $status && $campaign->has_goal() ) {
 						$status = $campaign->has_achieved_goal() ? 'successful' : 'unsuccessful';
 					}
 
@@ -290,7 +289,7 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 			global $typenow;
 
 			/* Show custom filters to filter orders by donor. */
-			if ( in_array( $typenow, array( Charitable::CAMPAIGN_POST_TYPE ) ) ) {
+			if ( in_array( $typenow, array( Charitable::CAMPAIGN_POST_TYPE ) ) ) { // phpcs:ignore WordPress.PHP.StrictInArray.MissingTypeDeclaration
 				charitable_admin_view( 'campaigns-page/filters' );
 			}
 		}
@@ -359,7 +358,7 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 							'relation' => 'OR',
 							array(
 								'key'     => '_campaign_end_date',
-								'value'   => date( 'Y-m-d H:i:s' ),
+								'value'   => date( 'Y-m-d H:i:s' ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 								'compare' => '>',
 								'type'    => 'datetime',
 							),
@@ -376,7 +375,7 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 						$vars['meta_query']  = array(
 							array(
 								'key'     => '_campaign_end_date',
-								'value'   => date( 'Y-m-d H:i:s' ),
+								'value'   => date( 'Y-m-d H:i:s' ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 								'compare' => '<=',
 								'type'    => 'datetime',
 							),
@@ -471,9 +470,9 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 			$time = charitable_sanitize_date_alt_format( $date );
 
 			$args = array(
-				'year'  => date( 'Y', $time ),
-				'month' => date( 'm', $time ),
-				'day'   => date( 'd', $time ),
+				'year'  => date( 'Y', $time ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
+				'month' => date( 'm', $time ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
+				'day'   => date( 'd', $time ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 			);
 
 			return $args;
@@ -611,9 +610,8 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 			if ( ! empty( $user_recommended_list ) ) {
 
 				foreach ( $user_recommended_list as $slug => $item ) {
-					echo $this->render_blank_slate_recommendation( $slug );
+					echo $this->render_blank_slate_recommendation( $slug ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				}
-
 			} else {
 
 				return;
@@ -655,9 +653,7 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 						$recommended_addon = $addon;
 						break;
 					}
-
 				}
-
 			}
 
 			if ( ! empty( $recommended_addon ) ) {
@@ -679,8 +675,8 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 								<span class="badge"><a href="#"><?php esc_html_e( 'Pro', 'charitable' ); ?></a></span>
 							</div>
 						</header>
-						<p class="description"><?php echo wp_strip_all_tags( $description ); ?></p>
-						<a href="<?php echo admin_url( 'admin.php?page=charitable-addons&search=' . esc_attr( str_replace( '-', ' ', $slug ) ) ); ?>" class="charitable-button button-link charitable-addons"><?php esc_html_e( 'View Addons', 'charitable' ); ?></a>
+						<p class="description"><?php echo wp_strip_all_tags( $description ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-addons&search=' . esc_attr( str_replace( '-', ' ', $slug ) ) ) ); ?>" class="charitable-button button-link charitable-addons"><?php esc_html_e( 'View Addons', 'charitable' ); ?></a>
 					</div>
 					<div class="step">
 						<div class="vertical-wrapper">

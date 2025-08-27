@@ -61,10 +61,10 @@ wp_enqueue_style( 'lean-modal-css' );
 					return;
 				}
 
-				$wrapper.html( "<?php _e( 'Unfortunately, something went wrong while trying to retrieve the donation form. Please reload the page and try again.', 'charitable' ); ?>" );
+				$wrapper.html( "<?php esc_html_e( 'Unfortunately, something went wrong while trying to retrieve the donation form. Please reload the page and try again.', 'charitable' ); ?>" );
 			},
 			error: function() {
-				$wrapper.html( "<?php _e( 'Unfortunately, something went wrong while trying to retrieve the donation form. Please reload the page and try again.', 'charitable' ); ?>" );
+				$wrapper.html( "<?php esc_html_e( 'Unfortunately, something went wrong while trying to retrieve the donation form. Please reload the page and try again.', 'charitable' ); ?>" );
 			}
 		}).fail(function ( response ) {
 			if ( window.console && window.console.log ) {

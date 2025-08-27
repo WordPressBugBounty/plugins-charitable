@@ -20,7 +20,7 @@ $textarea_tab_index = isset( $view_args['tab_index'] ) ? $view_args['tab_index']
 $is_required = array_key_exists( 'required', $view_args ) && $view_args['required'];
 $field_attrs = array_key_exists( 'field_attrs', $view_args ) ? $view_args['field_attrs'] : array();
 ?>
-<div id="<?php echo esc_attr( $view_args['wrapper_id'] ); ?>" class="<?php echo esc_attr( $view_args['wrapper_class'] ); ?>" <?php echo charitable_get_arbitrary_attributes( $view_args ); ?>>
+<div id="<?php echo esc_attr( $view_args['wrapper_id'] ); ?>" class="<?php echo esc_attr( $view_args['wrapper_class'] ); ?>" <?php echo charitable_get_arbitrary_attributes( $view_args ); // phpcs:ignore ?>>
 	<?php if ( isset( $view_args['label'] ) ) : ?>
 		<label for="<?php echo esc_attr( $view_args['id'] ); ?>">
 			<?php
@@ -32,7 +32,7 @@ $field_attrs = array_key_exists( 'field_attrs', $view_args ) ? $view_args['field
 			endif;
 			?>
 		</label>
-	<?php
+		<?php
 	endif;
 	wp_editor(
 		$view_args['value'],

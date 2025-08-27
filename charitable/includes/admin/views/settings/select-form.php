@@ -25,7 +25,7 @@ $error_message      = false;
 
 // determine if the fields should be shown, based on what we are trying to do with them.
 if ( isset( $view_args['nonce_action_name'] ) && 'export_campaign' === $view_args['nonce_action_name'] && is_array( $view_args['options'] ) && 0 === count( $view_args['options'] ) ) {
-	$error_message = '<strong>' . __( ' You have no campaigns to export.', 'charitable' ) . '</strong>';
+	$error_message = '<strong>' . __( 'You have no campaigns to export.', 'charitable' ) . '</strong>';
 } elseif ( isset( $view_args['nonce_action_name'] ) && 'export_donations_from_campaign' === $view_args['nonce_action_name'] && is_array( $view_args['options'] ) && 0 === count( $view_args['options'] ) ) {
 	$error_message = '<strong>' . __( 'You have no donations to export.', 'charitable' ) . '</strong>';
 }
@@ -35,8 +35,8 @@ if ( isset( $view_args['nonce_action_name'] ) && 'export_campaign' === $view_arg
 	<?php wp_nonce_field( $nonce_action_name, $nonce_field_name ); ?>
 
 	<?php if ( ! $error_message ) { ?>
-		<select id="<?php printf( 'charitable_settings_%s', esc_attr( implode( '_', $view_args['key'] ) ) ); ?>"
-			name="<?php printf( 'charitable_settings[%s]', esc_attr( $view_args['name'] ) ); ?>"
+		<select id="<?php printf( 'charitable_settings_%s', implode( '_', $view_args['key'] ) ); // phpcs:ignore ?>"
+			name="<?php printf( 'charitable_settings[%s]', $view_args['name'] ); // phpcs:ignore ?>"
 			class="<?php echo esc_attr( $view_args['classes'] ); ?>"
 			<?php echo charitable_get_arbitrary_attributes( $view_args ); // phpcs:ignore ?>
 			>
@@ -45,9 +45,9 @@ if ( isset( $view_args['nonce_action_name'] ) && 'export_campaign' === $view_arg
 				if ( is_array( $option ) ) :
 					$label = isset( $option['label'] ) ? $option['label'] : '';
 					?>
-					<optgroup label="<?php echo $label; ?>">
+					<optgroup label="<?php echo esc_html( $label ); ?>">
 					<?php foreach ( $option['options'] as $k => $opt ) : ?>
-						<option value="<?php echo $k; ?>" <?php selected( $k, $value ); // phpcs:ignore ?>><?php echo $opt; ?></option>
+						<option value="<?php echo esc_attr( $k ); ?>" <?php selected( $k, $value ); ?>><?php echo esc_html( $opt ); ?></option>
 					<?php endforeach ?>
 					</optgroup>
 				<?php else : ?>
@@ -57,9 +57,9 @@ if ( isset( $view_args['nonce_action_name'] ) && 'export_campaign' === $view_arg
 			endforeach
 			?>
 		</select>
-		<input class="button button-primary" type="submit" value="<?php echo $button_label; // phpcs:ignore ?>">
+		<input class="button button-primary" type="submit" value="<?php echo esc_html( $button_label ); ?>">
 	<?php } else { ?>
-		<p><?php echo $error_message; ?></p>
+        <p><?php echo $error_message; // phpcs:ignore ?></p>
 	<?php } ?>
 </form>
 <?php if ( isset( $view_args['help'] ) ) : ?>

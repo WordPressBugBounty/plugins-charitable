@@ -18,7 +18,7 @@ $panels = $helper->get_campaign_settings_panels();
 <div id="charitable-campaign-advanced-metabox" class="charitable-metabox charitable-campaign-settings">
 	<ul class="charitable-tabs">
 		<?php foreach ( $panels as $id => $panel ) : ?>
-			<li><a href="<?php echo esc_attr( sprintf( '#%s', $id ) ); ?>"><?php echo $panel['title']; ?></a></li>
+			<li><a href="<?php echo esc_attr( sprintf( '#%s', $id ) ); ?>"><?php echo wp_kses_post( $panel['title'] ); ?></a></li>
 		<?php endforeach ?>
 	</ul>
 	<?php foreach ( $panels as $id => $panel ) : ?>

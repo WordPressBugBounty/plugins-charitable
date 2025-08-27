@@ -25,27 +25,45 @@ if ( ! class_exists( 'Charitable_Donation_Amount_Form' ) ) :
 	class Charitable_Donation_Amount_Form extends Charitable_Donation_Form implements Charitable_Donation_Form_Interface {
 
 		/**
+		 * The current campaign.
+		 *
+		 * @since 1.0.0
+		 *
 		 * @var     Charitable_Campaign
 		 */
 		protected $campaign;
 
 		/**
+		 * Form fields.
+		 *
+		 * @since 1.0.0
+		 *
 		 * @var     array
 		 */
 		protected $form_fields;
 
 		/**
+		 * Nonce action.
+		 *
+		 * @since 1.0.0
+		 *
 		 * @var     string
 		 */
 		protected $nonce_action = 'charitable_donation_amount';
 
 		/**
+		 * Nonce name.
+		 *
+		 * @since 1.0.0
+		 *
 		 * @var     string
 		 */
 		protected $nonce_name = '_charitable_donation_amount_nonce';
 
 		/**
 		 * Action to be executed upon form submission.
+		 *
+		 * @since 1.0.0
 		 *
 		 * @var     string
 		 */
@@ -129,7 +147,7 @@ if ( ! class_exists( 'Charitable_Donation_Amount_Form' ) ) :
 
 			$redirect_url = charitable_get_permalink( 'campaign_donation_page', array( 'campaign_id' => $campaign_id ) );
 
-			if ( 'same_page' == charitable_get_option( 'donation_form_display', 'separate_page' ) ) {
+			if ( 'same_page' == charitable_get_option( 'donation_form_display', 'separate_page' ) ) { // phpcs:ignore Universal.Operators.StrictComparisons.LooseEqual
 				$redirect_url .= '#charitable-donation-form';
 			}
 

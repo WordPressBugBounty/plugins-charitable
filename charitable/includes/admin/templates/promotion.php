@@ -18,20 +18,32 @@ $links_count = count( $links );
 ?>
 
 <div class="charitable-footer-promotion">
-	<p><?php echo wp_kses( $title, array( 'span' => array( 'style' => array(), 'color' => array() ) ) ); ?></p>
+	<p>
+	<?php
+	echo wp_kses(
+		$title,
+		array(
+			'span' => array(
+				'style' => array(),
+				'color' => array(),
+			),
+		)
+	);
+	?>
+	</p>
 	<ul class="charitable-footer-promotion-links">
 		<?php foreach ( $links as $key => $item ) : ?>
 			<li>
 				<?php
-				$attributes = [
+				$attributes = array(
 					'href'   => esc_url( $item['url'] ),
 					'target' => isset( $item['target'] ) ? $item['target'] : false,
 					'rel'    => isset( $item['target'] ) ? 'noopener noreferrer' : false,
-				];
+				);
 
 				printf(
 					'<a %1s>%2$s</a>%3$s',
-					charitable_html_attributes( '', [], [], $attributes, false ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					charitable_html_attributes( '', array(), array(), $attributes, false ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					esc_html( $item['text'] ),
 					$links_count === $key + 1 ? '' : '<span>/</span>'
 				);
@@ -80,11 +92,11 @@ $links_count = count( $links );
 				<span class="screen-reader-text"><?php echo esc_html( 'YouTube' ); ?></span>
 			</a>
 		</li>
-        <li>
-            <a href="https://www.tiktok.com/@wpcharitablepro" target="_blank" rel="noopener noreferrer">
-            <svg width="14" height="14" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 449.45 515.38"><path fill-rule="nonzero" fill="#A7AAAD" d="M382.31 103.3c-27.76-18.1-47.79-47.07-54.04-80.82-1.35-7.29-2.1-14.8-2.1-22.48h-88.6l-.15 355.09c-1.48 39.77-34.21 71.68-74.33 71.68-12.47 0-24.21-3.11-34.55-8.56-23.71-12.47-39.94-37.32-39.94-65.91 0-41.07 33.42-74.49 74.48-74.49 7.67 0 15.02 1.27 21.97 3.44V190.8c-7.2-.99-14.51-1.59-21.97-1.59C73.16 189.21 0 262.36 0 352.3c0 55.17 27.56 104 69.63 133.52 26.48 18.61 58.71 29.56 93.46 29.56 89.93 0 163.08-73.16 163.08-163.08V172.23c34.75 24.94 77.33 39.64 123.28 39.64v-88.61c-24.75 0-47.8-7.35-67.14-19.96z"/></svg>
-                <span class="screen-reader-text"><?php echo esc_html( 'TikTok' ); ?></span>
-            </a>
-        </li>
+		<li>
+			<a href="https://www.wpcharitable.com/tiktok" target="_blank" rel="noopener noreferrer">
+			<svg width="14" height="14" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 449.45 515.38"><path fill-rule="nonzero" fill="#A7AAAD" d="M382.31 103.3c-27.76-18.1-47.79-47.07-54.04-80.82-1.35-7.29-2.1-14.8-2.1-22.48h-88.6l-.15 355.09c-1.48 39.77-34.21 71.68-74.33 71.68-12.47 0-24.21-3.11-34.55-8.56-23.71-12.47-39.94-37.32-39.94-65.91 0-41.07 33.42-74.49 74.48-74.49 7.67 0 15.02 1.27 21.97 3.44V190.8c-7.2-.99-14.51-1.59-21.97-1.59C73.16 189.21 0 262.36 0 352.3c0 55.17 27.56 104 69.63 133.52 26.48 18.61 58.71 29.56 93.46 29.56 89.93 0 163.08-73.16 163.08-163.08V172.23c34.75 24.94 77.33 39.64 123.28 39.64v-88.61c-24.75 0-47.8-7.35-67.14-19.96z"/></svg>
+				<span class="screen-reader-text"><?php echo esc_html( 'TikTok' ); ?></span>
+			</a>
+		</li>
 	</ul>
 </div>

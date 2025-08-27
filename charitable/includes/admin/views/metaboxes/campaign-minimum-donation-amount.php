@@ -10,16 +10,16 @@
 
 global $post;
 
-$title 			= isset( $view_args['title'] ) 		? $view_args['title'] 	: '';
+$title = isset( $view_args['title'] ) ? $view_args['title'] : ''; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
-$tooltip 		= isset( $view_args['tooltip'] )	? '<span class="tooltip"> '. $view_args['tooltip'] . '</span>'	: '';
-$description	= isset( $view_args['description'] )? '<span class="charitable-helper">' . $view_args['description'] . '</span>' 	: '';
-$goal 			= get_post_meta( $post->ID, '_campaign_minimum_donation_amount', true );
-$goal 			= ! $goal ? '' : charitable_format_money( $goal );
+$tooltip     = isset( $view_args['tooltip'] ) ? '<span class="tooltip"> ' . $view_args['tooltip'] . '</span>' : '';
+$description = isset( $view_args['description'] ) ? '<span class="charitable-helper">' . wp_kses_post( $view_args['description'] ) . '</span>' : '';
+$goal        = get_post_meta( $post->ID, '_campaign_minimum_donation_amount', true );
+$goal        = ! $goal ? '' : charitable_format_money( $goal );
 ?>
 <div id="charitable-campaign-min-donation-metabox-wrap" class="charitable-metabox-wrap">
-    <h4><?php echo $title; ?></h4>
-	<label class="screen-reader-text" for="campaign_minimum_donation_amount"><?php echo $title ?></label>
-	<input type="text" id="campaign_minimum_donation_amount" name="_campaign_minimum_donation_amount"  placeholder="&#8734;" value="<?php echo $goal ?>" />
-	<?php echo $description ?>
+	<h4><?php echo wp_kses_post( $title ); ?></h4>
+	<label class="screen-reader-text" for="campaign_minimum_donation_amount"><?php echo wp_kses_post( $title ); ?></label>
+	<input type="text" id="campaign_minimum_donation_amount" name="_campaign_minimum_donation_amount"  placeholder="&#8734;" value="<?php echo esc_attr( $goal ); ?>" />
+	<?php echo $description; // phpcs:ignore ?>
 </div>

@@ -159,7 +159,7 @@ if ( ! class_exists( 'Charitable_i18n' ) ) :
 		 * @param  string $default The format to use when decline months is off.
 		 * @return string
 		 */
-		public function get_datepicker_format( $default = 'F d, Y' ) {
+		public function get_datepicker_format( $default = 'F d, Y' ) { // phpcs:ignore
 			if ( ! $this->decline_months() ) {
 				return $default;
 			}
@@ -185,7 +185,7 @@ if ( ! class_exists( 'Charitable_i18n' ) ) :
 		 * @param  string $default The format to use when decline months is off.
 		 * @return string
 		 */
-		public function get_js_datepicker_format( $default = 'MM d, yy' ) {
+		public function get_js_datepicker_format( $default = 'MM d, yy' ) { // phpcs:ignore
 			if ( ! $this->decline_months() ) {
 				return $default;
 			}
@@ -210,8 +210,8 @@ if ( ! class_exists( 'Charitable_i18n' ) ) :
 		 * @param   string $source Either 'local' or 'global'.
 		 * @return  string
 		 */
-		private function get_mofile_path( $source = 'local' ) {
-			if ( 'global' == $source ) {
+		private function get_mofile_path( $source = 'local' ) { // phpcs:ignore
+			if ( 'global' == $source ) { // phpcs:ignore Universal.Operators.StrictComparisons.LooseEqual
 				return WP_LANG_DIR . '/' . $this->textdomain . '/' . $this->mofile;
 			}
 

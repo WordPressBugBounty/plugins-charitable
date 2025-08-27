@@ -10,7 +10,7 @@
  * @version 1.4.18
  */
 
-$campaigns = $view_args['campaigns'];
+$campaigns      = $view_args['campaigns'];
 $show_thumbnail = isset( $view_args['show_thumbnail'] ) ? $view_args['show_thumbnail'] : true;
 $thumbnail_size = apply_filters( 'charitable_campaign_widget_thumbnail_size', 'medium' );
 
@@ -18,11 +18,11 @@ if ( ! $campaigns->have_posts() ) :
 	return;
 endif;
 
-echo $view_args['before_widget'];
+echo $view_args['before_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 if ( ! empty( $view_args['title'] ) ) :
 
-	echo $view_args['before_title'] . $view_args['title'] . $view_args['after_title'];
+	echo $view_args['before_title'] . $view_args['title'] . $view_args['after_title']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 endif;
 ?>
@@ -42,17 +42,17 @@ while ( $campaigns->have_posts() ) :
 
 		endif;
 		?>
-		<h6 class="campaign-title"><a href="<?php the_permalink() ?>"><?php the_title() ?></a></h6>
-		<?php if ( ! $campaign->is_endless() ) : ?>		
-			<div class="campaign-time-left"><?php echo $campaign->get_time_left() ?></div>
+		<h6 class="campaign-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h6>
+		<?php if ( ! $campaign->is_endless() ) : ?>
+			<div class="campaign-time-left"><?php echo esc_html( $campaign->get_time_left() ); ?></div>
 		<?php endif ?>
 	</li>
-<?php
+	<?php
 endwhile;
 ?>
 </ol>
 <?php
 
-echo $view_args['after_widget'];
+echo $view_args['after_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 wp_reset_postdata();

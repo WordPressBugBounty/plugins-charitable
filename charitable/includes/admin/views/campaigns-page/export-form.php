@@ -69,7 +69,7 @@ $statuses = array(
 			<input type="text" id="charitable-export-end_date_to" name="end_date_to" class="charitable-datepicker" autocomplete="off" value="<?php echo $end_date_to; ?>" placeholder="<?php esc_attr_e( 'To:', 'charitable' ); ?>" />
 		</fieldset>
 		<label for="charitable-campaigns-export-status"><?php esc_html_e( 'Filter by Status', 'charitable' ); ?></label>
-		<select id="charitable-campaigns-filter-status" name="status">
+		<select id="charitable-campaigns-export-status" name="status">
 			<?php foreach ( $statuses as $key => $label ) : ?>
 				<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $status, $key ); ?>><?php echo esc_html( $label ); ?></option>
 			<?php endforeach ?>
