@@ -63,6 +63,12 @@ ob_start();
 
 <div id="charitable-setup-checklist-wrap" class="wrap">
 
+	<h2 class="nav-tab-wrapper">
+		<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-about&view=about' ) ); ?>" class="nav-tab"><?php esc_html_e( 'About Us', 'charitable' ); ?></a>
+		<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-about&view=getting-started' ) ); ?>" class="nav-tab nav-tab-active"><?php esc_html_e( 'Getting Started', 'charitable' ); ?></a>
+		<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-about&view=lite-vs-pro' ) ); ?>" class="nav-tab"><?php esc_html_e( 'Lite vs Pro', 'charitable' ); ?></a>
+	</h2>
+
 	<main id="charitable-setup-checklist" class="charitable-setup-checklist">
 
 		<div class="charitable-setup-checklist-container">

@@ -1,3 +1,11 @@
+# 1.8.8
+* NEW: New dashboard design with top campaigns, latest donations, top donors, and comments. New "30 Day" period added.
+* NEW: Added 'charitable_donor_query_skip_donation_filters' for donor query to make including donors without donations more flexible.
+* NEW: Added 'charitable_admin_donation_form_donor_list' to control donor retreval in the admin.
+* NEW: Test Mode Alert now shows in admin pages, links to Charitable's payment methods settings screen.
+* NEW: Updated plugin screen design.
+* NEW: About Us menu that includes "Getting Started" page for the Charitable Checklist.
+
 # 1.8.7.4
 * FIX: Resolve a fatal error in PHP 8.0 in campaign visual builder in certain scenarios.
 

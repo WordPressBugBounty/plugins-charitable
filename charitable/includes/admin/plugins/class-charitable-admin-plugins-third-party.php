@@ -163,15 +163,16 @@ if ( ! class_exists( 'Charitable_Admin_Plugins_Third_Party' ) ) :
 				wp_send_json_error( esc_html__( 'Install error', 'charitable' ) );
 			}
 
-			$slug = isset( $post_data['slug'] ) ? sanitize_text_field( wp_unslash( $post_data['slug'] ) ) : false;
+		$slug = isset( $post_data['slug'] ) ? sanitize_text_field( wp_unslash( $post_data['slug'] ) ) : false;
 
-			if ( ! $slug ) {
-				wp_send_json(
-					array(
-						'message' => esc_html__( 'Missing plugin name for install.', 'charitable' ),
-					)
-				);
-			}
+
+		if ( ! $slug ) {
+			wp_send_json(
+				array(
+					'message' => esc_html__( 'Missing plugin name for install.', 'charitable' ),
+				)
+			);
+		}
 
 			include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 			$api = plugins_api(
@@ -195,17 +196,17 @@ if ( ! class_exists( 'Charitable_Admin_Plugins_Third_Party' ) ) :
 				)
 			);
 
-			if ( is_wp_error( $api ) ) {
-				wp_send_json(
-					array(
-						'error' => $api->get_error_message(),
-					)
-				);
-				if ( charitable_is_debug() ) :
-					error_log( print_r( $api->get_error_message(), true ) ); // phpcs:ignore
-				endif;
-				die();
-			}
+		if ( is_wp_error( $api ) ) {
+			wp_send_json(
+				array(
+					'error' => $api->get_error_message(),
+				)
+			);
+			if ( charitable_is_debug() ) :
+				error_log( print_r( $api->get_error_message(), true ) ); // phpcs:ignore
+			endif;
+			die();
+		}
 
 			$download_url = $api->download_link;
 
@@ -800,7 +801,8 @@ if ( ! class_exists( 'Charitable_Admin_Plugins_Third_Party' ) ) :
 		/**
 		 * Get the recommended plugins.
 		 *
-		 * @since  1.8.1
+		 * @since   1.8.1
+		 * @version 1.8.8
 		 *
 		 * @param  boolean $return_json Whether to return the plugins as JSON or an array.
 		 *
@@ -1242,6 +1244,24 @@ if ( ! class_exists( 'Charitable_Admin_Plugins_Third_Party' ) ) :
 				'setup'      => admin_url( 'admin.php?page=formidable-dashboard' ),
 				'id'         => 'formidableforms',
 				'gt_section' => 'engagement',
+			);
+
+			// WPConsent.
+			$plugins['wpconsent'] = array(
+				'active'    => function_exists( 'wpconsent' ),
+				'icon'      => false,
+				'title'     => 'WPConsent',
+				'excerpt'   => __( 'WPConsent is the best privacy compliance plugin for WordPress. It helps you comply with GDPR, CCPA, and other privacy regulations.', 'charitable' ),
+				'why'       => __( 'Privacy compliance plugins can help you comply with GDPR, CCPA, and other privacy regulations.', 'charitable' ),
+				'what'      => __( 'a privacy compliance plugin', 'charitable' ),
+				'installed' => array_key_exists( 'wpconsent-cookies-banner-privacy-suite/wpconsent.php', $installed_plugins ),
+				'basename'  => 'wpconsent-cookies-banner-privacy-suite/wpconsent.php',
+				'slug'      => 'wpconsent-cookies-banner-privacy-suite',
+				'settings'  => admin_url( 'admin.php?page=wpconsent-cookies' ),
+				'setup'     => admin_url( 'admin.php?page=wpconsent-cookies' ),
+				'id'        => 'wpconsent',
+				'gt_section' => 'privacy',
+				'gt_learn'  => 'https://wordpress.org/plugins/wpconsent-cookies-banner-privacy-suite/',
 			);
 
 			$plugins['guide-coming-soon'] = array(

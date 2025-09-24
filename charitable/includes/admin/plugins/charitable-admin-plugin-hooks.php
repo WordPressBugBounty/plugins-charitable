@@ -36,3 +36,17 @@ add_action( 'wp_ajax_charitable_activate_plugin', array( Charitable_Admin_Plugin
  * @see Charitable_Admin_Plugins_Third_Party::get_plugins()
  */
 add_action( 'wp_ajax_charitable_get_plugins', array( Charitable_Admin_Plugins_Third_Party::get_instance(), 'get_plugins' ), 11 );
+
+/**
+ * Install Charitable addon.
+ *
+ * @see Charitable_Dashboard::ajax_install_charitable_addon()
+ */
+add_action( 'wp_ajax_charitable_install_charitable_addon', array( Charitable_Dashboard::get_instance(), 'ajax_install_charitable_addon' ), 11 );
+
+/**
+ * Activate Charitable addon.
+ *
+ * @see Charitable_Dashboard::ajax_activate_charitable_addon()
+ */
+add_action( 'wp_ajax_charitable_activate_charitable_addon', array( Charitable_Dashboard::get_instance(), 'ajax_activate_charitable_addon' ), 11 );

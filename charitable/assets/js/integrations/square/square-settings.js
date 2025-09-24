@@ -43,8 +43,6 @@ const CharitableSettingsSquare = window.CharitableSettingsSquare || ( function( 
 		ready() {
 			// Wait for DOM to be fully loaded
 			$(document).ready(function() {
-				console.log('DOM ready, initializing elements...');
-
 				// Initialize all element references after DOM is loaded
 				$el = {
 					sandboxModeCheckbox: $( '#charitable-setting-square-sandbox-mode' ),
@@ -62,9 +60,6 @@ const CharitableSettingsSquare = window.CharitableSettingsSquare || ( function( 
 					webhookConnectBtn: $( '#charitable-setting-square-webhooks-connect, .charitable-btn-connect-webhooks' ),
 				};
 
-				console.log('Elements initialized, binding events...');
-				console.log('Webhook connect button:', $el.webhookConnectBtn.length);
-
 				// Bind events after elements are initialized
 				app.events();
 			});
@@ -76,7 +71,6 @@ const CharitableSettingsSquare = window.CharitableSettingsSquare || ( function( 
 		 * @since 1.8.7
 		 */
 		events() {
-			console.log('Binding events...');
 
 			// if ($el.webhookConnectBtn.length === 0) {
 			// 	console.error('Webhook connect button not found in DOM!');

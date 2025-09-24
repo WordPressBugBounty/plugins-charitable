@@ -125,10 +125,11 @@ if ( ! class_exists( 'Charitable_Reports_Download' ) ) :
 				'include_icons'           => $include_icons,
 				'action'                  => $action,
 				'show_recommended_addons' => $show_recommended_addons,
+				'show_notifications'      => false,
 				'use_cache'               => 'no',
 			);
 
-			$charitable_dashboard = new Charitable_Dashboard( $init_vars );
+			$charitable_dashboard = new Charitable_Dashboard_Legacy( $init_vars );
 			$html                 = $charitable_dashboard->generate_dashboard_report_html( $init_vars ); // phpcs:ignore
 
 			$assets_dir      = charitable()->get_path( 'assets', true );

@@ -2,7 +2,7 @@
 /**
  * What's New modal section.
  *
- * @since 1.8.7
+ * @since 1.8.8
  *
  * @var string $title Section title.
  * @var string $content Section content.
@@ -30,12 +30,17 @@ $classes = [
 		if ( ! empty( $section['new'] ) ) {
 			printf(
 				'<span class="charitable-splash-badge">%s</span>',
-				esc_html__( 'New Feature', 'charitable' )
+				esc_html__( 'New Feature' . ( ! empty( $section['version'] ) ? ' ' . $section['version'] : '' ), 'charitable' )
 			);
 		} elseif ( ! empty( $section['new-addon'] ) ) {
 			printf(
 				'<span class="charitable-splash-badge">%s</span>',
-				esc_html__( 'New Addon', 'charitable' )
+				esc_html__( 'New Addon' . ( ! empty( $section['version'] ) ? ' ' . $section['version'] : '' ), 'charitable' )
+			);
+		} elseif ( ! empty( $section['new-for-pro'] ) ) {
+			printf(
+				'<span class="charitable-splash-badge">%s</span>',
+				esc_html__( 'New for Pro' . ( ! empty( $section['version'] ) ? ' ' . $section['version'] : '' ), 'charitable' )
 			);
 		}
 		?>

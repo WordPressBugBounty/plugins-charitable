@@ -224,7 +224,8 @@ if ( ! class_exists( 'Charitable_Donor_Query' ) ) :
 		/**
 		 * Remove any hooks that have been attached by the class to prevent contaminating other queries.
 		 *
-		 * @since  1.0.0
+		 * @since   1.0.0
+		 * @version 1.8.8
 		 *
 		 * @return void
 		 */
@@ -240,12 +241,20 @@ if ( ! class_exists( 'Charitable_Donor_Query' ) ) :
 			remove_filter( 'charitable_query_join', array( $this, 'join_campaign_donations_table_on_donation' ), 5 );
 			remove_filter( 'charitable_query_join', array( $this, 'join_donors_table' ), 6 );
 			remove_filter( 'charitable_query_join', array( $this, 'join_meta' ), 7 );
-			remove_filter( 'charitable_query_where', array( $this, 'where_status_is_in' ), 5 );
-			remove_filter( 'charitable_query_where', array( $this, 'where_campaign_is_in' ), 6 );
+
+			// Check if we should skip donation-based filters when including donors without donations.
+			$skip_donation_filters = apply_filters( 'charitable_donor_query_skip_donation_filters', false, $this );
+
+			// Only remove donation-based filters if they were added.
+			if ( ! $this->get( 'include_donors_without_donations' ) || ! $skip_donation_filters ) {
+				remove_filter( 'charitable_query_where', array( $this, 'where_status_is_in' ), 5 );
+				remove_filter( 'charitable_query_where', array( $this, 'where_campaign_is_in' ), 6 );
+				remove_filter( 'charitable_query_where', array( $this, 'where_date' ), 9 );
+				remove_filter( 'charitable_query_where', array( $this, 'where_meta' ), 10 );
+			}
+
 			remove_filter( 'charitable_query_where', array( $this, 'where_donor_id_is_in' ), 7 );
 			remove_filter( 'charitable_query_where', array( $this, 'where_donor_is_not_erased' ), 8 );
-			remove_filter( 'charitable_query_where', array( $this, 'where_date' ), 9 );
-			remove_filter( 'charitable_query_where', array( $this, 'where_meta' ), 10 );
 			remove_filter( 'charitable_query_groupby', array( $this, 'groupby_donor_id' ) );
 			remove_filter( 'charitable_query_orderby', array( $this, 'orderby_date' ) );
 			remove_filter( 'charitable_query_orderby', array( $this, 'orderby_count' ) );
@@ -257,7 +266,8 @@ if ( ! class_exists( 'Charitable_Donor_Query' ) ) :
 		/**
 		 * Set up callbacks for WP_Query filters.
 		 *
-		 * @since  1.0.0
+		 * @since   1.0.0
+		 * @version 1.8.8
 		 *
 		 * @return void
 		 */
@@ -269,12 +279,35 @@ if ( ! class_exists( 'Charitable_Donor_Query' ) ) :
 			add_filter( 'charitable_query_join', array( $this, 'join_campaign_donations_table_on_donation' ), 5 );
 			add_filter( 'charitable_query_join', array( $this, 'join_donors_table' ), 6 );
 			add_filter( 'charitable_query_join', array( $this, 'join_meta' ), 7 );
-			add_filter( 'charitable_query_where', array( $this, 'where_status_is_in' ), 5 );
-			add_filter( 'charitable_query_where', array( $this, 'where_campaign_is_in' ), 6 );
+
+			/**
+			 * Check if we should skip donation-based filters when including donors without donations.
+			 *
+			 * This filter allows you to opt into the new behavior where donation-based filters
+			 * are skipped when querying donors without donations. By default, this is false
+			 * to maintain backward compatibility.
+			 *
+			 * Usage:
+			 * add_filter( 'charitable_donor_query_skip_donation_filters', '__return_true' );
+			 *
+			 * @since 1.8.8
+			 *
+			 * @param boolean $skip_donation_filters Whether to skip donation-based filters.
+			 * @param Charitable_Donor_Query $query The current query instance.
+			 */
+			$skip_donation_filters = apply_filters( 'charitable_donor_query_skip_donation_filters', false, $this );
+
+			// Only apply donation-based filters when not including donors without donations
+			// or when the skip filter is not enabled.
+			if ( ! $this->get( 'include_donors_without_donations' ) || ! $skip_donation_filters ) {
+				add_filter( 'charitable_query_where', array( $this, 'where_status_is_in' ), 5 );
+				add_filter( 'charitable_query_where', array( $this, 'where_campaign_is_in' ), 6 );
+				add_filter( 'charitable_query_where', array( $this, 'where_date' ), 9 );
+				add_filter( 'charitable_query_where', array( $this, 'where_meta' ), 10 );
+			}
+
 			add_filter( 'charitable_query_where', array( $this, 'where_donor_id_is_in' ), 7 );
 			add_filter( 'charitable_query_where', array( $this, 'where_donor_is_not_erased' ), 8 );
-			add_filter( 'charitable_query_where', array( $this, 'where_date' ), 9 );
-			add_filter( 'charitable_query_where', array( $this, 'where_meta' ), 10 );
 			add_action( 'charitable_post_query', array( $this, 'unhook_callbacks' ) );
 		}
 

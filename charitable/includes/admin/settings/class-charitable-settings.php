@@ -821,7 +821,8 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 		/**
 		 * Display upgrade notice at the bottom on the plugin settings pages.
 		 *
-		 * @since 1.7.0.4
+		 * @since   1.7.0.4
+		 * @version 1.8.8
 		 *
 		 * @param string $view Current view inside the plugin settings page.
 		 * @param string $css_class CSS class for the cta.
@@ -848,61 +849,12 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 				return;
 			}
 			?>
-			<div class="charitable-cta-lite-to-pro <?php echo esc_attr( $css_class ); ?> <?php echo $show_close_button ? 'show-close-button' : 'no-close-button'; ?>">
-				<?php if ( $show_close_button ) : ?>
+			<?php if ( $show_close_button ) : ?>
+				<div class="charitable-cta-dismiss-container">
 					<button type="button" class="button-link charitable-banner-dismiss dismiss">x</button>
-				<?php endif; ?>
-				<div class="charitable-cta-content">
-					<div class="charitable-cta-content-left">
-						<h5><?php esc_html_e( 'Upgrade Charitable to Pro and Unlock all Features!', 'charitable' ); ?></h5>
-						<p><?php esc_html_e( 'Thanks for being a loyal Charitable Lite user. Upgrade to Charitable Pro and take your fundraising to the next level!', 'charitable' ); ?></p>
-						<div class="charitable-cta-list">
-							<ul>
-								<li><?php esc_html_e( 'Manage donations in a centralized dashboard', 'charitable' ); ?></li>
-								<li><?php esc_html_e( 'View, edit, and export your donor database', 'charitable' ); ?></li>
-								<li><?php esc_html_e( 'Allow donors to give anonymously', 'charitable' ); ?></li>
-								<li><?php esc_html_e( 'Give donors their own dashboard', 'charitable' ); ?></li>
-								<li><?php esc_html_e( 'Send automated thank you and confirmation emails', 'charitable' ); ?></li>
-								<li><?php esc_html_e( 'Get powerful insights with built-in analytics & reports', 'charitable' ); ?></li>
-								<li><?php esc_html_e( 'Build steady income with recurring donations', 'charitable' ); ?></li>
-								<li><?php esc_html_e( 'Auto-generate PDF & Annual receipts', 'charitable' ); ?></li>
-								<li><?php esc_html_e( 'Ask donors to cover transaction fees', 'charitable' ); ?></li>
-								<li><?php esc_html_e( 'Give donors their preferred payment methods', 'charitable' ); ?></li>
-								<li><?php esc_html_e( 'Integrate with your email marketing service', 'charitable' ); ?></li>
-								<li><?php esc_html_e( 'Raise more funds with peer-to-peer fundraising', 'charitable' ); ?></li>
-							</ul>
-							<div class="charitable-cta-button-container">
-								<a class="button button-primary" href="<?php echo esc_url( charitable_pro_upgrade_url( 'settings-upgrade' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Get Charitable Pro', 'charitable' ); ?></a>
-								<p>
-										<?php
-
-										$bonus_text = sprintf(
-											/* translators: %1$s: HTML-wrapped "Bonus:" text, %2$s: HTML-wrapped discount amount */
-											__( '%1$s Get up to %2$s off regular price', 'charitable' ),
-											'<strong>' . esc_html__( 'Bonus:', 'charitable' ) . '</strong><br/>',
-											'<span class="green">$300</span>'
-										);
-
-										echo wp_kses(
-											$bonus_text,
-											array(
-												'br'     => array(),
-												'strong' => array(),
-												'span'   => array(
-													'class' => array(),
-												),
-											)
-										);
-										?>
-								</p>
-							</div>
-						</div>
-					</div>
-					<div class="charitable-cta-featured-image">
-
-					</div>
 				</div>
-			</div>
+			<?php endif; ?>
+			<?php charitable_render_global_upgrade_cta( $css_class ); ?>
 			<script type="text/javascript">
 				jQuery( function ( $ ) {
 					$( document ).on( 'click', '.settings-lite-cta .dismiss', function ( event ) {

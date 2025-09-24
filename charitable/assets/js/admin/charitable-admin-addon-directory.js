@@ -32,26 +32,8 @@
 			// Document ready.
 			$( CharitableDirAdmin.ready );
 
-			// Entries Single (Details).
-			// CharitableDirAdmin.initEntriesSingle();
-
-			// // Entries List.
-			// CharitableDirAdmin.initEntriesList();
-
-			// // Welcome activation.
-			// CharitableDirAdmin.initWelcome();
-
 			// Addons List.
 			$( document ).on( 'CharitableDirReady', CharitableDirAdmin.initAddons );
-
-			// Settings.
-			// CharitableDirAdmin.initSettings();
-
-			// // Tools.
-			// CharitableDirAdmin.initTools();
-
-			// // Upgrades (Tools view).
-			// CharitableDirAdmin.initUpgrades();
 		},
 
 		/**
@@ -68,8 +50,6 @@
 			if ( $( '#charitable-admin-addons-search' ).val() ) {
 				$( '#charitable-admin-addons-search' ).trigger( 'keyup' );
 			}
-
-
 		},
 
 		//--------------------------------------------------------------------//
@@ -88,29 +68,108 @@
 				return;
 			}
 
+			// Addon page collapsible sections.
+			function setup_addon_sections() {
+				function setCookie(name, value, days) {
+					var expires = "";
+					if (days) {
+						var date = new Date();
+						date.setTime(date.getTime() + (days*24*60*60*1000));
+						expires = "; expires=" + date.toUTCString();
+					}
+					document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+				}
+
+				function getCookie(name) {
+					var nameEQ = name + "=";
+					var ca = document.cookie.split(';');
+					for(var i=0;i < ca.length;i++) {
+						var c = ca[i];
+						while (c.charAt(0)==' ') c = c.substring(1,c.length);
+						if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+					}
+					return null;
+				}
+
+				var $collapsible_headers = $('.charitable-addons-section-header:not(.charitable-addons-section-header-featured)');
+				var open_sections = getCookie('charitable_open_addon_sections');
+				open_sections = open_sections ? JSON.parse(open_sections) : [];
+
+				// Make sure 'featured' is not in the cookie for some legacy reason.
+				var featured_index = open_sections.indexOf('featured');
+				if (featured_index > -1) {
+					open_sections.splice(featured_index, 1);
+					setCookie('charitable_open_addon_sections', JSON.stringify(open_sections), 7);
+				}
+
+				$collapsible_headers.each(function() {
+					var section_id = $(this).data('section');
+					if (open_sections.includes(section_id)) {
+						$(this).addClass('open');
+						$('#charitable-addons-' + section_id).show();
+					}
+				});
+
+				$collapsible_headers.on('click', function() {
+					var section_id = $(this).data('section');
+					var content = $('#charitable-addons-' + section_id);
+					var open_sections = getCookie('charitable_open_addon_sections');
+					open_sections = open_sections ? JSON.parse(open_sections) : [];
+
+					$(this).toggleClass('open');
+					content.slideToggle();
+
+					if ($(this).hasClass('open')) {
+						if (!open_sections.includes(section_id)) {
+							open_sections.push(section_id);
+						}
+					} else {
+						var index = open_sections.indexOf(section_id);
+						if (index > -1) {
+							open_sections.splice(index, 1);
+						}
+					}
+					setCookie('charitable_open_addon_sections', JSON.stringify(open_sections), 7);
+				});
+			}
+
+			setup_addon_sections();
+
 			// Addons searching.
-			if ( $( '#charitable-admin-addons-list' ).length ) {
-				var addonSearch = new List(
-					'charitable-admin-addons-list',
-					{
-						valueNames: [ 'addon-link' ],
+			if ( $( '#charitable-addons' ).length ) {
+				$( '#charitable-admin-addons-search' ).on(
+					'keyup search input',
+					function() {
+						CharitableDirAdmin.updateAddonSearchResult( this );
 					}
 				);
 
+				// Store search term in session storage for persistence
 				$( '#charitable-admin-addons-search' ).on(
-					'keyup search',
+					'input',
 					function() {
-						CharitableDirAdmin.updateAddonSearchResult( this, addonSearch );
+						var searchTerm = $( this ).val();
+						if ( searchTerm ) {
+							sessionStorage.setItem( 'charitable_addons_search', searchTerm );
+						} else {
+							sessionStorage.removeItem( 'charitable_addons_search' );
+						}
 					}
 				);
+
+				// Restore search term on page load
+				var savedSearch = sessionStorage.getItem( 'charitable_addons_search' );
+				if ( savedSearch ) {
+					$( '#charitable-admin-addons-search' ).val( savedSearch ).trigger( 'keyup' );
+				}
 			}
 
 			// Toggle an addon state.
-			$( document ).on( 'click', '#charitable-admin-addons .addon-item button', function( event ) {
+			$( document ).on( 'click', '#charitable-admin-addons .charitable-addons-list-item  button', function( event ) {
 
 				event.preventDefault();
 
-				if ( $( this ).hasClass( 'disabled' ) ) {
+				if ( $( this ).hasClass( 'disabledd6' ) ) {
 					return false;
 				}
 
@@ -126,16 +185,9 @@
 		 * @param {object} searchField The search field html element.
 		 * @param {object} addonSearch Addons list (uses List.js).
 		 */
-		updateAddonSearchResult: function( searchField, addonSearch ) {
+		updateAddonSearchResult: function( searchField ) {
 
-			var searchTerm = $( searchField ).val(),
-				$heading   = $( '#addons-heading' );
-
-			// if ( searchTerm ) {
-			// 	$heading.text( charitable_admin.addon_search );
-			// } else {
-			// 	$heading.text( $heading.data( 'text' ) );
-			// }
+			var searchTerm = $( searchField ).val();
 
 			/*
 			 * Replace dot and comma with space
@@ -146,7 +198,123 @@
 			 */
 			searchTerm = searchTerm.replace( /[.,]/g, ' ' );
 
-			addonSearch.search( searchTerm );
+			// Custom search implementation for the current HTML structure
+			CharitableDirAdmin.performCustomSearch( searchTerm );
+
+			// Add highlighting to search results
+			CharitableDirAdmin.highlightSearchTerms( searchTerm );
+		},
+
+		/**
+		 * Perform custom search across all addon items.
+		 *
+		 * @since 1.7.4
+		 *
+		 * @param {string} searchTerm The search term to filter by.
+		 */
+		performCustomSearch: function( searchTerm ) {
+
+			var $allAddonItems = $( '#charitable-addons .charitable-addons-list-item' );
+			var searchWords = searchTerm.toLowerCase().split( ' ' ).filter( function( word ) {
+				return word.length > 0;
+			} );
+
+			if ( searchWords.length === 0 ) {
+				// Show all items when search is empty
+				$allAddonItems.show();
+				$( '.charitable-addons-section' ).show();
+				return;
+			}
+
+			var hasVisibleItems = false;
+
+			$allAddonItems.each( function() {
+				var $item = $( this );
+				var $title = $item.find( '.addon-link' );
+				var $description = $item.find( '.addon-description' );
+
+				var titleText = $title.text().toLowerCase();
+				var descriptionText = $description.text().toLowerCase();
+
+				var matches = false;
+
+				// Check if any search word matches title or description
+				searchWords.forEach( function( word ) {
+					if ( titleText.indexOf( word ) !== -1 || descriptionText.indexOf( word ) !== -1 ) {
+						matches = true;
+					}
+				} );
+
+				if ( matches ) {
+					$item.show();
+					hasVisibleItems = true;
+				} else {
+					$item.hide();
+				}
+			} );
+
+			// Show/hide sections based on whether they have visible items
+			$( '.charitable-addons-section' ).each( function() {
+				var $section = $( this );
+				var $visibleItems = $section.find( '.charitable-addons-list-item:visible' );
+
+				if ( $visibleItems.length > 0 ) {
+					$section.show();
+					// Ensure the section content is visible
+					$section.find( '.charitable-addons-section-content' ).show();
+					$section.find( '.charitable-addons-section-header' ).addClass( 'open' );
+				} else {
+					$section.hide();
+				}
+			} );
+		},
+
+		/**
+		 * Highlight search terms in the results.
+		 *
+		 * @since 1.7.4
+		 *
+		 * @param {string} searchTerm The search term to highlight.
+		 */
+		highlightSearchTerms: function( searchTerm ) {
+
+			if ( ! searchTerm ) {
+				// Remove all highlighting when search is cleared
+				$( '.addon-link, .addon-description' ).each( function() {
+					var $element = $( this );
+					$element.html( $element.text() );
+				} );
+				return;
+			}
+
+			// Split search term into words for highlighting
+			var searchWords = searchTerm.toLowerCase().split( ' ' ).filter( function( word ) {
+				return word.length > 0;
+			} );
+
+			if ( searchWords.length === 0 ) {
+				return;
+			}
+
+			// Only highlight visible items
+			$( '.charitable-addons-list-item:visible .addon-link, .charitable-addons-list-item:visible .addon-description' ).each( function() {
+				var $element = $( this );
+				var originalText = $element.text();
+				var highlightedText = originalText;
+
+				// Highlight each search word
+				searchWords.forEach( function( word ) {
+					if ( word.length > 0 ) {
+						var regex = new RegExp( '(' + word.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ) + ')', 'gi' );
+						highlightedText = highlightedText.replace( regex, '<mark>$1</mark>' );
+					}
+				} );
+
+				// Update the element with highlighted text
+				if ( highlightedText !== originalText ) {
+					$element.html( highlightedText );
+				}
+			} );
 		},
 
 		/**
@@ -195,6 +363,11 @@
 		 */
 		addonToggle: function( $btn ) {
 
+			// Check if button is disabled or has invalid plugin data
+			if ( $btn.prop( 'disabled' ) || $btn.attr( 'data-plugin' ) === 'invalid' ) {
+				return;
+			}
+
 			var $addon = $btn.closest( '.addon-item' ),
 				plugin = $btn.attr( 'data-plugin' ),
 				pluginType = $btn.attr( 'data-type' ),
@@ -204,6 +377,8 @@
 				buttonText,
 				errorText,
 				successText;
+
+
 
 			if ( $btn.hasClass( 'status-go-to-url' ) ) {
 
@@ -220,7 +395,7 @@
 				// Deactivate.
 				state = 'deactivate';
 				cssClass = 'status-installed';
-				if ( pluginType === 'plugin' ) {
+				if ( pluginType === 'plugin' || pluginType === 'addon' ) {
 					cssClass += ' button button-secondary';
 				}
 				stateText = charitable_admin.addon_inactive;
@@ -236,8 +411,8 @@
 				// Activate.
 				state = 'activate';
 				cssClass = 'status-active';
-				if ( pluginType === 'plugin' ) {
-					cssClass += ' button button-secondary disabled';
+				if ( pluginType === 'plugin' || pluginType === 'addon' ) {
+					cssClass += ' button';
 				}
 				stateText = charitable_admin.addon_active;
 				buttonText = charitable_admin.addon_deactivate;
@@ -254,7 +429,7 @@
 				// Install & Activate.
 				state = 'install';
 				cssClass = 'status-active';
-				if ( pluginType === 'plugin' ) {
+				if ( pluginType === 'plugin' || pluginType === 'addon' ) {
 					cssClass += ' button disabled';
 				}
 				stateText = charitable_admin.addon_active;
@@ -269,6 +444,8 @@
 				return;
 			}
 
+
+
 			// eslint-disable-next-line complexity
 			CharitableDirAdmin.setAddonState( plugin, state, pluginType, function( res ) {
 
@@ -280,10 +457,16 @@
 							stateText  = charitable_admin.addon_inactive;
 							buttonText = 'addon' === pluginType ? charitable_admin.addon_activate : s.iconActivate + charitable_admin.addon_activate;
 							cssClass   = 'addon' === pluginType ? 'status-installed button button-secondary' : 'status-installed';
+						} else {
+							// Addon was installed and activated, so it should be status-active without disabled
+							cssClass = 'status-active button';
+							stateText = charitable_admin.addon_active;
+							buttonText = charitable_admin.addon_deactivate;
 						}
 					} else {
 						successText = res.data;
 					}
+
 					$addon.find( '.actions' ).append( '<div class="msg success">' + successText + '</div>' );
 					$addon.find( 'span.status-label' )
 						.removeClass( 'status-active status-installed status-missing' )
@@ -294,13 +477,6 @@
 						.removeClass( 'status-active status-installed status-missing' )
 						.removeClass( 'button button-primary button-secondary disabled' )
 						.addClass( cssClass ).html( buttonText );
-
-					// Check if this is Charitable Pro activation and redirect if needed.
-					if ( 'activate' === state && plugin === 'charitable-pro/charitable.php' && $btn.attr( 'data-redirect' ) ) {
-						setTimeout( function() {
-							window.location.href = $btn.attr( 'data-redirect' );
-						}, 1500 );
-					}
 				} else {
 					if ( 'object' === typeof res.data ) {
 						if ( pluginType === 'addon' ) {

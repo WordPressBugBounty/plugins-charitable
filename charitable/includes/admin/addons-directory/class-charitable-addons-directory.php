@@ -63,20 +63,6 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		private $can_install;
 
 		/**
-		 * The available addons.
-		 *
-		 * @var array
-		 */
-		private $available_addons;
-
-		/**
-		 * The addons.
-		 *
-		 * @var array
-		 */
-		private $addons;
-
-		/**
 		 * Create object instance.
 		 *
 		 * @since 1.0.0
@@ -106,8 +92,6 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		 *
 		 * @since   1.8.0
 		 * @version 1.8.1.15 - Added upgrade_modal.
-		 * @version 1.8.5.3  - Added is_pro_installed.
-		 * @version 1.8.6.2  - Added filter for strings.
 		 */
 		public function charitable_admin_scripts() {
 
@@ -129,13 +113,13 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					'addon_error'                     => sprintf(
 						wp_kses( /* translators: %1$s - An addon download URL, %2$s - Link to manual installation guide. */
 							__( 'Could not install the addon. Please <a href="%1$s" target="_blank" rel="noopener noreferrer">download it from wpcharitable.com</a> and <a href="%2$s" target="_blank" rel="noopener noreferrer">install it manually</a>.', 'charitable' ),
-							array(
-								'a' => array(
+							[
+								'a' => [
 									'href'   => true,
 									'target' => true,
 									'rel'    => true,
-								),
-							)
+								],
+							]
 						),
 						'https://wpcharitable.com/account/licenses/',
 						'https://wpcharitable.com/docs/how-to-manually-install-addons-in-charitable/'
@@ -145,9 +129,6 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					'ajax_url'                        => admin_url( 'admin-ajax.php' ),
 					'admin_url'                       => admin_url(),
 					'ok'                              => esc_html__( 'OK', 'charitable' ),
-					'oops'                            => esc_html__( 'Oops!', 'charitable' ),
-					'please_enter_key'                => esc_html__( 'Please enter a valid license key.', 'charitable' ),
-					'manual_upgrade'                  => esc_html__( 'Manual Upgrade', 'charitable' ),
 					'cancel'                          => esc_html__( 'Cancel', 'charitable' ),
 					'close'                           => esc_html__( 'Close', 'charitable' ),
 					'plugin_install_activate_btn'     => esc_html__( 'Install and Activate', 'charitable' ),
@@ -173,16 +154,14 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					'thanks_for_interest'             => esc_html__( 'Thanks for your interest in Charitable Pro!', 'charitable' ),
 					'upgrade_modal'                   => charitable_get_upgrade_modal_text(),
 					'autoshow_plugin_notifications'   => charitable_get_autoshow_plugin_notifications(),
-					'is_pro_installed'                => (int) charitable_is_pro_installed(),
-					'activated_title'                 => esc_html__( 'Almost Done', 'charitable' ),
-					'activated_content'               => esc_html__( 'Charitable Pro is installed but not activated.', 'charitable' ),
+					'enable_express_checkout_message' => __( 'To enable this payment method, enable Express Checkout', 'charitable' ),
 				)
 			);
 
 			wp_enqueue_script(
 				'listjs',
 				$assets_dir . 'js/libraries/list.min.js',
-				array( 'jquery' ),
+				[ 'jquery' ],
 				$version,
 				false
 			);
@@ -324,8 +303,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		/**
 		 * Callback for displaying the UI for Addons.
 		 *
-		 * @since   1.7.0
-		 * @version 1.8.5.1
+		 * @since 1.7.0
 		 */
 		public function addons_directory_content() {
 
@@ -344,47 +322,102 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					</div>
 				<?php
 
-				if ( charitable_is_debug() ) {
-					// phpcs:disable
-					error_log( 'addons_directory_content - communication issue' );
-					// phpcs:enable
+				if ( charitable_is_debug() ) { // @codingStandardsIgnoreLine
+					error_log( 'addons_directory_content - communication issue' ); // @codingStandardsIgnoreLine
 				}
 
 				return;
-			}
-
-			if ( ! empty( $temp_addons ) ) {
-				foreach ( array( 'unlicensed', 'licensed' ) as $addon_type ) {
-					if ( ! empty( $temp_addons[ $addon_type ] ) ) {
-						foreach ( $temp_addons[ $addon_type ] as $i => $addon ) {
-							if ( 'charitable-pro-plugin' === $addon['slug'] ) {
-								// Remove from current location.
-								unset( $temp_addons[ $addon_type ][ $i ] );
-
-								// Add to start of recommended array.
-								if ( ! isset( $temp_addons['recommended'] ) ) {
-									$temp_addons['recommended'] = array();
-								}
-								array_unshift( $temp_addons['recommended'], $addon );
-							}
-						}
-					}
-				}
 			}
 
 			$recommended_addons = array_map( array( $this, 'prepare_addon_data' ), ! empty( $temp_addons['recommended'] ) ? $temp_addons['recommended'] : array() );
 			$unlicensed_addons  = array_map( array( $this, 'prepare_addon_data' ), ! empty( $temp_addons['unlicensed'] ) ? $temp_addons['unlicensed'] : array() );
 			$licensed_addons    = array_map( array( $this, 'prepare_addon_data' ), ! empty( $temp_addons['licensed'] ) ? $temp_addons['licensed'] : array() );
 
-			$addons = array(
-				'recommended' => $recommended_addons,
-				'licensed'    => $licensed_addons,
-				'unlicensed'  => $unlicensed_addons,
+			$installed_plugins = get_plugins();
+
+			// Categorize addons.
+			$featured_addons    = array();
+			$installed_addons   = array();
+			$available_addons   = array();
+			$premium_addons     = array();
+			$all_addons_display = array();
+
+			// Combine all addons into a single array to avoid duplicates.
+			$all_api_addons = array_merge( $recommended_addons, $licensed_addons, $unlicensed_addons );
+			$all_addons     = array();
+			foreach ( $all_api_addons as $addon ) {
+				if ( isset( $addon['slug'] ) ) {
+					$all_addons[ $addon['slug'] ] = $addon;
+				}
+			}
+
+			foreach ( $all_addons as $addon ) {
+				// Apply slug replacements for plugin detection (same logic as in prepare_addon_data).
+				$replacements = array(
+					'charitable-recurring-donations' => 'charitable-recurring',
+					'charitable-anonymous-donations' => 'charitable-anonymous',
+					'charitable-easy-digital-downloads-connect' => 'charitable-edd',
+				);
+
+				$slug_for_detection = $addon['slug'];
+				if ( array_key_exists( $addon['slug'], $replacements ) ) {
+					$slug_for_detection = $replacements[ $addon['slug'] ];
+				}
+
+				$plugin_basename     = $this->get_plugin_basename_from_slug( $slug_for_detection );
+				$is_installed        = array_key_exists( $plugin_basename, $installed_plugins );
+				$is_featured         = ! empty( $addon['featured'] ) && in_array( 'recommended', $addon['featured'], true );
+				$is_available        = ! empty( $addon['license'] ) && in_array( $this->get_current_plan_slug(), $addon['license'], true );
+				$addon['is_updated'] = $this->is_addon_updated( $addon );
+				$addon['is_new']     = $this->is_addon_new( $addon );
+				$addon['is_active']  = is_plugin_active( $plugin_basename );
+
+				// Check if addon is included in pro.
+				$addons_included_in_pro      = array(
+					'charitable-videos',
+					'charitable-pdf-receipts',
+					'charitable-stripe',
+					'charitable-geolocation',
+					'charitable-donor-comments',
+				);
+				$is_included_in_pro          = in_array( $addon['slug'], $addons_included_in_pro, true );
+				$addon['is_included_in_pro'] = $is_included_in_pro;
+
+				// Prioritize installed addons over featured status.
+				// Don't add addons included in pro to the installed category.
+				if ( $is_installed && ! $is_included_in_pro ) {
+					$installed_addons[] = $addon;
+				} elseif ( $is_featured ) {
+					$featured_addons[] = $addon;
+				} elseif ( $is_available && ! $is_included_in_pro ) {
+					$available_addons[] = $addon;
+				} elseif ( ! $is_included_in_pro ) {
+					$premium_addons[] = $addon;
+				}
+			}
+
+			$addon_categories = array(
+				'featured'  => array(
+					'label'  => __( 'Featured', 'charitable' ),
+					'addons' => $featured_addons,
+				),
+				'installed' => array(
+					'label'  => __( 'Installed', 'charitable' ),
+					'addons' => $installed_addons,
+				),
+				'available' => array(
+					'label'  => __( 'Available In Your Plan', 'charitable' ),
+					'addons' => $available_addons,
+				),
+				'premium'   => array(
+					'label'  => __( 'Premium Addons', 'charitable' ),
+					'addons' => $premium_addons,
+				),
 			);
 
 			// If no Addon(s) were returned, our API call returned an error.
 			// Show an error message with a button to reload the page, which will trigger another API call.
-			if ( ! $addons ) {
+			if ( ! $all_addons ) {
 				?>
 				<form id="charitable-addons-refresh-addons-form" method="post">
 					<p>
@@ -400,54 +433,100 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 			// If here, we have Addons to display, so let's output them now.
 			// Get installed plugins and upgrade URL.
-			$installed_plugins = get_plugins();
-			$upgrade_url       = $this->charitable_get_upgrade_link();
+			$upgrade_url   = $this->charitable_get_upgrade_link();
 			$type              = ( isset( $_GET['plan'] ) ) ? esc_attr( $_GET['plan'] ) : $this->get_current_plan_slug(); // phpcs:ignore
 			$preset_search     = ( isset( $_GET['search'] ) ) ? trim( esc_attr( $_GET['search'] ) ) : ''; // phpcs:ignore
 			?>
 
-			<h1 class="page-title"><?php echo esc_html( get_admin_page_title() ); ?><input type="search" placeholder="<?php esc_html_e( 'Search Addons', 'charitable' ); ?>" id="charitable-admin-addons-search" value="<?php echo esc_html( $preset_search ); ?>" /></h1>
-
+			<div class="charitable-addons-header">
+				<h1 class="charitable-addons-header-title">
+					Charitable Addons
+					<a href="<?php echo esc_url( add_query_arg( 'charitable_refresh_addons', '1' ) ); ?>" class="charitable-addons-link">
+						<?php esc_html_e( 'Refresh Addons', 'charitable' ); ?>
+					</a>
+				</h1>
+				<div class="charitable-addons-header-search">
+					<input type="search" placeholder="<?php esc_html_e( 'Search Addons', 'charitable' ); ?>" id="charitable-admin-addons-search" value="<?php echo esc_html( $preset_search ); ?>" />
+				</div>
+			</div>
 			<?php
 
-			if ( charitable_is_debug() ) {
-				// phpcs:disable
+			// phpcs:disable
+			if ( defined( 'CHARITABLE_DEBUG_LICENSE' ) && CHARITABLE_DEBUG_LICENSE ) {
+				echo '<p>Plan type is: ' . $type . '</p>';
 				error_log( 'addons_directory_content' );
 				error_log( print_r( $type, true ) );
 				error_log( print_r( $installed_plugins, true ) );
 				error_log( print_r( $upgrade_url, true ) );
-				// phpcs:enable
 			}
+			// phpcs:enable
+
+			/*
+			* Remove addons that are not needed for pro.
+			*
+			* @since 1.8.5
+			*/
+			$addons_to_remove = array(
+				'charitable-pro-plugin',
+				'charitable-pro',
+			);
+
+			// Recursively remove specified addons.
+			foreach ( $addon_categories as $slug => &$category ) {
+				foreach ( $category['addons'] as $k => &$v ) {
+					if ( is_array( $v ) && isset( $v['slug'] ) && in_array( $v['slug'], $addons_to_remove ) ) {
+						unset( $category['addons'][ $k ] );
+					}
+				}
+				// Reindex array after removal.
+				$category['addons'] = array_values( $category['addons'] );
+			}
+			unset( $category ); // Break the reference.
+			unset( $v ); // Break the reference.
 			?>
 
 			<div id="charitable-addons">
-
-				<div id="charitable-admin-addons-list">
-
-				<div class="list">
-				<?php
-				if ( isset( $addons['recommended'] ) && ! empty( $addons['recommended'] ) ) {
-					foreach ( (array) $addons['recommended'] as $i => $addon ) {
-						$this->get_addon_card( $addon, $i, true, $installed_plugins );
-					}
-				}
-				?>
-					<?php
-					if ( isset( $addons['licensed'] ) && ! empty( $addons['licensed'] ) ) {
-						foreach ( (array) $addons['licensed'] as $i => $addon ) {
-							$this->get_addon_card( $addon, $i, true, $installed_plugins );
-						}
-					}
-					?>
-					<?php
-					if ( isset( $addons['unlicensed'] ) && ! empty( $addons['unlicensed'] ) ) {
-						foreach ( (array) $addons['unlicensed'] as $i => $addon ) {
-							$this->get_addon_card( $addon, $i, false, $installed_plugins );
-						}
-					}
-					?>
-				</div>
-
+				<?php foreach ( $addon_categories as $slug => $category ) : ?>
+					<?php if ( ! empty( $category['addons'] ) ) : ?>
+						<div class="charitable-addons-section">
+							<?php
+							$is_featured_section = ( 'featured' === $slug );
+							$header_classes      = array( 'charitable-addons-section-header' );
+							if ( $is_featured_section ) {
+								$header_classes[] = 'charitable-addons-section-header-featured';
+							}
+							?>
+							<div class="<?php echo esc_attr( implode( ' ', $header_classes ) ); ?>" data-section="<?php echo esc_attr( $slug ); ?>">
+								<div class="charitable-addons-section-title">
+									<?php echo esc_html( $category['label'] ); ?>
+									<?php
+									if ( 'available' === $slug ) {
+										$plan_slug = $this->get_current_plan_slug();
+										if ( ! empty( $plan_slug ) && 'lite' !== $plan_slug ) {
+											echo ' <span class="charitable-badge charitable-badge-lg charitable-badge-inline charitable-badge-titanium charitable-badge-rounded">' . esc_html( $plan_slug ) . '</span>';
+										}
+									}
+									?>
+								</div>
+								<?php if ( ! $is_featured_section ) : ?>
+									<div class="charitable-addons-section-toggle">
+										<span class="dashicons dashicons-arrow-right-alt2"></span>
+									</div>
+								<?php endif; ?>
+							</div>
+							<?php
+							$content_style = ( $is_featured_section ) ? '' : 'style="display: none;"';
+							?>
+							<div id="charitable-addons-<?php echo esc_attr( $slug ); ?>" class="charitable-addons-list charitable-addons-section-content" <?php echo $content_style; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+								<?php
+								foreach ( (array) $category['addons'] as $i => $addon ) {
+									$this->get_addon_card( $addon, $i, true, $installed_plugins );
+								}
+								?>
+							</div>
+						</div>
+					<?php endif; ?>
+				<?php endforeach; ?>
 			</div>
 			<?php
 		}
@@ -455,8 +534,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		/**
 		 * Retrieves addons from the stored transient or remote server.
 		 *
-		 * @since   1.7.0
-		 * @version 1.8.7.1 - Added Square to the list of gateways that are built in.
+		 * @since 1.7.0
 		 *
 		 * @return bool | array false | Array of licensed and unlicensed Addons.
 		 */
@@ -492,25 +570,20 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					continue;
 				}
 
-				// Filter out the Square addon since it's now built into the core plugin.
-				if ( 'charitable-square' === $addon['slug'] ) {
-					continue;
-				}
-
 				if ( ! is_array( $addon ) ) {
 					$addon = array();
 				}
 
 				$addon['path'] = ( '' === $addon['path'] ) ? sprintf( '%1$s/%1$s.php', $addon['slug'] ) : $addon['path'];
 
-				$type = ( isset( $_GET['license'] ) ) ? esc_html( $_GET['license'] ) : $this->get_current_plan_slug(); // phpcs:ignore
+				$type = ( isset( $_GET['license'] ) ) ? $_GET['license'] : $this->get_current_plan_slug(); // phpcs:ignore
 
-				if ( isset( $addon['featured'] ) && in_array( 'recommended', $addon['featured'] ) ) {
+				if ( isset( $addon['featured'] ) && in_array( 'recommended', $addon['featured'] ) ) { // phpcs:ignore
 					$results['recommended'][] = (array) $addon;
 					continue;
 				} else { // phpcs:ignore
 					// Determine if the addon belongs licensed or unlicensed based on the confirmed plan.
-					if ( isset( $addon['license'] ) && in_array( $type, $addon['license'] ) ) {
+					if ( isset( $addon['license'] ) && in_array( $type, $addon['license'] ) ) { // phpcs:ignore
 						$results['licensed'][] = (array) $addon;
 						continue;
 					} else {
@@ -560,7 +633,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		/**
 		 * Outputs the addon "box" on the addons page.
 		 *
-		 * @since 1.7.0
+		 * @since   1.7.0
 		 * @version 1.8.1.12 - Added EDD to replacements string check.
 		 *
 		 * @param object $addon Addon data from the API / transient call.
@@ -606,39 +679,39 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				$addon['upgrade_url']
 			);
 
-			if ( ! isset( $installed_plugins[ $plugin_basename ] ) ) {
-				switch ( $this->get_current_plan_slug() ) {
-					case 'basic':
-						$the_plans = array( 'basic' );
-						break;
-					case 'plus':
-						$the_plans = array( 'basic', 'plus' );
-						break;
-					case 'pro':
-						$the_plans = array( 'basic', 'plus', 'pro' );
-						break;
-					case 'agency':
-						$the_plans = array( 'basic', 'plus', 'pro', 'agency', 'elite' );
-						break;
+			switch ( $this->get_current_plan_slug() ) {
+				case 'basic':
+					$the_plans = array( 'basic' );
+					break;
+				case 'plus':
+					$the_plans = array( 'basic', 'plus' );
+					break;
+				case 'pro':
+					$the_plans = array( 'basic', 'plus', 'pro' );
+					break;
+				case 'agency':
+					$the_plans = array( 'basic', 'plus', 'pro', 'agency', 'elite' );
+					break;
 
-					default:
-						$the_plans = array();
-						break;
-				}
+				default:
+					$the_plans = array();
+					break;
+			}
+
+			if ( ! isset( $installed_plugins[ $plugin_basename ] ) ) {
 
 				$addon['status'] = 'missing';
 				$addon['action'] = 'license';
 
 				foreach ( $addon['license'] as $license_to_check ) {
-					// Check if $license_to_check is a vaule in the $the_plans array.
-					if ( in_array( $license_to_check, $the_plans ) ) {
+					if ( in_array( $license_to_check, $the_plans ) ) { // phpcs:ignore
 						$addon['status'] = 'missing';
 						$addon['action'] = 'install';
 					}
 				}
-			} else {
+			} else { // phpcs:ignore
 				// Plugin is installed.
-				if ( is_plugin_active( $plugin_basename ) ) {
+				if ( $addon['is_active'] ) {
 					$addon['status'] = 'active';
 					$addon['action'] = 'deactivate';
 				} else {
@@ -647,97 +720,97 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				}
 			}
 
-			if ( 'charitable-pro-plugin' === $addon['slug'] ) {
-				// Check if Charitable Pro is installed.
-				$charitable_pro_basename = 'charitable-pro/charitable.php';
-				$is_pro_installed        = isset( $installed_plugins[ $charitable_pro_basename ] );
-				$is_pro_active           = is_plugin_active( $charitable_pro_basename );
+			// Check if addon is included in pro.
+			$addons_included_in_pro = array(
+				'charitable-videos',
+				'charitable-pdf-receipts',
+				'charitable-stripe',
+				'charitable-geolocation',
+				'charitable-donor-comments',
+			);
+			$is_included_in_pro = in_array( $addon['slug'], $addons_included_in_pro, true );
 
-				if ( $is_pro_installed && ! $is_pro_active ) {
-					// Plugin is installed but not activated - show activate button.
-					$button = '<button class="status-installed" data-plugin="' . esc_attr( $charitable_pro_basename ) . '" data-type="addon" data-redirect="' . admin_url( 'admin.php?page=charitable-dashboard' ) . '">' . esc_html__( 'Activate Pro', 'charitable' ) . '</button>';
-				} else {
-					// Plugin is not installed or is active - show download link.
-					$button = '<a href="https://www.wpcharitable.com/charitable-pro/" target="_blank" rel="noopener noreferrer" class="charitable-btn charitable-btn-orange">' . esc_html__( 'Download Pro', 'charitable' ) . '</a>';
-				}
-			} else {
-				$button = $this->get_addon_button_html( $addon );
+			// Check if addon is installed.
+			$is_installed = array_key_exists( $plugin_basename, $installed_plugins );
+
+			// Override status for addons included in pro.
+			if ( $is_included_in_pro ) {
+				$addon['status'] = 'included_in_pro';
+				$addon['action'] = 'none';
 			}
+
+			// Override status for installed addons to show "Installed" text instead of button.
+			if ( $is_installed && ! $is_included_in_pro ) {
+				$addon['status'] = 'installed_text';
+				$addon['action'] = 'none';
+			}
+
+			$button = $this->get_addon_button_html( $addon );
 
 			$status_label = $this->get_addon_status_label( $addon['status'] );
 
 			// get the icon/graphic.
 			$icon = isset( $addon['icon'] ) ? esc_url( $addon['icon'] ) : 'placeholder';
 
+			$icon_file_name = str_replace( 'charitable-', '', $addon['slug'] );
+			$icon_file_name = str_replace( '-banner', '', $icon_file_name );
+
+			// Locate icon, if it exists.
+			if ( ! file_exists( charitable()->get_path( 'assets', true ) . 'images/addons/addon-icon-' . $icon_file_name . '.png' ) ) {
+				$icon = charitable()->get_path( 'assets', false ) . 'images/addons/addon-icon-stripe.png';
+			} else {
+				$icon = charitable()->get_path( 'assets', false ) . 'images/addons/addon-icon-' . $icon_file_name . '.png';
+			}
+
 			// get the plugin description.
-			$sections       = unserialize( $addon['sections'] ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize
+			$sections       = unserialize( $addon['sections'] ); // phpcs:ignore
 			$description    = wp_strip_all_tags( ( $sections['description'] ) );
-			$is_recommended = ( isset( $addon['featured'] ) && is_array( $addon['featured'] ) && in_array( 'recommended', $addon['featured'] ) ) ? true : false;
+			$is_recommended = ( isset( $addon['featured'] ) && is_array( $addon['featured'] ) && in_array( 'recommended', $addon['featured'] ) ) ? true : false; // phpcs:ignore
 
 			// css.
-			$css = array( 'addon-container' );
-			if ( $is_recommended || 'charitable-pro-plugin' === $addon['slug'] ) {
+			$css = array();
+			if ( $is_recommended ) {
+				$css[] = 'has-badge';
 				$css[] = 'recommended';
 			}
 
 			// Output the card.
-			$allowed_html = array(
-				'a'      => array(
-					'href'  => array(),
-					'title' => array(),
-				),
-				'br'     => array(),
-				'em'     => array(),
-				'strong' => array(),
-				'p'      => array(),
-			);
 
+			$addon_name       = str_replace( 'Charitable ', '', $addon['name'] );
+			$landing_page_url = ! empty( $addon['homepage'] ) ? $addon['homepage'] : false;
+			$landing_page_url = false === $landing_page_url ? $addon['upgrade_url'] : $landing_page_url;
 			?>
 
-			<div class="<?php echo esc_attr( implode( ' ', $css ) ); ?>">
-				<div class="addon-item">
-					<?php if ( $is_recommended || 'charitable-pro-plugin' === $addon['slug'] ) : ?>
-						<div class="recommended"><?php echo esc_html__( 'Recommended', 'charitable' ); ?></div>
-					<?php endif; ?>
-					<img src="<?php echo esc_url( $icon ); ?>" alt="<?php echo esc_html( $addon['name'] ); ?> Addon logo">
-					<div class="details charitable-clear">
-						<h5 class="addon-name">
-						<?php if ( 'charitable-pro-plugin' === $addon['slug'] ) : ?>
-							<a href="https://www.wpcharitable.com/charitable-pro/" title="Learn more" target="_blank" rel="noopener noreferrer" class="addon-link"><?php echo esc_html( $addon['name'] ); ?></a>
-						<?php else : ?>
-							<a href="<?php echo esc_url( $addon['upgrade_url'] ); ?>" title="Learn more" target="_blank" rel="noopener noreferrer" class="addon-link"><?php echo esc_html( $addon['name'] ); ?> Addon</a>
-						<?php endif; ?>
-						</h5>
-						<?php if ( 'charitable-pro-plugin' === $addon['slug'] ) : ?>
-							<p class="addon-desc"><?php echo esc_html__( 'A new and powerful way to run donation and fundraising websites.', 'charitable' ); ?></p>
-						<?php else : ?>
-							<p class="addon-desc"><?php echo wp_kses( wpautop( $description ), $allowed_html ); ?></p>
+
+			<div class="charitable-addons-list-item <?php echo esc_attr( implode( ' ', $css ) ); ?>">
+				<div class="charitable-addons-list-item-header">
+					<img src="<?php echo esc_url( $icon ); ?>" alt="<?php echo esc_html( $addon['name'] ); ?> logo">
+
+					<div class="charitable-addons-list-item-header-meta">
+						<div class="charitable-addons-list-item-header-meta-title">
+							<a href="<?php echo esc_url( $landing_page_url ); ?>" title="Learn more" target="_blank" rel="noopener noreferrer" class="addon-link"><?php echo esc_html( $addon_name ); ?></a>
+							<?php if ( $is_recommended ) : ?>
+								<?php /* <span class="charitable-badge charitable-badge-sm charitable-badge-inline charitable-badge-green charitable-badge-rounded"><i class="fa fa-star" aria-hidden="true"></i>Recommended</span> */ ?>
+								<span class="charitable-badge charitable-badge-sm charitable-badge-inline charitable-badge-orange charitable-badge-rounded">Featured</span>
+							<?php elseif ( $addon['is_updated'] ) : ?>
+								<span class="charitable-badge charitable-badge-sm charitable-badge-inline charitable-badge-blue charitable-badge-rounded">Updated</span>
+							<?php endif; ?>
+						</div>
+
+						<div class="charitable-addons-list-item-header-meta-excerpt addon-description">
+						<?php echo wpautop( $description ); // phpcs:ignore ?>	</div>
+					</div>
+				</div>
+
+				<div class="charitable-addons-list-item-footer charitable-addons-list-item-footer-installed" data-plugin="<?php echo esc_attr( $addon['path'] ); ?>" data-type="addon">
+					<div>
+						<?php if ( ! empty( $addon['license'] ) ) : ?>
+						<span class="charitable-badge charitable-badge-lg charitable-badge-inline charitable-badge-titanium charitable-badge-rounded"><?php echo esc_html( end( $addon['license'] ) ); ?></span>
 						<?php endif; ?>
 					</div>
-					<div class="actions charitable-clear">
-					<?php
-					if ( ! empty( $addon['status'] ) && $addon['action'] !== 'upgrade' && $addon['action'] !== 'license' && $addon['plugin_allow'] ) :
-						$action_class = 'action-button action-button-' . $addon['slug'];
-						?>
-						<div class="status">
-							<strong>
-								<?php
-								printf(
-									/* translators: %s - addon status label. */
-									esc_html__( 'Status: %s', 'charitable' ),
-									'<span class="status-label status-' . esc_attr( $addon['status'] ) . '">' . wp_kses_post( $status_label ) . '</span>'
-								);
-								?>
-							</strong>
-						</div>
-						<?php
-					endif;
 
-					$action_class = empty( $action_class ) ? 'upgrade-button' : $action_class;
-					?>
-						<div class="<?php echo esc_attr( $action_class ); ?>">
-							<?php echo $button; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-						</div>
+					<div class="charitable-addons-list-item-footer-actions">
+						<?php echo wp_kses_post( $button ); ?>
 					</div>
 				</div>
 			</div>
@@ -756,6 +829,16 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		 */
 		private function get_addon_button_html( $addon ) {
 
+			// Check if addon is included in pro and return appropriate text.
+			if ( ! empty( $addon['is_included_in_pro'] ) ) {
+				return '<span class="charitable-addon-included-in-pro">' . esc_html__( 'Included In Pro', 'charitable' ) . '</span>';
+			}
+
+			// Check if addon is installed and return appropriate text.
+			if ( 'installed_text' === $addon['status'] ) {
+				return '<span class="charitable-addon-installed">' . esc_html__( 'Installed', 'charitable' ) . '</span>';
+			}
+
 			if ( $addon['action'] === 'upgrade' || $addon['action'] === 'license' || ! $addon['plugin_allow'] ) {
 
 				if ( charitable_is_pro() ) {
@@ -768,15 +851,18 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 						$upid = 0; // the upgrade plan id.
 
-						if ( in_array( 'agency', $addon['license'] ) ) { // if the desired addon is in the agency category license, we need to pass along the upgrade plan id of 4.
+						if ( in_array( 'agency', $addon['license'] ) ) { // phpcs:ignore
+							// if the desired addon is in the agency category license, we need to pass along the upgrade plan id of 4.
 							$upid = 4;
 						}
 
-						if ( in_array( 'pro', $addon['license'] ) ) { // if the desired addon is in the pro category license, we need to pass along the upgrade plan id of 3.
+						if ( in_array( 'pro', $addon['license'] ) ) { // phpcs:ignore
+							// if the desired addon is in the pro category license, we need to pass along the upgrade plan id of 3.
 							$upid = 3;
 						}
 
-						if ( in_array( 'plus', $addon['license'] ) ) { // if the desired addon is in the plus category license, we need to pass along the upgrade plan id of 2.
+						if ( in_array( 'plus', $addon['license'] ) ) { // phpcs:ignore
+							// if the desired addon is in the plus category license, we need to pass along the upgrade plan id of 2.
 							$upid = 2;
 						}
 
@@ -808,7 +894,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				}
 
 				return sprintf(
-					'<a href="%1$s" target="_blank" rel="noopener noreferrer" class="charitable-btn charitable-btn-orange">%2$s</a>',
+					'<a href="%1$s" target="_blank" rel="noopener noreferrer" class="button button-secondary">%2$s</a>',
 					$upgrade_url,
 					esc_html__( 'Upgrade Now', 'charitable' )
 				);
@@ -824,13 +910,13 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 			switch ( $addon['status'] ) {
 				case 'active':
-					$html  = '<button class="status-' . esc_attr( $addon['status'] ) . '" data-plugin="' . esc_attr( $addon['path'] ) . '" data-type="addon">';
+					$html  = '<button class="button button-secondary status-' . esc_attr( $addon['status'] ) . '" data-plugin="' . esc_attr( $addon['path'] ) . '" data-type="addon">';
 					$html .= esc_html__( 'Deactivate', 'charitable' );
 					$html .= '</button>';
 					break;
 
 				case 'installed':
-					$html  = '<button class="status-' . esc_attr( $addon['status'] ) . '" data-plugin="' . esc_attr( $addon['path'] ) . '" data-type="addon">';
+					$html  = '<button class="button button-secondary status-' . esc_attr( $addon['status'] ) . '" data-plugin="' . esc_attr( $addon['path'] ) . '" data-type="addon">';
 					$html .= esc_html__( 'Activate', 'charitable' );
 					$html .= '</button>';
 					break;
@@ -844,15 +930,60 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					$download_url = ! empty( $addon['download_link'] ) ? esc_url( $addon['download_link'] ) : false;
 					$download_url = ( false === $download_url ) && ! empty( $addon['install'] ) ? esc_url( $addon['install'] ) : $download_url;
 
-					$html  = '<button class="status-' . esc_attr( $addon['status'] ) . '" data-plugin="' . esc_url( $download_url ) . '" data-type="addon">';
-					$html .= esc_html__( 'Install Addon', 'charitable' );
-					$html .= '</button>';
+					// Validate the download URL - if it's invalid, disable the button
+					$is_valid_url = $download_url && filter_var( $download_url, FILTER_VALIDATE_URL ) && ! strpos( $download_url, 'invalid_price_id_plan__' );
+
+					if ( $is_valid_url ) {
+						$html  = '<button class="button button-secondary status-' . esc_attr( $addon['status'] ) . '" data-plugin="' . esc_url( $download_url ) . '" data-type="addon">';
+						$html .= esc_html__( 'Install Addon', 'charitable' );
+						$html .= '</button>';
+					} else {
+						// Invalid URL - disable button and add warning class
+						$html  = '<button class="button button-secondary status-' . esc_attr( $addon['status'] ) . ' disabled" data-plugin="invalid" data-type="addon" disabled>';
+						$html .= esc_html__( 'Install Addon', 'charitable' );
+						$html .= '</button>';
+					}
 					break;
 			}
 
 			return $html;
 		}
 
+
+		/**
+		 * Check if any addons have invalid download URLs and display admin notice.
+		 *
+		 * @since 1.8.8
+		 */
+		public function check_for_invalid_urls() {
+			$addons           = $this->get_addons();
+			$has_invalid_urls = false;
+
+			foreach ( $addons as $addon ) {
+				if ( 'missing' === $addon['status'] ) {
+					$download_url = ! empty( $addon['download_link'] ) ? $addon['download_link'] : false;
+					$download_url = ( false === $download_url ) && ! empty( $addon['install'] ) ? $addon['install'] : $download_url;
+
+					if ( ! $download_url || ! filter_var( $download_url, FILTER_VALIDATE_URL ) || strpos( $download_url, 'invalid_price_id_plan__' ) !== false ) {
+						$has_invalid_urls = true;
+						break;
+					}
+				}
+			}
+
+			if ( $has_invalid_urls ) {
+				$settings_url = admin_url( 'admin.php?page=charitable-settings' );
+				$notice       = sprintf(
+					'<div class="notice notice-warning is-dismissible"><p><strong>%s</strong> %s <a href="%s">%s</a></p></div>',
+					esc_html__( 'License Data Warning:', 'charitable' ),
+					esc_html__( 'Some addon download URLs appear to be invalid. This may indicate that your license data is not fully synchronized with the license server. You may need to reconnect your license by removing it and adding it back in the', 'charitable' ),
+					esc_url( $settings_url ),
+					esc_html__( 'Charitable Settings page', 'charitable' )
+				);
+
+				echo $notice;
+			}
+		}
 
 		/**
 		 * Get addon status label.
@@ -865,15 +996,51 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		 */
 		private function get_addon_status_label( $status ) {
 
-			$label = array(
+			$label = [
 				'active'    => esc_html__( 'Active', 'charitable' ),
 				'installed' => esc_html__( 'Inactive', 'charitable' ),
 				'missing'   => esc_html__( 'Not Installed', 'charitable' ),
-			);
+			];
 
 			return isset( $label[ $status ] ) ? $label[ $status ] : '';
 		}
 
+		/**
+		 * Check if addon is new.
+		 * This examines 'last_updated' from the addon data and compares it to the current date.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param array $addon Addon data.
+		 *
+		 * @return bool
+		 */
+		public function is_addon_updated( $addon ) {
+
+			if ( empty( $addon['last_updated'] ) ) {
+				return false;
+			}
+
+			$addon_date   = strtotime( $addon['last_updated'] );
+			$current_date = strtotime( date( 'Y-m-d' ) );
+
+			// If the last_updated is within 90 days, return true.
+			return $addon_date > $current_date - 90 * DAY_IN_SECONDS;
+		}
+
+		/**
+		 * Check if addon is new.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param array $addon Addon data.
+		 *
+		 * @return bool
+		 */
+		public function is_addon_new( $addon ) {
+
+			return false;
+		}
 
 		/**
 		 * Prepare addon data.
@@ -887,7 +1054,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		protected function prepare_addon_data( $addon ) {
 
 			if ( empty( $addon ) ) {
-				return array();
+				return [];
 			}
 
 			$addon['title'] = ! empty( $addon['title'] ) ? $addon['title'] : '';
@@ -897,7 +1064,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			$addon['modal_name']    = sprintf( esc_html__( '%s addon', 'charitable' ), $addon['name'] );
 			$addon['clear_slug']    = str_replace( 'charitable-', '', $addon['slug'] );
 			$addon['utm_content']   = ucwords( str_replace( '-', ' ', $addon['clear_slug'] ) );
-			$addon['license']       = empty( $addon['license'] ) ? array() : (array) $addon['license'];
+			$addon['license']       = empty( $addon['license'] ) ? [] : (array) $addon['license'];
 			$addon['license_level'] = $this->get_license_level( $addon );
 			$addon['icon']          = ! empty( $addon['icon'] ) ? $addon['icon'] : '';
 			$addon['path']          = sprintf( '%1$s/%1$s.php', $addon['slug'] );
@@ -930,11 +1097,11 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 			$slug = 'charitable-' . str_replace( 'charitable-', '', sanitize_key( $slug ) );
 
-			$addon = ! empty( $this->available_addons[ $slug ] ) ? $this->available_addons[ $slug ] : array();
+			$addon = ! empty( $this->available_addons[ $slug ] ) ? $this->available_addons[ $slug ] : [];
 
 			// In case if addon is "not available" let's try to get and prepare addon data from all addons.
 			if ( empty( $addon ) ) {
-				$addon = ! empty( $this->addons[ $slug ] ) ? $this->prepare_addon_data( $this->addons[ $slug ] ) : array();
+				$addon = ! empty( $this->addons[ $slug ] ) ? $this->prepare_addon_data( $this->addons[ $slug ] ) : [];
 			}
 
 			return $addon;
@@ -956,10 +1123,10 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			}
 
 			$addon            = is_string( $addon ) ? $this->get_addon( $addon ) : $addon;
-			$addon['license'] = empty( $addon['license'] ) ? array() : (array) $addon['license'];
+			$addon['license'] = empty( $addon['license'] ) ? [] : (array) $addon['license'];
 
 			// TODO: convert to a class constant when we will drop PHP 5.5.
-			$levels  = array( 'basic', 'plus', 'pro', 'elite', 'agency', 'ultimate' );
+			$levels  = [ 'basic', 'plus', 'pro', 'elite', 'agency', 'ultimate' ];
 			$license = '';
 
 			foreach ( $levels as $level ) {
@@ -974,7 +1141,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				return '';
 			}
 
-			return in_array( $license, array( 'basic', 'plus', 'pro' ), true ) ? 'pro' : 'elite';
+			return in_array( $license, [ 'basic', 'plus', 'pro' ], true ) ? 'pro' : 'elite';
 		}
 
 		/**
@@ -1112,9 +1279,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				*/
 				if ( $this->request_recently_failed() ) {
 					if ( charitable_is_debug() ) {
-						// phpcs:disable
-						error_log( 'WPCharitable Debug Error: get_versions (licenses) API call aborted because it recently failed' );
-						// phpcs:enable
+						error_log( 'WPCharitable Debug Error: get_versions (licenses) API call aborted because it recently failed' ); // @codingStandardsIgnoreLine
 					}
 					return false;
 				}
@@ -1146,10 +1311,8 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					$this->log_failed_request();
 
 					if ( charitable_is_debug() ) {
-						// phpcs:disable
-						error_log( 'WPCharitable Debug Error: get_versions (licenses) API call failed' );
-						error_log( print_r( $response, true ) );
-						// phpcs:enable
+						error_log( 'WPCharitable Debug Error: get_versions (licenses) API call failed' ); // @codingStandardsIgnoreLine
+						error_log( print_r( $response, true ) ); // @codingStandardsIgnoreLine
 					}
 
 					return ( false !== $versions && isset( $versions['data'] ) ) ? $versions['data'] : array();

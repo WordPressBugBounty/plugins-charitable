@@ -150,6 +150,13 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 				'wp_posts' => $this->get_wp_posts(),
 			);
 
+			// Add recommendation tracking data
+			$data['recommended_plugins_viewed'] = get_option( 'charitable_recommended_plugins_viewed', array() );
+			$data['recommended_plugins_clicked'] = get_option( 'charitable_recommended_plugins_clicked', array() );
+			$data['recommended_plugins_installed'] = get_option( 'charitable_recommended_plugins_installed', array() );
+			$data['recommended_plugins_activated'] = get_option( 'charitable_recommended_plugins_activated', array() );
+			$data['dashboard_enhance_section_views'] = get_option( 'charitable_dashboard_enhance_views', 0 );
+
 			// Retrieve current plugin information.
 			if ( ! function_exists( 'get_plugins' ) ) {
 				include ABSPATH . '/wp-admin/includes/plugin.php';

@@ -683,8 +683,6 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 				}
 			}).fail(function (data) {
 				if ( window.console && window.console.log ) {
-					// console.log( 'failed' );
-					// console.log( data );
 					link.css('pointer-events', 'all');
 					link.css('opacity', '1.0');
 				}
@@ -955,6 +953,37 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 				$legacyLegacyContent.show();
 			}
 		});
+
+																				// Test Mode Flash Effect
+		// Check if we should highlight the test mode checkbox
+		// Only trigger when sessionStorage indicates user came from admin bar badge
+		if (sessionStorage.getItem('charitable_from_admin_bar') === 'true') {
+			// Clear the sessionStorage flag immediately
+			sessionStorage.removeItem('charitable_from_admin_bar');
+
+			// Wait for the page to fully load
+			$(window).on('load', function() {
+				// Find the test mode checkbox row
+				var $testModeRow = $('tr.charitable-settings-field.charitable-test-mode-checkbox');
+
+				if ($testModeRow.length) {
+					// Add flash animation class
+					$testModeRow.addClass('charitable-test-mode-flash');
+
+					// Remove the class after animation completes
+					setTimeout(function() {
+						$testModeRow.removeClass('charitable-test-mode-flash');
+					}, 2000);
+
+					// Scroll to the row
+					$('html, body').animate({
+						scrollTop: $testModeRow.offset().top - 100
+					}, 800);
+				}
+			});
+		}
+
+
 	});
 
 })( jQuery );

@@ -113,6 +113,14 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 					$version
 				);
 
+				// Enqueue about-us.css for navigation styling
+				wp_enqueue_style(
+					'charitable-admin-about-us',
+					$assets_dir . 'css/admin/about-us.css',
+					array(),
+					$version
+				);
+
 				/* tour */
 
 				wp_enqueue_script(

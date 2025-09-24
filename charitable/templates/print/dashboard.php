@@ -51,6 +51,32 @@ $currency_symbol = ( false !== $currency_symbol ) ? html_entity_decode( $currenc
 			 */
 			do_action( 'charitable_pdf_dashboard_styles', $view_args );
 			?>
+
+			/* Print-specific styles for full-width chart */
+			.charitable-headline-graph-container {
+				width: 100% !important;
+				max-width: 100% !important;
+				padding: 20px 0 !important;
+				margin: 0 !important;
+			}
+
+			.charitable-headline-graph {
+				width: 100% !important;
+				max-width: 100% !important;
+			}
+
+			.apexcharts-canvas {
+				width: 100% !important;
+				max-width: 100% !important;
+			}
+
+			/* Hide any notifications that might appear */
+			.charitable-notification,
+			.notice,
+			.update-nag,
+			.charitable-admin-notice {
+				display: none !important;
+			}
 		</style>
 	</head>
 
@@ -79,8 +105,8 @@ $currency_symbol = ( false !== $currency_symbol ) ? html_entity_decode( $currenc
 					<?php echo $charitable_cards; // phpcs:ignore ?>
 				</div>
 
-				<div class="charitable-container charitable-report-ui charitable-headline-graph-container">
-					<div id="charitable-headline-graph" class="charitable-headline-graph"></div>
+				<div class="charitable-container charitable-report-ui charitable-headline-graph-container" style="width: 100%; max-width: 100%; padding: 20px 0;">
+					<div id="charitable-headline-graph" class="charitable-headline-graph" style="width: 100%;"></div>
 				</div>
 
 			</div>
@@ -123,7 +149,7 @@ $currency_symbol = ( false !== $currency_symbol ) ? html_entity_decode( $currenc
 						background: '#fff',
 						foreColor: "#757781",
 						type: 'area',
-						width: '900px',
+						width: '100%',
 						stacked: true,
 						toolbar: {
 							show: false
@@ -140,6 +166,12 @@ $currency_symbol = ( false !== $currency_symbol ) ? html_entity_decode( $currenc
 							lines: {
 								show: true
 							}
+						},
+						padding: {
+							right: 28,
+							left: 8,
+							top: 0,
+							bottom: 0
 						}
 					},
 					dataLabels: {

@@ -208,7 +208,7 @@ if ( ! class_exists( 'Charitable_Post_Types' ) ) :
 			// Get the current screen, and check whether we're viewing the campaign post types.
 			$screen = get_current_screen();
 
-			$applicable_post_types = [ 'campaign', 'donation', 'charitable_page_charitable-settings', 'charitable_page_charitable-addons', 'charitable_page_charitable-reports', 'charitable_page_charitable-tools', 'charitable_page_charitable-dashboard', 'charitable_page_charitable-growth-tools', 'charitable_page_charitable-setup-checklist', 'charitable_page_charitable-donors' ];
+			$applicable_post_types = [ 'campaign', 'donation', 'charitable_page_charitable-settings', 'charitable_page_charitable-addons', 'charitable_page_charitable-reports', 'charitable_page_charitable-tools', 'charitable_page_charitable-dashboard', 'charitable_page_charitable-growth-tools', 'charitable_page_charitable-setup-checklist', 'charitable_page_charitable-donors', 'charitable_page_charitable-about' ];
 
 			if ( in_array( $screen->post_type, $applicable_post_types, true ) || in_array( $screen->base, $applicable_post_types, true ) ) {
 				$is_charitable_page = true;

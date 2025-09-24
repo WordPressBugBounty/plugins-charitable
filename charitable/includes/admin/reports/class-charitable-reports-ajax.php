@@ -350,7 +350,7 @@ if ( ! class_exists( 'Charitable_Reports_Ajax' ) ) :
 			$end_date   = isset( $_POST['end_date'] ) ? sanitize_text_field( $_POST['end_date'] ) : false; // phpcs:ignore
 			$days       = isset( $_POST['days'] ) ? intval( $_POST['days'] ) : false;
 
-			$charitable_dashboard                                   = Charitable_Dashboard::get_instance();
+			$charitable_dashboard                                   = Charitable_Dashboard_Legacy::get_instance();
 			$report_html['html']                                    = $charitable_dashboard->generate_dashboard_report_html( array( 'start_date' => $start_date, 'end_date' => $end_date, 'days' => $days ) ); // phpcs:ignore
 			$report_html['headline_chart_options']['donation_axis'] = (array) $charitable_dashboard->get_donation_axis();
 			$report_html['headline_chart_options']['date_axis']     = (array) $charitable_dashboard->get_date_axis();

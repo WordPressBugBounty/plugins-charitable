@@ -649,7 +649,8 @@ if ( ! class_exists( 'Charitable_Admin_Donation_Form' ) ) :
 		/**
 		 * Get a key=>value array of all existing donors.
 		 *
-		 * @since  1.5.0
+		 * @since   1.5.0
+		 * @version 1.8.8
 		 *
 		 * @return array
 		 */
@@ -676,6 +677,9 @@ if ( ! class_exists( 'Charitable_Admin_Donation_Form' ) ) :
 
 				$donor_list[ $donor->donor_id ] = $name;
 			}
+
+			// Apply a filter here to allow for the donor list to be modified.
+			$donor_list = apply_filters( 'charitable_admin_donation_form_donor_list', $donor_list );
 
 			$list = array(
 				'new'      => __( 'Add a New Donor', 'charitable' ),

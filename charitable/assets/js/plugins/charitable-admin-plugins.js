@@ -29,13 +29,14 @@ var CharitableAdminPlugins = window.CharitableAdminPlugins || (function (documen
 
         ready: function () { // check to see if javascript has been defined.
 
-            $reports    = $('#charitable-reports');
-            $blankSlate = $('.charitable-blank-slate');
-            $guideTools = $('#charitable-growth-tools');
-            $toolsArea  = $('#charitable-tools');
-            $smtpArea   = $('#charitable-smtp');
+            $reports               = $('#charitable-reports');
+            $blankSlate            = $('.charitable-blank-slate');
+            $guideTools            = $('#charitable-growth-tools');
+            $toolsArea             = $('#charitable-tools');
+            $smtpArea              = $('#charitable-smtp');
+            $privacyComplianceArea = $('#charitable-privacy-compliance');
 
-            if ( $reports.length === 0 && $blankSlate.length === 0 && $guideTools.length === 0 && $toolsArea.length === 0 && $smtpArea.length === 0 ) {
+            if ( $reports.length === 0 && $blankSlate.length === 0 && $guideTools.length === 0 && $toolsArea.length === 0 && $smtpArea.length === 0 && $privacyComplianceArea.length === 0 ) {
                 return;
             }
 
@@ -47,6 +48,8 @@ var CharitableAdminPlugins = window.CharitableAdminPlugins || (function (documen
                 $targetArea = $toolsArea;
             } else if ( $smtpArea.length > 0 ) {
                 $targetArea = $smtpArea;
+            } else if ( $privacyComplianceArea.length > 0 ) {
+                $targetArea = $privacyComplianceArea;
             } else {
                 $targetArea = $blankSlate;
             }

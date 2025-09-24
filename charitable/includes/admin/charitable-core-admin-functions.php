@@ -97,14 +97,14 @@ function charitable_get_admin_reports() {
 }
 
 /**
- * Returns the Charitable_Dashboard helper.
+ * Returns the Charitable_Dashboard_Legacy helper.
  *
  * @since  1.8.1
  *
- * @return Charitable_Reports
+ * @return Charitable_Dashboard_Legacy
  */
 function charitable_get_admin_dashboard() {
-	return Charitable_Dashboard::get_instance();
+	return Charitable_Dashboard_Legacy::get_instance();
 }
 
 /**
@@ -489,7 +489,8 @@ function charitable_show_promotion_footer() {
 /**
  * Pre-footer promotion block, displayed on all Charitable admin pages except Form Builder.
  *
- * @since 1.8.7.2
+ * @since   1.8.7.2
+ * @version 1.8.8 - Updated plugin footer links.
  */
 function charitable_promote_footer() {
 
@@ -518,7 +519,7 @@ function charitable_promote_footer() {
 			'target' => '_blank',
 		],
 		[
-			'url'  => admin_url( 'admin.php?page=charitable-growth-tools' ),
+			'url'  => admin_url( 'admin.php?page=charitable-about' ),
 			'text' => __( 'Free Plugins', 'charitable' ),
 		],
 	];
@@ -1674,4 +1675,142 @@ function charitable_is_pro_installed() {
 	}
 
 	return true;
+}
+
+/**
+ * Display admin bar when active.
+ *
+ * @since 1.8.7.5
+ *
+ * @param WP_Admin_Bar $wp_admin_bar WP_Admin_Bar instance, passed by reference.
+ *
+ * @return bool
+ */
+function charitable_show_test_mode_notice_in_admin_bar( $wp_admin_bar ) {
+	$is_test_mode = charitable_get_option( 'test_mode' ) ? true : false;
+
+	// Allow filtering to disable the admin bar notice
+	$show_notice = apply_filters( 'charitable_show_test_mode_admin_bar_notice', true );
+
+	if (
+		! current_user_can( 'manage_options' ) ||
+		! $is_test_mode ||
+		! $show_notice
+	) {
+		return false;
+	}
+
+	// Add the main site admin menu item.
+			$wp_admin_bar->add_menu(
+		[
+			'id'     => 'charitable-test-notice',
+			'href'   => admin_url( 'admin.php?page=charitable-settings&tab=gateways' ),
+			'parent' => 'top-secondary',
+			'title'  => __( '<span class="charitable-test-mode-badge">Charitable Test Mode Active</span>', 'charitable' ),
+			'meta'   => [
+				'class' => 'charitable-test-mode-active',
+				'onclick' => 'sessionStorage.setItem("charitable_from_admin_bar", "true");',
+			],
+		]
+	);
+
+	return true;
+}
+
+add_action( 'admin_bar_menu', 'charitable_show_test_mode_notice_in_admin_bar', 1000, 1 );
+
+/**
+ * Render the global upgrade CTA section.
+ *
+ * This function provides a consistent upgrade CTA that can be used across all admin pages.
+ * It uses the same styling and content as the dashboard v2 upgrade section.
+ *
+ * @since 1.8.8
+ *
+ * @param string $css_class Optional. Additional CSS classes to add to the section.
+ * @param bool   $echo      Optional. Whether to echo the output or return it. Default is true.
+ * @return string|void The HTML output if $echo is false, otherwise void.
+ */
+function charitable_render_global_upgrade_cta( $css_class = '', $echo = true ) {
+	$output = '';
+
+	$output .= '<section class="charitable-dashboard-v2-section charitable-global-upgrade-cta ' . esc_attr( $css_class ) . '">';
+	$output .= '<h4 class="charitable-dashboard-v2-upgrade-title">' . esc_html__( 'Upgrade to Pro to Unlock Powerful Donation Features', 'charitable' ) . '</h4>';
+	$output .= '<div class="charitable-dashboard-v2-upgrade-features">';
+	$output .= '<div class="charitable-dashboard-v2-upgrade-column">';
+	$output .= charitable_render_global_upgrade_features_left();
+	$output .= '</div>';
+	$output .= '<div class="charitable-dashboard-v2-upgrade-column">';
+	$output .= charitable_render_global_upgrade_features_right();
+	$output .= '</div>';
+	$output .= '</div>';
+	$output .= '<div class="charitable-dashboard-v2-upgrade-actions">';
+	$output .= '<button class="charitable-dashboard-v2-upgrade-button">' . esc_html__( 'Upgrade To Pro', 'charitable' ) . '</button>';
+	$output .= '<a href="#" class="charitable-dashboard-v2-learn-more-link">' . esc_html__( 'Learn more about all features →', 'charitable' ) . '</a>';
+	$output .= '</div>';
+	$output .= '</section>';
+
+	if ( $echo ) {
+		echo $output;
+	} else {
+		return $output;
+	}
+}
+
+/**
+ * Render left column upgrade features for global CTA.
+ *
+ * @since 1.8.8
+ *
+ * @return string The HTML output for left column features.
+ */
+function charitable_render_global_upgrade_features_left() {
+	$features = array(
+		__( 'Recurring Donations', 'charitable' ),
+		__( 'Peer-to-Peer Fundraising', 'charitable' ),
+		__( 'Donor Database', 'charitable' ),
+		__( 'Donor Dashboard', 'charitable' ),
+		__( 'PDF & Annual Receipts', 'charitable' )
+	);
+
+	$output = '';
+	foreach ( $features as $feature ) {
+		$output .= '<div class="charitable-dashboard-v2-upgrade-feature">';
+		$output .= '<svg class="charitable-dashboard-v2-upgrade-checkmark" width="18" height="18" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">';
+		$output .= '<path fill-rule="evenodd" clip-rule="evenodd" d="M9.0688 1.3573C13.798 1.3573 17.6374 5.19676 17.6374 9.92591C17.6374 14.6551 13.798 18.4945 9.0688 18.4945C4.33966 18.4945 0.500198 14.6551 0.500198 9.92591C0.500198 5.19676 4.33966 1.3573 9.0688 1.3573ZM13.5778 7.82078C13.5778 7.67488 13.5197 7.52981 13.4146 7.42562L12.6234 6.63444C12.5192 6.52938 12.3733 6.47118 12.2283 6.47118C12.0824 6.47118 11.9373 6.52938 11.8322 6.63444L8.01537 10.4548L6.30536 8.7396C6.20026 8.6345 6.05523 8.57631 5.90933 8.57631C5.7643 8.57631 5.6184 8.6345 5.51421 8.7396L4.72303 9.53075C4.61793 9.63498 4.55978 9.78088 4.55978 9.92591C4.55978 10.0709 4.61793 10.2168 4.72303 10.3211L7.62021 13.2174C7.72444 13.3225 7.87034 13.3806 8.01537 13.3806C8.16127 13.3806 8.3063 13.3225 8.4114 13.2174L13.4146 8.2159C13.5197 8.11171 13.5778 7.96581 13.5778 7.82078Z" fill="#59A56D"/>';
+		$output .= '</svg>';
+		$output .= '<span class="charitable-dashboard-v2-upgrade-feature-text">' . esc_html( $feature ) . '</span>';
+		$output .= '</div>';
+	}
+
+	return $output;
+}
+
+/**
+ * Render right column upgrade features for global CTA.
+ *
+ * @since 1.8.8
+ *
+ * @return string The HTML output for right column features.
+ */
+function charitable_render_global_upgrade_features_right() {
+	$features = array(
+		__( 'Anonymous Giving', 'charitable' ),
+		__( 'Fee Coverage Option', 'charitable' ),
+		__( 'Email Marketing Integration', 'charitable' ),
+		__( 'Built-In Analytics & Reports', 'charitable' ),
+		__( 'Flexible Payment Methods', 'charitable' )
+	);
+
+	$output = '';
+	foreach ( $features as $feature ) {
+		$output .= '<div class="charitable-dashboard-v2-upgrade-feature">';
+		$output .= '<svg class="charitable-dashboard-v2-upgrade-checkmark" width="18" height="18" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">';
+		$output .= '<path fill-rule="evenodd" clip-rule="evenodd" d="M9.0688 1.3573C13.798 1.3573 17.6374 5.19676 17.6374 9.92591C17.6374 14.6551 13.798 18.4945 9.0688 18.4945C4.33966 18.4945 0.500198 14.6551 0.500198 9.92591C0.500198 5.19676 4.33966 1.3573 9.0688 1.3573ZM13.5778 7.82078C13.5778 7.67488 13.5197 7.52981 13.4146 7.42562L12.6234 6.63444C12.5192 6.52938 12.3733 6.47118 12.2283 6.47118C12.0824 6.47118 11.9373 6.52938 11.8322 6.63444L8.01537 10.4548L6.30536 8.7396C6.20026 8.6345 6.05523 8.57631 5.90933 8.57631C5.7643 8.57631 5.6184 8.6345 5.51421 8.7396L4.72303 9.53075C4.61793 9.63498 4.55978 9.78088 4.55978 9.92591C4.55978 10.0709 4.61793 10.2168 4.72303 10.3211L7.62021 13.2174C7.72444 13.3225 7.87034 13.3806 8.01537 13.3806C8.16127 13.3806 8.3063 13.3225 8.4114 13.2174L13.4146 8.2159C13.5197 8.11171 13.5778 7.96581 13.5778 7.82078Z" fill="#59A56D"/>';
+		$output .= '</svg>';
+		$output .= '<span class="charitable-dashboard-v2-upgrade-feature-text">' . esc_html( $feature ) . '</span>';
+		$output .= '</div>';
+	}
+
+	return $output;
 }

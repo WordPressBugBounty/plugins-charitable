@@ -951,7 +951,7 @@ function charitable_get_charitable_screens() {
 	 *
 	 * @param string[] $screens List of screen ids.
 	 */
-	return apply_filters(
+		return apply_filters(
 		'charitable_admin_screens',
 		array(
 			'campaign',
@@ -967,6 +967,12 @@ function charitable_get_charitable_screens() {
 			'charitable_page_charitable-addons',
 			'charitable_page_charitable-setup-checklist',
 			'charitable_page_charitable-donors',
+			'charitable_page_charitable-about',
+			'charitable_page_charitable-seo',
+			'charitable_page_charitable-smtp',
+			'charitable_page_charitable-privacy-compliance',
+			'charitable_page_charitable-backups',
+			'charitable_page_charitable-automation',
 		)
 	);
 }

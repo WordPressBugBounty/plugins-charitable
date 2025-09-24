@@ -109,6 +109,18 @@ body.charitable-splash-modal.post-type-campaign .jconfirm .jconfirm-box div.jcon
   flex: 1;
 }
 
+#charitable-splash-modal main .charitable-splash-section.charitable-splash-section-one-third-two-thirds-flipped .charitable-splash-section-content {
+  flex: 2;
+  text-align: left !important;
+}
+#charitable-splash-modal main .charitable-splash-section.charitable-splash-section-one-third-two-thirds-flipped .charitable-splash-section-content .charitable-splash-section-buttons {
+  justify-content: start !important;
+}
+
+#charitable-splash-modal main .charitable-splash-section.charitable-splash-section-one-third-two-thirds-flipped .charitable-splash-section-image {
+  flex: 1;
+}
+
 #charitable-splash-modal main .charitable-splash-section:nth-child(odd) .charitable-splash-section-content {
   order: 2;
 }
@@ -125,6 +137,11 @@ body.charitable-splash-modal.post-type-campaign .jconfirm .jconfirm-box div.jcon
   flex: 0 0 auto;
   align-self: center;
   justify-self: center;
+}
+
+#charitable-splash-modal main .charitable-splash-section .charitable-splash-section-image img {
+  max-width: 100%;
+  height: auto;
 }
 
 #charitable-splash-modal main .charitable-splash-section .charitable-splash-section-image.charitable-image-shadow-apply img {

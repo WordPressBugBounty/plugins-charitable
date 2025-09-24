@@ -141,16 +141,11 @@ if ( ! class_exists( 'Charitable_Square_Subscription_Plan' ) ) :
 		 */
 		public function get_plans() {
 
-			error_log( 'get_plans: plans are already set' );
-			error_log( print_r( $this->plans, true ) );
-
 			if ( isset( $this->plans ) ) {
 				return $this->plans;
 			}
 
-			error_log( 'get_plans: plans are not set so getting them from the database from the campaign' );
 			$all_plans = get_post_meta( $this->campaign_id, 'square_donation_plans', true );
-			error_log( print_r( $all_plans, true ) );
 
 			if ( ! is_array( $all_plans ) || ! array_key_exists( $this->mode, $all_plans ) ) {
 				$this->plans = array();
@@ -304,31 +299,15 @@ if ( ! class_exists( 'Charitable_Square_Subscription_Plan' ) ) :
 				),
 			);
 
-			// $subscription_plan_variation_data = new \Square\Models\CatalogSubscriptionPlanVariation( $plan_name, $phases );
-			// $subscription_plan_variation_data->setSubscriptionPlanId( $plan_id );
-			// $subscription_plan_variation_data->setName( $plan_name );
-
-			// $object = new \Square\Models\CatalogObject( 'SUBSCRIPTION_PLAN_VARIATION', '#1' );
-			// $object->setSubscriptionPlanVariationData( $subscription_plan_variation_data );
-
-
-			error_log( 'Square Create Plan Request:' );
-			error_log( print_r( $args, true ) );
-
 			$new_plan = $this->api()->post( 'catalog/object/', $args );
 
 			if ( false === $new_plan ) {
 				$response = $this->api()->get_last_response();
-				error_log( 'Square API Response:' );
-				error_log( print_r( $response, true ) );
 
 				$response_body = wp_remote_retrieve_body( $response );
-				error_log( 'Response Body:' );
-				error_log( $response_body );
 
 				$decoded_response = json_decode( $response_body );
 				if ( json_last_error() !== JSON_ERROR_NONE ) {
-					error_log( 'JSON Decode Error: ' . json_last_error_msg() );
 					charitable_get_notices()->add_error( __( 'Invalid response from Square API', 'charitable' ) );
 					return false;
 				}
@@ -345,14 +324,6 @@ if ( ! class_exists( 'Charitable_Square_Subscription_Plan' ) ) :
 
 			$plan_variation_id = $new_plan->catalog_object->subscription_plan_data->subscription_plan_variations[0]->id;
 
-			error_log( 'new plan is' );
-			error_log( print_r( $new_plan, true ) );
-			error_log( 'plan variation id is' );
-			error_log( print_r( $plan_variation_id, true ) );
-
-			error_log( 'create_plan: plan id is' );
-			error_log( print_r( $plan_id, true ) );
-
 			$this->save_plan( $plan_id );
 
 			return $plan_id;
@@ -360,76 +331,12 @@ if ( ! class_exists( 'Charitable_Square_Subscription_Plan' ) ) :
 
 		public function create_plan_variation_id( $plan_id, $plan ) {
 
-			error_log( 'create_plan_variation_id: plan id is' );
-			error_log( print_r( $plan_id, true ) );
-
 			$catalog_object = $this->api()->get( 'catalog/object/' . $plan_id );
-
-			error_log( 'create_plan_variation_id: catalog object is' );
-			error_log( print_r( $catalog_object, true ) );
 
 			$plan_variation_id = $catalog_object->object->subscription_plan_data->subscription_plan_variations[0]->id;
 
-			error_log( 'create_plan_variation_id: plan variation id is' );
-			error_log( print_r( $plan_variation_id, true ) );
-
 			return $plan_variation_id;
-			// error_log( 'create_plan_variation_id: plan variation id is' );
-			// error_log( print_r( $plan_variation_id, true ) );
-
-			// return $plan_variation_id;
 		}
-
-		// {
-		// 	"catalog_object": {
-		// 	"type": "SUBSCRIPTION_PLAN",
-		// 		"id": "VVH3YXQSQATSL3XR4LIKD3QM",
-		// 		"updated_at": "2022-11-09T20:28:12.208Z",
-		// 		"created_at": "2022-11-09T20:28:12.208Z",
-		// 		"version": 1668025692208,
-		// 		"present_at_all_locations": true,
-		// 		"subscription_plan_data": {
-		// 			"name": "Coffee Subscription",
-		// 	"subscription_plan_variations": [{
-		// 				"type": "SUBSCRIPTION_PLAN_VARIATION",
-		// 				"id": "CUPS23SKJ7J4FD4F3IMVAEOH",
-		// 				"updated_at": "2022-11-09T20:52:58.857Z",
-		// 				"created_at": "2022-11-09T20:52:58.857Z",
-		// 		  "version": 1668027178857,
-		// 				"present_at_all_locations": true,
-		// 				"subscription_plan_variation_data": {
-		// 					"name": "Coffee of the Month Club",
-		// 					"phases": [{
-		// 						"uid": "CR7TS35JYEVXC5BSDV5N7Z4Y",
-		// 						"cadence": "MONTHLY",
-		// 						"ordinal": 0,
-		// 	"periods": 1,
-		// 						"pricing": {
-		// 							"type": "STATIC",
-		// 							"price": {
-		// 								"amount": 1000,
-		// 								"currency": "USD"
-		// 							}
-		// 						}
-		// 					},
-		// 						{
-		// 						"uid": "AW9ES43NVGRFC8AQRK8J5X1S",
-		// 						"cadence": "MONTHLY",
-		// 						"ordinal": 1,
-		// 						"pricing": {
-		// 							"type": "RELATIVE",
-		// 							"discount_ids": ["5PFBH6YH5SB2F63FOIHJ7HWR"]
-		// 							}
-		// 					}],
-		// 					"subscription_plan_id": "VVH3YXQSQATSL3XR4LIKD3QM"
-		// 					}
-		// 				}],
-		// 				"eligible_category_ids": ["2CJLFP5C6G74W3U3HD5YAE5W"],
-		// 				"all_items": false
-		// 			}
-		// 		}
-		// 	}
-
 
 		/**
 		 * Save plan to campaign meta.
@@ -440,8 +347,6 @@ if ( ! class_exists( 'Charitable_Square_Subscription_Plan' ) ) :
 		 * @return mixed
 		 */
 		public function save_plan( $plan_id ) {
-			error_log('save_plan: plan id is');
-			error_log(print_r($plan_id, true));
 
 			$mode_plans                          = $this->get_plans();
 			$mode_plans[ $this->get_plan_key() ] = $plan_id;

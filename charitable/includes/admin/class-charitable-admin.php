@@ -54,10 +54,23 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 			$this->donation_actions = new Charitable_Donation_Admin_Actions();
 
+			// Initialize About page.
+			new Charitable_About();
+
 			do_action( 'charitable_admin_loaded' );
 
 			add_action( 'wp_ajax_charitable_lite_settings_upgrade', array( $this, 'dismiss_lite_cta' ) );
 			add_action( 'wp_ajax_charitable_lite_reports_upgrade', array( $this, 'dismiss_lite_reports_cta' ) );
+
+			// Addon management AJAX handlers.
+			add_action( 'wp_ajax_charitable_install_addon', array( $this, 'install_addon' ) );
+			add_action( 'wp_ajax_charitable_activate_addon', array( $this, 'activate_addon' ) );
+			add_action( 'wp_ajax_charitable_deactivate_addon', array( $this, 'deactivate_addon' ) );
+
+			// Dedicated About/Addons handlers to avoid conflicts with legacy hooks.
+			add_action( 'wp_ajax_charitable_addons_install_wporg', array( $this, 'install_addon' ) );
+			add_action( 'wp_ajax_charitable_addons_activate', array( $this, 'activate_addon' ) );
+			add_action( 'wp_ajax_charitable_addons_deactivate', array( $this, 'deactivate_addon' ) );
 
 			add_filter( 'post_row_actions', array( $this, 'campaign_action_row' ), 10, 2 );
 			add_filter( 'get_edit_post_link', array( $this, 'campaign_link' ), 99, 3 );
@@ -255,6 +268,8 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 			require_once $admin_dir . 'charitable-core-admin-functions.php';
 			require_once $admin_dir . 'campaigns/charitable-admin-campaign-hooks.php';
+			require_once $admin_dir . 'dashboard/class-charitable-dashboard-ajax.php';
+			require_once $admin_dir . 'charitable-dashboard-hooks.php';
 			require_once $admin_dir . 'dashboard-widgets/charitable-dashboard-widgets-hooks.php';
 			require_once $admin_dir . 'donations/charitable-admin-donation-hooks.php';
 			require_once $admin_dir . 'settings/charitable-settings-admin-hooks.php';
@@ -267,6 +282,13 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 			require_once $admin_dir . 'onboarding/charitable-onboarding-admin-hooks.php';
 			require_once $admin_dir . 'tracking/charitable-tracking-admin-hooks.php';
 			require_once $admin_dir . 'smtp/charitable-smtp-admin-hooks.php';
+			require_once $admin_dir . 'class-charitable-about.php';
+			require_once $admin_dir . 'charitable-admin-addons-functions.php';
+			require_once $admin_dir . 'privacy-compliance/charitable-privacy-compliance-admin-hooks.php';
+			require_once $admin_dir . 'intergrations/charitable-privacy-compliance-admin-hooks.php';
+			require_once $admin_dir . 'intergrations/charitable-backups-admin-hooks.php';
+			require_once $admin_dir . 'intergrations/charitable-seo-admin-hooks.php';
+			require_once $admin_dir . 'intergrations/charitable-automation-admin-hooks.php';
 		}
 
 		/**
@@ -475,6 +497,21 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 					'3.0.0'
 				);
 
+				// Add custom CSS for lity image sizing
+				wp_add_inline_style( 'lity', '
+					.lity-image img {
+						max-width: 90vw !important;
+						max-height: 90vh !important;
+						width: auto !important;
+						height: auto !important;
+						margin: 0 auto !important;
+					}
+					.lity-image .lity-container {
+						max-width: 90vw !important;
+						max-height: 90vh !important;
+					}
+				' );
+
 				wp_enqueue_script(
 					'lity',
 					charitable()->get_path( 'directory', false ) . 'assets/lib/lity/lity.min.js',
@@ -574,6 +611,39 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 					do_action( 'charitable_admin_enqueue_analytics_scripts' );
 
 				}
+			}
+
+			// Register v2 dashboard specific assets
+			if ( ! is_null( $screen ) && $screen->id === 'charitable_page_charitable-dashboard' && ! charitable_use_legacy_dashboard() ) {
+
+				// Register ApexCharts for the v2 dashboard chart
+				wp_register_script(
+					'charitable-apex-charts',
+					charitable()->get_path( 'assets', false ) . 'js/libraries/apexcharts.min.js',
+					array( 'jquery' ),
+					$version,
+					true
+				);
+
+				// Enqueue dashboard specific CSS
+				wp_enqueue_style(
+					'charitable-admin-dashboard',
+					charitable()->get_path( 'assets', false ) . 'css/admin/charitable-admin-dashboard.css',
+					array(),
+					charitable()->get_version()
+				);
+
+				// Enqueue dashboard specific JavaScript with ApexCharts dependency
+				wp_enqueue_script(
+					'charitable-admin-dashboard',
+					$assets_dir . 'js/admin/charitable-admin-dashboard.js',
+					array( 'jquery', 'charitable-apex-charts' ),
+					charitable()->get_version(),
+					true
+				);
+
+				// Enqueue ApexCharts
+				wp_enqueue_script( 'charitable-apex-charts' );
 			}
 
 			// Register these scripts only for checklist, onboarding, and similar pages.
@@ -1450,6 +1520,134 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 			}
 
 			return $post_types_objects;
+		}
+
+		/**
+		 * Install addon via AJAX.
+		 *
+		 * @since 1.8.7.6
+		 */
+		public function install_addon() {
+			// Check nonce.
+			if ( ! wp_verify_nonce( $_POST['nonce'], 'charitable_admin_addons' ) ) {
+				wp_send_json_error( 'Invalid nonce' );
+			}
+
+			// Check permissions.
+			if ( ! charitable_can_install( 'plugin' ) ) {
+				wp_send_json_error( 'Insufficient permissions' );
+			}
+
+			$plugin = sanitize_text_field( wp_unslash( $_POST['plugin'] ) );
+			$type   = sanitize_text_field( wp_unslash( $_POST['type'] ) );
+
+			if ( empty( $plugin ) ) {
+				wp_send_json_error( 'Plugin not specified' );
+			}
+
+			// Ensure filesystem access (request credentials if needed) similar to legacy flow.
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			$method = '';
+			$url    = esc_url( admin_url( 'admin.php?page=charitable-about' ) );
+
+			ob_start();
+			$creds = request_filesystem_credentials( $url, $method, false, false, null );
+			if ( false === $creds ) {
+				$form = ob_get_clean();
+				wp_send_json_success( array( 'form' => $form ) );
+			}
+
+			if ( ! WP_Filesystem( $creds ) ) {
+				ob_start();
+				request_filesystem_credentials( $url, $method, true, false, null );
+				$form = ob_get_clean();
+				wp_send_json_success( array( 'form' => $form ) );
+			}
+
+			// Download and install the plugin.
+			$result = charitable_install_wporg_plugin( $plugin );
+
+			if ( is_wp_error( $result ) ) {
+				wp_send_json_error( $result->get_error_message() );
+			}
+
+			// Get plugin basename.
+			$plugin_basename = charitable_get_plugin_basename_from_slug( $plugin );
+
+			wp_send_json_success( array(
+				'msg'         => 'Plugin installed successfully',
+				'basename'    => $plugin_basename,
+				'is_activated' => false,
+			) );
+		}
+
+		/**
+		 * Activate addon via AJAX.
+		 *
+		 * @since 1.8.7.6
+		 */
+		public function activate_addon() {
+			// Check nonce.
+			if ( ! wp_verify_nonce( $_POST['nonce'], 'charitable_admin_addons' ) ) {
+				wp_send_json_error( 'Invalid nonce' );
+			}
+
+			// Check permissions.
+			if ( ! charitable_can_activate( 'plugin' ) ) {
+				wp_send_json_error( 'Insufficient permissions' );
+			}
+
+			$plugin = sanitize_text_field( wp_unslash( $_POST['plugin'] ) );
+
+			if ( empty( $plugin ) ) {
+				wp_send_json_error( 'Plugin not specified' );
+			}
+
+			// Normalize plugin basename if a folder only or slug was passed.
+			if ( false === strpos( $plugin, '/' ) ) {
+				$plugin = charitable_get_plugin_basename_from_slug( $plugin );
+			}
+
+			// Activate the plugin.
+			$result = charitable_activate_wporg_plugin( $plugin );
+
+			if ( is_wp_error( $result ) ) {
+				wp_send_json_error( $result->get_error_message() );
+			}
+
+			wp_send_json_success( 'Plugin activated successfully' );
+		}
+
+		/**
+		 * Deactivate addon via AJAX.
+		 *
+		 * @since 1.8.7.6
+		 */
+		public function deactivate_addon() {
+			// Check nonce.
+			if ( ! wp_verify_nonce( $_POST['nonce'], 'charitable_admin_addons' ) ) {
+				wp_send_json_error( 'Invalid nonce' );
+			}
+
+			// Check permissions.
+			if ( ! charitable_can_activate( 'plugin' ) ) {
+				wp_send_json_error( 'Insufficient permissions' );
+			}
+
+			$plugin = sanitize_text_field( wp_unslash( $_POST['plugin'] ) );
+
+			if ( empty( $plugin ) ) {
+				wp_send_json_error( 'Plugin not specified' );
+			}
+
+			// Deactivate the plugin.
+			$result = charitable_deactivate_wporg_plugin( $plugin );
+
+			if ( is_wp_error( $result ) ) {
+				wp_send_json_error( $result->get_error_message() );
+			}
+
+			wp_send_json_success( 'Plugin deactivated successfully' );
 		}
 	}
 

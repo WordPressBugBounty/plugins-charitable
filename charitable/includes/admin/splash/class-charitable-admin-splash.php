@@ -236,22 +236,86 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 			$sections = array(
 				array(
 					'new'     => true,
+					'version' => '1.8.8',
 					'layout'  => 'fifty-fifty',
 					'class'   => 'no-order',
-					'title'   => __( 'Square Is Here!', 'charitable' ),
-					'content' => __( 'Charitable now supports Square as a built-in payment gateway. This means you can accept payments from donors using Square without adding any additional plugins.', 'charitable' ),
+					'title'   => __( 'New Dashboard!', 'charitable' ),
+					'content' => __( 'Charitable now has a new dashboard design with top campaigns, latest donations, top donors, and comments. New "30 Day" period added.', 'charitable' ),
 					'img'     => array(
-						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-7-square.png',
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-8-dashboard.png',
 						'shadow' => 'none',
 					),
 					'buttons' => array(
 						'main'      => array(
 							'text' => __( 'Get Started', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/get-started/square', 'splash-modal', 'Square Widgets Main' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/get-started/square/', 'splash-modal', 'Square Widgets Main' ),
 						),
 						'secondary' => array(
 							'text' => __( 'Learn More', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/learn-more/square', 'splash-modal', 'Square Widgets Secondary' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/learn-more/square/', 'splash-modal', 'Square Widgets Secondary' ),
+						),
+					),
+				),
+				array(
+					'new-for-pro' => true,
+					'layout'    => 'one-third-two-thirds-flipped',
+					'class'     => 'no-order',
+					'title'     => __( 'Advanced Elementor Widgets', 'charitable' ),
+					'content'   => __( 'When you create pages with the Elementor page builder, you\'ll now find four ready-made Charitable widgets (campaigns, donation button, donation form, campaigns).', 'charitable' ),
+					'img'       => array(
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-8-elementor.png',
+						'shadow' => 'none',
+					),
+					'buttons'   => array(
+						'main'      => array(
+							'text' => __( 'Get Started', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/documentation/how-to-use-charitable-widgets-in-elementor/', 'splash-modal', 'Elementor Widgets Main' ),
+						),
+						'secondary' => array(
+							'text' => __( 'Learn More', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/introducing-charitable-1-8-6-elementor-widgets-reply-to-and-new-splash-screen/', 'splash-modal', 'Elementor Widgets Secondary' ),
+						),
+					),
+				),
+				array(
+					'new-addon' => true,
+					'layout'    => 'one-third-two-thirds',
+					'class'     => 'no-order',
+					'title'     => __( 'DonorTrust', 'charitable' ),
+					'content'   => __( 'Showcase real-time, verified donations to your website visitors and encourage more people to donate to your cause.', 'charitable' ),
+					'img'       => array(
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-8-donortrust.gif',
+						'shadow' => 'none',
+					),
+					'buttons'   => array(
+						'main'      => array(
+							'text' => __( 'Get Started', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/documentation/charitable-donortrust/', 'splash-modal', 'DonorTrust Main' ),
+						),
+						'secondary' => array(
+							'text' => __( 'Learn More', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/introducing-donortrust/', 'splash-modal', 'DonorTrust Secondary' ),
+						),
+					),
+				),
+				array(
+					'new-for-pro'     => true,
+					'layout'  => 'one-third-two-thirds-flipped',
+					'class'   => 'no-order',
+					'title'   => __( 'More Stripe Options!', 'charitable' ),
+					'content' => __( 'Charitable now supports ACH Direct Debit, SEPA Direct Debit, Cash App, and BECS Direct Debit for Stripe users.', 'charitable' ),
+					'img'     => array(
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-8-stripe.png',
+						'shadow' => 'none',
+					),
+					'buttons' => array(
+						'main'      => array(
+							'text' => __( 'Get Started', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/introducing-charitable-1-8-8/', 'splash-modal', 'Square Widgets Main' ),
+						),
+						'secondary' => array(
+							'text' => __( 'Learn More', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/introducing-charitable-1-8-8/', 'splash-modal', 'Square Widgets Secondary' ),
 						),
 					),
 				),
@@ -268,11 +332,11 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 					'buttons'   => array(
 						'main'      => array(
 							'text' => __( 'Get Started', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/get-started/google-analytics', 'splash-modal', 'GA Main' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/get-started/google-analytics/', 'splash-modal', 'GA Main' ),
 						),
 						'secondary' => array(
 							'text' => __( 'Learn More', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/learn-more/google-analytics', 'splash-modal', 'GA Secondary' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/learn-more/google-analytics/', 'splash-modal', 'GA Secondary' ),
 						),
 					),
 				),

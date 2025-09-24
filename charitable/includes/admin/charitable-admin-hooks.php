@@ -269,3 +269,18 @@ add_action( 'wp_ajax_nopriv_charitable_connect_process', array( Charitable_Admin
 add_action( 'admin_init', [ Charitable_Admin_Splash::get_instance(), 'initialize_splash_data' ], 15 );
 add_action( 'admin_enqueue_scripts', [ Charitable_Admin_Splash::get_instance(), 'admin_enqueue_scripts' ] );
 add_action( 'admin_footer', [ Charitable_Admin_Splash::get_instance(), 'admin_footer' ] );
+
+/**
+ * Dashboard AJAX handlers.
+ *
+ * @see Charitable_Dashboard::ajax_activate_addon()
+ * @see Charitable_Dashboard::ajax_approve_comment()
+ * @see Charitable_Dashboard::ajax_delete_comment()
+ * @see Charitable_Dashboard::ajax_install_charitable_addon()
+ * @see Charitable_Dashboard::ajax_activate_charitable_addon()
+ */
+add_action( 'wp_ajax_charitable_activate_addon', array( Charitable_Dashboard::get_instance(), 'ajax_activate_addon' ) );
+add_action( 'wp_ajax_charitable_approve_comment', array( Charitable_Dashboard::get_instance(), 'ajax_approve_comment' ) );
+add_action( 'wp_ajax_charitable_delete_comment', array( Charitable_Dashboard::get_instance(), 'ajax_delete_comment' ) );
+add_action( 'wp_ajax_charitable_install_charitable_addon', array( Charitable_Dashboard::get_instance(), 'ajax_install_charitable_addon' ) );
+add_action( 'wp_ajax_charitable_activate_charitable_addon', array( Charitable_Dashboard::get_instance(), 'ajax_activate_charitable_addon' ) );

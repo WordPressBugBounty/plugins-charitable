@@ -29,7 +29,7 @@ ob_start();
 			<div>
 				<div class="charitable-screenshot">
 					<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/integrations/smtp-screenshot-thumnbail.png' ); ?>" alt="<?php echo esc_html__( 'Integrate WP Mail SMTP Into Charitable For Improved Email Reliability', 'charitable' ); ?>">
-					<a href="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/icons/zoom.svg' ); ?>" class="hover" data-lity=""></a>
+					<a href="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/integrations/smtp-screenshot-full.png' ); ?>" class="hover" data-lity=""></a>
 				</div>
 			</div>
 			<div>
@@ -144,18 +144,6 @@ ob_start();
 
 	</div> <!-- charitable integrations container -->
 
-	<div id="charitable-large-screenshot-preview" class="charitable-screenshot-modal">
-
-		<div id="charitable-large-screenshot-form" class="charitable-large-screenshot-form">
-			<div class="charitable-screenshot-close-icon">×</div>
-
-			<div class="interior">
-				<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/integrations/smtp-screenshot-full.png' ); ?>" alt="<?php echo esc_html__( 'Integrate WP Mail SMTP Into Charitable For Improved Email Reliability', 'charitable' ); ?>">
-			</div>
-
-		</div>
-
-	</div>
 
 </div>
 
