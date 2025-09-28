@@ -66,7 +66,7 @@
   * via jQuery when the notice loads.
   */
  domReady( () => {
-     // fiveStarRatingNotice();
+     fiveStarRatingNotice();
      upgradeToProLink();
 
      jQuery( '.charitable-notice' ).each( function () {

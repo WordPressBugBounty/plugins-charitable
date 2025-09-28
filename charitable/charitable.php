@@ -3,11 +3,11 @@
  * Plugin Name: Charitable
  * Plugin URI: https://www.wpcharitable.com
  * Description: The best WordPress donation plugin. Fundraising with recurring donations, and powerful features to help you raise more money online.
- * Version: 1.8.8
+ * Version: 1.8.8.1
  * Author: Charitable Donations & Fundraising Team
  * Author URI: https://wpcharitable.com
  * Requires at least: 5.0
- * Stable tag: 1.8.8
+ * Stable tag: 1.8.8.1
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
@@ -39,7 +39,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		const AUTHOR = 'WP Charitable';
 
 		/* Plugin version. */
-		const VERSION = '1.8.8';
+		const VERSION = '1.8.8.1';
 
 		/* Version of database schema. */
 		const DB_VERSION = '20180522';
@@ -994,6 +994,9 @@ if ( ! class_exists( 'Charitable' ) ) :
 
 			// create or update the install date for future reference.
 			update_option( 'wpcharitable_activated_datetime', current_time( 'timestamp' ) ); // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
+
+			// Set initial timestamps for rotating menu items if they're already installed
+			$this->set_initial_rotating_menu_timestamps();
 		}
 
 		/**
@@ -1335,6 +1338,59 @@ if ( ! class_exists( 'Charitable' ) ) :
 					add_option( 'charitable_version_warning', $message );
 				} else {
 					delete_option( 'charitable_version_warning' );
+				}
+			}
+		}
+
+		/**
+		 * Set initial timestamps for rotating menu items if they're already installed.
+		 * This ensures the 7-day countdown starts immediately for already-installed plugins.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @return void
+		 */
+		private function set_initial_rotating_menu_timestamps() {
+			// Get the rotating menu items configuration
+			$admin_pages = Charitable_Admin_Pages::get_instance();
+			$reflection = new ReflectionClass( $admin_pages );
+			$method = $reflection->getMethod( 'get_marketing_rotation_items' );
+			$method->setAccessible( true );
+			$items = $method->invoke( $admin_pages );
+
+			$current_time = time();
+
+			foreach ( $items as $item ) {
+				$option_name = $item['option_name'] ?? '';
+				$option_key = $item['option_key'] ?? '';
+				$plugin_file = $item['plugin_file'] ?? '';
+
+				if ( empty( $option_name ) || empty( $plugin_file ) ) {
+					continue;
+				}
+
+				// Check if the plugin is installed (file exists in plugins directory)
+				$plugin_path = WP_PLUGIN_DIR . '/' . $plugin_file;
+				if ( file_exists( $plugin_path ) ) {
+					// Plugin is installed, check if we already have a timestamp
+					$existing_option = get_option( $option_name );
+					$has_timestamp = false;
+
+					if ( is_array( $existing_option ) ) {
+						$has_timestamp = isset( $existing_option[ $option_key ] ) && is_numeric( $existing_option[ $option_key ] );
+					} elseif ( is_numeric( $existing_option ) ) {
+						$has_timestamp = true;
+					}
+
+					// Only set timestamp if one doesn't already exist
+					if ( ! $has_timestamp ) {
+						if ( is_array( $existing_option ) ) {
+							$existing_option[ $option_key ] = $current_time;
+							update_option( $option_name, $existing_option );
+						} else {
+							update_option( $option_name, array( $option_key => $current_time ) );
+						}
+					}
 				}
 			}
 		}

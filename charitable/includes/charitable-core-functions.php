@@ -179,7 +179,13 @@ function charitable_get_user_dashboard() {
  * @return mixed|null A child class of Charitable_DB if table exists. null otherwise.
  */
 function charitable_get_table( $table ) {
-	return charitable()->get_db_table( $table );
+	$charitable = function_exists( 'charitable' ) ? charitable() : null;
+
+	if ( empty( $charitable ) || ! is_object( $charitable ) || ! method_exists( $charitable, 'get_db_table' ) ) {
+		return null;
+	}
+
+	return $charitable->get_db_table( $table );
 }
 
 /**

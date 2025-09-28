@@ -540,6 +540,11 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				$localized_vars = (array) apply_filters( 'charitable_localized_javascript_vars', $localized_vars );
 
 				wp_localize_script( 'charitable-admin', 'CHARITABLE', $localized_vars );
+				
+				// Localize script for charitable-admin-2.0.js
+				wp_localize_script( 'charitable-admin-2.0', 'charitable_admin', array(
+					'autoshow_plugin_notifications' => charitable_get_autoshow_plugin_notifications(),
+				) );
 
 				/* color picker for admin settings */
 				wp_enqueue_script( 'wp-color-picker', false, false, false, true ); // phpcs:ignore.

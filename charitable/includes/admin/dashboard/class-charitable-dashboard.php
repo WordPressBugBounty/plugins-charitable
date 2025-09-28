@@ -21,7 +21,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	 * Charitable_Dashboard
 	 *
 	 * @final
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 */
 	final class Charitable_Dashboard {
 
@@ -52,7 +52,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Source of blog posts content.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 *
 	 * @var string
 	 */
@@ -61,7 +61,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Cached version information from the API.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 *
 	 * @var array|null
 	 */
@@ -70,7 +70,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Create object instance.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		public function __construct() {
 			// Constructor - AJAX handlers are registered in charitable-admin-hooks.php
@@ -83,7 +83,8 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render the dashboard new page.
 		 *
-		 * @since 1.8.1
+		 * @since   1.8.8
+		 * @version 1.8.8.1
 		 */
 		public function render_dashboard_new() {
 			?>
@@ -96,7 +97,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 				/**
 				 * Do or render something right before the dashboard new area.
 				 *
-				 * @since 1.8.1
+				 * @since 1.8.8
 				 */
 				do_action( 'charitable_before_admin_dashboard_v2' );
 				?>
@@ -112,13 +113,24 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 							<?php $this->render_stats_section(); ?>
 							<?php $this->render_tabs_section(); ?>
 							<?php $this->render_upgrade_section(); ?>
+							<?php 
+							// Show Quick Access in left column for Pro users (when upgrade section is hidden)
+							if ( charitable_is_pro() ) {
+								$this->render_quick_access_section();
+							}
+							?>
 						</div>
 
 						<!-- Right Column -->
 						<div class="charitable-dashboard-v2-right-column">
 							<?php $this->render_enhance_campaign_section(); ?>
 							<?php $this->render_latest_updates_section(); ?>
-							<?php $this->render_quick_access_section(); ?>
+							<?php 
+							// Show Quick Access in right column for non-Pro users
+							if ( ! charitable_is_pro() ) {
+								$this->render_quick_access_section();
+							}
+							?>
 						</div>
 					</div>
 				</div>
@@ -127,7 +139,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 				/**
 				 * Do or render something right after the dashboard new area.
 				 *
-				 * @since 1.8.1
+				 * @since 1.8.8
 				 */
 				do_action( 'charitable_after_admin_dashboard_v2' );
 				?>
@@ -141,7 +153,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render the dashboard header section.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		public function render_dashboard_header() {
 			?>
@@ -169,7 +181,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render dashboard notifications.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		public function render_dashboard_notifications() {
 			// Get dashboard notifications
@@ -280,7 +292,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render the stats section with time period filter and chart.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		public function render_stats_section() {
 			?>
@@ -336,7 +348,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render the stats row with donation statistics.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		private function render_stats_row() {
 			// Get the selected time period from request, default to 'last-7-days'
@@ -397,7 +409,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Get dashboard statistics data.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 * @param string $time_period The selected time period.
 		 * @return array
 		 */
@@ -481,7 +493,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Get date range for a given time period.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 * @param string $time_period The time period.
 		 * @return array
 		 */
@@ -533,7 +545,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Calculate percentage changes for donations and average.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @param string $time_period Current time period.
 	 * @param float $current_total Current total donations.
 	 * @param string $current_avg Current average donation.
@@ -605,7 +617,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Get previous period date range for comparison.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @param string $time_period Current time period.
 	 * @return array|false
 	 */
@@ -628,7 +640,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Get previous period donation data.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @param array $date_range Previous period date range.
 	 * @return array|false
 	 */
@@ -665,7 +677,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Calculate percentage change between two values.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @param float $previous Previous value.
 	 * @param float $current Current value.
 	 * @return string
@@ -697,7 +709,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Parse money amount from formatted string.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @param string $money_formatted Formatted money string.
 	 * @return float
 	 */
@@ -723,7 +735,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Clear dashboard stats cache.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 */
 	public function clear_dashboard_stats_cache() {
 		// Delete all dashboard stats cache transients
@@ -748,7 +760,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Get the default tab from URL parameter.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 * @return string
 		 */
 		private function get_default_tab() {
@@ -766,7 +778,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Check if a tab should be active.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 * @param string $tab_name The tab name to check.
 		 * @return bool
 		 */
@@ -777,7 +789,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render the tabs section with campaigns, donations, donors, and comments.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		public function render_tabs_section() {
 			?>
@@ -811,7 +823,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render the top campaigns tab content.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		private function render_top_campaigns_tab() {
 			$campaigns = $this->get_top_campaigns();
@@ -882,7 +894,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Get top campaigns data.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 * @return array
 		 */
 	private function get_top_campaigns() {
@@ -970,7 +982,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render the latest donations tab content.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		private function render_latest_donations_tab() {
 			$donations = $this->get_latest_donations();
@@ -1035,7 +1047,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Get latest donations data.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 * @return array
 		 */
 	private function get_latest_donations() {
@@ -1128,7 +1140,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Render the top donors tab content.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 */
 	private function render_top_donors_tab() {
 		$donors = $this->get_top_donors();
@@ -1220,7 +1232,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Get top donors data.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @return array
 	 */
 	private function get_top_donors() {
@@ -1291,7 +1303,11 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 			}
 
 			// Determine donor type and badge
-			$donation_parent = ! empty( $donor_data->donation_parent_id ) ? charitable_get_donation( $donor_data->donation_parent_id )->get( 'donation_type' ) : false;
+			$donation_parent = false;
+			if ( ! empty( $donor_data->donation_parent_id ) ) {
+				$donation = charitable_get_donation( $donor_data->donation_parent_id );
+				$donation_parent = ( $donation && is_object( $donation ) ) ? $donation->get( 'donation_type' ) : false;
+			}
 			$display_count = ! empty( $donor_data->total_donation_count ) ? intval( $donor_data->total_donation_count ) : 1;
 
 			$badge_css = strtolower( $donation_parent ) === 'recurring' ? 'recurring' : 'one-time';
@@ -1324,7 +1340,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render the comments tab content.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		private function render_comments_tab() {
 			?>
@@ -1337,7 +1353,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render comments content based on addon status.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		private function render_comments_content() {
 			$addon_status = $this->get_donor_comments_addon_status();
@@ -1362,7 +1378,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Get donor comments addon status.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 * @return string Status: 'active', 'installed_inactive', 'not_installed_pro', 'not_installed_lite'
 		 */
 		private function get_donor_comments_addon_status() {
@@ -1384,7 +1400,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render comments table with actual data.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		private function render_comments_table() {
 			$comments = $this->get_comments();
@@ -1465,7 +1481,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render message for addon not installed (Lite users).
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		private function render_addon_not_installed_lite_message() {
 			?>
@@ -1484,7 +1500,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render message for addon not installed (Pro users).
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		private function render_addon_not_installed_pro_message() {
 			?>
@@ -1503,7 +1519,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render message for addon installed but not activated.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		private function render_addon_inactive_message() {
 			?>
@@ -1531,7 +1547,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Get comments data.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 * @return array
 		 */
 	private function get_comments() {
@@ -1606,7 +1622,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * AJAX handler for activating addons.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		public function ajax_activate_addon() {
 			// Verify nonce
@@ -1644,7 +1660,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * AJAX handler for approving comments.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		public function ajax_approve_comment() {
 			// Verify nonce
@@ -1687,7 +1703,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * AJAX handler for deleting comments.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		public function ajax_delete_comment() {
 			// Verify nonce
@@ -1730,9 +1746,13 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render the upgrade section.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		public function render_upgrade_section() {
+			// Don't show upgrade section if user already has Pro license
+			if ( charitable_is_pro() ) {
+				return;
+			}
 			?>
 			<section class="charitable-dashboard-v2-section">
 				<h4 class="charitable-dashboard-v2-upgrade-title"><?php esc_html_e( 'Upgrade to Pro to Unlock Powerful Donation Features', 'charitable' ); ?></h4>
@@ -1755,7 +1775,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render left column upgrade features.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		private function render_upgrade_features_left() {
 			$features = array(
@@ -1781,7 +1801,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render right column upgrade features.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		private function render_upgrade_features_right() {
 			$features = array(
@@ -1807,7 +1827,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render the enhance campaign section.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		public function render_enhance_campaign_section() {
 			// Hide section if no items to show
@@ -1891,7 +1911,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render enhance grid items.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		private function render_enhance_grid_items() {
 			$items = $this->get_enhance_items();
@@ -1943,7 +1963,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Get enhance items data.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 * @return array
 		 */
 		private function get_enhance_items() {
@@ -1999,7 +2019,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * AJAX handler for installing Charitable addons.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 */
 	public function ajax_install_charitable_addon() {
 		// Security check
@@ -2058,7 +2078,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * AJAX handler for activating Charitable addons.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 */
 	public function ajax_activate_charitable_addon() {
 		// Security check
@@ -2118,7 +2138,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Get curated third-party plugins list.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @return array
 	 */
 	private function get_curated_third_party_plugins() {
@@ -2137,7 +2157,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Get custom SVG icons for plugins.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @return array
 	 */
 	private function get_custom_plugin_icons() {
@@ -2156,7 +2176,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Get curated Charitable addons list.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @return array
 	 */
 	private function get_curated_charitable_addons() {
@@ -2171,7 +2191,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Get custom title overrides for Charitable addons.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @return array
 	 */
 	private function get_charitable_addon_title_overrides() {
@@ -2189,7 +2209,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Get third-party plugin data.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @return array
 	 */
 	private function get_third_party_plugin_data() {
@@ -2200,7 +2220,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Get Charitable addon data.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @param string $slug Addon slug.
 	 * @return array|false
 	 */
@@ -2291,7 +2311,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Get Charitable addon icon from local assets.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @param string $slug Addon slug.
 	 * @return string Icon URL or generic icon.
 	 */
@@ -2332,7 +2352,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Get generic plugin icon SVG.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @return string Generic icon SVG.
 	 */
 	private function get_generic_plugin_icon() {
@@ -2346,7 +2366,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Format plugin item for display.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @param array  $plugin_data Plugin data.
 	 * @param string $type Plugin type.
 	 * @return array
@@ -2378,7 +2398,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Format addon item for display.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @param array $addon_data Addon data.
 	 * @return array
 	 */
@@ -2515,7 +2535,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Get button state for plugin/addon.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @param array  $item_data Item data.
 	 * @param string $type Item type.
 	 * @return array
@@ -2585,7 +2605,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Get plugin icon.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @param array $plugin_data Plugin data.
 	 * @return string
 	 */
@@ -2631,7 +2651,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Convert URL to server file path.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @param string $url The URL to convert.
 	 * @return string|false The server path or false if conversion fails.
 	 */
@@ -2685,7 +2705,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Track recommendation interaction.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @param string $action Action performed.
 	 * @param string $plugin_slug Plugin slug.
 	 * @param string $plugin_type Plugin type.
@@ -2718,7 +2738,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Check if enhance section should be shown.
 	 *
-	 * @since 1.8.1
+	 * @since 1.8.8
 	 * @return bool
 	 */
 	private function should_show_enhance_section() {
@@ -2729,7 +2749,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render the latest updates section.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		public function render_latest_updates_section() {
 			// Check if there are blog posts to determine footer link text
@@ -2793,7 +2813,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render update features.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		private function render_update_features() {
 			$features = array(
@@ -2818,7 +2838,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render blog posts.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		private function render_blog_posts() {
 			$posts = $this->get_blog_posts();
@@ -2903,7 +2923,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Fetch blog posts from feed.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 *
 		 * @return array|false Returns array on success, false on failure
 		 */
@@ -2947,7 +2967,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Verify blog posts data before it is saved.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 *
 		 * @param array $blog_posts Array of blog posts items to verify.
 		 *
@@ -3021,7 +3041,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Get blog posts from transient cache.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 *
 		 * @return array
 		 */
@@ -3039,7 +3059,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Cache blog posts data using transients.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 *
 		 * @param array $blog_posts Blog posts data to cache.
 		 */
@@ -3058,7 +3078,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Get blog posts data.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 * @return array
 		 */
 		private function get_blog_posts() {
@@ -3102,7 +3122,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Clear blog posts cache (for testing purposes).
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		private function clear_blog_posts_cache() {
 			delete_transient( 'charitable_blog_posts_cache' );
@@ -3111,7 +3131,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Get blog posts error data when API fails and no cache is available.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 * @return array
 		 */
 		private function get_blog_posts_error() {
@@ -3132,7 +3152,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Check if blog posts contain an error.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 * @param array $posts Blog posts array.
 		 * @return bool True if posts contain an error.
 		 */
@@ -3153,7 +3173,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Calculate how many updates behind the user is.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 * @return int Number of updates behind, or 0 if up to date or unable to determine.
 		 */
 		private function get_updates_behind() {
@@ -3173,7 +3193,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Get the latest version from the API data.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 * @return string Latest version or empty string if not available.
 		 */
 		private function get_latest_version() {
@@ -3196,7 +3216,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Compare two version strings and return how many updates behind.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 * @param string $current Current version (e.g., "1.8.4").
 		 * @param string $latest Latest version (e.g., "1.8.8").
 		 * @return int Number of updates behind.
@@ -3237,7 +3257,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Test version comparison logic (for debugging).
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 * @return void
 		 */
 		public function test_version_comparison() {
@@ -3260,7 +3280,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render the quick access section.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		public function render_quick_access_section() {
 			?>
@@ -3306,7 +3326,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render quick access items.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		private function render_quick_access_items() {
 			$items = $this->get_quick_access_items();
@@ -3328,7 +3348,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Get quick access items data.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 * @return array
 		 */
 		private function get_quick_access_items() {
@@ -3367,7 +3387,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		/**
 		 * Render dashboard scripts.
 		 *
-		 * @since 1.8.1
+		 * @since 1.8.8
 		 */
 		public function render_dashboard_scripts() {
 			$charitable_dashboard_legacy = Charitable_Dashboard_Legacy::get_instance();

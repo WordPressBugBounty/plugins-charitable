@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.8.2
 Requires PHP: 7.2
-Stable tag: 1.8.8
+Stable tag: 1.8.8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -259,6 +259,11 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.8.1 =
+* FIX: Fixed some CSS issues in certain areas in the admin when a license was not activated.
+* FIX: Resolved 404 on completed checklist page in certain scenarios.
+* UPDATE: Minor dashboard visual updates when a license is activated.
 
 = Donation Form & Fundraising Campaigns v1.8.8 =
 * NEW: New dashboard design with top campaigns, latest donations, top donors, and comments. New "30 Day" period added.

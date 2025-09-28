@@ -1732,6 +1732,11 @@ add_action( 'admin_bar_menu', 'charitable_show_test_mode_notice_in_admin_bar', 1
  * @return string|void The HTML output if $echo is false, otherwise void.
  */
 function charitable_render_global_upgrade_cta( $css_class = '', $echo = true ) {
+	// Don't show upgrade CTA if user already has Pro license
+	if ( charitable_is_pro() ) {
+		return $echo ? '' : '';
+	}
+
 	$output = '';
 
 	$output .= '<section class="charitable-dashboard-v2-section charitable-global-upgrade-cta ' . esc_attr( $css_class ) . '">';

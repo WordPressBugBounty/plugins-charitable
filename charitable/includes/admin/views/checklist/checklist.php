@@ -112,7 +112,7 @@ ob_start();
 						<?php
 						printf(
 							// translators: Suggestion on completion of checklist on checklist page.
-							esc_html__( '%1$s <a href="https://www.wpcharitable.com/documentation/" target="_blank">%2$s</a> %3$s <a href="https://www.wpcharitable.com/support/" target="_blank">%4$s</a>.', 'charitable' ),
+							__( '%1$s <a href="https://www.wpcharitable.com/documentation/" target="_blank">%2$s</a> %3$s <a href="https://www.wpcharitable.com/support/" target="_blank">%4$s</a>.', 'charitable' ),
 							esc_html__( 'Need help? Visit our', 'charitable' ),
 							esc_html__( 'documentation', 'charitable' ),
 							esc_html__( 'or', 'charitable' ),

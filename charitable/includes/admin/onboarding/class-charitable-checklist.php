@@ -252,6 +252,7 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 		 * Add checklist to WordPress admin menu.
 		 *
 		 * @since 1.8.2
+		 * @version 1.8.8.1
 		 *
 		 * @param array $submenu The submenu array.
 		 *
@@ -263,20 +264,7 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 				return $submenu;
 			}
 
-			if ( defined( 'CHARITABLE_ONBOARDING_FORCE_CHECKLIST' ) && CHARITABLE_ONBOARDING_FORCE_CHECKLIST ) { // phpcs:ignore
-				// do nothing.
-			} else {
-				// If the checklist is completed, don't show it in the menu unless we are on the checklist page.
-				if ( $this->is_checklist_completed() || $this->is_checklist_skipped() ) {
-					if ( ! isset( $_GET['page'] ) || 'charitable-setup-checklist' !== $_GET['page'] ) { // phpcs:ignore
-						return $submenu;
-					}
-				}
-				if ( ! $this->maybe_load_checklist_within_activation() ) {
-					return $submenu;
-				}
-			}
-
+			// Always show checklist menu item - removed time-based restrictions
 			$checklist_menu_item = array(
 				'page_title' => __( 'Checklist', 'charitable' ),
 				'menu_title' => __( 'Checklist', 'charitable' ) . $this->get_checklist_bar_html(),
@@ -426,6 +414,63 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 			}
 
 			return false;
+		}
+
+		/**
+		 * Check if the checklist should be considered completed based on actual conditions.
+		 * This method determines if the checklist should be auto-completed based on:
+		 * - Having campaigns created
+		 * - Time since activation (14+ days)
+		 * - Other completion criteria
+		 *
+		 * @since 1.8.2
+		 * @version 1.8.8.1
+		 *
+		 * @return bool
+		 */
+		public function should_checklist_be_completed() {
+
+			$total_campaigns = wp_count_posts( 'campaign' );
+			$count_campaigns = ! empty( $total_campaigns->publish ) ? $total_campaigns->publish : 0;
+
+			// If there are campaigns created, check activation time
+			if ( intval( $count_campaigns ) > 0 ) {
+				$activation_date = get_option( 'wpcharitable_activated_datetime', false );
+
+				// If wpcharitable_activated_datetime is false, try the backup option
+				if ( false === $activation_date ) {
+					$activation_date = get_option( 'charitable_activated', false );
+					if ( is_array( $activation_date ) ) {
+						foreach ( $activation_date as $date ) {
+							if ( is_numeric( $date ) ) {
+								$activation_date = $date;
+								break;
+							}
+						}
+					}
+				}
+
+				// If we have an activation date and it's been more than 14 days, auto-complete
+				if ( false !== $activation_date && is_numeric( $activation_date ) ) {
+					$difference = time() - $activation_date;
+					if ( $difference > ( 14 * 24 * 60 * 60 ) ) {
+						return true;
+					}
+				}
+			}
+
+			// Also check if all required steps are actually completed
+			$required_steps = array( 'connect-gateway', 'general-settings', 'email-settings', 'first-campaign' );
+			$all_steps_completed = true;
+
+			foreach ( $required_steps as $step ) {
+				if ( ! $this->is_step_completed( $step, false ) ) {
+					$all_steps_completed = false;
+					break;
+				}
+			}
+
+			return $all_steps_completed;
 		}
 
 		/**
@@ -669,6 +714,35 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 			// redirect to the checklist page.
 			wp_safe_redirect( admin_url( 'admin.php?page=charitable-setup-checklist' ) );
 			exit;
+		}
+
+		/**
+		 * Manually mark checklist as completed.
+		 * This method can be called to force completion of the checklist.
+		 *
+		 * @since 1.8.2
+		 * @version 1.8.8.1
+		 *
+		 * @return bool True if successful, false otherwise.
+		 */
+		public function force_complete_checklist() {
+
+			// Mark all steps as completed
+			foreach ( $this->steps as $step ) {
+				$this->mark_step_completed( $step );
+			}
+
+			// Update status to completed
+			$result = $this->update_checklist_status( 'completed' );
+
+			// Clear any existing dashboard notices
+			$dashboard_notices = get_option( 'charitable_dashboard_notifications', array() );
+			if ( isset( $dashboard_notices['checklist_status'] ) ) {
+				unset( $dashboard_notices['checklist_status'] );
+				update_option( 'charitable_dashboard_notifications', $dashboard_notices );
+			}
+
+			return $result;
 		}
 
 
@@ -983,6 +1057,7 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 		 * Confirm if we can load the checklist assets.
 		 *
 		 * @since 1.8.2
+		 * @version 1.8.8.1
 		 *
 		 * @return bool
 		 */
@@ -990,7 +1065,7 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 
 			$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 
-			// if we are on the checklist page, it's a must.
+			// if we are on the checklist page, always allow access
 			if ( isset( $_GET['page'] ) && 'charitable-setup-checklist' === $_GET['page'] ) { // phpcs:ignore`
 				return true;
 			}
@@ -1010,11 +1085,7 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 				return false;
 			}
 
-			if ( ! $this->maybe_load_checklist_within_activation() ) {
-				return false;
-			}
-
-			// finally, if we are on a legitimate Charitable screen and made it this far, then load the checklist assets.
+			// Always allow checklist assets to load on Charitable screens - removed time restrictions
 			if ( ! is_null( $screen ) && in_array( $screen->id, charitable_get_charitable_screens() ) ) {
 				return true;
 			}
@@ -1029,14 +1100,18 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 		 * @since   1.8.1.6
 		 * @version 1.8.1.9 // Updated doc URL.
 		 * @version 1.8.2
+		 * @version 1.8.8.1
 		 */
 		public function get_dashboard_notices() {
 
 			$dashboard_notices = get_option( 'charitable_dashboard_notifications', array() );
 
-			// Has user started or completed the checklist?
-			if ( ! $this->is_checklist_started() ) {
-				return $dashboard_notices;
+			// Check if checklist should be considered completed based on actual conditions
+			$should_be_completed = $this->should_checklist_be_completed();
+
+			// If checklist should be completed but isn't marked as such, mark it as completed
+			if ( $should_be_completed && ! $this->is_checklist_completed() && ! $this->is_checklist_skipped() ) {
+				$this->update_checklist_status( 'completed' );
 			}
 
 			// Has user completed the checklist?
@@ -1049,12 +1124,13 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 				return $dashboard_notices;
 			}
 
-			// if the 'donation_security_checks' already exists in the dashboard notices, don't add it again.
+			// if the 'checklist_status' already exists in the dashboard notices, don't add it again.
 			if ( isset( $dashboard_notices['checklist_status'] ) ) {
 				return $dashboard_notices;
 			}
 
-			if ( ! $this->maybe_load_checklist_within_activation() ) {
+			// Only show notice if checklist is actually incomplete and user has started it
+			if ( ! $this->is_checklist_started() ) {
 				return $dashboard_notices;
 			}
 

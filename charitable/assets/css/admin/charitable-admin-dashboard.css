@@ -1292,6 +1292,32 @@ body.charitable_page_charitable-dashboard #wpwrap::after {
   width: 392px;
 }
 
+/* Quick Access in left column (Pro users) - make it wider */
+.charitable-dashboard-v2-left-column .charitable-dashboard-v2-quick-access-content .charitable-dashboard-v2-quick-access-items {
+  width: 100%;
+  max-width: 600px;
+}
+
+/* Adjust footer margins for Quick Access in left column */
+.charitable-dashboard-v2-left-column .charitable-dashboard-v2-quick-access-footer {
+  margin: 20px -25px -20px -25px;
+}
+
+/* Remove padding for Quick Access section when in left column (Pro users only) */
+.charitable-dashboard-v2-left-column #charitable-dashboard-v2-quick-access.charitable-dashboard-v2-section {
+  padding: 0;
+}
+
+/* Update Quick Access content alignment for left column (Pro users only) */
+.charitable-dashboard-v2-left-column .charitable-dashboard-v2-section .charitable-dashboard-v2-quick-access-content {
+  justify-content: start;
+}
+
+/* Remove margin for h3 in Quick Access section when in left column (Pro users only) */
+.charitable-dashboard-v2-left-column .charitable-dashboard-v2-section:not(.charitable-dashboard-v2-right-column .charitable-dashboard-v2-section) h3 {
+  margin: 0;
+}
+
 .charitable-dashboard-v2-section .charitable-dashboard-v2-quick-access-content .charitable-dashboard-v2-quick-access-items .charitable-dashboard-v2-quick-access-item {
   display: flex;
   align-items: center;

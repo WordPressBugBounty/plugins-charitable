@@ -1,3 +1,9 @@
+
+# 1.8.8.1
+* FIX: Fixed some CSS issues in certain areas in the admin when a license was not activated.
+* FIX: Resolved 404 on completed checklist page in certain scenarios.
+* UPDATE: Minor dashboard visual updates when a license is activated.
+
 # 1.8.8
 * NEW: New dashboard design with top campaigns, latest donations, top donors, and comments. New "30 Day" period added.
 * NEW: Added 'charitable_donor_query_skip_donation_filters' for donor query to make including donors without donations more flexible.

@@ -1314,6 +1314,12 @@ body.charitable_page_charitable-settings div#charitable-settings table.form-tabl
   margin-bottom: 0;
 }
 
+/* Hide steps 2 and 3 by default, only show step 1 initially */
+.charitable-admin-notice-five-star-rating[data-step="2"],
+.charitable-admin-notice-five-star-rating[data-step="3"] {
+  display: none;
+}
+
 .edit-php.post-type-charitable .tablenav .actions {
   padding-right: 0;
 }

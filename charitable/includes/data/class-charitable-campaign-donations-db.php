@@ -173,16 +173,30 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
 		/**
 		 * Delete all campaign donation records for a given donation.
 		 *
-		 * @since  1.2.0
+		 * @since   1.2.0
+		 * @version 1.8.8.1
 		 *
 		 * @param  int $donation_id The donation ID.
 		 * @return boolean
 		 */
 		public static function delete_donation_records( $donation_id ) {
+			// Only act on Charitable donation post type.
+			$post_type = get_post_type( (int) $donation_id );
+			if ( empty( $post_type ) || ( defined( 'Charitable::DONATION_POST_TYPE' ) ? $post_type !== Charitable::DONATION_POST_TYPE : $post_type !== 'donation' ) ) { // Fallback to 'donation' slug if constant is unavailable.
+				return false;
+			}
+
 			$table = charitable_get_table( 'campaign_donations' );
+			if ( empty( $table ) || ! is_object( $table ) || ! method_exists( $table, 'get_campaigns_for_donation' ) ) {
+				return false;
+			}
 
 			foreach ( $table->get_campaigns_for_donation( $donation_id ) as $campaign_id ) {
 				Charitable_Campaign::flush_donations_cache( $campaign_id );
+			}
+
+			if ( ! method_exists( $table, 'delete_by' ) ) {
+				return false;
 			}
 
 			return $table->delete_by( 'donation_id', $donation_id );

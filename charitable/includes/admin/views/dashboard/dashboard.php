@@ -48,6 +48,13 @@ $charitable_dashboard = Charitable_Dashboard::get_instance();
 				<?php $charitable_dashboard->render_tabs_section(); ?>
 
 				<?php $charitable_dashboard->render_upgrade_section(); ?>
+
+				<?php 
+				// Show Quick Access in left column for Pro users (when upgrade section is hidden)
+				if ( charitable_is_pro() ) {
+					$charitable_dashboard->render_quick_access_section();
+				}
+				?>
 			</div>
 
 			<!-- Right Column -->
@@ -56,7 +63,12 @@ $charitable_dashboard = Charitable_Dashboard::get_instance();
 
 				<?php $charitable_dashboard->render_latest_updates_section(); ?>
 
-				<?php $charitable_dashboard->render_quick_access_section(); ?>
+				<?php 
+				// Show Quick Access in right column for non-Pro users
+				if ( ! charitable_is_pro() ) {
+					$charitable_dashboard->render_quick_access_section();
+				}
+				?>
 			</div>
 		</div>
 	</div>
