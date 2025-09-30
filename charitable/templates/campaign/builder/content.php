@@ -263,6 +263,21 @@ if ( 'publish' === $post_status || ( ( false === $post_status || 'draft' === $po
 
 										?>
 									<article>
+										<?php
+										// Check if all tabs should be hidden (1.8.8.2)
+										$all_tabs_hidden = true;
+										$visible_tabs_count = 0;
+										foreach ( $tab_tabs as $tab_id => $tab_fields ) {
+											$tab_info = $campaign_data['tabs'][ $tab_id ];
+											if ( empty( $tab_info['visible_nav'] ) || $tab_info['visible_nav'] !== 'invisible' ) {
+												$all_tabs_hidden = false;
+												$visible_tabs_count++;
+											}
+										}
+
+										// Only show navigation if there are multiple visible tabs (hide for single tab)
+										if ( ! $all_tabs_hidden && $visible_tabs_count > 1 ) :
+										?>
 										<nav class="charitable-campaign-nav charitable-tab-style-<?php echo esc_attr( $tab_style ); ?> charitable-tab-size-<?php echo esc_attr( $tab_size ); ?>">
 											<ul>
 											<?php if ( ! empty( $tab_tabs ) ) : ?>
@@ -294,6 +309,7 @@ if ( 'publish' === $post_status || ( ( false === $post_status || 'draft' === $po
 
 											</ul>
 										</nav>
+										<?php endif; // end if not all tabs hidden ?>
 										<div class="tab-content">
 
 											<ul class="charitable-tabs">

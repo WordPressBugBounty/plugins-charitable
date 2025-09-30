@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.8.2
 Requires PHP: 7.2
-Stable tag: 1.8.8.1
+Stable tag: 1.8.8.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -260,9 +260,12 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 
 == Changelog ==
 
-= Donation Form & Fundraising Campaigns v1.8.8.1 =
+# 1.8.8.2
+* FIX: Resolve PHP error causing issues with dashboard fully loading in some scenarios.
+* FIX: Improved front-end detection of tabs in visual campaigns.
+
+# 1.8.8.1
 * FIX: Fixed some CSS issues in certain areas in the admin when a license was not activated.
-* FIX: Resolved 404 on completed checklist page in certain scenarios.
 * UPDATE: Minor dashboard visual updates when a license is activated.
 
 = Donation Form & Fundraising Campaigns v1.8.8 =

@@ -1,7 +1,9 @@
+# 1.8.8.2
+* FIX: Resolve PHP error causing issues with dashboard fully loading in some scenarios.
+* FIX: Improved front-end detection of tabs in visual campaigns.
 
 # 1.8.8.1
 * FIX: Fixed some CSS issues in certain areas in the admin when a license was not activated.
-* FIX: Resolved 404 on completed checklist page in certain scenarios.
 * UPDATE: Minor dashboard visual updates when a license is activated.
 
 # 1.8.8

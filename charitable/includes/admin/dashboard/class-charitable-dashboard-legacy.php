@@ -1215,8 +1215,9 @@ if ( ! class_exists( 'Charitable_Dashboard_Legacy' ) ) :
 		/**
 		 * Get the recommended dashboard addons.
 		 *
-		 * @since  1.8.1.5
+		 * @since   1.8.1.5
 		 * @version 1.8.3
+		 * @version 1.8.8.2
 		 *
 		 * @return array
 		 */
@@ -1245,7 +1246,8 @@ if ( ! class_exists( 'Charitable_Dashboard_Legacy' ) ) :
 
 					if ( isset( $addon['featured'] ) && ! empty( $addon['sections'] ) && in_array( 'recommended', $addon['featured'], true ) ) {
 
-						$sections    = unserialize( $addon['sections'] );
+						// Check if sections is already an array or needs to be unserialized (added in 1.8.8.2)
+						$sections    = is_array( $addon['sections'] ) ? $addon['sections'] : unserialize( $addon['sections'] );
 						$description = isset( $sections['description'] ) ? $sections['description'] : '';
 
 						// subsutite test for translations, trying in 1.8.3.

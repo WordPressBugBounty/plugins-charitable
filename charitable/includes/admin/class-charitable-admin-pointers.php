@@ -200,6 +200,12 @@ if ( ! class_exists( 'Charitable_Admin_Pointers' ) ) :
 					}
 
 					function show_wpchar_pointer( id ) {
+						// Check if WordPress pointer function is available
+						if ( typeof $.fn.pointer === 'undefined' ) {
+							console.warn( 'Charitable: WordPress pointer function not available' );
+							return;
+						}
+						
 						var pointer = wpchar_pointers.pointers[ id ];
 						var options = $.extend( pointer.options, {
 							pointerClass: 'wp-pointer charitable-pointer',

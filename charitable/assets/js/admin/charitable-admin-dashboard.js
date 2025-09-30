@@ -29,6 +29,14 @@
 
             // Also hide spinners immediately if we're on the dashboard page
             this.hideSpinnersOnPageLoad();
+
+            // Add timeout fallback to ensure spinner is always hidden after 10 seconds
+            var self = this;
+            setTimeout(function() {
+                // Force hide spinner after 10 seconds as fallback
+                $('#charitable-dashboard-v2').addClass('charitable-dashboard-loaded');
+                $('body.charitable_page_charitable-dashboard').addClass('charitable-dashboard-loaded');
+            }, 10000); // 10 seconds
         },
 
         /**
@@ -831,6 +839,7 @@
 
         /**
          * Hide all dashboard spinners
+         * Note: There's also a 10-second timeout fallback in init() to ensure spinner is always hidden
          */
         hideSpinners: function() {
             // Hide the dashboard v2 spinner
