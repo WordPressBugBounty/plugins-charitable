@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.8.2
 Requires PHP: 7.2
-Stable tag: 1.8.8.2
+Stable tag: 1.8.8.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -260,11 +260,15 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 
 == Changelog ==
 
-# 1.8.8.2
+= Donation Form & Fundraising Campaigns v1.8.8.3
+* FIX: Resolved application fee calculation issue for zero-decimal currencies in Stripe payments in certain scenarios.
+* FIX: Updated code related to improve security and PHP standards compliance.
+
+= Donation Form & Fundraising Campaigns v1.8.8.2
 * FIX: Resolve PHP error causing issues with dashboard fully loading in some scenarios.
 * FIX: Improved front-end detection of tabs in visual campaigns.
 
-# 1.8.8.1
+= Donation Form & Fundraising Campaigns v1.8.8.1
 * FIX: Fixed some CSS issues in certain areas in the admin when a license was not activated.
 * UPDATE: Minor dashboard visual updates when a license is activated.
 
@@ -502,16 +506,6 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 * UPDATE: UI updates to items in marketing and payment tabs in visual builder.
 * FIX: Better sync for legacy and visual campaigns in certain scenarios.
 * FIX: Issue with Easy Digital Downloads addon card in addons screen resolved.
-* FIX: Resolved typos and PHP warnings and notices.
-
-= Donation Form & Fundraising Campaigns v1.8.1.11 =
-* FIX: Resolve issue when incorrectly connecting to Stripe in live mode on new installs in certain scenarios.
-
-= Donation Form & Fundraising Campaigns v1.8.1.10 =
-* NEW: UI updates and tweaks to notices and tooltips.
-* NEW: Deactivate legacy campaigns now an option in advanced settings.
-* NEW: Added and updated several items in the Growth Tools page.
-* FIX: Addressed security for ajax functions related to reporting.
 * FIX: Resolved typos and PHP warnings and notices.
 
 **[View entire donation form and fundraising platform changelog](https://plugins.svn.wordpress.org/charitable/trunk/CHANGELOG.md)**

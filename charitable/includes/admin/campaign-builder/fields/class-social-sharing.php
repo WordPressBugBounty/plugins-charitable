@@ -282,7 +282,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Sharing' ) ) :
 
 			<div class="charitable-panel-field charitable-panel-field-section" data-field-id="<?php echo intval( $field_id ); ?>">
 
-				<?php echo do_action( 'charitable_builder_' . esc_attr( $this->type ) . '_settings_display_start', $field_id, $campaign_data ); ?>
+				<?php do_action( 'charitable_builder_' . esc_attr( $this->type ) . '_settings_display_start', $field_id, $campaign_data ); ?>
 
 			</div>
 

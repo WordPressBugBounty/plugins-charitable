@@ -70,8 +70,8 @@ $pro_plugin        = 'wpconsent-premium/wpconsent-premium.php';
 
 			<div class="charitable-intergration-step charitable-intergration-step-1"  data-status="install">
 				<div class="instructions">
-					<h3><?php echo esc_html__( 'Install and Activate ' . $plugin_name, 'charitable' ); ?></h3>
-					<p><?php echo esc_html__( 'Install the ' . $plugin_name . ' plugin by clicking this button', 'charitable' ); ?></p>
+					<h3><?php echo esc_html( sprintf( __( 'Install and Activate %s', 'charitable' ), $plugin_name ) ); ?></h3>
+					<p><?php echo esc_html( sprintf( __( 'Install the %s plugin by clicking this button', 'charitable' ), $plugin_name ) ); ?></p>
 					<?php echo $install_button_html; // phpcs:ignore ?>
 				</div>
 				<div class="step">
@@ -94,8 +94,8 @@ $pro_plugin        = 'wpconsent-premium/wpconsent-premium.php';
 
 			<div class="charitable-intergration-step charitable-intergration-step-1" data-status="activate">
 				<div class="instructions">
-					<h3><?php echo esc_html__( 'Activate ' . $plugin_name, 'charitable' ); ?></h3>
-					<p><?php echo esc_html__( 'Activate ' . $plugin_name . ' by clicking this button:', 'charitable' ); ?></p>
+					<h3><?php echo esc_html( sprintf( __( 'Activate %s', 'charitable' ), $plugin_name ) ); ?></h3>
+					<p><?php echo esc_html( sprintf( __( 'Activate %s by clicking this button:', 'charitable' ), $plugin_name ) ); ?></p>
 					<?php echo $activate_button_html; // phpcs:ignore ?>
 				</div>
 				<div class="step">
@@ -117,8 +117,8 @@ $pro_plugin        = 'wpconsent-premium/wpconsent-premium.php';
 
 			<div class="charitable-intergration-step charitable-intergration-step-1" data-status="setup">
 				<div class="instructions">
-					<h3><?php echo esc_html__( 'Setup ' . $plugin_name, 'charitable' ); ?></h3>
-					<p><?php echo esc_html__( 'Setup ' . $plugin_name . ' plugin by clicking this button:', 'charitable' ); ?></p>
+					<h3><?php echo esc_html( sprintf( __( 'Setup %s', 'charitable' ), $plugin_name ) ); ?></h3>
+					<p><?php echo esc_html( sprintf( __( 'Setup %s plugin by clicking this button:', 'charitable' ), $plugin_name ) ); ?></p>
 					<a href="<?php echo esc_url( $setup_url ); ?>" target="_blank" class="charitable-button button-link charitable-button-setup"><?php echo esc_html__( 'Set Up WPConsent', 'charitable' ); ?></a>
 				</div>
 				<div class="step">
@@ -134,8 +134,8 @@ $pro_plugin        = 'wpconsent-premium/wpconsent-premium.php';
 
 			<div class="charitable-intergration-step charitable-intergration-step-1">
 				<div class="instructions">
-					<h3><?php echo esc_html__( 'Upgrade to ' . $plugin_name . ' Pro', 'charitable' ); ?></h3>
-					<p><?php echo esc_html__( 'Unlock addition features by upgrading to ' . $plugin_name . ' Pro. Special offer: Get 50% off your plan!', 'charitable' ); ?></p>
+					<h3><?php echo esc_html( sprintf( __( 'Upgrade to %s Pro', 'charitable' ), $plugin_name ) ); ?></h3>
+					<p><?php echo esc_html( sprintf( __( 'Unlock addition features by upgrading to %s Pro. Special offer: Get 50%% off your plan!', 'charitable' ), $plugin_name ) ); ?></p>
 					<a href="https://wpconsent.com/?utm_source=charitableplugin&utm_medium=link&utm_campaign=privacy-compliance-page" target="_blank" class="charitable-button button-link"><?php echo esc_html__( 'Upgrade To Pro', 'charitable' ); ?></a>
 				</div>
 				<div class="step">

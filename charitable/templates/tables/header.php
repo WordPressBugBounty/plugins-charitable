@@ -22,6 +22,6 @@ if ( ! array_key_exists( 'helper', $view_args ) ) {
 ?>
 <tr>
     <?php foreach ( $view_args['helper']->columns as $key => $header ) : ?>
-    <th scope="col" class="charitable-table-header-<?php echo esc_attr( $key ) ?>"><?php echo $header ?></th>
+    <th scope="col" class="charitable-table-header-<?php echo esc_attr( $key ) ?>"><?php echo wp_kses_post( $header ) ?></th>
     <?php endforeach ?>
 </tr>

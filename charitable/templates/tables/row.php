@@ -25,6 +25,6 @@ $columns = $view_args['columns'];
 ?>
 <tr>
     <?php foreach ( $columns as $key => $header ) : ?>
-    <td class="charitable-table-cell-<?php echo esc_attr( $key ) ?>"><?php echo array_key_exists( $key, $data ) ? $data[ $key ] : '' ?></td>
+    <td class="charitable-table-cell-<?php echo esc_attr( $key ) ?>"><?php echo array_key_exists( $key, $data ) ? wp_kses_post( $data[ $key ] ) : '' ?></td>
     <?php endforeach ?>
 </tr>

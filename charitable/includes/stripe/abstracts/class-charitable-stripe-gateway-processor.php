@@ -1174,8 +1174,9 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 		/**
 		 * Return the application fee to be charged for a particular amount.
 		 *
-		 * @since  1.4.2
+		 * @since   1.4.2
 		 * @version 1.8.0
+		 * @version 1.8.8.3
 		 *
 		 * @param  mixed $amount          The donation amount.
 		 * @param  mixed $application_fee The application fee.
@@ -1203,12 +1204,21 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 				);
 
 			} else {
-				$application_fee = 3;
-
-				$fee = round(
-					(float) $amount * $application_fee, // 0.02,
-					0
-				);
+				// Check if this is a zero-decimal currency (JPY, KRW, VND, etc.)
+				if ( self::is_zero_decimal_currency() ) {
+					// For zero-decimal currencies, use 0.03 (3% as decimal)
+					$fee = round(
+						(float) $amount * 0.03,
+						0
+					);
+				} else {
+					// For regular currencies (USD, EUR, GBP, etc.), use 3 (cents per dollar)
+					$application_fee = 3;
+					$fee = round(
+						(float) $amount * $application_fee,
+						0
+					);
+				}
 
 			}
 

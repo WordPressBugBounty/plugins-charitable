@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version.  1.8.0
+ * @version   1.8.8.3
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -81,10 +81,16 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment_Request' ) ) :
 
 			$active = ( true === apply_filters( 'charitable_campaign_builder_payment_sidebar_active', $this->active, $this->slug ) ) ? 'active' : false;
 
-			echo '<a href="#" class="charitable-panel-sidebar-section charitable-panel-sidebar-section-' . $this->slug . ' ' . $active . ' payment-request" data-section="' . $this->slug . '">'
-				. '<img class="charitable-builder-sidebar-icon" width="44" height="44" src="' . charitable()->get_path( 'assets', false ) . 'images/campaign-builder/settings/payment/' . $this->slug . '.png" />'
-				. $this->primary_label
-				. ' <i class="fa fa-angle-right charitable-toggle-arrow"></i></a>';
+			printf(
+				'<a href="#" class="charitable-panel-sidebar-section charitable-panel-sidebar-section-%1$s %2$s payment-request" data-section="%1$s">'
+				. '<img class="charitable-builder-sidebar-icon" width="44" height="44" src="%3$s" />'
+				. '%4$s'
+				. ' <i class="fa fa-angle-right charitable-toggle-arrow"></i></a>',
+				esc_attr( $this->slug ),
+				esc_attr( $active ),
+				esc_url( charitable()->get_path( 'assets', false ) . 'images/campaign-builder/settings/payment/' . $this->slug . '.png' ),
+				esc_html( $this->primary_label )
+			);
 		}
 
 
@@ -104,9 +110,9 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment_Request' ) ) :
 
 			?>
 
-			<div class="charitable-panel-content-section charitable-panel-content-section-parent-payment charitable-panel-content-section-<?php echo $this->slug; ?> <?php echo $active; ?>" style="<?php echo $style; ?>">
+			<div class="charitable-panel-content-section charitable-panel-content-section-parent-payment charitable-panel-content-section-<?php echo esc_attr( $this->slug ); ?> <?php echo esc_attr( $active ); ?>" style="<?php echo esc_attr( $style ); ?>">
 
-				<div class="charitable-panel-content-section-title"><?php echo $this->primary_label; ?></div>
+				<div class="charitable-panel-content-section-title"><?php echo esc_html( $this->primary_label ); ?></div>
 
 				<div class="charitable-panel-content-section-interior">
 
@@ -133,7 +139,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Payment_Request' ) ) :
 
 			$html = ob_get_clean();
 
-			echo $html;
+			echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	}
 

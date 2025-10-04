@@ -1,3 +1,7 @@
+# 1.8.8.3
+* FIX: Resolved application fee calculation issue for zero-decimal currencies in Stripe payments in certain scenarios.
+* FIX: Updated code related to improve security and PHP standards compliance.
+
 # 1.8.8.2
 * FIX: Resolve PHP error causing issues with dashboard fully loading in some scenarios.
 * FIX: Improved front-end detection of tabs in visual campaigns.

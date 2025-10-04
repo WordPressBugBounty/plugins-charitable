@@ -380,7 +380,7 @@ if ( ! class_exists( 'Charitable_Admin_Pages' ) ) :
 		private function get_marketing_rotation_items(): array {
 			return [
 				[
-					'label'       => esc_html__( 'Privacy Compliance', 'wpforms-lite' ),
+					'label'       => esc_html__( 'Privacy Compliance', 'charitable' ),
 					'menu_slug'   => 'charitable-privacy-compliance',
 					'option_name' => 'wpconsent_activated',
 					'option_key'  => 'wpconsent',
@@ -388,7 +388,7 @@ if ( ! class_exists( 'Charitable_Admin_Pages' ) ) :
 					'period_days' => 7,
 				],
 				[
-					'label'       => esc_html__( 'Backups', 'wpforms-lite' ),
+					'label'       => esc_html__( 'Backups', 'charitable' ),
 					'menu_slug'   => 'charitable-backups',
 					'option_name' => 'duplicator_activated',
 					'option_key'  => 'duplicator',
@@ -396,7 +396,7 @@ if ( ! class_exists( 'Charitable_Admin_Pages' ) ) :
 					'period_days' => 7,
 				],
 				[
-					'label'       => esc_html__( 'SEO', 'wpforms-lite' ),
+					'label'       => esc_html__( 'SEO', 'charitable' ),
 					'menu_slug'   => 'charitable-seo',
 					'option_name' => 'all-in-one-seo-pack_activated',
 					'option_key'  => 'all-in-one-seo-pack',
@@ -404,7 +404,7 @@ if ( ! class_exists( 'Charitable_Admin_Pages' ) ) :
 					'period_days' => 7,
 				],
 				[
-					'label'       => esc_html__( 'Automation', 'wpforms-lite' ),
+					'label'       => esc_html__( 'Automation', 'charitable' ),
 					'menu_slug'   => 'charitable-automation',
 					'option_name' => 'uncanny-automator_activated',
 					'option_key'  => 'uncanny_automator',

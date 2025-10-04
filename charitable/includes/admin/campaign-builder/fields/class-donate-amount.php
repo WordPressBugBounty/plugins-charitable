@@ -109,16 +109,16 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
                 <div class="charitable-' . esc_attr( $preview_or_template_css ) . '-donation-options">
                 <ul class="charitable-' . esc_attr( $preview_or_template_css ) . '-donation-amounts">
                     <li class="charitable-' . esc_attr( $preview_or_template_css ) . '-donation-amount suggested-donation-amount">
-                        <label><span class="amount">' . $currency_helper->get_monetary_amount( '5.00' ) . '</span></label>
+                        <label><span class="amount">' . esc_html( $currency_helper->get_monetary_amount( '5.00' ) ) . '</span></label>
                     </li>
                     <li class="charitable-' . esc_attr( $preview_or_template_css ) . '-donation-amount suggested-donation-amount">
-						<label><span class="amount">' . $currency_helper->get_monetary_amount( '10.00' ) . '</span></label>
+						<label><span class="amount">' . esc_html( $currency_helper->get_monetary_amount( '10.00' ) ) . '</span></label>
                     </li>
                     <li class="charitable-' . esc_attr( $preview_or_template_css ) . '-donation-amount suggested-donation-amount selected">
-						<label><span class="amount">' . $currency_helper->get_monetary_amount( '15.00' ) . '</span></label>
+						<label><span class="amount">' . esc_html( $currency_helper->get_monetary_amount( '15.00' ) ) . '</span></label>
                     </li>
                     <li class="charitable-' . esc_attr( $preview_or_template_css ) . '-donation-amount suggested-donation-amount">
-						<label><span class="amount">' . $currency_helper->get_monetary_amount( '20.00' ) . '</span></label>
+						<label><span class="amount">' . esc_html( $currency_helper->get_monetary_amount( '20.00' ) ) . '</span></label>
                     </li>
                     <li class="charitable-' . esc_attr( $preview_or_template_css ) . '-donation-amount custom-donation-amount">
                         <span class="custom-donation-amount-wrapper">
@@ -142,7 +142,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 					echo '<p>Cannot recieve donations.</p>';
 					echo '</div> <!-- placeholder -->';
 					$html = ob_get_clean();
-					echo $html;
+					echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					return;
 				endif;
 
@@ -152,7 +152,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 					echo '<p>No donation options available.</p>';
 					echo '</div> <!-- placeholder -->';
 					$html = ob_get_clean();
-					echo $html;
+					echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					return;
 				endif;
 
@@ -179,8 +179,8 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 						?>
 					<li class="charitable-<?php echo esc_attr( $preview_or_template_css ); ?>-donation-amount suggested-donation-amount <?php echo esc_attr( $selected_css ); ?>">
 						<label>
-							<input type="radio" name="donation_amount" value="<?php echo $suggested_donation['amount']; ?>" <?php echo esc_attr( $checked_attribute ); ?>>
-							<span class="amount"><?php echo $currency_helper->get_monetary_amount( $suggested_donation['amount'] ); ?></span> <?php /* <span class="description"><?php echo esc_html( $suggested_donation['description'] ); ?></span> */ ?>
+							<input type="radio" name="donation_amount" value="<?php echo esc_attr( $suggested_donation['amount'] ); ?>" <?php echo esc_attr( $checked_attribute ); ?>>
+							<span class="amount"><?php echo esc_html( $currency_helper->get_monetary_amount( $suggested_donation['amount'] ) ); ?></span> <?php /* <span class="description"><?php echo esc_html( $suggested_donation['description'] ); ?></span> */ ?>
 						</label>
 					</li>
 						<?php
@@ -201,7 +201,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 					<label>
 					<input type="radio" name="donation_amount" value="custom"><span class="description"><?php echo esc_html__( 'Custom amount', 'charitable' ); ?></span>
 					</label>
-					<input type="text" <?php echo esc_attr( $input_disabled_attr ); ?> class="custom-donation-input" name="custom_donation_amount" placeholder="<?php echo esc_html__( 'Custom Donation Amount', 'charitable' ); ?>" value="<?php echo $value; ?>">
+					<input type="text" <?php echo esc_attr( $input_disabled_attr ); ?> class="custom-donation-input" name="custom_donation_amount" placeholder="<?php echo esc_html__( 'Custom Donation Amount', 'charitable' ); ?>" value="<?php echo esc_attr( $value ); ?>">
 					</span>
 				</li>
 
@@ -234,10 +234,10 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 		 */
 		public function field_preview( $field_data = false, $campaign_data = false, $field_id = false, $theme = '' ) {
 
-			$html  = $this->field_title( $this->name );
-			$html .= $this->field_wrapper( $this->render( $field_data, $campaign_data, $field_id, 'preview' ), $field_data );
+		$html  = $this->field_title( $this->name );
+		$html .= $this->field_wrapper( $this->render( $field_data, $campaign_data, $field_id, 'preview' ), $field_data );
 
-			echo $html;
+		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
@@ -251,9 +251,9 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 		 */
 		public function field_display( $field_type = '', $field_data = false, $campaign_data = false ) {
 
-			$html = $this->field_display_wrapper( $this->render( $field_data, $campaign_data ), $field_data );
+		$html = $this->field_display_wrapper( $this->render( $field_data, $campaign_data ), $field_data );
 
-			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data );
+		echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
@@ -282,7 +282,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['headline'] ) ? $settings['headline'] : '',
 				esc_html__( 'Headline', 'charitable' ),
 				array(
@@ -294,9 +294,9 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_divider( false, false, array( 'field_id' => $field_id ) );
+			echo $charitable_builder_form_fields->generate_divider( false, false, array( 'field_id' => $field_id ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
-			echo $charitable_builder_form_fields->generate_donation_amounts_mini(
+			echo $charitable_builder_form_fields->generate_donation_amounts_mini( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				$campaign_data,
 				esc_html__( 'Suggested Donation Amounts', 'charitable' ),
 				array(
@@ -308,7 +308,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_divider( false, false, array( 'field_id' => $field_id ) );
+			echo $charitable_builder_form_fields->generate_divider( false, false, array( 'field_id' => $field_id ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 			$campaign_settings = false;
 
@@ -321,7 +321,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 
 			$default_allow_custom = false !== $campaign_settings && ! isset( $campaign_settings['settings']['donation-options']['allow_custom_donations'] ) ? false : '1';
 
-			echo $charitable_builder_form_fields->generate_toggle(
+			echo $charitable_builder_form_fields->generate_toggle( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				$default_allow_custom,
 				esc_html__( 'Allow Custom Donations', 'charitable' ),
 				array(
@@ -333,9 +333,9 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_divider( false, false, array( 'field_id' => $field_id ) );
+			echo $charitable_builder_form_fields->generate_divider( false, false, array( 'field_id' => $field_id ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['css_class'] ) ? $settings['css_class'] : false,
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(
@@ -365,11 +365,11 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 			$field_id    = intval( $_POST['field_id'] );
 			$campaign_id = intval( $_POST['campaign_id'] ); // todo: should this be added? see a few lines down.
 
-			if ( ! class_exists( 'Charitable_Builder_Amount_Fields' ) ) {
+			if ( ! class_exists( 'Charitable_Builder_Form_Fields' ) ) {
 				wp_send_json_error( esc_html__( 'Something went wrong while performing this action.', 'charitable' ) );
 			}
 
-			$charitable_builder_form_fields = new Charitable_Builder_Amount_Fields();
+			$charitable_builder_form_fields = new Charitable_Builder_Form_Fields();
 
 			$campaign_data = get_post_meta( $campaign_id, 'campaign_settings_v2', true );
 			$settings      = isset( $campaign_data['fields'][ $field_id ] ) ? $campaign_data['fields'][ $field_id ] : false;
@@ -380,7 +380,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['headline'] ) ? $settings['headline'] : '',
 				esc_html__( 'Headline', 'charitable' ),
 				array(
@@ -392,7 +392,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				$settings['css_class'],
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(

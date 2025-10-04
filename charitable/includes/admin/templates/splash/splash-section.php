@@ -2,7 +2,8 @@
 /**
  * What's New modal section.
  *
- * @since 1.8.8
+ * @since   1.8.8
+ * @version 1.8.8.3
  *
  * @var string $title Section title.
  * @var string $content Section content.
@@ -28,19 +29,22 @@ $classes = [
 	<div class="charitable-splash-section-content">
 		<?php
 		if ( ! empty( $section['new'] ) ) {
+			$version_text = ! empty( $section['version'] ) ? ' ' . $section['version'] : '';
 			printf(
 				'<span class="charitable-splash-badge">%s</span>',
-				esc_html__( 'New Feature' . ( ! empty( $section['version'] ) ? ' ' . $section['version'] : '' ), 'charitable' )
+				esc_html( sprintf( __( 'New Feature%s', 'charitable' ), $version_text ) )
 			);
 		} elseif ( ! empty( $section['new-addon'] ) ) {
+			$version_text = ! empty( $section['version'] ) ? ' ' . $section['version'] : '';
 			printf(
 				'<span class="charitable-splash-badge">%s</span>',
-				esc_html__( 'New Addon' . ( ! empty( $section['version'] ) ? ' ' . $section['version'] : '' ), 'charitable' )
+				esc_html( sprintf( __( 'New Addon%s', 'charitable' ), $version_text ) )
 			);
 		} elseif ( ! empty( $section['new-for-pro'] ) ) {
+			$version_text = ! empty( $section['version'] ) ? ' ' . $section['version'] : '';
 			printf(
 				'<span class="charitable-splash-badge">%s</span>',
-				esc_html__( 'New for Pro' . ( ! empty( $section['version'] ) ? ' ' . $section['version'] : '' ), 'charitable' )
+				esc_html( sprintf( __( 'New for Pro%s', 'charitable' ), $version_text ) )
 			);
 		}
 		?>

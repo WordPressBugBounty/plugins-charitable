@@ -19,12 +19,12 @@ $content = $view_args['content'];
 
 if ( is_user_logged_in() ) : ?>
 	<div class="charitable-notice">
-		<?php _e( 'You do not have access to this donation receipt.', 'charitable' ); ?>
+		<?php esc_html_e( 'You do not have access to this donation receipt.', 'charitable' ); ?>
 	</div>
 <?php else : ?>
 	<div class="charitable-notice">
 		<?php
-			_e( 'You must be logged in to access your donation receipt.', 'charitable' );
+			esc_html_e( 'You must be logged in to access your donation receipt.', 'charitable' );
 
 			/* Display any other notices. */
 			charitable_template( 'form-fields/notices.php', array( 'notices' => charitable_get_notices()->get_notices() ) );
@@ -39,7 +39,7 @@ if ( is_user_logged_in() ) : ?>
 		?>
 	</div>
 	<?php
-		echo Charitable_Login_Shortcode::display( array( 'redirect' => charitable_get_current_url() ) );
+		echo Charitable_Login_Shortcode::display( array( 'redirect' => esc_url( charitable_get_current_url() ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 		/* Turn the login form notices hook back on. */
 		add_action( 'charitable_login_form_before', 'charitable_template_notices', 10, 0 );

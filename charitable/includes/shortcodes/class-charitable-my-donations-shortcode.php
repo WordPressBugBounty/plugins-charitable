@@ -49,7 +49,7 @@ if ( ! class_exists( 'Charitable_My_Donations_Shortcode' ) ) :
 				if ( false === $args['hide_login'] ) {
 					$args['redirect'] = charitable_get_current_url();
 
-					echo Charitable_Login_Shortcode::display( $args );
+					echo Charitable_Login_Shortcode::display( $args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				}
 
 				return ob_get_clean();

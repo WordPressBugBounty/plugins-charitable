@@ -68,7 +68,7 @@ function charitable_template_from_session( $template_name, array $args, $templat
 
 	charitable_template( $template_name, $args, $classname );
 
-	echo charitable_template_from_session_content( $template_key, $wrapper_args, ob_get_clean() );
+	echo charitable_template_from_session_content( $template_key, $wrapper_args, ob_get_clean() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }
 
 /**
