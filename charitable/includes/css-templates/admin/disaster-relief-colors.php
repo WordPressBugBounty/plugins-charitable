@@ -315,6 +315,14 @@ require_once '../../admin/campaign-builder/templates/functions-campaign-template
 	padding-right: 0;
 }
 
+/* social icons */
+
+<?php
+// Include shared social icons CSS with dark icon style.
+$icon_style = 'dark';
+include dirname( __FILE__ ) . '/partials/social-icons.php';
+?>
+
 /* field: campaign summary */
 
 <?php echo charitable_esc_attr_php( $wrapper ); ?> .charitable-field-preview-campaign-summary {

@@ -74,3 +74,70 @@ if ( ! function_exists( 'charitable_get_constracting_text_color' ) ) {
 		return $brightness < 175 ? '#FFFFFF' : '#000000';
 	}
 }
+
+if ( ! function_exists( 'charitable_get_campaign_builder_asset_url' ) ) {
+	/**
+	 * Get the correct URL for campaign builder assets.
+	 * Handles both Charitable core and Charitable Pro plugin directories.
+	 *
+	 * @since   1.8.9.2
+	 * @version 1.8.9.4
+	 *
+	 * @param  string $asset_path Relative path from plugin assets directory.
+	 * @param  bool   $add_version Whether to add version parameter for cache busting.
+	 * @return string Full URL to the asset.
+	 */
+	function charitable_get_campaign_builder_asset_url( $asset_path, $add_version = null ) {
+		// Use filter to control version parameter default.
+		if ( is_null( $add_version ) ) {
+			/**
+			 * Filter whether to add version parameters to campaign builder asset URLs.
+			 *
+			 * @since   1.8.9.2
+			 * @version 1.8.9.4
+			 *
+			 * @param bool $add_version Whether to add version parameter. Default true.
+			 */
+			$add_version = apply_filters( 'charitable_campaign_builder_asset_versioning', true );
+		}
+
+		$asset_path = ltrim( $asset_path, '/' );
+		$url        = '';
+		$version    = '';
+
+		// Check Charitable Pro first (if it exists and has the file).
+		if ( defined( 'CHARITABLE_PRO_VERSION' ) && defined( 'CHARITABLE_PRO_FILE' ) ) {
+			$pro_path = plugin_dir_path( CHARITABLE_PRO_FILE ) . 'assets/' . $asset_path;
+			if ( file_exists( $pro_path ) ) {
+				$url     = plugin_dir_url( CHARITABLE_PRO_FILE ) . 'assets/' . $asset_path;
+				$version = CHARITABLE_PRO_VERSION;
+			}
+		}
+
+		// Fallback to core Charitable.
+		if ( empty( $url ) ) {
+			$charitable_path = charitable()->get_path( 'assets' ) . $asset_path;
+			if ( file_exists( $charitable_path ) ) {
+				$url     = charitable()->get_path( 'assets', false ) . $asset_path;
+				$version = charitable()->get_version();
+			}
+		}
+
+		// Add version parameter for cache busting if enabled.
+		if ( $add_version && ! empty( $version ) ) {
+			$url = add_query_arg( 'ver', $version, $url );
+		}
+
+		/**
+		 * Filter the campaign builder asset URL.
+		 *
+		 * @since   1.8.9.2
+		 * @version 1.8.9.4
+		 *
+		 * @param string $url        The asset URL.
+		 * @param string $asset_path The original asset path.
+		 * @param bool   $add_version Whether versioning was requested.
+		 */
+		return apply_filters( 'charitable_campaign_builder_asset_url', $url, $asset_path, $add_version );
+	}
+}

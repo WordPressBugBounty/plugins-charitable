@@ -1,3 +1,7 @@
+# 1.8.9.4
+* FIX: Resolved seemingly missing social media icons in some campaign builder template previews in certain scenarios.
+* UPDATE: Improved campaign builder templates for cache busting.
+
 # 1.8.9.3
 * FIX: Resolved onboarding redirect issue in some scenarios.
 

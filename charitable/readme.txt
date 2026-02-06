@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.9.1
 Requires PHP: 7.2
-Stable tag: 1.8.9.3
+Stable tag: 1.8.9.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -268,6 +268,10 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 
 == Changelog ==
 
+= Donation Form & Fundraising Campaigns v1.8.9.4 =
+* FIX: Resolved seemingly missing social media icons in some campaign builder template previews in certain scenarios.
+* UPDATE: Improved campaign builder templates for cache busting.
+
 = Donation Form & Fundraising Campaigns v1.8.9.3 =
 * FIX: Resolved onboarding redirect issue in some scenarios.
 
@@ -530,11 +534,5 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 * FIX: Resolved error on getting started screen after Stripe was connected.
 * FIX: Improved retrieval of campaign descriptions for legacy campaigns.
 * FIX: Resolved CSS issue in visual builder.
-
-= Donation Form & Fundraising Campaigns v1.8.1.13 =
-* UPDATE: Updated copy and links on getting started screen.
-* FIX: Minified starting screen CSS.
-* FIX: Resolved typos and PHP notices.
-* FIX: Updated additional text in admin UI to allow for translations.
 
 **[View entire donation form and fundraising platform changelog](https://plugins.svn.wordpress.org/charitable/trunk/CHANGELOG.md)**
