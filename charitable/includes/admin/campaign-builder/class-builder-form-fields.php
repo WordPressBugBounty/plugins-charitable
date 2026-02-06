@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version   1.8.0
+ * @version   1.8.9.1
  */
 class Charitable_Builder_Form_Fields {
 
@@ -754,7 +754,7 @@ class Charitable_Builder_Form_Fields {
 		}
 
 		if ( false !== $value && '' !== trim( $value ) && ! charitable_is_valid_timestamp( $value ) ) {
-			$value = date( $params['date-format'], strtotime( $value ) );
+			$value = date( $params['date-format'], strtotime( $value ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 		}
 
 		if ( is_array( $params['name'] ) ) {
@@ -1260,6 +1260,7 @@ class Charitable_Builder_Form_Fields {
 	 * @param array  $args  Field params.
 	 *
 	 * @return string
+	 * @version 1.8.9.1
 	 */
 	public function generate_categories( $value = false, $label = false, $args = false ) {
 
@@ -1273,8 +1274,8 @@ class Charitable_Builder_Form_Fields {
 		$params = array_replace_recursive( $defaults, $args );
 
 		$categories_terms = get_terms(
-			'campaign_category',
 			array(
+				'taxonomy'   => 'campaign_category',
 				'hide_empty' => 0,
 			)
 		);
@@ -1329,6 +1330,7 @@ class Charitable_Builder_Form_Fields {
 	 * @param array  $args  Field params.
 	 *
 	 * @return string
+	 * @version 1.8.9.1
 	 */
 	public function generate_campaign_creator_info( $value = false, $label = false, $args = false ) {
 
@@ -1355,15 +1357,15 @@ class Charitable_Builder_Form_Fields {
 			?>
 			<div id="campaign-creator" class="charitable-campaign-creator-info-container">
 				<div class="creator-avatar charitable-campaign-creator-avatar">
-					<?php echo $creator->get_avatar(); ?>
+					<?php echo $creator->get_avatar(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				</div><!--.creator-avatar-->
 				<div class="charitable-campaign-creator-info">
 					<?php if ( false === $creator ) : ?>
 
 					<?php else : ?>
 
-					<h3 class="creator-name"><a href="<?php echo esc_url( admin_url( 'user-edit.php?user_id=' . $creator->ID ) ); ?>"><?php printf( '%s (%s %d)', $creator->display_name, __( 'User ID', 'charitable' ), $creator->ID ); ?></a></h3>
-					<p class="joined-on"><?php printf( '%s <span>%s</span>', _x( 'Joined on', 'joined on date', 'charitable' ), date_i18n( 'F Y', strtotime( $creator->user_registered ) ) ); ?></p>
+					<h3 class="creator-name"><a href="<?php echo esc_url( admin_url( 'user-edit.php?user_id=' . $creator->ID ) ); ?>"><?php printf( '%s (%s %d)', esc_html( $creator->display_name ), esc_html__( 'User ID', 'charitable' ), esc_html( $creator->ID ) ); ?></a></h3>
+					<p class="joined-on"><?php printf( '%s <span>%s</span>', esc_html_x( 'Joined on', 'joined on date', 'charitable' ), esc_html( date_i18n( 'F Y', strtotime( $creator->user_registered ) ) ) ); ?></p>
 					<ul>
 						<li><a target="_blank" class="public-profile-link" href="<?php echo esc_url( get_author_posts_url( $creator->ID ) ); ?>"><?php esc_html_e( 'Public Profile', 'charitable' ); ?></a></li><li><a target="_blank" class="edit-profile-link" href="<?php echo esc_url( admin_url( 'user-edit.php?user_id=' . $creator->ID ) ); ?>"><?php esc_html_e( 'Edit Profile', 'charitable' ); ?></a></li>
 					</ul>

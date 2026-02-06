@@ -296,7 +296,9 @@ if ( ! class_exists( 'Charitable_Builder_Field' ) ) :
 				wp_send_json_error( esc_html__( 'Your session expired. Please reload the builder.', 'charitable' ) );
 			}
 
-			if ( ! wp_verify_nonce( isset( $_POST['nonce'] ) ? $_POST['nonce'] : false, 'charitable-builder' ) ) {
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- wp_verify_nonce handles validation
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'charitable-builder' ) ) {
 				wp_send_json_error( esc_html__( 'A security or cache check has failed. Please reload the builder.', 'charitable' ) );
 			}
 
@@ -311,7 +313,9 @@ if ( ! class_exists( 'Charitable_Builder_Field' ) ) :
 			}
 
 			// Grab field data.
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by sanitize_text_field
 			$campaign_title = ! empty( $_POST['campaign_title'] ) && '' !== trim( wp_unslash( $_POST['campaign_title'] ) ) ? sanitize_text_field( wp_unslash( $_POST['campaign_title'] ) ) : '';
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			$field_args     = ! empty( $_POST['defaults'] ) && is_array( $_POST['defaults'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['defaults'] ) ) : [];
 			$field_type     = sanitize_key( $_POST['type'] );

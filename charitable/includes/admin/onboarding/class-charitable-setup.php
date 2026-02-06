@@ -187,20 +187,50 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 		 * If the option 'charitable_start_onboarding' is set, then we will start the onboarding process, assuming the user lost connection, WP site logged out by the time app.wpcharitable.com came back, etc.
 		 *
 		 * @since  1.8.4
+		 * @since  1.8.9.2 Added WordPress context awareness and smart page detection.
 		 */
 		public function resume_onboarding() {
+
+			// Don't redirect during WordPress maintenance operations.
+			if ( defined( 'DOING_AUTOSAVE' ) || wp_is_json_request() ||
+			     defined( 'IFRAME_REQUEST' ) || ( function_exists( 'wp_doing_heartbeat' ) && wp_doing_heartbeat() ) ) {
+				return;
+			}
 
 			// Check if we should consider redirection.
 			if ( false === (bool) get_option( 'charitable_started_onboarding', false ) ) {
 				return;
 			}
 
-			// Make sure we aren't on the setup welcome page.
-			if ( ! empty( $_GET['page'] ) && 'charitable' !== $_GET['page'] ) { // phpcs:ignore
+			// Allow developers to disable resume onboarding via filter.
+			if ( apply_filters( 'charitable_disable_activation_redirect', false ) ) {
 				return;
 			}
 
+			// Don't redirect if user is on a non-Charitable admin page.
+			if ( ! empty( $_GET['page'] ) && strpos( $_GET['page'], 'charitable' ) === false ) {
+				return;
+			}
+
+			// Don't redirect from specific WordPress admin pages without page parameter.
+			$current_page = basename( $_SERVER['PHP_SELF'] ?? '' );
+			$wp_admin_pages = array( 'edit.php', 'post-new.php', 'upload.php', 'users.php', 'edit-tags.php', 'edit-comments.php', 'themes.php', 'plugins.php', 'tools.php', 'options-general.php' );
+			if ( in_array( $current_page, $wp_admin_pages ) ) {
+				return;
+			}
+
+			// Don't redirect if user is accessing post type or taxonomy pages.
+			if ( isset( $_GET['post_type'] ) || isset( $_GET['taxonomy'] ) ) {
+				return;
+			}
+
+			// Make sure we aren't already on the setup welcome page.
 			if ( isset( $_GET['wpchar_lite'] ) && 'lite' === $_GET['wpchar_lite'] ) { // phpcs:ignore
+				return;
+			}
+
+			// Don't redirect if user is trying to cancel onboarding - let cancel_onboarding() method handle it.
+			if ( isset( $_GET['charitable_onboarding'] ) && 'cancel' === $_GET['charitable_onboarding'] ) { // phpcs:ignore
 				return;
 			}
 
@@ -220,8 +250,15 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 		 * @since 1.8.1.12
 		 * @version 1.8.3 tweak what is an initial install.
 		 * @version 1.8.4 add charitable_started_onboarding option.
+		 * @version 1.8.9.2 Added WordPress filter and context awareness.
 		 */
 		public function redirect() {
+
+			// Don't redirect during WordPress maintenance operations.
+			if ( defined( 'DOING_AUTOSAVE' ) || wp_is_json_request() ||
+			     defined( 'IFRAME_REQUEST' ) || ( function_exists( 'wp_doing_heartbeat' ) && wp_doing_heartbeat() ) ) {
+				return;
+			}
 
 			// Check if we should consider redirection.
 			if ( ! get_transient( 'charitable_activation_redirect' ) ) {
@@ -233,6 +270,11 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 
 			// Check option to disable welcome redirect.
 			if ( get_option( 'charitable_activation_redirect', false ) ) {
+				return;
+			}
+
+			// Allow developers to disable activation redirect via filter.
+			if ( apply_filters( 'charitable_disable_activation_redirect', false ) ) {
 				return;
 			}
 
@@ -1531,8 +1573,8 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 			if ( $should_activate_pro ) {
 				update_option( 'charitable_activate_pro', true );
 			} else {
-				// Log this for debugging
-				error_log( 'Charitable: Pro plugin not found during setup completion - skipping Pro activation' );
+			// Log this for debugging
+			error_log( 'Charitable: Pro plugin not found during setup completion - skipping Pro activation' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			}
 
 			wp_send_json_success(

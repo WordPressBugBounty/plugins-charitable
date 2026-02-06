@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version   1.8.0
+ * @version   1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -104,7 +104,7 @@ if ( ! class_exists( 'Charitable_Field_Organizer' ) ) :
                         </div>
                         <div class="charitable-organizer-info">
                             <div class="charitable-organizer-name">' . esc_html( $creator_name ) . '</div>
-                            <div class="charitable-organizer-title placeholder"><h5 class="charitable-field-preview-headline">' . $role_or_title . '</h5></div>
+                            <div class="charitable-organizer-title charitable-main-placeholder"><h5 class="charitable-field-preview-headline">' . $role_or_title . '</h5></div>
                             <div class="charitable-organizer-description">' . ( $organizer_content ) . '</div>
                         </div>
                     </div>';
@@ -132,7 +132,7 @@ if ( ! class_exists( 'Charitable_Field_Organizer' ) ) :
                         </div>
                         <div class="charitable-organizer-info">
                             <div class="charitable-organizer-name">' . esc_html( $creator_name ) . '</div>
-                            <div class="charitable-organizer-title placeholder"><h5 class="charitable-field-template-headline">' . $role_or_title . '</h5></div>
+                            <div class="charitable-organizer-title charitable-main-placeholder"><h5 class="charitable-field-template-headline">' . $role_or_title . '</h5></div>
                             <div class="charitable-organizer-description">' . $this->format( $field_id, $organizer_content, $campaign_data ) . '</div>
                         </div>
                     </div>';
@@ -204,7 +204,7 @@ if ( ! class_exists( 'Charitable_Field_Organizer' ) ) :
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['role_or_title'] ) ? $settings['role_or_title'] : esc_html__( 'Organizer', 'charitable' ),
 				esc_html__( 'Role or Title', 'charitable' ),
 				array(
@@ -230,7 +230,7 @@ if ( ! class_exists( 'Charitable_Field_Organizer' ) ) :
 				);
 			}
 
-			echo $charitable_builder_form_fields->generate_user_dropdown_mini(
+			echo $charitable_builder_form_fields->generate_user_dropdown_mini( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				$campaign_data,
 				esc_html__( 'Campaign Creator', 'charitable' ),
 				array(
@@ -238,14 +238,14 @@ if ( ! class_exists( 'Charitable_Field_Organizer' ) ) :
 					'id'              => 'field_' . esc_attr( $this->type ) . '_campaign_creator' . '_' . intval( $field_id ), // phpcs:ignore
 					'name'            => array( '_fields', intval( $field_id ), 'campaign_creator' ),
 					'field_id'        => esc_attr( $field_id ),
-					'default'         => get_current_user_id(),
-					'options'         => $users_to_pass,
+					'default'         => get_current_user_id(), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					'options'         => $users_to_pass, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					'selected_value'  => intval( $campaign_creator_id ),
 					'container_class' => 'campaign-builder-campaign-creator-id-mini',
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_textbox(
+			echo $charitable_builder_form_fields->generate_textbox( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['content'] ) ? $settings['content'] : false,
 				esc_html__( 'Organizer Description', 'charitable' ),
 				array(
@@ -262,7 +262,7 @@ if ( ! class_exists( 'Charitable_Field_Organizer' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_number_slider(
+			echo $charitable_builder_form_fields->generate_number_slider( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['width_percentage'] ) ? $settings['width_percentage'] : 100,
 				esc_html__( 'Width', 'charitable' ),
 				array(
@@ -278,7 +278,7 @@ if ( ! class_exists( 'Charitable_Field_Organizer' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_align(
+			echo $charitable_builder_form_fields->generate_align( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['align'] ) ? $settings['align'] : esc_attr( $this->align_default ),
 				esc_html__( 'Align', 'charitable' ),
 				array(
@@ -288,7 +288,7 @@ if ( ! class_exists( 'Charitable_Field_Organizer' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['css_class'] ) ? $settings['css_class'] : false,
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(
@@ -329,7 +329,7 @@ if ( ! class_exists( 'Charitable_Field_Organizer' ) ) :
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_number_slider(
+			echo $charitable_builder_form_fields->generate_number_slider( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['width_percentage'] ) ? $settings['width_percentage'] : 100,
 				esc_html__( 'Width', 'charitable' ),
 				array(
@@ -343,7 +343,7 @@ if ( ! class_exists( 'Charitable_Field_Organizer' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_align(
+			echo $charitable_builder_form_fields->generate_align( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['align'] ) ? $settings['align'] : false,
 				esc_html__( 'Align', 'charitable' ),
 				array(
@@ -353,7 +353,7 @@ if ( ! class_exists( 'Charitable_Field_Organizer' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				$settings['css_class'],
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(

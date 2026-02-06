@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display the main settings page wrapper.
  *
@@ -7,18 +13,17 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
- * @version   1.6.19
- * @version   1.8.5.1
+ * @version   1.8.9
  */
 
-$active_tab      = isset( $_GET['tab'] ) ? esc_html( $_GET['tab'] ) : 'general'; // phpcs:ignore
-$tab_no_form_tag = array( 'import', 'export', 'tools' );
-$group           = isset( $_GET['group'] ) ? esc_html( $_GET['group'] ) : $active_tab; // phpcs:ignore
-$sections        = charitable_get_admin_settings()->get_sections();
-$show_return     = $group !== $active_tab;
-$css             = '';
+$charitable_active_tab      = isset( $_GET['tab'] ) ? esc_html( $_GET['tab'] ) : 'general'; // phpcs:ignore
+$charitable_tab_no_form_tag = array( 'import', 'export', 'tools' );
+$charitable_group           = isset( $_GET['group'] ) ? esc_html( $_GET['group'] ) : $charitable_active_tab; // phpcs:ignore
+$charitable_sections        = charitable_get_admin_settings()->get_sections();
+$charitable_show_return     = $charitable_group !== $charitable_active_tab;
+$charitable_css             = '';
 
-if ( $show_return ) {
+if ( $charitable_show_return ) {
 	/**
 	 * Filter the return link text.
 	 *
@@ -28,15 +33,15 @@ if ( $show_return ) {
 	 * @param string $active_tab The active tab.
 	 * @param string $group      The current group.
 	 */
-	$return_tab_text = apply_filters(
+	$charitable_return_tab_text = apply_filters(
 		'charitable_settings_return_tab_text',
 		sprintf(
 			/* translators: %s: tab name */
 			__( '&#8592; Return to %s', 'charitable' ),
-			$active_tab
+			$charitable_active_tab
 		),
-		$active_tab,
-		$group
+		$charitable_active_tab,
+		$charitable_group
 	);
 
 	/**
@@ -48,14 +53,14 @@ if ( $show_return ) {
 	 * @param string $active_tab The active tab.
 	 * @param string $group      The current group.
 	 */
-	$return_tab_url = apply_filters(
+	$charitable_return_tab_url = apply_filters(
 		'charitable_settings_return_tab_url',
 		add_query_arg(
-			array( 'tab' => $active_tab ),
+			array( 'tab' => $charitable_active_tab ),
 			admin_url( 'admin.php?page=charitable-settings' )
 		),
-		$active_tab,
-		$group
+		$charitable_active_tab,
+		$charitable_group
 	);
 }
 
@@ -66,22 +71,16 @@ ob_start();
 	<h1><?php echo get_admin_page_title(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></h1>
 	<?php do_action( 'charitable_maybe_show_notification' ); ?>
 	<h2 class="nav-tab-wrapper">
-		<?php foreach ( $sections as $section_key => $section_name ) : ?>
+		<?php foreach ( $charitable_sections as $charitable_section_key => $charitable_section_name ) : ?>
 			<?php
-
-			$css                 = '';
-			$url_query_arg_array = array( 'tab' => $section_key );
-			if ( 'security' === $section_key && defined( 'CHARITABLE_SPAMBLOCKER_FEATURE_PLUGIN' ) ) {
-				$css = 'no-pro-tab';
-			}
-
+			$charitable_url_query_arg_array = array( 'tab' => $charitable_section_key );
 			?>
-			<a href="<?php echo esc_url( add_query_arg( $url_query_arg_array, admin_url( 'admin.php?page=charitable-settings' ) ) ); ?>" class="nav-tab nav-tab-<?php echo esc_attr( $section_key ); ?> <?php echo ( esc_attr( $active_tab ) === esc_attr( $section_key ) ) ? ' nav-tab-active' : ''; ?>"><?php echo esc_html( $section_name ); ?></a>
+			<a href="<?php echo esc_url( add_query_arg( $charitable_url_query_arg_array, admin_url( 'admin.php?page=charitable-settings' ) ) ); ?>" class="nav-tab nav-tab-<?php echo esc_attr( $charitable_section_key ); ?> <?php echo ( esc_attr( $charitable_active_tab ) === esc_attr( $charitable_section_key ) ) ? ' nav-tab-active' : ''; ?>"><?php echo esc_html( $charitable_section_name ); ?></a>
 		<?php endforeach ?>
 	</h2>
-	<?php if ( $show_return ) : ?>
+	<?php if ( $charitable_show_return ) : ?>
 		<?php /* translators: %s: active settings tab label */ ?>
-		<p><a href="<?php echo esc_url( $return_tab_url ); ?>"><?php echo $return_tab_text; // phpcs:ignore ?></a></p>
+		<p><a href="<?php echo esc_url( $charitable_return_tab_url ); ?>"><?php echo $charitable_return_tab_text; // phpcs:ignore ?></a></p>
 	<?php endif ?>
 	<?php
 		/**
@@ -91,27 +90,31 @@ ob_start();
 		 *
 		 * @param string $group The settings group we are viewing.
 		 */
-		do_action( 'charitable_before_admin_settings', $group );
+		do_action( 'charitable_before_admin_settings', $charitable_group );
+
 	?>
+
 	<?php
-	if ( 'marketing' === $active_tab || 'donors' === $active_tab || ( ! defined( 'CHARITABLE_SPAMBLOCKER_FEATURE_PLUGIN' ) && 'security' === $active_tab ) ) :
+	// Show CTA only for marketing and donors tabs.
+	// Security tab will show actual settings (either from spam blocker or core).
+	if ( 'marketing' === $charitable_active_tab || 'donors' === $charitable_active_tab ) :
 		?>
-		<?php do_action( 'charitable_pro_settings_cta', $active_tab ); ?>
+		<?php do_action( 'charitable_pro_settings_cta', $charitable_active_tab ); ?>
 	<?php else : ?>
 
-		<?php if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) : // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict ?>
+		<?php if ( ! in_array( strtolower( $charitable_active_tab ), $charitable_tab_no_form_tag ) ) : // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict ?>
 		<form method="post" action="options.php">
 		<?php endif; ?>
 			<table class="form-table">
 			<?php
-			if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) : // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
+			if ( ! in_array( strtolower( $charitable_active_tab ), $charitable_tab_no_form_tag ) ) : // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
 				settings_fields( 'charitable_settings' );
 				endif;
 
-				charitable_do_settings_fields( 'charitable_settings_' . $group, 'charitable_settings_' . $group );
+				charitable_do_settings_fields( 'charitable_settings_' . $charitable_group, 'charitable_settings_' . $charitable_group );
 			?>
 			</table>
-			<?php if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) : // phpcs:ignore ?>
+			<?php if ( ! in_array( strtolower( $charitable_active_tab ), $charitable_tab_no_form_tag ) ) : // phpcs:ignore ?>
 				<?php
 					/**
 					 * Filter the submit button at the bottom of the settings table.
@@ -120,14 +123,19 @@ ob_start();
 					 *
 					 * @param string $button The button output.
 					 */
-					echo apply_filters( 'charitable_settings_button_' . $group, get_submit_button( null, 'primary', 'submit', true, null ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					echo apply_filters( 'charitable_settings_button_' . $charitable_group, get_submit_button( null, 'primary', 'submit', true, null ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				?>
 			<?php endif; ?>
-		<?php if ( ! in_array( strtolower( $active_tab ), $tab_no_form_tag ) ) : // phpcs:ignore ?>
+		<?php if ( ! in_array( strtolower( $charitable_active_tab ), $charitable_tab_no_form_tag ) ) : // phpcs:ignore ?>
 		</form>
 		<?php endif; ?>
 
 	<?php endif; ?>
+
+	<?php if ( 'security' === $charitable_active_tab) : ?>
+		<?php do_action( 'charitable_pro_settings_cta', $charitable_active_tab ); ?>
+	<?php endif; ?>
+
 	<?php
 		/**
 		 * Do or render something right after the settings form.
@@ -136,7 +144,7 @@ ob_start();
 		 *
 		 * @param string $group The settings group we are viewing.
 		 */
-		do_action( 'charitable_after_admin_settings', $group );
+		do_action( 'charitable_after_admin_settings', $charitable_group );
 	?>
 </div>
 <?php

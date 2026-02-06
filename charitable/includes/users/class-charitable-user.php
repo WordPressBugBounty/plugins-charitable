@@ -13,7 +13,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
- * @version   1.6.44
+ * @version   1.8.9.1
  */
 
 // Exit if accessed directly.
@@ -612,6 +612,7 @@ if ( ! class_exists( 'Charitable_User' ) ) :
 		 * Checks whether the user has any current campaigns (i.e. non-expired).
 		 *
 		 * @since  1.0.0
+		 * @version 1.8.9.1
 		 *
 		 * @param  array $args Query arguments.
 		 * @return WP_Query
@@ -623,7 +624,7 @@ if ( ! class_exists( 'Charitable_User' ) ) :
 					'relation' => 'OR',
 					array(
 						'key'     => '_campaign_end_date',
-						'value'   => date( 'Y-m-d H:i:s' ),
+						'value'   => date( 'Y-m-d H:i:s' ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 						'compare' => '>=',
 						'type'    => 'datetime',
 					),

@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * The template used to display select fieldsets.
  *
@@ -8,30 +14,31 @@
  * @package Charitable/Templates/Form Fields
  * @since   1.0.0
  * @version 1.5.0
+ * @version 1.8.8.6
  */
 
 if ( ! isset( $view_args['form'] ) || ! isset( $view_args['field'] ) ) {
 	return;
 }
 
-$form    = $view_args['form'];
-$field   = $view_args['field'];
-$classes = $view_args['classes'];
-$fields  = isset( $field['fields'] ) ? $field['fields'] : array();
+$charitable_form    = $view_args['form'];
+$charitable_field   = $view_args['field'];
+$charitable_classes = $view_args['classes'];
+$charitable_fields  = isset( $charitable_field['fields'] ) ? $charitable_field['fields'] : array();
 
-if ( ! count( $fields ) ) :
+if ( ! count( $charitable_fields ) ) :
 	return;
 endif;
 
 ?>
-<fieldset class="<?php echo esc_attr( $classes ); ?>">
+<fieldset class="<?php echo esc_attr( $charitable_classes ); ?>">
 	<?php
-	if ( isset( $field['legend'] ) ) :
+	if ( isset( $charitable_field['legend'] ) ) :
 		?>
-		<div class="charitable-form-header"><?php echo esc_html( $field['legend'] ); ?></div>
+		<div class="charitable-form-header"><?php echo esc_html( $charitable_field['legend'] ); ?></div>
 		<?php
 	endif;
 
-	$form->view()->render_fields( $fields );
+	$charitable_form->view()->render_fields( $charitable_fields );
 	?>
 </fieldset>

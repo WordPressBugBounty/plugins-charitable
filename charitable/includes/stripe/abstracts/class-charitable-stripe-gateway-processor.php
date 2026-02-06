@@ -219,6 +219,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 		 * @param  string|null $campaign Optional Campaign object. If not passed, will get the
 		 *                               list of campaigns donated to from the Donation object.
 		 * @return string
+		 * @version 1.8.9.1
 		 */
 		public function get_statement_descriptor( $campaign = null ) {
 			$format     = charitable_get_option( [ 'gateways_stripe', 'statement_descriptor' ], 'auto' );
@@ -246,7 +247,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 
 			/* The descriptor must be at least 5 characters long. */
 			if ( strlen( $descriptor ) < 5 ) {
-				$url        = parse_url( home_url() );
+				$url        = wp_parse_url( home_url() );
 				$descriptor = $descriptor . ' ' . $url['host'];
 			}
 
@@ -811,6 +812,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 		 * @param  int        $campaign_id The campaign ID.
 		 * @param  array|null $options     Options to pass to Stripe.
 		 * @return string|false
+		 * @version 1.8.9.1
 		 */
 		public static function create_stripe_campaign_product( $campaign_id, $options = null ) {
 			/* No product could be retrieved, so we need to create one. */
@@ -835,7 +837,10 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 
 			} catch ( Exception $e ) {
 				/* Log the error message and return false. */
-				error_log( 'STRIPE - Error creating product: ' . $e->getMessage() );
+				if ( charitable_is_debug() ) {
+					// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					error_log( 'STRIPE - Error creating product: ' . $e->getMessage() );
+				}
 
 				return false;
 			}
@@ -1091,6 +1096,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 		 * Set up connected account data for this donation.
 		 *
 		 * @since  1.4.0
+		 * @version 1.8.9.1
 		 *
 		 * @return void
 		 */
@@ -1099,7 +1105,9 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 			$campaign_donations = $this->donation->get_campaign_donations();
 
 			if ( charitable_is_debug() ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 				error_log( 'setup_stripe_connect in embedded stripe' );
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 				error_log( print_r( $campaign_donations, true ) );
 			}
 
@@ -1110,6 +1118,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 
 			if ( ! class_exists( 'Charitable_Stripe_Connect' ) ) {
 				if ( charitable_is_debug() ) {
+					// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 					error_log( 'Charitable_Stripe_Connect not found' );
 					return;
 				}
@@ -1121,7 +1130,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 
 			/* We cannot support multiple campaign donations in a single donation with Stripe Connect. */
 			if ( 1 < count( $campaign_donations ) ) {
-				wp_die( __( 'Error: Unable to process multiple campaign donations in a single donation with Stripe Connect.', 'charitable' ) );
+				wp_die( esc_html( __( 'Error: Unable to process multiple campaign donations in a single donation with Stripe Connect.', 'charitable' ) ) );
 			}
 
 			$connected_account = charitable_stripe_get_connected_account_for_campaign( current( $campaign_donations )->campaign_id );
@@ -1177,6 +1186,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 		 * @since   1.4.2
 		 * @version 1.8.0
 		 * @version 1.8.8.3
+		 * @version 1.8.9.1
 		 *
 		 * @param  mixed $amount          The donation amount.
 		 * @param  mixed $application_fee The application fee.
@@ -1188,8 +1198,11 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 			$amount = str_replace( ',', '.', $amount );
 
 			if ( charitable_is_debug() ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				error_log( 'get_application_fee_amount' );
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 				error_log( print_r( $amount, true ) );
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 				error_log( print_r( $application_fee, true ) );
 			}
 
@@ -1223,9 +1236,13 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 			}
 
 			if ( charitable_is_debug() ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				error_log( 'get_application_fee_amount fee' );
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 				error_log( print_r( $fee, true ) );
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 				error_log( print_r( $amount, true ) );
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 				error_log( print_r( $application_fee, true ) );
 			}
 

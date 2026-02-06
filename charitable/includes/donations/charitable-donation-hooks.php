@@ -134,3 +134,19 @@ add_action( 'charitable_recurring_donation_status_changed', 'charitable_update_c
  */
 add_filter( 'charitable_validate_donation_form_submission_security_check', array( Charitable_Donation_Notices::get_instance(), 'update_security_check_error_total' ), 10, 2 );
 add_filter( 'charitable_admin_dashboard_init_end', array( Charitable_Donation_Notices::get_instance(), 'get_dashboard_notices' ), 10 );
+
+/**
+ * Schedule cleanup of old donation form error logs.
+ *
+ * @see charitable_schedule_error_log_cleanup()
+ * @see charitable_cleanup_old_form_errors()
+ */
+add_action( 'init', 'charitable_schedule_error_log_cleanup' );
+add_action( 'charitable_daily_error_log_cleanup', 'charitable_cleanup_old_form_errors' );
+
+/**
+ * Register cleanup for plugin deactivation when plugin is loaded.
+ *
+ * @see charitable_cleanup_error_log_cron_on_deactivation()
+ */
+add_action( 'charitable_start', 'charitable_register_error_log_deactivation_hook' );

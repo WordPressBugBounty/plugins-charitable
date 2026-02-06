@@ -82,10 +82,10 @@ if ( ! class_exists( 'Charitable_Export_Items' ) ) :
 			$export_args = $_POST['charitable_settings']['export']; // phpcs:ignore
 
 			if ( ! isset( $export_args['export_campaign'] ) || intval( $export_args['export_campaign'] ) === 0 ) {
-				if ( charitable_is_debug() ) {
-					error_log( 'admin_accept_export_campaign_request: ' );
-					error_log( print_r( $export_args, true ) );
-				}
+			if ( charitable_is_debug() ) {
+				error_log( 'admin_accept_export_campaign_request: ' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( print_r( $export_args, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
+			}
 				return;
 			}
 

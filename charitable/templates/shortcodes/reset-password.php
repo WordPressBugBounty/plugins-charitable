@@ -7,6 +7,7 @@
  * @package Charitable/Templates/Account
  * @since   1.4.0
  * @version 1.6.29
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -14,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$form = $view_args['form'];
+$charitable_form = $view_args['form'];
 
 ?>
 <div class="charitable-reset-password-form">
@@ -27,7 +28,7 @@ $form = $view_args['form'];
 	do_action( 'charitable_reset_password_before', $view_args );
 
 	?>
-	<form id="resetpassform" class="charitable-form" action="<?php echo site_url( 'wp-login.php?action=resetpass' ); ?>" method="post" autocomplete="off">
+	<form id="resetpassform" class="charitable-form" action="<?php echo esc_url( site_url( 'wp-login.php?action=resetpass' ) ); ?>" method="post" autocomplete="off">
 		<?php
 		/**
 		 * Do something before rendering the form fields.
@@ -37,14 +38,14 @@ $form = $view_args['form'];
 		 * @param Charitable_Form $form      The form object.
 		 * @param array           $view_args All args passed to template.
 		 */
-		do_action( 'charitable_form_before_fields', $form, $view_args );
+		do_action( 'charitable_form_before_fields', $charitable_form, $view_args );
 
 		?>
 		<div class="charitable-form-fields cf">
 			<input type="hidden" id="user_login" name="rp_login" value="<?php echo esc_attr( $view_args['login'] ); ?>" autocomplete="off" >
 			<input type="hidden" name="rp_key" value="<?php echo esc_attr( $view_args['key'] ); ?>" >
-			<?php $form->view()->render(); ?>
-			<p class="description"><?php echo wp_get_password_hint(); ?></p>
+			<?php $charitable_form->view()->render(); ?>
+			<p class="description"><?php echo wp_kses_post( wp_get_password_hint() ); ?></p>
 		</div><!-- .charitable-form-fields -->
 		<?php
 		/**
@@ -55,11 +56,11 @@ $form = $view_args['form'];
 		 * @param Charitable_Form $form      The form object.
 		 * @param array           $view_args All args passed to template.
 		 */
-		do_action( 'charitable_form_after_fields', $form, $view_args );
+		do_action( 'charitable_form_after_fields', $charitable_form, $view_args );
 
 		?>
 		<div class="charitable-form-field charitable-submit-field resetpass-submit">
-			<input type="submit" name="submit" class="<?php echo esc_attr( charitable_get_button_class( 'lostpassword' ) ); ?>" id="resetpass-button" value="<?php _e( 'Reset Password', 'charitable' ); ?>">
+			<input type="submit" name="submit" class="<?php echo esc_attr( charitable_get_button_class( 'lostpassword' ) ); ?>" id="resetpass-button" value="<?php esc_attr_e( 'Reset Password', 'charitable' ); ?>">
 		</div>
 	</form><!-- #resetpassform -->
 	<?php

@@ -1194,6 +1194,10 @@ body.post-type-donation {
 #charitable-user-fields-wrap {
 	width: 100%;
 
+	.charitable-overlay {
+		display: none !important;
+	}
+
 	&.loading-data {
 		.charitable-overlay {
 			display: block !important;
@@ -1796,6 +1800,7 @@ form#posts-filter .actions.charitable-export-actions {
 	margin-left: 3px;
 	margin-right: 20px;
 	margin-bottom: 0;
+	padding: 10px 10px;
 }
 .charitable-notice.updated,
 .charitable-notice.error {

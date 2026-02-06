@@ -114,8 +114,9 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 				);
 			}
 
-			// Only show security tab if security addon is not active.
-			if ( ! defined( 'CHARITABLE_SPAMBLOCKER_FEATURE_PLUGIN' ) ) {
+			// Always show security tab.
+			// When spam blocker is active, it will handle the settings.
+			// When spam blocker is inactive, core security features will handle the settings.
 				$tabs = charitable_add_settings_tab(
 					$tabs,
 					'security',
@@ -124,7 +125,6 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 						'index' => 6,
 					)
 				);
-			}
 
 			// Ensure the advanced tab is always last by moving it to the end of the array.
 			if ( isset( $tabs['advanced'] ) ) {
@@ -286,13 +286,13 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 			$settings_keys = array_keys( $new_values );
 
 			if ( charitable_is_debug() ) {
-				error_log( 'santiize_settings' );
-				error_log( 'values:' );
-				error_log( print_r( $values, true ) );
-				error_log( 'old_values:' );
-				error_log( print_r( $old_values, true ) );
-				error_log( 'new_values:' );
-				error_log( print_r( $new_values, true ) );
+				error_log( 'santiize_settings' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( 'values:' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( print_r( $values, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
+				error_log( 'old_values:' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( print_r( $old_values, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
+				error_log( 'new_values:' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( print_r( $new_values, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 			}
 
 			// determine if Charitable gateway "test_mode" is being changed, and if so add a notice to the user.
@@ -354,15 +354,15 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 					$values['gateways_stripe']['test_public_key'] = $old_values['gateways_stripe']['test_public_key'];
 				}
 				if ( charitable_is_debug() ) {
-					error_log( 'update:' );
-					error_log( print_r( $values, true ) );
+					error_log( 'update:' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					error_log( print_r( $values, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 				}
 			}
 
 			// determine if stripe is being returned as new values - if so, then perform the API key save workaround.
 			if ( in_array( 'gateways_stripe', $settings_keys ) && charitable()->is_stripe_connect_addon() && false === charitable_using_stripe_connect() ) {
 				if ( charitable_is_debug() ) {
-					error_log( 'there is a stripe connect addon but we are not using stripe connect' );
+					error_log( 'there is a stripe connect addon but we are not using stripe connect' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				}
 				// the stripe connect addon is installed AND the AM Stripe Connect isn't being used... so it's possible the keys could be manual and the user could be updating them... therefore let's just make sure the new values match the values incoming.
 				$new_values['gateways_stripe']['live_secret_key'] = ( isset( $values['gateways_stripe']['live_secret_key'] ) && ( false !== $values['gateways_stripe']['live_secret_key'] ) ) ? $values['gateways_stripe']['live_secret_key'] : null;
@@ -372,7 +372,7 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 			} elseif ( in_array( 'gateways_stripe', $settings_keys ) ) {
 				// otherwise we preserve the keys.
 				if ( charitable_is_debug() ) {
-					error_log( 'charitable debug, final with debug on:' );
+					error_log( 'charitable debug, final with debug on:' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 					$new_values['gateways_stripe']['live_secret_key'] = ( isset( $values['gateways_stripe']['live_secret_key'] ) && ( false !== $values['gateways_stripe']['live_secret_key'] ) ) ? $values['gateways_stripe']['live_secret_key'] : null;
 					$new_values['gateways_stripe']['live_public_key'] = ( isset( $values['gateways_stripe']['live_public_key'] ) && ( false !== $values['gateways_stripe']['live_public_key'] ) ) ? $values['gateways_stripe']['live_public_key'] : null;
 					$new_values['gateways_stripe']['test_secret_key'] = ( isset( $values['gateways_stripe']['test_secret_key'] ) && ( false !== $values['gateways_stripe']['test_secret_key'] ) ) ? $values['gateways_stripe']['test_secret_key'] : null;
@@ -436,8 +436,8 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 			}
 
 			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-				error_log( 'santiize_settings values updated' );
-				error_log( print_r( $values, true ) );
+				error_log( 'santiize_settings values updated' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( print_r( $values, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 			}
 
 			/**
@@ -454,12 +454,16 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 
 			// save a temp transient for legacy licenses (1.7.0.8+)
 			// purpose is to provide better error reporting (transient should be deleted after settings page (advanced tab) is loaded).
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
 			if ( isset( $_POST['charitable_settings']['legacy_licenses'] ) ) {
 				$referer = wp_get_referer();
 				if ( false !== strpos( $referer, 'admin.php?page=charitable-settings&tab=advanced' ) ) {
-					set_transient( '_charitable_legacy_license_info', $_POST['charitable_settings']['legacy_licenses'], MINUTE_IN_SECONDS );
+					// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array data, sanitized later
+					$legacy_licenses = wp_unslash( $_POST['charitable_settings']['legacy_licenses'] );
+					set_transient( '_charitable_legacy_license_info', $legacy_licenses, MINUTE_IN_SECONDS );
 				}
 			}
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			$this->add_update_message( __( 'Settings saved', 'charitable' ), 'success' );
 
@@ -873,7 +877,8 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 		/**
 		 * Show the settings CTA.
 		 *
-		 * @since 1.8.5.1
+		 * @since   1.8.5.1
+		 * @version 1.8.9
 		 *
 		 * @return void
 		 */
@@ -898,8 +903,8 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 						$this->get_settings_cta_education_content_marketing_settings();
 					} elseif ( 'donors' === $tab_value ) {
 						$this->get_settings_cta_education_content_donor_settings();
-					} elseif ( 'security' === $tab_value && ! defined( 'CHARITABLE_SPAMBLOCKER_FEATURE_PLUGIN' ) ) {
-						$this->get_settings_cta_education_content_security_settings();
+					} elseif ( 'security' === $tab_value && ! charitable_is_pro() ) {
+						$this->get_settings_cta_education_content_advanced_security_settings();
 					}
 					?>
 					<?php if ( charitable_is_pro() ) : ?>
@@ -907,8 +912,9 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 							<p>
 							<?php
 							printf(
-								/* translators: %s: Documentation URL */
-								esc_html__( 'This feature is only available in Charitable Pro. Please %s on how to download Charitable Pro.', 'charitable' ),
+								/* translators: %1$s: SPAM BUILDER link, %2$s: Documentation URL */
+								esc_html__( 'Please add your license to download the %1$s addon. Advanced features are available in Charitable Pro. Please %2$s on how to download Charitable Pro.', 'charitable' ),
+								'<a href="https://www.wpcharitable.com/extensions/charitable-spam-blocker/" target="_blank">' . esc_html__( 'SPAM BUILDER', 'charitable' ) . '</a>',
 								'<a href="https://wpcharitable.com/docs/download-charitable-pro/" target="_blank">' . esc_html__( 'see our documentation', 'charitable' ) . '</a>'
 							);
 							?>
@@ -916,7 +922,7 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 						</div>
 					<?php else : ?>
 					<div class="charitable-education-page-button">
-						<a href="<?php echo esc_url( charitable_utm_link( 'https://wpcharitable.com/lite-upgrade/', 'pdf-receipts', 'Upgrade to Charitable Pro' ) ); ?>" class="button button-primary" target="_blank">Upgrade to Charitable Pro</a>
+						<a href="<?php echo esc_url( charitable_utm_link( 'https://wpcharitable.com/lite-upgrade/', $tab_value, __( 'Upgrade to Charitable Pro', 'charitable' ) ) ); ?>" class="button button-primary" target="_blank"><?php esc_html_e( 'Upgrade to Charitable Pro', 'charitable' ); ?></a>
 					</div>
 					<?php endif; ?>
 				</div>
@@ -1055,7 +1061,7 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 
 			<div class="charitable-education-page-heading">
 				<h4><?php esc_html_e( 'Security', 'charitable' ); ?></h4>
-				<p><?php esc_html_e( 'It is important to protect against potential misuse while maintaining donor trust. Built-in rate limiting prevents rapid-fire submissions, while CAPTCHA integration adds an essential layer of protection against automated attacks and spam donations. Every transaction is meticulously logged with IP address documentation and timestamp verification, providing a clear audit trail and helping prevent fraudulent activities.', 'charitable' ); ?></p>
+				<p><?php esc_html_e( 'It is important to protect against potential misuse while maintaining donor trust. CAPTCHA integration adds an essential layer of protection against automated attacks and spam donations. Every transaction is meticulously logged with IP address documentation and timestamp verification, providing a clear audit trail and helping prevent fraudulent activities.', 'charitable' ); ?></p>
 			</div>
 
 			<div class="charitable-education-page-media">
@@ -1066,13 +1072,6 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 							<a href="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/security/education-1.png" class="hover" data-lity="" data-lity-desc="<?php esc_attr_e( 'Security', 'charitable' ); ?>"></a>
 						</div>
 						<figcaption><?php esc_html_e( 'Captchas', 'charitable' ); ?></figcaption>
-					</figure>
-					<figure>
-						<div class="charitable-education-page-images-image">
-							<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/security/education-2.png" alt="<?php esc_attr_e( 'Security', 'charitable' ); ?>">
-							<a href="<?php echo esc_url( charitable()->get_path( 'assets', false ) ); ?>images/education/security/education-2.png" class="hover" data-lity="" data-lity-desc="<?php esc_attr_e( 'Security', 'charitable' ); ?>"></a>
-						</div>
-						<figcaption><?php esc_html_e( 'Rate limiting', 'charitable' ); ?></figcaption>
 					</figure>
 					<figure>
 						<div class="charitable-education-page-images-image">
@@ -1090,6 +1089,34 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Easy Activation', 'charitable' ); ?></li>
 					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Record IP Addresses', 'charitable' ); ?></li>
 					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Block Bad Bots', 'charitable' ); ?></li>
+				</ul>
+			</div>
+			<?php
+		}
+
+		/**
+		 * Get the settings CTA education content for advanced security features.
+		 *
+		 * @since 1.8.9
+		 *
+		 * @return void
+		 */
+		public function get_settings_cta_education_content_advanced_security_settings() {
+			?>
+
+			<div class="charitable-education-page-heading">
+				<h4><?php esc_html_e( 'Advanced Security Features', 'charitable' ); ?></h4>
+				<p><?php esc_html_e( 'Charitable Pro offers a fortified layer of safety designed for high-volume campaigns. Upgrade to unlock sophisticated spam filtering and enhanced payment protection, ensuring the highest level of trust and security for your donors.', 'charitable' ); ?></p>
+			</div>
+			<div class="charitable-education-page-caps">
+				<p><?php esc_html_e( 'Protect against potential misuse while maintaining donor trust.', 'charitable' ); ?></p>
+				<ul>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'General Rate Limiting', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Stripe Rate Limiting', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'IP Blacklist/Whitelist', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Email Pattern Blocking', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Minimum Donation Features', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Math Field Protection', 'charitable' ); ?></li>
 				</ul>
 			</div>
 			<?php

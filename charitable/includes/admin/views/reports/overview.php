@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display the main reports "overview" page.
  *
@@ -8,96 +14,97 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8,1
  * @version   1.8.1
+ * @version   1.8.8.6
  */
 
-$start_date  = false;
-$end_date    = false;
-$filter      = false;
-$campaign_id = false;
-$category_id = false;
+$charitable_start_date  = false;
+$charitable_end_date    = false;
+$charitable_filter      = false;
+$charitable_campaign_id = false;
+$charitable_category_id = false;
 $status      = false; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
 $charitable_reports = Charitable_Reports::get_instance();
 
 // Check the transients via charitable_report_overview_args.
-$report_data_args = false; // get_transient( 'charitable-report-overview-args' );
+$charitable_report_data_args = false; // get_transient( 'charitable-report-overview-args' );
 
-if ( false !== $report_data_args ) {
+if ( false !== $charitable_report_data_args ) {
 
-	$start_date  = ( false === $start_date && ! empty( $report_data_args['start_date'] ) ) ? $charitable_reports->get_valid_date_string( $report_data_args['start_date'] ) : false;
-	$end_date    = ( false === $end_date && ! empty( $report_data_args['end_date'] ) ) ? $charitable_reports->get_valid_date_string( $report_data_args['end_date'] ) : false;
-	$filter      = ( false === $filter && ! empty( $report_data_args['filter'] ) ) ? intval( $report_data_args['filter'] ) : 'test';
-	$campaign_id = ( false === $campaign_id && ! empty( $report_data_args['campaign_id'] ) ) ? intval( $report_data_args['campaign_id'] ) : false;
-	$category_id = ( false === $category_id && ! empty( $report_data_args['category_id'] ) ) ? intval( $report_data_args['category_id'] ) : false;
+	$charitable_start_date  = ( false === $charitable_start_date && ! empty( $charitable_report_data_args['start_date'] ) ) ? $charitable_reports->get_valid_date_string( $charitable_report_data_args['start_date'] ) : false;
+	$charitable_end_date    = ( false === $charitable_end_date && ! empty( $charitable_report_data_args['end_date'] ) ) ? $charitable_reports->get_valid_date_string( $charitable_report_data_args['end_date'] ) : false;
+	$charitable_filter      = ( false === $charitable_filter && ! empty( $charitable_report_data_args['filter'] ) ) ? intval( $charitable_report_data_args['filter'] ) : 'test';
+	$charitable_campaign_id = ( false === $charitable_campaign_id && ! empty( $charitable_report_data_args['campaign_id'] ) ) ? intval( $charitable_report_data_args['campaign_id'] ) : false;
+	$charitable_category_id = ( false === $charitable_category_id && ! empty( $charitable_report_data_args['category_id'] ) ) ? intval( $charitable_report_data_args['category_id'] ) : false;
 
 }
 
-if ( false === $start_date || false === $end_date || false === $filter ) {
+if ( false === $charitable_start_date || false === $charitable_end_date || false === $charitable_filter ) {
 	// so nothing from the transient, so check the $_GET.
-	$start_date  = isset( $_GET['start_date'] ) ? $charitable_reports->get_valid_date_string( sanitize_text_field( $_GET['start_date'] ) ) : false; // phpcs:ignore
-	$end_date    = isset( $_GET['end_date'] ) ? $charitable_reports->get_valid_date_string( sanitize_text_field( $_GET['end_date'] ) ) : false; // phpcs:ignore
-	$filter      = isset( $_GET['filter'] ) ? intval( $_GET['filter'] ) : false; // phpcs:ignore
-	$campaign_id = isset( $_GET['campaign_id'] ) ? intval( $_GET['campaign_id'] ) : false; // phpcs:ignore
-	$category_id = isset( $_GET['category_id'] ) ? intval( $_GET['category_id'] ) : false; // phpcs:ignore
+	$charitable_start_date  = isset( $_GET['start_date'] ) ? $charitable_reports->get_valid_date_string( sanitize_text_field( $_GET['start_date'] ) ) : false; // phpcs:ignore
+	$charitable_end_date    = isset( $_GET['end_date'] ) ? $charitable_reports->get_valid_date_string( sanitize_text_field( $_GET['end_date'] ) ) : false; // phpcs:ignore
+	$charitable_filter      = isset( $_GET['filter'] ) ? intval( $_GET['filter'] ) : false; // phpcs:ignore
+	$charitable_campaign_id = isset( $_GET['campaign_id'] ) ? intval( $_GET['campaign_id'] ) : false; // phpcs:ignore
+	$charitable_category_id = isset( $_GET['category_id'] ) ? intval( $_GET['category_id'] ) : false; // phpcs:ignore
 }
 
-if ( false === $start_date || false === $end_date || false === $filter ) {
+if ( false === $charitable_start_date || false === $charitable_end_date || false === $charitable_filter ) {
 	// If still nothing assign defaults.
-	$start_date  = gmdate( 'Y/m/d', strtotime( '-7 days' ) );
-	$end_date    = gmdate( 'Y/m/d' );
-	$filter      = 7;
-	$campaign_id = -1; // cannot be zero because that would be false.
-	$category_id = 0;
+	$charitable_start_date  = gmdate( 'Y/m/d', strtotime( '-7 days' ) );
+	$charitable_end_date    = gmdate( 'Y/m/d' );
+	$charitable_filter      = 7;
+	$charitable_campaign_id = -1; // cannot be zero because that would be false.
+	$charitable_category_id = 0;
 }
 
 $charitable_report_overview_args = apply_filters(
 	'charitable_report_overview_args',
 	array(
-		'start_date'  => $start_date,
-		'end_date'    => $end_date,
-		'filter'      => $filter,
-		'campaign_id' => $campaign_id,
-		'category_id' => $category_id,
+		'start_date'  => $charitable_start_date,
+		'end_date'    => $charitable_end_date,
+		'filter'      => $charitable_filter,
+		'campaign_id' => $charitable_campaign_id,
+		'category_id' => $charitable_category_id,
 	)
 );
 
 $charitable_reports->init_with_array( 'overview', $charitable_report_overview_args );
 
 // main activity.
-$report_activity = $charitable_reports->get_activity();
+$charitable_report_activity = $charitable_reports->get_activity();
 
 // donations.
-$donations              = $charitable_reports->get_donations();
-$total_count_donations  = count( $donations );
-$total_amount_donations = $charitable_reports->get_donations_total();
-$donation_breakdown     = $charitable_reports->get_donations_by_day();
-$payment_breakdown      = $charitable_reports->get_donations_by_payment();
-$donation_average       = ( $total_amount_donations > 0 && $total_amount_donations > 0 ) ? ( charitable_format_money( $total_amount_donations / $total_count_donations, 2, true ) ) : charitable_format_money( 0 );
-$donation_total         = charitable_format_money( $total_amount_donations );
+$charitable_donations              = $charitable_reports->get_donations();
+$charitable_total_count_donations  = count( $charitable_donations );
+$charitable_total_amount_donations = $charitable_reports->get_donations_total();
+$charitable_donation_breakdown     = $charitable_reports->get_donations_by_day();
+$charitable_payment_breakdown      = $charitable_reports->get_donations_by_payment();
+$charitable_donation_average       = ( $charitable_total_amount_donations > 0 && $charitable_total_amount_donations > 0 ) ? ( charitable_format_money( $charitable_total_amount_donations / $charitable_total_count_donations, 2, true ) ) : charitable_format_money( 0 );
+$charitable_donation_total         = charitable_format_money( $charitable_total_amount_donations );
 
 // donors.
-$top_donors         = $charitable_reports->get_top_donors_overview();
-$total_count_donors = $charitable_reports->get_donors_count();
-$total_donors_label = ( 1 === $total_count_donors ) ? esc_html__( 'Donor', 'charitable' ) : esc_html__( 'Donors', 'charitable' );
+$charitable_top_donors         = $charitable_reports->get_top_donors_overview();
+$charitable_total_count_donors = $charitable_reports->get_donors_count();
+$charitable_total_donors_label = ( 1 === $charitable_total_count_donors ) ? esc_html__( 'Donor', 'charitable' ) : esc_html__( 'Donors', 'charitable' );
 
 // refunds.
-$refunds_data         = $charitable_reports->get_refunds();
-$total_amount_refunds = $refunds_data['total_amount'];
-$total_count_refunds  = $refunds_data['total_count'];
+$charitable_refunds_data         = $charitable_reports->get_refunds();
+$charitable_total_amount_refunds = $charitable_refunds_data['total_amount'];
+$charitable_total_count_refunds  = $charitable_refunds_data['total_count'];
 
 // campaigns.
-$args              = array( 'posts_per_page' => apply_filters( 'charitable_overview_top_campaigns_amount', 20 ) );
-$top_campaigns     = Charitable_Campaigns::ordered_by_amount( $args );
-$campaign_dropdown = array();
-if ( ! empty( $top_campaigns->posts ) ) :
-	$campaign_dropdown = wp_list_pluck( $top_campaigns->posts, 'post_title', 'ID' );
-	$campaign_dropdown = array_map( 'esc_html', $campaign_dropdown );
+$charitable_args              = array( 'posts_per_page' => apply_filters( 'charitable_overview_top_campaigns_amount', 20 ) );
+$charitable_top_campaigns     = Charitable_Campaigns::ordered_by_amount( $charitable_args );
+$charitable_campaign_dropdown = array();
+if ( ! empty( $charitable_top_campaigns->posts ) ) :
+	$charitable_campaign_dropdown = wp_list_pluck( $charitable_top_campaigns->posts, 'post_title', 'ID' );
+	$charitable_campaign_dropdown = array_map( 'esc_html', $charitable_campaign_dropdown );
 	// sort by title.
-	asort( $campaign_dropdown );
+	asort( $charitable_campaign_dropdown );
 endif;
 
-$campaign_categories  = $charitable_reports->get_campaign_categories();
-$campaign_category_id = 0;
+$charitable_campaign_categories  = $charitable_reports->get_campaign_categories();
+$charitable_campaign_category_id = 0;
 
 ?>
 
@@ -106,13 +113,13 @@ $campaign_category_id = 0;
 		<label for="report-campaign-filter" class="screen-reader-text"><?php echo esc_html__( 'Select Campaign', 'charitable' ); ?></label>
 		<select name="action" id="report-campaign-filter">
 			<option value="-1"><?php echo esc_html__( 'Showing Results for', 'charitable' ); ?> <strong><?php echo esc_html__( 'All Campaigns', 'charitable' ); ?></strong></option>
-			<?php if ( ! empty( $campaign_dropdown ) ) : ?>
-				<?php foreach ( $campaign_dropdown as $campaign_dropdown_id => $campaign_title ) : ?>
-				<option value="<?php echo intval( $campaign_dropdown_id ); ?>"><?php echo esc_html( $campaign_title ); ?></option>
+			<?php if ( ! empty( $charitable_campaign_dropdown ) ) : ?>
+				<?php foreach ( $charitable_campaign_dropdown as $charitable_campaign_dropdown_id => $charitable_campaign_title ) : ?>
+				<option value="<?php echo intval( $charitable_campaign_dropdown_id ); ?>"><?php echo esc_html( $charitable_campaign_title ); ?></option>
 				<?php endforeach; ?>
 			<?php endif; ?>
 		</select>
-		<?php if ( ! empty( $campaign_categories ) ) : ?>
+		<?php if ( ! empty( $charitable_campaign_categories ) ) : ?>
 		<label for="report-category-filter" class="screen-reader-text"><?php echo esc_html__( 'Select Category', 'charitable' ); ?></label>
 			<?php
 
@@ -129,7 +136,7 @@ $campaign_category_id = 0;
 						'child_of'          => 0,
 						'exclude'           => '',
 						'echo'              => 1,
-						'selected'          => $campaign_category_id,
+						'selected'          => $charitable_campaign_category_id,
 						'hierarchical'      => 1,
 						'name'              => 'action',
 						'id'                => 'report-category-filter',
@@ -147,15 +154,15 @@ $campaign_category_id = 0;
 
 		<form action="" method="post" target="_blank" class="charitable-report-print" id="charitable-overview-print">
 			<input name="charitable_report_action" type="hidden" value="charitable_report_print_overview" />
-			<input name="start_date" type="hidden" value="<?php echo esc_attr( $start_date ); ?>" />
-			<input name="end_date" type="hidden" value="<?php echo esc_attr( $end_date ); ?>" />
-			<input name="campaign_id" type="hidden" value="<?php echo intval( $campaign_id ); ?>" />
-			<input name="category_id" type="hidden" value="<?php echo intval( $category_id ); ?>" />
+			<input name="start_date" type="hidden" value="<?php echo esc_attr( $charitable_start_date ); ?>" />
+			<input name="end_date" type="hidden" value="<?php echo esc_attr( $charitable_end_date ); ?>" />
+			<input name="campaign_id" type="hidden" value="<?php echo intval( $charitable_campaign_id ); ?>" />
+			<input name="category_id" type="hidden" value="<?php echo intval( $charitable_category_id ); ?>" />
 			<?php wp_nonce_field( 'charitable_export_report', 'charitable_export_report_nonce' ); ?>
 			<button value="Download CSV" type="submit" class="button with-icon charitable-report-print-button" title="<?php echo esc_html__( 'Print Summary', 'charitable' ); ?>" class="button with-icon charitable-report-ui" data-nonce="<?php echo wp_create_nonce( 'charitable_export_report' ); // phpcs:ignore ?>"><label><?php echo esc_html__( 'Print', 'charitable' ); ?></label><img width="15" height="15" src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/icons/print.svg' ); ?>" alt=""></button>
 		</form>
 
-		<input type="text" id="charitable-reports-topnav-datepicker" class="charitable-reports-datepicker charitable-datepicker-ranged" data-start-date="<?php echo esc_attr( $start_date ); ?>" data-end-date="<?php echo esc_attr( $end_date ); ?>" value="<?php echo esc_attr( $start_date ); ?> - <?php echo esc_attr( $end_date ); ?>" />
+		<input type="text" id="charitable-reports-topnav-datepicker" class="charitable-reports-datepicker charitable-datepicker-ranged" data-start-date="<?php echo esc_attr( $charitable_start_date ); ?>" data-end-date="<?php echo esc_attr( $charitable_end_date ); ?>" value="<?php echo esc_attr( $charitable_start_date ); ?> - <?php echo esc_attr( $charitable_end_date ); ?>" />
 
 		<div class="charitable-datepicker-container"><a href="#" class="button button-primary" id="charitable-reports-filter-button" data-filter-type="overview"><?php echo esc_html__( 'Filter', 'charitable' ); ?></a></div>
 
@@ -169,20 +176,20 @@ $campaign_category_id = 0;
 
 		<div class="charitable-cards">
 			<div class="charitable-container charitable-report-ui charitable-card">
-				<strong><span id="charitable-top-donation-total-amount"><?php echo esc_html( $donation_total ); ?></span></strong>
-				<p><span id="charitable-top-donation-total-count"><?php echo count( $donations ); ?></span> <?php echo esc_html__( 'Total Donations (Net)', 'charitable' ); ?></p>
+				<strong><span id="charitable-top-donation-total-amount"><?php echo esc_html( $charitable_donation_total ); ?></span></strong>
+				<p><span id="charitable-top-donation-total-count"><?php echo count( $charitable_donations ); ?></span> <?php echo esc_html__( 'Total Donations (Net)', 'charitable' ); ?></p>
 			</div>
 			<div class="charitable-container charitable-report-ui charitable-card">
-				<strong><span id="charitable-top-donation-average"><?php echo esc_html( $donation_average ); ?></span></strong>
+				<strong><span id="charitable-top-donation-average"><?php echo esc_html( $charitable_donation_average ); ?></span></strong>
 				<p><?php echo esc_html__( 'Average Donation', 'charitable' ); ?></p>
 			</div>
 			<div class="charitable-container charitable-report-ui charitable-card">
-				<strong><span id="charitable-top-donor-count"><?php echo intval( $total_count_donors ); ?></span></strong>
-				<p><?php echo esc_html( $total_donors_label ); ?></p>
+				<strong><span id="charitable-top-donor-count"><?php echo intval( $charitable_total_count_donors ); ?></span></strong>
+				<p><?php echo esc_html( $charitable_total_donors_label ); ?></p>
 			</div>
 			<div class="charitable-container charitable-report-ui charitable-card">
-				<strong><span id="charitable-top-refund-total-amount"><?php echo charitable_format_money( $total_amount_refunds ); // phpcs:ignore  ?></span></strong>
-				<p><span id="charitable-top-refund-count"><?php echo intval( $total_count_refunds ); ?></span> <?php echo esc_html__( 'Refunds', 'charitable' ); ?></p>
+				<strong><span id="charitable-top-refund-total-amount"><?php echo charitable_format_money( $charitable_total_amount_refunds ); // phpcs:ignore  ?></span></strong>
+				<p><span id="charitable-top-refund-count"><?php echo intval( $charitable_total_count_refunds ); ?></span> <?php echo esc_html__( 'Refunds', 'charitable' ); ?></p>
 			</div>
 		</div>
 
@@ -202,10 +209,10 @@ $campaign_category_id = 0;
 
 			<form target="_blank" action="" method="post" class="charitable-report-download-form" id="charitable-donations-breakdown-download-form">
 				<input name="charitable_report_action" type="hidden" value="charitable_report_download_donation_breakdown" />
-				<input name="start_date" type="hidden" value="<?php echo esc_attr( $start_date ); ?>" />
-				<input name="end_date" type="hidden" value="<?php echo esc_attr( $end_date ); ?>" />
-				<input name="campaign_id" type="hidden" value="<?php echo intval( $campaign_id ); ?>" />
-				<input name="category_id" type="hidden" value="<?php echo intval( $category_id ); ?>" />
+				<input name="start_date" type="hidden" value="<?php echo esc_attr( $charitable_start_date ); ?>" />
+				<input name="end_date" type="hidden" value="<?php echo esc_attr( $charitable_end_date ); ?>" />
+				<input name="campaign_id" type="hidden" value="<?php echo intval( $charitable_campaign_id ); ?>" />
+				<input name="category_id" type="hidden" value="<?php echo intval( $charitable_category_id ); ?>" />
 				<?php wp_nonce_field( 'charitable_export_report', 'charitable_export_report_nonce' ); ?>
 				<button value="Download CSV" type="submit" class="button with-icon charitable-report-download-button" title="<?php echo esc_html__( 'Download CSV', 'charitable' ); ?>" class="button with-icon charitable-report-ui" data-nonce="<?php echo wp_create_nonce( 'charitable_export_report' ); // phpcs:ignore ?>"><label><?php echo esc_html__( 'Download CSV', 'charitable' ); ?></label><img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/icons/download.svg' ); ?>" alt=""></button>
 			</form>
@@ -224,7 +231,7 @@ $campaign_category_id = 0;
 				</tr>
 			</thead>
 			<tbody id="donations-breakdown-list">
-				<?php echo $charitable_reports->generate_donations_breakdown_rows( $donation_breakdown, $refunds_data ); // phpcs:ignore ?>
+				<?php echo $charitable_reports->generate_donations_breakdown_rows( $charitable_donation_breakdown, $charitable_refunds_data ); // phpcs:ignore ?>
 			</tbody>
 			<tfoot>
 				<tr>
@@ -250,7 +257,7 @@ $campaign_category_id = 0;
 			</div>
 			<div class="charitable-toggle-container charitable-report-ui">
 				<div class="the-list">
-					<?php echo $charitable_reports->generate_activity_list( $report_activity ); // phpcs:ignore ?>
+					<?php echo $charitable_reports->generate_activity_list( $charitable_report_activity ); // phpcs:ignore ?>
 				</div>
 			</div>
 		</div>
@@ -261,7 +268,7 @@ $campaign_category_id = 0;
 				<a href="#" class="charitable-toggle"><i class="fa fa-angle-down charitable-angle-down"></i></a>
 			</div>
 			<div class="charitable-toggle-container charitable-report-ui">
-				<?php echo $charitable_reports->generate_top_donors( $top_donors ); // phpcs:ignore ?>
+				<?php echo $charitable_reports->generate_top_donors( $charitable_top_donors ); // phpcs:ignore ?>
 			</div>
 		</div>
 
@@ -275,10 +282,10 @@ $campaign_category_id = 0;
 				<a href="#" class="charitable-toggle"><i class="fa fa-angle-down charitable-angle-down"></i></a>
 			</div>
 			<div class="charitable-toggle-container charitable-report-ui">
-			<?php if ( ! empty( $top_campaigns->posts ) ) : ?>
+			<?php if ( ! empty( $charitable_top_campaigns->posts ) ) : ?>
 				<div class="the-list">
 					<ul id="charitable-top-campaigns-list">
-						<?php echo $charitable_reports->generate_top_campaigns( $top_campaigns ); // phpcs:ignore ?>
+						<?php echo $charitable_reports->generate_top_campaigns( $charitable_top_campaigns ); // phpcs:ignore ?>
 					</ul>
 				</div>
 			<?php else : ?>
@@ -303,7 +310,7 @@ $campaign_category_id = 0;
 					</div>
 					<div class="the-legend">
 						<ul id="charitable-payment-methods-list">
-							<?php echo $charitable_reports->generate_payment_methods_list( $payment_breakdown ); // phpcs:ignore ?>
+							<?php echo $charitable_reports->generate_payment_methods_list( $charitable_payment_breakdown ); // phpcs:ignore ?>
 						</ul>
 					</div> <!-- the legend -->
 				</div>

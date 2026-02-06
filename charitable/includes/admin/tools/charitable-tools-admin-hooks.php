@@ -36,6 +36,24 @@ add_filter( 'charitable_tools_tab_fields_snippets', array( Charitable_Tools_Sett
 add_filter( 'charitable_tools_tab_fields_customize', array( Charitable_Tools_Settings::get_instance(), 'add_tools_customize_fields' ), 5 );
 
 /**
+ * Add settings to the Misc tab.
+ *
+ * @since 1.8.9
+ *
+ * @see Charitable_Tools_Misc::add_misc_fields()
+ */
+add_filter( 'charitable_tools_tab_fields_misc', array( Charitable_Tools_Misc::get_instance(), 'add_misc_fields' ), 5 );
+
+/**
+ * Handle bulk removal of donations.
+ *
+ * @since 1.8.9
+ *
+ * @see Charitable_Tools_Misc::bulk_remove_donations()
+ */
+add_filter( 'charitable_save_tools', array( Charitable_Tools_Misc::get_instance(), 'bulk_remove_donations' ), 10, 3 );
+
+/**
  * Look for export/import attempts.
  *
  * @see Charitable_Export_Settings::add_export_fields()
@@ -55,3 +73,46 @@ add_action( 'admin_init', array( Charitable_Import_Items::get_instance(), 'admin
  */
 add_action( 'admin_enqueue_scripts', array( Charitable_Intergrations_WPCode::get_instance(), 'enqueue_scripts' ) );
 add_action( 'admin_enqueue_scripts', array( Charitable_Tools_System_Info::get_instance(), 'enqueue_scripts' ) );
+
+/**
+ * Register AJAX action for email diagnostics.
+ *
+ * @since 1.8.9.2
+ */
+add_action( 'wp_ajax_charitable_email_diagnostics', array( Charitable_Tools_System_Info::get_instance(), 'ajax_email_diagnostics' ) );
+
+/**
+ * Register AJAX action for test email.
+ *
+ * @since 1.8.9.2
+ */
+add_action( 'wp_ajax_charitable_send_test_email', array( Charitable_Tools_System_Info::get_instance(), 'ajax_send_test_email' ) );
+
+/**
+ * Clear error logs via AJAX.
+ *
+ * @since 1.8.9.2
+ *
+ * @see Charitable_Tools_System_Info::ajax_clear_error_logs()
+ */
+add_action( 'wp_ajax_charitable_clear_error_logs', array( Charitable_Tools_System_Info::get_instance(), 'ajax_clear_error_logs' ) );
+
+/**
+ * Export error logs via AJAX.
+ *
+ * @since 1.8.9.2
+ *
+ * @see Charitable_Tools_System_Info::ajax_export_error_logs()
+ */
+add_action( 'wp_ajax_charitable_export_error_logs', array( Charitable_Tools_System_Info::get_instance(), 'ajax_export_error_logs' ) );
+
+/**
+ * Register AJAX action for debug log scanner.
+ *
+ * @since 1.8.9.2
+ *
+ * @see Charitable_Tools_System_Info::ajax_debug_log_scan()
+ */
+add_action( 'wp_ajax_charitable_debug_log_scan', array( Charitable_Tools_System_Info::get_instance(), 'ajax_debug_log_scan' ) );
+
+add_action( 'admin_enqueue_scripts', array( Charitable_Tools_Misc::get_instance(), 'enqueue_scripts' ) );

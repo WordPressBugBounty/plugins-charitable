@@ -70,7 +70,11 @@ if ( ! class_exists( 'Charitable_Object_Fields' ) ) :
 				return null;
 			}
 
-			return call_user_func( $field->value_callback, $this->object, $field_key );
+			if ( is_callable( $field->value_callback ) ) {
+				return call_user_func( $field->value_callback, $this->object, $field_key );
+			}
+
+			return null;
 		}
 
 		/**

@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version   1.8.0
+ * @version   1.8.9.1
  */
 
 // Exit if accessed directly.
@@ -326,33 +326,34 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 
 			$url_data_params = http_build_query( $url_data );
 
+			// Use REST API for admin CSS templates (added in 1.8.9.2)
 			wp_enqueue_style(
 				'charitable-builder-template-preview-theme',
-				charitable()->get_path( 'directory', false ) . "assets/css/campaign-builder/themes/admin/{$template_id}.php?" . $url_data_params,
+				add_query_arg( $url_data, rest_url( 'charitable/v1/campaign-css-admin/' . $template_id ) ),
 				array(),
 				$style_version
 			);
 			wp_enqueue_style(
 				'charitable-builder-template-preview-theme-colors-primary',
-				charitable()->get_path( 'directory', false ) . "assets/css/campaign-builder/themes/admin/{$template_id}-colors.php?" . $url_data_params,
+				add_query_arg( $url_data, rest_url( 'charitable/v1/campaign-css-admin/' . $template_id . '-colors' ) ),
 				array(),
 				$style_version
 			);
 			wp_enqueue_style(
 				'charitable-builder-template-preview-theme-colors-secondary',
-				charitable()->get_path( 'directory', false ) . "assets/css/campaign-builder/themes/admin/{$template_id}-colors.php?" . $url_data_params,
+				add_query_arg( $url_data, rest_url( 'charitable/v1/campaign-css-admin/' . $template_id . '-colors' ) ),
 				array(),
 				$style_version
 			);
 			wp_enqueue_style(
 				'charitable-builder-template-preview-theme-colors-tertiary',
-				charitable()->get_path( 'directory', false ) . "assets/css/campaign-builder/themes/admin/{$template_id}-colors.php?" . $url_data_params,
+				add_query_arg( $url_data, rest_url( 'charitable/v1/campaign-css-admin/' . $template_id . '-colors' ) ),
 				array(),
 				$style_version
 			);
 			wp_enqueue_style(
 				'charitable-builder-template-preview-theme-colors-button',
-				charitable()->get_path( 'directory', false ) . "assets/css/campaign-builder/themes/admin/{$template_id}-colors.php?" . $url_data_params,
+				add_query_arg( $url_data, rest_url( 'charitable/v1/campaign-css-admin/' . $template_id . '-colors' ) ),
 				array(),
 				$style_version
 			);
@@ -423,11 +424,21 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				'2.2.6'
 			);
 
+			/**
+			 * Enqueue jQuery UI smoothness theme for datepicker styling.
+			 *
+			 * Note: This file must be bundled locally for WordPress.org compliance.
+			 * Download from: https://code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css
+			 * Save to: assets/css/libraries/jquery-ui-smoothness.css
+			 *
+			 * @since 1.0.0
+			 * @version 1.8.9.1
+			 */
 			wp_enqueue_style(
 				'themeslug-jquery-css',
-				'//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css',
+				charitable()->get_path( 'directory', false ) . 'assets/css/libraries/jquery-ui-smoothness.css',
 				null,
-				$style_version
+				'1.11.2'
 			);
 
 			// Remove TinyMCE editor styles from third-party themes and plugins.
@@ -947,6 +958,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 					'charitable_campaign_builder_charitable_assets_dir',
 					charitable()->get_path( 'directory', false ) . 'assets/'
 				),
+				'charitable_rest_url'               => rest_url( 'charitable/v1/' ),
 			);
 
 			if ( $this->is_tour_active() ) {
@@ -1253,6 +1265,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 		 * Load the appropriate files to build the page.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.8.6
 		 */
 		public function output() {
 
@@ -1329,9 +1342,12 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 			 * @param string $content Content before toolbar. Defaults to empty string.
 			 */
 			$before_toolbar = apply_filters( 'charitable_builder_output_before_toolbar', '' );
-			?>
+		?>
 
-			<div id="charitable-builder" class="<?php echo charitable_sanitize_classes( $builder_classes, true ); ?>">
+		<?php
+		$builder_classes_output = charitable_sanitize_classes( $builder_classes, true );
+		?>
+		<div id="charitable-builder" class="<?php echo esc_attr( $builder_classes_output ); ?>">
 
 				<?php
 
@@ -1395,7 +1411,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 
 							<span class="charitable-edit-campaign-title-area">
 								<input id="charitable_settings_title" name="title" placeholder="<?php echo esc_html__( 'Enter Your Campaign Name Here...', 'charitable' ); ?>" class="charitable-center-form-name charitable-form-name" value="<?php echo esc_html( isset( $this->campaign_data['title'] ) ? $this->campaign_data['title'] : '' ); ?>" />
-								<!--<a href="#" class="charitable-title-edit" title="<?php echo esc_html__( 'Edit Campaign Title', 'charitable' ); ?>"><img class="charitable-edit-campaign-title-icon" width="18" height="18" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/edit.png'; ?>" /></a>-->
+								<!--<a href="#" class="charitable-title-edit" title="<?php echo esc_html__( 'Edit Campaign Title', 'charitable' ); ?>"><img class="charitable-edit-campaign-title-icon" width="18" height="18" src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/icons/edit.png' ); ?>" /></a>-->
 
 							</span>
 
@@ -1409,7 +1425,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 								echo 'charitable-disabled'; }
 							?>
 							" title="<?php echo esc_html__( 'Embed Campaign Ctrl+B', 'charitable' ); ?>">
-								<img class="topbar_icon" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/topbar_embed.svg'; ?>" />
+								<img class="topbar_icon" src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/icons/topbar_embed.svg' ); ?>" />
 								<span class="text"><?php echo esc_html__( 'Embed', 'charitable' ); ?></span>
 							</button>
 
@@ -1419,12 +1435,12 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 													echo 'charitable-disabled'; }
 												?>
 							" title="<?php esc_attr_e( 'View Live', 'charitable' ); ?>" target="_blank" rel="noopener noreferrer">
-								<img class="topbar_icon" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/view_live.svg'; ?>" />
+								<img class="topbar_icon" src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/icons/view_live.svg' ); ?>" />
 								<span class="text"><?php echo esc_html__( 'View Live', 'charitable' ); ?></span>
 							</a>
 
 							<a href="<?php echo esc_url( charitable_get_campaign_preview_url( $campaign_id, true ) ); ?>" class="charitable-btn charitable-btn-toolbar charitable-disabled" id="charitable-preview-btn" target="_blank" rel="noopener noreferrer">
-								<img class="topbar_icon" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/topbar_visibility.svg'; ?>" />
+								<img class="topbar_icon" src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/icons/topbar_visibility.svg' ); ?>" />
 								<span class="text"><?php echo esc_html__( 'Preview', 'charitable' ); ?></span>
 							</a>
 
@@ -1436,7 +1452,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 
 								<button id="charitable-status-button" class="charitable-btn charitable-btn-toolbar charitable-btn-light-grey" data-status="draft">
 									<span class="text"><?php echo esc_html__( 'Publish', 'charitable' ); ?></span>
-									<img class="topbar_icon" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/expand_more.svg'; ?>" />
+									<img class="topbar_icon" src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/icons/expand_more.svg' ); ?>" />
 								</button>
 								<ul id="charitable-status-dropdown" class="charitable-hidden">
 									<li><a data-status="publish" data-status-label="Publish" class="publish" href="#"><?php echo esc_html__( 'Publish', 'charitable' ); ?></a></li>
@@ -1447,12 +1463,12 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 
 
 							<button id="charitable-save" class="charitable-btn charitable-btn-toolbar charitable-btn-green" title="Save Campaign Ctrl+S">
-									<img class="topbar_icon" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/topbar_check.svg'; ?>" />
+									<img class="topbar_icon" src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/icons/topbar_check.svg' ); ?>" />
 									<i class="charitable-loading-spinner charitable-loading-white charitable-loading-inline charitable-hidden"></i><span class="text"><?php echo esc_html__( 'Save', 'charitable' ); ?></span>
 							</button>
 
 							<button id="charitable-exit" title="<?php esc_attr_e( 'Exit Ctrl+Q', 'charitable' ); ?>">
-								<img class="topbar_icon" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/x.png'; ?>" />
+								<img class="topbar_icon" src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/icons/x.png' ); ?>" />
 							</button>
 
 						</div>

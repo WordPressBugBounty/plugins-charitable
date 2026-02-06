@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display the main backups page wrapper.
  *
@@ -8,6 +14,7 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.8
  * @version   1.8.8
+ * @version   1.8.8.6
  */
 
 ob_start();
@@ -52,12 +59,12 @@ ob_start();
 			$charitable_plugins_third_party = new Charitable_Admin_Plugins_Third_Party(); // phpcs:ignore
 
 			// determine if the Backups plugin is installed and activated.
-			$is_backups_installed = $charitable_plugins_third_party->is_plugin_installed( 'duplicator' );
-			$is_backups_active    = $charitable_plugins_third_party->is_plugin_activated( 'duplicator' );
+			$charitable_is_backups_installed = $charitable_plugins_third_party->is_plugin_installed( 'duplicator' );
+			$charitable_is_backups_active    = $charitable_plugins_third_party->is_plugin_activated( 'duplicator' );
 
-			if ( ! $is_backups_installed ) {
+			if ( ! $charitable_is_backups_installed ) {
 
-				$install_button_html = $charitable_plugins_third_party->get_install_button_html( 'duplicator', 'Install Duplicator' );
+				$charitable_install_button_html = $charitable_plugins_third_party->get_install_button_html( 'duplicator', 'Install Duplicator' );
 
 				?>
 
@@ -65,7 +72,7 @@ ob_start();
 				<div class="instructions">
 					<h3><?php echo esc_html__( 'Install and Activate Duplicator', 'charitable' ); ?></h3>
 					<p><?php echo esc_html__( 'Install the Duplicator plugin by clicking this button', 'charitable' ); ?></p>
-					<?php echo $install_button_html; // phpcs:ignore ?>
+					<?php echo $charitable_install_button_html; // phpcs:ignore ?>
 				</div>
 				<div class="step">
 					<div class="vertical-wrapper">
@@ -75,13 +82,13 @@ ob_start();
 			</div>
 
 				<?php
-			} elseif ( ! $is_backups_active ) {
+			} elseif ( ! $charitable_is_backups_active ) {
 
-				$basename = $charitable_plugins_third_party->get_basename_from_slug( 'backups' );
+				$charitable_basename = $charitable_plugins_third_party->get_basename_from_slug( 'backups' );
 
-				if ( $basename ) :
+				if ( $charitable_basename ) :
 
-					$activate_button_html = $charitable_plugins_third_party->get_activation_button_html( 'duplicator', 'Activate Duplicator' );
+					$charitable_activate_button_html = $charitable_plugins_third_party->get_activation_button_html( 'duplicator', 'Activate Duplicator' );
 
 					?>
 
@@ -89,7 +96,7 @@ ob_start();
 				<div class="instructions">
 					<h3><?php echo esc_html__( 'Activate Duplicator', 'charitable' ); ?></h3>
 					<p><?php echo esc_html__( 'Activate Duplicator by clicking this button:', 'charitable' ); ?></p>
-					<?php echo $activate_button_html; // phpcs:ignore ?>
+					<?php echo $charitable_activate_button_html; // phpcs:ignore ?>
 				</div>
 				<div class="step">
 					<div class="vertical-wrapper">
@@ -104,7 +111,7 @@ ob_start();
 
 			} else {
 
-				$setup_url = $charitable_plugins_third_party->get_setup_screen_for_plugin( 'duplicator' );
+				$charitable_setup_url = $charitable_plugins_third_party->get_setup_screen_for_plugin( 'duplicator' );
 
 				?>
 
@@ -112,7 +119,7 @@ ob_start();
 				<div class="instructions">
 					<h3><?php echo esc_html__( 'Setup Duplicator', 'charitable' ); ?></h3>
 					<p><?php echo esc_html__( 'Setup Duplicator plugin by clicking this button:', 'charitable' ); ?></p>
-					<a href="<?php echo esc_url( $setup_url ); ?>" target="_blank" class="charitable-button button-link charitable-button-setup"><?php echo esc_html__( 'Set Up Duplicator', 'charitable' ); ?></a>
+					<a href="<?php echo esc_url( $charitable_setup_url ); ?>" target="_blank" class="charitable-button button-link charitable-button-setup"><?php echo esc_html__( 'Set Up Duplicator', 'charitable' ); ?></a>
 				</div>
 				<div class="step">
 					<div class="vertical-wrapper">

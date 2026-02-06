@@ -314,7 +314,12 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 					}
 					// phpcs:enable
 
-					$message = call_user_func( $default_processors[ $this->event->type ], $this->event );
+					$processor = $default_processors[ $this->event->type ];
+				if ( is_callable( $processor ) ) {
+					$message = $processor( $this->event );
+				} else {
+					$message = 'Invalid processor';
+				}
 
 					/* Kill processing with a message returned by the event processor. */
 					die( $message ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -718,13 +723,13 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			if ( method_exists( $subscription, 'get_donation_length' ) ) {
 				$length = (int) $subscription->get_donation_length();
 
-				if ( $length ) {
-					$cancel_at = charitable_recurring_calculate_future_date(
-						$length,
-						$subscription->get_donation_period(),
-						date( 'Y-m-d 00:00:00' ),
-						'U'
-					);
+			if ( $length ) {
+				$cancel_at = charitable_recurring_calculate_future_date(
+					$length,
+					$subscription->get_donation_period(),
+					date( 'Y-m-d 00:00:00' ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
+					'U'
+				);
 
 					/* Set the cancel_at in the subscription. */
 					try {

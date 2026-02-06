@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.5.0
- * @version   1.6.24
+ * @version   1.6.24, 1.8.9.1
  */
 
 // Exit if accessed directly.
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$registry = charitable()->registry();
+$registry = charitable()->registry(); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- $registry is used in multiple add_action/add_filter hooks throughout this file. Changing it would break hook registrations.
 $registry->register_object( Charitable_Campaign_Meta_Boxes::get_instance() );
 
 /**
@@ -138,6 +138,6 @@ add_action( 'manage_posts_extra_tablenav', array( Charitable_Campaign_List_Table
 /**
  * Set the content of each column item.
  *
- * @see Charitable_Donation_List_Table::dashboard_column_item()
+ * @see Charitable_Campaign_List_Table::maybe_render_blank_state()
  */
-add_filter( 'manage_posts_extra_tablenav', array( Charitable_Campaign_List_Table::get_instance(), 'maybe_render_blank_state' ), 11, 2 );
+add_action( 'manage_posts_extra_tablenav', array( Charitable_Campaign_List_Table::get_instance(), 'maybe_render_blank_state' ), 11, 2 );

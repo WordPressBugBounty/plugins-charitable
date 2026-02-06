@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display fieldset.
  *
@@ -6,7 +12,7 @@
  * @package   Charitable/Admin Views/Metaboxes
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @since     1.5.0
- * @version   1.5.0
+ * @version   1.8.9.1
  */
 
 if ( ! array_key_exists( 'form_view', $view_args ) || ! $view_args['form_view']->field_has_required_args( $view_args ) ) {
@@ -14,7 +20,7 @@ if ( ! array_key_exists( 'form_view', $view_args ) || ! $view_args['form_view']-
 }
 
 ?>
-<fieldset id="<?php echo esc_attr( $view_args['wrapper_id'] ); ?>" class="<?php echo esc_attr( $view_args['wrapper_class'] ); ?>" <?php echo charitable_get_arbitrary_attributes( $view_args ); ?>>
+<fieldset id="<?php echo esc_attr( $view_args['wrapper_id'] ); ?>" class="<?php echo esc_attr( $view_args['wrapper_class'] ); ?>" <?php echo charitable_get_arbitrary_attributes( $view_args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<?php if ( array_key_exists( 'legend', $view_args ) ) : ?>
 		<h4 class="charitable-metabox-header charitable-fieldset-header"><?php echo esc_html( $view_args['legend'] ); ?></h4>
 	<?php endif; ?>
@@ -24,4 +30,4 @@ if ( ! array_key_exists( 'form_view', $view_args ) || ! $view_args['form_view']-
 	<?php
 	$view_args['form_view']->render_fields( $view_args['fields'] );
 	?>
-</fieldset><!-- #<?php echo $view_args['wrapper_id']; ?> -->
+</fieldset><!-- #<?php echo esc_attr( $view_args['wrapper_id'] ); ?> -->

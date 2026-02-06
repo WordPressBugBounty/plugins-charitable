@@ -8,6 +8,7 @@
  * @package Charitable/Templates/Account
  * @since   1.4.0
  * @version 1.6.19
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -15,8 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$user      = array_key_exists( 'user', $view_args ) ? $view_args['user'] : charitable_get_user( get_current_user_id() );
-$donations = $view_args['donations'];
+$charitable_user      = array_key_exists( 'user', $view_args ) ? $view_args['user'] : charitable_get_user( get_current_user_id() );
+$charitable_donations = $view_args['donations'];
 
 /**
  * Do something before rendering the donations.
@@ -24,18 +25,18 @@ $donations = $view_args['donations'];
  * @param  object[] $donations An array of donations as a simple object.
  * @param  array    $view_args All args passed to template.
  */
-do_action( 'charitable_my_donations_before', $donations, $view_args );
+do_action( 'charitable_my_donations_before', $charitable_donations, $view_args );
 
-if ( empty( $donations ) ) : ?>
+if ( empty( $charitable_donations ) ) : ?>
 
-	<p><?php _e( 'You have not made any donations yet.', 'charitable' ); ?></p>
+	<p><?php esc_html_e( 'You have not made any donations yet.', 'charitable' ); ?></p>
 
 <?php else : ?>
 
 	<table class="charitable-my-donations charitable-table">
 		<thead>
 			<tr>
-				<th scope="col"><?php _e( 'Date', 'charitable' ); ?></th>
+				<th scope="col"><?php esc_html_e( 'Date', 'charitable' ); ?></th>
 				<?php
 					/**
 					 * Add a column header after the donation date header. Any output should be wrapped in <th></th>.
@@ -45,9 +46,9 @@ if ( empty( $donations ) ) : ?>
 					 * @param object[] $donations An array of donations as a simple object.
 					 * @param array    $view_args All args passed to template.
 					 */
-					do_action( 'charitable_my_donations_table_header_after_date', $donations, $view_args );
+					do_action( 'charitable_my_donations_table_header_after_date', $charitable_donations, $view_args );
 				?>
-				<th scope="col"><?php _e( 'Campaign', 'charitable' ); ?></th>
+				<th scope="col"><?php esc_html_e( 'Campaign', 'charitable' ); ?></th>
 				<?php
 					/**
 					 * Add a column header after the campaign header. Any output should be wrapped in <th></th>.
@@ -57,9 +58,9 @@ if ( empty( $donations ) ) : ?>
 					 * @param object[] $donations An array of donations as a simple object.
 					 * @param array    $view_args All args passed to template.
 					 */
-					do_action( 'charitable_my_donations_table_header_after_campaigns', $donations, $view_args );
+					do_action( 'charitable_my_donations_table_header_after_campaigns', $charitable_donations, $view_args );
 				?>
-				<th scope="col"><?php _e( 'Amount', 'charitable' ); ?></th>
+				<th scope="col"><?php esc_html_e( 'Amount', 'charitable' ); ?></th>
 				<?php
 					/**
 					 * Add a column header after the amount header. Any output should be wrapped in <th></th>.
@@ -69,9 +70,9 @@ if ( empty( $donations ) ) : ?>
 					 * @param object[] $donations An array of donations as a simple object.
 					 * @param array    $view_args All args passed to template.
 					 */
-					do_action( 'charitable_my_donations_table_header_after_amount', $donations, $view_args );
+					do_action( 'charitable_my_donations_table_header_after_amount', $charitable_donations, $view_args );
 				?>
-				<th scope="col"><?php _e( 'Status', 'charitable' ); ?></th>
+				<th scope="col"><?php esc_html_e( 'Status', 'charitable' ); ?></th>
 				<?php
 					/**
 					 * Add a column header after the status header. Any output should be wrapped in <th></th>.
@@ -80,9 +81,9 @@ if ( empty( $donations ) ) : ?>
 					 *
 					 * @param object[] $donations An array of donations as a simple object.
 					 */
-					do_action( 'charitable_my_donations_table_header_after_status', $donations );
+					do_action( 'charitable_my_donations_table_header_after_status', $charitable_donations );
 				?>
-				<th scope="col"><?php _e( 'Receipt', 'charitable' ); ?></th>
+				<th scope="col"><?php esc_html_e( 'Receipt', 'charitable' ); ?></th>
 				<?php
 					/**
 					 * Add a column header after the receipt header. Any output should be wrapped in <th></th>.
@@ -92,14 +93,14 @@ if ( empty( $donations ) ) : ?>
 					 * @param object[] $donations An array of donations as a simple object.
 					 * @param array    $view_args All args passed to template.
 					 */
-					do_action( 'charitable_my_donations_table_header_after_receipt', $donations, $view_args );
+					do_action( 'charitable_my_donations_table_header_after_receipt', $charitable_donations, $view_args );
 				?>
 			</tr>
 		</thead>
 		<tbody>
-			<?php foreach ( $donations as $donation ) : ?>
+			<?php foreach ( $charitable_donations as $charitable_donation ) : ?>
 			<tr>
-				<td><?php echo mysql2date( 'F j, Y', get_post_field( 'post_date', $donation->ID ) ); ?></td>
+				<td><?php echo esc_html( mysql2date( 'F j, Y', get_post_field( 'post_date', $charitable_donation->ID ) ) ); ?></td>
 				<?php
 					/**
 					 * Add a cell after the donation date. Any output should be wrapped in <td></td>.
@@ -109,9 +110,9 @@ if ( empty( $donations ) ) : ?>
 					 * @param object $donation  The donation as a simple object.
 					 * @param array  $view_args All args passed to template.
 					 */
-					do_action( 'charitable_my_donations_table_after_date', $donation );
+					do_action( 'charitable_my_donations_table_after_date', $charitable_donation );
 				?>
-				<td><?php echo $donation->campaigns; ?></td>
+				<td><?php echo esc_html( $charitable_donation->campaigns ); ?></td>
 				<?php
 					/**
 					 * Add a cell after the list of campaigns. Any output should be wrapped in <td></td>.
@@ -121,7 +122,7 @@ if ( empty( $donations ) ) : ?>
 					 * @param object $donation  The donation as a simple object.
 					 * @param array  $view_args All args passed to template.
 					 */
-					do_action( 'charitable_my_donations_table_after_campaigns', $donation );
+					do_action( 'charitable_my_donations_table_after_campaigns', $charitable_donation );
 				?>
 				<td class="amount" data-title="<?php esc_attr_e( 'Amount', 'charitable' ); ?>">
 					<?php
@@ -133,7 +134,7 @@ if ( empty( $donations ) ) : ?>
 						 * @param string $amount   The total donation amount.
 						 * @param object $donation The donation as a simple object.
 						 */
-						echo apply_filters( 'charitable_my_donation_total_amount', charitable_format_money( $donation->amount ), $donation );
+						echo esc_html( apply_filters( 'charitable_my_donation_total_amount', charitable_format_money( $charitable_donation->amount ), $charitable_donation ) );
 					?>
 				</td>
 				<?php
@@ -145,9 +146,9 @@ if ( empty( $donations ) ) : ?>
 					 * @param object $donation  The donation as a simple object.
 					 * @param array  $view_args All args passed to template.
 					 */
-					do_action( 'charitable_my_donations_table_after_amount', $donation );
+					do_action( 'charitable_my_donations_table_after_amount', $charitable_donation );
 				?>
-				<td><?php echo charitable_get_donation( $donation->ID )->get_status_label(); ?></td>
+				<td><?php echo esc_html( charitable_get_donation( $charitable_donation->ID )->get_status_label() ); ?></td>
 				<?php
 					/**
 					 * Add a cell after the donation status. Any output should be wrapped in <td></td>.
@@ -156,9 +157,9 @@ if ( empty( $donations ) ) : ?>
 					 *
 					 * @param object $donation The donation as a simple object.
 					 */
-					do_action( 'charitable_my_donations_table_after_status', $donation );
+					do_action( 'charitable_my_donations_table_after_status', $charitable_donation );
 				?>
-				<td><a href="<?php echo esc_url( charitable_get_permalink( 'donation_receipt_page', array( 'donation_id' => $donation->ID ) ) ); ?>"><?php _e( 'View Receipt', 'charitable' ); ?></a></td>
+				<td><a href="<?php echo esc_url( charitable_get_permalink( 'donation_receipt_page', array( 'donation_id' => $charitable_donation->ID ) ) ); ?>"><?php esc_html_e( 'View Receipt', 'charitable' ); ?></a></td>
 				<?php
 					/**
 					 * Add a cell after the link to the receipt. Any output should be wrapped in <td></td>.
@@ -168,7 +169,7 @@ if ( empty( $donations ) ) : ?>
 					 * @param object $donation  The donation as a simple object.
 					 * @param array  $view_args All args passed to template.
 					 */
-					do_action( 'charitable_my_donations_table_after_receipt', $donation, $view_args );
+					do_action( 'charitable_my_donations_table_after_receipt', $charitable_donation, $view_args );
 				?>
 			</tr>
 			<?php endforeach ?>
@@ -183,4 +184,4 @@ endif;
  * @param  object[] $donations An array of donations as a simple object.
  * @param  array    $view_args All args passed to template.
  */
-do_action( 'charitable_my_donations_after', $donations, $view_args );
+do_action( 'charitable_my_donations_after', $charitable_donations, $view_args );

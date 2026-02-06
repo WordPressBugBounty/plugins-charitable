@@ -8,6 +8,7 @@
  * @package Charitable/Templates/Donation Receipt
  * @since   1.0.0
  * @version 1.4.7
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -16,15 +17,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /* @var Charitable_Donation */
-$donation = $view_args['donation'];
-$amount   = $donation->get_total();
+$charitable_donation = $view_args['donation'];
+$charitable_amount   = $charitable_donation->get_total();
 
 ?>
 <dl class="donation-summary">
 	<dt class="donation-id"><?php esc_html_e( 'Donation Number:', 'charitable' ); ?></dt>
-	<dd class="donation-summary-value"><?php echo esc_html( $donation->get_number() ); ?></dd>
+	<dd class="donation-summary-value"><?php echo esc_html( $charitable_donation->get_number() ); ?></dd>
 	<dt class="donation-date"><?php esc_html_e( 'Date:', 'charitable' ); ?></dt>
-	<dd class="donation-summary-value"><?php echo esc_html( $donation->get_date() ); ?></dd>
+	<dd class="donation-summary-value"><?php echo esc_html( $charitable_donation->get_date() ); ?></dd>
 	<dt class="donation-total"> <?php esc_html_e( 'Total:', 'charitable' ); ?></dt>
 	<dd class="donation-summary-value">
 	<?php
@@ -39,9 +40,9 @@ $amount   = $donation->get_total();
 		 * @param  string              $context  The context in which this is being shown.
 		 * @return string
 		 */
-		echo apply_filters( 'charitable_donation_receipt_donation_amount', charitable_format_money( $amount ), $amount, $donation, 'summary' ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo apply_filters( 'charitable_donation_receipt_donation_amount', charitable_format_money( $charitable_amount ), $charitable_amount, $charitable_donation, 'summary' ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	?>
 	</dd>
 	<dt class="donation-method"><?php esc_html_e( 'Payment Method:', 'charitable' ); ?></dt>
-	<dd class="donation-summary-value"><?php echo esc_html( $donation->get_gateway_label() ); ?></dd>
+	<dd class="donation-summary-value"><?php echo esc_html( $charitable_donation->get_gateway_label() ); ?></dd>
 </dl>

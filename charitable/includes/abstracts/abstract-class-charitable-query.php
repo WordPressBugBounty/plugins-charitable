@@ -673,7 +673,7 @@ if ( ! class_exists( 'Charitable_Query' ) ) :
 		 */
 		public function where_donor_id_is_in( $where_statement ) {
 
-			$donor_email_passed = isset( $_GET['donor_email'] ) ? esc_html( $_GET['donor_email'] ) : false; // phpcs:ignore
+			$donor_email_passed = isset( $_GET['donor_email'] ) ? sanitize_email( $_GET['donor_email'] ) : false; // phpcs:ignore
 			$donor_email        = $this->get( 'email', $donor_email_passed );
 
 			if ( $donor_email ) { // stop searching by ID, we will search by email that was supplied.
@@ -730,7 +730,8 @@ if ( ! class_exists( 'Charitable_Query' ) ) :
 		/**
 		 * Filter query by donation ID(s).
 		 *
-		 * @since  1.7.0.9
+		 * @since   1.7.0.9
+		 * @version 1.8.8.5
 		 *
 		 * @global WPBD   $wpdb
 		 * @param  string $where_statement The default where statement.
@@ -739,7 +740,7 @@ if ( ! class_exists( 'Charitable_Query' ) ) :
 		public function where_donation_id_is_in( $where_statement ) {
 			global $wpdb;
 
-			$donation_ids_passed = isset( $_GET['donation_ids'] ) ? esc_html( $_GET['donation_ids'] ) : false; // phpcs:ignore
+			$donation_ids_passed = isset( $_GET['donation_ids'] ) ? sanitize_text_field( $_GET['donation_ids'] ) : false; // phpcs:ignore
 
 			if ( $donation_ids_passed === false ) {
 				return $where_statement;
@@ -752,7 +753,23 @@ if ( ! class_exists( 'Charitable_Query' ) ) :
 				return $where_statement;
 			}
 
-			return $where_statement . " AND {$wpdb->posts}.ID IN ({$donation_ids_passed})";
+			// Validate and sanitize each donation ID to ensure they are positive integers
+			$valid_donation_ids = array();
+			foreach ( $donation_ids as $donation_id ) {
+				$donation_id = trim( $donation_id );
+				if ( is_numeric( $donation_id ) && intval( $donation_id ) > 0 ) {
+					$valid_donation_ids[] = intval( $donation_id );
+				}
+			}
+
+			if ( empty( $valid_donation_ids ) ) {
+				return $where_statement;
+			}
+
+			// Use proper parameterized query with placeholders
+			$placeholders = $this->get_where_in_placeholders( $valid_donation_ids, 'charitable_validate_absint', '%d' );
+
+			return $where_statement . " AND {$wpdb->posts}.ID IN ({$placeholders})";
 		}
 
 		/**

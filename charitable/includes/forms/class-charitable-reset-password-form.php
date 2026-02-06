@@ -161,6 +161,7 @@ if ( ! class_exists( 'Charitable_Reset_Password_Form' ) ) :
 		 * Reset the password.
 		 *
 		 * @since  1.4.0
+		 * @version 1.8.9.1
 		 *
 		 * @return bool|WP_Error True: when finish. WP_Error on error
 		 */
@@ -172,13 +173,17 @@ if ( ! class_exists( 'Charitable_Reset_Password_Form' ) ) :
 				return;
 			}
 
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
 			/* The key and login must be set. */
 			if ( ! isset( $_POST['key'] ) || ! isset( $_POST['login'] ) ) {
 				charitable_get_notices()->add_error( '<strong>ERROR:</strong> Invalid reset key.', 'charitable' );
 				return;
 			}
 
-			$user = check_password_reset_key( $_POST['key'], $_POST['login'] );
+			$key   = sanitize_text_field( wp_unslash( $_POST['key'] ) );
+			$login = sanitize_text_field( wp_unslash( $_POST['login'] ) );
+
+			$user = check_password_reset_key( $key, $login );
 
 			if ( is_wp_error( $user ) ) {
 				charitable_get_notices()->add_errors_from_wp_error( $user );
@@ -191,14 +196,20 @@ if ( ! class_exists( 'Charitable_Reset_Password_Form' ) ) :
 				return;
 			}
 
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Password fields should not be sanitized
+			$pass1 = wp_unslash( $_POST['pass1'] );
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Password fields should not be sanitized
+			$pass2 = wp_unslash( $_POST['pass2'] );
+
 			/* The passwords do not match. */
-			if ( $_POST['pass1'] != $_POST['pass2'] ) {
+			if ( $pass1 != $pass2 ) {
 				charitable_get_notices()->add_error( __( '<strong>ERROR:</strong> The two passwords you entered don\'t match.', 'charitable' ) );
 				return;
 			}
 
 			/* Parameter checks OK, reset password */
-			reset_password( $user, $_POST['pass1'] );
+			reset_password( $user, $pass1 );
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			charitable_get_notices()->add_success( __( 'Your password was successfully changed.', 'charitable' ) );
 
@@ -214,6 +225,7 @@ if ( ! class_exists( 'Charitable_Reset_Password_Form' ) ) :
 		 *
 		 * @since  1.4.0
 		 * @since  1.5.0 Returns a boolean to indicate whether the key and login are available.
+		 * @version 1.8.9.1
 		 *
 		 * @return boolean True if the reset key is found. False otherwise.
 		 */
@@ -226,6 +238,7 @@ if ( ! class_exists( 'Charitable_Reset_Password_Form' ) ) :
 				return false;
 			}
 
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash
 			$cookie = $_COOKIE[ 'wp-resetpass-' . COOKIEHASH ];
 
 			if ( ! strpos( $cookie, ':' ) ) {

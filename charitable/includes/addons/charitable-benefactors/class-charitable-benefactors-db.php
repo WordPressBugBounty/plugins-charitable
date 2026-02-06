@@ -212,6 +212,7 @@ if ( ! class_exists( 'Charitable_Benefactors_DB' ) ) :
 		 *
 		 * @global  WPDB        $wpdb
 		 * @since   1.0.0
+		 * @version 1.8.9.1
 		 *
 		 * @param   int $campaign_id The campaign ID.
 		 * @return  Object[]
@@ -219,10 +220,12 @@ if ( ! class_exists( 'Charitable_Benefactors_DB' ) ) :
 		public function get_campaign_benefactors( $campaign_id ) {
 			global $wpdb;
 
-			return $wpdb->get_results( // phpcs:ignore
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			return $wpdb->get_results(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is safe
 				$wpdb->prepare(
 					"SELECT *
-					FROM $this->table_name
+					FROM {$this->table_name}
 					WHERE campaign_id = %d
 					AND date_created < UTC_TIMESTAMP()
 					AND ( date_deactivated = '0000-00-00 00:00:00' OR date_deactivated > UTC_TIMESTAMP() );",
@@ -230,6 +233,7 @@ if ( ! class_exists( 'Charitable_Benefactors_DB' ) ) :
 				),
 				OBJECT_K
 			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		}
 
 		/**

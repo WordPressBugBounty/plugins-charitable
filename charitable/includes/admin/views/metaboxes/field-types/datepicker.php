@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display datepicker field.
  *
@@ -7,27 +13,28 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @since     1.5.0
  * @version   1.6.52
+ * @version   1.8.8.6
  */
 
 if ( ! array_key_exists( 'form_view', $view_args ) || ! $view_args['form_view']->field_has_required_args( $view_args ) ) {
 	return;
 }
 
-$timestamp  = isset( $view_args['timestamp'] ) ? $view_args['timestamp'] : strtotime( $view_args['value'] );
-$i18n       = charitable()->registry()->get( 'i18n' );
-$php_format = $i18n->get_datepicker_format( 'F d, Y' );
-$js_format  = $i18n->get_js_datepicker_format( 'MM d, yy' );
+$charitable_timestamp  = isset( $view_args['timestamp'] ) ? $view_args['timestamp'] : strtotime( $view_args['value'] );
+$charitable_i18n       = charitable()->registry()->get( 'i18n' );
+$charitable_php_format = $charitable_i18n->get_datepicker_format( 'F d, Y' );
+$charitable_js_format  = $charitable_i18n->get_js_datepicker_format( 'MM d, yy' );
 
 if ( array_key_exists( 'value', $view_args ) ) {
-	$date = 'data-date="' . esc_attr( date_i18n( $php_format, $timestamp ) ) . '"';
+	$charitable_date = 'data-date="' . esc_attr( date_i18n( $charitable_php_format, $charitable_timestamp ) ) . '"';
 } elseif ( array_key_exists( 'default', $view_args ) ) {
-	$date = 'data-date="' . esc_attr( $view_args['default'] ) . '"';
+	$charitable_date = 'data-date="' . esc_attr( $view_args['default'] ) . '"';
 } else {
-	$date = '';
+	$charitable_date = '';
 }
 
-$is_required = array_key_exists( 'required', $view_args ) && $view_args['required'];
-$field_attrs = array_key_exists( 'field_attrs', $view_args ) ? $view_args['field_attrs'] : array();
+$charitable_is_required = array_key_exists( 'required', $view_args ) && $view_args['required'];
+$charitable_field_attrs = array_key_exists( 'field_attrs', $view_args ) ? $view_args['field_attrs'] : array();
 
 ?>
 <div id="<?php echo esc_attr( $view_args['wrapper_id'] ); ?>" class="<?php echo esc_attr( $view_args['wrapper_class'] ); ?>" <?php echo charitable_get_arbitrary_attributes( $view_args ); // phpcs:ignore ?>>
@@ -35,7 +42,7 @@ $field_attrs = array_key_exists( 'field_attrs', $view_args ) ? $view_args['field
 		<label for="<?php echo esc_attr( $view_args['id'] ); ?>">
 			<?php
 			echo esc_html( $view_args['label'] );
-			if ( $is_required ) :
+			if ( $charitable_is_required ) :
 				?>
 				<abbr class="required" title="required">*</abbr>
 				<?php
@@ -49,9 +56,9 @@ $field_attrs = array_key_exists( 'field_attrs', $view_args ) ? $view_args['field
 		class="charitable-datepicker"
 		autocomplete="off"
 		tabindex="<?php echo esc_attr( $view_args['tabindex'] ); ?>"
-		data-format="<?php echo $js_format; // phpcs:ignore ?>"
-		<?php echo charitable_get_arbitrary_attributes( $field_attrs ); // phpcs:ignore ?>
-		<?php echo $date; // phpcs:ignore ?>
+		data-format="<?php echo $charitable_js_format; // phpcs:ignore ?>"
+		<?php echo charitable_get_arbitrary_attributes( $charitable_field_attrs ); // phpcs:ignore ?>
+		<?php echo $charitable_date; // phpcs:ignore ?>
 	/>
 	<?php if ( isset( $view_args['description'] ) ) : ?>
 		<span class="charitable-helper"><?php echo esc_html( $view_args['description'] ); ?></span>

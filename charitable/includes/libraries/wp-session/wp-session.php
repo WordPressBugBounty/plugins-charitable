@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * WordPress session managment.
  *
@@ -15,7 +21,7 @@
  *
  * @return int
  */
-function wp_session_cache_expire() {
+function wp_session_cache_expire() { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- This is a bundled library function. Changing it would break existing functionality.
 	$wp_session = WP_Session::get_instance();
 
 	return $wp_session->cache_expiration();
@@ -24,7 +30,7 @@ function wp_session_cache_expire() {
 /**
  * Alias of wp_session_write_close()
  */
-function wp_session_commit() {
+function wp_session_commit() { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- This is a bundled library function. Changing it would break existing functionality.
 	wp_session_write_close();
 }
 
@@ -33,7 +39,7 @@ function wp_session_commit() {
  *
  * @param string $data
  */
-function wp_session_decode( $data ) {
+function wp_session_decode( $data ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- This is a bundled library function. Changing it would break existing functionality.
 	$wp_session = WP_Session::get_instance();
 
 	return $wp_session->json_in( $data );
@@ -44,7 +50,7 @@ function wp_session_decode( $data ) {
  *
  * @return string
  */
-function wp_session_encode() {
+function wp_session_encode() { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- This is a bundled library function. Changing it would break existing functionality.
 	$wp_session = WP_Session::get_instance();
 
 	return $wp_session->json_out();
@@ -57,7 +63,7 @@ function wp_session_encode() {
  *
  * @return bool
  */
-function wp_session_regenerate_id( $delete_old_session = false ) {
+function wp_session_regenerate_id( $delete_old_session = false ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- This is a bundled library function. Changing it would break existing functionality.
 	$wp_session = WP_Session::get_instance();
 
 	$wp_session->regenerate_id( $delete_old_session );
@@ -72,9 +78,9 @@ function wp_session_regenerate_id( $delete_old_session = false ) {
  *
  * @return bool
  */
-function wp_session_start() {
+function wp_session_start() { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- This is a bundled library function. Changing it would break existing functionality.
 	$wp_session = WP_Session::get_instance();
-	do_action( 'wp_session_start' );
+	do_action( 'wp_session_start' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- This is a bundled library hook. Changing it would break existing functionality.
 
 	return $wp_session->session_started();
 }
@@ -87,7 +93,7 @@ if ( ! defined( 'WP_CLI' ) || false === WP_CLI ) {
  *
  * @return int
  */
-function wp_session_status() {
+function wp_session_status() { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- This is a bundled library function. Changing it would break existing functionality.
 	$wp_session = WP_Session::get_instance();
 
 	if ( $wp_session->session_started() ) {
@@ -100,7 +106,7 @@ function wp_session_status() {
 /**
  * Unset all session variables.
  */
-function wp_session_unset() {
+function wp_session_unset() { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- This is a bundled library function. Changing it would break existing functionality.
 	$wp_session = WP_Session::get_instance();
 
 	$wp_session->reset();
@@ -109,11 +115,11 @@ function wp_session_unset() {
 /**
  * Write session data and end session
  */
-function wp_session_write_close() {
+function wp_session_write_close() { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- This is a bundled library function. Changing it would break existing functionality.
 	$wp_session = WP_Session::get_instance();
 
 	$wp_session->write_data();
-	do_action( 'wp_session_commit' );
+	do_action( 'wp_session_commit' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- This is a bundled library hook. Changing it would break existing functionality.
 }
 if ( ! defined( 'WP_CLI' ) || false === WP_CLI ) {
 	add_action( 'shutdown', 'wp_session_write_close' );
@@ -126,7 +132,7 @@ if ( ! defined( 'WP_CLI' ) || false === WP_CLI ) {
  * This method should never be called directly and should instead be triggered as part
  * of a scheduled task or cron job.
  */
-function wp_session_cleanup() {
+function wp_session_cleanup() { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- This is a bundled library function. Changing it would break existing functionality.
 	if ( defined( 'WP_SETUP_CONFIG' ) ) {
 		return;
 	}
@@ -137,21 +143,21 @@ function wp_session_cleanup() {
 		 *
 		 * @param int
 		 */
-		$batch_size = apply_filters( 'wp_session_delete_batch_size', 1000 );
+		$batch_size = apply_filters( 'wp_session_delete_batch_size', 1000 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- This is a bundled library hook. Changing it would break existing functionality.
 
 		// Delete a batch of old sessions
 		WP_Session_Utils::delete_old_sessions( $batch_size );
 	}
 
 	// Allow other plugins to hook in to the garbage collection process.
-	do_action( 'wp_session_cleanup' );
+	do_action( 'wp_session_cleanup' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- This is a bundled library hook. Changing it would break existing functionality.
 }
 add_action( 'wp_session_garbage_collection', 'wp_session_cleanup' );
 
 /**
  * Register the garbage collector as a twice daily event.
  */
-function wp_session_register_garbage_collection() {
+function wp_session_register_garbage_collection() { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- This is a bundled library function. Changing it would break existing functionality.
 	if ( ! wp_next_scheduled( 'wp_session_garbage_collection' ) ) {
 		wp_schedule_event( time(), 'hourly', 'wp_session_garbage_collection' );
 	}

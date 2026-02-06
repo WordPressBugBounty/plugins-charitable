@@ -2,9 +2,9 @@
 Contributors: WPCharitable, griffinjt, smub, dimensionmedia
 Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
-Tested up to: 6.8.2
+Tested up to: 6.9.1
 Requires PHP: 7.2
-Stable tag: 1.8.8.3
+Stable tag: 1.8.9.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -104,6 +104,14 @@ We also know that our developer friends may want more control, so we have added 
 = Full Charitable Feature List =
 
 * Donation Form Builder - powerful drag & drop donation form builder. Create smart donation forms, add custom donate buttons, accept donation payments, and more without writing any code.
+* Visual Donation Form Builder – Design beautiful donation forms in minutes with a true drag & drop visual editor, live previews, and code-free customization.
+* Page Builder & Analytics Integrations – Deeply integrated with Elementor, WPBakery, and Google Analytics 4 for seamless visual design and automatic conversion tracking.
+* Secure Credit Card & Digital Wallet Payments – Securely accept credit cards and Apple Pay/Google Pay with built-in Square support, plus Stripe, PayPal, and more.
+* Comprehensive Donor Management System – A full CRM to manage donor relationships, track activity, log offline gifts, and view donor history from a single dashboard.
+* Donor Dashboard – Provide a dedicated, self-service portal for supporters to manage profiles, view donation history, and download receipts.
+* Donor Leaderboard – Gamify fundraising by showcasing top supporters in list or card views to encourage friendly competition.
+* Social Proof (DonorTrust) – Increase trust and conversions by displaying real-time popup notifications of recent donations to site visitors.
+* Easy Data Migration – Import donors from other platforms or spreadsheets in minutes with the powerful CSV Importer.
 * 100% mobile responsive.
 * GDPR & CCPA friendly - full privacy compliance tools
 * [Pre-built Fundraising Templates](https://www.wpcharitable.com/templates/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - Get access to sleek modern fundraising templates that are optimized to help you raise more donations.
@@ -260,15 +268,49 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 
 == Changelog ==
 
-= Donation Form & Fundraising Campaigns v1.8.8.3
+= Donation Form & Fundraising Campaigns v1.8.9.3 =
+* FIX: Resolved onboarding redirect issue in some scenarios.
+
+= Donation Form & Fundraising Campaigns v1.8.9.2 =
+* NEW: Email and donation form debugging tools in "System Info" in Charitable Tools.
+* UPDATE: Campaign template CSS now loads via REST API endpoint to resolve 500 errors on servers that block direct PHP file access.
+* FIX: Adjustments for PHP 8.4 and PHP 8.5 for better compatibility.
+* FIX: Adjustment in how email emails are registered and loaded for better potential compatibility in certain server configurations.
+* FIX: Minor translation and coding updates.
+
+= Donation Form & Fundraising Campaigns v1.8.9.1 =
+* FIX: Resolved issue where blank state screens were not displaying on campaigns and donations list pages when no items exist.
+* FIX: Fixed help button in campaign builder not navigating to documentation URL.
+
+= Donation Form & Fundraising Campaigns v1.8.9 =
+* NEW: Captcha security settings in security tab. Supports Google reCAPTCHA (Invisible V2), Google reCAPTCHA v3 (Invisible), hCaptcha, Cloudflare Turnstile.
+
+= Donation Form & Fundraising Campaigns v1.8.8.6 =
+* NEW: Added include_children to the stat shortcode.
+* FIX: Resolved issue relating to onboarding screen overriding a number of other WordPress admin screens.
+* FIX: Updated code related to translations and PHP standards.
+* UPDATE: Campaign frontend CSS system revised.
+
+= Donation Form & Fundraising Campaigns v1.8.8.5 =
+* FIX: Resolved bug regarding manual donation edit and time resetting to midnight.
+* FIX: Insured proper sanitization of user input in database queries in some scenarios.
+* FIX: Updated code related to translations and PHP standards.
+
+= Donation Form & Fundraising Campaigns v1.8.8.4 =
+* FIX: Fixed compatibility issue in admin action processing that could cause errors when managing recurring donations.
+* FIX: Improved caching of dashboard blog posts.
+* FIX: Updated code related to translations and PHP standards.
+* UPDATE: Updated text on dashboard widgets.
+
+= Donation Form & Fundraising Campaigns v1.8.8.3 =
 * FIX: Resolved application fee calculation issue for zero-decimal currencies in Stripe payments in certain scenarios.
 * FIX: Updated code related to improve security and PHP standards compliance.
 
-= Donation Form & Fundraising Campaigns v1.8.8.2
+= Donation Form & Fundraising Campaigns v1.8.8.2 =
 * FIX: Resolve PHP error causing issues with dashboard fully loading in some scenarios.
 * FIX: Improved front-end detection of tabs in visual campaigns.
 
-= Donation Form & Fundraising Campaigns v1.8.8.1
+= Donation Form & Fundraising Campaigns v1.8.8.1 =
 * FIX: Fixed some CSS issues in certain areas in the admin when a license was not activated.
 * UPDATE: Minor dashboard visual updates when a license is activated.
 
@@ -494,18 +536,5 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 * FIX: Minified starting screen CSS.
 * FIX: Resolved typos and PHP notices.
 * FIX: Updated additional text in admin UI to allow for translations.
-
-= Donation Form & Fundraising Campaigns v1.8.1.12 =
-* NEW: Getting Started Screen for new users upon install and activation.
-* NEW: Tour guide of visual builder for new users.
-* NEW: Expiring license and expired license noticiations in WordPress admin Charitable screens.
-* NEW: Progress bar in visual builder campaigns show currency in frontend. Filter added for further customization.
-* NEW: Show currency symbol in visual builder settings under "Goal".
-* NEW: Added filters for showing content before and after donor lists and donor wall using shortcodes.
-* UPDATE: UI updates and tweaks related to visual builder and admin screens.
-* UPDATE: UI updates to items in marketing and payment tabs in visual builder.
-* FIX: Better sync for legacy and visual campaigns in certain scenarios.
-* FIX: Issue with Easy Digital Downloads addon card in addons screen resolved.
-* FIX: Resolved typos and PHP warnings and notices.
 
 **[View entire donation form and fundraising platform changelog](https://plugins.svn.wordpress.org/charitable/trunk/CHANGELOG.md)**

@@ -92,6 +92,7 @@ function charitable_get_terms_and_conditions() {
 
 		// if this content contains the shortcode 'charitable_donation_form', stripe this shortcode from the content/text.
 		$custom_content = ( has_shortcode( $terms_page_content, 'charitable_donation_form' ) ) ? '' : $terms_page_content;
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- the_content is a WordPress core filter hook.
 		$custom_content = apply_filters( 'the_content', $custom_content );
 	}
 

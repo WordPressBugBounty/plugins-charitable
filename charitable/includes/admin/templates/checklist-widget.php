@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Checklist main modal "widget" window template.
  *
@@ -11,6 +17,8 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+// These are local template variables, not global variables. They are scoped to this template file.
 $checklist_class              = Charitable_Checklist::get_instance();
 $checklist_state              = $checklist_class->get_checklist_option( 'status' );
 $checklist_classes            = $checklist_class->get_steps_css();
@@ -32,6 +40,7 @@ $start_checklist_url = $checklist_class->get_start_checklist_url();
 $next_checklist_url  = $checklist_class->get_next_checklist_url();
 
 $closed_css = $checklist_class->get_checklist_option( 'window_closed' ) ? 'closed' : '';
+// phpcs:enable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 
 ?>
 <div class="charitable-checklist <?php echo esc_attr( $base_class ); ?>">
@@ -123,7 +132,7 @@ $closed_css = $checklist_class->get_checklist_option( 'window_closed' ) ? 'close
 					__( 'Please rate %1$sCharitable%2$s %3$s★★★★★%4$s on %3$sWordPress.org%4$s!', 'charitable' ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					'<strong>',
 					'</strong>',
-					'<a href="https://wordpress.org/support/plugin/charitable/reviews/?filter=5#new-post" rel="noopener noreferrer" target="_blank">',
+					'<a href="https://wordpress.org/support/plugin/charitable/reviews/#new-post" rel="noopener noreferrer" target="_blank">',
 					'</a>'
 				);
 				?>

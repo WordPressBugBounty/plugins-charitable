@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Displays the campaign summary.
  *
@@ -8,9 +14,10 @@
  * @package Charitable/Templates/Campaign Page
  * @since   1.0.0
  * @version 1.0.0
+ * @version 1.8.8.6
  */
 
-$campaign = $view_args['campaign'];
+$charitable_campaign = $view_args['campaign'];
 
 /**
  * Do something before the campaign summary is rendered.
@@ -19,7 +26,7 @@ $campaign = $view_args['campaign'];
  *
  * @param Charitable_Campaign $campaign The Campaign instance.
  */
-do_action( 'charitable_campaign_summary_before', $campaign );
+do_action( 'charitable_campaign_summary_before', $charitable_campaign );
 
 ?>
 <div class="campaign-summary">
@@ -40,7 +47,7 @@ do_action( 'charitable_campaign_summary_before', $campaign );
 	 *
 	 * @param Charitable_Campaign $campaign The Campaign instance.
 	 */
-	do_action( 'charitable_campaign_summary', $campaign );
+	do_action( 'charitable_campaign_summary', $charitable_campaign );
 	?>
 </div>
 <?php
@@ -51,4 +58,4 @@ do_action( 'charitable_campaign_summary_before', $campaign );
  *
  * @param Charitable_Campaign $campaign The Campaign instance.
  */
-do_action( 'charitable_campaign_summary_after', $campaign );
+do_action( 'charitable_campaign_summary_after', $charitable_campaign );

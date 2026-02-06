@@ -6,7 +6,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version.  1.8.0
+ * @version.  1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -72,7 +72,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Campaign_Summary' ) ) :
 
 			$active = ( true === apply_filters( 'charitable_campaign_builder_settings_sidebar_active', $this->active, $this->slug ) ) ? 'active' : false;
 
-			echo '<a href="#" class="charitable-panel-sidebar-section charitable-panel-sidebar-section-' . $this->slug . ' ' . $active . '" data-section="' . $this->slug . '">' . $this->primary_label . ' <i class="fa fa-angle-right charitable-toggle-arrow"></i></a>';
+			echo '<a href="#" class="charitable-panel-sidebar-section charitable-panel-sidebar-section-' . esc_attr( $this->slug ) . ' ' . esc_attr( $active ) . '" data-section="' . esc_attr( $this->slug ) . '">' . esc_html( $this->primary_label ) . ' <i class="fa fa-angle-right charitable-toggle-arrow"></i></a>';
 		}
 
 		/**
@@ -97,30 +97,30 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Campaign_Summary' ) ) :
 
 				<?php
 
-					echo $charitable_builder_form_fields->generate_checkboxes(
-						$settings->campaign_data_settings( '', 'campaign-summary' ),
-						esc_html__( 'Hide Information', 'charitable' ),
-						array(
-							'id'      => 'charitable-campaign-suggested-donations',
-							'name'    => array( 'settings', esc_attr( $this->slug ) ),
-							'options' => array(
-								'Amount Donated'   => 'campaign_hide_amount_donated',
-								'Number of Donors' => 'campaign_hide_number_of_donors',
-								'Percent Raised'   => 'campaign_hide_percent_raised',
-								'Time Remaining'   => 'campaign_hide_time_remaining',
-							),
-						)
-					);
+			echo $charitable_builder_form_fields->generate_checkboxes( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					$settings->campaign_data_settings( '', 'campaign-summary' ),
+					esc_html__( 'Hide Information', 'charitable' ),
+					array(
+						'id'      => 'charitable-campaign-suggested-donations',
+						'name'    => array( 'settings', esc_attr( $this->slug ) ),
+						'options' => array(
+							'Amount Donated'   => 'campaign_hide_amount_donated',
+							'Number of Donors' => 'campaign_hide_number_of_donors',
+							'Percent Raised'   => 'campaign_hide_percent_raised',
+							'Time Remaining'   => 'campaign_hide_time_remaining',
+						),
+					)
+				);
 
-					echo $charitable_builder_form_fields->generate_text(
-						$settings->campaign_data_settings( 'donation_button_text', 'campaign-summary' ),
-						esc_html__( 'Donation Button Text', 'charitable' ),
-						array(
-							'id'          => 'campaign_donation_button_text',
-							'name'        => array( 'settings', esc_attr( $this->slug ), 'donation_button_text' ),
-							'placeholder' => 'Donate',
-						)
-					);
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					$settings->campaign_data_settings( 'donation_button_text', 'campaign-summary' ),
+					esc_html__( 'Donation Button Text', 'charitable' ),
+					array(
+						'id'          => 'campaign_donation_button_text',
+						'name'        => array( 'settings', esc_attr( $this->slug ), 'donation_button_text' ),
+						'placeholder' => 'Donate',
+					)
+				);
 
 				?>
 
@@ -130,7 +130,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Campaign_Summary' ) ) :
 
 			$html = ob_get_clean();
 
-			echo $html;
+			echo wp_kses_post( $html );
 		}
 	}
 

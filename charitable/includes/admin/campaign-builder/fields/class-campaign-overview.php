@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version   1.8.0
+ * @version   1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -138,6 +138,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Overview' ) ) :
 		 * Campaign Overview display on the form front-end.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.9.1
 		 *
 		 * @param array $field      Campaign Overview settings.
 		 * @param array $field_data Field Data.
@@ -145,9 +146,10 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Overview' ) ) :
 		 */
 		public function field_display( $field, $field_data = false, $campaign_data = false ) {
 
-			$campaign_overview = ! empty( $campaign_data['settings']['general']['overview'] ) ? ( $campaign_data['settings']['general']['overview'] ) : ''; // to-do: santitize.
-			$headline          = ! empty( $field_data['headline'] ) ? esc_html( $field_data['headline'] ) : false;
-			$css_class         = ! empty( $field_data['css_class'] ) ? ' class="' . esc_html( $field_data['css_class'] ) . '" ' : '';
+			$campaign_overview_raw = ! empty( $campaign_data['settings']['general']['overview'] ) ? ( $campaign_data['settings']['general']['overview'] ) : '';
+			$campaign_overview     = wp_kses_post( $campaign_overview_raw );
+			$headline              = ! empty( $field_data['headline'] ) ? esc_html( $field_data['headline'] ) : false;
+			$css_class             = ! empty( $field_data['css_class'] ) ? ' class="' . esc_html( $field_data['css_class'] ) . '" ' : '';
 
 			ob_start();
 
@@ -156,17 +158,17 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Overview' ) ) :
 		<div class="charitable-campaign-field charitable-campaign-field_<?php echo esc_attr( $this->type ); ?> <?php echo esc_attr( $css_class ); ?>">
 
 			<?php if ( $headline ) : ?>
-				<h4><?php echo $headline; ?></h4>
+				<h4><?php echo $headline; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></h4>
 			<?php endif; ?>
 
-			<?php echo $campaign_overview; ?>
+			<?php echo $campaign_overview; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</div>
 
 			<?php
 
 			$html = ob_get_clean();
 
-			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data );
+			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
@@ -193,7 +195,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Overview' ) ) :
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['headline'] ) ? $settings['headline'] : false,
 				esc_html__( 'Headline', 'charitable' ),
 				array(
@@ -204,7 +206,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Overview' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_textbox(
+			echo $charitable_builder_form_fields->generate_textbox( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['content'] ) ? $settings['content'] : false,
 				esc_html__( 'Campaign Overview', 'charitable' ),
 				array(
@@ -220,9 +222,9 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Overview' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_divider( false, false, array( 'field_id' => $field_id ) );
+			echo $charitable_builder_form_fields->generate_divider( false, false, array( 'field_id' => $field_id ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
-			echo $charitable_builder_form_fields->generate_number_slider(
+			echo $charitable_builder_form_fields->generate_number_slider( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['width_percentage'] ) ? $settings['width_percentage'] : 100,
 				esc_html__( 'Width', 'charitable' ),
 				array(
@@ -236,7 +238,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Overview' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_align(
+			echo $charitable_builder_form_fields->generate_align( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['align'] ) ? $settings['align'] : false,
 				esc_html__( 'Align', 'charitable' ),
 				array(
@@ -246,7 +248,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Overview' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['css_class'] ) ? $settings['css_class'] : false,
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(

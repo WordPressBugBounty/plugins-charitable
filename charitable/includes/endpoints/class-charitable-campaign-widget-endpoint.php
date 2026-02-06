@@ -50,6 +50,7 @@ if ( ! class_exists( 'Charitable_Campaign_Widget_Endpoint' ) ) :
 		 * Return the endpoint URL.
 		 *
 		 * @since  1.5.0
+		 * @version 1.8.9.1
 		 *
 		 * @global WP_Rewrite $wp_rewrite
 		 * @param  array $args Mixed args.
@@ -60,7 +61,9 @@ if ( ! class_exists( 'Charitable_Campaign_Widget_Endpoint' ) ) :
 
 			$campaign_id = array_key_exists( 'campaign_id', $args ) ? $args['campaign_id'] : get_the_ID();
 
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended
 			if ( $wp_rewrite->using_permalinks() && ! isset( $_GET['preview'] ) ) {
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 				$url = trailingslashit( get_permalink( $campaign_id ) ) . 'widget/';
 			} else {
 				$url = esc_url_raw( add_query_arg( array( 'widget' => 1 ), get_permalink( $campaign_id ) ) );

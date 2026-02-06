@@ -1,10 +1,16 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Ajax actions related to the campaign builder used in by admin.
  *
  * @package   Charitable
  * @since     1.8.0
- * @version   1.8.0
+ * @version   1.8.9.1
  */
 
 /**
@@ -104,9 +110,9 @@ function charitable_save_campaign() {
 		wp_send_json_error( esc_html__( 'Something went wrong while performing this action.', 'charitable' ) );
 	}
 
-	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON data, decoded and sanitized in loop
 	// $campaign_post = json_decode( wp_unslash( $_POST['data'] ), ARRAY_A );
-	$campaign_post = array_column( json_decode( wp_unslash( $_POST['data'] ), ARRAY_A ), null, 'name' );
+	$campaign_post = array_column( json_decode( wp_unslash( $_POST['data'] ), ARRAY_A ), null, 'name' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON data, decoded and sanitized in loop
 	$is_preview    = isset( $_POST['preview'] ) && 'true' === $_POST['preview'] ? true : false;
 	$data          = [
 		'fields' => [],
@@ -409,7 +415,9 @@ function charitable_save_campaign() {
 
 	// tags.
 	$custom_tax_terms = array();
+	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON data, decoded and sanitized in loop
 	if ( ! empty( $_POST['data'] ) ) {
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON data, decoded and sanitized in loop
 		$_tmp_data = json_decode( wp_unslash( $_POST['data'] ) );
 		foreach ( $_tmp_data as $index => $object ) {
 			if ( $object->name === 'settings[general][tags]' ) {
@@ -421,7 +429,9 @@ function charitable_save_campaign() {
 
 	// categories.
 	$custom_cat_terms = array();
+	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON data, decoded and sanitized in loop
 	if ( ! empty( $_POST['data'] ) ) {
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON data, decoded and sanitized in loop
 		$_tmp_data = json_decode( wp_unslash( $_POST['data'] ) );
 		foreach ( $_tmp_data as $index => $object ) {
 			if ( strpos( $object->name, 'categories-' ) !== false ) {
@@ -944,6 +954,7 @@ function charitable_new_campaign() { // phpcs:ignore Generic.Metrics.CyclomaticC
 		);
 	}
 
+	// phpcs:ignore WordPress.WP.DeprecatedFunctions.get_page_by_titleFound -- Legacy support, will be replaced with WP_Query in future version
 	$title_exists = get_page_by_title( $campaign_title, 'OBJECT', 'charitable' );
 	$campaign_id  = charitable()->get( 'form' )->add(
 		$campaign_title,
@@ -1162,8 +1173,9 @@ add_action( 'wp_ajax_charitable_builder_dynamic_choices', 'charitable_builder_dy
  * @since 1.8.0
  */
 function charitable_builder_tab_content_preview() {
-
-	$type   = sanitize_key( $_POST['type'] );
+	// phpcs:disable WordPress.Security.NonceVerification.Missing
+	$type = isset( $_POST['type'] ) ? sanitize_key( wp_unslash( $_POST['type'] ) ) : '';
+	// phpcs:enable WordPress.Security.NonceVerification.Missing
 	$output = charitable_builder_tab_content_preview_by_type( $type );
 
 	wp_send_json_success(
@@ -1181,21 +1193,22 @@ add_action( 'wp_ajax_charitable_tab_content_preview', 'charitable_builder_tab_co
  * @since 1.8.0
  */
 function charitable_builder_field_content_preview() {
+	// phpcs:disable WordPress.Security.NonceVerification.Missing
+	if ( ! empty( $_POST['field_type'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized below
 
-	if ( ! empty( $_POST['field_type'] ) ) { // phpcs:ignore
-
-		$type = 'Charitable_Field_' . str_replace( ' ', '_', ( ucwords( str_replace( '-', ' ', sanitize_key( $_POST['field_type'] ) ) ) ) );
+		$type = 'Charitable_Field_' . str_replace( ' ', '_', ( ucwords( str_replace( '-', ' ', sanitize_key( wp_unslash( $_POST['field_type'] ) ) ) ) ) );
 
 		if ( class_exists( $type ) ) :
 
 			$class         = new $type();
-			$field_id      = isset( $_POST['field_id'] ) ? intval( $_POST['field_id'] ) : 0; // phpcs:ignore
-			$campaign_data = get_post_meta( intval( $_POST['campaign_id'] ), 'campaign_settings_v2', true ); // phpcs:ignore
+			$field_id      = isset( $_POST['field_id'] ) ? intval( wp_unslash( $_POST['field_id'] ) ) : 0; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$campaign_data = isset( $_POST['campaign_id'] ) ? get_post_meta( intval( wp_unslash( $_POST['campaign_id'] ) ), 'campaign_settings_v2', true ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array data, sanitized in field_preview method
 			$field_data    = $_POST;
 
 			ob_start();
 
-			echo $class->field_preview( $field_data, $campaign_data, $field_id, false, true );
+			echo $class->field_preview( $field_data, $campaign_data, $field_id, false, true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 			$output = ob_get_clean();
 
@@ -1206,7 +1219,7 @@ function charitable_builder_field_content_preview() {
 			);
 
 		endif;
-
+	// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 
 	wp_send_json_error();
@@ -1244,14 +1257,14 @@ function charitable_verify_ssl_ajax() {
 		);
 	}
 
-	wp_send_json_error(
-		[
-			'msg'   => esc_html__( 'There was an error and the connection failed. Please contact your web host with the technical details below.', 'charitable' ),
-			'debug' => '<pre>' . print_r( map_deep( $response, 'wp_strip_all_tags' ), true ) . '</pre>',
-		]
-	);
+			wp_send_json_error(
+				[
+					'msg'   => esc_html__( 'There was an error and the connection failed. Please contact your web host with the technical details below.', 'charitable' ),
+					'debug' => '<pre>' . print_r( map_deep( $response, 'wp_strip_all_tags' ), true ) . '</pre>', // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
+				]
+			);
 }
-add_action( 'wp_ajax_charitable_verify_ssl', 'charitable_verify_ssl_ajax' );
+// add_action( 'wp_ajax_charitable_verify_ssl', 'charitable_verify_ssl_ajax' ); // Disabled - conflicts with handler in charitable-core-admin-functions.php
 
 
 /**
@@ -1359,15 +1372,16 @@ add_action( 'wp_ajax_charitable_update_campaign_status_link', 'charitable_builde
  * @since 1.8.0
  */
 function charitable_campaign_builder_send_feedback_ajax() {
-
+	// phpcs:disable WordPress.Security.NonceVerification.Missing
 	/* Data to send in our API request */
 	$feedback_params = array(
 		'feedback_action' => 'template_feedback',
-		'type'            => ! empty( $_POST['data']['type'] ) ? sanitize_text_field( $_POST['data']['type'] ) : false,
-		'name'            => ! empty( $_POST['data']['name'] ) ? sanitize_text_field( $_POST['data']['name'] ) : false,
-		'email'           => ! empty( $_POST['data']['email'] ) ? sanitize_email( $_POST['data']['email'] ) : false,
-		'feedback'        => ! empty( $_POST['data']['feedback'] ) ? sanitize_text_field( $_POST['data']['feedback'] ) : false,
+		'type'            => ! empty( $_POST['data']['type'] ) ? sanitize_text_field( wp_unslash( $_POST['data']['type'] ) ) : false, // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		'name'            => ! empty( $_POST['data']['name'] ) ? sanitize_text_field( wp_unslash( $_POST['data']['name'] ) ) : false, // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		'email'           => ! empty( $_POST['data']['email'] ) ? sanitize_email( wp_unslash( $_POST['data']['email'] ) ) : false, // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		'feedback'        => ! empty( $_POST['data']['feedback'] ) ? sanitize_text_field( wp_unslash( $_POST['data']['feedback'] ) ) : false, // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 	);
+	// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 	/* Call the custom API */
 	$response = wp_remote_post(

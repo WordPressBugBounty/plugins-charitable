@@ -70,6 +70,7 @@ if ( ! class_exists( 'Charitable_Field_Shortcode' ) ) :
 		 * @param array  $campaign_data Campaign data and settings.
 		 * @param array  $field_id Field ID.
 		 * @param string $theme Template data.
+		 * @version 1.8.9.1
 		 */
 		public function field_preview( $field_data = false, $campaign_data = false, $field_id = false, $theme = '' ) {
 
@@ -89,13 +90,14 @@ if ( ! class_exists( 'Charitable_Field_Shortcode' ) ) :
 
 			$final_html = $title_html . $this->field_wrapper( $html, $field_data );
 
-			echo $final_html;
+			echo $final_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
 		 * Donation Options display on the form front-end.
 		 *
-		 * @since 1.8.0
+		 * @since   1.8.0
+		 * @version 1.8.8.6
 		 *
 		 * @param array $field      Donation Options settings.
 		 * @param array $deprecated Deprecated.
@@ -109,17 +111,17 @@ if ( ! class_exists( 'Charitable_Field_Shortcode' ) ) :
 				return;
 			}
 
-			$shortcode = ! empty( $field_data['shortcode'] ) ? $this->format_for_output( $field_data['shortcode'], $campaign_data ) : false;
-			$css_class = ! empty( $field_data['css_class'] ) ? ' class="' . esc_html( $field_data['css_class'] ) . '" ' : '';
+		$shortcode = ! empty( $field_data['shortcode'] ) ? $this->format_for_output( $field_data['shortcode'], $campaign_data ) : false;
+		$css_class = ! empty( $field_data['css_class'] ) ? ' class="' . esc_attr( $field_data['css_class'] ) . '" ' : '';
 
-			ob_start();
+		ob_start();
 
-			if ( $shortcode ) :
+		if ( $shortcode ) :
 
-				?>
+			?>
 
-		<div class="charitable-campaign-field_<?php echo $this->type; ?>">
-			<div <?php echo $css_class; ?>>
+		<div class="charitable-campaign-field_<?php echo esc_attr( $this->type ); ?>">
+			<div <?php echo $css_class; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $css_class is already escaped with esc_attr() on line 115. ?>>
 				<?php if ( $shortcode ) : ?>
 					<?php echo do_shortcode( $shortcode ); ?>
 				<?php endif; ?>
@@ -132,13 +134,14 @@ if ( ! class_exists( 'Charitable_Field_Shortcode' ) ) :
 
 			$html = ob_get_clean();
 
-			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data );
+			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
 		 * The display on the form settings backend when the user clicks on the field/block.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.9.1
 		 *
 		 * @param array $field          Social Sharing settings.
 		 * @param array $campaign_data  Campaign data and settings.
@@ -157,7 +160,7 @@ if ( ! class_exists( 'Charitable_Field_Shortcode' ) ) :
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['headline'] ) ? $settings['headline'] : '',
 				esc_html__( 'Headline', 'charitable' ),
 				array(
@@ -169,7 +172,7 @@ if ( ! class_exists( 'Charitable_Field_Shortcode' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['shortcode'] ) ? $this->format_for_setting( $settings['shortcode'] ) : false,
 				esc_html__( 'Shortcode', 'charitable' ),
 				array(
@@ -181,7 +184,7 @@ if ( ! class_exists( 'Charitable_Field_Shortcode' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['css_class'] ) ? $settings['css_class'] : false,
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(

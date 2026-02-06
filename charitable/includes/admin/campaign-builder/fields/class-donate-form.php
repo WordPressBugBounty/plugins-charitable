@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version   1.8.0
+ * @version   1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -161,7 +161,7 @@ if ( ! class_exists( 'Charitable_Field_Donation_Form' ) ) :
 
 			$html = $this->field_display_wrapper( $html, $field_data );
 
-			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data );
+			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
@@ -199,7 +199,7 @@ if ( ! class_exists( 'Charitable_Field_Donation_Form' ) ) :
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['headline'] ) ? $settings['headline'] : '',
 				esc_html__( 'Headline', 'charitable' ),
 				array(
@@ -211,7 +211,7 @@ if ( ! class_exists( 'Charitable_Field_Donation_Form' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['css_class'] ) ? $settings['css_class'] : false,
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(
@@ -232,14 +232,18 @@ if ( ! class_exists( 'Charitable_Field_Donation_Form' ) ) :
 		}
 
 		/**
-		 * Generate field vix ajax.
+		 * Display settings for AJAX requests.
 		 *
-		 * @since 1.8.0
+		 * @since  1.8.0
+		 * @version 1.8.9.1
+		 *
+		 * @return void
 		 */
 		public function settings_display_ajax() {
-
-			$field_id    = intval( $_POST['field_id'] );
-			$campaign_id = intval( $_POST['campaign_id'] ); // todo: should this be added? see a few lines down.
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
+			$field_id    = isset( $_POST['field_id'] ) ? intval( wp_unslash( $_POST['field_id'] ) ) : 0;
+			$campaign_id = isset( $_POST['campaign_id'] ) ? intval( wp_unslash( $_POST['campaign_id'] ) ) : 0; // todo: should this be added? see a few lines down.
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			$charitable_builder_form_fields = new Charitable_Builder_Form_Fields();
 
@@ -252,7 +256,7 @@ if ( ! class_exists( 'Charitable_Field_Donation_Form' ) ) :
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['headline'] ) ? $settings['headline'] : '',
 				esc_html__( 'Headline', 'charitable' ),
 				array(
@@ -264,7 +268,7 @@ if ( ! class_exists( 'Charitable_Field_Donation_Form' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				$settings['css_class'],
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(

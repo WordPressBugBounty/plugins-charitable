@@ -199,14 +199,21 @@
             // Update total donations
             var donationsChangeHtml = '';
             if (stats.donations_change && stats.donations_change !== '') {
-                var isPositive = stats.donations_change.indexOf('+') === 0 || (stats.donations_change.indexOf('-') !== 0 && parseFloat(stats.donations_change) > 0);
+                var changeValue = parseFloat(stats.donations_change.replace('%', ''));
+                var isZero = changeValue === 0;
+                var isPositive = stats.donations_change.indexOf('+') === 0 || (stats.donations_change.indexOf('-') !== 0 && changeValue > 0);
+                var isNegative = stats.donations_change.indexOf('-') === 0 && changeValue < 0;
                 var svgId = 'mask0_1904_1526_' + Date.now() + '_1';
-                var svgColor = isPositive ? '#31944D' : '#DC2626';
-                var svgPath = isPositive ?
+                // Positive = green, Negative = red, Zero = black
+                var svgColor = isZero ? '#000000' : (isPositive ? '#31944D' : '#DC2626');
+                // Use up arrow for positive, down arrow for negative, up arrow for zero
+                var svgPath = (isPositive || isZero) ?
                     'M1.82849 9.52507L1.07562 8.804L5.05505 4.96689L7.20609 7.02708L10.0024 4.37458H8.60426V3.34448H11.8308V6.43477H10.7553V5.09565L7.20609 8.49497L5.05505 6.43477L1.82849 9.52507Z' :
                     'M1.82849 3.47493L1.07562 4.196L5.05505 8.03311L7.20609 5.97292L10.0024 8.62542H8.60426V9.65552H11.8308V6.56523H10.7553V7.90435L7.20609 4.50503L5.05505 6.56523L1.82849 3.47493Z';
 
-                donationsChangeHtml = '<span class="charitable-dashboard-v2-stat-change">' +
+                // Add class based on value: positive, negative, or zero
+                var changeClass = isZero ? 'charitable-dashboard-v2-stat-change-zero' : (isPositive ? 'charitable-dashboard-v2-stat-change-positive' : 'charitable-dashboard-v2-stat-change-negative');
+                donationsChangeHtml = '<span class="charitable-dashboard-v2-stat-change ' + changeClass + '">' +
                     '<svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">' +
                     '<mask id="' + svgId + '" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="13" height="13">' +
                     '<rect y="0.25415" width="12.9062" height="12.3612" fill="#D9D9D9"></rect>' +
@@ -226,14 +233,21 @@
             // Update average donations
             var avgChangeHtml = '';
             if (stats.avg_change && stats.avg_change !== '') {
-                var isPositive = stats.avg_change.indexOf('+') === 0 || (stats.avg_change.indexOf('-') !== 0 && parseFloat(stats.avg_change) > 0);
+                var changeValue = parseFloat(stats.avg_change.replace('%', ''));
+                var isZero = changeValue === 0;
+                var isPositive = stats.avg_change.indexOf('+') === 0 || (stats.avg_change.indexOf('-') !== 0 && changeValue > 0);
+                var isNegative = stats.avg_change.indexOf('-') === 0 && changeValue < 0;
                 var svgId = 'mask0_1904_1526_' + Date.now() + '_2';
-                var svgColor = isPositive ? '#31944D' : '#DC2626';
-                var svgPath = isPositive ?
+                // Positive = green, Negative = red, Zero = black
+                var svgColor = isZero ? '#000000' : (isPositive ? '#31944D' : '#DC2626');
+                // Use up arrow for positive, down arrow for negative, up arrow for zero
+                var svgPath = (isPositive || isZero) ?
                     'M1.82849 9.52507L1.07562 8.804L5.05505 4.96689L7.20609 7.02708L10.0024 4.37458H8.60426V3.34448H11.8308V6.43477H10.7553V5.09565L7.20609 8.49497L5.05505 6.43477L1.82849 9.52507Z' :
                     'M1.82849 3.47493L1.07562 4.196L5.05505 8.03311L7.20609 5.97292L10.0024 8.62542H8.60426V9.65552H11.8308V6.56523H10.7553V7.90435L7.20609 4.50503L5.05505 6.56523L1.82849 3.47493Z';
 
-                avgChangeHtml = '<span class="charitable-dashboard-v2-stat-change">' +
+                // Add class based on value: positive, negative, or zero
+                var changeClass = isZero ? 'charitable-dashboard-v2-stat-change-zero' : (isPositive ? 'charitable-dashboard-v2-stat-change-positive' : 'charitable-dashboard-v2-stat-change-negative');
+                avgChangeHtml = '<span class="charitable-dashboard-v2-stat-change ' + changeClass + '">' +
                     '<svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">' +
                     '<mask id="' + svgId + '" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="13" height="13">' +
                     '<rect y="0.25415" width="12.9062" height="12.3612" fill="#D9D9D9"></rect>' +
@@ -512,19 +526,12 @@
                     yaxis: {
                         labels: {
                             formatter: function(value) {
-                                // Format currency values with 2 decimal places
-                                // TODO: Future enhancement - add auto-refresh functionality
-                                // Decode HTML entities in case the currency symbol is encoded
-                                // alert( charitable_dashboard_reporting.currency_symbol + ' ' + value.toFixed(2) );
-                                // &#36; 1.00
-                                var decodedSymbol = charitable_dashboard_reporting.currency_symbol
-                                    .replace(/&amp;/g, '&')
-                                    .replace(/&lt;/g, '<')
-                                    .replace(/&gt;/g, '>')
-                                    .replace(/&quot;/g, '"')
-                                    .replace(/&#039;/g, "'")
-                                    .replace(/&#36;/g, '$');
-                                return decodedSymbol + value.toFixed(2);
+                                // Format currency values using the configured decimal count.
+                                // Currency symbol is already decoded in PHP, so use it directly.
+                                var decimalCount = typeof charitable_dashboard_reporting.decimal_count !== 'undefined'
+                                    ? charitable_dashboard_reporting.decimal_count
+                                    : 2;
+                                return charitable_dashboard_reporting.currency_symbol + value.toFixed(decimalCount);
                             }
                         },
                         min: 0

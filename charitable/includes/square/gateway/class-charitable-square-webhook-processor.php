@@ -448,7 +448,8 @@ if ( ! class_exists( 'Charitable_Square_Webhook_Processor' ) ) :
 			}
 
 			// Get the information so we can create a new one-time donation that has a post parent of the recurring donation.
-			$amount    = $recurring_donation->get_total_donation_amount();
+			// Updated in 1.8.8.4 to use the new method.
+			$amount    = $this->get_donation_amount_with_fees( $recurring_donation );
 			$donations = $recurring_donation->get_campaign_donations();
 
 			if ( charitable_is_debug( 'square' ) ) {
@@ -1381,6 +1382,25 @@ if ( ! class_exists( 'Charitable_Square_Webhook_Processor' ) ) :
 				self::$instance = new self( true );
 			}
 			return self::$instance;
+		}
+
+		/**
+		 * Get the donation amount including fees if fee relief is enabled.
+		 *
+		 * @since  1.8.8.4
+		 *
+		 * @param  Charitable_Donation $donation The donation object.
+		 * @return float
+		 */
+		private function get_donation_amount_with_fees( $donation ) {
+			// Check if fee relief is enabled and donor opted to cover fees
+			if ( $donation->get( 'cover_fees' ) ) {
+				// Use the total donation amount including fees
+				return \Charitable_Currency::get_instance()->cast_to_decimal_format( $donation->get( 'total_donation_with_fees' ) );
+			}
+
+			// Return the standard donation amount
+			return $donation->get_total_donation_amount( true );
 		}
 	}
 endif;

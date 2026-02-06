@@ -6,6 +6,7 @@
  * @package Charitable/Templates/Account
  * @since   1.4.0
  * @version 1.6.29
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -13,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$form = $view_args['form'];
+$charitable_form = $view_args['form'];
 
 ?>
 <div class="charitable-forgot-password-form">
@@ -38,11 +39,11 @@ $form = $view_args['form'];
 		 * @param Charitable_Form $form      The form object.
 		 * @param array           $view_args All args passed to template.
 		 */
-		do_action( 'charitable_form_before_fields', $form, $view_args );
+		do_action( 'charitable_form_before_fields', $charitable_form, $view_args );
 
 		?>
 		<div class="charitable-form-fields cf">
-			<?php $form->view()->render(); ?>
+			<?php $charitable_form->view()->render(); ?>
 		</div><!-- .charitable-form-fields -->
 		<?php
 		/**
@@ -53,7 +54,7 @@ $form = $view_args['form'];
 		 * @param Charitable_Form $form      The form object.
 		 * @param array           $view_args All args passed to template.
 		 */
-		do_action( 'charitable_form_after_fields', $form, $view_args );
+		do_action( 'charitable_form_after_fields', $charitable_form, $view_args );
 
 		?>
 		<div class="charitable-form-field charitable-submit-field">

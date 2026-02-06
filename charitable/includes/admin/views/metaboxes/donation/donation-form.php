@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Renders the donation form meta box for the Donation post type.
  *
@@ -8,22 +14,23 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.5.0
  * @version   1.5.0
+ * @version   1.8.8.6
  */
 
-$form   = $view_args['form'];
-$fields = $form->get_fields();
+$charitable_form   = $view_args['form'];
+$charitable_fields = $charitable_form->get_fields();
 
-unset( $fields['meta_fields'] );
+unset( $charitable_fields['meta_fields'] );
 
 ?>
 <div class="donation-banner-wrapper">
 	<div class="donation-banner">
-		<h3 class="donation-number"><?php printf( '%s #%d', esc_html__( 'Donation', 'charitable' ), esc_html( $form->get_donation()->get_number() ) ); ?></h3>
+		<h3 class="donation-number"><?php printf( '%s #%d', esc_html__( 'Donation', 'charitable' ), esc_html( $charitable_form->get_donation()->get_number() ) ); ?></h3>
 	</div>
 </div>
 <div class="charitable-form-fields primary">
 	<?php
-	$form->view()->render_hidden_fields();
-	$form->view()->render_fields( $fields );
+	$charitable_form->view()->render_hidden_fields();
+	$charitable_form->view()->render_fields( $charitable_fields );
 	?>
 </div><!-- .charitable-form-fields -->

@@ -8,6 +8,7 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
  * @version   1.0.0
+ * @version   1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -15,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$feedback_url = 'https://wordpress.org/support/plugin/charitable/reviews/?filter=5#new-post';
+$charitable_feedback_url = 'https://wordpress.org/support/plugin/charitable/reviews/#new-post';
 
 ?><div class="charitable-admin-notice-five-star-rating" data-step="1" data-id="five-star-review">
 	<p style="margin: 0;">
@@ -44,7 +45,7 @@ $feedback_url = 'https://wordpress.org/support/plugin/charitable/reviews/?filter
 	</p>
 
 	<p style="display: flex; align-items: center;">
-		<a href="<?php echo esc_url( $feedback_url ); ?>" class="button button-link charitable-notice-dismiss" target="_blank" rel="noopener noreferrer">
+		<a href="<?php echo esc_url( $charitable_feedback_url ); ?>" class="button button-link charitable-notice-dismiss" target="_blank" rel="noopener noreferrer">
 			<?php esc_html_e( 'Give feedback', 'charitable' ); ?>
 		</a>
 
@@ -81,7 +82,7 @@ $feedback_url = 'https://wordpress.org/support/plugin/charitable/reviews/?filter
 	</p>
 
 	<p style="display: flex; align-items: center;">
-		<a href="https://wordpress.org/support/plugin/charitable/reviews/?filter=5#new-post" class="button button-link charitable-notice-dismiss" target="_blank" rel="noopener noreferrer">
+		<a href="https://wordpress.org/support/plugin/charitable/reviews/#new-post" class="button button-link charitable-notice-dismiss" target="_blank" rel="noopener noreferrer">
 			<?php esc_html_e( 'Ok, you deserve it', 'charitable' ); ?>
 		</a>
 

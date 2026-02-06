@@ -21,8 +21,9 @@ if ( ! class_exists( 'Campaign_Builder_Preview' ) ) :
 	 * Campaign preview.
 	 *
 	 * @since 1.8.0
+	 * @version 1.8.8.6
 	 */
-	class Campaign_Builder_Preview {
+	class Campaign_Builder_Preview { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Class name is used by other code. Changing it would break existing functionality.
 
 		/**
 		 * One is the loneliest number that you'll ever do.
@@ -272,7 +273,7 @@ if ( ! class_exists( 'Campaign_Builder_Preview' ) ) :
 
 			if ( 'publish' === get_post_status( $this->campaign_data['id'] ) ) :
 
-				if ( ! empty( $_GET['charitable_campaign_preview'] ) ) {
+				if ( ! empty( $_GET['charitable_campaign_preview'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 					$content .= '<p>';
 

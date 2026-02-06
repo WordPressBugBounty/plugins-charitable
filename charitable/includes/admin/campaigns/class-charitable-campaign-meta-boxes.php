@@ -50,14 +50,31 @@ if ( ! class_exists( 'Charitable_Campaign_Meta_Boxes' ) ) :
 		}
 
 
-		public function default_campaign_name( $title ) {
-
-			if ( ! isset( $_GET['post_type'] ) || ! isset( $_GET['campaign_name'] ) || 'campaign' !== ( esc_html( $_GET['post_type'] ) ) || '' === trim( $_GET['campaign_name'] ) ) {
-				return $title;
-			}
-
-			return urldecode( esc_html( $_GET['campaign_name'] ) );
+	/**
+	 * Set default campaign name from URL parameters.
+	 *
+	 * @since  1.0.0
+	 * @version 1.8.9.1
+	 *
+	 * @param  string $title The default title.
+	 * @return string
+	 */
+	public function default_campaign_name( $title ) {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		if ( ! isset( $_GET['post_type'] ) || ! isset( $_GET['campaign_name'] ) ) {
+			return $title;
 		}
+
+		$post_type     = sanitize_key( wp_unslash( $_GET['post_type'] ) );
+		$campaign_name = sanitize_text_field( wp_unslash( $_GET['campaign_name'] ) );
+
+		if ( 'campaign' !== $post_type || '' === trim( $campaign_name ) ) {
+			return $title;
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+		return urldecode( esc_html( $campaign_name ) );
+	}
 
 		/**
 		 * Returns and/or create the single instance of this class.
@@ -193,6 +210,7 @@ if ( ! class_exists( 'Charitable_Campaign_Meta_Boxes' ) ) :
 		 * Save meta for the campaign.
 		 *
 		 * @since  1.0.0
+		 * @version 1.8.9.1
 		 *
 		 * @param  int     $campaign_id The campaign ID.
 		 * @param  WP_Post $post        Current Post object.
@@ -204,7 +222,10 @@ if ( ! class_exists( 'Charitable_Campaign_Meta_Boxes' ) ) :
 			}
 
 			$meta_keys = $this->get_campaign_meta_keys();
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array data, sanitized in loop
 			$submitted = $_POST;
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 			$data      = array(
 				'ID' => $campaign_id,
 			);
@@ -313,9 +334,13 @@ if ( ! class_exists( 'Charitable_Campaign_Meta_Boxes' ) ) :
 				2  => __( 'Custom field updated.', 'charitable' ),
 				3  => __( 'Custom field deleted.', 'charitable' ),
 				4  => __( 'Campaign updated.', 'charitable' ),
-				5  => isset( $_GET['revision'] )
-					// Translators: %s is the revision date.
-					? sprintf( __( 'Campaign restored to revision from %s', 'charitable' ), wp_post_revision_title( (int) $_GET['revision'], false ) )
+				5  => // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display only, no action
+					isset( $_GET['revision'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					? sprintf(
+						// Translators: %s is the revision date.
+						__( 'Campaign restored to revision from %s', 'charitable' ),
+						wp_post_revision_title( (int) sanitize_text_field( wp_unslash( $_GET['revision'] ) ), false ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					)
 					: false,
 				6  => sprintf(
 					// Translators: %s is the permalink to the campaign.
@@ -430,21 +455,25 @@ if ( ! class_exists( 'Charitable_Campaign_Meta_Boxes' ) ) :
 		private function sanitize_campaign_field( $field, $key ) {
 			$field_name = preg_replace( '/^_campaign_/', '', $key );
 
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
 			if ( array_key_exists( $key, $_POST ) ) {
-				$field['value'] = $_POST[ $key ];
+				$field['value'] = sanitize_text_field( wp_unslash( $_POST[ $key ] ) );
 				return $field;
 			}
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			/* Checkboxes don't need a value set. */
 			if ( 'checkbox' != $field['type'] ) {
 				$field['value'] = array_key_exists( 'default', $field ) ? $field['default'] : '';
 			}
 
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended
 			if ( ! array_key_exists( 'post', $_GET ) ) {
 				return $field;
 			}
 
-			$campaign = charitable_get_campaign( $_GET['post'] );
+			$campaign = charitable_get_campaign( intval( wp_unslash( $_GET['post'] ) ) );
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 			if ( in_array( $campaign->post_status, array( 'auto-draft' ) ) ) {
 				return $field;

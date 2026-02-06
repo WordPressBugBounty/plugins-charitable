@@ -1,5 +1,5 @@
 <?php
-$array_to_return = array(
+$array_to_return = array( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- '$array_to_return' is a local variable within a function.
 	'Charitable_Abstract_Donation'                   => 'abstracts/abstract-class-charitable-abstract-donation.php',
 	'Charitable_Admin_Actions'                       => 'abstracts/abstract-class-charitable-admin-actions.php',
 	'Charitable_API_Route'                           => 'abstracts/abstract-class-charitable-api-route.php',
@@ -46,6 +46,7 @@ $array_to_return = array(
 	'Charitable_Import_Settings'                     => 'admin/settings/class-charitable-import-settings.php',
 	'Charitable_Tools_Settings'                      => 'admin/settings/class-charitable-tools-settings.php',
 	'Charitable_Settings'                            => 'admin/settings/class-charitable-settings.php',
+	'Charitable_API_Route_Campaign_CSS'              => 'api/class-charitable-api-route-campaign-css.php',
 	'Charitable_API_Route_Reports'                   => 'api/class-charitable-api-route-reports.php',
 	'Charitable_Map'                                 => 'autoloader/charitable-class-map.php',
 	'Charitable_Registry'                            => 'autoloader/class-charitable-registry.php',
@@ -78,6 +79,7 @@ $array_to_return = array(
 	'Charitable_Email_Offline_Donation_Notification' => 'emails/class-charitable-email-offline-donation-notification.php',
 	'Charitable_Email_Offline_Donation_Receipt'      => 'emails/class-charitable-email-offline-donation-receipt.php',
 	'Charitable_Email_Password_Reset'                => 'emails/class-charitable-email-password-reset.php',
+	'Charitable_Email_Test'                          => 'emails/class-charitable-email-test.php',
 	'Charitable_Emails'                              => 'emails/class-charitable-emails.php',
 	'Charitable_Email_Fields_Campaign'               => 'emails/fields/class-charitable-email-fields-campaign.php',
 	'Charitable_Email_Fields_Donation'               => 'emails/fields/class-charitable-email-fields-donation.php',
@@ -201,6 +203,8 @@ $array_to_return = array(
 	'Charitable_Tools'                               => 'admin/tools/class-charitable-tools.php', // v1.8.1.6.
 	'Charitable_Intergrations_WPCode'                => 'admin/intergrations/class-charitable-intergrations-wpcode.php', // v1.8.1.6.
 	'Charitable_Tools_System_Info'                   => 'admin/tools/class-charitable-tools-system-info.php', // v1.8.1.6.
+	'Charitable_Tools_Email_Diagnostics'             => 'admin/tools/class-charitable-tools-email-diagnostics.php', // v1.8.9.2.
+	'Charitable_Tools_Debug_Log_Scanner'             => 'admin/tools/class-charitable-tools-debug-log-scanner.php', // v1.8.9.2.
 	'Charitable_Donation_Notices'                    => 'donations/class-charitable-donation-notices.php', // v1.8.1.6.
 	'Charitable_Guide_Tools'                         => 'admin/growth-tools/class-charitable-growth-tools.php', // v1.8.1.6.
 	'Charitable_Intergrations_SMTP'                  => 'admin/intergrations/class-charitable-intergrations-smtp.php', // v1.8.1.8.
@@ -219,6 +223,7 @@ $array_to_return = array(
 	'Charitable_Elementor'                           => 'elementor/class-charitable-elementor.php', // v1.8.6.
 	'Charitable_Admin_Splash'                        => 'admin/splash/class-charitable-admin-splash.php', // v1.8.6.
 	'Charitable_Gateway_Square_Legacy'               => 'gateways/class-charitable-gateway-square-legacy.php', // v1.8.7.
+	'Charitable_Tools_Misc'						     => 'admin/tools/class-charitable-tools-misc.php', // v1.8.9
 );
 
-return $array_to_return;
+return $array_to_return; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- '$array_to_return' is a local variable within a function.

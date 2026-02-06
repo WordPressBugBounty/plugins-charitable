@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display the main privacy compliance page wrapper.
  *
@@ -7,16 +13,17 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.8
- * @version   1.8.8
+ * @version   1.8.9.1
+ * @version   1.8.8.6
  */
 
 ob_start();
 
-$plugin_name       = 'WPConsent';
-$lite_plugin       = 'wpconsent-cookies-banner-privacy-suite/wpconsent.php';
-$lite_wporg_url    = 'https://wordpress.org/plugins/wpconsent-cookies-banner-privacy-suite/';
-$lite_download_url = 'https://downloads.wordpress.org/plugin/wpconsent-cookies-banner-privacy-suite.zip';
-$pro_plugin        = 'wpconsent-premium/wpconsent-premium.php';
+$charitable_plugin_name       = 'WPConsent';
+$charitable_lite_plugin       = 'wpconsent-cookies-banner-privacy-suite/wpconsent.php';
+$charitable_lite_wporg_url    = 'https://wordpress.org/plugins/wpconsent-cookies-banner-privacy-suite/';
+$charitable_lite_download_url = 'https://downloads.wordpress.org/plugin/wpconsent-cookies-banner-privacy-suite.zip';
+$charitable_pro_plugin        = 'wpconsent-premium/wpconsent-premium.php';
 
 ?>
 
@@ -59,20 +66,26 @@ $pro_plugin        = 'wpconsent-premium/wpconsent-premium.php';
 			$charitable_plugins_third_party = new Charitable_Admin_Plugins_Third_Party(); // phpcs:ignore
 
 			// determine if the Privacy Compliance plugin is installed and activated.
-			$is_privacy_compliance_installed = $charitable_plugins_third_party->is_plugin_installed( 'wpconsent' );
-			$is_privacy_compliance_active    = $charitable_plugins_third_party->is_plugin_activated( 'wpconsent' );
+			$charitable_is_privacy_compliance_installed = $charitable_plugins_third_party->is_plugin_installed( 'wpconsent' );
+			$charitable_is_privacy_compliance_active    = $charitable_plugins_third_party->is_plugin_activated( 'wpconsent' );
 
-			if ( ! $is_privacy_compliance_installed ) {
+			if ( ! $charitable_is_privacy_compliance_installed ) {
 
-				$install_button_html = $charitable_plugins_third_party->get_install_button_html( 'wpconsent', 'Install WPConsent' );
+				$charitable_install_button_html = $charitable_plugins_third_party->get_install_button_html( 'wpconsent', 'Install WPConsent' );
 
 				?>
 
 			<div class="charitable-intergration-step charitable-intergration-step-1"  data-status="install">
 				<div class="instructions">
-					<h3><?php echo esc_html( sprintf( __( 'Install and Activate %s', 'charitable' ), $plugin_name ) ); ?></h3>
-					<p><?php echo esc_html( sprintf( __( 'Install the %s plugin by clicking this button', 'charitable' ), $plugin_name ) ); ?></p>
-					<?php echo $install_button_html; // phpcs:ignore ?>
+				<h3><?php
+					// translators: %s is the plugin name
+					echo esc_html( sprintf( __( 'Install and Activate %s', 'charitable' ), $charitable_plugin_name ) );
+				?></h3>
+				<p><?php
+					// translators: %s is the plugin name
+					echo esc_html( sprintf( __( 'Install the %s plugin by clicking this button', 'charitable' ), $charitable_plugin_name ) );
+				?></p>
+					<?php echo $charitable_install_button_html; // phpcs:ignore ?>
 				</div>
 				<div class="step">
 					<div class="vertical-wrapper">
@@ -82,21 +95,27 @@ $pro_plugin        = 'wpconsent-premium/wpconsent-premium.php';
 			</div>
 
 				<?php
-			} elseif ( ! $is_privacy_compliance_active ) {
+			} elseif ( ! $charitable_is_privacy_compliance_active ) {
 
-				$basename = $charitable_plugins_third_party->get_basename_from_slug( 'wpconsent' );
+				$charitable_basename = $charitable_plugins_third_party->get_basename_from_slug( 'wpconsent' );
 
-				if ( $basename ) :
+				if ( $charitable_basename ) :
 
-					$activate_button_html = $charitable_plugins_third_party->get_activation_button_html( 'wpconsent', 'Activate ' . $plugin_name );
+					$charitable_activate_button_html = $charitable_plugins_third_party->get_activation_button_html( 'wpconsent', 'Activate ' . $charitable_plugin_name );
 
 					?>
 
 			<div class="charitable-intergration-step charitable-intergration-step-1" data-status="activate">
 				<div class="instructions">
-					<h3><?php echo esc_html( sprintf( __( 'Activate %s', 'charitable' ), $plugin_name ) ); ?></h3>
-					<p><?php echo esc_html( sprintf( __( 'Activate %s by clicking this button:', 'charitable' ), $plugin_name ) ); ?></p>
-					<?php echo $activate_button_html; // phpcs:ignore ?>
+				<h3><?php
+					// translators: %s is the plugin name
+					echo esc_html( sprintf( __( 'Activate %s', 'charitable' ), $charitable_plugin_name ) );
+				?></h3>
+				<p><?php
+					// translators: %s is the plugin name
+					echo esc_html( sprintf( __( 'Activate %s by clicking this button:', 'charitable' ), $charitable_plugin_name ) );
+				?></p>
+					<?php echo $charitable_activate_button_html; // phpcs:ignore ?>
 				</div>
 				<div class="step">
 					<div class="vertical-wrapper">
@@ -111,15 +130,21 @@ $pro_plugin        = 'wpconsent-premium/wpconsent-premium.php';
 
 			} else {
 
-				$setup_url = $charitable_plugins_third_party->get_setup_screen_for_plugin( 'wpconsent' );
+				$charitable_setup_url = $charitable_plugins_third_party->get_setup_screen_for_plugin( 'wpconsent' );
 
 				?>
 
 			<div class="charitable-intergration-step charitable-intergration-step-1" data-status="setup">
 				<div class="instructions">
-					<h3><?php echo esc_html( sprintf( __( 'Setup %s', 'charitable' ), $plugin_name ) ); ?></h3>
-					<p><?php echo esc_html( sprintf( __( 'Setup %s plugin by clicking this button:', 'charitable' ), $plugin_name ) ); ?></p>
-					<a href="<?php echo esc_url( $setup_url ); ?>" target="_blank" class="charitable-button button-link charitable-button-setup"><?php echo esc_html__( 'Set Up WPConsent', 'charitable' ); ?></a>
+				<h3><?php
+					// translators: %s is the plugin name
+					echo esc_html( sprintf( __( 'Setup %s', 'charitable' ), $charitable_plugin_name ) );
+				?></h3>
+				<p><?php
+					// translators: %s is the plugin name
+					echo esc_html( sprintf( __( 'Setup %s plugin by clicking this button:', 'charitable' ), $charitable_plugin_name ) );
+				?></p>
+					<a href="<?php echo esc_url( $charitable_setup_url ); ?>" target="_blank" class="charitable-button button-link charitable-button-setup"><?php echo esc_html__( 'Set Up WPConsent', 'charitable' ); ?></a>
 				</div>
 				<div class="step">
 					<div class="vertical-wrapper">
@@ -134,8 +159,14 @@ $pro_plugin        = 'wpconsent-premium/wpconsent-premium.php';
 
 			<div class="charitable-intergration-step charitable-intergration-step-1">
 				<div class="instructions">
-					<h3><?php echo esc_html( sprintf( __( 'Upgrade to %s Pro', 'charitable' ), $plugin_name ) ); ?></h3>
-					<p><?php echo esc_html( sprintf( __( 'Unlock addition features by upgrading to %s Pro. Special offer: Get 50%% off your plan!', 'charitable' ), $plugin_name ) ); ?></p>
+				<h3><?php
+					// translators: %s is the plugin name
+					echo esc_html( sprintf( __( 'Upgrade to %s Pro', 'charitable' ), $charitable_plugin_name ) );
+				?></h3>
+				<p><?php
+					// translators: %s is the plugin name
+					echo esc_html( sprintf( __( 'Unlock addition features by upgrading to %s Pro. Special offer: Get 50%% off your plan!', 'charitable' ), $charitable_plugin_name ) );
+				?></p>
 					<a href="https://wpconsent.com/?utm_source=charitableplugin&utm_medium=link&utm_campaign=privacy-compliance-page" target="_blank" class="charitable-button button-link"><?php echo esc_html__( 'Upgrade To Pro', 'charitable' ); ?></a>
 				</div>
 				<div class="step">

@@ -280,6 +280,7 @@ function charitable_add_settings_tab( $tabs, $key, $name, $args = array() ) {
  * @return boolean
  */
 function charitable_is_tools_view( $tab = '' ) {
+
 	if ( ! empty( $_POST ) ) { // phpcs:ignore
 		$is_settings = array_key_exists( 'option_page', $_POST ) && 'charitable_tools' === $_POST['option_page']; // phpcs:ignore
 
@@ -418,6 +419,7 @@ function charitable_disable_legacy_campaigns() {
  * Outputs "please rate" text.
  *
  * @since 1.7.0
+ * @version 1.8.8.6
  *
  * @param string $footer_text Footer text.
  * @return string
@@ -432,7 +434,7 @@ function charitable_add_footer_text( $footer_text ) {
 		__( 'Please rate %1$sCharitable%2$s %3$s★★★★★%4$s on %3$sWordPress.org%4$s to help us spread the word. Thank you from the Charitable team!', 'charitable' ),
 		'<strong>',
 		'</strong>',
-		'<a href="https://wordpress.org/support/plugin/charitable/reviews/?filter=5#new-post" rel="noopener noreferrer" target="_blank">',
+		'<a href="https://wordpress.org/support/plugin/charitable/reviews/#new-post" rel="noopener noreferrer" target="_blank">',
 		'</a>'
 	);
 }
@@ -840,7 +842,15 @@ function charitable_admin_include_html( $template_name, $args = array(), $extrac
 
 	if ( $extract && is_array( $args ) ) {
 
-		$created_vars_count = extract( $args, EXTR_SKIP ); // phpcs:ignore WordPress.PHP.DontExtract
+		// Extract variables for template, checking for conflicts to prevent scope modification.
+		$created_vars_count = 0;
+		foreach ( $args as $var_name => $var_value ) {
+			// Only create variable if it doesn't already exist (equivalent to EXTR_SKIP).
+			if ( ! isset( $$var_name ) ) {
+				$$var_name = $var_value;
+				$created_vars_count++;
+			}
+		}
 
 		// Protecting existing scope from modification.
 		if ( count( $args ) !== $created_vars_count ) {
@@ -965,7 +975,7 @@ function charitable_can_do( $what, $type ) {
 function charitable_verify_ssl() {
 
 	// Run a security check.
-	check_ajax_referer( 'charitable-admin', 'nonce' );
+	check_ajax_referer( 'charitable-admin-tools', 'nonce' );
 
 	// Check for permissions.
 	if ( ! charitable_current_user_can( 'manage_options' ) ) {
@@ -1432,10 +1442,11 @@ function charitable_get_license_slug_from_plan_id( $plan_id = false ) {
  * Hide non-Charitable warnings.
  *
  * @since  1.8.1.5
+ * @version 1.8.8.6
  *
  * @return void
  */
-function hide_non_charitable_warnings() {
+function hide_non_charitable_warnings() { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Function name is hooked via add_action and changing it would break existing functionality.
 
 	// Bail if we're not on a charitable screen (another type of check).
 	if ( false === charitable_is_admin_screen() ) {
@@ -1681,6 +1692,7 @@ function charitable_is_pro_installed() {
  * Display admin bar when active.
  *
  * @since 1.8.7.5
+ * @version 1.8.9.1
  *
  * @param WP_Admin_Bar $wp_admin_bar WP_Admin_Bar instance, passed by reference.
  *
@@ -1706,7 +1718,7 @@ function charitable_show_test_mode_notice_in_admin_bar( $wp_admin_bar ) {
 			'id'     => 'charitable-test-notice',
 			'href'   => admin_url( 'admin.php?page=charitable-settings&tab=gateways' ),
 			'parent' => 'top-secondary',
-			'title'  => __( '<span class="charitable-test-mode-badge">Charitable Test Mode Active</span>', 'charitable' ),
+			'title'  => '<span class="charitable-test-mode-badge">' . esc_html__( 'Charitable Test Mode Active', 'charitable' ) . '</span>',
 			'meta'   => [
 				'class' => 'charitable-test-mode-active',
 				'onclick' => 'sessionStorage.setItem("charitable_from_admin_bar", "true");',
@@ -1750,13 +1762,13 @@ function charitable_render_global_upgrade_cta( $css_class = '', $echo = true ) {
 	$output .= '</div>';
 	$output .= '</div>';
 	$output .= '<div class="charitable-dashboard-v2-upgrade-actions">';
-	$output .= '<button class="charitable-dashboard-v2-upgrade-button">' . esc_html__( 'Upgrade To Pro', 'charitable' ) . '</button>';
-	$output .= '<a href="#" class="charitable-dashboard-v2-learn-more-link">' . esc_html__( 'Learn more about all features →', 'charitable' ) . '</a>';
+	$output .= '<a href="' . esc_url( charitable_utm_link( 'https://wpcharitable.com/lite-vs-pro/', 'Reports Upgrade Section', 'Upgrade To Pro Button' ) ) . '" target="_blank" rel="noopener noreferrer" class="charitable-dashboard-v2-upgrade-button">' . esc_html__( 'Upgrade To Pro', 'charitable' ) . '</a>';
+	$output .= '<a href="' . esc_url( charitable_utm_link( 'https://wpcharitable.com/lite-vs-pro/', 'Reports Upgrade Section', 'Learn More About Features Link' ) ) . '" target="_blank" rel="noopener noreferrer" class="charitable-dashboard-v2-learn-more-link">' . esc_html__( 'Learn more about all features →', 'charitable' ) . '</a>';
 	$output .= '</div>';
 	$output .= '</section>';
 
 	if ( $echo ) {
-		echo $output;
+		echo $output; // phpcs:ignore
 	} else {
 		return $output;
 	}

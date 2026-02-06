@@ -8,6 +8,7 @@
  * @package Charitable/Templates/Donation Receipt
  * @since   1.0.0
  * @version 1.6.57
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -16,6 +17,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /* @var Charitable_Donation */
-$donation = $view_args['donation'];
+$charitable_donation = $view_args['donation'];
 
-echo wp_kses_post( wpautop( do_shortcode( $donation->get_gateway_object()->get_value( 'instructions' ) ) ) );
+echo wp_kses_post( wpautop( do_shortcode( $charitable_donation->get_gateway_object()->get_value( 'instructions' ) ) ) );

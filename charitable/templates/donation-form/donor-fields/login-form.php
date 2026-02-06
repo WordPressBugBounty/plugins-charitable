@@ -15,10 +15,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 <p class="login-prompt">
-	<a href="#" data-charitable-toggle="charitable-donation-login-form"><?php _e( 'Registered before? Log in to use your saved details.', 'charitable' ); ?></a>
+	<a href="#" data-charitable-toggle="charitable-donation-login-form"><?php esc_html_e( 'Registered before? Log in to use your saved details.', 'charitable' ); ?></a>
 </p>
 <div id="charitable-donation-login-form" class="charitable-login-form charitable-form">
-	<p><?php _e( 'If you registered an account, please enter your details below to login. If this is your first time, proceed to the donation form.', 'charitable' ); ?></p>
+	<p><?php esc_html_e( 'If you registered an account, please enter your details below to login. If this is your first time, proceed to the donation form.', 'charitable' ); ?></p>
 	<?php
 	wp_login_form(
 		array(

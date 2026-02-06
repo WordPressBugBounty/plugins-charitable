@@ -8,6 +8,7 @@
  * @package Charitable/Templates/Tables
  * @since   1.5.0
  * @version 1.5.0
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -21,7 +22,7 @@ if ( ! array_key_exists( 'helper', $view_args ) ) {
 
 ?>
 <tr>
-    <?php foreach ( $view_args['helper']->columns as $key => $header ) : ?>
-    <th scope="col" class="charitable-table-header-<?php echo esc_attr( $key ) ?>"><?php echo wp_kses_post( $header ) ?></th>
+    <?php foreach ( $view_args['helper']->columns as $charitable_key => $charitable_header ) : ?>
+    <th scope="col" class="charitable-table-header-<?php echo esc_attr( $charitable_key ) ?>"><?php echo wp_kses_post( $charitable_header ) ?></th>
     <?php endforeach ?>
 </tr>

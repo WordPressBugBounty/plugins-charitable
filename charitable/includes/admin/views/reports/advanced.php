@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display the "advanced" reports page.
  *
@@ -8,31 +14,32 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8,1
  * @version   1.8.1
+ * @version   1.8.8.6
  */
 
-$report_args = charitable_reports_get_advanced_report_args();
+$charitable_report_args = charitable_reports_get_advanced_report_args();
 
 $charitable_reports = Charitable_Reports::get_instance();
 
 if ( charitable_is_pro() ) :
 
-	$charitable_reports->init_with_array( $report_args['report_type'] );
+	$charitable_reports->init_with_array( $charitable_report_args['report_type'] );
 
-	$advanced_report_data = $charitable_reports->get_advanced_data_by_report_type( $report_args );
+	$charitable_advanced_report_data = $charitable_reports->get_advanced_data_by_report_type( $charitable_report_args );
 
 else :
 
-	$advanced_report_data = $charitable_reports->get_data_sample( 'advanced' );
+	$charitable_advanced_report_data = $charitable_reports->get_data_sample( 'advanced' );
 
 endif;
 
 $charitable_reports->maybe_load_scripts();
 $charitable_reports->maybe_add_reports_cta();
 
-$start_date_compare_from = $report_args['start_date_compare_from'];
-$end_date_compare_from   = $report_args['end_date_compare_from'];
-$start_date_compare_to   = $report_args['start_date_compare_to'];
-$end_date_compare_to     = $report_args['end_date_compare_to'];
+$charitable_start_date_compare_from = $charitable_report_args['start_date_compare_from'];
+$charitable_end_date_compare_from   = $charitable_report_args['end_date_compare_from'];
+$charitable_start_date_compare_to   = $charitable_report_args['start_date_compare_to'];
+$charitable_end_date_compare_to     = $charitable_report_args['end_date_compare_to'];
 
 ?>
 
@@ -41,12 +48,12 @@ $end_date_compare_to     = $report_args['end_date_compare_to'];
 		<?php if ( charitable_is_pro() ) : ?>
 		<label for="report-campaign-filter" class="screen-reader-text"><?php echo esc_html__( 'Select Report', 'charitable' ); ?></label>
 			<div class="charitable-datepicker-container"><label for="charitable-reports-start_date"><?php echo esc_html__( 'Select Report', 'charitable' ); ?>:</label>
-			<?php echo $charitable_reports->get_advanced_report_type_dropdown( $report_args['report_type'] ); // phpcs:ignore ?>
+			<?php echo $charitable_reports->get_advanced_report_type_dropdown( $charitable_report_args['report_type'] ); // phpcs:ignore ?>
 		</div>
 		<?php else : ?>
 		<label for="report-campaign-filter" class="screen-reader-text"><?php echo esc_html__( 'Available Reports', 'charitable' ); ?></label>
 			<div class="charitable-datepicker-container"><label for="charitable-reports-start_date"><?php echo esc_html__( 'Available Reports', 'charitable' ); ?>:</label>
-			<?php echo $charitable_reports->get_advanced_report_type_dropdown( $report_args['report_type'] ); // phpcs:ignore ?>
+			<?php echo $charitable_reports->get_advanced_report_type_dropdown( $charitable_report_args['report_type'] ); // phpcs:ignore ?>
 		</div>
 		<?php endif; ?>
 	</div>
@@ -56,8 +63,8 @@ $end_date_compare_to     = $report_args['end_date_compare_to'];
 			<?php if ( charitable_is_pro() ) : ?>
 
 				<div class="charitable-advanced-date-picker" data-report-type="lybunt">
-					<label><?php echo esc_html__( 'Compare', 'charitable' ); ?> <input type="text" id="charitable-reports-topnav-datepicker-comparefrom-lybunt" class="charitable-reports-datepicker charitable-datepicker-ranged" data-start-date="<?php echo esc_html( $start_date_compare_from ); ?>" data-end-date="<?php echo esc_html( $end_date_compare_from ); ?>" value="<?php echo esc_html( $start_date_compare_from ); ?> - <?php echo esc_html( $end_date_compare_from ); ?>" />
-					<?php echo esc_html__( 'to', 'charitable' ); ?> <input type="text" id="charitable-reports-topnav-datepicker-compareto-lybunt" class="charitable-reports-datepicker charitable-datepicker-ranged" data-start-date="<?php echo esc_html( $start_date_compare_to ); ?>" data-end-date="<?php echo esc_html( $end_date_compare_to ); ?>" value="<?php echo esc_html( $start_date_compare_to ); ?> - <?php echo esc_html( $end_date_compare_to ); ?>" /></label>
+					<label><?php echo esc_html__( 'Compare', 'charitable' ); ?> <input type="text" id="charitable-reports-topnav-datepicker-comparefrom-lybunt" class="charitable-reports-datepicker charitable-datepicker-ranged" data-start-date="<?php echo esc_html( $charitable_start_date_compare_from ); ?>" data-end-date="<?php echo esc_html( $charitable_end_date_compare_from ); ?>" value="<?php echo esc_html( $charitable_start_date_compare_from ); ?> - <?php echo esc_html( $charitable_end_date_compare_from ); ?>" />
+					<?php echo esc_html__( 'to', 'charitable' ); ?> <input type="text" id="charitable-reports-topnav-datepicker-compareto-lybunt" class="charitable-reports-datepicker charitable-datepicker-ranged" data-start-date="<?php echo esc_html( $charitable_start_date_compare_to ); ?>" data-end-date="<?php echo esc_html( $charitable_end_date_compare_to ); ?>" value="<?php echo esc_html( $charitable_start_date_compare_to ); ?> - <?php echo esc_html( $charitable_end_date_compare_to ); ?>" /></label>
 				</div>
 
 				<?php do_action( 'charitable_report_advanced_date_pickers' ); ?>
@@ -86,7 +93,7 @@ $end_date_compare_to     = $report_args['end_date_compare_to'];
 
 		<div class="charitable-title-card-content">
 
-			<?php echo $charitable_reports->generate_title_card_html( $report_args['report_type'] );  // phpcs:ignore  ?>
+			<?php echo $charitable_reports->generate_title_card_html( $charitable_report_args['report_type'] );  // phpcs:ignore  ?>
 
 		</div>
 
@@ -94,7 +101,7 @@ $end_date_compare_to     = $report_args['end_date_compare_to'];
 
 	<div id="charitable-report-advanced-container">
 
-		<?php echo $charitable_reports->generate_advanced_breakdown_report_html( $report_args['report_type'], $advanced_report_data, $report_args );  // phpcs:ignore  ?>
+		<?php echo $charitable_reports->generate_advanced_breakdown_report_html( $charitable_report_args['report_type'], $charitable_advanced_report_data, $charitable_report_args );  // phpcs:ignore  ?>
 
 	</div>
 

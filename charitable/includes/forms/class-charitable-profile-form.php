@@ -92,15 +92,18 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 		 * Returns the value of a particular key.
 		 *
 		 * @since  1.0.0
+		 * @version 1.8.9.1
 		 *
 		 * @param  string $key     The key of the data we are searching for.
 		 * @param  string $default Optional. The value that will be used if none is set.
 		 * @return mixed
 		 */
 		public function get_user_value( $key, $default = '' ) {
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
 			if ( isset( $_POST[ $key ] ) ) {
-				return $_POST[ $key ];
+				return sanitize_text_field( wp_unslash( $_POST[ $key ] ) );
 			}
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			$value = $this->get_user_prop_or_default( $key, $default );
 
@@ -602,11 +605,20 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 		 * Validate the email change.
 		 *
 		 * @since  1.6.2
+		 * @version 1.8.9.1
 		 *
 		 * @return boolean
 		 */
 		public function validate_email_change() {
-			if ( 0 != charitable_get_donor_id_by_email( $_POST['user_email'] ) ) {
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
+			$user_email = isset( $_POST['user_email'] ) ? sanitize_email( wp_unslash( $_POST['user_email'] ) ) : '';
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+			if ( empty( $user_email ) ) {
+				return false;
+			}
+
+			if ( 0 != charitable_get_donor_id_by_email( $user_email ) ) {
 				charitable_get_notices()->add_error(
 					__( 'This email address is already in use.', 'charitable' )
 				);

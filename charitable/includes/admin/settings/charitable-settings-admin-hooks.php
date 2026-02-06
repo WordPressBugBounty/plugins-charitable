@@ -116,6 +116,24 @@ add_action( 'charitable_pro_settings_cta', array( Charitable_Settings::get_insta
 
 
 /**
+ * Add security settings group.
+ *
+ * This ensures the 'security' group is recognized by the settings API.
+ * Settings will be added via the charitable_settings_tab_fields_security filter.
+ *
+ * @since 1.8.0
+ */
+add_filter( 'charitable_security_admin_settings_groups', function( $groups ) {
+	if ( ! is_array( $groups ) ) {
+		$groups = array();
+	}
+	if ( ! in_array( 'security', $groups, true ) ) {
+		$groups[] = 'security';
+	}
+	return $groups;
+} );
+
+/**
  * Add settings to the Advanced tab.
  *
  * @see Charitable_Advanced_Settings::add_advanced_fields()

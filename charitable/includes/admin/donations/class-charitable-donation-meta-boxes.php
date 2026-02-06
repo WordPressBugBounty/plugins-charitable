@@ -68,6 +68,7 @@ if ( ! class_exists( 'Charitable_Donation_Meta_Boxes' ) ) :
 		 * Add needed css classes to body HTML tag.
 		 *
 		 * @since  1.8.1
+		 * @version 1.8.9.1
 		 *
 		 * @param  string $classes The body classes.
 		 * @return string
@@ -83,9 +84,11 @@ if ( ! class_exists( 'Charitable_Donation_Meta_Boxes' ) ) :
 			if ( 'donation' !== $screen->post_type ) {
 				return $classes;
 			}
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended
 			if ( ! empty( $_GET['action'] ) ) {
-				$classes .= ' charitable-admin-donation-' . esc_attr( $_GET['action'] ) . ' ';
+				$classes .= ' charitable-admin-donation-' . esc_attr( sanitize_text_field( wp_unslash( $_GET['action'] ) ) ) . ' ';
 			}
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 			return $classes;
 
@@ -140,13 +143,16 @@ if ( ! class_exists( 'Charitable_Donation_Meta_Boxes' ) ) :
 		 * Returns an array of all meta boxes added to the donation post type screen.
 		 *
 		 * @since  1.5.0
+		 * @version 1.8.9.1
 		 *
 		 * @return array
 		 */
 		private function get_meta_boxes() {
 			$screen = get_current_screen();
 
-			if ( 'donation' == $screen->post_type && ( 'add' == $screen->action || isset( $_GET['show_form'] ) ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$show_form = isset( $_GET['show_form'] );
+			if ( 'donation' == $screen->post_type && ( 'add' == $screen->action || $show_form ) ) {
 				$meta_boxes = $this->get_form_meta_box();
 			} else {
 				$meta_boxes = $this->get_view_meta_boxes();
@@ -451,11 +457,12 @@ if ( ! class_exists( 'Charitable_Donation_Meta_Boxes' ) ) :
 				2  => __( 'Custom field updated.', 'charitable' ),
 				3  => __( 'Custom field deleted.', 'charitable' ),
 				4  => __( 'Donation updated.', 'charitable' ),
-				5  => isset( $_GET['revision'] )
+				5  => // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display only, no action
+					isset( $_GET['revision'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					? sprintf(
 						/* translators: %s: revision title */
 						__( 'Donation restored to revision from %s', 'charitable' ),
-						wp_post_revision_title( (int) $_GET['revision'], false )
+						wp_post_revision_title( (int) sanitize_text_field( wp_unslash( $_GET['revision'] ) ), false ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					)
 					: false,
 				6  => sprintf(
@@ -565,17 +572,21 @@ if ( ! class_exists( 'Charitable_Donation_Meta_Boxes' ) ) :
 			 * Finally, if we're saving a manually created donation, only
 			 * send the email if that option was checked in the admin.
 			 */
-			return array_key_exists( 'send_donation_receipt', $_POST ) && $_POST['send_donation_receipt'];
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
+			return array_key_exists( 'send_donation_receipt', $_POST ) && ! empty( sanitize_text_field( wp_unslash( $_POST['send_donation_receipt'] ) ) );
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 		}
 
 		/**
 		 * Checks whether we are saving the admin donation form.
 		 *
 		 * @since  1.6.15
+		 * @version 1.8.9.1
 		 *
 		 * @return boolean
 		 */
 		public function is_admin_donation_save() {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing
 			return array_key_exists( 'charitable_action', $_POST );
 		}
 
@@ -583,10 +594,12 @@ if ( ! class_exists( 'Charitable_Donation_Meta_Boxes' ) ) :
 		 * Checks whether we are doing a donation action.
 		 *
 		 * @since  1.6.15
+		 * @version 1.8.9.1
 		 *
 		 * @return boolean
 		 */
 		public function is_donation_action() {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing
 			return array_key_exists( 'charitable_donation_action', $_POST );
 		}
 	}

@@ -23,6 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return void
  */
 function charitable_compat_litespeed_cache_disable_cache() {
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- LSCACHE_NO_CACHE is a third-party constant defined by LiteSpeed Cache plugin for compatibility.
 	define( 'LSCACHE_NO_CACHE', true );
 }
 

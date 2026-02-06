@@ -115,8 +115,10 @@ if ( ! class_exists( 'Charitable_Login_Shortcode' ) ) :
 				'charitable' => true,
 			);
 
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display only, no action
 			if ( isset( $_GET['username'] ) ) {
-				$default['value_username'] = str_replace( ' ', '+', $_GET['username'] );
+				// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display only, no action
+				$default['value_username'] = str_replace( ' ', '+', sanitize_text_field( wp_unslash( $_GET['username'] ) ) );
 			}
 
 			/**

@@ -8,6 +8,7 @@
  * @package Charitable/Templates/Donation Receipt
  * @since   1.0.0
  * @version 1.6.55
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -16,8 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /* @var Charitable_Donation */
-$donation = $view_args['donation'];
-$amount   = $donation->get_total();
+$charitable_donation = $view_args['donation'];
+$charitable_amount   = $charitable_donation->get_total();
 
 ?>
 <h3 class="charitable-header"><?php echo esc_html_x( 'Your Donation', 'donation receipt header', 'charitable' ); ?></h3>
@@ -29,11 +30,11 @@ $amount   = $donation->get_total();
 		</tr>
 	</thead>
 	<tbody>
-	<?php foreach ( $donation->get_campaign_donations() as $campaign_donation ) : ?>
+	<?php foreach ( $charitable_donation->get_campaign_donations() as $charitable_campaign_donation ) : ?>
 		<tr>
 			<td class="campaign-name">
 				<?php
-					echo esc_html( $campaign_donation->campaign_name );
+					echo esc_html( $charitable_campaign_donation->campaign_name );
 
 					/**
 					 * Do something after displaying the campaign name.
@@ -43,10 +44,10 @@ $amount   = $donation->get_total();
 					 * @param object              $campaign_donation Database record for the campaign donation.
 					 * @param Charitable_Donation $donation          The Donation object.
 					 */
-					do_action( 'charitable_donation_receipt_after_campaign_name', $campaign_donation, $donation );
+					do_action( 'charitable_donation_receipt_after_campaign_name', $charitable_campaign_donation, $charitable_donation );
 				?>
 			</td>
-			<td class="donation-amount"><?php echo charitable_format_money( $campaign_donation->amount, false, false, $donation->get_currency() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
+			<td class="donation-amount"><?php echo charitable_format_money( $charitable_campaign_donation->amount, false, false, $charitable_donation->get_currency() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
 		</tr>
 	<?php endforeach ?>
 	</tbody>
@@ -61,7 +62,7 @@ $amount   = $donation->get_total();
 			 *
 			 * @param Charitable_Donation $donation The Donation object.
 			 */
-			do_action( 'charitable_donation_receipt_before_donation_total', $donation );
+			do_action( 'charitable_donation_receipt_before_donation_total', $charitable_donation );
 		?>
 		<tr>
 			<td><?php esc_html_e( 'Total', 'charitable' ); ?></td>
@@ -78,7 +79,7 @@ $amount   = $donation->get_total();
 					 * @param  string              $context  The context in which this is being shown.
 					 * @return string
 					 */
-					echo apply_filters( 'charitable_donation_receipt_donation_amount', charitable_format_money( $amount, false, true, $donation->get_currency() ), $amount, $donation, 'details' ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					echo apply_filters( 'charitable_donation_receipt_donation_amount', charitable_format_money( $charitable_amount, false, true, $charitable_donation->get_currency() ), $charitable_amount, $charitable_donation, 'details' ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				?>
 			</td>
 		</tr>
@@ -92,7 +93,7 @@ $amount   = $donation->get_total();
 			 *
 			 * @param Charitable_Donation $donation The Donation object.
 			 */
-			do_action( 'charitable_donation_receipt_after_donation_total', $donation );
+			do_action( 'charitable_donation_receipt_after_donation_total', $charitable_donation );
 		?>
 	</tfoot>
 </table>

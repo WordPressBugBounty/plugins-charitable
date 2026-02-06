@@ -304,6 +304,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		 * Callback for displaying the UI for Addons.
 		 *
 		 * @since 1.7.0
+		 * @version 1.8.8.6
 		 */
 		public function addons_directory_content() {
 
@@ -514,10 +515,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 									</div>
 								<?php endif; ?>
 							</div>
-							<?php
-							$content_style = ( $is_featured_section ) ? '' : 'style="display: none;"';
-							?>
-							<div id="charitable-addons-<?php echo esc_attr( $slug ); ?>" class="charitable-addons-list charitable-addons-section-content" <?php echo $content_style; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+						<div id="charitable-addons-<?php echo esc_attr( $slug ); ?>" class="charitable-addons-list charitable-addons-section-content"<?php echo ( $is_featured_section ) ? '' : ' style="' . esc_attr( 'display: none;' ) . '"'; ?>>
 								<?php
 								foreach ( (array) $category['addons'] as $i => $addon ) {
 									$this->get_addon_card( $addon, $i, true, $installed_plugins );
@@ -906,6 +904,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			$addon['path'] = str_replace( 'charitable-recurring-donations', 'charitable-recurring', $addon['path'] );
 
 			// Apply filter, mostly for testing and troubleshooting.
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Legacy hook name maintained for backward compatibility with existing filters.
 			$addon = apply_filters( 'get_addon_button_html_addon', $addon );
 
 			switch ( $addon['status'] ) {
@@ -954,6 +953,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		 * Check if any addons have invalid download URLs and display admin notice.
 		 *
 		 * @since 1.8.8
+		 * @version 1.8.9.1
 		 */
 		public function check_for_invalid_urls() {
 			$addons           = $this->get_addons();
@@ -981,7 +981,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					esc_html__( 'Charitable Settings page', 'charitable' )
 				);
 
-				echo $notice;
+				echo wp_kses_post( $notice );
 			}
 		}
 
@@ -1022,7 +1022,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			}
 
 			$addon_date   = strtotime( $addon['last_updated'] );
-			$current_date = strtotime( date( 'Y-m-d' ) );
+			$current_date = strtotime( date( 'Y-m-d' ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 
 			// If the last_updated is within 90 days, return true.
 			return $addon_date > $current_date - 90 * DAY_IN_SECONDS;

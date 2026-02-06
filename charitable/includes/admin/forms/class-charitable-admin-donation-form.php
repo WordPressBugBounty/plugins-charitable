@@ -131,7 +131,7 @@ if ( ! class_exists( 'Charitable_Admin_Donation_Form' ) ) :
 				$fields['meta_fields']['fields']['time'] = array(
 					'type'     => 'hidden',
 					'priority' => 2,
-					'value'    => date( 'H:i:s', strtotime( $this->get_donation()->post_date_gmt ) ),
+					'value'    => date( 'H:i:s', strtotime( $this->get_donation()->post_date_gmt ) ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 				);
 			} else {
 				$fields['donor_id'] = array(
@@ -339,10 +339,14 @@ if ( ! class_exists( 'Charitable_Admin_Donation_Form' ) ) :
 				charitable_get_admin_notices()->fill_notices_from_frontend();
 			}
 
-			$campaign_donations          = array_key_exists( 'campaign_donations', $_POST ) ? $_POST['campaign_donations'] : array();
-			$_POST['campaign_donations'] = array_filter( $campaign_donations, array( $this, 'filter_campaign_donation' ) );
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array data, sanitized in filter_campaign_donation
+			$campaign_donations = array_key_exists( 'campaign_donations', $_POST ) ? wp_unslash( $_POST['campaign_donations'] ) : array();
+			$campaign_donations = array_filter( $campaign_donations, array( $this, 'filter_campaign_donation' ) );
+			$_POST['campaign_donations'] = $campaign_donations;
 
-			if ( empty( $_POST['campaign_donations'] ) ) {
+			if ( empty( $campaign_donations ) ) {
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 				charitable_get_admin_notices()->add_error( __( 'You must provide both a campaign and amount.', 'charitable' ) );
 
 				$this->valid = false;
@@ -619,7 +623,8 @@ if ( ! class_exists( 'Charitable_Admin_Donation_Form' ) ) :
 		/**
 		 * Sanitize the date.
 		 *
-		 * @since  1.5.0
+		 * @since   1.5.0
+		 * @version 1.8.8.5
 		 *
 		 * @param  array $values The submitted values.
 		 * @return array
@@ -634,13 +639,26 @@ if ( ! class_exists( 'Charitable_Admin_Donation_Form' ) ) :
 			$values['date_gmt'] = $date . ' ' . $time;
 
 			/* If the date matches today's date and it's a new donation, save the time too. */
-			if ( date( 'Y-m-d 00:00:00' ) == $values['date_gmt'] && $is_new ) {
-				$values['date_gmt'] = date( 'Y-m-d H:i:s' );
+			if ( date( 'Y-m-d 00:00:00' ) == $values['date_gmt'] && $is_new ) { // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
+				$values['date_gmt'] = date( 'Y-m-d H:i:s' ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 			}
 
-			/* If the donation date has been changed, the time is always set to 00:00:00 */
+			/* If the donation date has been changed, preserve the original time from the donation log */
 			if ( $values['date_gmt'] !== $donation->post_date_gmt && ! $is_new ) {
-				$values['date_gmt'] = $date . ' 00:00:00';
+				// Get the original donation time from the donation log
+				$donation_log = get_post_meta( $donation->ID, '_donation_log', true );
+				$original_time = '00:00:00'; // Default fallback
+
+				if ( is_array( $donation_log ) && ! empty( $donation_log ) ) {
+					// Get the first log entry which contains the original creation time
+					$first_log_entry = $donation_log[0];
+					if ( isset( $first_log_entry['time'] ) ) {
+						// Convert the original timestamp to GMT time format
+						$original_time = gmdate( 'H:i:s', $first_log_entry['time'] );
+					}
+				}
+
+				$values['date_gmt'] = $date . ' ' . $original_time;
 			}
 
 			return $values;
@@ -696,14 +714,17 @@ if ( ! class_exists( 'Charitable_Admin_Donation_Form' ) ) :
 		 * Set a field's initial value.
 		 *
 		 * @since  1.5.0
+		 * @version 1.8.9.1
 		 *
 		 * @param  array  $field Field definition.
 		 * @param  string $key   The key of the field.
 		 * @return array
 		 */
 		protected function maybe_set_field_value( $field, $key ) {
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
 			if ( array_key_exists( $key, $_POST ) ) {
-				$field['value'] = $_POST[ $key ];
+				$field['value'] = sanitize_text_field( wp_unslash( $_POST[ $key ] ) );
+				// phpcs:enable WordPress.Security.NonceVerification.Missing
 				return $field;
 			}
 

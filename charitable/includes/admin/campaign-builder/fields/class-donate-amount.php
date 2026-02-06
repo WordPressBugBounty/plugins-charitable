@@ -312,8 +312,10 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 
 			$campaign_settings = false;
 
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display/routing parameter
 			if ( ! empty( $_GET['campaign_id'] ) ) {
-				$campaign_id = intval( $_GET['campaign_id'] );
+				// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display/routing parameter
+				$campaign_id = intval( wp_unslash( $_GET['campaign_id'] ) );
 				if ( $campaign_id > 0 ) {
 					$campaign_settings = get_post_meta( $campaign_id, 'campaign_settings_v2', true );
 				}
@@ -356,14 +358,18 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 		}
 
 		/**
-		 * Generate field vix ajax.
+		 * Display settings for AJAX requests.
 		 *
-		 * @since 1.8.0
+		 * @since  1.8.0
+		 * @version 1.8.9.1
+		 *
+		 * @return void
 		 */
 		public function settings_display_ajax() {
-
-			$field_id    = intval( $_POST['field_id'] );
-			$campaign_id = intval( $_POST['campaign_id'] ); // todo: should this be added? see a few lines down.
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
+			$field_id    = isset( $_POST['field_id'] ) ? intval( wp_unslash( $_POST['field_id'] ) ) : 0;
+			$campaign_id = isset( $_POST['campaign_id'] ) ? intval( wp_unslash( $_POST['campaign_id'] ) ) : 0; // todo: should this be added? see a few lines down.
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			if ( ! class_exists( 'Charitable_Builder_Form_Fields' ) ) {
 				wp_send_json_error( esc_html__( 'Something went wrong while performing this action.', 'charitable' ) );

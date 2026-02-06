@@ -9,6 +9,7 @@
  * @package Charitable/Templates/Account
  * @since   1.4.0
  * @version 1.5.0
+ * @version 1.8.8.6
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,12 +20,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @var     Charitable_Reset_Password_Form
  */
-$form = $view_args['form'];
+$charitable_form = $view_args['form'];
 
 ?>
 <div class="charitable-reset-password-form">
 	<?php
-	if ( $form->has_key() ) :
+	if ( $charitable_form->has_key() ) :
 
 		/**
 		 * @hook charitable_reset_password_before
@@ -34,14 +35,14 @@ $form = $view_args['form'];
 		?>
 		<form id="resetpassform" class="charitable-form" method="post" autocomplete="off">
 
-			<?php do_action( 'charitable_form_before_fields', $form ); ?>
+			<?php do_action( 'charitable_form_before_fields', $charitable_form ); ?>
 
 			<div class="charitable-form-fields cf">
-				<?php $form->view()->render(); ?>
+				<?php $charitable_form->view()->render(); ?>
 				<p class="description"><?php echo wp_get_password_hint(); // phpcs:ignore ?></p>
 			</div><!-- .charitable-form-fields -->
 
-			<?php do_action( 'charitable_form_after_fields', $form ); ?>
+			<?php do_action( 'charitable_form_after_fields', $charitable_form ); ?>
 
 			<div class="charitable-form-field charitable-submit-field resetpass-submit">
 				<button id="resetpass-button" class="button button-primary lostpassword-button" type="submit"><?php esc_html_e( 'Reset Password', 'charitable' ); ?></button>

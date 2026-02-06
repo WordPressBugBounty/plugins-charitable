@@ -92,6 +92,7 @@ if ( ! class_exists( 'Charitable_i18n' ) ) :
 			 * @param string $directory The directory, relative to the WP_PLUGIN_DIR directory.
 			 */
 			$this->languages_directory = apply_filters( 'charitable_languages_directory', 'charitable/i18n/languages' );
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- plugin_locale is a WordPress core hook used for plugin localization.
 			$this->locale              = apply_filters( 'plugin_locale', get_locale(), $this->textdomain );
 			$this->mofile              = sprintf( '%1$s-%2$s.mo', $this->textdomain, $this->locale );
 
@@ -118,6 +119,7 @@ if ( ! class_exists( 'Charitable_i18n' ) ) :
 		 * Create class object.
 		 *
 		 * @since   1.1.2
+		 * @version 1.8.9.1
 		 *
 		 * @return  void
 		 */
@@ -132,6 +134,7 @@ if ( ! class_exists( 'Charitable_i18n' ) ) :
 				load_textdomain( $this->textdomain, $mofile_path );
 			}
 
+			// phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound
 			load_plugin_textdomain( $this->textdomain, false, $this->languages_directory );
 		}
 

@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.5.0
- * @version   1.8.1.5
+ * @version   1.8.1.5, 1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -494,34 +494,54 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 			return 'edit.php' === $pagenow && in_array( $typenow, array( Charitable::CAMPAIGN_POST_TYPE ), true );
 		}
 
-		/**
-		 * Show blank slate.
-		 *
-		 * @since 1.8.1.5
-		 *
-		 * @param string $which String which tablenav is being shown.
-		 *
-		 * @return void
-		 */
-		public function maybe_render_blank_state( $which = '' ) {
-			global $post_type;
+	/**
+	 * Show blank slate.
+	 *
+	 * @since   1.8.1.5
+	 * @version 1.8.8.6, 1.8.9.1
+	 *
+	 * @param string $which String which tablenav is being shown.
+	 *
+	 * @return void
+	 */
+	public function maybe_render_blank_state( $which = '' ) {
+		global $post_type, $typenow;
 
-			if ( $post_type === $this->list_table_type && 'bottom' === $which ) {
-				$counts = (array) wp_count_posts( $post_type );
-				unset( $counts['auto-draft'] );
-				$count = array_sum( $counts );
+		// Static flag to prevent double rendering
+		static $blank_state_rendered = false;
 
-				if ( ! defined( 'CHARITABLE_FORCE_BLANK_SLATE' ) ) :
-					if ( 0 < $count || ( defined( 'CHARITABLE_DISABLE_BLANK_SLATE' ) && CHARITABLE_DISABLE_BLANK_SLATE ) ) {
-						return;
-					}
-				endif;
+		// Use $typenow as fallback if $post_type is not set
+		$current_post_type = $post_type ? $post_type : $typenow;
 
-				$this->render_blank_state();
+		// Only proceed if we're on the correct post type
+		if ( $current_post_type !== $this->list_table_type ) {
+			return;
+		}
 
-				echo '<style type="text/css">#posts-filter .wp-list-table, #posts-filter .tablenav.top, .tablenav.bottom .actions, .wrap .subsubsub, .wrap .search-box, .wrap .tablenav-pages  { display: none; } #posts-filter .tablenav.bottom { height: auto; } body.post-type-donation .page-title-action { display: inline-block; } </style>';
+		// Check post count
+		$counts = (array) wp_count_posts( $current_post_type );
+		unset( $counts['auto-draft'] );
+		$count = array_sum( $counts );
+
+		// Skip if there are posts or blank slate is disabled
+		if ( ! defined( 'CHARITABLE_FORCE_BLANK_SLATE' ) ) {
+			if ( 0 < $count || ( defined( 'CHARITABLE_DISABLE_BLANK_SLATE' ) && CHARITABLE_DISABLE_BLANK_SLATE ) ) {
+				return;
 			}
 		}
+
+		// Prefer bottom, but render in top if bottom doesn't fire (when there are 0 posts)
+		if ( 'bottom' === $which && ! $blank_state_rendered ) {
+			$blank_state_rendered = true;
+			$this->render_blank_state();
+			echo '<style type="text/css">#posts-filter .wp-list-table, #posts-filter .tablenav.top, .tablenav.bottom .actions, .wrap .subsubsub, .wrap .search-box, .wrap .tablenav-pages  { display: none; } #posts-filter .tablenav.bottom { height: auto; } body.post-type-donation .page-title-action { display: inline-block; } </style>';
+		} elseif ( 'top' === $which && ! $blank_state_rendered ) {
+			// Fallback: if bottom never fires (WordPress doesn't render it with 0 posts), render in top
+			$blank_state_rendered = true;
+			$this->render_blank_state();
+			echo '<style type="text/css">#posts-filter .wp-list-table, #posts-filter .tablenav.top .actions, .wrap .subsubsub, .wrap .search-box, .wrap .tablenav-pages  { display: none; } #posts-filter .tablenav.top { height: auto; } body.post-type-donation .page-title-action { display: inline-block; } </style>';
+		}
+	}
 
 		/**
 		 * Renders advice in the event that no orders exist yet.

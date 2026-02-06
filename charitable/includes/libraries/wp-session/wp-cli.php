@@ -6,7 +6,7 @@
  * @package    WP_Session
  * @subpackage Commands
  */
-class WP_Session_Command extends \WP_CLI_Command {
+class WP_Session_Command extends \WP_CLI_Command { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- This is a bundled library class. Changing it would break existing functionality.
 
 	/**
 	 * Count the total number of sessions stored in the database.
@@ -76,7 +76,7 @@ class WP_Session_Command extends \WP_CLI_Command {
 		 *
 		 * @param int
 		 */
-		$batch = isset( $assoc_args['batch'] ) ? absint( $assoc_args['batch'] ) : apply_filters( 'wp_session_delete_batch_size', 1000 );
+		$batch = isset( $assoc_args['batch'] ) ? absint( $assoc_args['batch'] ) : apply_filters( 'wp_session_delete_batch_size', 1000 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- This is a bundled library hook. Changing it would break existing functionality.
 
 		switch ( $all ) {
 			case true:

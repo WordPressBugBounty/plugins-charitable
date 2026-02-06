@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.6.0
- * @version   1.6.54
+ * @version   1.8.9.1
  */
 
 // Exit if accessed directly.
@@ -87,7 +87,7 @@ return apply_filters(
 			'email_tag'      => array(
 				'tag'         => 'campaign_end_date',
 				'description' => __( 'The end date of the campaign', 'charitable' ),
-				'preview'     => date( get_option( 'date_format', 'd/m/Y' ) ),
+				'preview'     => date( get_option( 'date_format', 'd/m/Y' ) ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 			),
 			'show_in_export' => true,
 		),

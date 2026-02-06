@@ -3,11 +3,11 @@
  * Plugin Name: Charitable
  * Plugin URI: https://www.wpcharitable.com
  * Description: The best WordPress donation plugin. Fundraising with recurring donations, and powerful features to help you raise more money online.
- * Version: 1.8.8.3
+ * Version: 1.8.9.3
  * Author: Charitable Donations & Fundraising Team
  * Author URI: https://wpcharitable.com
  * Requires at least: 5.0
- * Stable tag: 1.8.8.3
+ * Stable tag: 1.8.9.3
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
@@ -16,7 +16,7 @@
  *
  * @package   Charitable
  * @author    David Bisset
- * @copyright Copyright (c) 2024, WP Charitable LLC
+ * @copyright Copyright (c) 2026, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  */
 
@@ -39,7 +39,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		const AUTHOR = 'WP Charitable';
 
 		/* Plugin version. */
-		const VERSION = '1.8.8.3';
+		const VERSION = '1.8.9.3';
 
 		/* Version of database schema. */
 		const DB_VERSION = '20180522';
@@ -229,6 +229,9 @@ if ( ! class_exists( 'Charitable' ) ) :
 			require_once $includes_path . 'user-management/charitable-user-management-hooks.php';
 			require_once $includes_path . 'utilities/charitable-utility-functions.php';
 			require_once $includes_path . 'elementor/charitable-elementor-hooks.php';
+
+			// Load security hooks on both admin and frontend (CAPTCHA needs to work on frontend).
+			require_once $this->get_path( 'includes', true ) . 'admin/security/charitable-security-hooks.php';
 
 			/* Load vendor/autoload.php - our modified platform_check.php and autoload_real.php will handle conditional loading */
 			require_once $this->get_path( 'directory' ) . 'vendor/autoload.php';
@@ -540,19 +543,45 @@ if ( ! class_exists( 'Charitable' ) ) :
 				return false;
 			}
 
-			/* The unit tests have to exist. */
-			if ( ! file_exists( $this->get_path( 'directory' ) . 'tests/qunit/tests.js' ) ) {
-				return false;
-			}
+		/* The unit tests have to exist. */
+		if ( ! file_exists( $this->get_path( 'directory' ) . 'tests/qunit/tests.js' ) ) {
+			return false;
+		}
 
-			wp_register_script( 'qunit', 'https://code.jquery.com/qunit/qunit-2.3.3.js', array(), '2.3.3', true );
+		/**
+		 * Register QUnit testing library.
+		 *
+		 * Note: These files must be bundled locally for WordPress.org compliance.
+		 * Download from:
+		 * - JS: https://code.jquery.com/qunit/qunit-2.3.3.js
+		 * - CSS: https://code.jquery.com/qunit/qunit-2.3.3.css
+		 * Save to:
+		 * - assets/js/libraries/qunit-2.3.3.js
+		 * - assets/css/libraries/qunit-2.3.3.css
+		 *
+		 * @since 1.0.0
+		 * @version 1.8.9.1
+		 */
+		wp_register_script(
+			'qunit',
+			$this->get_path( 'directory', false ) . 'assets/js/libraries/qunit-2.3.3.js',
+			array(),
+			'2.3.3',
+			true
+		);
 
-			/* Version: '20170615-15:44' */
-			wp_register_script( 'qunit-tests', $this->get_path( 'directory', false ) . 'tests/qunit/tests.js', array( 'jquery', 'qunit' ), time(), true );
-			wp_enqueue_script( 'qunit-tests' );
+		/* Version: '20170615-15:44' */
+		wp_register_script( 'qunit-tests', $this->get_path( 'directory', false ) . 'tests/qunit/tests.js', array( 'jquery', 'qunit' ), time(), true );
+		wp_enqueue_script( 'qunit-tests' );
 
-			wp_register_style( 'qunit', 'https://code.jquery.com/qunit/qunit-2.3.3.css', array(), '2.3.3', 'all' );
-			wp_enqueue_style( 'qunit' );
+		wp_register_style(
+			'qunit',
+			$this->get_path( 'directory', false ) . 'assets/css/libraries/qunit-2.3.3.css',
+			array(),
+			'2.3.3',
+			'all'
+		);
+		wp_enqueue_style( 'qunit' );
 		}
 
 		/**
@@ -1353,10 +1382,16 @@ if ( ! class_exists( 'Charitable' ) ) :
 		private function set_initial_rotating_menu_timestamps() {
 			// Get the rotating menu items configuration
 			$admin_pages = Charitable_Admin_Pages::get_instance();
-			$reflection = new ReflectionClass( $admin_pages );
-			$method = $reflection->getMethod( 'get_marketing_rotation_items' );
-			$method->setAccessible( true );
-			$items = $method->invoke( $admin_pages );
+
+			try {
+				$reflection = new ReflectionClass( $admin_pages );
+				$method = $reflection->getMethod( 'get_marketing_rotation_items' );
+				$method->setAccessible( true );
+				$items = $method->invoke( $admin_pages );
+			} catch ( ReflectionException $e ) {
+				// Fallback if reflection fails in future PHP versions
+				$items = array();
+			}
 
 			$current_time = time();
 

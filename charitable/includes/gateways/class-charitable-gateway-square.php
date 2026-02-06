@@ -1665,7 +1665,8 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 		/**
 		 * Process a donation's payment using the Payment Processor API.
 		 *
-		 * @since  1.8.7.
+		 * @since  1.8.7
+		 * @since  1.8.8.4
 		 *
 		 * @param  array                          $response The response from the Payment Processor API (Example: "1").
 		 * @param  int                            $donation_id The ID of the donation (Example: "677").
@@ -1718,9 +1719,9 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 				// phpcs:enable
 			}
 
-			$donation_amount = $donation->get_total_donation_amount( true );
-			// Conver to cents.
-			$donation_amount = $donation_amount * 100;
+		$donation_amount = $this->get_donation_amount_with_fees( $donation );
+		// Conver to cents.
+		$donation_amount = $donation_amount * 100;
 			$args_name       = 'Donation ID: ' . $donation_id . ' | ' . ( 'custom' === ! empty( $_POST['donation_amount'] ) ? 'Custom Amount' : 'Suggested Amount' ); // phpcs:ignore
 
 			// Set tokens provided by Web Payments SDK.
@@ -2050,7 +2051,7 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 			 * @param array   $args    The subscription payment arguments.
 			 * @param Process $process The Process instance.
 			 */
-			return (array) apply_filters( 'square_integrations_square_process_get_payment_args_subscription', $args_sub, $this );
+			return (array) apply_filters( 'square_integrations_square_process_get_payment_args_subscription', $args_sub, $this ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- This is a third-party hook from the Square Integrations plugin. Changing it would break existing functionality.
 		}
 
 		/**
@@ -2249,6 +2250,7 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 		 * Process a refund initiated in the WordPress dashboard.
 		 *
 		 * @since  1.8.7
+		 * @since  1.8.8.4
 		 *
 		 * @param  int $donation_id The donation ID.
 		 * @return boolean
@@ -2285,7 +2287,7 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 				}
 
 				$currency = $donation->get_currency();
-				$amount   = $donation->get_total_donation_amount( true );
+				$amount   = self::get_donation_amount_with_fees_static( $donation );
 				// Convert amount to cents.
 				$amount_cents = $amount * 100;
 
@@ -2327,6 +2329,28 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 				);
 				return false;
 			}
+		}
+
+		/**
+		 * Get the donation amount including fees if fee relief is enabled.
+		 *
+		 * @since  1.8.8.4
+		 *
+		 * @param  Charitable_Donation $donation The donation object.
+		 * @return float
+		 */
+		private static function get_donation_amount_with_fees_static( $donation ) {
+			if ( ! $donation ) {
+				return 0.0;
+			}
+
+			// Check if fee relief is enabled and donor opted to cover fees.
+			if ( $donation->get( 'cover_fees' ) ) {
+				return \Charitable_Currency::get_instance()->cast_to_decimal_format( $donation->get( 'total_donation_with_fees' ) );
+			}
+
+			// Return the standard donation amount.
+			return (float) $donation->get_total_donation_amount( true );
 		}
 
 		/**
@@ -2882,6 +2906,25 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 			}
 
 			return $is_active;
+		}
+
+		/**
+		 * Get the donation amount including fees if fee relief is enabled.
+		 *
+		 * @since  1.8.8.3
+		 *
+		 * @param  Charitable_Donation $donation The donation object.
+		 * @return float
+		 */
+		private function get_donation_amount_with_fees( $donation ) {
+			// Check if fee relief is enabled and donor opted to cover fees
+			if ( $donation->get( 'cover_fees' ) ) {
+				// Use the total donation amount including fees
+				return \Charitable_Currency::get_instance()->cast_to_decimal_format( $donation->get( 'total_donation_with_fees' ) );
+			}
+
+			// Return the standard donation amount
+			return $donation->get_total_donation_amount( true );
 		}
 	}
 endif;

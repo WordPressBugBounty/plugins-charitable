@@ -21,7 +21,7 @@ add_action( 'charitable_campaign_save', 'charitable_legacy_campaign_save', 10, 1
  * Do something with the posted data.
  *
  * @since 1.8.1.12
- * @version 1.8.1.14
+ * @version 1.8.9.1
  *
  * @param WP_Post $post An instance of `WP_Post`.
  */
@@ -32,7 +32,7 @@ function charitable_legacy_campaign_save( $post ) {
 		return;
 	}
 
-	if ( defined( 'CHARITABLE_DISABLE_LEGACY_SYNC_TO_BUILDER' ) && CHARITABLE_DISABLE_LEGACY_SYNC_TO_BUILDER ) {
+	if ( defined( 'CHARITABLE_DISABLE_LEGACY_SYNC_TO_BUILDER' ) && CHARITABLE_DISABLE_LEGACY_SYNC_TO_BUILDER ) { // phpcs:ignore
 		return;
 	}
 
@@ -53,8 +53,9 @@ function charitable_legacy_campaign_save( $post ) {
 		return;
 	}
 
+	// phpcs:disable WordPress.Security.NonceVerification.Missing
 	// --- Campaign Goal.
-	$_campaign_goal = ! empty( $_POST['_campaign_goal'] ) ? esc_html( $_POST['_campaign_goal'] ) : false;
+	$_campaign_goal = ! empty( $_POST['_campaign_goal'] ) ? sanitize_text_field( wp_unslash( $_POST['_campaign_goal'] ) ) : false;
 
 	// Sanitize some misc fields.
 	$campaign_settings_v2['settings']['general']['goal'] = ! empty( $_campaign_goal ) ? Charitable_Currency::get_instance()->sanitize_monetary_amount( (string) $_campaign_goal ) : false;
@@ -69,15 +70,18 @@ function charitable_legacy_campaign_save( $post ) {
 	}
 
 	// --- End Date.
-	$_end_date = ! empty( $_POST['_campaign_end_date'] ) ? esc_html( $_POST['_campaign_end_date'] ) . ' ' . esc_html( $_POST['_campaign_end_time'] ) : '';
+	$end_date_raw = ! empty( $_POST['_campaign_end_date'] ) ? sanitize_text_field( wp_unslash( $_POST['_campaign_end_date'] ) ) : '';
+	$end_time_raw = isset( $_POST['_campaign_end_time'] ) ? sanitize_text_field( wp_unslash( $_POST['_campaign_end_time'] ) ) : '';
+	$_end_date = ! empty( $end_date_raw ) ? $end_date_raw . ' ' . $end_time_raw : '';
 
 		$campaign_settings_v2['settings']['general']['end_date'] = Charitable_Campaign::sanitize_campaign_end_date( $_end_date );
 
 	// --- Title.
-	$campaign_settings_v2['title'] = ! empty( $_POST['post_title'] ) ? sanitize_text_field( $_POST['post_title'] ) : false;
+	$campaign_settings_v2['title'] = ! empty( $_POST['post_title'] ) ? sanitize_text_field( wp_unslash( $_POST['post_title'] ) ) : false;
 
 	// --- Description.
-	$campaign_settings_v2['settings']['general']['description'] = ! empty( $_POST['post_content'] ) ? trim( $_POST['post_content'] ) : false;
+	$campaign_settings_v2['settings']['general']['description'] = ! empty( $_POST['post_content'] ) ? sanitize_textarea_field( wp_unslash( $_POST['post_content'] ) ) : false;
+	// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 	update_post_meta( $campaign_id, 'campaign_settings_v2', $campaign_settings_v2 );
 }

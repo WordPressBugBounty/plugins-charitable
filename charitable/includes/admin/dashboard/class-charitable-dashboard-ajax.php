@@ -125,7 +125,7 @@ if ( ! class_exists( 'Charitable_Dashboard_Ajax' ) ) :
 					$date_axis = array_map( function( $date ) {
 						// Convert "Aug 27" to "8/27"
 						$timestamp = strtotime( $date );
-						return date( 'n/j', $timestamp );
+						return date( 'n/j', $timestamp ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 					}, $date_axis );
 				}
 

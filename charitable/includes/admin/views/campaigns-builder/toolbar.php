@@ -1,3 +1,19 @@
+<?php
+/**
+ * Campaign Builder Toolbar Template
+ *
+ * @package   Charitable/Admin/Views
+ * @author    WP Charitable LLC
+ * @copyright Copyright (c) 2023, WP Charitable LLC
+ * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
+ * @since     1.8.0
+ * @version   1.8.9.1
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+?>
 <div class="charitable-toolbar">
 
     <div class="charitable-left">

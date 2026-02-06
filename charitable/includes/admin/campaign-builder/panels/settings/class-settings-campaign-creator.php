@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version.  1.8.0
+ * @version.  1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -80,6 +80,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Campaign_Creator' ) ) :
 		 * Generate panel content.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.9.1
 		 */
 		public function panel_content( $campaign_data = false, $campaign_id = false ) {
 
@@ -115,7 +116,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Campaign_Creator' ) ) :
 
 					$campaign_creator_id = ( false === $campaign ) ? get_current_user_id() : $campaign->post_author;
 
-					echo $charitable_builder_form_fields->generate_campaign_creator_info(
+					echo $charitable_builder_form_fields->generate_campaign_creator_info( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						$settings->campaign_data_settings( 'campaign_creator_id', 'campaign-creator' ),
 						'',
 						array(
@@ -124,13 +125,14 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Campaign_Creator' ) ) :
 						)
 					);
 
-					echo $charitable_builder_form_fields->generate_dropdown(
+					echo $charitable_builder_form_fields->generate_dropdown( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						$settings->campaign_data_settings( 'campaign_creator_id', 'campaign-creator' ),
 						esc_html__( 'Change the campaign creator', 'charitable' ),
 						array(
 							'id'             => 'campaign_campaign_creator_id',
 							'name'           => array( 'settings', esc_attr( $this->slug ), 'campaign_creator_id' ),
 							'class'          => 'campaign-builder-campaign-creator-id',
+							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 							'options'        => $users_to_pass,
 							'html'           => true,
 							'selected_value' => intval( $campaign_creator_id ),
@@ -146,7 +148,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Campaign_Creator' ) ) :
 
 			$html = ob_get_clean();
 
-			echo $html;
+			echo wp_kses_post( $html );
 		}
 	}
 

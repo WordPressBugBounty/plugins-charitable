@@ -44,17 +44,22 @@ if ( ! class_exists( 'Charitable_Admin_Support' ) ) :
 		 * Checks and sees if there is anything being manually passed into the query vars.
 		 *
 		 * @since  1.7.0.3
+		 * @version 1.8.9.1
 		 */
 		public static function maybe_do_charitable_support_query() {
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended
 			if ( ! is_admin() || ! isset( $_GET['charitable-support'] ) ) {
 				return;
 			}
 
-			switch ( esc_html( $_GET['charitable-support'] ) ) {
+			$support_action = sanitize_text_field( wp_unslash( $_GET['charitable-support'] ) );
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+			switch ( $support_action ) {
 				case 'clear-notifications':
 					delete_option( 'charitable_notifications' ); // delete the entire option in the database.
 					if ( charitable_is_debug() ) {
-						error_log( 'charitable-support: clear-notification' );
+						error_log( 'charitable-support: clear-notification' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 					}
 					break;
 

@@ -6,7 +6,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
- * @version   1.6.49
+ * @version   1.8.9.1
  */
 
 // Exit if accessed directly.
@@ -62,7 +62,7 @@ if ( ! class_exists( 'Charitable_Session' ) ) :
 			}
 
 			if ( ! defined( 'WP_SESSION_COOKIE' ) ) {
-				define( 'WP_SESSION_COOKIE', 'charitable_session' );
+				define( 'WP_SESSION_COOKIE', 'charitable_session' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- This is a bundled library constant. Changing it would break existing functionality.
 			}
 
 			if ( ! class_exists( 'Recursive_ArrayAccess' ) ) {
@@ -146,7 +146,7 @@ if ( ! class_exists( 'Charitable_Session' ) ) :
 					'cookie_name'        => WP_SESSION_COOKIE,
 					'expiration'         => $this->set_session_length(),
 					'expiration_variant' => $this->set_session_expiration_variant_length(),
-					'secure'             => (bool) apply_filters( 'wp_session_cookie_secure', false ),
+					'secure'             => (bool) apply_filters( 'wp_session_cookie_secure', false ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- This is a bundled library hook. Changing it would break existing functionality.
 					'cookie_path'        => COOKIEPATH,
 					'cookie_domain'      => COOKIE_DOMAIN,
 					'generated_id'       => WP_Session_Utils::generate_id(),
@@ -419,7 +419,7 @@ if ( ! class_exists( 'Charitable_Session' ) ) :
 
 			if ( ! empty( $_SERVER['REQUEST_URI'] ) ) {
 				$blocklist = $this->get_blocklist();
-				$uri       = ltrim( $_SERVER['REQUEST_URI'], '/' );
+				$uri       = ltrim( $_SERVER['REQUEST_URI'], '/' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 				$uri       = untrailingslashit( $uri );
 
 				if ( in_array( $uri, $blocklist ) ) {

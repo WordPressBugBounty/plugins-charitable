@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version   1.8.0
+ * @version   1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,6 +18,8 @@ if ( ! class_exists( 'Charitable_Field_HTML' ) ) :
 
 	/**
 	 * Class to add campaign html field to a campaign form in the builder.
+	 *
+	 * @version 1.8.9.1
 	 */
 	class Charitable_Field_HTML extends Charitable_Builder_Field {
 
@@ -106,6 +108,7 @@ if ( ! class_exists( 'Charitable_Field_HTML' ) ) :
 		 * HTML preview inside the builder.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.9.1
 		 *
 		 * @param array  $field_data Field data and settings.
 		 * @param array  $campaign_data Campaign data and settings.
@@ -117,13 +120,14 @@ if ( ! class_exists( 'Charitable_Field_HTML' ) ) :
 			$html  = $this->field_title( $this->name );
 			$html .= $this->field_wrapper( $this->render( $field_data, $campaign_data, $field_id ), $field_data );
 
-			echo $html; // phpcs:ignore
+			echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
 		 * The display on the campaign front-end.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.9.1
 		 *
 		 * @param string $field          The passed field type.
 		 * @param array  $field_data     Any field data.
@@ -146,7 +150,7 @@ if ( ! class_exists( 'Charitable_Field_HTML' ) ) :
 
 		<div class="charitable-campaign-field charitable-campaign-field_<?php echo esc_attr( $this->type ); ?>">
 			<div <?php echo esc_attr( $css_class ); ?>>
-				<?php echo $html_content; ?>
+				<?php echo $html_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</div>
 		</div>
 
@@ -154,13 +158,14 @@ if ( ! class_exists( 'Charitable_Field_HTML' ) ) :
 
 			$html = ob_get_clean();
 
-			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data );
+			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
 		 * HTML display on the form front-end.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.9.1
 		 *
 		 * @param integer $field_id      Number ID.
 		 * @param array   $campaign_data Form data and settings.
@@ -179,7 +184,7 @@ if ( ! class_exists( 'Charitable_Field_HTML' ) ) :
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_textbox(
+			echo $charitable_builder_form_fields->generate_textbox( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['content'] ) ? $settings['content'] : false,
 				esc_html__( 'HTML', 'charitable' ),
 				array(
@@ -194,7 +199,7 @@ if ( ! class_exists( 'Charitable_Field_HTML' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['css_class'] ) ? $settings['css_class'] : false,
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(
@@ -215,14 +220,18 @@ if ( ! class_exists( 'Charitable_Field_HTML' ) ) :
 		}
 
 		/**
-		 * Generate field vix ajax.
+		 * Display settings for AJAX requests.
 		 *
-		 * @since 1.8.0
+		 * @since  1.8.0
+		 * @version 1.8.9.1
+		 *
+		 * @return void
 		 */
 		public function settings_display_ajax() {
-
-			$field_id    = intval( $_POST['field_id'] );
-			$campaign_id = intval( $_POST['campaign_id'] ); // todo: should this be added? see a few lines down.
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
+			$field_id    = isset( $_POST['field_id'] ) ? intval( wp_unslash( $_POST['field_id'] ) ) : 0;
+			$campaign_id = isset( $_POST['campaign_id'] ) ? intval( wp_unslash( $_POST['campaign_id'] ) ) : 0; // todo: should this be added? see a few lines down.
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			$charitable_builder_form_fields = new Charitable_Builder_Form_Fields();
 
@@ -235,7 +244,7 @@ if ( ! class_exists( 'Charitable_Field_HTML' ) ) :
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				$settings['css_class'],
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(

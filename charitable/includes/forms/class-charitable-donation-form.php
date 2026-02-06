@@ -106,6 +106,15 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		protected $valid;
 
 		/**
+		 * Cached merged fields array.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @var   array
+		 */
+		protected $merged_fields;
+
+		/**
 		 * Create a donation form object.
 		 *
 		 * @since 1.0.0
@@ -177,15 +186,18 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		 * Returns the set value for a particular user field.
 		 *
 		 * @since  1.0.0
+		 * @version 1.8.9.1
 		 *
 		 * @param  string $key     The field key.
 		 * @param  string $default Optional. The value that will be used if none is set.
 		 * @return mixed
 		 */
-		public function get_user_value( $key, $default = '' ) { // phpcs:ignore
-			if ( isset( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-				return $_POST[ $key ];
+		public function get_user_value( $key, $default = '' ) {
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
+			if ( isset( $_POST[ $key ] ) ) {
+				return sanitize_text_field( wp_unslash( $_POST[ $key ] ) );
 			}
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			$donation_id = $this->get_validated_donation_id();
 
@@ -549,17 +561,21 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		 * and one that the current user should have access to.
 		 *
 		 * @since  1.5.14
+		 * @version 1.8.9.1
 		 *
 		 * @return int
 		 */
 		public function get_validated_donation_id() {
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended,WordPress.Security.NonceVerification.Missing
 			if ( array_key_exists( 'donation_id', $_GET ) ) {
-				$donation_id = $_GET['donation_id'];
+				$donation_id = intval( wp_unslash( $_GET['donation_id'] ) );
 			} elseif ( array_key_exists( 'ID', $_POST ) ) {
-				$donation_id = $_POST['ID'];
+				$donation_id = intval( wp_unslash( $_POST['ID'] ) );
 			} else {
+				// phpcs:enable WordPress.Security.NonceVerification.Recommended,WordPress.Security.NonceVerification.Missing
 				return 0;
 			}
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended,WordPress.Security.NonceVerification.Missing
 
 			if ( charitable_user_can_access_donation( $donation_id ) ) {
 				return $donation_id;
@@ -688,6 +704,15 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 					__( 'Unfortunately, we were unable to verify your form submission. Please reload the page and try again.', 'charitable' )
 				);
 
+				// Log the security validation failure
+				$error_details = ! $this->validate_nonce() ? 'nonce_failed' : 'honeypot_failed';
+				$context = array(
+					'campaign_id' => $this->get_campaign_id(),
+					'amount'      => $this->get_submitted_value( 'donation_amount' ),
+					'gateway'     => $this->get_submitted_value( 'gateway' ),
+				);
+				charitable_log_form_error( 'security_failure', $error_details, $context );
+
 				$ret = false;
 			}
 
@@ -722,6 +747,14 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 						$submitted
 					)
 				);
+
+				// Log the email validation failure
+				$context = array(
+					'campaign_id' => $this->get_campaign_id(),
+					'amount'      => $this->get_submitted_value( 'donation_amount' ),
+					'gateway'     => $this->get_submitted_value( 'gateway' ),
+				);
+				charitable_log_form_error( 'validation_failure', 'invalid_email', $context );
 
 				$ret = false;
 			}
@@ -789,6 +822,14 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 					)
 				);
 
+				// Log the minimum amount validation failure
+				$context = array(
+					'campaign_id' => $submitted['campaign_id'],
+					'amount'      => $amount,
+					'gateway'     => $this->get_submitted_value( 'gateway' ),
+				);
+				charitable_log_form_error( 'validation_failure', 'amount_below_minimum', $context );
+
 				$ret = false;
 			} elseif ( $maximum && $maximum < $amount ) {
 				charitable_get_notices()->add_error(
@@ -799,6 +840,14 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 					)
 				);
 
+				// Log the maximum amount validation failure
+				$context = array(
+					'campaign_id' => $submitted['campaign_id'],
+					'amount'      => $amount,
+					'gateway'     => $this->get_submitted_value( 'gateway' ),
+				);
+				charitable_log_form_error( 'validation_failure', 'amount_above_maximum', $context );
+
 				$ret = false;
 			} elseif ( $minimum === 0 && $amount <= 0 && ! apply_filters( 'charitable_permit_0_donation', false ) ) {
 				charitable_get_notices()->add_error(
@@ -808,6 +857,14 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 						charitable_format_money( $minimum )
 					)
 				);
+
+				// Log the zero amount validation failure
+				$context = array(
+					'campaign_id' => $submitted['campaign_id'],
+					'amount'      => $amount,
+					'gateway'     => $this->get_submitted_value( 'gateway' ),
+				);
+				charitable_log_form_error( 'validation_failure', 'zero_amount_not_permitted', $context );
 
 				$ret = false;
 			}
@@ -1219,15 +1276,18 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		 * Return the donation amount.
 		 *
 		 * @since  1.0.0
+		 * @version 1.8.9.1
 		 *
 		 * @return float
 		 */
 		public static function get_donation_amount() {
-			$amount = isset( $_POST['donation_amount'] ) ? $_POST['donation_amount'] : 0;
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
+			$amount = isset( $_POST['donation_amount'] ) ? sanitize_text_field( wp_unslash( $_POST['donation_amount'] ) ) : 0;
 
 			if ( 0 === $amount || 'custom' == $amount ) {
-				$amount = isset( $_POST['custom_donation_amount'] ) ? $_POST['custom_donation_amount'] : 0;
+				$amount = isset( $_POST['custom_donation_amount'] ) ? sanitize_text_field( wp_unslash( $_POST['custom_donation_amount'] ) ) : 0;
 			}
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			/**
 			 * Only sanitize the amount if it's a number (no letters).
@@ -1277,6 +1337,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		 * Set a field's initial value.
 		 *
 		 * @since  1.5.0
+		 * @version 1.8.9.1
 		 *
 		 * @param  array  $field Field definition.
 		 * @param  string $key   The key of the field.
@@ -1284,7 +1345,9 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 		 */
 		protected function set_field_value( $field, $key ) {
 			$donation_id = $this->get_validated_donation_id();
-			$submitted   = isset( $_POST[ $key ] ) ? $_POST[ $key ] : null;
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
+			$submitted = isset( $_POST[ $key ] ) ? sanitize_text_field( wp_unslash( $_POST[ $key ] ) ) : null;
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			/* Mark a checkbox as checked. */
 			if ( 'checkbox' === $field['type'] ) {

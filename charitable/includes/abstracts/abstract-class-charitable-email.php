@@ -460,6 +460,7 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 		 * Sends the email.
 		 *
 		 * @since  1.0.0
+		 * @since  1.8.9.2 Added comprehensive error handling for email processing failures.
 		 *
 		 * @return boolean
 		 */
@@ -473,13 +474,44 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 			 */
 			do_action( 'charitable_before_send_email', $this );
 
-			$sent = wp_mail(
-				$this->get_recipient(),
-				do_shortcode( $this->get_subject() ),
-				$this->build_email(),
-				$this->get_headers(),
-				$this->get_attachments()
-			);
+			try {
+				// Safely get each email component with error handling
+				$recipient = $this->safe_get_recipient();
+				if ( false === $recipient ) {
+					return false;
+				}
+
+				$subject = $this->safe_get_subject();
+				if ( false === $subject ) {
+					return false;
+				}
+
+				$body = $this->safe_build_email();
+				if ( false === $body ) {
+					return false;
+				}
+
+				$headers = $this->safe_get_headers();
+				if ( false === $headers ) {
+					return false;
+				}
+
+				$attachments = $this->safe_get_attachments();
+				if ( false === $attachments ) {
+					return false;
+				}
+
+				// Attempt to send email
+				$sent = wp_mail( $recipient, $subject, $body, $headers, $attachments );
+
+				if ( ! $sent ) {
+					$this->log_email_error( 'wp_mail_failed', 'wp_mail() returned false' );
+				}
+
+			} catch ( Throwable $e ) {
+				$this->log_email_error( 'exception_during_send', $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine() );
+				$sent = false;
+			}
 
 			/**
 			 * Do something after sending the email.
@@ -488,9 +520,9 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 			 *
 			 * @param \Charitable_Email $email The email object.
 			 */
-			do_action( 'charitable_after_send_email', $this, $sent );
+			do_action( 'charitable_after_send_email', $this, $sent ?? false );
 
-			return $sent;
+			return $sent ?? false;
 		}
 
 		/**
@@ -816,6 +848,7 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 		 * Return HTML formatted list of shortcode options that can be used within the body, headline and subject line.
 		 *
 		 * @since  version
+		 * @version 1.8.9.1
 		 *
 		 * @return string
 		 */
@@ -823,11 +856,11 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 			$fields = new Charitable_Email_Fields( $this );
 			ob_start();
 ?>
-			<p><?php _e( 'The following options are available with the <code>[charitable_email]</code> shortcode:', 'charitable' ) ?></p>
+			<p><?php esc_html_e( 'The following options are available with the <code>[charitable_email]</code> shortcode:', 'charitable' ); ?></p>
 			<ul>
 			<?php foreach ( $fields->get_fields() as $key => $field ) : ?>
-				<li><strong><?php echo $field['description'] ?></strong>: [charitable_email show=<?php echo $key ?>]</li>
-			<?php endforeach ?>
+				<li><strong><?php echo wp_kses_post( $field['description'] ); ?></strong>: [charitable_email show=<?php echo esc_html( $key ); ?>]</li>
+			<?php endforeach; ?>
 			</ul>
 
 <?php
@@ -922,6 +955,174 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 		 */
 		public function add_preview_campaign_content_fields( $fields, Charitable_Email $email ) {
 			return $fields;
+		}
+
+		/**
+		 * Safely get email recipient with error handling.
+		 *
+		 * @since  1.8.9.2
+		 *
+		 * @return string|false Email recipient or false on error.
+		 */
+		private function safe_get_recipient() {
+			try {
+				$recipient = $this->get_recipient();
+
+				if ( empty( $recipient ) || ! is_email( $recipient ) ) {
+					$this->log_email_error( 'invalid_recipient', 'Recipient email is empty or invalid: ' . $recipient );
+					return false;
+				}
+
+				return $recipient;
+
+			} catch ( Throwable $e ) {
+				$this->log_email_error( 'recipient_error', $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine() );
+				return false;
+			}
+		}
+
+		/**
+		 * Safely get email subject with error handling.
+		 *
+		 * @since  1.8.9.2
+		 *
+		 * @return string|false Email subject or false on error.
+		 */
+		private function safe_get_subject() {
+			try {
+				// Capture any errors during shortcode processing
+				$original_handler = null;
+				if ( function_exists( 'set_error_handler' ) ) {
+					$original_handler = set_error_handler( function( $severity, $message, $file, $line ) {
+						throw new ErrorException( $message, 0, $severity, $file, $line );
+					} );
+				}
+
+				$subject = do_shortcode( $this->get_subject() );
+
+				if ( $original_handler !== null ) {
+					restore_error_handler();
+				}
+
+				return $subject;
+
+			} catch ( Throwable $e ) {
+				if ( isset( $original_handler ) && $original_handler !== null ) {
+					restore_error_handler();
+				}
+				$this->log_email_error( 'subject_error', $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine() );
+				return false;
+			}
+		}
+
+		/**
+		 * Safely build email body with error handling.
+		 *
+		 * @since  1.8.9.2
+		 *
+		 * @return string|false Email body or false on error.
+		 */
+		private function safe_build_email() {
+			try {
+				// Set up error handler to catch fatal errors during email building
+				$original_handler = null;
+				if ( function_exists( 'set_error_handler' ) ) {
+					$original_handler = set_error_handler( function( $severity, $message, $file, $line ) {
+						// Convert errors to exceptions so we can catch them
+						throw new ErrorException( $message, 0, $severity, $file, $line );
+					} );
+				}
+
+				$body = $this->build_email();
+
+				if ( $original_handler !== null ) {
+					restore_error_handler();
+				}
+
+				return $body;
+
+			} catch ( Throwable $e ) {
+				if ( isset( $original_handler ) && $original_handler !== null ) {
+					restore_error_handler();
+				}
+				$this->log_email_error( 'email_build_failed', $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine() );
+				return false;
+			}
+		}
+
+		/**
+		 * Safely get email headers with error handling.
+		 *
+		 * @since  1.8.9.2
+		 *
+		 * @return string|array|false Email headers or false on error.
+		 */
+		private function safe_get_headers() {
+			try {
+				return $this->get_headers();
+			} catch ( Throwable $e ) {
+				$this->log_email_error( 'headers_error', $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine() );
+				return false;
+			}
+		}
+
+		/**
+		 * Safely get email attachments with error handling.
+		 *
+		 * @since  1.8.9.2
+		 *
+		 * @return array|false Email attachments or false on error.
+		 */
+		private function safe_get_attachments() {
+			try {
+				$attachments = $this->get_attachments();
+				return is_array( $attachments ) ? $attachments : array();
+			} catch ( Throwable $e ) {
+				$this->log_email_error( 'attachments_error', $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine() );
+				return false;
+			}
+		}
+
+		/**
+		 * Log email processing errors using the existing donation form error logging system.
+		 *
+		 * @since  1.8.9.2
+		 *
+		 * @param  string $error_details Specific error details or code.
+		 * @param  string $error_message The error message with context.
+		 * @return int|false The activity ID on success, false on failure.
+		 */
+		private function log_email_error( $error_details, $error_message ) {
+			// Only log if the function exists (defensive coding)
+			if ( ! function_exists( 'charitable_log_form_error' ) ) {
+				return false;
+			}
+
+			// Prepare context with email and donation details
+			$context = array(
+				'error_message' => $error_message,
+				'email_class'   => get_class( $this ),
+			);
+
+			// Add donation context if available
+			if ( isset( $this->donation ) && is_object( $this->donation ) ) {
+				$context['donation_id'] = method_exists( $this->donation, 'get_donation_id' ) ? $this->donation->get_donation_id() : null;
+				$context['campaign_id'] = method_exists( $this->donation, 'get_campaign_id' ) ? $this->donation->get_campaign_id() : null;
+				$context['donor_id']    = method_exists( $this->donation, 'get_donor_id' ) ? $this->donation->get_donor_id() : null;
+				$context['amount']      = method_exists( $this->donation, 'get_total_donation_amount' ) ? $this->donation->get_total_donation_amount() : null;
+			}
+
+			// Try to get recipient for context (safely)
+			try {
+				if ( method_exists( $this, 'get_recipient' ) ) {
+					$context['recipient'] = $this->get_recipient();
+				}
+			} catch ( Throwable $e ) {
+				// Ignore if we can't get recipient
+			}
+
+			// Log using the existing error logging system
+			return charitable_log_form_error( 'email_failure', $error_details, $context );
 		}
 	}
 

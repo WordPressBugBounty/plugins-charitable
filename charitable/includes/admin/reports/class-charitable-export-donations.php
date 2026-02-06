@@ -251,7 +251,7 @@ if ( ! class_exists( 'Charitable_Export_Donations' ) ) :
 			 *
 			 * @since 1.3.5
 			 */
-			$query_args = apply_filters( 'chairtable_export_donations_query_args', $query_args, $this->args );
+			$query_args = apply_filters( 'chairtable_export_donations_query_args', $query_args, $this->args ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- 'chairtable_export_donations_query_args' is a legacy hook (note: typo in hook name) that cannot be renamed.
 
 			/**
 			 * Filter donations query arguments.

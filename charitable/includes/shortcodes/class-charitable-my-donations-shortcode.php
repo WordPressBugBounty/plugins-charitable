@@ -74,8 +74,9 @@ if ( ! class_exists( 'Charitable_My_Donations_Shortcode' ) ) :
 				if ( ! $user->is_verified() ) {
 					$query_args['user_id'] = $user->ID;
 
-					if ( array_key_exists( 'charitable_action', $_GET ) && 'verify_email' === $_GET['charitable_action'] ) {
-						$redirect = array_key_exists( 'redirect_url', $_GET ) ? $_GET['redirect_url'] : false;
+				if ( array_key_exists( 'charitable_action', $_GET ) && 'verify_email' === $_GET['charitable_action'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display/routing parameter
+					$redirect = array_key_exists( 'redirect_url', $_GET ) ? esc_url_raw( wp_unslash( $_GET['redirect_url'] ) ) : false;
 						$message  = sprintf(
 							/* translators: %s: email verification link */
 							__( 'We have sent you an email to confirm your email address. Haven\'t received the email? <a href="%s">Click here to send it again.</a>', 'charitable' ),

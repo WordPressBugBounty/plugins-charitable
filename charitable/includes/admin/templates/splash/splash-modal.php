@@ -4,6 +4,7 @@
  *
  * @package Charitable/Admin/Templates
  * @since 1.8.6
+ * @version 1.8.8.6
  *
  * @var array $header Header data.
  * @var array $footer Footer data.
@@ -34,12 +35,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php
 			if ( ! empty( $data['sections'] ) ) {
 
-				foreach ( $data['sections'] as $section ) {
+				foreach ( $data['sections'] as $charitable_section ) {
 					echo wp_kses_post(
 						charitable_render(
 							'admin/templates/splash/splash-section',
 							[
-								'section' => $section,
+								'section' => $charitable_section,
 							],
 							true
 						)
@@ -49,7 +50,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			?>
 		</main>
 		<?php
-		$license = isset( $license ) ? $license : 'lite';
+		$charitable_license = isset( $license ) ? $license : 'lite'; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- $license may be passed in from external context.
 		echo wp_kses_post(
 			charitable_render(
 				'admin/templates/splash/splash-footer',

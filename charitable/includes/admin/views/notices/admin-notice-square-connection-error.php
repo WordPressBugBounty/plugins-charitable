@@ -8,6 +8,7 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
  * @version   1.0.0
+ * @version   1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -15,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$settings_url = add_query_arg(
+$charitable_settings_url = add_query_arg(
 	array(
 		'page'  => 'charitable-settings',
 		'tab'   => 'gateways',
@@ -24,11 +25,11 @@ $settings_url = add_query_arg(
 	admin_url( 'admin.php' )
 );
 
-$message     = $view_args['message'];
-$status_code = $view_args['status_code'];
+$charitable_message     = $view_args['message'];
+$charitable_status_code = $view_args['status_code'];
 
-if ( $status_code === '401' ) {
-	$message = 'Charitable has been disconnected from your Square account. Please reconnect to continue accepting payments.';
+if ( $charitable_status_code === '401' ) {
+	$charitable_message = 'Charitable has been disconnected from your Square account. Please reconnect to continue accepting payments.';
 }
 
 
@@ -43,8 +44,8 @@ if ( $status_code === '401' ) {
 					'strong' => array(),
 				)
 			),
-			esc_html( $message ),
-			'<br><a href="' . esc_url( $settings_url ) . '" class="button button-primary charitable-admin-notice-square-connection-error" style="margin-top: 10px; background-color: #E89940; border-color: #E89940;">',
+			esc_html( $charitable_message ),
+			'<br><a href="' . esc_url( $charitable_settings_url ) . '" class="button button-primary charitable-admin-notice-square-connection-error" style="margin-top: 10px; background-color: #E89940; border-color: #E89940;">',
 			'</a>'
 		);
 		?>

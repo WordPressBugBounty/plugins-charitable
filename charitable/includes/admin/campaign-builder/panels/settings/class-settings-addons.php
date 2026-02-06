@@ -139,7 +139,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Addons' ) ) :
 			endif;
 
 			// grab the list of active plugins only once, don't need it in the loop.
-			$active_plugins = apply_filters( 'active_plugins', get_option( 'active_plugins' ) );
+			$active_plugins = apply_filters( 'active_plugins', get_option( 'active_plugins' ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- 'active_plugins' is a WordPress core hook.
 
 			// sort array.
 			$addon_array = $this->sort_addon_array( ( $this->addon_array ) );

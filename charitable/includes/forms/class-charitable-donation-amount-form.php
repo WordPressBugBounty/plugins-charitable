@@ -134,7 +134,8 @@ if ( ! class_exists( 'Charitable_Donation_Amount_Form' ) ) :
 		/**
 		 * Redirect to payment form after submission.
 		 *
-		 * @since  1.0.0
+		 * @since   1.0.0
+		 * @version 1.8.8.6
 		 *
 		 * @param  int $campaign_id The campaign we are donating to.
 		 * @param  int $amount      The donation amount.
@@ -153,9 +154,29 @@ if ( ! class_exists( 'Charitable_Donation_Amount_Form' ) ) :
 
 			$redirect_url = apply_filters( 'charitable_donation_amount_form_redirect', $redirect_url, $campaign_id, $amount );
 
-			wp_redirect( esc_url_raw( $redirect_url ) );
+			// Check if URL is external and add to allowed hosts if needed.
+			$parsed_url = wp_parse_url( $redirect_url );
+			if ( ! empty( $parsed_url['host'] ) ) {
+				$redirect_host = $parsed_url['host'];
+				$site_host     = wp_parse_url( home_url(), PHP_URL_HOST );
 
-			die();
+				// If redirecting to external host, add it to allowed redirect hosts.
+				if ( $redirect_host !== $site_host ) {
+					add_filter(
+						'allowed_redirect_hosts',
+						function( $hosts ) use ( $redirect_host ) {
+							if ( ! in_array( $redirect_host, $hosts, true ) ) {
+								$hosts[] = $redirect_host;
+							}
+							return $hosts;
+						}
+					);
+				}
+			}
+
+			wp_safe_redirect( esc_url_raw( $redirect_url ) );
+
+			exit();
 		}
 
 		/**

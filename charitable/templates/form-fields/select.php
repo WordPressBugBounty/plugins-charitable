@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * The template used to display select form fields.
  *
@@ -6,48 +12,49 @@
  * @package Charitable/Templates/Form Fields
  * @since   1.0.0
  * @version 1.0.0
+ * @version 1.8.8.6
  */
 
 if ( ! isset( $view_args['form'] ) || ! isset( $view_args['field'] ) ) {
 	return;
 }
 
-$form        = $view_args['form'];
-$field       = $view_args['field'];
-$classes     = $view_args['classes'];
-$is_required = isset( $field['required'] ) ? $field['required'] : false;
-$options     = isset( $field['options'] ) ? $field['options'] : array();
-$value       = isset( $field['value'] ) ? $field['value'] : '';
+$charitable_form        = $view_args['form'];
+$charitable_field       = $view_args['field'];
+$charitable_classes     = $view_args['classes'];
+$charitable_is_required = isset( $charitable_field['required'] ) ? $charitable_field['required'] : false;
+$charitable_options     = isset( $charitable_field['options'] ) ? $charitable_field['options'] : array();
+$charitable_value       = isset( $charitable_field['value'] ) ? $charitable_field['value'] : '';
 
-if ( is_array( $value ) ) {
-	$value = current( $value );
+if ( is_array( $charitable_value ) ) {
+	$charitable_value = current( $charitable_value );
 }
 
-if ( count( $options ) ) :
+if ( count( $charitable_options ) ) :
 
 	?>
-<div id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>" class="<?php echo esc_attr( $classes ); ?>">
-	<?php if ( isset( $field['label'] ) ) : ?>
-		<label for="charitable_field_<?php echo esc_attr( $field['key'] ); ?>_element">
-			<?php echo wp_kses_post( $field['label'] ); ?>
-			<?php if ( $is_required ) : ?>
+<div id="charitable_field_<?php echo esc_attr( $charitable_field['key'] ); ?>" class="<?php echo esc_attr( $charitable_classes ); ?>">
+	<?php if ( isset( $charitable_field['label'] ) ) : ?>
+		<label for="charitable_field_<?php echo esc_attr( $charitable_field['key'] ); ?>_element">
+			<?php echo wp_kses_post( $charitable_field['label'] ); ?>
+			<?php if ( $charitable_is_required ) : ?>
 				<abbr class="required" title="<?php esc_html_e( 'Required', 'charitable' ); ?>">*</abbr>
 			<?php endif ?>
 		</label>
 	<?php endif ?>
-	<select name="<?php echo esc_attr( $field['key'] ); ?>" id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>_element">
+	<select name="<?php echo esc_attr( $charitable_field['key'] ); ?>" id="charitable_field_<?php echo esc_attr( $charitable_field['key'] ); ?>_element">
 		<?php
-		foreach ( $options as $val => $label ) :
+		foreach ( $charitable_options as $charitable_val => $charitable_label ) :
 
-			if ( is_array( $label ) ) :
+			if ( is_array( $charitable_label ) ) :
 				?>
-				<optgroup label="<?php echo esc_attr( $val ); ?>">
-				<?php foreach ( $label as $val => $label ) : ?>
-					<option value="<?php echo esc_attr( $val ); ?>" <?php selected( $val, $value ); ?>><?php echo esc_html( $label ); ?></option>
+				<optgroup label="<?php echo esc_attr( $charitable_val ); ?>">
+				<?php foreach ( $charitable_label as $charitable_val => $charitable_label ) : ?>
+					<option value="<?php echo esc_attr( $charitable_val ); ?>" <?php selected( $charitable_val, $charitable_value ); ?>><?php echo esc_html( $charitable_label ); ?></option>
 				<?php endforeach; ?>
 				</optgroup>
 			<?php else : ?>
-				<option value="<?php echo esc_attr( $val ); ?>" <?php selected( $val, $value ); ?>><?php echo esc_html( $label ); ?></option>
+				<option value="<?php echo esc_attr( $charitable_val ); ?>" <?php selected( $charitable_val, $charitable_value ); ?>><?php echo esc_html( $charitable_label ); ?></option>
 				<?php
 
 			endif;
@@ -55,8 +62,8 @@ if ( count( $options ) ) :
 
 		?>
 	</select>
-	<?php if ( isset( $field['help'] ) ) : ?>
-		<p class="charitable-field-help"><?php echo $field['help']; // phpcs:ignore ?></p>
+	<?php if ( isset( $charitable_field['help'] ) ) : ?>
+		<p class="charitable-field-help"><?php echo $charitable_field['help']; // phpcs:ignore ?></p>
 	<?php endif ?>
 </div>
 	<?php

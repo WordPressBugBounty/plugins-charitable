@@ -612,7 +612,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 			// $("head link[rel='stylesheet']").last().after('<link rel="stylesheet" id="charitable-builder-template-preview-theme-css-temp" href="' + charitable_builder.charitable_assets_dir + 'css/campaign-builder/themes/admin/' + templateID + '.php?' + colorQueryString + '" type="text/css" media="screen">');
 
 			if ( justColors === false ) {
-				$('link[id="charitable-builder-template-preview-theme-css"]').attr('href', charitable_builder.charitable_assets_dir + 'css/campaign-builder/themes/admin/' + templateID + '.php?' + colorQueryString );
+				$('link[id="charitable-builder-template-preview-theme-css"]').attr('href', charitable_builder.charitable_rest_url + 'campaign-css-admin/' + templateID + '?' + colorQueryString );
 			}
 
 			if ( whatChanged !== null ) {
@@ -639,7 +639,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 		replaceCSSFile: function ( whatChanged, templateID, colorQueryString ) {
 
 			$('head').find('link#charitable-builder-template-preview-theme-colors-' + whatChanged + '-css').remove();
-			$('head').append('<link rel="stylesheet" data-color-type="' + whatChanged + '" id="charitable-builder-template-preview-theme-colors-temp" href="' + charitable_builder.charitable_assets_dir + 'css/campaign-builder/themes/admin/' + templateID + '-colors.php?' + colorQueryString + '" type="text/css" media="screen">');
+			$('head').append('<link rel="stylesheet" data-color-type="' + whatChanged + '" id="charitable-builder-template-preview-theme-colors-temp" href="' + charitable_builder.charitable_rest_url + 'campaign-css-admin/' + templateID + '-colors?' + colorQueryString + '" type="text/css" media="screen">');
 
 			$('#charitable-design-wrap').addClass('loading');
 
@@ -2191,6 +2191,25 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 			} );
 
+			// Handle send-feedback links in template panel description.
+			$builder.on( 'click', 'a.send-feedback', function( e ) {
+				e.preventDefault();
+
+				// Scroll to the top of the charitable-panel-content-wrap div container.
+				$('.charitable-panel-content-wrap').animate({
+					scrollTop: 0
+				}, 500);
+
+				$('.charitable-template-list-container').addClass('disabled');
+				$('.charitable-feedback-form-container').after('<div id="charitable-builder-underlay" class="charitable-builder-underlay"></div>');
+				$('.charitable-feedback-form-container').css("opacity", "100" ).css("visibility", "visible" );
+
+				$('.charitable-feedback-form-container').find('.charitable-feedback-form-interior').removeClass('charitable-hidden');
+				$('.charitable-feedback-form-container').find('textarea').val('');
+				$('.charitable-feedback-form-interior-confirmation').addClass('charitable-hidden');
+
+			} );
+
 			// Suggested Donation Amounts
 
 			$builder.on( 'keyup', 'table.charitable-campaign-suggested-donations-mini input', function( e ) { // eslint-disable-line
@@ -2817,6 +2836,28 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 				// if the button has a disabled class, then we can't switch the panel because it's disabled.
 				if ( ! $( this ).hasClass('disabled') ) {
 					app.panelSwitch( $( this ).data( 'panel' ) );
+				}
+			} );
+
+			// Help button - allow the link to work by ensuring the anchor's href is followed.
+			$builder.on( 'click', '.charitable-panel-help-button, #charitable-panels-toggle a:has(.charitable-panel-help-button)', function( e ) {
+				var $anchor = $( this ).closest( 'a' );
+				if ( ! $anchor.length ) {
+					$anchor = $( this ).is( 'a' ) ? $( this ) : $( this ).closest( 'a' );
+				}
+				if ( $anchor.length && $anchor.attr( 'href' ) ) {
+					// Stop event propagation to prevent other handlers from interfering
+					e.stopPropagation();
+					e.stopImmediatePropagation();
+					// Navigate to the URL - let the anchor handle it naturally
+					var href = $anchor.attr( 'href' );
+					var target = $anchor.attr( 'target' ) || '_blank';
+					if ( target === '_blank' ) {
+						window.open( href, target );
+					} else {
+						window.location.href = href;
+					}
+					return false;
 				}
 			} );
 

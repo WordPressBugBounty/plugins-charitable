@@ -9,6 +9,7 @@
  * @package Charitable/Templates/Account
  * @since   1.4.0
  * @version 1.5.0
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -19,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * @var Charitable_Forgot_Password_Form
  */
-$form = $view_args['form'];
+$charitable_form = $view_args['form'];
 
 ?>
 <div class="charitable-forgot-password-form">
@@ -32,13 +33,13 @@ $form = $view_args['form'];
 	?>
 	<form id="lostpasswordform" class="charitable-form" method="post">
 
-		<?php do_action( 'charitable_form_before_fields', $form ); ?>
+		<?php do_action( 'charitable_form_before_fields', $charitable_form ); ?>
 
 		<div class="charitable-form-fields cf">
-			<?php $form->view()->render() ?>
+			<?php $charitable_form->view()->render() ?>
 		</div><!-- .charitable-form-fields -->
 
-		<?php do_action( 'charitable_form_after_fields', $form ); ?>
+		<?php do_action( 'charitable_form_after_fields', $charitable_form ); ?>
 
 		<div class="charitable-form-field charitable-submit-field">
 			<button class="button button-primary lostpassword-button" type="submit"><?php esc_attr_e( 'Reset Password', 'charitable' ) ?></button>

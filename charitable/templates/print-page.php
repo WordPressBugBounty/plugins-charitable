@@ -7,6 +7,7 @@
  * @package Charitable/Templates/Print-Page
  * @author  WP Charitable LLC
  * @since   1.6.57
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -14,15 +15,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$assets_folder = plugins_url( 'assets', __DIR__ );
-$version       = charitable()->get_version(); // phpcs:ignore
+$charitable_assets_folder = plugins_url( 'assets', __DIR__ );
+$charitable_version       = charitable()->get_version(); // phpcs:ignore
 
 ?>
 
 <html>
 	<head>
-		<link rel='stylesheet' href='<?php echo esc_url( $assets_folder ); ?>/css/charitable.css?ver=<?php echo esc_attr( $version ); // phpcs:ignore ?>' media='all' />
-		<link rel='stylesheet' href='<?php echo esc_url( $assets_folder ); ?>/css/charitable-print.css?ver=<?php echo esc_attr( $version ); // phpcs:ignore ?>' media='all' />
+		<link rel='stylesheet' href='<?php echo esc_url( $charitable_assets_folder ); ?>/css/charitable.css?ver=<?php echo esc_attr( $charitable_version ); // phpcs:ignore ?>' media='all' />
+		<link rel='stylesheet' href='<?php echo esc_url( $charitable_assets_folder ); ?>/css/charitable-print.css?ver=<?php echo esc_attr( $charitable_version ); // phpcs:ignore ?>' media='all' />
 		<?php
 			/**
 			 * Add in extra stylesheets if needed

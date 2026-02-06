@@ -193,8 +193,17 @@ if ( ! class_exists( 'Charitable_Admin_Activities' ) ) :
 				'campaign' => array(),
 			);
 
-			// break up array into individual vars.
-			extract( $args ); // phpcs:ignore
+			// Extract individual variables from args array.
+			$activity_filter_types = $args['activity_filter_types'] ?? array();
+			$activity_action_types = $args['activity_action_types'] ?? array();
+			$campaign_id           = $args['campaign_id'] ?? 0;
+			$category_id           = $args['category_id'] ?? 0;
+			$start_date            = $args['start_date'] ?? gmdate( 'Y/m/d', strtotime( '-7 days' ) );
+			$end_date              = $args['end_date'] ?? gmdate( 'Y/m/d' );
+			$limit                 = $args['limit'] ?? 0;
+			$offset                = $args['offset'] ?? 0;
+			$sort_by               = $args['sort_by'] ?? 'date_to_sort';
+			$order                 = $args['order'] ?? 'DESC';
 
 			if ( ! empty( $activity_filter_types ) ) :
 
@@ -314,8 +323,7 @@ if ( ! class_exists( 'Charitable_Admin_Activities' ) ) :
 			$left_join['campaign']   = array_filter( $left_join['campaign'] ); // remove all empty values from the array.
 			$left_join_campaign_args = 'LEFT JOIN ' . implode( ' LEFT JOIN ', $left_join['campaign'] );
 
-			// break up array into individual vars.
-			extract( $args ); // phpcs:ignore
+			// Variables already extracted from args array above.
 
 			$sql = "SELECT {$table_shortcuts['campaign']}.activity_id,
 				{$table_shortcuts['campaign']}.campaign_id,
@@ -392,8 +400,7 @@ if ( ! class_exists( 'Charitable_Admin_Activities' ) ) :
 			$left_join['donation']   = array_filter( $left_join['donation'] ); // remove all empty values from the array.
 			$left_join_donation_args = 'LEFT JOIN ' . implode( ' LEFT JOIN ', $left_join['donation'] );
 
-			// break up array into individual vars.
-			extract( $args ); // phpcs:ignore
+			// Variables already extracted from args array above.
 
 				$sql = "SELECT {$table_shortcuts['donation']}.activity_id,
 								{$table_shortcuts['donation']}.campaign_id,
@@ -1018,6 +1025,210 @@ if ( ! class_exists( 'Charitable_Admin_Activities' ) ) :
 			);
 
 			return $data;
+		}
+
+		/**
+		 * Log a donation form error.
+		 *
+		 * @since  1.8.9.2
+		 *
+		 * @param  string $error_type The type of error (validation_failure, ajax_failure, security_failure, email_failure).
+		 * @param  string $error_details Specific error details or code.
+		 * @param  array  $context Additional context data for the error.
+		 *
+		 * @return int|false The activity ID on success, false on failure.
+		 */
+		public function log_form_error( $error_type, $error_details, $context = array() ) {
+			global $wpdb;
+
+			// Check if error logging is enabled
+			if ( ! apply_filters( 'charitable_form_error_logging_enabled', true ) ) {
+				return false;
+			}
+
+			// Prepare the data for insertion
+			$data = array(
+				'donation_id'      => isset( $context['donation_id'] ) ? intval( $context['donation_id'] ) : null,
+				'campaign_id'      => isset( $context['campaign_id'] ) ? intval( $context['campaign_id'] ) : null,
+				'donor_id'         => isset( $context['donor_id'] ) ? intval( $context['donor_id'] ) : null,
+				'type'             => 'form_error',
+				'primary_action'   => sanitize_text_field( $error_type ),
+				'secondary_action' => sanitize_text_field( $error_details ),
+				'amount'           => isset( $context['amount'] ) ? floatval( $context['amount'] ) : null,
+				'created_by'       => get_current_user_id(),
+				'date_recorded'    => gmdate( 'Y-m-d H:i:s' ),
+			);
+
+			// Get table name
+			$table_name = $wpdb->prefix . 'charitable_donation_activities';
+
+			// Insert the error log
+			$activity_id = $this->insert( $data, $table_name, 'form_error' );
+
+			// Store additional context data as meta if needed
+			if ( $activity_id && ! empty( $context ) ) {
+				$meta_data = $this->prepare_error_meta_data( $context );
+				if ( ! empty( $meta_data ) ) {
+					// Store meta data using WordPress options temporarily
+					// In a full implementation, you might want a dedicated meta table
+					update_option( 'charitable_form_error_meta_' . $activity_id, $meta_data, false );
+				}
+			}
+
+			/**
+			 * Action fired after a form error is logged.
+			 *
+			 * @since 1.8.9.2
+			 *
+			 * @param int    $activity_id The activity ID.
+			 * @param string $error_type  The error type.
+			 * @param string $error_details The error details.
+			 * @param array  $context     The error context.
+			 */
+			do_action( 'charitable_form_error_logged', $activity_id, $error_type, $error_details, $context );
+
+			return $activity_id;
+		}
+
+		/**
+		 * Prepare error meta data for storage.
+		 *
+		 * @since  1.8.9.2
+		 *
+		 * @param  array $context The error context.
+		 *
+		 * @return array The prepared meta data.
+		 */
+		private function prepare_error_meta_data( $context ) {
+			$meta_data = array();
+
+			// Store essential data only for privacy
+			if ( isset( $context['url'] ) ) {
+				$meta_data['url'] = esc_url_raw( $context['url'] );
+			}
+
+			if ( isset( $context['user_agent'] ) ) {
+				$meta_data['user_agent'] = sanitize_text_field( $context['user_agent'] );
+			}
+
+			if ( isset( $context['ip_address'] ) ) {
+				$meta_data['ip_address'] = sanitize_text_field( $context['ip_address'] );
+			}
+
+			if ( isset( $context['gateway'] ) ) {
+				$meta_data['gateway'] = sanitize_text_field( $context['gateway'] );
+			}
+
+			// Apply privacy filter to allow customization
+			$meta_data = apply_filters( 'charitable_form_error_log_data', $meta_data, $context );
+
+			return $meta_data;
+		}
+
+		/**
+		 * Get recent form errors for display.
+		 *
+		 * @since  1.8.9.2
+		 *
+		 * @param  int $limit The number of errors to retrieve.
+		 *
+		 * @return array Array of error records.
+		 */
+		public function get_recent_form_errors( $limit = 50 ) {
+			global $wpdb;
+
+			$table_name = $wpdb->prefix . 'charitable_donation_activities';
+
+			$sql = $wpdb->prepare(
+				"SELECT * FROM {$table_name}
+				WHERE type = 'form_error'
+				ORDER BY date_recorded DESC
+				LIMIT %d",
+				$limit
+			);
+
+			$errors = $wpdb->get_results( $sql ); // phpcs:ignore
+
+			// Enhance errors with meta data
+			foreach ( $errors as &$error ) {
+				$meta_data = get_option( 'charitable_form_error_meta_' . $error->activity_id, array() );
+				$error->meta_data = $meta_data;
+			}
+
+			return $errors;
+		}
+
+		/**
+		 * Get form error statistics.
+		 *
+		 * @since  1.8.9.2
+		 *
+		 * @param  int $days Number of days to look back.
+		 *
+		 * @return array Statistics array.
+		 */
+		public function get_form_error_stats( $days = 7 ) {
+			global $wpdb;
+
+			$table_name = $wpdb->prefix . 'charitable_donation_activities';
+			$date_threshold = gmdate( 'Y-m-d H:i:s', strtotime( "-{$days} days" ) );
+
+			$sql = $wpdb->prepare(
+				"SELECT
+					primary_action,
+					secondary_action,
+					COUNT(*) as error_count,
+					MAX(date_recorded) as last_occurrence
+				FROM {$table_name}
+				WHERE type = 'form_error'
+				AND date_recorded >= %s
+				GROUP BY primary_action, secondary_action
+				ORDER BY error_count DESC",
+				$date_threshold
+			);
+
+			return $wpdb->get_results( $sql ); // phpcs:ignore
+		}
+
+		/**
+		 * Clean up old form error logs.
+		 *
+		 * @since  1.8.9.2
+		 *
+		 * @param  int $days Number of days to retain.
+		 *
+		 * @return int Number of records deleted.
+		 */
+		public function cleanup_old_form_errors( $days = 7 ) {
+			global $wpdb;
+
+			$table_name = $wpdb->prefix . 'charitable_donation_activities';
+			$date_threshold = gmdate( 'Y-m-d H:i:s', strtotime( "-{$days} days" ) );
+
+			// Get IDs of records to delete for meta cleanup
+			$sql = $wpdb->prepare(
+				"SELECT activity_id FROM {$table_name}
+				WHERE type = 'form_error'
+				AND date_recorded < %s",
+				$date_threshold
+			);
+
+			$old_error_ids = $wpdb->get_col( $sql ); // phpcs:ignore
+
+			// Delete meta data
+			foreach ( $old_error_ids as $activity_id ) {
+				delete_option( 'charitable_form_error_meta_' . $activity_id );
+			}
+
+			// Delete the activity records
+			$sql = $wpdb->prepare(
+				"DELETE FROM {$table_name}
+				WHERE type = 'form_error'
+				AND date_recorded < %s",
+				$date_threshold
+			);
+
+			return $wpdb->query( $sql ); // phpcs:ignore
 		}
 
 		/**

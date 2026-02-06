@@ -170,7 +170,7 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 			$content = apply_filters( 'charitable_campaign_description_content', $content, $campaign );
 
 			// apply WP's the_content filter, which other plugins can hook into.
-			$content = apply_filters( 'the_content', $content );
+			$content = apply_filters( 'the_content', $content ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- 'the_content' is a WordPress core filter hook.
 
 			return $content;
 		}
@@ -461,7 +461,7 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 
 				$minutes_remaining = ceil( $seconds_left / 60 );
 				$time_left         = apply_filters(
-					'charitabile_campaign_minutes_left',
+					'charitabile_campaign_minutes_left', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- This is a legacy hook used by other Charitable code. Changing it would break existing functionality.
 					// translators: %s is the number of minutes left.
 					sprintf( _n( '%s Minute Left', '%s Minutes Left', $minutes_remaining, 'charitable' ), '<span class="amount time-left minutes-left">' . $minutes_remaining . '</span>' ),
 					$this
@@ -473,7 +473,7 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 
 				$hours_remaining = floor( $seconds_left / 3600 );
 				$time_left       = apply_filters(
-					'charitabile_campaign_hours_left',
+					'charitabile_campaign_hours_left', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- This is a legacy hook used by other Charitable code. Changing it would break existing functionality.
 					// translators: %s is the number of hours left.
 					sprintf( _n( '%s Hour Left', '%s Hours Left', $hours_remaining, 'charitable' ), '<span class="amount time-left hours-left">' . $hours_remaining . '</span>' ),
 					$this
@@ -485,7 +485,7 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 
 				$days_remaining = floor( $seconds_left / 86400 );
 				$time_left      = apply_filters(
-					'charitabile_campaign_days_left',
+					'charitabile_campaign_days_left', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- This is a legacy hook used by other Charitable code. Changing it would break existing functionality.
 					// translators: %s is the number of days left.
 					sprintf( _n( '%s Day Left', '%s Days Left', $days_remaining, 'charitable' ), '<span class="amount time-left days-left">' . $days_remaining . '</span>' ),
 					$this

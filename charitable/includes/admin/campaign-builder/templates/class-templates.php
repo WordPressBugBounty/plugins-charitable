@@ -696,7 +696,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 			$addon_information = $this->get_addon_information( $field_type );
 
 			// grab the list of active plugins only once, don't need it in the loop.
-			$active_plugins = apply_filters( 'active_plugins', get_option( 'active_plugins' ) );
+			$active_plugins = apply_filters( 'active_plugins', get_option( 'active_plugins' ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- 'active_plugins' is a WordPress core hook.
 
 			if ( false === $addon_information ) {
 				return false;
@@ -757,7 +757,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 			}
 
 			// grab the list of active plugins only once, don't need it in the loop.
-			$active_plugins = apply_filters( 'active_plugins', get_option( 'active_plugins' ) );
+			$active_plugins = apply_filters( 'active_plugins', get_option( 'active_plugins' ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- 'active_plugins' is a WordPress core hook.
 
 			// get license stuff once.
 			$charitable_addons = get_transient( '_charitable_addons' ); // @codingStandardsIgnoreLine - testing.

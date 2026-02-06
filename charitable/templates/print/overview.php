@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Format this page for PDF or print.
  *
@@ -7,46 +13,47 @@
  * @package Charitable-PDF-Receipts
  * @author  WPCharitable
  * @since   1.8.1
+ * @version 1.8.8.6
  */
 
 $charitable_action = $view_args['action'] === 'print' ? 'print' : 'download';
 
 $charitable_admin_2_0_css = $view_args['charitable_admin_2_0_css'];
 
-$donations                     = $view_args['donations'];
-$donation_total                = $view_args['donation_total'];
-$donation_average              = $view_args['donation_average'];
-$total_count_donors            = $view_args['total_count_donors'];
-$total_amount_refunds          = $view_args['total_amount_refunds'];
-$total_count_refunds           = $view_args['total_count_refunds'];
-$donation_breakdown_html       = $view_args['donation_breakdown_html'];
-$activity_list                 = $view_args['activity_list'];
-$top_donors                    = $view_args['top_donors'];
-$top_campaigns                 = $view_args['top_campaigns'];
-$payment_methods_list          = $view_args['payment_methods_list'];
-$headline_chart_options        = $view_args['headline_chart_options'];
-$payment_methods_chart_options = $view_args['payment_methods_chart_options'];
+$charitable_donations                     = $view_args['donations'];
+$charitable_donation_total                = $view_args['donation_total'];
+$charitable_donation_average              = $view_args['donation_average'];
+$charitable_total_count_donors            = $view_args['total_count_donors'];
+$charitable_total_amount_refunds          = $view_args['total_amount_refunds'];
+$charitable_total_count_refunds           = $view_args['total_count_refunds'];
+$charitable_donation_breakdown_html       = $view_args['donation_breakdown_html'];
+$charitable_activity_list                 = $view_args['activity_list'];
+$charitable_top_donors                    = $view_args['top_donors'];
+$charitable_top_campaigns                 = $view_args['top_campaigns'];
+$charitable_payment_methods_list          = $view_args['payment_methods_list'];
+$charitable_headline_chart_options        = $view_args['headline_chart_options'];
+$charitable_payment_methods_chart_options = $view_args['payment_methods_chart_options'];
 
-$campaign_id = $view_args['campaign_id'];
-$campaign    = $view_args['campaign'];
+$charitable_campaign_id = $view_args['campaign_id'];
+$charitable_campaign    = $view_args['campaign'];
 
-$category_id        = $view_args['category_id'];
-$category_term_name = $view_args['category_term_name'];
+$charitable_category_id        = $view_args['category_id'];
+$charitable_category_term_name = $view_args['category_term_name'];
 
 $charitable_chart_js = $view_args['charitable_chart_js'];
 
 // convert php array values into a javascript array.
-$headline_chart_options_donation_axis = wp_json_encode( $headline_chart_options['donation_axis'] );
-$headline_chart_options_date_axis     = wp_json_encode( $headline_chart_options['date_axis'] );
+$charitable_headline_chart_options_donation_axis = wp_json_encode( $charitable_headline_chart_options['donation_axis'] );
+$charitable_headline_chart_options_date_axis     = wp_json_encode( $charitable_headline_chart_options['date_axis'] );
 
-$payment_methods_chart_options_payment_percentages = wp_json_encode( $payment_methods_chart_options['payment_percentages'] );
-$payment_methods_chart_options_payment_labels      = wp_json_encode( $payment_methods_chart_options['payment_labels'] );
+$charitable_payment_methods_chart_options_payment_percentages = wp_json_encode( $charitable_payment_methods_chart_options['payment_percentages'] );
+$charitable_payment_methods_chart_options_payment_labels      = wp_json_encode( $charitable_payment_methods_chart_options['payment_labels'] );
 
-$currency_symbol = $view_args['currency_symbol'];
-$currency_symbol = ( false !== $currency_symbol ) ? html_entity_decode( $currency_symbol ) : '$';
+$charitable_currency_symbol = $view_args['currency_symbol'];
+$charitable_currency_symbol = ( false !== $charitable_currency_symbol ) ? html_entity_decode( $charitable_currency_symbol ) : '$';
 
-$start_date = ! empty( $view_args['start_date'] ) ? $view_args['start_date'] : false;
-$end_date   = ! empty( $view_args['end_date'] ) ? $view_args['end_date'] : false;
+$charitable_start_date = ! empty( $view_args['start_date'] ) ? $view_args['start_date'] : false;
+$charitable_end_date   = ! empty( $view_args['end_date'] ) ? $view_args['end_date'] : false;
 
 ?>
 <!DOCTYPE html>
@@ -86,14 +93,14 @@ $end_date   = ! empty( $view_args['end_date'] ) ? $view_args['end_date'] : false
 
 				<div class="charitable-print-header">
 					<h1><?php echo esc_html__( 'Overview Report', 'charitable' ); ?></h1>
-					<?php if ( $start_date && $end_date ) : ?>
-						<p><?php echo esc_html( $start_date ); ?> - <?php echo esc_html( $end_date ); ?></p>
+					<?php if ( $charitable_start_date && $charitable_end_date ) : ?>
+						<p><?php echo esc_html( $charitable_start_date ); ?> - <?php echo esc_html( $charitable_end_date ); ?></p>
 					<?php endif; ?>
-					<?php if ( isset( $campaign->post_title ) && $campaign->post_title ) : ?>
-						<p><?php echo esc_html__( 'Campaign', 'charitable' ); ?>: <?php echo esc_html( $campaign->post_title ); ?></p>
+					<?php if ( isset( $charitable_campaign->post_title ) && $charitable_campaign->post_title ) : ?>
+						<p><?php echo esc_html__( 'Campaign', 'charitable' ); ?>: <?php echo esc_html( $charitable_campaign->post_title ); ?></p>
 					<?php endif; ?>
-					<?php if ( $category_term_name ) : ?>
-						<p><?php echo esc_html__( 'Campaign Category:', 'charitable' ); ?>: <?php echo esc_html( $category_term_name ); ?></p>
+					<?php if ( $charitable_category_term_name ) : ?>
+						<p><?php echo esc_html__( 'Campaign Category:', 'charitable' ); ?>: <?php echo esc_html( $charitable_category_term_name ); ?></p>
 					<?php endif; ?>
 				</div>
 
@@ -104,15 +111,15 @@ $end_date   = ! empty( $view_args['end_date'] ) ? $view_args['end_date'] : false
 					if ( $charitable_action === 'download' ) :
 						?>
 						style="width: 24.5%; display:inline-block;"<?php endif; ?>>
-						<strong><span id="charitable-top-donation-total-amount"><?php echo $donation_total; // phpcs:ignore ?></span></strong>
-						<p><span id="charitable-top-donation-total-count"><?php echo count( $donations ); ?></span> <?php echo esc_html__( 'Total Donations (Net)', 'charitable' ); ?></p>
+						<strong><span id="charitable-top-donation-total-amount"><?php echo $charitable_donation_total; // phpcs:ignore ?></span></strong>
+						<p><span id="charitable-top-donation-total-count"><?php echo count( $charitable_donations ); ?></span> <?php echo esc_html__( 'Total Donations (Net)', 'charitable' ); ?></p>
 					</div>
 					<div class="charitable-container charitable-report-ui charitable-card"
 					<?php
 					if ( $charitable_action === 'download' ) :
 						?>
 						style="width: 24.5%; display:inline-block;"<?php endif; ?>>
-						<strong><span id="charitable-top-donation-average"><?php echo $donation_average; // phpcs:ignore ?></span></strong>
+						<strong><span id="charitable-top-donation-average"><?php echo $charitable_donation_average; // phpcs:ignore ?></span></strong>
 						<p><?php echo esc_html__( 'Average Donation', 'charitable' ); ?></p>
 					</div>
 					<div class="charitable-container charitable-report-ui charitable-card"
@@ -120,7 +127,7 @@ $end_date   = ! empty( $view_args['end_date'] ) ? $view_args['end_date'] : false
 					if ( $charitable_action === 'download' ) :
 						?>
 						style="width: 24.5%; display:inline-block;"<?php endif; ?>>
-						<strong><span id="charitable-top-donor-count"><?php echo intval( $total_count_donors ); // phpcs:ignore ?></span></strong>
+						<strong><span id="charitable-top-donor-count"><?php echo intval( $charitable_total_count_donors ); // phpcs:ignore ?></span></strong>
 						<p><?php echo esc_html__( 'Donors', 'charitable' ); ?></p>
 					</div>
 					<div class="charitable-container charitable-report-ui charitable-card"
@@ -128,8 +135,8 @@ $end_date   = ! empty( $view_args['end_date'] ) ? $view_args['end_date'] : false
 					if ( $charitable_action === 'download' ) :
 						?>
 						style="width: 24.5%; display:inline-block;"<?php endif; ?>>
-						<strong><span id="charitable-top-refund-total-amount"><?php echo charitable_format_money( $total_amount_refunds ); // phpcs:ignore ?></span></strong>
-						<p><span id="charitable-top-refund-count"><?php echo intval( $total_count_refunds ); ?></span> <?php echo esc_html__( 'Refunds', 'charitable' ); ?></p>
+						<strong><span id="charitable-top-refund-total-amount"><?php echo charitable_format_money( $charitable_total_amount_refunds ); // phpcs:ignore ?></span></strong>
+						<p><span id="charitable-top-refund-count"><?php echo intval( $charitable_total_count_refunds ); ?></span> <?php echo esc_html__( 'Refunds', 'charitable' ); ?></p>
 					</div>
 				</div>
 
@@ -171,7 +178,7 @@ $end_date   = ! empty( $view_args['end_date'] ) ? $view_args['end_date'] : false
 					</tr>
 				</thead>
 				<tbody id="donations-breakdown-list">
-					<?php echo $donation_breakdown_html; // phpcs:ignore ?>
+					<?php echo $charitable_donation_breakdown_html; // phpcs:ignore ?>
 				</tbody>
 			</table>
 
@@ -191,7 +198,7 @@ $end_date   = ! empty( $view_args['end_date'] ) ? $view_args['end_date'] : false
 				</div>
 				<div class="charitable-toggle-container charitable-report-ui">
 					<div class="the-list">
-						<?php echo $activity_list; // phpcs:ignore ?>
+						<?php echo $charitable_activity_list; // phpcs:ignore ?>
 					</div>
 				</div>
 			</div>
@@ -201,7 +208,7 @@ $end_date   = ! empty( $view_args['end_date'] ) ? $view_args['end_date'] : false
 					<h4><?php echo esc_html__( 'Top Donors', 'charitable' ); ?></h4>
 				</div>
 				<div class="charitable-toggle-container charitable-report-ui">
-					<?php echo $top_donors; // phpcs:ignore ?>
+					<?php echo $charitable_top_donors; // phpcs:ignore ?>
 				</div>
 			</div>
 
@@ -214,10 +221,10 @@ $end_date   = ! empty( $view_args['end_date'] ) ? $view_args['end_date'] : false
 					<h4><?php echo esc_html__( 'Top Campaigns', 'charitable' ); ?></h4>
 				</div>
 				<div class="charitable-toggle-container charitable-report-ui">
-				<?php if ( ! empty( $top_campaigns ) ) : ?>
+				<?php if ( ! empty( $charitable_top_campaigns ) ) : ?>
 					<div class="the-list">
 						<ul id="charitable-top-campaigns-list">
-							<?php echo $top_campaigns; // phpcs:ignore ?>
+							<?php echo $charitable_top_campaigns; // phpcs:ignore ?>
 						</ul>
 					</div>
 				<?php else : ?>
@@ -235,7 +242,7 @@ $end_date   = ! empty( $view_args['end_date'] ) ? $view_args['end_date'] : false
 						</div>
 						<div class="the-legend">
 							<ul id="charitable-payment-methods-list">
-								<?php echo $payment_methods_list; // phpcs:ignore ?>
+								<?php echo $charitable_payment_methods_list; // phpcs:ignore ?>
 							</ul>
 						</div> <!-- the legend -->
 					</div>
@@ -250,14 +257,14 @@ $end_date   = ! empty( $view_args['end_date'] ) ? $view_args['end_date'] : false
 
 			<script id="charitable-report-data-js">
 					var charitable_reporting = {
-						'currency_symbol' : "<?php echo $currency_symbol; // phpcs:ignore ?>",
+						'currency_symbol' : "<?php echo $charitable_currency_symbol; // phpcs:ignore ?>",
 						"headline_chart_options":
-						{"donation_axis":<?php echo $headline_chart_options_donation_axis; // phpcs:ignore ?>,
-							"date_axis":<?php echo $headline_chart_options_date_axis; // phpcs:ignore ?>
+						{"donation_axis":<?php echo $charitable_headline_chart_options_donation_axis; // phpcs:ignore ?>,
+							"date_axis":<?php echo $charitable_headline_chart_options_date_axis; // phpcs:ignore ?>
 						},
 						"payment_methods_chart_options":{
-							"payment_percentages":<?php echo $payment_methods_chart_options_payment_percentages; // phpcs:ignore ?>,
-							"payment_labels":<?php echo $payment_methods_chart_options_payment_labels; // phpcs:ignore ?>
+							"payment_percentages":<?php echo $charitable_payment_methods_chart_options_payment_percentages; // phpcs:ignore ?>,
+							"payment_labels":<?php echo $charitable_payment_methods_chart_options_payment_labels; // phpcs:ignore ?>
 						}
 					};
 			</script>

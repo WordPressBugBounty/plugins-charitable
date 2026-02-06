@@ -45,6 +45,7 @@ add_action( 'charitable_flush_campaign_cache', 'charitable_compat_w3tc_clear_cam
  */
 function charitable_compat_w3tc_turn_off_donation_cache() {
 	if ( ! defined( 'DONOTCACHEDB' ) ) {
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- DONOTCACHEDB is a third-party constant defined by W3 Total Cache plugin for compatibility.
 		define( 'DONOTCACHEDB', true );
 	}
 }

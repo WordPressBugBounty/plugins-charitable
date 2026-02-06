@@ -94,7 +94,7 @@ function charitable_get_campaign_preview_url( $campaign_id = false, $new_window 
  *
  * @since 1.8.0
  */
-function campaign_is_campaign_builder_admin_page() {
+function campaign_is_campaign_builder_admin_page() { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- This is a legacy function that cannot be renamed.
 
 	if ( isset( $_POST['campaign_id'] ) ) { // @codingStandardsIgnoreLine
 		return true;

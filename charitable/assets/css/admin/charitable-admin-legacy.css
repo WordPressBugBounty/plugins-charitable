@@ -1076,6 +1076,9 @@ body.post-type-donation .donation-erasure-notice {
 #charitable-user-fields-wrap {
   width: 100%;
 }
+#charitable-user-fields-wrap .charitable-overlay {
+  display: none !important;
+}
 #charitable-user-fields-wrap.loading-data .charitable-overlay {
   display: block !important;
   text-align: center;
@@ -1626,6 +1629,7 @@ form#posts-filter .actions.charitable-export-actions {
   margin-left: 3px;
   margin-right: 20px;
   margin-bottom: 0;
+  padding: 10px 10px;
 }
 
 .charitable-notice.updated,

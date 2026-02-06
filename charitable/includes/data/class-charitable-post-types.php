@@ -115,7 +115,7 @@ if ( ! class_exists( 'Charitable_Post_Types' ) ) :
 		 * @version 1.8.1.14
 		 */
 		public function update_campaign_link_visual_builder() {
-			global $post_new_file, $post_type_object;
+			global $post_new_file, $post_type_object; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- '$post_new_file' is a WordPress core global variable.
 			if ( ! isset( $post_type_object ) || 'campaign' !== $post_type_object->name ) {
 				return false;
 			}
@@ -127,9 +127,9 @@ if ( ! class_exists( 'Charitable_Post_Types' ) ) :
 				}
 			} else {
 				if ( charitable_disable_legacy_campaigns() ) :
-					$post_new_file = 'admin.php?page=charitable-campaign-builder&view=template';
+					$post_new_file = 'admin.php?page=charitable-campaign-builder&view=template'; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- '$post_new_file' is a WordPress core global variable.
 				else :
-					$post_new_file = 'post-new.php?post_type=campaign';
+					$post_new_file = 'post-new.php?post_type=campaign'; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- '$post_new_file' is a WordPress core global variable.
 					if ( isset( $post_type_object->labels ) && isset( $post_type_object->labels->add_new ) ) :
 						$post_type_object->labels->add_new_item = 'Add New Legacy Campaign';
 					endif;

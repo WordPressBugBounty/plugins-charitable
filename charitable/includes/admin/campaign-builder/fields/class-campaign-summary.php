@@ -187,7 +187,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Summary' ) ) :
 
 				$pre_html = ob_get_clean();
 
-				$html = '<div class="charitable-field-' . $mode . '-campaign-summary charitable-prevent-select"><div class="placeholder"><h5 class="charitable-field-' . $mode . '-headline">' . $headline . '</h5></div>' . $pre_html . '</div>';
+				$html = '<div class="charitable-field-' . $mode . '-campaign-summary charitable-prevent-select"><div class="charitable-main-placeholder"><h5 class="charitable-field-' . $mode . '-headline">' . $headline . '</h5></div>' . $pre_html . '</div>';
 
 				return $html;
 		}

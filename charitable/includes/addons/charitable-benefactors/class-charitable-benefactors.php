@@ -143,17 +143,21 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 		 * Save benefactors when saving campaign.
 		 *
 		 * @since   1.0.0
+		 * @version 1.8.9.1
 		 *
 		 * @param   WP_Post $post Post object.
 		 * @return  void
 		 */
 		public function save_benefactors( WP_Post $post ) {
-			if ( ! isset( $_POST['_campaign_benefactor'] ) ) { // phpcs:ignore
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
+			if ( ! isset( $_POST['_campaign_benefactor'] ) ) {
 				return;
 			}
 
 			$currency_helper = charitable_get_currency_helper();
-			$benefactors     = $_POST['_campaign_benefactor'];
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array data, sanitized in loop
+			$benefactors     = wp_unslash( $_POST['_campaign_benefactor'] );
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			foreach ( $benefactors as $campaign_benefactor_id => $data ) {
 
@@ -177,7 +181,7 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 					if ( $sanitize_date ) {
 						$data['date_created'] = charitable_sanitize_date( $data['date_created'], 'Y-m-d 00:00:00' );
 					} else {
-						$data['date_created'] = date( 'Y-m-d 00:00:00', strtotime( $data['date_created'] ) );
+						$data['date_created'] = date( 'Y-m-d 00:00:00', strtotime( $data['date_created'] ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 					}
 
 				}
@@ -193,7 +197,7 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 					if ( $sanitize_date ) {
 						$date_deactivated = charitable_sanitize_date( $data['date_deactivated'], 'Y-m-d 00:00:00' );
 					} else {
-						$date_deactivated = date( 'Y-m-d 00:00:00', strtotime( $data['date_deactivated'] ) );
+						$date_deactivated = date( 'Y-m-d 00:00:00', strtotime( $data['date_deactivated'] ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 					}
 
 					$data['date_deactivated'] = ( $campaign_end_date && $campaign_end_date < $date_deactivated ) ? $campaign_end_date : $date_deactivated;
@@ -216,15 +220,20 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 		 * Add a new benefactor block with AJAX.
 		 *
 		 * @since   1.2.0
+		 * @version 1.8.9.1
 		 *
 		 * @return  void
 		 */
 		public function add_benefactor_form() {
-			$idx = isset( $_POST['idx'] ) ? $_POST['idx'] : 0;
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
+			$idx = isset( $_POST['idx'] ) ? intval( wp_unslash( $_POST['idx'] ) ) : 0;
 
 			if ( ! isset( $_POST['extension'] ) ) {
 				wp_die( '-1' );
 			}
+
+			$extension = sanitize_text_field( wp_unslash( $_POST['extension'] ) );
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			ob_start();
 
@@ -232,8 +241,8 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 				'metaboxes/campaign-benefactors/form',
 				array(
 					'benefactor' => null,
-					'extension'  => $_POST['extension'],
-					'index'      => "_{$idx}", // phpcs:ignore
+					'extension'  => $extension,
+					'index'      => "_{$idx}", // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				)
 			);
 
@@ -246,6 +255,7 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 		 * Deactivate a benefactor.
 		 *
 		 * @since   1.0.0
+		 * @version 1.8.9.1
 		 *
 		 * @return  void
 		 */
@@ -253,7 +263,8 @@ if ( ! class_exists( 'Charitable_Benefactors' ) ) :
 			/* Run a security check first to ensure we initiated this action. */
 			check_ajax_referer( 'charitable-deactivate-benefactor', 'nonce' );
 
-			$benefactor_id = isset( $_POST['benefactor_id'] ) ? $_POST['benefactor_id'] : 0;
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$benefactor_id = isset( $_POST['benefactor_id'] ) ? intval( wp_unslash( $_POST['benefactor_id'] ) ) : 0;
 
 			if ( ! $benefactor_id ) {
 				$return = array( 'error' => __( 'No benefactor ID provided.', 'charitable' ) );

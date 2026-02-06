@@ -230,7 +230,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
                     ON p.ID = cd.donation_id
                     $where_sql";
 
-			$total = $wpdb->get_var( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$total = $wpdb->get_var( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 			if ( $this->is_comma_decimal() ) {
 				$total = Charitable_Currency::get_instance()->sanitize_database_amount( $total );
@@ -293,7 +293,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
                     FROM $this->table_name
                     WHERE $where_column IN ( $in );";
 
-			return $wpdb->get_col( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			return $wpdb->get_col( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		}
 
 		/**
@@ -340,7 +340,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
                     FROM $this->table_name
                     WHERE $where_clause;";
 
-			$total = $wpdb->get_var( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$total = $wpdb->get_var( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 			if ( $this->is_comma_decimal() ) {
 				$total = Charitable_Currency::get_instance()->sanitize_database_amount( $total );
@@ -377,7 +377,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
                     FROM $this->table_name
                     WHERE donation_id = %d;";
 
-			return $wpdb->get_col( $wpdb->prepare( $sql, intval( $donation_id ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			return $wpdb->get_col( $wpdb->prepare( $sql, intval( $donation_id ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		}
 
 		/**
@@ -472,7 +472,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
                     INNER JOIN $wpdb->posts p ON p.ID = cd.donation_id
                     $sql_where;";
 
-			return $wpdb->get_var( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			return $wpdb->get_var( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		}
 
 		/**
@@ -498,7 +498,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
                     FROM $this->table_name cd
                     WHERE cd.donor_id = %d;";
 
-			$results = $wpdb->get_results( $wpdb->prepare( $sql, $donor_id ), OBJECT_K ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$results = $wpdb->get_results( $wpdb->prepare( $sql, $donor_id ), OBJECT_K ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 			if ( $this->is_comma_decimal() ) {
 				$results = array_map( array( $this, 'sanitize_amounts' ), $results );
@@ -523,7 +523,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
                     FROM $this->table_name cd
                     WHERE cd.donor_id = %d;";
 
-			$total = $wpdb->get_var( $wpdb->prepare( $sql, $donor_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$total = $wpdb->get_var( $wpdb->prepare( $sql, $donor_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 			if ( $this->is_comma_decimal() ) {
 				$total = Charitable_Currency::get_instance()->sanitize_database_amount( $total );
@@ -551,7 +551,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
                     FROM $this->table_name
                     WHERE donor_id = %d;";
 
-			return $wpdb->get_var( $wpdb->prepare( $sql, $donor_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			return $wpdb->get_var( $wpdb->prepare( $sql, $donor_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		}
 
 		/**
@@ -607,7 +607,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
 				$sql = $wpdb->prepare( $sql, $parameters ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 			}
 
-			$results = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$results = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 			if ( $this->is_comma_decimal() ) {
 				$results = array_map( array( $this, 'sanitize_amounts' ), $results );
@@ -642,7 +642,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
 				$sql = $wpdb->prepare( $sql, $parameters ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 			}
 
-			$total = $wpdb->get_var( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$total = $wpdb->get_var( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 			if ( $this->is_comma_decimal() && $sanitize ) {
 				$total = Charitable_Currency::get_instance()->sanitize_database_amount( $total );
@@ -680,7 +680,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
 				$sql = $wpdb->prepare( $sql, $parameters ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 			}
 
-			$results = $wpdb->get_results( $sql, 'ARRAY_N' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$results = $wpdb->get_results( $sql, 'ARRAY_N' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 			if ( $this->is_comma_decimal() && $sanitize ) {
 				$results = array_map( array( $this, 'sanitize_grouped_amounts' ), $results );
@@ -803,7 +803,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
 				INNER JOIN $wpdb->posts p ON p.ID = cd.donation_id
 				$sql_where";
 
-			$results = $wpdb->get_results( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$results = $wpdb->get_results( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 			if ( empty( $results ) ) {
 				return (object) array(
@@ -877,7 +877,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
 					INNER JOIN $wpdb->posts p ON p.ID = cd.donation_id
 					$sql_where;";
 
-			return $wpdb->get_var( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			return $wpdb->get_var( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		}
 
 		/**

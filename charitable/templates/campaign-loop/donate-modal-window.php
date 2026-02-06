@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Sets up the modal window for the campaigns in the loop.
  *
@@ -8,14 +14,15 @@
  * @package Charitable/Templates/Campaign
  * @since   1.0.0
  * @version 1.6.57
+ * @version 1.8.8.6
  */
 
-$modal_class = apply_filters( 'charitable_modal_window_class', 'charitable-modal' );
+$charitable_modal_class = apply_filters( 'charitable_modal_window_class', 'charitable-modal' );
 
 wp_enqueue_script( 'lean-modal' );
 wp_enqueue_style( 'lean-modal-css' );
 ?>
-<div id="charitable-donation-form-modal-loop" style="display: none;" class="<?php echo esc_attr( $modal_class ); ?>">
+<div id="charitable-donation-form-modal-loop" style="display: none;" class="<?php echo esc_attr( $charitable_modal_class ); ?>">
 	<a class="modal-close"></a>
 	<div class="donation-form-wrapper"></div>
 </div>

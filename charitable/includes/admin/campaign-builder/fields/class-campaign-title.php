@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version   1.8.0
+ * @version   1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,6 +18,8 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Title' ) ) :
 
 	/**
 	 * Class to add campaign title field to a campaign form in the builder.
+	 *
+	 * @version 1.8.9.1
 	 */
 	class Charitable_Field_Campaign_Title extends Charitable_Builder_Field {
 
@@ -115,6 +117,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Title' ) ) :
 		 * Campaign Title preview inside the builder.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.9.1
 		 *
 		 * @param array  $field_data Field data and settings.
 		 * @param array  $campaign_data Campaign data and settings.
@@ -126,13 +129,14 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Title' ) ) :
 			$html  = $this->field_title( $this->name );
 			$html .= $this->field_wrapper( $this->render( $field_data, $campaign_data, $field_id, 'preview' ), $field_data );
 
-			echo $html;
+			echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
 		 * The display on the campaign front-end.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.9.1
 		 *
 		 * @param string $field_type     The passed field type.
 		 * @param array  $field_data     Any field data.
@@ -142,13 +146,14 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Title' ) ) :
 
 			$html = $this->field_display_wrapper( $this->render( $field_data, $campaign_data ), $field_data );
 
-			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data );
+			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
 		 * The display on the form settings backend when the user clicks on the field/block.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.9.1
 		 *
 		 * @param array $field          Campaign Title settings.
 		 * @param array $campaign_data  Campaign data and settings.
@@ -174,13 +179,13 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Title' ) ) :
 
 			<div class="charitable-panel-field charitable-panel-field-section" data-field-id="<?php echo intval( $field_id ); ?>">
 
-				<?php echo do_action( 'charitable_builder_' . $this->type . '_settings_display_start', $field_id, $campaign_data ); ?>
+				<?php echo do_action( 'charitable_builder_' . $this->type . '_settings_display_start', $field_id, $campaign_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 
 			</div>
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['title'] ) ? $settings['title'] : false,
 				esc_html__( 'Campaign Title', 'charitable' ),
 				array(
@@ -193,7 +198,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Title' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_align(
+			echo $charitable_builder_form_fields->generate_align( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['align'] ) ? $settings['align'] : esc_attr( $this->align_default ),
 				esc_html__( 'Align', 'charitable' ),
 				array(
@@ -206,7 +211,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Title' ) ) :
 
 			/* CSS CLASS */
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['css_class'] ) ? $settings['css_class'] : false,
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(

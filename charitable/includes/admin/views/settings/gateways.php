@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display the table of payment gateways.
  *
@@ -7,25 +13,26 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
- * @version   1.6.38
+ * @version   1.6.38 - Add Stripe Warning
  * @version   1.8.2 - Add Stripe Warning
  * @version   1.8.7 - Add Square Legacy gateway and sanitize gateway logos.
+ * @version   1.8.8.6
  */
 
-$helper   = charitable_get_helper( 'gateways' );
-$gateways = $helper->get_available_gateways();
-$default  = $helper->get_default_gateway();
-$upgrades = $helper->get_recommended_gateways();
+$charitable_helper   = charitable_get_helper( 'gateways' );
+$charitable_gateways = $charitable_helper->get_available_gateways();
+$charitable_default  = $charitable_helper->get_default_gateway();
+$charitable_upgrades = $charitable_helper->get_recommended_gateways();
 
 // Add a warning message here if Stripe is an enabled gateway, but no keys are found.
 
 if ( class_exists( 'Charitable_Gateway_Stripe_AM' ) ) {
 
-	if ( ( ! defined( 'CHARITABLE_DISABLE_STRIPE_KEY_CHECK' ) || ! CHARITABLE_DISABLE_STRIPE_KEY_CHECK ) && is_array( $gateways ) && ! empty( $gateways ) && in_array( 'Charitable_Gateway_Stripe_AM', $gateways, true ) && $helper->is_active_gateway( 'Charitable_Gateway_Stripe_AM' ) ) { // phpcs:ignore
-		$stripe_gateway = new Charitable_Gateway_Stripe_AM();
-		$stripe_keys    = $stripe_gateway->get_keys();
+	if ( ( ! defined( 'CHARITABLE_DISABLE_STRIPE_KEY_CHECK' ) || ! CHARITABLE_DISABLE_STRIPE_KEY_CHECK ) && is_array( $charitable_gateways ) && ! empty( $charitable_gateways ) && in_array( 'Charitable_Gateway_Stripe_AM', $charitable_gateways, true ) && $charitable_helper->is_active_gateway( 'Charitable_Gateway_Stripe_AM' ) ) { // phpcs:ignore
+		$charitable_stripe_gateway = new Charitable_Gateway_Stripe_AM();
+		$charitable_stripe_keys    = $charitable_stripe_gateway->get_keys();
 
-		if ( ! isset( $stripe_keys['public_key'] ) || empty( $stripe_keys['public_key'] ) ) {
+		if ( ! isset( $charitable_stripe_keys['public_key'] ) || empty( $charitable_stripe_keys['public_key'] ) ) {
 			// Display the warning message HTML.
 			/* translators: %s: URL to the Stripe settings page */
 			echo wp_kses(
@@ -48,100 +55,100 @@ if ( class_exists( 'Charitable_Gateway_Stripe_AM' ) ) {
 }
 
 // We need to make sure the 'square_core' gateway always follows the 'stripe' gateway.
-$gateway_keys = array_keys( $gateways );
-$stripe_index = array_search( 'stripe', $gateway_keys, true );
-$square_index = array_search( 'square_core', $gateway_keys, true );
+$charitable_gateway_keys = array_keys( $charitable_gateways );
+$charitable_stripe_index = array_search( 'stripe', $charitable_gateway_keys, true );
+$charitable_square_index = array_search( 'square_core', $charitable_gateway_keys, true );
 
-if ( false !== $stripe_index && false !== $square_index && $square_index !== $stripe_index + 1 ) {
+if ( false !== $charitable_stripe_index && false !== $charitable_square_index && $charitable_square_index !== $charitable_stripe_index + 1 ) {
 	// Remove square_core from its current position.
-	$square_gateway = $gateways['square_core'];
-	unset( $gateways['square_core'] );
+	$charitable_square_gateway = $charitable_gateways['square_core'];
+	unset( $charitable_gateways['square_core'] );
 
 	// Rebuild the array with square_core after stripe.
-	$reordered_gateways = array();
-	$gateway_keys       = array_keys( $gateways );
+	$charitable_reordered_gateways = array();
+	$charitable_gateway_keys       = array_keys( $charitable_gateways );
 
-	foreach ( $gateway_keys as $key ) {
-		$reordered_gateways[ $key ] = $gateways[ $key ];
+	foreach ( $charitable_gateway_keys as $charitable_key ) {
+		$charitable_reordered_gateways[ $charitable_key ] = $charitable_gateways[ $charitable_key ];
 
 		// Insert square_core after stripe.
-		if ( 'stripe' === $key ) {
-			$reordered_gateways['square_core'] = $square_gateway;
+		if ( 'stripe' === $charitable_key ) {
+			$charitable_reordered_gateways['square_core'] = $charitable_square_gateway;
 		}
 	}
 
-	$gateways = $reordered_gateways;
+	$charitable_gateways = $charitable_reordered_gateways;
 }
 
-foreach ( $gateways as $gateway ) :
+foreach ( $charitable_gateways as $charitable_gateway ) :
 
-	$gateway = class_exists( $gateway ) ? new $gateway() : null;
-	if ( ! $gateway ) {
+	$charitable_gateway = class_exists( $charitable_gateway ) ? new $charitable_gateway() : null;
+	if ( ! $charitable_gateway ) {
 		continue;
 	}
 
-	$is_active = $helper->is_active_gateway( $gateway->get_gateway_id() );
+	$charitable_is_active = $charitable_helper->is_active_gateway( $charitable_gateway->get_gateway_id() );
 
-	if ( $is_active ) {
-		$action_url  = esc_url(
+	if ( $charitable_is_active ) {
+		$charitable_action_url  = esc_url(
 			add_query_arg(
 				array(
 					'charitable_action' => 'disable_gateway',
-					'gateway_id'        => $gateway->get_gateway_id(),
+					'gateway_id'        => $charitable_gateway->get_gateway_id(),
 					'_nonce'            => wp_create_nonce( 'gateway' ),
 				),
 				admin_url( 'admin.php?page=charitable-settings&tab=gateways' )
 			)
 		);
-		$action_text = __( 'Disable Gateway', 'charitable' );
+		$charitable_action_text = __( 'Disable Gateway', 'charitable' );
 	} else {
-		$action_url  = esc_url(
+		$charitable_action_url  = esc_url(
 			add_query_arg(
 				array(
 					'charitable_action' => 'enable_gateway',
-					'gateway_id'        => $gateway->get_gateway_id(),
+					'gateway_id'        => $charitable_gateway->get_gateway_id(),
 					'_nonce'            => wp_create_nonce( 'gateway' ),
 				),
 				admin_url( 'admin.php?page=charitable-settings&tab=gateways' )
 			)
 		);
-		$action_text = __( 'Enable Gateway', 'charitable' );
+		$charitable_action_text = __( 'Enable Gateway', 'charitable' );
 	}
 
-	$action_url = esc_url(
+	$charitable_action_url = esc_url(
 		add_query_arg(
 			array(
-				'charitable_action' => $is_active ? 'disable_gateway' : 'enable_gateway',
-				'gateway_id'        => $gateway->get_gateway_id(),
+				'charitable_action' => $charitable_is_active ? 'disable_gateway' : 'enable_gateway',
+				'gateway_id'        => $charitable_gateway->get_gateway_id(),
 				'_nonce'            => wp_create_nonce( 'gateway' ),
 			),
 			admin_url( 'admin.php?page=charitable-settings&tab=gateways' )
 		)
 	);
 
-	$make_default_url = esc_url(
+	$charitable_make_default_url = esc_url(
 		add_query_arg(
 			array(
 				'charitable_action' => 'make_default_gateway',
-				'gateway_id'        => $gateway->get_gateway_id(),
+				'gateway_id'        => $charitable_gateway->get_gateway_id(),
 				'_nonce'            => wp_create_nonce( 'gateway' ),
 			),
 			admin_url( 'admin.php?page=charitable-settings&tab=gateways' )
 		)
 	);
 
-	$gateway_name = null !== $gateway->get_name() ? $gateway->get_name() : '';
+	$charitable_gateway_name = null !== $charitable_gateway->get_name() ? $charitable_gateway->get_name() : '';
 
 	?>
-	<div class="charitable-settings-object charitable-gateway <?php echo esc_attr( strtolower( $gateway_name ) ); ?>">
+	<div class="charitable-settings-object charitable-gateway <?php echo esc_attr( strtolower( $charitable_gateway_name ) ); ?>">
 		<span class="gateway-logo-name">
 			<?php
 				// if method get_logo() exists, use it.
-			if ( method_exists( $gateway, 'get_logo' ) ) {
-				$logo = $gateway->get_logo();
-				if ( is_string( $logo ) && ( strpos( $logo, '<img' ) !== false || strpos( $logo, '<svg' ) !== false ) ) {
+			if ( method_exists( $charitable_gateway, 'get_logo' ) ) {
+				$charitable_logo = $charitable_gateway->get_logo();
+				if ( is_string( $charitable_logo ) && ( strpos( $charitable_logo, '<img' ) !== false || strpos( $charitable_logo, '<svg' ) !== false ) ) {
 					echo '<span class="gateway-logo">' . wp_kses(
-						$logo,
+						$charitable_logo,
 						array(
 							'img'  => array(
 								'src'    => array(),
@@ -164,63 +171,63 @@ foreach ( $gateways as $gateway ) :
 						)
 					) . '</span>';
 				} else {
-					echo '<span class="gateway-logo">' . esc_html( $logo ) . '</span>';
+					echo '<span class="gateway-logo">' . esc_html( $charitable_logo ) . '</span>';
 				}
 			} else {
-				$name = esc_html( $gateway->get_name() );
-				if ( 'square' === strtolower( $name ) ) {
-					$name .= ' ' . __( '(Legacy)', 'charitable' );
+				$charitable_name = esc_html( $charitable_gateway->get_name() );
+				if ( 'square' === strtolower( $charitable_name ) ) {
+					$charitable_name .= ' ' . __( '(Legacy)', 'charitable' );
 				}
-				echo '<h4>' . esc_html( $name ) . '</h4>';
+				echo '<h4>' . esc_html( $charitable_name ) . '</h4>';
 			}
 			?>
 
-			<?php if ( $gateway->get_recommended() ) : ?>
+			<?php if ( $charitable_gateway->get_recommended() ) : ?>
 				<span class="charitable-badge charitable-badge-sm charitable-badge-inline charitable-badge-green charitable-badge-rounded"><i class="fa fa-star" aria-hidden="true"></i><?php esc_html_e( 'Recommended', 'charitable' ); ?></span>
 			<?php endif ?>
 
-			<?php if ( (string) $gateway->get_gateway_id() === (string) $default ) : ?>
+			<?php if ( (string) $charitable_gateway->get_gateway_id() === (string) $charitable_default ) : ?>
 
 				<span class="charitable-badge charitable-badge-sm charitable-badge-inline charitable-badge-orange charitable-badge-rounded"><i class="fa fa-check" aria-hidden="true"></i><?php esc_html_e( 'Default Gateway', 'charitable' ); ?></span>
 
-			<?php elseif ( $is_active ) : ?>
+			<?php elseif ( $charitable_is_active ) : ?>
 
-				<a href="<?php echo esc_url( $make_default_url ); ?>" class="make-default-gateway"><i class="fa fa-check" aria-hidden="true"></i><?php esc_html_e( 'Make default', 'charitable' ); ?></a>
+				<a href="<?php echo esc_url( $charitable_make_default_url ); ?>" class="make-default-gateway"><i class="fa fa-check" aria-hidden="true"></i><?php esc_html_e( 'Make default', 'charitable' ); ?></a>
 
 			<?php endif ?>
 		</span>
 		<span class="actions">
 			<?php
-			if ( $is_active ) :
-				$settings_url = esc_url(
+			if ( $charitable_is_active ) :
+				$charitable_settings_url = esc_url(
 					add_query_arg(
 						array(
-							'group' => 'gateways_' . $gateway->get_gateway_id(),
+							'group' => 'gateways_' . $charitable_gateway->get_gateway_id(),
 						),
 						admin_url( 'admin.php?page=charitable-settings&tab=gateways' )
 					)
 				);
 				?>
 
-				<a href="<?php echo esc_url( $settings_url ); ?>" class="button button-primary"><?php esc_html_e( 'Gateway Settings', 'charitable' ); ?></a>
+				<a href="<?php echo esc_url( $charitable_settings_url ); ?>" class="button button-primary"><?php esc_html_e( 'Gateway Settings', 'charitable' ); ?></a>
 			<?php endif ?>
-			<a href="<?php echo esc_url( $action_url ); ?>" class="button"><?php echo esc_html( $action_text ); ?></a>
+			<a href="<?php echo esc_url( $charitable_action_url ); ?>" class="button"><?php echo esc_html( $charitable_action_text ); ?></a>
 		</span>
 	</div>
 
 	<?php
 	// Display Square gateway row after Stripe if the class isn't loaded.
-	if ( 'stripe' === $gateway->get_gateway_id() && ! class_exists( 'Charitable_Gateway_Square' ) ) :
-		$php_version_check = version_compare( PHP_VERSION, '8.1.0', '>=' );
+	if ( 'stripe' === $charitable_gateway->get_gateway_id() && ! class_exists( 'Charitable_Gateway_Square' ) ) :
+		$charitable_php_version_check = version_compare( PHP_VERSION, '8.1.0', '>=' );
 
-		if ( ! $php_version_check ) {
-			$error_message = sprintf(
+		if ( ! $charitable_php_version_check ) {
+			$charitable_error_message = sprintf(
 				/* translators: %s: URL to documentation */
 				__( 'Requires PHP 8.1.0 or higher. <a href="%s" target="_blank">See our documentation</a>.', 'charitable' ),
 				'https://www.wpcharitable.com/documentation/php-version-compatibility-square/'
 			);
 		} else {
-			$error_message = __( 'Square gateway could not be loaded.', 'charitable' );
+			$charitable_error_message = __( 'Square gateway could not be loaded.', 'charitable' );
 		}
 		?>
 		<div class="charitable-settings-object charitable-gateway square">
@@ -233,7 +240,7 @@ foreach ( $gateways as $gateway ) :
 				<span class="gateway-error">
 					<?php
 					echo wp_kses(
-						$error_message,
+						$charitable_error_message,
 						array(
 							'a' => array(
 								'href'   => array(),
@@ -251,26 +258,26 @@ endforeach
 ?>
 
 <?php
-if ( ! empty( $upgrades ) ) :
-	if ( 1 === count( $upgrades ) ) {
-		$currencies = charitable_get_currency_helper()->get_all_currencies();
-		$gateway    = key( $upgrades );
-		$message    = sprintf(
+if ( ! empty( $charitable_upgrades ) ) :
+	if ( 1 === count( $charitable_upgrades ) ) {
+		$charitable_currencies = charitable_get_currency_helper()->get_all_currencies();
+		$charitable_gateway    = key( $charitable_upgrades );
+		$charitable_message    = sprintf(
 			/* translators: %1$s: currency; %2$s: hyperlink %3$s: payment gateway name */
 			__( '<strong>Tip</strong>: Accept donations in %1$s with <a href="%2$s" target="_blank">%3$s</a>.', 'charitable' ),
-			$currencies[ charitable_get_currency() ],
-			'https://www.wpcharitable.com/extensions/charitable-' . $gateway . '/?utm_source=WordPress&utm_campaign=WP+Charitable&utm_medium=Upgrade+Notice&utm_content=Accept+Donations',
-			current( $upgrades )
+			$charitable_currencies[ charitable_get_currency() ],
+			'https://www.wpcharitable.com/extensions/charitable-' . $charitable_gateway . '/?utm_source=WordPress&utm_campaign=WP+Charitable&utm_medium=Upgrade+Notice&utm_content=Accept+Donations',
+			current( $charitable_upgrades )
 		);
 	} else {
-		$message = sprintf(
+		$charitable_message = sprintf(
 			/* translators: %1$s: hyperlink; %2$s: single extension name; %3$s: comma-separated list of extension names */
 			__( '<strong>Need more options?</strong> <a href="%1$s" target="_blank">Click here to browse our payment gateway extensions</a>, including %3$s and %2$s.', 'charitable' ),
 			'https://www.wpcharitable.com/extensions/category/payment-gateways/?utm_source=WordPress&utm_campaign=WP+Charitable&utm_medium=Admin+Notice&utm_content=Need+More+Options+Browse+Gateway+Extensions',
-			array_pop( $upgrades ),
-			implode( ', ', $upgrades )
+			array_pop( $charitable_upgrades ),
+			implode( ', ', $charitable_upgrades )
 		);
 	}
 	?>
-	<p class="charitable-gateway-prompt charitable-settings-notice"><?php echo esc_html( $message ); ?></p>
+	<p class="charitable-gateway-prompt charitable-settings-notice"><?php echo esc_html( $charitable_message ); ?></p>
 <?php endif ?>

@@ -34,11 +34,11 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 40px;
-  height: 40px;
-  margin: -20px 0 0 -20px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #5AA152;
+  width: 50px;
+  height: 50px;
+  margin: -25px 0 0 -25px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #5AA152;
   border-radius: 50%;
   animation: charitable-dashboard-v2-spinner 1s linear infinite;
   z-index: 10000;
@@ -49,6 +49,45 @@
 #charitable-dashboard-v2.charitable-dashboard-loaded::after {
   opacity: 0;
   pointer-events: none;
+}
+
+/* More aggressive hiding for tab URLs */
+body.charitable-dashboard-loaded #charitable-dashboard-v2::before,
+body.charitable-dashboard-loaded #charitable-dashboard-v2::after {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Force hide spinner on tab URLs */
+#charitable-dashboard-v2[style*="--spinner-display: none"]::before,
+#charitable-dashboard-v2[style*="--spinner-display: none"]::after {
+  display: none !important;
+}
+
+/* Additional aggressive hiding for tab URLs */
+body[class*="charitable_page_charitable-dashboard"] #charitable-dashboard-v2.charitable-dashboard-loaded::before,
+body[class*="charitable_page_charitable-dashboard"] #charitable-dashboard-v2.charitable-dashboard-loaded::after {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Force hide all spinners after 2 seconds - but keep spinning until hidden */
+#charitable-dashboard-v2::before {
+  animation: charitable-dashboard-v2-spinner-fadeout 2s ease-in-out forwards;
+}
+
+/* Spinner should spin continuously and then fade out after 1.8 seconds */
+#charitable-dashboard-v2::after {
+  animation: charitable-dashboard-v2-spinner 1s linear infinite, charitable-dashboard-v2-spinner-fadeout 2s ease-in-out 1.8s forwards;
+}
+
+@keyframes charitable-dashboard-v2-spinner-fadeout {
+  0% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; display: none; }
 }
 
 /* Global Dashboard Loading Spinner - Targets body class */
@@ -401,6 +440,18 @@ body.charitable_page_charitable-dashboard #wpwrap::after {
   line-height: 100%;
   letter-spacing: 0px;
   color: rgba(49, 148, 77, 1);
+}
+
+.charitable-dashboard-v2-stat-change.charitable-dashboard-v2-stat-change-positive {
+  color: rgba(49, 148, 77, 1);
+}
+
+.charitable-dashboard-v2-stat-change.charitable-dashboard-v2-stat-change-negative {
+  color: rgba(220, 38, 38, 1);
+}
+
+.charitable-dashboard-v2-stat-change.charitable-dashboard-v2-stat-change-zero {
+  color: rgba(0, 0, 0, 1);
 }
 
 .charitable-dashboard-v2-download-button:hover {
@@ -1284,12 +1335,11 @@ body.charitable_page_charitable-dashboard #wpwrap::after {
 /* Quick Access Content Section */
 .charitable-dashboard-v2-section .charitable-dashboard-v2-quick-access-content {
   display: flex;
-  justify-content: center;
   margin-bottom: 30px;
 }
 
 .charitable-dashboard-v2-section .charitable-dashboard-v2-quick-access-content .charitable-dashboard-v2-quick-access-items {
-  width: 392px;
+  width: 100%;
 }
 
 /* Quick Access in left column (Pro users) - make it wider */
@@ -1958,7 +2008,7 @@ body.charitable_page_charitable-dashboard #wpwrap::after {
 }
 
 .charitable-dashboard-v2-empty-state-content h3 {
-  margin: 0 0 12px 0;
+  margin: 0 0 10px 0 !important;
   font-size: 18px;
   font-weight: 600;
   color: #191D2D;
@@ -1981,7 +2031,7 @@ body.charitable_page_charitable-dashboard #wpwrap::after {
   font-weight: 600;
   font-size: 14px;
   transition: background-color 0.2s ease;
-  margin-top: 10px;
+  margin-top: 20px;
   border: 0;
 }
 

@@ -396,7 +396,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 							sprintf(
 								/* translators: %1$s: opening link tag, %2$s: closing link tag */
 								esc_html__( '3%% per transaction + Stripe fees. %1$sUpgrade to Pro%2$s for no added fees and priority support.', 'charitable' ),
-								'<a target="_blank" href="' . esc_url( charitable_pro_upgrade_url( $medium ) ) . '">',
+								'<a target="_blank" href="' . esc_url( charitable_pro_upgrade_url( 'gateway-stripe' ) ) . '">',
 								'</a>'
 							) . '</p>
 						</div>';
@@ -654,6 +654,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 		 * in the child class.
 		 *
 		 * @since  1.7.0
+		 * @version 1.8.9.1
 		 *
 		 * @return array[]
 		 */
@@ -752,7 +753,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 				);
 				?>
 				<label for="charitable_stripe_card_field"><?php esc_html_e( 'Credit/Debit Card', 'charitable' ); ?></label>
-				<div id="charitable_stripe_card_field" data-secret="<?php echo $intent ? $intent->get( 'client_secret' ) : ''; ?>" data-intent="<?php echo $intent ? $intent->get( 'id' ) : ''; ?>"></div>
+				<div id="charitable_stripe_card_field" data-secret="<?php echo esc_attr( $intent ? $intent->get( 'client_secret' ) : '' ); ?>" data-intent="<?php echo esc_attr( $intent ? $intent->get( 'id' ) : '' ); ?>"></div>
 				<div id="charitable_stripe_card_errors" role="alert"></div>
 				<input type="hidden" name="stripe_payment_method" />
 				<?php
@@ -775,6 +776,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 		 * Set up an output buffer before the donation form fields are displayed.
 		 *
 		 * @since  1.3.0
+		 * @version 1.8.9.1
 		 *
 		 * @param  Charitable_Form $form Form object.
 		 * @return void
@@ -788,7 +790,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 
 			echo '<noscript><div class="charitable-notice charitable-form-errors">
 				<ul class="charitable-notice-errors errors">
-					<li>' . __( 'For security reasons, credit card donations require Javascript. Please enable Javascript in your browser before continuing.', 'charitable' ) . '</li>
+					<li>' . esc_html__( 'For security reasons, credit card donations require Javascript. Please enable Javascript in your browser before continuing.', 'charitable' ) . '</li>
 				</ul><!-- charitable-notice- -->
 			</div></noscript>';
 		}
@@ -798,6 +800,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 		 * from cc fields.
 		 *
 		 * @since  1.3.0
+		 * @version 1.8.9.1
 		 *
 		 * @param  Charitable_Form $form Form object.
 		 * @return void
@@ -810,7 +813,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 			$fields = ob_get_clean();
 			$fields = str_replace( 'name="cc_name"', '', $fields );
 
-			echo $fields;
+			echo $fields; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
@@ -841,12 +844,16 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 
 			/* If we're using Payment Intents, make sure we have a payment method. */
 			if ( ! $gateway->get_value( 'enable_stripe_checkout' ) ) {
-				if ( ! array_key_exists( 'stripe_payment_method', $_POST ) || ! $_POST['stripe_payment_method'] ) { // phpcs:ignore WordPress.Security.NonceVerification
+				// phpcs:disable WordPress.Security.NonceVerification.Missing
+				$stripe_payment_method = isset( $_POST['stripe_payment_method'] ) ? sanitize_text_field( wp_unslash( $_POST['stripe_payment_method'] ) ) : '';
+				if ( empty( $stripe_payment_method ) ) {
+					// phpcs:enable WordPress.Security.NonceVerification.Missing
 					charitable_get_notices()->add_error(
 						__( '<strong>Missing payment details.</strong> <a href="#charitable-gateway-fields">Click here to double-check that all required payment fields are completed.</a>', 'charitable' )
 					);
 					return false;
 				}
+				// phpcs:enable WordPress.Security.NonceVerification.Missing
 			}
 
 			return $valid;
@@ -1610,7 +1617,12 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 			);
 
 			if ( array_key_exists( $event_type, $default_processors ) ) {
-				$message = call_user_func( $default_processors[ $event_type ], $event );
+				$processor = $default_processors[ $event_type ];
+				if ( is_callable( $processor ) ) {
+					$message = $processor( $event );
+				} else {
+					$message = 'Invalid processor';
+				}
 				/* Kill processing with a message returned by the event processor. */
 				die( $message ); // phpcs:ignore
 			}

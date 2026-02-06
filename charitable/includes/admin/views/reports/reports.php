@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display the main reports page wrapper.
  *
@@ -8,12 +14,13 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8,1
  * @version   1.8.1
+ * @version   1.8.8.6
  */
 
 $active_tab  = isset( $_GET['tab'] ) ? esc_html( $_GET['tab'] ) : 'overview';  // phpcs:ignore
 $group       = isset( $_GET['group'] ) ? esc_html( $_GET['group'] ) : $active_tab; // phpcs:ignore
-$sections    = charitable_get_admin_reports()->get_sections();
-$show_return = $group !== $active_tab;
+$charitable_sections    = charitable_get_admin_reports()->get_sections();
+$charitable_show_return = $group !== $active_tab;
 
 ob_start();
 ?>
@@ -25,8 +32,8 @@ ob_start();
 	<h1><?php echo esc_html__( 'Reports', 'charitable' ); ?></h1>
 
 	<h2 class="nav-tab-wrapper">
-		<?php foreach ( $sections as $the_tab => $name ) : ?>
-			<a href="<?php echo esc_url( add_query_arg( array( 'tab' => $the_tab ), admin_url( 'admin.php?page=charitable-reports' ) ) ); ?>" class="nav-tab <?php echo esc_attr( sanitize_title( $name ) ); ?> <?php echo $active_tab === $the_tab ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( $name ); ?></a>
+		<?php foreach ( $charitable_sections as $charitable_the_tab => $charitable_name ) : ?>
+			<a href="<?php echo esc_url( add_query_arg( array( 'tab' => $charitable_the_tab ), admin_url( 'admin.php?page=charitable-reports' ) ) ); ?>" class="nav-tab <?php echo esc_attr( sanitize_title( $charitable_name ) ); ?> <?php echo $active_tab === $charitable_the_tab ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( $charitable_name ); ?></a>
 		<?php endforeach ?>
 	</h2>
 

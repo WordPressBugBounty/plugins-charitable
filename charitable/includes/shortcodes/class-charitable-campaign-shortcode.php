@@ -208,7 +208,7 @@ if ( ! class_exists( 'Charitable_Campaign_Shortcode' ) ) :
 					$template_id,
 					$campaign_data
 				),
-				$assets_dir . 'css/campaign-builder/themes/frontend/' . $template_id . '.php'
+				rest_url( 'charitable/v1/campaign-css/' . $template_id )
 			);
 
 			wp_enqueue_style(

@@ -3,6 +3,7 @@
  * Footer promotion template.
  *
  * @since 1.8.7.2
+ * @version 1.8.8.6
  * @package Charitable/Admin/Templates
  *
  * @var string $title
@@ -13,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$links_count = count( $links );
+$charitable_links_count = count( $links );
 
 ?>
 
@@ -32,20 +33,20 @@ $links_count = count( $links );
 	?>
 	</p>
 	<ul class="charitable-footer-promotion-links">
-		<?php foreach ( $links as $key => $item ) : ?>
+		<?php foreach ( $links as $charitable_key => $charitable_item ) : ?>
 			<li>
 				<?php
-				$attributes = array(
-					'href'   => esc_url( $item['url'] ),
-					'target' => isset( $item['target'] ) ? $item['target'] : false,
-					'rel'    => isset( $item['target'] ) ? 'noopener noreferrer' : false,
+				$charitable_attributes = array(
+					'href'   => esc_url( $charitable_item['url'] ),
+					'target' => isset( $charitable_item['target'] ) ? $charitable_item['target'] : false,
+					'rel'    => isset( $charitable_item['target'] ) ? 'noopener noreferrer' : false,
 				);
 
 				printf(
 					'<a %1s>%2$s</a>%3$s',
-					charitable_html_attributes( '', array(), array(), $attributes, false ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-					esc_html( $item['text'] ),
-					$links_count === $key + 1 ? '' : '<span>/</span>'
+					charitable_html_attributes( '', array(), array(), $charitable_attributes, false ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					esc_html( $charitable_item['text'] ),
+					$charitable_links_count === $charitable_key + 1 ? '' : '<span>/</span>'
 				);
 				?>
 			</li>

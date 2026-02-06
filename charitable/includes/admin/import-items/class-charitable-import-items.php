@@ -7,6 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.7.0.7
+ * @version   1.8.9.1
  */
 
 // Exit if accessed directly.
@@ -221,15 +222,15 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 				if ( is_wp_error( $stream ) ) {
 
 					if ( charitable_is_debug() ) {
-						error_log( 'admin_accept_import_campaign_request:: ' );
-						error_log( print_r( $stream, true ) );
+						error_log( 'admin_accept_import_campaign_request:: ' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+						error_log( print_r( $stream, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 					}
 
 				} elseif ( ! $type || strpos( $type, 'text/html' ) !== false ) {
 
 					if ( charitable_is_debug() ) {
-						error_log( 'admin_accept_import_campaign_request type: ' );
-						error_log( print_r( $type, true ) );
+						error_log( 'admin_accept_import_campaign_request type: ' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+						error_log( print_r( $type, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 					}
 
 				} else {
@@ -240,8 +241,8 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 					if ( ! empty( $mirror['error'] ) ) {
 
 						if ( charitable_is_debug() ) {
-							error_log( 'admin_accept_import_campaign_request:: ' );
-							error_log( print_r( $stream, true ) );
+							error_log( 'admin_accept_import_campaign_request:: ' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+							error_log( print_r( $stream, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 						}
 
 					} else {
@@ -357,8 +358,8 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 
 					if ( ! isset( $donation_data['post'] ) ) {
 						if ( charitable_is_debug() ) {
-							error_log( 'import post fail donation data: ' );
-							error_log( print_r( $donation_data, true ) );
+							error_log( 'import post fail donation data: ' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+							error_log( print_r( $donation_data, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 						}
 						return;
 					}

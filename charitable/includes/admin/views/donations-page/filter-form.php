@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display the Filters modal.
  *
@@ -6,6 +12,7 @@
  * @package Charitable/Admin View/Donations Page
  * @since   1.0.0
  * @version 1.6.39
+ * @version 1.8.8.6
  */
 
 /**
@@ -15,10 +22,10 @@
  *
  * @param string $class The modal window class.
  */
-$modal_class = apply_filters( 'charitable_modal_window_class', 'charitable-modal' );
+$charitable_modal_class = apply_filters( 'charitable_modal_window_class', 'charitable-modal' );
 
-$campaign_id = isset( $_GET['campaign_id'] ) ? intval( $_GET['campaign_id'] ) : ''; // phpcs:ignore
-$campaigns   = get_posts(
+$charitable_campaign_id = isset( $_GET['campaign_id'] ) ? intval( $_GET['campaign_id'] ) : ''; // phpcs:ignore
+$charitable_campaigns   = get_posts(
 	array(
 		'post_type'   => Charitable::CAMPAIGN_POST_TYPE,
 		'nopaging'    => true,
@@ -27,12 +34,12 @@ $campaigns   = get_posts(
 	)
 );
 
-$start_date  = isset( $_GET['start_date'] ) ? charitable_sanitize_date_filter_format( $_GET['start_date'] ) : null; // phpcs:ignore
-$end_date    = isset( $_GET['end_date'] ) ? charitable_sanitize_date_filter_format( $_GET['end_date'] ) : null; // phpcs:ignore
-$post_status = isset( $_GET['post_status'] ) ? esc_html( $_GET['post_status'] ) : 'all'; // phpcs:ignore
+$charitable_start_date  = isset( $_GET['start_date'] ) ? charitable_sanitize_date_filter_format( $_GET['start_date'] ) : null; // phpcs:ignore
+$charitable_end_date    = isset( $_GET['end_date'] ) ? charitable_sanitize_date_filter_format( $_GET['end_date'] ) : null; // phpcs:ignore
+$charitable_post_status = isset( $_GET['post_status'] ) ? esc_html( $_GET['post_status'] ) : 'all'; // phpcs:ignore
 
 ?>
-<div id="charitable-donations-filter-modal" style="display: none" class="charitable-donations-modal <?php echo esc_attr( $modal_class ); ?>" tabindex="0">
+<div id="charitable-donations-filter-modal" style="display: none" class="charitable-donations-modal <?php echo esc_attr( $charitable_modal_class ); ?>" tabindex="0">
 	<a class="modal-close"></a>
 	<h3><?php esc_html_e( 'Filter Donations', 'charitable' ); ?></h3>
 	<form class="charitable-donations-modal-form charitable-modal-form" method="get" action="">
@@ -40,21 +47,21 @@ $post_status = isset( $_GET['post_status'] ) ? esc_html( $_GET['post_status'] ) 
 		<?php wp_nonce_field( 'charitable_filter_campaigns', 'charitable_nonce', false ); ?>
 		<fieldset>
 			<legend><?php esc_html_e( 'Filter by Date', 'charitable' ); ?></legend>
-			<input type="text" id="charitable-filter-start_date" name="start_date" class="charitable-datepicker" autocomplete="off" value="<?php echo esc_attr( $start_date ); ?>" placeholder="<?php esc_attr_e( 'From:', 'charitable' ); ?>" />
-			<input type="text" id="charitable-filter-end_date" name="end_date" class="charitable-datepicker" autocomplete="off" value="<?php echo esc_attr( $end_date ); ?>" placeholder="<?php esc_attr_e( 'To:', 'charitable' ); ?>" />
+			<input type="text" id="charitable-filter-start_date" name="start_date" class="charitable-datepicker" autocomplete="off" value="<?php echo esc_attr( $charitable_start_date ); ?>" placeholder="<?php esc_attr_e( 'From:', 'charitable' ); ?>" />
+			<input type="text" id="charitable-filter-end_date" name="end_date" class="charitable-datepicker" autocomplete="off" value="<?php echo esc_attr( $charitable_end_date ); ?>" placeholder="<?php esc_attr_e( 'To:', 'charitable' ); ?>" />
 		</fieldset>
 		<label for="charitable-donations-filter-status"><?php esc_html_e( 'Filter by Status', 'charitable' ); ?></label>
 		<select id="charitable-donations-filter-status" name="post_status">
-			<option value="all" <?php selected( $post_status, 'all' ); ?>><?php esc_html_e( 'All', 'charitable' ); ?></option>
-			<?php foreach ( charitable_get_valid_donation_statuses() as $key => $status ) : // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited ?>
-				<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $post_status, $key ); ?>><?php echo esc_html( $status ); ?></option>
+			<option value="all" <?php selected( $charitable_post_status, 'all' ); ?>><?php esc_html_e( 'All', 'charitable' ); ?></option>
+			<?php foreach ( charitable_get_valid_donation_statuses() as $charitable_key => $status ) : // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited ?>
+				<option value="<?php echo esc_attr( $charitable_key ); ?>" <?php selected( $charitable_post_status, $charitable_key ); ?>><?php echo esc_html( $status ); ?></option>
 			<?php endforeach ?>
 		</select>
 		<label for="charitable-donations-filter-campaign"><?php esc_html_e( 'Filter by Campaign', 'charitable' ); ?></label>
 		<select id="charitable-donations-filter-campaign" name="campaign_id">
 			<option value="all"><?php esc_html_e( 'All Campaigns', 'charitable' ); ?></option>
-			<?php foreach ( $campaigns as $campaign ) : ?>
-				<option value="<?php echo esc_attr( $campaign->ID ); ?>" <?php selected( $campaign_id, $campaign->ID ); ?>><?php echo esc_html( get_the_title( $campaign->ID ) ); ?></option>
+			<?php foreach ( $charitable_campaigns as $charitable_campaign ) : ?>
+				<option value="<?php echo esc_attr( $charitable_campaign->ID ); ?>" <?php selected( $charitable_campaign_id, $charitable_campaign->ID ); ?>><?php echo esc_html( get_the_title( $charitable_campaign->ID ) ); ?></option>
 			<?php endforeach ?>
 		</select>
 		<?php

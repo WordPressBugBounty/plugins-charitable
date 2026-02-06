@@ -7,6 +7,8 @@
  * @author  WP Charitable LLC
  * @package Charitable/Templates/Emails
  * @version 1.0.0
+ * @version 1.8.8.4 - fixed PHP warning when using wp_kses_post() in footer content.
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -15,12 +17,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // For gmail compatibility, including CSS styles in head/body are stripped out therefore styles need to be inline. These variables contain rules which are added to the template inline.
-$template_footer = "
+$charitable_template_footer = "
 	border-top:0;
 	-webkit-border-radius:3px;
 ";
 
-$credit = "
+$charitable_credit = "
 	border:0;
 	color: #000000;
 	font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif;
@@ -43,14 +45,21 @@ $credit = "
 							<tr>
 								<td align="center" valign="top">
 									<!-- Footer -->
-									<table border="0" cellpadding="10" cellspacing="0" width="600" id="template_footer" style="<?php echo $template_footer; ?>">
+									<table border="0" cellpadding="10" cellspacing="0" width="600" id="template_footer" style="<?php echo esc_attr( $charitable_template_footer ); ?>">
 										<tr>
 											<td valign="top">
 												<table border="0" cellpadding="10" cellspacing="0" width="100%">
 													<tr>
-														<td colspan="2" valign="middle" id="credit" style="<?php echo $credit; ?>">
+														<td colspan="2" valign="middle" id="credit" style="<?php echo esc_attr( $charitable_credit ); ?>">
 															<?php
-																echo wpautop(
+																/**
+																 * Filter the complete email footer content output.
+																 *
+																 * @since 1.8.0
+																 *
+																 * @param string $footer_content The default footer content.
+																 */
+																$charitable_footer_content = apply_filters( 'charitable_email_footer_content', wp_kses_post( wpautop(
 																	wp_kses_post(
 																		wptexturize(
 																			/**
@@ -63,7 +72,9 @@ $credit = "
 																			apply_filters( 'charitable_email_footer_text', '<a href="' . esc_url( home_url() ) . '">' . get_bloginfo( 'name' ) . '</a>' )
 																		)
 																	)
-																);
+																) ) );
+
+																echo wp_kses_post( $charitable_footer_content );
 															?>
 														</td>
 													</tr>

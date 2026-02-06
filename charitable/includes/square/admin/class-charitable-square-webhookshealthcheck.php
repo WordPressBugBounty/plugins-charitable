@@ -165,15 +165,16 @@ if ( ! class_exists( 'Charitable_Square_WebhooksHealthCheck' ) ) :
 			global $wpdb;
 
 			// Find the last 'donation' custom post type with a meta_key of 'gateway' set to 'square'.
-			$payments = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$wpdb->prepare(
-					"SELECT * FROM {$wpdb->prefix}posts
-				WHERE post_type = 'donation'
-				AND meta_key = 'donation_gateway'
-				AND meta_value = 'square'
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQLPlaceholders.UnnecessaryPrepare
+			$payments = $wpdb->get_results(
+				"SELECT * FROM {$wpdb->posts} p
+				INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
+				WHERE p.post_type = 'donation'
+				AND p.post_status = 'charitable-completed'
+				AND pm.meta_key = 'donation_gateway'
+				AND pm.meta_value = 'square'
 				ORDER BY ID DESC
-				LIMIT 1"
-				),
+				LIMIT 1",
 				ARRAY_A
 			);
 

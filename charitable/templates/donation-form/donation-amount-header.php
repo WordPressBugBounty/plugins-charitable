@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * The template used to display the donation amount form header.
  *
@@ -7,4 +13,4 @@
  * @version 1.0.0
  */
 ?>
-<h3 class="charitable-form-header"><?php _ex( 'Your Donation', 'donation form amount section header', 'charitable' ) ?></h3>
+<h3 class="charitable-form-header"><?php esc_html_x( 'Your Donation', 'donation form amount section header', 'charitable' ) ?></h3>

@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
- * @version   1.6.5
+ * @version   1.8.9.1
  */
 
 // Exit if accessed directly.
@@ -144,13 +144,14 @@ if ( ! class_exists( 'Charitable_Donors_DB' ) ) :
 		 * Default column values.
 		 *
 		 * @since  1.0.0
+		 * @version 1.8.9.1
 		 *
 		 * @return array
 		 */
 		public function get_column_defaults() {
 			$defaults = array(
 				'user_id'     => 0,
-				'date_joined' => date( 'Y-m-d H:i:s' ),
+				'date_joined' => date( 'Y-m-d H:i:s' ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 			);
 
 			return array_intersect_key( $defaults, array_flip( $this->get_db_columns() ) );

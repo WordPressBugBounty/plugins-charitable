@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version   1.8.1.4
+ * @version   1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -611,7 +611,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Marketing' ) ) :
 					if ( strpos( $addon_url, 'charitable-newsletter-connect' ) !== false && $marketing_item_slug === 'mailchimp' ) {
 						echo '<a class="button-link charitable-upgrade-to-pro-button" target="_blank" href="https://wpcharitable.com/lite-vs-pro/?utm_source=WordPress&utm_campaign=WP+Charitable&utm_medium=Upgrade+From+Lite+Top+Banner+Link&utm_content=To+unlock+more+features+consider+upgrading+to+Pro">' . esc_html__( 'Upgrade to PRO', 'charitable' ) . '</a>';
 					} else {
-						echo '<a class="button-link ' . esc_attr( $action_css_class ) . '" data-settings-url="' . esc_url( $settings_url ) . '" data-plugin-url="' . esc_attr( $addon_information_install ) . '" data-name="' . esc_attr( $addon_information_name ) . '" data-plugin-slug="' . $addon_url . '" data-field-icon="">' . $button_label . '</a>';
+						echo '<a class="button-link ' . esc_attr( $action_css_class ) . '" data-settings-url="' . esc_url( $settings_url ) . '" data-plugin-url="' . esc_attr( $addon_information_install ) . '" data-name="' . esc_attr( $addon_information_name ) . '" data-plugin-slug="' . esc_attr( $addon_url ) . '" data-field-icon="">' . esc_html( $button_label ) . '</a>';
 					}
 					?>
 				</div>
@@ -649,7 +649,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Marketing' ) ) :
 
 			if ( class_exists( 'Charitable_Newsletter_Connect_Providers' ) ) :
 
-				$helper    = Charitable_Newsletter_Connect_Providers::get_instance();
+				$helper    = Charitable_Newsletter_Connect_Providers::get_instance(); // phpcs:ignore
 				$providers = $helper->get_available_providers();
 				$found     = false;
 

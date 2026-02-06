@@ -1080,8 +1080,12 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
                 yaxis: {
                     labels: {
                         formatter: (value) => {
-                            // value is a currency, so limit it to 2 decimal places.
-                            return app.decodeHtml(charitable_reporting.currency_symbol) + value.toFixed(2)
+                            // Format currency values using the configured decimal count.
+                            // Currency symbol is already decoded in PHP, so use it directly.
+                            var decimalCount = typeof charitable_reporting.decimal_count !== 'undefined'
+                                ? charitable_reporting.decimal_count
+                                : 2;
+                            return charitable_reporting.currency_symbol + value.toFixed(decimalCount);
                         }
                     },
                     min: 0
@@ -1122,12 +1126,53 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
                 this.return;
             }
 
+            // Color mapping for payment methods by gateway key.
+            // This ensures consistent colors regardless of order.
+            // Colors match the CSS legend dot colors in charitable-admin.scss.
+            var paymentMethodColors = {
+                'stripe': '#5AA152',      // Green (matches CSS)
+                'offline': '#9e36f9',     // Purple (matches CSS)
+                'manual': '#F99E36',      // Orange (matches CSS)
+                'paypal': '#2B66D1',      // Blue (matches CSS)
+                'square_core': '#d21561', // Pink/Red (unique color for Square)
+                'square': '#d21561'       // Legacy Square support
+            };
+
+            // Default color palette for unknown payment methods.
+            var defaultColors = [
+                '#d21561', '#9e36f9', '#F99E36', '#2B66D1', '#5AA152'
+            ];
+
+            // Build colors array based on payment method keys.
+            var paymentKeys = typeof charitable_reporting.payment_methods_chart_options.payment_keys !== 'undefined'
+                ? charitable_reporting.payment_methods_chart_options.payment_keys
+                : [];
+            var colors = [];
+            var colorIndex = 0;
+
+            for ( var i = 0; i < paymentKeys.length; i++ ) {
+                var key = paymentKeys[i];
+                if ( key && paymentMethodColors[key] ) {
+                    colors.push( paymentMethodColors[key] );
+                } else if ( key ) {
+                    // For unknown payment methods, use a color from the default palette.
+                    colors.push( defaultColors[colorIndex % defaultColors.length] );
+                    colorIndex++;
+                } else {
+                    // Empty key (usually the trailing empty entry), use first default color.
+                    colors.push( defaultColors[0] );
+                }
+            }
+
+            // If no colors were generated (fallback), use the default array.
+            if ( colors.length === 0 ) {
+                colors = defaultColors;
+            }
+
             var paymentMethodsChartOptions = {
                 series: charitable_reporting.payment_methods_chart_options.payment_percentages,
                 labels: charitable_reporting.payment_methods_chart_options.payment_labels,
-                colors: [
-                    '#d21561', '#9e36f9', '#F99E36', '#2B66D1', '#5AA152'
-                ],
+                colors: colors,
                 chart: {
                     type: 'donut',
                     width: '75%',

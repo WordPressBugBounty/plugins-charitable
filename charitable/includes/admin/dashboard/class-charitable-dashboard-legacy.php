@@ -390,8 +390,17 @@ if ( ! class_exists( 'Charitable_Dashboard_Legacy' ) ) :
 
 			$args = apply_filters( 'charitable_dashboard_report_html_args', wp_parse_args( $args, $defaults ) );
 
-			// break up array into individual vars.
-			extract( $args ); // phpcs:ignore
+			// Extract individual variables from args array.
+			$start_date                = $args['start_date'] ?? false;
+			$end_date                  = $args['end_date'] ?? false;
+			$days                      = $args['days'] ?? false;
+			$show_support_box          = $args['show_support_box'] ?? true;
+			$include_icons             = $args['include_icons'] ?? true;
+			$action                    = $args['action'] ?? false;
+			$show_recommended_addons   = $args['show_recommended_addons'] ?? true;
+			$show_recommended_snippets = $args['show_recommended_snippets'] ?? true;
+			$show_notifications        = $args['show_notifications'] ?? true;
+			$use_cache                 = $args['use_cache'] ?? 'no';
 
 			if ( false === $days ) {
 				$args = $this->get_cached_dashboard_data_args();

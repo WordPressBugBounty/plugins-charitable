@@ -8,6 +8,7 @@
  * @package Charitable/Templates/Tables
  * @since   1.5.0
  * @version 1.5.0
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -19,12 +20,12 @@ if ( ! array_key_exists( 'data', $view_args ) || ! array_key_exists( 'columns', 
     return;
 }
 
-$data    = $view_args['data'];
-$columns = $view_args['columns'];
+$charitable_data    = $view_args['data'];
+$charitable_columns = $view_args['columns'];
 
 ?>
 <tr>
-    <?php foreach ( $columns as $key => $header ) : ?>
-    <td class="charitable-table-cell-<?php echo esc_attr( $key ) ?>"><?php echo array_key_exists( $key, $data ) ? wp_kses_post( $data[ $key ] ) : '' ?></td>
+    <?php foreach ( $charitable_columns as $charitable_key => $charitable_header ) : ?>
+    <td class="charitable-table-cell-<?php echo esc_attr( $charitable_key ) ?>"><?php echo array_key_exists( $charitable_key, $charitable_data ) ? wp_kses_post( $charitable_data[ $charitable_key ] ) : '' ?></td>
     <?php endforeach ?>
 </tr>

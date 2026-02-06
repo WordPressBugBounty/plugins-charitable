@@ -414,7 +414,7 @@ if ( ! class_exists( 'Charitable_Admin_Blocks' ) ) :
 				);
 			}
 
-			do_action( 'after_charitable_admin_block_enqueue_scripts', $min, $version, $assets_dir );
+			do_action( 'after_charitable_admin_block_enqueue_scripts', $min, $version, $assets_dir ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook name may be used by other code. Changing it would break existing functionality.
 		}
 
 		/**

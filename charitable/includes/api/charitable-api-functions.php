@@ -24,4 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function charitable_register_api_routes() {
 	$route = new Charitable_API_Route_Reports();
 	$route->register_routes();
+
+	$css_route = new Charitable_API_Route_Campaign_CSS();
+	$css_route->register_routes();
 }

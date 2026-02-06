@@ -286,7 +286,9 @@ if ( ! class_exists( 'Charitable_Square_WebhooksManager' ) ) :
 				}
 			} catch ( Exception $e ) {
 				// Log the exception or handle it appropriately.
-				error_log( 'Error listing Square webhooks: ' . $e->getMessage() );
+				if ( charitable_is_debug() ) {
+					error_log( 'Error listing Square webhooks: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				}
 				return array();
 			}
 

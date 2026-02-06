@@ -218,7 +218,7 @@ if ( ! class_exists( 'Charitable_Endpoint' ) ) :
 		 * @return string
 		 */
 		public function sanitize_endpoint_url( $base_url, $slug ) {
-			$url_parts = parse_url( $base_url );
+			$url_parts = parse_url( $base_url ); // phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url
 
 			if ( ! array_key_exists( 'query', $url_parts ) ) {
 				return trailingslashit( $base_url ) . trailingslashit( $slug );

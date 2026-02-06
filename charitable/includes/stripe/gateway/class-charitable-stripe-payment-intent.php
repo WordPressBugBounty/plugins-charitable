@@ -61,6 +61,15 @@ if ( ! class_exists( 'Charitable_Stripe_Payment_Intent' ) ) :
 		private $options;
 
 		/**
+		 * The destination account for Stripe Connect.
+		 *
+		 * @since 1.4.0
+		 *
+		 * @var   string|null
+		 */
+		private $destination;
+
+		/**
 		 * Create class object.
 		 *
 		 * @since 1.4.0
@@ -240,29 +249,29 @@ if ( ! class_exists( 'Charitable_Stripe_Payment_Intent' ) ) :
 		 * @return void Output is sent as a JSON response.
 		 */
 		public static function ajax_update() {
-			if ( ! array_key_exists( 'amount', $_POST ) ) {
+			if ( ! array_key_exists( 'amount', $_POST ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 				wp_send_json_error( __( 'Missing amount in request.', 'charitable' ) );
 			}
 
-			if ( 0 == $_POST['amount'] ) {
+			if ( 0 == $_POST['amount'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 				return;
 			}
 
-			$options = $_POST['options'];
+			$options = $_POST['options']; // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotValidated,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 			if ( is_array( $options ) && array_key_exists( 'stripeAccount', $options ) ) {
 				$options['stripe_account'] = $options['stripeAccount'];
 				unset( $options['stripeAccount'] );
 			}
 
-			if ( empty( $_POST['intent'] ) ) {
-				$intent = new Charitable_Stripe_Payment_Intent( '', $options, $_POST['destination'] );
-				$intent->create( $_POST['amount'] );
+			if ( empty( $_POST['intent'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				$intent = new Charitable_Stripe_Payment_Intent( '', $options, $_POST['destination'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotValidated,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				$intent->create( $_POST['amount'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			} else {
-				$intent = new Charitable_Stripe_Payment_Intent( $_POST['intent'], $options );
+				$intent = new Charitable_Stripe_Payment_Intent( $_POST['intent'], $options ); // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 				$intent->update(
 					[
-						'amount' => Charitable_Stripe_Gateway_Processor::get_sanitized_donation_amount( $_POST['amount'] ),
+						'amount' => Charitable_Stripe_Gateway_Processor::get_sanitized_donation_amount( $_POST['amount'] ), // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 					]
 				);
 			}

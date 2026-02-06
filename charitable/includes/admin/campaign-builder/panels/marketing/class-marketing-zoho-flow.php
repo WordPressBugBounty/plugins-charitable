@@ -178,7 +178,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Marketing_Zoho_Flow' ) ) :
 				<?php
 
 				// determine if the user is (1) using pro and (2) has the needed addon activated.
-				if ( charitable_is_pro() && in_array( $this->needed_addon_url, apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
+				if ( charitable_is_pro() && in_array( $this->needed_addon_url, apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- 'active_plugins' is a WordPress core hook.
 
 					// plugin is activated so proceed with displaying non-marketing, plugin content.
 					$panel->plugin_activated_text( $this->primary_label, esc_attr( $this->slug ), $this->needed_addon_name, $button_label, $button_url, $this->needed_addon_url, true );

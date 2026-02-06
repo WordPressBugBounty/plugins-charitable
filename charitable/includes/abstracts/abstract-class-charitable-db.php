@@ -10,8 +10,10 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
- * @version   1.5.11
+ * @version   1.8.9.1
  */
+
+// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -84,6 +86,7 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 		 * Return the format for the given column.
 		 *
 		 * @since  1.0.0
+		 * @version 1.8.9.1
 		 *
 		 * @param  string $column The column to get the format for.
 		 * @return %s, %d or %f
@@ -92,17 +95,34 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 			$columns = $this->get_columns();
 			$format  = isset( $columns[ $column ] ) ? $columns[ $column ] : false;
 
-			// If the column isn't found, throw an exception.
-			if ( false === $format ) {
-				throw new Exception( sprintf( 'Invalid column passed %s', $column ) );
-			}
+		// If the column isn't found, throw an exception.
+		if ( false === $format ) {
+			throw new Exception( sprintf( 'Invalid column passed %s', esc_html( $column ) ) );
+		}
 
-			// If the column format isn't valid, throw an exception.
-			if ( ! in_array( $format, array( '%s', '%d', '%f' ) ) ) {
-				throw new Exception( sprintf( 'Invalid column format for column %s. Format returned %s', $column, $format ) );
-			}
+		// If the column format isn't valid, throw an exception.
+		if ( ! in_array( $format, array( '%s', '%d', '%f' ) ) ) {
+			throw new Exception( sprintf( 'Invalid column format for column %s. Format returned %s', esc_html( $column ), esc_html( $format ) ) );
+		}
 
 			return $format;
+		}
+
+		/**
+		 * Validate that a column name exists in the table schema.
+		 *
+		 * @since  1.8.8.6
+		 *
+		 * @param  string $column The column name to validate.
+		 * @return string The validated column name.
+		 * @throws Exception If column is invalid.
+		 */
+		protected function validate_column_name( $column ) {
+			$columns = $this->get_columns();
+			if ( ! isset( $columns[ $column ] ) ) {
+				throw new Exception( sprintf( 'Invalid column passed %s', esc_html( $column ) ) );
+			}
+			return $column;
 		}
 
 		/**
@@ -115,12 +135,16 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 		public function get( $row_id ) {
 			global $wpdb;
 
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter
+			// Direct database queries are expected in this database abstraction class.
+			// $this->table_name and $this->primary_key are class properties set at initialization and validated.
 			return $wpdb->get_row(
 				$wpdb->prepare(
 					"SELECT * FROM $this->table_name WHERE $this->primary_key = %d LIMIT 1;",
 					$row_id
 				)
-			); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		}
 
 		/**
@@ -132,12 +156,19 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 		public function get_by( $column, $row_id ) {
 			global $wpdb;
 
+			// Validate column name before use.
+			$column = $this->validate_column_name( $column );
+
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter
+			// Direct database queries are expected in this database abstraction class.
+			// $column is validated above via validate_column_name(), $this->table_name is a class property set at initialization.
 			return $wpdb->get_row(
 				$wpdb->prepare(
 					"SELECT * FROM $this->table_name WHERE $column = {$this->get_column_format($column)} LIMIT 1;",
 					$row_id
 				)
-			); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -150,12 +181,19 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 		public function get_column( $column, $row_id ) {
 			global $wpdb;
 
+			// Validate column name before use.
+			$column = $this->validate_column_name( $column );
+
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter
+			// Direct database queries are expected in this database abstraction class.
+			// $column is validated above via validate_column_name(), $this->table_name and $this->primary_key are class properties set at initialization.
 			return $wpdb->get_var(
 				$wpdb->prepare(
 					"SELECT $column FROM $this->table_name WHERE $this->primary_key = %d LIMIT 1;",
 					$row_id
 				)
-			); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -171,12 +209,20 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 		public function get_column_by( $column, $column_where, $column_value ) {
 			global $wpdb;
 
+			// Validate column names before use.
+			$column       = $this->validate_column_name( $column );
+			$column_where = $this->validate_column_name( $column_where );
+
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter
+			// Direct database queries are expected in this database abstraction class.
+			// $column and $column_where are validated above via validate_column_name(), $this->table_name is a class property set at initialization.
 			return $wpdb->get_var(
 				$wpdb->prepare(
 					"SELECT $column FROM $this->table_name WHERE $column_where = {$this->get_column_format($column_where)} LIMIT 1;",
 					$column_value
 				)
-			); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -192,12 +238,20 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 		public function get_column_all_by( $column, $column_where, $column_value ) {
 			global $wpdb;
 
+			// Validate column names before use.
+			$column       = $this->validate_column_name( $column );
+			$column_where = $this->validate_column_name( $column_where );
+
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter
+			// Direct database queries are expected in this database abstraction class.
+			// $column and $column_where are validated above via validate_column_name(), $this->table_name is a class property set at initialization.
 			return $wpdb->get_col(
 				$wpdb->prepare(
 					"SELECT $column FROM $this->table_name WHERE $column_where = {$this->get_column_format($column_where)};",
 					$column_value
 				)
-			); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -210,9 +264,13 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 		public function count_all() {
 			global $wpdb;
 
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			// Direct database queries are expected in this database abstraction class.
+			// $this->table_name is a class property set at initialization.
 			return $wpdb->get_var(
 				"SELECT COUNT( * ) FROM $this->table_name;"
-			); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -225,18 +283,26 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 		public function count_by( $column, $column_value ) {
 			global $wpdb;
 
+			// Validate column name before use.
+			$column = $this->validate_column_name( $column );
+
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter
+			// Direct database queries are expected in this database abstraction class.
+			// $column is validated above via validate_column_name(), $this->table_name is a class property set at initialization.
 			return $wpdb->get_var(
 				$wpdb->prepare(
 					"SELECT COUNT( * ) FROM $this->table_name WHERE $column = {$this->get_column_format($column)};",
 					$column_value
 				)
-			); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
 		 * Insert a new row
 		 *
-		 * @since  1.0.0
+		 * @since   1.0.0
+		 * @version 1.8.8.6
 		 *
 		 * @return int
 		 */
@@ -261,7 +327,11 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 			$data_keys      = array_keys( $data );
 			$column_formats = array_merge( array_flip( $data_keys ), $column_formats );
 
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			// Direct database queries are expected in this database abstraction class.
+			// $this->table_name is a class property set at initialization, and $data/$column_formats are sanitized above.
 			$inserted = $wpdb->insert( $this->table_name, $data, $column_formats );
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			/* If the insert failed, return 0 */
 			if ( false === $inserted ) {
@@ -277,6 +347,7 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 		 * Update a row.
 		 *
 		 * @since  1.0.0
+		 * @version 1.8.8.6
 		 *
 		 * @global WPDB $wpdb
 		 * @param  int    $row_id The record to update.
@@ -311,7 +382,14 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 			$data_keys      = array_keys( $data );
 			$column_formats = array_merge( array_flip( $data_keys ), $column_formats );
 
-			if ( false === $wpdb->update( $this->table_name, $data, array( $where => $row_id ), $column_formats ) ) {
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			// Direct database queries are expected in this database abstraction class.
+			// $this->table_name is a class property set at initialization, $where is validated (defaults to primary_key or validated column),
+			// $row_id is sanitized via absint(), and $data/$column_formats are sanitized above.
+			$updated = $wpdb->update( $this->table_name, $data, array( $where => $row_id ), $column_formats );
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+
+			if ( false === $updated ) {
 				return false;
 			}
 
@@ -350,7 +428,14 @@ if ( ! class_exists( 'Charitable_DB' ) ) :
 		public function delete_by( $column, $row_id = 0 ) {
 			global $wpdb;
 
+			// Validate column name before use.
+			$column = $this->validate_column_name( $column );
+
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter
+			// Direct database queries are expected in this database abstraction class.
+			// $column is validated above via validate_column_name(), $this->table_name is a class property set at initialization.
 			$result = $wpdb->query( $wpdb->prepare( "DELETE FROM $this->table_name WHERE $column = {$this->get_column_format($column)}", $row_id ) );
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 			return false !== $result;
 		}

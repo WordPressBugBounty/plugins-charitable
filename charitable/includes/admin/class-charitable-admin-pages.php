@@ -721,7 +721,7 @@ if ( ! class_exists( 'Charitable_Admin_Pages' ) ) :
 						'relation' => 'OR',
 						array(
 							'key'     => '_campaign_end_date',
-							'value'   => date( 'Y-m-d H:i:s' ),
+							'value'   => date( 'Y-m-d H:i:s' ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 							'compare' => '>=',
 							'type'    => 'datetime',
 						),

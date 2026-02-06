@@ -203,15 +203,19 @@ function charitable_reports_get_advanced_data_report( $report_type = 'lybunt' ) 
 		return;
 	}
 
+	// phpcs:disable WordPress.Security.NonceVerification.Missing
 	// security check.
-	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'charitable-reporting' ) ) {
+	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- wp_verify_nonce handles validation
+	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'charitable-reporting' ) ) {
 		wp_send_json_error( 'Invalid nonce.' );
 		exit;
 	}
 
+	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array data, sanitized in function
 	$charitable_report_advanced_args = charitable_reports_get_advanced_report_args( $_POST );
 
-	$report_type = isset( $_POST['report_type'] ) ? esc_html( $_POST['report_type'] ) : $charitable_report_advanced_args['report_type'];
+	$report_type = isset( $_POST['report_type'] ) ? esc_html( wp_unslash( $_POST['report_type'] ) ) : $charitable_report_advanced_args['report_type']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by esc_html
+	// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 	$charitable_reports = Charitable_Reports::get_instance();
 

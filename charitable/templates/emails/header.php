@@ -7,6 +7,7 @@
  * @author  WP Charitable LLC
  * @package Charitable/Templates/Emails
  * @version 1.0.0
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -14,30 +15,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$email = $view_args['email'];
+$charitable_email = $view_args['email'];
 
-if ( is_object( $email ) && is_a( $email, 'Charitable_Email' ) ) {
+if ( is_object( $charitable_email ) && is_a( $charitable_email, 'Charitable_Email' ) ) {
 
-	$headline = $email->get_headline();
+	$charitable_headline = $charitable_email->get_headline();
 
 } elseif ( array_key_exists( 'headline', $view_args ) ) {
 
-	$headline = $view_args['headline'];
+	$charitable_headline = $view_args['headline'];
 
 }
 
 // For gmail compatibility, including CSS styles in head/body are stripped out therefore styles need to be inline. These variables contain rules which are added to the template inline. !important; is a gmail hack to prevent styles being stripped if it doesn't like something.
-$body = "
+$charitable_body = "
 	background-color: #f6f6f6;
 	font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif;
 ";
-$wrapper = "
+$charitable_wrapper = "
 	width:100%;
 	-webkit-text-size-adjust:none !important;
 	margin:0;
 	padding: 70px 0 70px 0;
 ";
-$template_container = "
+$charitable_template_container = "
 	box-shadow:0 0 0 1px #f3f3f3 !important;
 	border-radius:3px !important;
 	background-color: #ffffff;
@@ -45,7 +46,7 @@ $template_container = "
 	border-radius:3px !important;
 	padding: 20px;
 ";
-$template_header = "
+$charitable_template_header = "
 	color: #00000;
 	border-top-left-radius:3px !important;
 	border-top-right-radius:3px !important;
@@ -55,18 +56,18 @@ $template_header = "
 	text-align: center;
 	vertical-align:middle;
 ";
-$body_content = "
+$charitable_body_content = "
 	border-radius:3px !important;
 	font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif;
 ";
-$body_content_inner = "
+$charitable_body_content_inner = "
 	color: #000000;
 	font-size:14px;
 	font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif;
 	line-height:150%;
 	text-align:left;
 ";
-$header_content_h1 = "
+$charitable_header_content_h1 = "
 	color: #000000;
 	margin:0;
 	padding: 28px 24px;
@@ -76,32 +77,32 @@ $header_content_h1 = "
 	font-weight: 500;
 	line-height: 1.2;
 ";
-$header_img = false;
+$charitable_header_img = false;
 ?>
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title><?php echo get_bloginfo( 'name' ); ?></title>
+		<title><?php echo esc_html( get_bloginfo( 'name' ) ); ?></title>
 	</head>
-	<body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" style="<?php echo $body; ?>">
-		<div style="<?php echo $wrapper; ?>">
+	<body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" style="<?php echo esc_attr( $charitable_body ); ?>">
+		<div style="<?php echo esc_attr( $charitable_wrapper ); ?>">
 		<table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%">
 			<tr>
 				<td align="center" valign="top">
-					<?php if( ! empty( $header_img ) ) : ?>
+					<?php if( ! empty( $charitable_header_img ) ) : ?>
 						<div id="template_header_image">
-							<?php echo '<p style="margin-top:0;"><img src="' . esc_url( $header_img ) . '" alt="' . get_bloginfo( 'name' ) . '" /></p>'; ?>
+							<?php echo '<p style="margin-top:0;"><img src="' . esc_url( $charitable_header_img ) . '" alt="' . esc_attr( get_bloginfo( 'name' ) ) . '" /></p>'; ?>
 						</div>
 					<?php endif; ?>
-					<table border="0" cellpadding="0" cellspacing="0" width="520" id="template_container" style="<?php echo $template_container; ?>">
+						<table border="0" cellpadding="0" cellspacing="0" width="520" id="template_container" style="<?php echo esc_attr( $charitable_template_container ); ?>">
 						<tr>
 							<td align="center" valign="top">
 								<!-- Header -->
-								<table border="0" cellpadding="0" cellspacing="0" width="520" id="template_header" style="<?php echo $template_header; ?>" bgcolor="#ffffff">
+								<table border="0" cellpadding="0" cellspacing="0" width="520" id="template_header" style="<?php echo esc_attr( $charitable_template_header ); ?>" bgcolor="#ffffff">
 									<tr>
 										<td>
-											<h1 style="<?php echo $header_content_h1; ?>"><?php echo $headline ?></h1>
+											<h1 style="<?php echo esc_attr( $charitable_header_content_h1 ); ?>"><?php echo esc_html( $charitable_headline ); ?></h1>
 										</td>
 									</tr>
 								</table>
@@ -113,9 +114,9 @@ $header_img = false;
 								<!-- Body -->
 								<table border="0" cellpadding="0" cellspacing="0" width="520" id="template_body">
 									<tr>
-										<td valign="top" style="<?php echo $body_content; ?>">
+										<td valign="top" style="<?php echo esc_attr( $charitable_body_content ); ?>">
 											<!-- Content -->
 											<table border="0" cellpadding="20" cellspacing="0" width="100%">
 												<tr>
 													<td valign="top">
-														<div style="<?php echo $body_content_inner; ?>">
+														<div style="<?php echo esc_attr( $charitable_body_content_inner ); ?>">

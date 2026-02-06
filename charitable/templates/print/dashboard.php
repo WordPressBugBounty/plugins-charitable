@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Format this page for PDF or print.
  *
@@ -8,6 +14,7 @@
  * @author  WPCharitable
  * @since   1.8.1
  * @version 1.8.1.6
+ * @version 1.8.8.6
  */
 
 $charitable_action = $view_args['action'] === 'print' ? 'print' : 'download';
@@ -17,20 +24,20 @@ $charitable_reports       = $view_args['charitable_reports'];
 $charitable_admin_2_0_css = $view_args['charitable_admin_2_0_css'];
 $charitable_chart_js      = $view_args['charitable_chart_js'];
 
-$start_date = ! empty( $view_args['start_date'] ) ? $view_args['start_date'] : false;
-$end_date   = ! empty( $view_args['end_date'] ) ? $view_args['end_date'] : false;
+$charitable_start_date = ! empty( $view_args['start_date'] ) ? $view_args['start_date'] : false;
+$charitable_end_date   = ! empty( $view_args['end_date'] ) ? $view_args['end_date'] : false;
 
-$headline_chart_options = $view_args['headline_chart_options'];
+$charitable_headline_chart_options = $view_args['headline_chart_options'];
 
 // Regarding the donation and data axis for the headline chart: convert php array values into a javascript array.
-$headline_chart_options_donation_axis = wp_json_encode( $headline_chart_options['donation_axis'] );
-$headline_chart_options_date_axis     = wp_json_encode( $headline_chart_options['date_axis'] );
+$charitable_headline_chart_options_donation_axis = wp_json_encode( $charitable_headline_chart_options['donation_axis'] );
+$charitable_headline_chart_options_date_axis     = wp_json_encode( $charitable_headline_chart_options['date_axis'] );
 
-$payment_methods_chart_options_payment_percentages = wp_json_encode( array() );
-$payment_methods_chart_options_payment_labels      = wp_json_encode( array() );
+$charitable_payment_methods_chart_options_payment_percentages = wp_json_encode( array() );
+$charitable_payment_methods_chart_options_payment_labels      = wp_json_encode( array() );
 
-$currency_symbol = $view_args['currency_symbol'];
-$currency_symbol = ( false !== $currency_symbol ) ? html_entity_decode( $currency_symbol ) : '$';
+$charitable_currency_symbol = $view_args['currency_symbol'];
+$charitable_currency_symbol = ( false !== $charitable_currency_symbol ) ? html_entity_decode( $charitable_currency_symbol ) : '$';
 
 ?>
 <!DOCTYPE html>
@@ -96,8 +103,8 @@ $currency_symbol = ( false !== $currency_symbol ) ? html_entity_decode( $currenc
 
 				<div class="charitable-print-header">
 					<h1><?php echo esc_html__( 'Dashboard Report', 'charitable' ); ?></h1>
-					<?php if ( $start_date && $end_date ) : ?>
-						<p><?php echo esc_html( $start_date ); ?> - <?php echo esc_html( $end_date ); ?></p>
+					<?php if ( $charitable_start_date && $charitable_end_date ) : ?>
+						<p><?php echo esc_html( $charitable_start_date ); ?> - <?php echo esc_html( $charitable_end_date ); ?></p>
 					<?php endif; ?>
 				</div>
 
@@ -128,13 +135,13 @@ $currency_symbol = ( false !== $currency_symbol ) ? html_entity_decode( $currenc
 			<script id="charitable-report-data-js">
 
 					var charitable_reporting = {
-						'currency_symbol' : "<?php echo $currency_symbol; // phpcs:ignore ?>",
+						'currency_symbol' : "<?php echo $charitable_currency_symbol; // phpcs:ignore ?>",
 						"headline_chart_options":{
-							"donation_axis":<?php echo $headline_chart_options_donation_axis; // phpcs:ignore ?>,
-							"date_axis":<?php echo $headline_chart_options_date_axis; // phpcs:ignore ?>},
+							"donation_axis":<?php echo $charitable_headline_chart_options_donation_axis; // phpcs:ignore ?>,
+							"date_axis":<?php echo $charitable_headline_chart_options_date_axis; // phpcs:ignore ?>},
 						"payment_methods_chart_options":{
-							"payment_percentages":<?php echo $payment_methods_chart_options_payment_percentages; // phpcs:ignore ?>,
-							"payment_labels":<?php echo $payment_methods_chart_options_payment_labels; // phpcs:ignore ?>
+							"payment_percentages":<?php echo $charitable_payment_methods_chart_options_payment_percentages; // phpcs:ignore ?>,
+							"payment_labels":<?php echo $charitable_payment_methods_chart_options_payment_labels; // phpcs:ignore ?>
 						}
 					};
 

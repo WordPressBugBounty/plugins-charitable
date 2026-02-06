@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
- * @version   1.6.55
+ * @version   1.8.9.1
  */
 
 // Exit if accessed directly.
@@ -333,22 +333,22 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 		public static function process_ipn() {
 			/* We only accept POST requests */
 			if ( ! self::is_valid_request() ) {
-				die( __( 'Invalid Request', 'charitable' ) );
+				die( esc_html( __( 'Invalid Request', 'charitable' ) ) );
 			}
 
 			$gateway = new Charitable_Gateway_Paypal();
 			$data    = $gateway->get_encoded_ipn_data();
 
 			if ( charitable_is_debug() ) {
-				error_log( var_export( $data, true ) );
+				error_log( var_export( $data, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log, WordPress.PHP.DevelopmentFunctions.error_log_var_export
 			}
 
 			if ( empty( $data ) ) {
-				die( __( 'Empty Data', 'charitable' ) );
+				die( esc_html( __( 'Empty Data', 'charitable' ) ) );
 			}
 
 			if ( ! $gateway->paypal_ipn_verification( $data ) ) {
-				die( __( 'IPN Verification Failure', 'charitable' ) );
+				die( esc_html( __( 'IPN Verification Failure', 'charitable' ) ) );
 			}
 
 			$defaults = array(
@@ -364,7 +364,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 				: absint( $custom );
 
 			if ( ! $donation_id ) {
-				die( __( 'Missing Donation ID', 'charitable' ) );
+				die( esc_html( __( 'Missing Donation ID', 'charitable' ) ) );
 			}
 
 			/**
@@ -399,7 +399,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 			$donation = charitable_get_donation( $donation_id );
 
 			if ( 'paypal' != $donation->get_gateway() ) {
-				die( __( 'Incorrect Gateway', 'charitable' ) );
+				die( esc_html( __( 'Incorrect Gateway', 'charitable' ) ) );
 			}
 
 			$custom = json_decode( $data['custom'], true );
@@ -409,7 +409,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 			} elseif ( is_array( $custom ) && array_key_exists( 'donation_key', $custom ) ) {
 				$donation_key = $custom['donation_key'];
 			} else {
-				die( __( 'Missing Donation Key', 'charitable' ) );
+				die( esc_html( __( 'Missing Donation Key', 'charitable' ) ) );
 			}
 
 			$amount         = $data['mc_gross'];
@@ -423,7 +423,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 				$message = sprintf( '%s %s', __( 'Invalid Business email in the IPN response. IPN data:', 'charitable' ), wp_json_encode( $data ) );
 				$donation->log()->add( $message );
 				$donation->update_status( 'charitable-failed' );
-				die( __( 'Incorrect Business Email', 'charitable' ) );
+				die( esc_html( __( 'Incorrect Business Email', 'charitable' ) ) );
 
 			}
 
@@ -434,7 +434,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 				$donation->log()->add( $message );
 				$donation->update_status( 'charitable-failed' );
 
-				die( __( 'Incorrect Currency', 'charitable' ) );
+				die( esc_html( __( 'Incorrect Currency', 'charitable' ) ) );
 
 			}
 
@@ -458,7 +458,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 
 				$donation->process_refund( $amount, $message );
 
-				die( __( 'Refund Processed', 'charitable' ) );
+				die( esc_html( __( 'Refund Processed', 'charitable' ) ) );
 
 			}
 
@@ -469,13 +469,13 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 				$donation->log()->add( $message );
 				$donation->update_status( 'charitable-failed' );
 
-				die( __( 'Payment Failed', 'charitable' ) );
+				die( esc_html( __( 'Payment Failed', 'charitable' ) ) );
 
 			}
 
 			/* If we have already processed this donation, stop here. */
 			if ( 'charitable-completed' == get_post_status( $donation_id ) ) {
-				die( __( 'Donation Processed Already', 'charitable' ) );
+				die( esc_html( __( 'Donation Processed Already', 'charitable' ) ) );
 			}
 
 			/* Verify that the donation key matches the one stored for the donation. */
@@ -485,7 +485,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 				$donation->log()->add( $message );
 				$donation->update_status( 'charitable-failed' );
 
-				die( __( 'Invalid Donation Key', 'charitable' ) );
+				die( esc_html( __( 'Invalid Donation Key', 'charitable' ) ) );
 
 			}
 
@@ -496,7 +496,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 				$donation->log()->add( $message );
 				$donation->update_status( 'charitable-failed' );
 
-				die( __( 'Incorrect Amount', 'charitable' ) );
+				die( esc_html( __( 'Incorrect Amount', 'charitable' ) ) );
 
 			}
 
@@ -510,7 +510,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 				$donation->log()->add( $message );
 				$donation->update_status( 'charitable-completed' );
 
-				die( __( 'Donation Completed', 'charitable' ) );
+				die( esc_html__( 'Donation Completed', 'charitable' ) );
 
 			}
 
@@ -526,11 +526,11 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 
 				$donation->update_status( 'charitable-pending' );
 
-				die( __( 'Donation Pending', 'charitable' ) );
+				die( esc_html( __( 'Donation Pending', 'charitable' ) ) );
 
 			}
 
-			die( __( 'Unknown Response', 'charitable' ) );
+			die( esc_html( __( 'Unknown Response', 'charitable' ) ) );
 		}
 
 		/**
@@ -547,7 +547,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 			if ( ini_get( 'allow_url_fopen' ) ) {
 				$post_data = file_get_contents( 'php://input' );
 			} else {
-				ini_set( 'post_max_size', '12M' );
+				ini_set( 'post_max_size', '12M' ); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
 			}
 
 			if ( strlen( $post_data ) ) {
@@ -561,6 +561,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 			}
 
 			/* Return an empty array if there are no POST variables. */
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
 			if ( empty( $_POST ) ) {
 				return array();
 			}
@@ -570,6 +571,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 			);
 
 			return array_merge( $data, $_POST );
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 		}
 
@@ -734,7 +736,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 			);
 
 			if ( charitable_is_debug() ) {
-				error_log( var_export( $args, true ) );
+				error_log( var_export( $args, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log, WordPress.PHP.DevelopmentFunctions.error_log_var_export
 			}
 
 			/* Post the arguments to PayPal. */
@@ -757,9 +759,9 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 			wp_parse_str( wp_remote_retrieve_body( $request ), $body );
 
 			if ( charitable_is_debug() ) {
-				error_log( var_export( $body, true ) );
-				error_log( 'Response Code: ' . $code );
-				error_log( 'Response Message: ' . $message );
+				error_log( var_export( $body, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log, WordPress.PHP.DevelopmentFunctions.error_log_var_export
+				error_log( 'Response Code: ' . $code ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( 'Response Message: ' . $message ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			}
 
 			if ( 200 === (int) $code

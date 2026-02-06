@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Helper functions to work with licenses, permissions and capabilities.
  *
@@ -11,6 +17,7 @@
  * Search for posts editable by user.
  *
  * @since 1.8.0
+ * @version 1.8.8.6
  *
  * @param string $search_term Optional search term. Default ''.
  * @param array  $args        Args {
@@ -62,8 +69,8 @@ function charitable_campaign_search_posts( $search_term = '', $args = [] ) {
 	) :
 		'';
 
-	$post_statuses              = array_intersect( array_keys( get_post_statuses() ), $args['post_status'] );
-	$post_statuses              = charitable_wpdb_prepare_in( $post_statuses );
+	$post_statuses_array        = array_intersect( array_keys( get_post_statuses() ), $args['post_status'] );
+	$post_statuses              = charitable_wpdb_prepare_in( $post_statuses_array );
 	$policy_id                  = (int) get_option( 'wp_page_for_privacy_policy' );
 	$can_delete_published_posts = (int) $user->has_cap( $post_type->cap->delete_published_posts );
 	$can_delete_posts           = (int) $user->has_cap( $post_type->cap->delete_posts );
@@ -72,6 +79,7 @@ function charitable_campaign_search_posts( $search_term = '', $args = [] ) {
 	$can_edit_policy            = (int) $user->has_cap( map_meta_cap( 'manage_privacy_options', $user_id )[0] );
 
 	// For the case when user is post author.
+	// Integers are safe as they're cast to int above.
 	$capability_author_where = "post_author = $user_id AND
 		( ( post_status IN ( 'publish', 'future' ) AND $can_delete_published_posts ) OR
 		( ( post_status NOT IN ( 'publish', 'future', 'trash' ) ) AND $can_delete_posts )
@@ -93,20 +101,25 @@ function charitable_campaign_search_posts( $search_term = '', $args = [] ) {
 		'(' . $capability_policy_where . ')' .
 		' )';
 
-	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// $post_title_where is already prepared by $wpdb->prepare() on line 59.
+	// $post_statuses is already prepared by charitable_wpdb_prepare_in().
+	// $capability_where uses integers that are cast to int, so they're safe.
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 	$posts = $wpdb->get_results(
 		$wpdb->prepare(
 			"SELECT ID, post_title, post_author
 					FROM $wpdb->posts
 					WHERE $post_title_where
-					post_type = '{$args['post_type']}' AND
+					post_type = %s AND
 					post_status IN ( $post_statuses ) AND
 					$capability_where
 					ORDER BY post_title LIMIT %d",
+			$args['post_type'],
 			absint( $args['count'] )
 		)
 	); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-	// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 	$posts = $posts ? $posts : [];
 	$posts = array_map(

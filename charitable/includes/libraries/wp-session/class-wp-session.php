@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package WordPress
  * @since 3.7.0
  */
-final class WP_Session extends Recursive_ArrayAccess {
+final class WP_Session extends Recursive_ArrayAccess { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- This is a bundled library class. Changing it would break existing functionality.
 	/**
 	 * ID of the current session.
 	 *
@@ -71,8 +71,10 @@ final class WP_Session extends Recursive_ArrayAccess {
 	 * @param $session_id
 	 */
 	protected function __construct() {
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Cookie data, handled by stripslashes and sanitized by preg_replace below
 		if ( isset( $_COOKIE[WP_SESSION_COOKIE] ) ) {
-			$cookie = stripslashes( $_COOKIE[WP_SESSION_COOKIE] );
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Cookie data, sanitized by preg_replace below
+			$cookie = stripslashes( wp_unslash( $_COOKIE[WP_SESSION_COOKIE] ) );
 			$cookie_crumbs = explode( '||', $cookie );
 
 			$this->session_id = preg_replace("/[^A-Za-z0-9_]/", '', $cookie_crumbs[0] );
@@ -112,8 +114,8 @@ final class WP_Session extends Recursive_ArrayAccess {
 	 * @uses apply_filters Calls `wp_session_expiration` to get the standard expiration time for sessions.
 	 */
 	protected function set_expiration() {
-		$this->exp_variant = time() + (int) apply_filters( 'wp_session_expiration_variant', 24 * 60 );
-		$this->expires = time() + (int) apply_filters( 'wp_session_expiration', 30 * 60 );
+		$this->exp_variant = time() + (int) apply_filters( 'wp_session_expiration_variant', 24 * 60 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- This is a bundled library hook. Changing it would break existing functionality.
+		$this->expires = time() + (int) apply_filters( 'wp_session_expiration', 30 * 60 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- This is a bundled library hook. Changing it would break existing functionality.
 	}
 
 	/**
@@ -123,8 +125,8 @@ final class WP_Session extends Recursive_ArrayAccess {
 	 * @uses apply_filters Calls `wp_session_cookie_httponly` to set the $httponly parameter of setcookie()
 	 */
 	protected function set_cookie() {
-		$secure   = apply_filters( 'wp_session_cookie_secure', false );
-		$httponly = apply_filters( 'wp_session_cookie_httponly', false );
+		$secure   = apply_filters( 'wp_session_cookie_secure', false ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- This is a bundled library hook. Changing it would break existing functionality.
+		$httponly = apply_filters( 'wp_session_cookie_httponly', false ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- This is a bundled library hook. Changing it would break existing functionality.
 		setcookie( WP_SESSION_COOKIE, $this->session_id . '||' . $this->expires . '||' . $this->exp_variant,
 			$this->expires,
 			COOKIEPATH,

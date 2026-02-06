@@ -8,6 +8,7 @@
  * @package Charitable/Templates/Campaign
  * @since   1.2.3
  * @version 1.6.29
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -15,14 +16,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$campaign = $view_args['campaign'];
+$charitable_campaign = $view_args['campaign'];
 
 ?>
 <p>
 	<a class="<?php echo esc_attr( charitable_get_button_class( 'read-more' ) ); ?>"
-		href="<?php echo esc_url( get_permalink( $campaign->ID ) ); ?>"
+		href="<?php echo esc_url( get_permalink( $charitable_campaign->ID ) ); ?>"
 		<?php /* translators: %s: campaign title */ ?>
-		aria-label="<?php echo esc_attr( sprintf( _x( 'Continue reading about %s', 'Continue reading about campaign', 'charitable' ), get_the_title( $campaign->ID ) ) ); ?>"
+		aria-label="<?php echo esc_attr( sprintf( _x( 'Continue reading about %s', 'Continue reading about campaign', 'charitable' ), get_the_title( $charitable_campaign->ID ) ) ); ?>"
 	>
 		<?php esc_html_e( 'Read More', 'charitable' ); ?>
 	</a>

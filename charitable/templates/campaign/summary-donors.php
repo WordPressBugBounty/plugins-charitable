@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Displays the campaign's donor summary.
  *
@@ -8,11 +14,12 @@
  * @package Charitable/Templates/Campaign Page
  * @since   1.0.0
  * @version 1.8.1.9
+ * @version 1.8.8.6
  */
 
-$campaign = $view_args['campaign'];
+$charitable_campaign = $view_args['campaign'];
 
-if ( ! class_exists( 'Charitable_Campaign' ) || ! $campaign instanceof Charitable_Campaign ) {
+if ( ! class_exists( 'Charitable_Campaign' ) || ! $charitable_campaign instanceof Charitable_Campaign ) {
 	return;
 }
 
@@ -22,7 +29,7 @@ if ( ! class_exists( 'Charitable_Campaign' ) || ! $campaign instanceof Charitabl
 	printf(
 		/* translators: %s: number of donors */
 		esc_html_x( '%s Donors', 'number of donors', 'charitable' ),
-		'<span class="donors-count">' . esc_html( $campaign->get_donor_count() ) . '</span>'
+		'<span class="donors-count">' . esc_html( $charitable_campaign->get_donor_count() ) . '</span>'
 	);
 	?>
 </div>

@@ -1,3 +1,31 @@
+# 1.8.9.3
+* FIX: Resolved onboarding redirect issue in some scenarios.
+
+# 1.8.9.2
+* NEW: Email and donation form debugging tools in "System Info" in Charitable Tools.
+* UPDATE: Campaign template CSS now loads via REST API endpoint to resolve 500 errors on servers that block direct PHP file access.
+* FIX: Adjustments for PHP 8.4 and PHP 8.5 for better compatibility.
+* FIX: Adjustment in how email emails are registered and loaded for better potential compatibility in certain server configurations.
+* FIX: Minor translation and coding updates.
+
+# 1.8.9.1
+* FIX: Resolved issue where blank state screens were not displaying on campaigns and donations list pages when no items exist.
+* FIX: Fixed help button in campaign builder not navigating to documentation URL.
+
+# 1.8.9
+* NEW: Captcha security settings in security tab. Supports Google reCAPTCHA (Invisible V2), Google reCAPTCHA v3 (Invisible), hCaptcha, Cloudflare Turnstile.
+
+# 1.8.8.5
+* FIX: Resolved bug regarding manual donation edit and time resetting to midnight.
+* FIX: Insured proper sanitization of user input in database queries in some scenarios.
+* FIX: Updated code related to translations and PHP standards.
+
+# 1.8.8.4
+* FIX: Fixed compatibility issue in admin action processing that could cause errors when managing recurring donations.
+* FIX: Improved caching of dashboard blog posts.
+* FIX: Updated code related to translations and PHP standards.
+* UPDATE: Updated text on dashboard widgets.
+
 # 1.8.8.3
 * FIX: Resolved application fee calculation issue for zero-decimal currencies in Stripe payments in certain scenarios.
 * FIX: Updated code related to improve security and PHP standards compliance.

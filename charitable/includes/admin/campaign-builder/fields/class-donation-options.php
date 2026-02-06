@@ -67,7 +67,8 @@ if ( ! class_exists( 'Charitable_Field_Donation_Options' ) ) :
 		/**
 		 * Donation Options preview inside the builder.
 		 *
-		 * @since 1.8.0
+		 * @since   1.8.0
+		 * @version 1.8.8.5
 		 *
 		 * @param array  $field_data Field data and settings.
 		 * @param array  $campaign_data Campaign data and settings.
@@ -77,8 +78,8 @@ if ( ! class_exists( 'Charitable_Field_Donation_Options' ) ) :
 		public function field_preview( $field_data = false, $campaign_data = false, $field_id = false, $theme = '' ) {
 
 			// Define data.
-			$placeholder   = ! empty( $field['placeholder'] ) ? $field['placeholder'] : '';
-			$default_value = ! empty( $field['default_value'] ) ? $field['default_value'] : '';
+			$placeholder   = ! empty( $field_data['placeholder'] ) ? $field_data['placeholder'] : '';
+			$default_value = ! empty( $field_data['default_value'] ) ? $field_data['default_value'] : '';
 
 			echo '<h4>' . esc_html( $this->name ) . '</h4>';
 
@@ -134,7 +135,7 @@ if ( ! class_exists( 'Charitable_Field_Donation_Options' ) ) :
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['css_class'] ) ? $settings['css_class'] : false,
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(

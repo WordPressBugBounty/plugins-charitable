@@ -236,6 +236,28 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 			$sections = array(
 				array(
 					'new'     => true,
+					'version' => '1.8.9',
+					'layout'  => 'fifty-fifty',
+					'class'   => 'no-order',
+					'title'   => __( 'Security Enhancements', 'charitable' ),
+					'content' => __( 'Charitable Lite now supports Google reCAPTCHA, hCaptcha, and Cloudflare Turnstile for improved security.', 'charitable' ),
+					'img'     => array(
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-9-security.png',
+						'shadow' => 'none',
+					),
+					'buttons' => array(
+						'main'      => array(
+							'text' => __( 'Get Started', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/get-started/1-8-9-security/', 'splash-modal', 'Square Widgets Main' ),
+						),
+						'secondary' => array(
+							'text' => __( 'Learn More', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/learn-more/1-8-9-security/', 'splash-modal', 'Square Widgets Secondary' ),
+						),
+					),
+				),
+				array(
+					'new'     => true,
 					'version' => '1.8.8',
 					'layout'  => 'fifty-fifty',
 					'class'   => 'no-order',

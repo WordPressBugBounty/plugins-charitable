@@ -8,6 +8,7 @@
  * @package Charitable/Templates/Donation Receipt
  * @since   1.1.2
  * @version 1.6.27
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -15,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$content = $view_args['content'];
+$charitable_content = $view_args['content'];
 
 if ( is_user_logged_in() ) : ?>
 	<div class="charitable-notice">

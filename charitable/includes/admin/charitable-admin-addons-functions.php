@@ -324,6 +324,7 @@ function charitable_get_plugin_data( $plugin, $details, $all_plugins ) {
  * Install a WordPress.org plugin.
  *
  * @since 1.8.7.6
+ * @version 1.8.9.1
  *
  * @param string $plugin Plugin slug or URL.
  * @return WP_Error|true
@@ -375,12 +376,12 @@ function charitable_install_wporg_plugin( $plugin ) {
 	// Unzip the file.
 	$unzip = unzip_file( $download, WP_PLUGIN_DIR );
 	if ( is_wp_error( $unzip ) ) {
-		unlink( $download );
+		unlink( $download ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
 		return $unzip;
 	}
 
 	// Clean up the zip file.
-	unlink( $download );
+	unlink( $download ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
 
 	return true;
 }
@@ -431,6 +432,7 @@ function charitable_deactivate_wporg_plugin( $plugin ) {
  * Get plugin basename from slug.
  *
  * @since 1.8.7.6
+ * @version 1.8.9.1
  *
  * @param string $plugin Plugin slug.
  * @return string
@@ -440,7 +442,7 @@ function charitable_get_plugin_basename_from_slug( $plugin ) {
 
 	// If a full URL was provided (e.g. downloads.wordpress.org/plugin/slug.zip), derive slug from URL.
 	if ( filter_var( $plugin, FILTER_VALIDATE_URL ) ) {
-		$path = parse_url( $plugin, PHP_URL_PATH );
+		$path = wp_parse_url( $plugin, PHP_URL_PATH );
 		$base = $path ? basename( $path ) : '';
 		$slug = $base ? preg_replace( '/\.zip$/', '', $base ) : '';
 		if ( $slug ) {

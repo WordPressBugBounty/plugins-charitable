@@ -9,6 +9,7 @@
  * @since   1.5.0
  * @version 1.6.49
  * @version 1.8.6 - Added filter to allow customizing the suggested donation amount text.
+ * @version 1.8.8.6
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -20,63 +21,63 @@ if ( ! array_key_exists( 'form_id', $view_args ) || ! array_key_exists( 'campaig
 }
 
 /* @var Charitable_Campaign */
-$campaign      = $view_args['campaign'];
-$form_id       = $view_args['form_id'];
-$suggested     = $campaign->get_suggested_donations();
-$has_suggested = count( $suggested ) > 0 ? 'has-suggested-amounts' : '';
-$custom        = $campaign->get( 'allow_custom_donations' );
-$default       = ( $campaign->get_suggested_donations_default() ) ? $campaign->get_suggested_donations_default() : false;
-$amount        = $campaign->get_donation_amount_in_session();
-$active_period = 'once' == $campaign->get_initial_donation_period() || in_array( $campaign->get( 'recurring_donation_mode' ), array( 'variable', 'simple' ) );
-$checked_once  = false;
+$charitable_campaign      = $view_args['campaign'];
+$charitable_form_id       = $view_args['form_id'];
+$charitable_suggested     = $charitable_campaign->get_suggested_donations();
+$charitable_has_suggested = count( $charitable_suggested ) > 0 ? 'has-suggested-amounts' : '';
+$charitable_custom        = $charitable_campaign->get( 'allow_custom_donations' );
+$charitable_default       = ( $charitable_campaign->get_suggested_donations_default() ) ? $charitable_campaign->get_suggested_donations_default() : false;
+$charitable_amount        = $charitable_campaign->get_donation_amount_in_session();
+$charitable_active_period = 'once' == $charitable_campaign->get_initial_donation_period() || in_array( $charitable_campaign->get( 'recurring_donation_mode' ), array( 'variable', 'simple' ) );
+$charitable_checked_once  = false;
 
-if ( 0 === $amount ) {
-	$amount = $campaign->get_default_donation_amount();
+if ( 0 === $charitable_amount ) {
+	$charitable_amount = $charitable_campaign->get_default_donation_amount();
 }
 
-if ( empty( $suggested ) && ! $custom ) {
+if ( empty( $charitable_suggested ) && ! $charitable_custom ) {
 	return;
 }
 
-if ( count( $suggested ) ) :
+if ( count( $charitable_suggested ) ) :
 
-	$amount_is_suggestion = false;
+	$charitable_amount_is_suggestion = false;
 	?>
-	<ul class="donation-amounts <?php echo esc_attr( $has_suggested ); ?> donation-amounts-count-<?php echo count( $suggested ); ?>">
+	<ul class="donation-amounts <?php echo esc_attr( $charitable_has_suggested ); ?> donation-amounts-count-<?php echo count( $charitable_suggested ); ?>">
 		<?php
-		foreach ( $suggested as $suggestion ) :
-			$checked  = $active_period ? checked( $suggestion['amount'], $amount, false ) : '';
-			$field_id = esc_attr(
+		foreach ( $charitable_suggested as $charitable_suggestion ) :
+			$charitable_checked  = $charitable_active_period ? checked( $charitable_suggestion['amount'], $charitable_amount, false ) : '';
+			$charitable_field_id = esc_attr(
 				sprintf(
 					'form-%s-field-%s',
-					$form_id,
-					$suggestion['amount']
+					$charitable_form_id,
+					$charitable_suggestion['amount']
 				)
 			);
 
-			if ( strlen( $checked ) ) :
-				$amount_is_suggestion = true;
+			if ( strlen( $charitable_checked ) ) :
+				$charitable_amount_is_suggestion = true;
 			endif;
 
-			if ( $amount === 0 && ( false === $checked_once && trim( htmlentities( $default ) ) === trim( html_entity_decode( charitable_format_money( $suggestion['amount'], false, true ) ) ) || trim( htmlentities( $default ) ) === trim( html_entity_decode( $suggestion['amount'] ) ) ) ) :
-				$checked      = 'checked = "true"';
-				$checked_once = true;
+			if ( $charitable_amount === 0 && ( false === $charitable_checked_once && trim( htmlentities( $charitable_default ) ) === trim( html_entity_decode( charitable_format_money( $charitable_suggestion['amount'], false, true ) ) ) || trim( htmlentities( $charitable_default ) ) === trim( html_entity_decode( $charitable_suggestion['amount'] ) ) ) ) :
+				$charitable_checked      = 'checked = "true"';
+				$charitable_checked_once = true;
 			endif;
 
 			?>
-			<li class="donation-amount suggested-donation-amount <?php echo strlen( $checked ) ? 'selected' : ''; ?>">
-				<label for="<?php echo esc_attr( $field_id ); ?>">
+			<li class="donation-amount suggested-donation-amount <?php echo strlen( $charitable_checked ) ? 'selected' : ''; ?>">
+				<label for="<?php echo esc_attr( $charitable_field_id ); ?>">
 					<input
-						id="<?php echo esc_attr( $field_id ); ?>"
+						id="<?php echo esc_attr( $charitable_field_id ); ?>"
 						type="radio"
 						name="donation_amount"
-						value="<?php echo esc_attr( charitable_get_currency_helper()->sanitize_database_amount( $suggestion['amount'] ) ); ?>" <?php echo $checked; // phpcs:ignore ?>
+						value="<?php echo esc_attr( charitable_get_currency_helper()->sanitize_database_amount( $charitable_suggestion['amount'] ) ); ?>" <?php echo $charitable_checked; // phpcs:ignore ?>
 					/>
 					<?php
 						printf(
 							'<span class="amount">%s</span> <span class="description">%s</span>',
-							apply_filters( 'charitable_donation_amount_form_suggested_amount_text', charitable_format_money( $suggestion['amount'], false, true ), $suggestion ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-							isset( $suggestion['description'] ) ? wp_kses_post( $suggestion['description'] ) : ''
+							apply_filters( 'charitable_donation_amount_form_suggested_amount_text', charitable_format_money( $charitable_suggestion['amount'], false, true ), $charitable_suggestion ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+							isset( $charitable_suggestion['description'] ) ? wp_kses_post( $charitable_suggestion['description'] ) : ''
 						);
 					?>
 				</label>
@@ -87,18 +88,18 @@ if ( count( $suggested ) ) :
 	</ul>
 	<ul class="donation-amounts donation-suggested-amount">
 		<?php
-		if ( $custom ) :
-			$amount = apply_filters( 'charitable_donation_amount_form_custom_amount', $amount );
-			$has_custom_donation_amount = $active_period && ( ! $amount_is_suggestion && $amount );
+		if ( $charitable_custom ) :
+			$charitable_amount = apply_filters( 'charitable_donation_amount_form_custom_amount', $charitable_amount );
+			$charitable_has_custom_donation_amount = $charitable_active_period && ( ! $charitable_amount_is_suggestion && $charitable_amount );
 			?>
 			<li class="donation-amount custom-donation-amount">
 				<span class="custom-donation-amount-wrapper">
-					<label for="form-<?php echo esc_attr( $form_id ); ?>-field-custom-amount">
+					<label for="form-<?php echo esc_attr( $charitable_form_id ); ?>-field-custom-amount">
 						<input
-							id="form-<?php echo esc_attr( $form_id ); ?>-field-custom-amount"
+							id="form-<?php echo esc_attr( $charitable_form_id ); ?>-field-custom-amount"
 							type="radio"
 							name="donation_amount"
-							value="custom" <?php checked( $has_custom_donation_amount ); ?>
+							value="custom" <?php checked( $charitable_has_custom_donation_amount ); ?>
 						/><span class="description"><?php echo apply_filters( 'charitable_donation_amount_form_custom_amount_text', __( 'Custom amount', 'charitable' ) ); // phpcs:ignore ?></span>
 					</label>
 					<input
@@ -106,21 +107,21 @@ if ( count( $suggested ) ) :
 						class="custom-donation-input"
 						name="custom_donation_amount"
 						placeholder="<?php esc_attr_e( 'Enter donation amount', 'charitable' ); ?>"
-						value="<?php echo $has_custom_donation_amount ? charitable_get_currency_helper()->get_sanitized_and_localized_amount( $amount, false, true ) : ''; // phpcs:ignore ?>"
+						value="<?php echo $charitable_has_custom_donation_amount ? charitable_get_currency_helper()->get_sanitized_and_localized_amount( $charitable_amount, false, true ) : ''; // phpcs:ignore ?>"
 					/>
 				</span>
 			</li>
 		<?php endif ?>
 	</ul><!-- .donation-amounts -->
-<?php elseif ( $custom ) :
-	$amount = apply_filters( 'charitable_donation_amount_form_custom_amount', $amount ); ?>
+<?php elseif ( $charitable_custom ) :
+	$charitable_amount = apply_filters( 'charitable_donation_amount_form_custom_amount', $charitable_amount ); ?>
 	<div id="custom-donation-amount-field" class="charitable-form-field charitable-custom-donation-field-alone">
 		<input
 			type="text"
 			class="custom-donation-input"
 			name="custom_donation_amount"
 			placeholder="<?php esc_attr_e( 'Enter donation amount', 'charitable' ); ?>"
-			value="<?php echo $amount ? esc_attr( charitable_get_currency_helper()->get_sanitized_and_localized_amount( $amount, false, true ) ) : ''; ?>"
+			value="<?php echo $charitable_amount ? esc_attr( charitable_get_currency_helper()->get_sanitized_and_localized_amount( $charitable_amount, false, true ) ) : ''; ?>"
 		/>
 	</div><!-- #custom-donation-amount-field -->
 <?php endif ?>

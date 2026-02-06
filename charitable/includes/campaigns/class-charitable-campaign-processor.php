@@ -144,7 +144,8 @@ if ( ! class_exists( 'Charitable_Campaign_Processor' ) ) :
 			 * If a class sanitization method exists for this key, call it.
 			 */
 			if ( $this->use_sanitizer( $key ) ) {
-				$value = call_user_func( array( $this, 'sanitize_' . $key ), $value );
+				$sanitizer_method = 'sanitize_' . $key;
+				$value = $this->$sanitizer_method( $value );
 			}
 
 			/**
@@ -638,7 +639,8 @@ if ( ! class_exists( 'Charitable_Campaign_Processor' ) ) :
 			update_post_meta( $this->campaign_id, $this->get_meta_key( $key ), $value );
 
 			if ( method_exists( $this, 'post_process_' . $key ) ) {
-				call_user_func( array( $this, 'post_process_' . $key ), $value );
+				$post_process_method = 'post_process_' . $key;
+				$this->$post_process_method( $value );
 			}
 		}
 

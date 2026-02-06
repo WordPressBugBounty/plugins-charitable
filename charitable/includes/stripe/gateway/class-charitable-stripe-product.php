@@ -154,7 +154,7 @@ if ( ! class_exists( 'Charitable_Stripe_Product' ) ) :
 
 			} catch ( Exception $e ) {
 				/* Log the error message and return false. */
-				error_log( 'STRIPE - Error creating product: ' . $e->getMessage() );
+				error_log( 'STRIPE - Error creating product: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 
 				return false;
 			}

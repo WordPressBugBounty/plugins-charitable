@@ -20,7 +20,7 @@ if ( ! array_key_exists( 'helper', $view_args ) ) {
 }
 
 ?>
-<table <?php echo $view_args['helper']->table_attributes() ?>>
+<table <?php echo $view_args['helper']->table_attributes(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
     <thead>
         <?php charitable_template( 'tables/header.php', $view_args ) ?>
     </thead>

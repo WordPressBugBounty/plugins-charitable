@@ -17,6 +17,9 @@
         line-height: 25px;
         padding-left: 0;
         padding-right: 0;
+        display: block;
+        text-align: center;
+        text-decoration: none;
         &.charitable-disabled {
             opacity: 0.5;
         }

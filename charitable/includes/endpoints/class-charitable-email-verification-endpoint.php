@@ -113,6 +113,7 @@ if ( ! class_exists( 'Charitable_Email_Verification_Endpoint' ) ) :
 		 * If the page should redirect, return the URL it should redirect to.
 		 *
 		 * @since  1.6.26
+		 * @version 1.8.9.1
 		 *
 		 * @return false|string
 		 */
@@ -124,9 +125,11 @@ if ( ! class_exists( 'Charitable_Email_Verification_Endpoint' ) ) :
 				charitable_get_notices()->add_success( __( 'Your email address has been verified.', 'charitable' ) );
 				charitable_get_session()->add_notices();
 
+				// phpcs:disable WordPress.Security.NonceVerification.Recommended
 				if ( array_key_exists( 'redirect_to', $_GET ) ) {
-					return $_GET['redirect_to'];
+					return sanitize_text_field( wp_unslash( $_GET['redirect_to'] ) );
 				}
+				// phpcs:enable WordPress.Security.NonceVerification.Recommended
 			}
 
 			return false;
@@ -206,6 +209,7 @@ if ( ! class_exists( 'Charitable_Email_Verification_Endpoint' ) ) :
 		 * Check whether a key and login were provided and are valid.
 		 *
 		 * @since  1.5.0
+		 * @version 1.8.9.1
 		 *
 		 * @return false|WP_User|WP_Error False if the key or login are missing.
 		 *                                WP_User if they are and the combo is valid.
@@ -213,11 +217,15 @@ if ( ! class_exists( 'Charitable_Email_Verification_Endpoint' ) ) :
 		 */
 		protected function get_verification_check_result() {
 			if ( ! isset( $this->verification_result ) ) {
+				// phpcs:disable WordPress.Security.NonceVerification.Recommended
 				if ( ! isset( $_GET['key'] ) || ! isset( $_GET['login'] ) ) {
 					$this->verification_result = false;
 				} else {
-					$this->verification_result = check_password_reset_key( wp_unslash( $_GET['key'] ), wp_unslash( $_GET['login'] ) );
+					$key   = sanitize_text_field( wp_unslash( $_GET['key'] ) );
+					$login = sanitize_text_field( wp_unslash( $_GET['login'] ) );
+					$this->verification_result = check_password_reset_key( $key, $login );
 				}
+				// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 				/* The user is logged in but the verification was for a different user. */
 				if ( is_user_logged_in() && get_current_user_id() !== $this->verification_result->ID ) {
@@ -226,7 +234,10 @@ if ( ! class_exists( 'Charitable_Email_Verification_Endpoint' ) ) :
 
 				/* If everything checks out, mark the user as verified. */
 				if ( is_a( $this->verification_result, 'WP_User' ) ) {
-					charitable_get_user( get_user_by( 'login', $_GET['login'] ) )->mark_as_verified( true );
+					// phpcs:disable WordPress.Security.NonceVerification.Recommended
+					$login = sanitize_text_field( wp_unslash( $_GET['login'] ) );
+					// phpcs:enable WordPress.Security.NonceVerification.Recommended
+					charitable_get_user( get_user_by( 'login', $login ) )->mark_as_verified( true );
 				}
 			}
 

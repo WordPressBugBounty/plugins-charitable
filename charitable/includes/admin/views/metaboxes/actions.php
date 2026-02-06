@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Renders the donation details meta box for the Donation post type.
  *
@@ -8,16 +14,17 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.5.0
  * @version   1.6.0
+ * @version   1.8.8.6
  */
 
 global $post;
 
-$helper  = array_key_exists( 'actions', $view_args ) ? $view_args['actions'] : charitable_get_donation_actions();
-$actions = $helper->get_available_actions( $post->ID );
-$groups  = $helper->get_available_groups( $post->ID );
-$type    = esc_attr( $helper->get_type() ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+$charitable_helper  = array_key_exists( 'actions', $view_args ) ? $view_args['actions'] : charitable_get_donation_actions();
+$charitable_actions = $charitable_helper->get_available_actions( $post->ID );
+$charitable_groups  = $charitable_helper->get_available_groups( $post->ID );
+$type    = esc_attr( $charitable_helper->get_type() ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
-if ( empty( $actions ) ) {
+if ( empty( $charitable_actions ) ) {
 	return;
 }
 ?>
@@ -37,21 +44,21 @@ if ( empty( $actions ) ) {
 		<select id="charitable_<?php echo esc_attr( $type ); ?>_actions" name="charitable_<?php echo esc_attr( $type ); ?>_action" class="charitable-action-select">
 			<option value=""><?php esc_html_e( 'Select an action', 'charitable' ); ?></option>
 			<?php
-			foreach ( $groups as $label => $group_actions ) :
+			foreach ( $charitable_groups as $charitable_label => $charitable_group_actions ) :
 
-				if ( ! empty( $label ) && 'default' != $label ) : // phpcs:ignore
+				if ( ! empty( $charitable_label ) && 'default' != $charitable_label ) : // phpcs:ignore
 					?>
-					<optgroup label="<?php echo esc_attr( $label ); ?>">
+					<optgroup label="<?php echo esc_attr( $charitable_label ); ?>">
 					<?php
 				endif;
-				foreach ( $group_actions as $action ) : // phpcs:ignore
-					if ( array_key_exists( $action, $actions ) ) :
+				foreach ( $charitable_group_actions as $action ) : // phpcs:ignore
+					if ( array_key_exists( $action, $charitable_actions ) ) :
 						?>
-						<option value="<?php echo esc_attr( $action ); ?>" data-button-text="<?php echo esc_attr( $actions[ $action ]['button_text'] ); ?>"><?php echo esc_html( $actions[ $action ]['label'] ); ?></option>
+						<option value="<?php echo esc_attr( $action ); ?>" data-button-text="<?php echo esc_attr( $charitable_actions[ $action ]['button_text'] ); ?>"><?php echo esc_html( $charitable_actions[ $action ]['label'] ); ?></option>
 						<?php
 					endif;
 				endforeach;
-				if ( ! empty( $label ) ) :
+				if ( ! empty( $charitable_label ) ) :
 					?>
 					</optgroup>
 					<?php
@@ -60,9 +67,9 @@ if ( empty( $actions ) ) {
 			?>
 		</select>
 		<?php
-		foreach ( $groups as $group_actions ) :
-			foreach ( $group_actions as $action ) : // phpcs:ignore
-				$helper->add_action_fields( $post->ID, $action );
+		foreach ( $charitable_groups as $charitable_group_actions ) :
+			foreach ( $charitable_group_actions as $action ) : // phpcs:ignore
+				$charitable_helper->add_action_fields( $post->ID, $action );
 			endforeach;
 		endforeach;
 		/**

@@ -196,14 +196,16 @@ if ( ! class_exists( 'Charitable_Square_Connect' ) ) :
 		 * Handle disconnection.
 		 *
 		 * @since 1.8.7
+		 * @version 1.8.9.1
 		 *
 		 * @param bool $redirect Whether to redirect after disconnection.
 		 */
 		private function handle_disconnect( $redirect = true ) {
-
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended
 			if ( isset( $_GET['live_mode'] ) ) {
-				$live_mode = absint( $_GET['live_mode'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$live_mode = absint( wp_unslash( $_GET['live_mode'] ) );
 			} else {
+				// phpcs:enable WordPress.Security.NonceVerification.Recommended
 				$live_mode = charitable_get_option( 'test_mode' ) ? 0 : 1;
 			}
 			$mode       = $live_mode ? 'live' : 'test';
@@ -498,6 +500,7 @@ if ( ! class_exists( 'Charitable_Square_Connect' ) ) :
 		 * Check connection raw data and save it if everything is OK.
 		 *
 		 * @since 1.8.7
+		 * @version 1.8.9.1
 		 *
 		 * @param array $raw    Connection raw data.
 		 * @param bool  $silent Optional. Whether to prevent showing admin notices. Default false.
@@ -510,13 +513,19 @@ if ( ! class_exists( 'Charitable_Square_Connect' ) ) :
 
 			// Bail if a connection doesn't have required data.
 			if ( ! $connection->is_configured() ) {
-				$silent ? error_log(
-					'Square error',
-					'We could not connect to Square. No tokens were given.',
-					array(
-						'type' => array( 'payment', 'error' ),
-					)
-				) : Charitable_Settings::get_instance()->add_update_message( __( 'Square Error: We could not connect to Square. No tokens were given.', 'charitable' ), 'error' );
+				if ( charitable_is_debug() ) {
+					// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					error_log(
+						'Square error',
+						'We could not connect to Square. No tokens were given.',
+						array(
+							'type' => array( 'payment', 'error' ),
+						)
+					);
+				}
+				if ( ! $silent ) {
+					Charitable_Settings::get_instance()->add_update_message( __( 'Square Error: We could not connect to Square. No tokens were given.', 'charitable' ), 'error' );
+				}
 
 				return null;
 			}
@@ -543,13 +552,19 @@ if ( ! class_exists( 'Charitable_Square_Connect' ) ) :
 
 			// Bail if a connection is not ready for save.
 			if ( ! $connection->is_saveable() ) {
-				$silent ? error_log(
-					'Square error',
-					'We could not save an account connection safely. Please, try again later.',
-					array(
-						'type' => array( 'payment', 'error' ),
-					)
-				) : Charitable_Settings::get_instance()->add_update_message( __( 'Square Error: We could not save an account connection safely. Please, try again later.', 'charitable' ), 'error' );
+				if ( charitable_is_debug() ) {
+					// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					error_log(
+						'Square error',
+						'We could not save an account connection safely. Please, try again later.',
+						array(
+							'type' => array( 'payment', 'error' ),
+						)
+					);
+				}
+				if ( ! $silent ) {
+					Charitable_Settings::get_instance()->add_update_message( __( 'Square Error: We could not save an account connection safely. Please, try again later.', 'charitable' ), 'error' );
+				}
 
 				return null;
 			}

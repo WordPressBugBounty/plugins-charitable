@@ -226,8 +226,24 @@
     font-size: 13px;
     line-height: 100%;
     letter-spacing: 0px;
-    color: rgba(49, 148, 77, 1);
+    color: rgba(49, 148, 77, 1); // Default green (for positive)
+
+    // Positive percentage - green
+    &.charitable-dashboard-v2-stat-change-positive {
+        color: rgba(49, 148, 77, 1); // #31944D
+    }
+
+    // Negative percentage - red
+    &.charitable-dashboard-v2-stat-change-negative {
+        color: rgba(220, 38, 38, 1); // #DC2626
+    }
+
+    // Zero percentage - black
+    &.charitable-dashboard-v2-stat-change-zero {
+        color: rgba(0, 0, 0, 1); // #000000
+    }
 }
+
 
 /* V2 Dashboard Layout */
 .charitable-dashboard-v2-layout {

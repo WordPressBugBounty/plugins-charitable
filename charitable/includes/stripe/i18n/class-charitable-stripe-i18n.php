@@ -46,7 +46,7 @@ if ( ! class_exists( 'Charitable_Stripe_i18n' ) ) :
 		 */
 		private function __construct() {
 			$this->languages_directory = apply_filters( 'charitable_stripe_languages_directory', 'charitable-stripe/languages' );
-			$this->locale = apply_filters( 'plugin_locale', get_locale(), $this->textdomain );
+			$this->locale = apply_filters( 'plugin_locale', get_locale(), $this->textdomain ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- 'plugin_locale' is a WordPress core hook for plugin localization.
 			$this->mofile = sprintf( '%1$s-%2$s.mo', $this->textdomain, $this->locale );
 
 			$this->load_textdomain();

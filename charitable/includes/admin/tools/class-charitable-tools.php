@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.1.6
- * @version   1.8.1.6
+ * @version   1.8.9
  */
 
 // Exit if accessed directly.
@@ -44,11 +44,15 @@ if ( ! class_exists( 'Charitable_Tools' ) ) :
 		 * Create object instance.
 		 *
 		 * @since 1.8.1.6
+		 * @version 1.8.9
 		 */
 		public function __construct() {
 
 			// Set the default tab.
-			if ( charitable_is_tools_view() && ! isset( $_GET['tab'] ) ) {
+			// Only redirect if we're on the tools page (not options.php) and no tab is set.
+			// Don't redirect when processing form submissions (options.php).
+			$is_options_page = isset( $_SERVER['REQUEST_URI'] ) && false !== strpos( $_SERVER['REQUEST_URI'], 'options.php' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+			if ( charitable_is_tools_view() && ! isset( $_GET['tab'] ) && ! $is_options_page ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$link = admin_url( 'edit-tags.php?taxonomy=campaign_category&post_type=campaign' );
 				wp_safe_redirect( $link );
 				exit();
@@ -65,17 +69,18 @@ if ( ! class_exists( 'Charitable_Tools' ) ) :
 		 * Redirects to the correct taxonomy page.
 		 *
 		 * @since 1.8.2
+		 * @version 1.8.9
 		 *
 		 * @return void
 		 */
 		public function taxonomy_redirects() {
-			if ( isset( $_GET['page'] ) && 'charitable-tools' == $_GET['page'] && isset( $_GET['tab'] ) && 'categories' == $_GET['tab'] ) {
+			if ( isset( $_GET['page'] ) && 'charitable-tools' == $_GET['page'] && isset( $_GET['tab'] ) && 'categories' == $_GET['tab'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$link = admin_url( 'edit-tags.php?taxonomy=campaign_category&post_type=campaign' );
 				wp_safe_redirect( $link );
 				exit();
 			}
 
-			if ( isset( $_GET['page'] ) && 'charitable-tools' == $_GET['page'] && isset( $_GET['tab'] ) && 'tags' == $_GET['tab'] ) {
+			if ( isset( $_GET['page'] ) && 'charitable-tools' == $_GET['page'] && isset( $_GET['tab'] ) && 'tags' == $_GET['tab'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$link = admin_url( 'edit-tags.php?taxonomy=campaign_tag&post_type=campaign' );
 				wp_safe_redirect( $link );
 				exit();
@@ -132,6 +137,7 @@ if ( ! class_exists( 'Charitable_Tools' ) ) :
 					'import'      => __( 'Import', 'charitable' ),
 					'system-info' => __( 'System Info', 'charitable' ),
 					'snippets'    => __( 'Code Snippets', 'charitable' ),
+					'misc'        => __( 'Misc', 'charitable' ),
 				)
 			);
 		}
@@ -347,6 +353,66 @@ if ( ! class_exists( 'Charitable_Tools' ) ) :
 		}
 
 		/**
+		 * Sanitize settings before saving.
+		 *
+		 * @since  1.8.9
+		 *
+		 * @param  array $values Submitted values.
+		 * @return array
+		 */
+		public function sanitize_settings( $values ) {
+			$old_values = get_option( 'charitable_tools', array() );
+			$new_values = array();
+
+			if ( ! is_array( $old_values ) ) {
+				$old_values = array();
+			}
+
+			if ( ! is_array( $values ) ) {
+				$values = array();
+			}
+
+			// Merge submitted values into the master array.
+			foreach ( $values as $section => $submitted ) {
+				if ( ! is_array( $submitted ) ) {
+					continue;
+				}
+				foreach ( $submitted as $key => $value ) {
+					if ( $this->is_dynamic_group( $section ) ) {
+						$new_values[ $section ][ $key ] = $value;
+					} else {
+						$new_values[ $key ] = $value;
+					}
+				}
+			}
+
+			$values = wp_parse_args( $new_values, $old_values );
+
+			if ( charitable_is_debug() ) {
+				error_log( 'sanitize_settings tools' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( 'values:' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( print_r( $values, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
+				error_log( 'old_values:' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( print_r( $old_values, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
+				error_log( 'new_values:' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( print_r( $new_values, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
+			}
+
+			/**
+			 * Filter sanitized tools settings.
+			 *
+			 * @since 1.8.9
+			 *
+			 * @param array $values     All values, merged.
+			 * @param array $new_values Newly submitted values.
+			 * @param array $old_values Old settings.
+			 */
+			$values = apply_filters( 'charitable_save_tools', $values, $new_values, $old_values );
+
+			return $values;
+		}
+
+		/**
 		 * Checkbox settings should always be either 1 or 0.
 		 *
 		 * @since  1.0.0
@@ -420,6 +486,7 @@ if ( ! class_exists( 'Charitable_Tools' ) ) :
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=import' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'Import', 'charitable' ); ?></a>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=system-info' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'System Info', 'charitable' ); ?></a>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=snippets' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'Code Snippets', 'charitable' ); ?></a>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=misc' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'Misc', 'charitable' ); ?></a>
 				</h2>
 			</div>
 

@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * The template used to display checkbox form fields.
  *
@@ -9,49 +15,50 @@
  * @since   1.0.0
  * @version 1.2.0
  * @version 1.8.6.1 Added description.
+ * @version 1.8.8.6
  */
 
 if ( ! isset( $view_args['form'] ) || ! isset( $view_args['field'] ) ) {
 	return;
 }
 
-$form        = $view_args['form'];
-$field       = $view_args['field'];
-$classes     = $view_args['classes'];
-$is_required = isset( $field['required'] ) ? $field['required'] : false;
-$value       = isset( $field['value'] ) ? esc_attr( $field['value'] ) : '1';
+$charitable_form        = $view_args['form'];
+$charitable_field       = $view_args['field'];
+$charitable_classes     = $view_args['classes'];
+$charitable_is_required = isset( $charitable_field['required'] ) ? $charitable_field['required'] : false;
+$charitable_value       = isset( $charitable_field['value'] ) ? esc_attr( $charitable_field['value'] ) : '1';
 
-if ( isset( $field['checked'] ) ) {
-	$checked = $field['checked'];
+if ( isset( $charitable_field['checked'] ) ) {
+	$charitable_checked = $charitable_field['checked'];
 } else {
-	$checked = isset( $field['default'] ) ? $field['default'] : 0;
+	$charitable_checked = isset( $charitable_field['default'] ) ? $charitable_field['default'] : 0;
 }
 ?>
-<div id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>" class="<?php echo esc_attr( $classes ); ?>">
+<div id="charitable_field_<?php echo esc_attr( $charitable_field['key'] ); ?>" class="<?php echo esc_attr( $charitable_classes ); ?>">
 	<input
 		type="checkbox"
-		name="<?php echo esc_attr( $field['key'] ); ?>"
-		value="<?php echo esc_attr( $value ); ?>"
-		id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>_element"
-		<?php checked( $checked ); ?>
-		<?php echo charitable_get_arbitrary_attributes( $field ); ?>
+		name="<?php echo esc_attr( $charitable_field['key'] ); ?>"
+		value="<?php echo esc_attr( $charitable_value ); ?>"
+		id="charitable_field_<?php echo esc_attr( $charitable_field['key'] ); ?>_element"
+		<?php checked( $charitable_checked ); ?>
+		<?php echo charitable_get_arbitrary_attributes( $charitable_field ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	/>
-	<?php if ( isset( $field['label'] ) ) : ?>
-		<label for="charitable_field_<?php echo esc_attr( $field['key'] ); ?>_element">
-		<?php echo wp_kses_post( $field['label'] ); ?>
-			<?php if ( $is_required ) : ?>
+	<?php if ( isset( $charitable_field['label'] ) ) : ?>
+		<label for="charitable_field_<?php echo esc_attr( $charitable_field['key'] ); ?>_element">
+		<?php echo wp_kses_post( $charitable_field['label'] ); ?>
+			<?php if ( $charitable_is_required ) : ?>
 				<abbr class="required" title="<?php esc_html_e( 'Required', 'charitable' ); ?>">*</abbr>
 			<?php endif ?>
 		</label>
 	<?php endif ?>
-	<?php if ( isset( $field['help'] ) ) : ?>
-		<p class="charitable-field-help"><?php echo $field['help']; ?></p>
+	<?php if ( isset( $charitable_field['help'] ) ) : ?>
+		<p class="charitable-field-help"><?php echo wp_kses_post( $charitable_field['help'] ); ?></p>
 	<?php endif ?>
 	<?php
 
 	// If there is a description, add it after the input.
-	if ( isset( $field['description'] ) && ! empty( $field['description'] ) ) {
-		echo '<p class="charitable-field-description">' . wp_kses_post( $field['description'] ) . '</p>';
+	if ( isset( $charitable_field['description'] ) && ! empty( $charitable_field['description'] ) ) {
+		echo '<p class="charitable-field-description">' . wp_kses_post( $charitable_field['description'] ) . '</p>';
 	}
 
 	?>

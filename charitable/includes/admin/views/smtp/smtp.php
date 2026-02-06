@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display the main smtp page wrapper.
  *
@@ -8,6 +14,7 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.1.8
  * @version   1.8.1.8
+ * @version   1.8.8.6
  */
 
 ob_start();
@@ -52,12 +59,12 @@ ob_start();
 			$charitable_plugins_third_party = new Charitable_Admin_Plugins_Third_Party(); // phpcs:ignore
 
 			// determine if the SMTP plugin is installed and activated.
-			$is_smtp_installed = $charitable_plugins_third_party->is_plugin_installed( 'wp-mail-smtp' );
-			$is_smtp_active    = $charitable_plugins_third_party->is_plugin_activated( 'wp-mail-smtp' );
+			$charitable_is_smtp_installed = $charitable_plugins_third_party->is_plugin_installed( 'wp-mail-smtp' );
+			$charitable_is_smtp_active    = $charitable_plugins_third_party->is_plugin_activated( 'wp-mail-smtp' );
 
-			if ( ! $is_smtp_installed ) {
+			if ( ! $charitable_is_smtp_installed ) {
 
-				$install_button_html = $charitable_plugins_third_party->get_install_button_html( 'wp-mail-smtp', 'Install WP Mail SMTP' );
+				$charitable_install_button_html = $charitable_plugins_third_party->get_install_button_html( 'wp-mail-smtp', 'Install WP Mail SMTP' );
 
 				?>
 
@@ -65,7 +72,7 @@ ob_start();
 				<div class="instructions">
 					<h3><?php echo esc_html__( 'Install and Activate WP Mail SMTP', 'charitable' ); ?></h3>
 					<p><?php echo esc_html__( 'Install the WP Mail SMTP plugin by clicking this button', 'charitable' ); ?></p>
-					<?php echo $install_button_html; // phpcs:ignore ?>
+					<?php echo $charitable_install_button_html; // phpcs:ignore ?>
 				</div>
 				<div class="step">
 					<div class="vertical-wrapper">
@@ -75,13 +82,13 @@ ob_start();
 			</div>
 
 				<?php
-			} elseif ( ! $is_smtp_active ) {
+			} elseif ( ! $charitable_is_smtp_active ) {
 
-				$basename = $charitable_plugins_third_party->get_basename_from_slug( 'wp-mail-smtp' );
+				$charitable_basename = $charitable_plugins_third_party->get_basename_from_slug( 'wp-mail-smtp' );
 
-				if ( $basename ) :
+				if ( $charitable_basename ) :
 
-					$activate_button_html = $charitable_plugins_third_party->get_activation_button_html( 'wp-mail-smtp', 'Activate WP Mail SMTP' );
+					$charitable_activate_button_html = $charitable_plugins_third_party->get_activation_button_html( 'wp-mail-smtp', 'Activate WP Mail SMTP' );
 
 					?>
 
@@ -89,7 +96,7 @@ ob_start();
 				<div class="instructions">
 					<h3><?php echo esc_html__( 'Activate WP Mail SMTP', 'charitable' ); ?></h3>
 					<p><?php echo esc_html__( 'Activate WP Mail SMTP by clicking this button:', 'charitable' ); ?></p>
-					<?php echo $activate_button_html; // phpcs:ignore ?>
+					<?php echo $charitable_activate_button_html; // phpcs:ignore ?>
 				</div>
 				<div class="step">
 					<div class="vertical-wrapper">
@@ -104,7 +111,7 @@ ob_start();
 
 			} else {
 
-				$setup_url = $charitable_plugins_third_party->get_setup_screen_for_plugin( 'wp-mail-smtp' );
+				$charitable_setup_url = $charitable_plugins_third_party->get_setup_screen_for_plugin( 'wp-mail-smtp' );
 
 				?>
 
@@ -112,7 +119,7 @@ ob_start();
 				<div class="instructions">
 					<h3><?php echo esc_html__( 'Setup WP Mail SMTP', 'charitable' ); ?></h3>
 					<p><?php echo esc_html__( 'Setup WP Mail SMTP plugin by clicking this button:', 'charitable' ); ?></p>
-					<a href="<?php echo esc_url( $setup_url ); ?>" target="_blank" class="charitable-button button-link charitable-button-setup"><?php echo esc_html__( 'Set Up WP Mail SMTP', 'charitable' ); ?></a>
+					<a href="<?php echo esc_url( $charitable_setup_url ); ?>" target="_blank" class="charitable-button button-link charitable-button-setup"><?php echo esc_html__( 'Set Up WP Mail SMTP', 'charitable' ); ?></a>
 				</div>
 				<div class="step">
 					<div class="vertical-wrapper">

@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.5.0
- * @version   1.6.39
+ * @version   1.6.39, 1.8.9.1
  */
 
 // Exit if accessed directly.
@@ -187,8 +187,8 @@ add_filter( 'request', array( Charitable_Donation_List_Table::get_instance(), 'f
 add_filter( 'posts_clauses', array( Charitable_Donation_List_Table::get_instance(), 'sort_donations' ) );
 
 /**
- * Set the content of each column item.
+ * Render blank state when there are no donations.
  *
- * @see Charitable_Donation_List_Table::dashboard_column_item()
+ * @see Charitable_Donation_List_Table::maybe_render_blank_state()
  */
-add_filter( 'manage_posts_extra_tablenav', array( Charitable_Donation_List_Table::get_instance(), 'maybe_render_blank_state' ), 11, 2 );
+add_action( 'manage_posts_extra_tablenav', array( Charitable_Donation_List_Table::get_instance(), 'maybe_render_blank_state' ), 11, 2 );

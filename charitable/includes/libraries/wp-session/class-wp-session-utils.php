@@ -5,7 +5,7 @@
  *
  * THIS CLASS SHOULD NEVER BE INSTANTIATED
  */
-class WP_Session_Utils {
+class WP_Session_Utils { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- This is a bundled library class. Changing it would break existing functionality.
 	/**
 	 * Count the total sessions in the database.
 	 *
@@ -23,9 +23,10 @@ class WP_Session_Utils {
 		 *
 		 * @param string $query Database count query
 		 */
-		$query = apply_filters( 'wp_session_count_query', $query );
+		$query = apply_filters( 'wp_session_count_query', $query ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- 'wp_session_count_query' is a third-party hook from the WP Session library.
 
-		$sessions = $wpdb->get_var( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- Filtered query allows customization for non-standard table setups. Filter should be used responsibly.
+		$sessions = $wpdb->get_var( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 		return absint( $sessions );
 	}
@@ -43,18 +44,18 @@ class WP_Session_Utils {
 			if ( false === $time ) {
 				$date = null;
 			} else {
-				$expires = date( 'U', strtotime( $date ) );
+				$expires = date( 'U', strtotime( $date ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 			}
 		}
 
 		// If null was passed, or if the string parsing failed, fall back on a default
 		if ( null === $date ) {
-			/**
-			 * Filter the expiration of the session in the database
-			 *
-			 * @param int
-			 */
-			$expires = time() + (int) apply_filters( 'wp_session_expiration', 30 * 60 );
+		/**
+		 * Filter the expiration of the session in the database
+		 *
+		 * @param int
+		 */
+			$expires = time() + (int) apply_filters( 'wp_session_expiration', 30 * 60 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- 'wp_session_expiration' is a third-party hook from the WP Session library.
 		}
 
 		$session_id = self::generate_id();
@@ -77,7 +78,7 @@ class WP_Session_Utils {
 		global $wpdb;
 
 		$limit = absint( $limit );
-		$keys = $wpdb->get_results( "SELECT option_name, option_value FROM $wpdb->options WHERE option_name LIKE '_wp_session_expires_%' ORDER BY option_value ASC LIMIT 0, {$limit}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		$keys = $wpdb->get_results( "SELECT option_name, option_value FROM $wpdb->options WHERE option_name LIKE '_wp_session_expires_%' ORDER BY option_value ASC LIMIT 0, {$limit}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		$now = time();
 		$expired = array();
@@ -103,8 +104,8 @@ class WP_Session_Utils {
 		    $format = implode( ', ', $placeholders );
 		    $query = "DELETE FROM $wpdb->options WHERE option_name IN ($format)";
 
-		    $prepared = $wpdb->prepare( $query, $expired );
-			$wpdb->query( $prepared ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		    $prepared = $wpdb->prepare( $query, $expired ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			$wpdb->query( $prepared ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
 		}
 
 		return $count;
@@ -136,4 +137,4 @@ class WP_Session_Utils {
 
 		return md5( $hash->get_random_bytes( 32 ) );
 	}
-} 
+}

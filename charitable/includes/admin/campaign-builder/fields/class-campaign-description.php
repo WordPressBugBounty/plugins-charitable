@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version   1.8.0
+ * @version   1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,6 +18,8 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Description' ) ) :
 
 	/**
 	 * Class to add campaign description field to a campaign form in the builder.
+	 *
+	 * @version 1.8.9.1
 	 */
 	class Charitable_Field_Campaign_Description extends Charitable_Builder_Field {
 
@@ -154,6 +156,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Description' ) ) :
 		 * Campaign Description preview inside the builder.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.9.1
 		 *
 		 * @param array  $field_data Field data and settings.
 		 * @param array  $campaign_data Campaign data and settings.
@@ -165,13 +168,14 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Description' ) ) :
 			$html  = $this->field_title( $this->name );
 			$html .= $this->field_wrapper( $this->render( $field_data, $campaign_data, $field_id, 'preview' ), $field_data );
 
-			echo $html;
+			echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
 		 * The display on the campaign front-end.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.9.1
 		 *
 		 * @param string $field_type     The passed field type.
 		 * @param array  $field_data     Any field data.
@@ -181,14 +185,14 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Description' ) ) :
 
 			$html = $this->field_display_wrapper( $this->render( $field_data, $campaign_data ), $field_data );
 
-			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data );
+			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
 		 * The display on the form settings backend when the user clicks on the field/block.
 		 *
 		 * @since 1.8.0
-		 * @version 1.8.2
+		 * @version 1.8.9.1
 		 *
 		 * @param array $field_id Field ID.
 		 * @param array $campaign_data  Campaign data and settings.
@@ -207,7 +211,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Description' ) ) :
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['headline'] ) ? $settings['headline'] : false,
 				esc_html__( 'Headline', 'charitable' ),
 				array(
@@ -220,7 +224,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Description' ) ) :
 
 			$campaign_description = ! empty( $campaign_data['settings']['general']['description'] ) ? ( $campaign_data['settings']['general']['description'] ) : 'Add your description here.'; // todo: santitize.
 
-			echo $charitable_builder_form_fields->generate_textbox(
+			echo $charitable_builder_form_fields->generate_textbox( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				$campaign_description,
 				esc_html__( 'Campaign Description', 'charitable' ),
 				array(
@@ -236,9 +240,9 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Description' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_divider( false, false, array( 'field_id' => $field_id ) );
+			echo $charitable_builder_form_fields->generate_divider( false, false, array( 'field_id' => intval( $field_id ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
-			echo $charitable_builder_form_fields->generate_number_slider(
+			echo $charitable_builder_form_fields->generate_number_slider( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['width_percentage'] ) ? $settings['width_percentage'] : 100,
 				esc_html__( 'Width', 'charitable' ),
 				array(
@@ -254,7 +258,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Description' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_align(
+			echo $charitable_builder_form_fields->generate_align( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['align'] ) ? $settings['align'] : esc_attr( $this->align_default ),
 				esc_html__( 'Align', 'charitable' ),
 				array(
@@ -264,7 +268,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Description' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['css_class'] ) ? $settings['css_class'] : false,
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(

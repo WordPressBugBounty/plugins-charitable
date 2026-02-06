@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.5.0
- * @version   1.6.56
+ * @version   1.8.9.1
  */
 
 // Exit if accessed directly.
@@ -229,6 +229,7 @@ if ( ! class_exists( 'Charitable_Endpoints' ) ) :
 				return;
 			}
 
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- DONOTCACHEPAGE is a third-party constant used by caching plugins (WP Super Cache, etc.) for compatibility.
 			define( 'DONOTCACHEPAGE', true );
 
 			/**
@@ -651,6 +652,7 @@ if ( ! class_exists( 'Charitable_Endpoints' ) ) :
 		 * Return the current endpoint.
 		 *
 		 * @since  1.5.0
+		 * @version 1.8.9.1
 		 *
 		 * @return string|false String if we're on one of our endpoints. False otherwise.
 		 */
@@ -664,13 +666,15 @@ if ( ! class_exists( 'Charitable_Endpoints' ) ) :
 
 						/* Sanity check to ensure the endpoint was properly registered. */
 						if ( ! isset( $this->endpoints[ $endpoint_id ] ) ) {
-							error_log(
-								sprintf(
-									/* translators: %s: endpoint id */
-									__( 'Endpoint %s was incorrectly registered.', 'charitable' ),
-									$endpoint_id
-								)
-							);
+							if ( charitable_is_debug() ) {
+								error_log( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+									sprintf(
+										/* translators: %s: endpoint id */
+										__( 'Endpoint %s was incorrectly registered.', 'charitable' ),
+										$endpoint_id
+									)
+								);
+							}
 
 							continue;
 						}

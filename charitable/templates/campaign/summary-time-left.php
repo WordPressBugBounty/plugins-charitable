@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Displays the amount of time left in the campaign.
  *
@@ -8,11 +14,12 @@
  * @package Charitable/Templates/Campaign Page
  * @since   1.0.0
  * @version 1.0.0
+ * @version 1.8.8.6
  */
 
-$campaign = $view_args['campaign'];
+$charitable_campaign = $view_args['campaign'];
 
 ?>
 <div class="campaign-time-left campaign-summary-item">
-	<?php echo wp_kses_post( $campaign->get_time_left() ); ?>
+	<?php echo wp_kses_post( $charitable_campaign->get_time_left() ); ?>
 </div>

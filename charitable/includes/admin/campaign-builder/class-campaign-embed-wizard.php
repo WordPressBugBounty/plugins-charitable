@@ -102,18 +102,22 @@ if ( ! class_exists( 'Charitable_Campaign_Embed_Wizard' ) ) :
 		 * Determine if we are on the campaign builder admin page
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.9.1
 		 */
 		public function campaign_is_campaign_builder_admin_page() {
 
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing
 			if ( isset( $_POST['campaign_id'] ) ) {
 				return true;
 			}
 
-			if ( ! isset( $_GET['page'] ) || $_GET['page'] !== 'charitable-campaign-builder' ) {
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended
+			if ( ! isset( $_GET['page'] ) || sanitize_text_field( wp_unslash( $_GET['page'] ) ) !== 'charitable-campaign-builder' ) {
 				return false;
 			} else {
 				return true;
 			}
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 		}
 
 		/**

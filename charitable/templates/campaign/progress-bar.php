@@ -8,6 +8,7 @@
  * @package Charitable/Templates/Campaign Page
  * @since   1.0.0
  * @version 1.0.0
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -15,11 +16,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$campaign = $view_args['campaign'];
+$charitable_campaign = $view_args['campaign'];
 
-if ( ! $campaign->has_goal() ) :
+if ( ! $charitable_campaign->has_goal() ) :
 	return;
 endif;
 
 ?>
-<div class="campaign-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?php echo $campaign->get_percent_donated_raw(); // phpcs:ignore ?>"><span class="bar" style="width: <?php echo $campaign->get_percent_donated_raw(); // phpcs:ignore ?>%;"></span></div>
+<div class="campaign-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?php echo $charitable_campaign->get_percent_donated_raw(); // phpcs:ignore ?>"><span class="bar" style="width: <?php echo $charitable_campaign->get_percent_donated_raw(); // phpcs:ignore ?>%;"></span></div>

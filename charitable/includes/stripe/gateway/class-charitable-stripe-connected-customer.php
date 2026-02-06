@@ -317,8 +317,10 @@ if ( ! class_exists( 'Charitable_Stripe_Connected_Customer' ) ) :
 				return $customer;
 
 			} catch ( Exception $e ) {
-				error_log( $e->getCode() );
-				error_log( $e->getMessage() );
+				if ( function_exists( 'charitable_is_debug' ) ? charitable_is_debug() : ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) {
+					error_log( $e->getCode() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					error_log( $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				}
 				return null;
 			}
 		}

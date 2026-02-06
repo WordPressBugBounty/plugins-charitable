@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Campaign Embed Wizard.
  * Embed popup HTML template.
@@ -9,17 +15,18 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
  * @version   1.8.0
+ * @version   1.8.8.6
  */
 
 if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
-$pages_exists = ! empty( $args['dropdown_pages'] ) ? 1 : 0;
+$charitable_pages_exists = ! empty( $args['dropdown_pages'] ) ? 1 : 0;
 
 ?>
 
 <div id="charitable-admin-campaign-embed-wizard-container" class="charitable-admin-popup-container">
-	<div id="charitable-admin-campaign-embed-wizard" class="charitable-admin-popup" data-pages-exists="<?php echo esc_attr( $pages_exists ); ?>">
+	<div id="charitable-admin-campaign-embed-wizard" class="charitable-admin-popup" data-pages-exists="<?php echo esc_attr( $charitable_pages_exists ); ?>">
 		<div class="charitable-admin-popup-content">
 			<h3><?php esc_html_e( 'Embed in a Page', 'charitable' ); ?></h3>
 			<div id="charitable-admin-campaign-embed-wizard-content-initial">

@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version   1.8.0
+ * @version   1.8.0, 1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -55,7 +55,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Help' ) ) :
 			$this->order   = 100;
 			$this->sidebar = true;
 			$this->button  = true;
-			$this->url     = 'https://www.wpcharitable.com/documentation/';
+			$this->url     = 'https://wpcharitable.com/documentation/';
 
 			// This should never be called unless we are on the campaign builder page.
 			if ( campaign_is_campaign_builder_admin_page() ) {

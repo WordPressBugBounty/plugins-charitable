@@ -8,6 +8,7 @@
  * @package Charitable/Templates/Donation Form
  * @since   1.0.0
  * @version 1.5.0
+ * @version 1.8.8.6
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,18 +20,18 @@ if ( ! isset( $view_args['form'] ) ) {
 }
 
 /* @var Charitable_Donation_Form */
-$form     = $view_args['form'];
-$form_id  = $form->get_form_identifier();
-$campaign = $form->get_campaign();
+$charitable_form     = $view_args['form'];
+$charitable_form_id  = $charitable_form->get_form_identifier();
+$charitable_campaign = $charitable_form->get_campaign();
 
-if ( is_null( $campaign ) ) {
+if ( is_null( $charitable_campaign ) ) {
 	return;
 }
 
-$suggested       = $campaign->get_suggested_donations();
-$currency_helper = charitable_get_currency_helper();
+$charitable_suggested       = $charitable_campaign->get_suggested_donations();
+$charitable_currency_helper = charitable_get_currency_helper();
 
-if ( empty( $suggested ) && ! $campaign->get( 'allow_custom_donations' ) ) {
+if ( empty( $charitable_suggested ) && ! $charitable_campaign->get( 'allow_custom_donations' ) ) {
 	return;
 }
 
@@ -41,7 +42,7 @@ if ( empty( $suggested ) && ! $campaign->get( 'allow_custom_donations' ) ) {
  *
  * @param Charitable_Donation_Form $form An instance of `Charitable_Donation_Form`.
  */
-do_action( 'charitable_donation_form_before_donation_amount', $form );
+do_action( 'charitable_donation_form_before_donation_amount', $charitable_form );
 
 ?>
 <div class="charitable-donation-options">
@@ -53,18 +54,18 @@ do_action( 'charitable_donation_form_before_donation_amount', $form );
 	 *
 	 * @param Charitable_Donation_Form $form An instance of `Charitable_Donation_Form`.
 	 */
-	do_action( 'charitable_donation_form_before_donation_amounts', $form );
+	do_action( 'charitable_donation_form_before_donation_amounts', $charitable_form );
 
 	charitable_template_from_session(
 		'donation-form/donation-amount-list.php',
 		array(
-			'campaign' => $campaign,
-			'form_id'  => $form_id,
+			'campaign' => $charitable_campaign,
+			'form_id'  => $charitable_form_id,
 		),
 		'donation_form_amount_field',
 		array(
-			'campaign_id' => $campaign->ID,
-			'form_id'     => $form_id,
+			'campaign_id' => $charitable_campaign->ID,
+			'form_id'     => $charitable_form_id,
 		)
 	);
 
@@ -75,7 +76,7 @@ do_action( 'charitable_donation_form_before_donation_amount', $form );
 	 *
 	 * @param Charitable_Donation_Form $form An instance of `Charitable_Donation_Form`.
 	 */
-	do_action( 'charitable_donation_form_after_donation_amounts', $form );
+	do_action( 'charitable_donation_form_after_donation_amounts', $charitable_form );
 	?>
 </div><!-- .charitable-donation-options -->
 <?php
@@ -87,4 +88,4 @@ do_action( 'charitable_donation_form_before_donation_amount', $form );
  *
  * @param Charitable_Donation_Form $form An instance of `Charitable_Donation_Form`.
  */
-do_action( 'charitable_donation_form_after_donation_amount', $form );
+do_action( 'charitable_donation_form_after_donation_amount', $charitable_form );

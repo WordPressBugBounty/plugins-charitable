@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.5.0
- * @version   1.8.1
+ * @version   1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -116,11 +116,12 @@ if ( ! class_exists( 'Charitable_Donation_Receipt_Endpoint' ) ) :
 		 *
 		 * @since  1.6.55
 		 * @since  1.8.1 Removed check for block theme.
+		 * @version 1.8.9.1
 		 *
 		 * @return boolean
 		 */
 		public function uses_custom_template() {
-			if ( array_key_exists( 'print', $_GET ) ) {
+			if ( array_key_exists( 'print', $_GET ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				return true;
 			}
 

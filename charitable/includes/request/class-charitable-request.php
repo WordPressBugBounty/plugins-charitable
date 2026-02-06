@@ -248,11 +248,13 @@ if ( ! class_exists( 'Charitable_Request' ) ) :
 		 * @return int
 		 */
 		public function get_campaign_id_from_submission() {
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
 			if ( ! isset( $_POST['campaign_id'] ) ) {
 				return 0;
 			}
 
-			$campaign_id = absint( $_POST['campaign_id'] );
+			$campaign_id = absint( sanitize_text_field( wp_unslash( $_POST['campaign_id'] ) ) );
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			if ( Charitable::CAMPAIGN_POST_TYPE !== get_post_type( $campaign_id ) ) {
 				return 0;
@@ -277,38 +279,45 @@ if ( ! class_exists( 'Charitable_Request' ) ) :
 			return $this->donation;
 		}
 
-		/**
-		 * Returns the current donation ID. If there is no current donation, return 0.
-		 *
-		 * @since  1.0.0
-		 *
-		 * @return int
-		 */
-		public function get_current_donation_id() {
-			$donation_id = get_query_var( 'donation_id', 0 );
+	/**
+	 * Returns the current donation ID. If there is no current donation, return 0.
+	 *
+	 * @since  1.0.0
+	 * @version 1.8.9.1
+	 *
+	 * @return int
+	 */
+	public function get_current_donation_id() {
+		$donation_id = get_query_var( 'donation_id', 0 );
 
-			if ( ! $donation_id && isset( $_GET['donation_id'] ) ) {
-				$donation_id = $_GET['donation_id'];
-			}
-
-			return $donation_id;
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		if ( ! $donation_id && isset( $_GET['donation_id'] ) ) {
+			$donation_id = absint( sanitize_text_field( wp_unslash( $_GET['donation_id'] ) ) );
 		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
-		/**
-		 * If set, add supported donation parameters to the session.
-		 *
-		 * @since  1.6.25
-		 *
-		 * @param  int $campaign_id The campaign receiving the donation.
-		 * @return void
-		 */
-		public function add_donation_params_to_session( $campaign_id ) {
-			if ( array_key_exists( 'amount', $_REQUEST ) ) {
-				$period = array_key_exists( 'period', $_REQUEST ) ? $_REQUEST['period'] : 'once';
+		return $donation_id;
+	}
 
-				charitable_get_session()->add_donation( $campaign_id, $_REQUEST['amount'], $period );
-			}
+	/**
+	 * If set, add supported donation parameters to the session.
+	 *
+	 * @since  1.6.25
+	 * @version 1.8.9.1
+	 *
+	 * @param  int $campaign_id The campaign receiving the donation.
+	 * @return void
+	 */
+	public function add_donation_params_to_session( $campaign_id ) {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		if ( array_key_exists( 'amount', $_REQUEST ) ) {
+			$amount = sanitize_text_field( wp_unslash( $_REQUEST['amount'] ) );
+			$period = array_key_exists( 'period', $_REQUEST ) ? sanitize_text_field( wp_unslash( $_REQUEST['period'] ) ) : 'once';
+
+			charitable_get_session()->add_donation( $campaign_id, $amount, $period );
 		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+	}
 
 		/**
 		 * Temporarily set the current campaign to the one for the donation form.

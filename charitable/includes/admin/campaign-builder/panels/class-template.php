@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version   1.8.0
+ * @version   1.8.9.1
  */
 
 // Exit if accessed directly.
@@ -60,6 +60,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Template' ) ) :
 		 * Output the panel primary content, which is a UI of campaign templates to select.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.9.1
 		 */
 		public function panel_content() {
 
@@ -140,25 +141,27 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Template' ) ) :
 
 						if ( $template_label ) :
 
-							printf(
-								/* translators: 1: Template ID */
-								__( 'You are currently using the <strong class="template-name">"%1$s"</strong> template. Changing a template now might result in losing fields and data. Proceed carefully.', 'charitable' ),
-								esc_html( $template_label )
+							echo wp_kses_post(
+								sprintf(
+									/* translators: 1: Template ID */
+									__( 'You are currently using the <strong class="template-name">"%1$s"</strong> template. Changing a template now might result in losing fields and data. Proceed carefully.', 'charitable' ),
+									esc_html( $template_label )
+								)
 							);
 
 						else :
 
-							printf(
-								/* translators: 1: Site URL, 2: Username, 3: User email address, 4: Lost password URL. */
-								__( 'To speed up the process you can select from one of our pre-made templates or start from scratch <a href="%1$s" class="charitable-trigger-blank"">with our simple column templates</a>. Have a suggestion for a new template? <a href="#" class="send-feedback" target="_blank" rel="noopener noreferrer">We’d love to hear it</a>!', 'charitable' ),
-								admin_url(), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-								admin_url(), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-								admin_url() // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+							echo wp_kses_post(
+								sprintf(
+									/* translators: 1: Site URL */
+									__( 'To speed up the process you can select from one of our pre-made templates or start from scratch <a href="%1$s" class="charitable-trigger-blank">with our simple column templates</a>. Have a suggestion for a new template? <a href="#" class="send-feedback">We would love to hear it</a>!', 'charitable' ),
+									esc_url( admin_url() )
+								)
 							);
 
-						endif;
+							echo $builder_template->output_templates_panel(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
-						echo $builder_template->output_templates_panel(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						endif;
 
 						?>
 					</p>

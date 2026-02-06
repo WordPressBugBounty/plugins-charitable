@@ -6,6 +6,7 @@
  * @package Charitable/Templates/Donation Form
  * @since   1.0.0
  * @version 1.5.0
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -17,18 +18,18 @@ if ( ! isset( $view_args['form'] ) || ! isset( $view_args['field'] ) ) {
 	return;
 }
 
-$form   = $view_args['form'];
-$field  = $view_args['field'];
-$fields = isset( $field['fields'] ) ? $field['fields'] : array();
+$charitable_form   = $view_args['form'];
+$charitable_field  = $view_args['field'];
+$charitable_fields = isset( $charitable_field['fields'] ) ? $charitable_field['fields'] : array();
 
-if ( empty( $fields ) ) {
+if ( empty( $charitable_fields ) ) {
 	return;
 }
 
 ?>
 <div id="charitable-meta-fields">
-	<?php if ( isset( $field['legend'] ) ) : ?>
-		<div class="charitable-form-header"><?php echo $field['legend']; ?></div>
+	<?php if ( isset( $charitable_field['legend'] ) ) : ?>
+		<div class="charitable-form-header"><?php echo esc_html( $charitable_field['legend'] ); ?></div>
 	<?php endif; ?>
-	<?php $form->view()->render_fields( $fields ); ?>
+	<?php $charitable_form->view()->render_fields( $charitable_fields ); ?>
 </div><!-- #charitable-meta-fields -->

@@ -8,6 +8,7 @@
  * @package Charitable/Templates/Campaign
  * @since   1.0.0
  * @version 1.0.0
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -23,9 +24,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @var Charitable_Donation_Form_Interface
  */
-$form = charitable_get_current_donation_form();
+$charitable_form = charitable_get_current_donation_form();
 
-if ( ! $form ) {
+if ( ! $charitable_form ) {
 	return;
 }
 
@@ -36,14 +37,14 @@ if ( ! $form ) {
  *
  * @param Charitable_Donation_Form_Interface $form The donation form object.
  */
-do_action( 'charitable_donation_form_before', $form );
+do_action( 'charitable_donation_form_before', $charitable_form );
 
 /**
  * Render the donation form.
  *
  * @param Charitable_Donation_Form_Interface $form The donation form object.
  */
-$form->render();
+$charitable_form->render();
 
 /**
  * Add something after the donation form.
@@ -52,4 +53,4 @@ $form->render();
  *
  * @param Charitable_Donation_Form_Interface $form The donation form object.
  */
-do_action( 'charitable_donation_form_after', $form );
+do_action( 'charitable_donation_form_after', $charitable_form );

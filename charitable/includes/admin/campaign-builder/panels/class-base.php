@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version   1.8.0
+ * @version   1.8.9.1, 1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -235,6 +235,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel' ) ) :
 		 * Primary panel button in the left panel navigation.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.9.1
 		 *
 		 * @param mixed  $campaign Current campaign object.
 		 * @param string $view The current view.
@@ -246,6 +247,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel' ) ) :
 			$upgrade_class   = false;
 			$upgrade_params  = false;
 			$button_linkable = ( $this->button && $this->url ) ? 'type="button"' : false;
+			$data_panel      = $button_linkable ? '' : 'data-panel="' . esc_attr( $this->slug ) . '"';
 
 			?>
 
@@ -254,9 +256,9 @@ if ( ! class_exists( 'Charitable_Builder_Panel' ) ) :
 				?>
 				<a target="_blank" href="<?php echo esc_url( $this->url ); ?>"><?php endif; ?>
 
-			<button <?php echo ( $button_linkable ); ?> class="charitable-panel-<?php echo esc_attr( $this->slug ); ?>-button <?php echo esc_attr( $upgrade_class ); ?> <?php echo esc_attr( $active ); ?>" data-panel="<?php echo esc_attr( $this->slug ); ?>" <?php echo esc_attr( $upgrade_params ); ?>>
+			<button <?php echo esc_attr( $button_linkable ); ?> class="charitable-panel-<?php echo esc_attr( $this->slug ); ?>-button <?php echo esc_attr( $upgrade_class ); ?> <?php echo esc_attr( $active ); ?>" <?php echo $data_panel; ?> <?php echo esc_attr( $upgrade_params ); ?>>
 				<?php if ( $this->icon ) : ?>
-					<img class="topbar_icon" src="<?php echo charitable()->get_path( 'assets', false ) . 'images/icons/' . esc_attr( $this->icon ); ?>" />
+					<img class="topbar_icon" src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/icons/' . $this->icon ); ?>" />
 				<?php endif; ?>
 				<span><?php echo esc_html( $this->name ); ?></span>
 			</button>
@@ -303,9 +305,9 @@ if ( ! class_exists( 'Charitable_Builder_Panel' ) ) :
 				$classes[] = 'active';
 			}
 
-			printf( '<div class="%s" id="charitable-panel-%s">', charitable_sanitize_classes( $classes, true ), esc_attr( $field_slug_id ) );
+			printf( '<div class="%s" id="charitable-panel-%s">', charitable_sanitize_classes( $classes, true ), esc_attr( $field_slug_id ) ); // phpcs:ignore
 
-			printf( '<div class="%s">', $wrap );
+			printf( '<div class="%s">', esc_attr( $wrap ) );
 
 			if ( true === $this->sidebar ) {
 
@@ -389,7 +391,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel' ) ) :
 			$classes = (array) apply_filters( 'charitable_builder_panel_sidebar_section_classes', [], $name, $slug, $icon );
 			$classes = array_merge( $default_classes, $classes );
 
-			echo '<a href="#" class="' . charitable_sanitize_classes( $classes, true ) . '" data-section="' . esc_attr( $slug ) . '">';
+			echo '<a href="#" class="' . esc_attr( charitable_sanitize_classes( $classes, true ) ) . '" data-section="' . esc_attr( $slug ) . '">';
 
 			if ( ! empty( $icon ) ) {
 				echo '<img src="' . esc_url( $icon ) . '">';

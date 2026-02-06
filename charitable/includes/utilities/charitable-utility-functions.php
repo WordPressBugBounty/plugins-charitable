@@ -89,6 +89,7 @@ function charitable_is_func_disabled( $function ) {
  * Verify a nonce. This also just ensures that the nonce is set.
  *
  * @since  1.0.0
+ * @version 1.8.9.1
  *
  * @param  string $nonce        The nonce name.
  * @param  string $action       The nonce action.
@@ -97,6 +98,7 @@ function charitable_is_func_disabled( $function ) {
  */
 function charitable_verify_nonce( $nonce, $action, $request_args = array() ) {
 	if ( empty( $request_args ) ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$request_args = $_GET;
 	}
 
@@ -133,7 +135,7 @@ function charitable_get_timezone_id() {
 	/* Last try, guess timezone string manually */
 	if ( false === $timezone ) {
 
-		$is_dst = date( 'I' );
+		$is_dst = date( 'I' ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 
 		foreach ( timezone_abbreviations_list() as $abbr ) {
 			foreach ( $abbr as $city ) {
@@ -245,6 +247,7 @@ function charitable_list_to_sentence_part( $list ) {
  *
  * @since   1.4.10
  * @version 1.8.4.2 Fix bug where english dates weren't being found in $wp_locale.
+ * @version 1.8.9.1
  *
  * @param  string $date          The date to be sanitized.
  * @param  string $return_format The date format to return. Default is U (timestamp).
@@ -299,13 +302,14 @@ function charitable_sanitize_date( $date, $return_format = 'U' ) {
 		return $time;
 	}
 
-	return date( $return_format, $time );
+	return date( $return_format, $time ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 }
 
 /**
  * Sanitizes a date passed in the format of yyyy/mm/dd.
  *
  * @since  1.7.0.8
+ * @version 1.8.9.1
  *
  * @param  string $date          The date to be sanitized.
  * @param  string $return_format The date format to return. Default is U (timestamp).
@@ -336,13 +340,14 @@ function charitable_sanitize_date_alt_format( $date, $return_format = 'U' ) {
 		return $time;
 	}
 
-	return date( $return_format, $time );
+	return date( $return_format, $time ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 }
 
 /**
  * Sanitizes a date passed in the format of mm/dd/yyyy for form filters.
  *
  * @since  1.7.0.11
+ * @version 1.8.9.1
  *
  * @param  string $date          The date to be sanitized.
  * @return string|false
@@ -357,7 +362,7 @@ function charitable_sanitize_date_filter_format( $date = false ) {
 	$timestamp = strtotime( $date );
 
 	// If it's not empty and not equal to -1, then convert it to the mm/dd/yyyy format.
-	$return_value = ( empty( $timestamp ) && -1 !== $timestamp ) ? '' : date( 'Y/m/d', $timestamp );
+	$return_value = ( empty( $timestamp ) && -1 !== $timestamp ) ? '' : date( 'Y/m/d', $timestamp ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 
 	return $return_value;
 }
@@ -366,6 +371,7 @@ function charitable_sanitize_date_filter_format( $date = false ) {
  * Sanitizes a date passed in the format of mm/dd/yyyy for form filters.
  *
  * @since  1.7.0.11
+ * @version 1.8.9.1
  *
  * @param  string $date          The date to be sanitized.
  * @return string|false
@@ -380,7 +386,7 @@ function charitable_sanitize_date_export_format( $date = false ) {
 	$timestamp = strtotime( $date );
 
 	// If it's not empty and not equal to -1, then convert it to the mm/dd/yyyy format.
-	$return_value = ( empty( $timestamp ) && -1 !== $timestamp ) ? '' : date( 'Y/m/d', $timestamp );
+	$return_value = ( empty( $timestamp ) && -1 !== $timestamp ) ? '' : date( 'Y/m/d', $timestamp ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 
 	return $return_value;
 }
@@ -425,6 +431,7 @@ function charitable_get_pages_options( $args = array() ) {
  * This is not fullproof. It uses a safelist of IP addresses.
  *
  * @since  1.6.14
+ * @version 1.8.9.1
  *
  * @return boolean
  */
@@ -449,7 +456,8 @@ function charitable_is_localhost() {
 		)
 	);
 
-	return in_array( $_SERVER['REMOTE_ADDR'], $safelist );
+	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated,WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+	return isset( $_SERVER['REMOTE_ADDR'] ) && in_array( $_SERVER['REMOTE_ADDR'], $safelist );
 }
 
 /**
@@ -622,6 +630,7 @@ function charitable_is_installed_mi_pro() {
  * Get the secret key for the crypto functions.
  *
  * @since 1.8.7
+ * @version 1.8.9.1
  *
  * @return string
  */
@@ -629,12 +638,19 @@ function charitable_crypto_get_secret_key() {
 
 	$secret_key = get_option( 'charitable_crypto_secret_key' );
 
-	error_log( 'charitable_crypto_get_secret_key: secret_key: ' . $secret_key );
+	if ( charitable_is_debug() ) {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( 'charitable_crypto_get_secret_key: secret_key: ' . $secret_key );
+	}
 
 	// If we already have the secret, send it back.
 	if ( false !== $secret_key ) {
-		error_log( 'charitable_crypto_get_secret_key: secret_key already exists: ' . $secret_key );
-		error_log( 'charitable_crypto_get_secret_key: secret_key decoded: ' . base64_decode( $secret_key ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
+		if ( charitable_is_debug() ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( 'charitable_crypto_get_secret_key: secret_key already exists: ' . $secret_key );
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
+			error_log( 'charitable_crypto_get_secret_key: secret_key decoded: ' . base64_decode( $secret_key ) );
+		}
 		return base64_decode( $secret_key ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 	}
 
@@ -642,7 +658,10 @@ function charitable_crypto_get_secret_key() {
 	$secret_key = sodium_crypto_secretbox_keygen();
 	add_option( 'charitable_crypto_secret_key', base64_encode( $secret_key ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
 
-	error_log( 'charitable_crypto_get_secret_key: secret_key returned: ' . $secret_key );
+	if ( charitable_is_debug() ) {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( 'charitable_crypto_get_secret_key: secret_key returned: ' . $secret_key );
+	}
 
 	return $secret_key;
 }
@@ -651,6 +670,7 @@ function charitable_crypto_get_secret_key() {
  * Encrypt a message.
  *
  * @since 1.6.1.2
+ * @version 1.8.9.1
  *
  * @param string $message Message to encrypt.
  * @param string $key     Encryption key.
@@ -659,8 +679,12 @@ function charitable_crypto_get_secret_key() {
  */
 function charitable_crypto_encrypt( $message, $key = '' ) {
 
-	error_log( 'charitable_crypto_encrypt: message: ' . $message );
-	error_log( 'charitable_crypto_encrypt: key: ' . $key );
+	if ( charitable_is_debug() ) {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( 'charitable_crypto_encrypt: message: ' . $message );
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( 'charitable_crypto_encrypt: key: ' . $key );
+	}
 
 	// Create a nonce for this operation. It will be stored and recovered in the message itself.
 	$nonce = random_bytes(
@@ -671,7 +695,10 @@ function charitable_crypto_encrypt( $message, $key = '' ) {
 		$key = charitable_crypto_get_secret_key();
 	}
 
-	error_log( 'charitable_crypto_encrypt: key: ' . $key );
+	if ( charitable_is_debug() ) {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( 'charitable_crypto_encrypt: key: ' . $key );
+	}
 
 	// Encrypt message and combine with nonce.
 	$cipher = base64_encode( // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
@@ -686,9 +713,15 @@ function charitable_crypto_encrypt( $message, $key = '' ) {
 	try {
 		sodium_memzero( $message );
 		sodium_memzero( $key );
-		error_log( 'charitable_crypto_encrypt: cipher: ' . $cipher );
+		if ( charitable_is_debug() ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( 'charitable_crypto_encrypt: cipher: ' . $cipher );
+		}
 	} catch ( \Exception $e ) {
-		error_log( 'charitable_crypto_encrypt: error: ' . $e->getMessage() );
+		if ( charitable_is_debug() ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( 'charitable_crypto_encrypt: error: ' . $e->getMessage() );
+		}
 		return $cipher;
 	}
 
@@ -699,6 +732,7 @@ function charitable_crypto_encrypt( $message, $key = '' ) {
  * Decrypt a message.
  *
  * @since 1.6.1.2
+ * @version 1.8.9.1
  *
  * @param string $encrypted Encrypted message.
  * @param string $key       Encryption key.
@@ -741,9 +775,15 @@ function charitable_crypto_decrypt( $encrypted, $key = '' ) {
 	try {
 		sodium_memzero( $ciphertext );
 		sodium_memzero( $key );
-		error_log( 'charitable_crypto_decrypt: message: ' . $message );
+		if ( charitable_is_debug() ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( 'charitable_crypto_decrypt: message: ' . $message );
+		}
 	} catch ( \Exception $e ) {
-		error_log( 'charitable_crypto_decrypt: error: ' . $e->getMessage() );
+		if ( charitable_is_debug() ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( 'charitable_crypto_decrypt: error: ' . $e->getMessage() );
+		}
 		return $message;
 	}
 

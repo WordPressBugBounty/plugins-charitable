@@ -311,7 +311,7 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 
 				$hook_name = 'charitable_process_donation_' . $gateway;
 
-				return apply_filters( $hook_name, true, $this->donation_id, $processor );
+				return apply_filters( $hook_name, true, $this->donation_id, $processor ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Hook name is dynamically constructed with the plugin prefix 'charitable_process_donation_'.
 
 			} else {
 				/**
@@ -395,6 +395,15 @@ if ( ! class_exists( 'Charitable_Donation_Processor' ) ) :
 				if ( empty( $errors ) ) {
 					$errors = array( __( 'Unable to process donation.', 'charitable' ) );
 				}
+
+				// Log the AJAX processing failure
+				$context = array(
+					'campaign_id' => $processor->get_donation_data_value( 'campaign_id' ),
+					'amount'      => $processor->get_donation_data_value( 'donation_amount' ),
+					'gateway'     => $processor->get_donation_data_value( 'gateway' ),
+					'donation_id' => (int) $processor->get_donation_id(),
+				);
+				charitable_log_form_error( 'ajax_failure', 'donation_processing_failed', $context );
 
 				$response['success']     = false;
 				$response['errors']      = $errors;

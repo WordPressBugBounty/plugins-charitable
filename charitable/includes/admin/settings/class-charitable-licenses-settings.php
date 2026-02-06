@@ -437,6 +437,7 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 		 * @since   1.0.0
 		 * @version 1.7.0.4
 		 * @version 1.8.6.2 - clear transient _charitable_plugin_versions
+		 * @version 1.8.9.1
 		 *
 		 * @param   mixed[] $values The parsed values combining old values & new values.
 		 * @param   mixed[] $new_values The newly submitted values.
@@ -449,6 +450,7 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 				return $values;
 			}
 
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$re_check = array_key_exists( 'recheck', $_POST );
 			$licenses = $new_values['licenses_legacy'];
 
@@ -624,12 +626,14 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 				$output .= '<p>' . esc_html__( 'There was an error attempting to validate your license key. Check and see if you have exceeded your license activations.', 'charitable' ) . '</p>';
 			} elseif ( ! $valid && isset( $license_data['comm_success'] ) && false !== $license_data['comm_success'] ) {
 				$output .= '<p>' . esc_html__( 'There was an error attempting to contact the license server. Please try again later.', 'charitable' ) . '</p>';
-			} elseif ( isset( $_GET['valid'] ) && 'invalid' === esc_html( $_GET['valid'] ) && isset( $_GET['comm_success'] ) && 0 === intval( $_GET['comm_success'] ) ) {
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended
+			} elseif ( isset( $_GET['valid'] ) && 'invalid' === sanitize_text_field( wp_unslash( $_GET['valid'] ) ) && isset( $_GET['comm_success'] ) && 0 === intval( wp_unslash( $_GET['comm_success'] ) ) ) {
 				$output .= '<p style="color:red;">' . esc_html__( 'There was an error attempting to validate your license key. Please try again later.', 'charitable' ) . '</p>';
-			} elseif ( isset( $_GET['valid'] ) && 'invalid' === esc_html( $_GET['valid'] ) && isset( $_GET['license_limit'] ) && false !== $_GET['license_limit'] ) {
+			} elseif ( isset( $_GET['valid'] ) && 'invalid' === sanitize_text_field( wp_unslash( $_GET['valid'] ) ) && isset( $_GET['license_limit'] ) && false !== sanitize_text_field( wp_unslash( $_GET['license_limit'] ) ) ) {
 				$output .= '<p style="color:red;">' . esc_html__( 'There was an error attempting to validate your license key. Check and see if you have exceeded your license activations.', 'charitable' ) . '</p>';
-			} elseif ( isset( $_GET['valid'] ) && 'invalid' === esc_html( $_GET['valid'] ) ) {
+			} elseif ( isset( $_GET['valid'] ) && 'invalid' === sanitize_text_field( wp_unslash( $_GET['valid'] ) ) ) {
 				$output .= '<p style="color:red;" data-invalid="Unknown">' . esc_html__( 'There was a problem attempting to validate your license key. Please try again later.', 'charitable' ) . '</p>';
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 			} else {
 				$output .= '<hr><p>' . esc_html__( 'Already purchased? Simply enter your license key below to enable Charitable PRO!', 'charitable' ) . '</p>';
 			}
@@ -722,10 +726,10 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 
 					$output .= '<p><strong>' . esc_html__( 'License data:', 'charitable' ) . '</strong> ' . $license_data . '</p>';
 					if ( $settings ) {
-						$output .= '<p><strong>' . esc_html__( 'Settings data:', 'charitable' ) . '</strong> ' . print_r( $settings, true ) . '</p>';
+						$output .= '<p><strong>' . esc_html__( 'Settings data:', 'charitable' ) . '</strong> ' . print_r( $settings, true ) . '</p>'; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 					}
 					if ( $plan_name ) {
-						$output .= '<p><strong>' . esc_html__( 'Plan name:', 'charitable' ) . '</strong> ' . print_r( $plan_name, true ) . '</p>';
+						$output .= '<p><strong>' . esc_html__( 'Plan name:', 'charitable' ) . '</strong> ' . print_r( $plan_name, true ) . '</p>'; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 					}
 					$output .= '</fieldset>';
 					error_log( 'get_licensed_message - valid' ); // phpcs:ignore
@@ -835,7 +839,7 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 			activate_plugin( 'charitable-pro/charitable.php' );
 
 			// Redirect to the settings page.
-			wp_redirect( admin_url( 'admin.php?page=charitable-settings&tab=general&valid=valid' ) );
+			wp_safe_redirect( admin_url( 'admin.php?page=charitable-settings&tab=general&valid=valid' ) );
 			exit;
 		}
 	}

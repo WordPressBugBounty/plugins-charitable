@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version   1.8.0
+ * @version   1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -115,7 +115,7 @@ if ( ! class_exists( 'Charitable_Field_Photo' ) ) :
 				?>
 
 				<div class="charitable-campaign-primary-image">
-					<img <?php echo $css_class; ?> src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $alt_text ); ?>" <?php echo esc_attr( $photo_attr ); ?> />
+					<img <?php echo esc_attr( $css_class ); ?> src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $alt_text ); ?>" <?php echo esc_attr( $photo_attr ); ?> />
 				</div>
 
 
@@ -143,7 +143,7 @@ if ( ! class_exists( 'Charitable_Field_Photo' ) ) :
 			$html  = $this->field_title( $this->name );
 			$html .= $this->field_wrapper( $this->render( $field_data, $campaign_data, $field_id, 'preview' ), $field_data );
 
-			echo $html;
+			echo wp_kses_post( $html );
 		}
 
 		/**
@@ -159,7 +159,7 @@ if ( ! class_exists( 'Charitable_Field_Photo' ) ) :
 
 			$html = $this->field_display_wrapper( $this->render( $field_data, $campaign_data ), $field_data );
 
-			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data );
+			echo wp_kses_post( apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data ) );
 		}
 
 		/**
@@ -192,21 +192,21 @@ if ( ! class_exists( 'Charitable_Field_Photo' ) ) :
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_uploader(
+			echo $charitable_builder_form_fields->generate_uploader( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['file'] ) ? $settings['file'] : false,
 				esc_html__( 'Photo URL', 'charitable' ),
 				array(
 					'id'           => 'field_' . esc_attr( $this->type ) . '_file' . '_' . intval( $field_id ), // phpcs:ignore
 					'name'         => array( '_fields', intval( $field_id ), 'file' ),
-					'field_id'     => $field_id,
+					'field_id'     => esc_attr( $field_id ),
 					'button_label' => esc_html__( 'Upload', 'charitable' ),
 					'placeholder'  => 'https://',
 					'description'  => esc_html__( 'Upload a new image or add an existing image.', 'charitable' ),
-					'tooltip'      => $this->tooltip,
+					'tooltip'      => esc_attr( $this->tooltip ),
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['alt_text'] ) ? $settings['alt_text'] : false,
 				esc_html__( 'ALT Text', 'charitable' ),
 				array(
@@ -217,7 +217,7 @@ if ( ! class_exists( 'Charitable_Field_Photo' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_hidden_field(
+			echo $charitable_builder_form_fields->generate_hidden_field( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['default'] ) ? $settings['default'] : false,
 				array(
 					'id'       => 'field_' . esc_attr( $this->type ) . '_default' . '_' . intval( $field_id ), // phpcs:ignore
@@ -226,7 +226,7 @@ if ( ! class_exists( 'Charitable_Field_Photo' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_number_slider(
+			echo $charitable_builder_form_fields->generate_number_slider( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['width_percentage'] ) ? $settings['width_percentage'] : 100,
 				esc_html__( 'Width', 'charitable' ),
 				array(
@@ -242,7 +242,7 @@ if ( ! class_exists( 'Charitable_Field_Photo' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_align(
+			echo $charitable_builder_form_fields->generate_align( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['align'] ) ? $settings['align'] : esc_attr( $this->align_default ),
 				esc_html__( 'Align', 'charitable' ),
 				array(
@@ -252,7 +252,7 @@ if ( ! class_exists( 'Charitable_Field_Photo' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['css_class'] ) ? $settings['css_class'] : false,
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(
@@ -272,11 +272,14 @@ if ( ! class_exists( 'Charitable_Field_Photo' ) ) :
 		 * Return HTML for display via ajax.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.9.1
 		 */
 		public function settings_display_ajax() {
 
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
 			$field_id    = isset( $_POST['field_id'] ) ? intval( $_POST['field_id'] ) : false;
 			$campaign_id = isset( $_POST['campaign_id'] ) ? intval( $_POST['campaign_id'] ) : false;
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			if ( false === $field_id ) {
 				return;
@@ -293,7 +296,7 @@ if ( ! class_exists( 'Charitable_Field_Photo' ) ) :
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_number_slider(
+			echo $charitable_builder_form_fields->generate_number_slider( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['width_percentage'] ) ? $settings['width_percentage'] : 100,
 				esc_html__( 'Width', 'charitable' ),
 				array(
@@ -307,7 +310,7 @@ if ( ! class_exists( 'Charitable_Field_Photo' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_align(
+			echo $charitable_builder_form_fields->generate_align( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['align'] ) ? $settings['align'] : false,
 				esc_html__( 'Align', 'charitable' ),
 				array(
@@ -317,7 +320,7 @@ if ( ! class_exists( 'Charitable_Field_Photo' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				$settings['css_class'],
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(

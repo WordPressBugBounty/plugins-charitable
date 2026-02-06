@@ -25,6 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function charitable_compat_wp_super_cache_clear_campaign_cache( $campaign_id ) {
 	/* Set super cache to enabled. */
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- $GLOBALS['super_cache_enabled'] is a third-party global variable used by WP Super Cache plugin for compatibility.
 	$GLOBALS['super_cache_enabled'] = 1;
 
 	if ( ! function_exists( 'wp_cache_post_change' ) ) {

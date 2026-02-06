@@ -151,11 +151,15 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 		 * @return void
 		 */
 		public function handle_gateway_settings_request() {
-			if ( ! wp_verify_nonce( $_REQUEST['_nonce'], 'gateway' ) ) { // phpcs:ignore
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- wp_verify_nonce handles validation
+			if ( ! isset( $_REQUEST['_nonce'] ) || ! wp_verify_nonce( wp_unslash( $_REQUEST['_nonce'] ), 'gateway' ) ) {
 				wp_die( __( 'Cheatin\' eh?!', 'charitable' ) ); // phpcs:ignore
 			}
 
-			$gateway = isset( $_REQUEST['gateway_id'] ) ? $_REQUEST['gateway_id'] : false;
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Gateway ID, sanitized below
+			$gateway = isset( $_REQUEST['gateway_id'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['gateway_id'] ) ) : false;
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			/* Gateway must be set */
 			if ( false === $gateway ) {
@@ -646,7 +650,8 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 		/**
 		 * Connects to Stripe by saving account information passed back to the plugin.
 		 *
-		 * @since 4.2.2
+		 * @since   4.2.2
+		 * @version 1.8.9
 		 *
 		 * @return void
 		 */
@@ -670,8 +675,9 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 				return;
 			}
 
-			if ( isset( $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'] ) ) {
-				$current_url = ( is_ssl() ? 'https' : 'http' ) . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+			if ( isset( $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Server variables for URL construction
+				$current_url = ( is_ssl() ? 'https' : 'http' ) . '://' . wp_unslash( $_SERVER['HTTP_HOST'] ) . wp_unslash( $_SERVER['REQUEST_URI'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Server variables are unslashed and then sanitized via esc_url_raw()
+				$current_url = esc_url_raw( $current_url ); // phpcs:ignore
 			} else {
 				$current_url = '';
 			}
@@ -701,6 +707,15 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 				200 !== wp_remote_retrieve_response_code( $response )
 			) {
 
+				// Log error details for debugging.
+				if ( is_wp_error( $response ) ) {
+					error_log( 'Charitable Stripe Connect Error: ' . $response->get_error_message() . ' | URL: ' . $wpcharitable_credentials_url ); // phpcs:ignore
+				} else {
+					$response_code = wp_remote_retrieve_response_code( $response );
+					$response_body = wp_remote_retrieve_body( $response );
+					error_log( 'Charitable Stripe Connect Error: HTTP ' . $response_code . ' | URL: ' . $wpcharitable_credentials_url . ' | Response: ' . substr( $response_body, 0, 500 ) ); // phpcs:ignore
+				}
+
 				$stripe_account_settings_url = add_query_arg(
 					array(
 						'tab'   => 'gateways',
@@ -714,7 +729,7 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 					sprintf(
 						/* translators: %1$s Opening anchor tag, do not translate. %2$s Closing anchor tag, do not translate. */
 						__(
-							'There was an error getting your Square credentials. Please %1$stry again%2$s. If you continue to have this problem, please contact support.',
+							'There was an error getting your Stripe credentials. Please %1$stry again%2$s. If you continue to have this problem, please contact support.',
 							'charitable'
 						),
 						'<a href="' . esc_url( $stripe_account_settings_url ) . '">',
@@ -722,7 +737,7 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 					)
 				);
 
-				wp_die( $message );
+				wp_die( $message ); // phpcs:ignore
 			}
 
 			$body = wp_remote_retrieve_body( $response );
@@ -745,9 +760,9 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 			 *
 			 * @param array $data Stripe response data.
 			 */
-			do_action( 'wpcharitable_stripe_account_connected', $account_data );
+			do_action( 'wpcharitable_stripe_account_connected', $account_data ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- This is a legacy hook used by other Charitable code. Changing it would break existing functionality.
 
-			wp_redirect( esc_url_raw( $customer_site_url ) );
+			wp_safe_redirect( esc_url_raw( $customer_site_url ) );
 			exit;
 		}
 
@@ -868,7 +883,7 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 			 *
 			 * @param array $data Square response data.
 			 */
-			do_action( 'wpcharitable_square_token_refreshed', $account_data );
+			do_action( 'wpcharitable_square_token_refreshed', $account_data ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- This is a legacy hook used by other Charitable code. Changing it would break existing functionality.
 
 			wp_safe_redirect( esc_url_raw( $customer_site_url ) );
 			exit;
@@ -1118,12 +1133,14 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 				return;
 			}
 
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display/routing parameter
 			if ( ! isset( $_GET['_wpnonce'] ) ) {
 				return;
 			}
 
 			// Invalid nonce, bail.
-			if ( ! wp_verify_nonce( $_GET['_wpnonce'], 'wpcharitable-stripe-connect-disconnect' ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- wp_verify_nonce handles validation
+			if ( ! wp_verify_nonce( wp_unslash( $_GET['_wpnonce'] ), 'wpcharitable-stripe-connect-disconnect' ) ) {
 				return;
 			}
 
@@ -1187,6 +1204,7 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 			$mode = 'sandbox' === $mode ? 'test' : 'live';
 
 			// Current user cannot handle this request or nonce is invalid.
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- wp_verify_nonce handles validation
 			if ( ! current_user_can( 'manage_options' ) || ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( wp_unslash( $_GET['_wpnonce'] ), 'wpcharitable-square-connect-disconnect' ) ) {
 				if ( charitable_is_debug( 'webhook' ) ) {
 					error_log( 'disconnect_gateways_square - user cannot manage options or nonce is invalid' ); // phpcs:ignore
@@ -1612,18 +1630,21 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 		}
 
 		/**
-		 * Handle the square gateway switch.
+		 * Handle Square gateway switch.
 		 *
-		 * @since 1.8.7
+		 * @since  1.8.7
+		 * @version 1.8.9.1
 		 *
 		 * @return void
 		 */
 		public function handle_square_gateway_switch() {
-
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
 			// Verify nonce.
-			if ( ! wp_verify_nonce( $_POST['nonce'], 'charitable_admin_nonce' ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- wp_verify_nonce handles validation
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'charitable_admin_nonce' ) ) {
 				wp_send_json_error( array( 'message' => __( 'Security check failed.', 'charitable' ) ) );
 			}
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			// Check user permissions.
 			if ( ! current_user_can( 'manage_options' ) ) {
@@ -1655,18 +1676,21 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 		}
 
 		/**
-		 * Handle the square core to legacy switch.
+		 * Handle Square core to legacy switch.
 		 *
-		 * @since 1.8.7
+		 * @since  1.8.7
+		 * @version 1.8.9.1
 		 *
 		 * @return void
 		 */
 		public function handle_square_core_to_legacy_switch() {
-
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
 			// Verify nonce.
-			if ( ! wp_verify_nonce( $_POST['nonce'], 'charitable_admin_nonce' ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- wp_verify_nonce handles validation
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'charitable_admin_nonce' ) ) {
 				wp_send_json_error( array( 'message' => __( 'Security check failed.', 'charitable' ) ) );
 			}
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			// Check user permissions.
 			if ( ! current_user_can( 'manage_options' ) ) {

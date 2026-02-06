@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * The template used to display the WP Editor in a form.
  *
@@ -6,18 +12,19 @@
  * @package Charitable/Templates/Form Fields
  * @since   1.0.0
  * @version 1.0.0
+ * @version 1.8.8.6
  */
 
 if ( ! isset( $view_args['form'] ) || ! isset( $view_args['field'] ) ) {
 	return;
 }
 
-$form        = $view_args['form'];
-$field       = $view_args['field'];
-$classes     = $view_args['classes'];
-$is_required = isset( $field['required'] ) ? $field['required'] : false;
-$value       = isset( $field['value'] ) ? $field['value'] : '';
-$editor_args = isset( $field['editor'] ) ? wpautop( $field['editor'] ) : array();
+$charitable_form        = $view_args['form'];
+$charitable_field       = $view_args['field'];
+$charitable_classes     = $view_args['classes'];
+$charitable_is_required = isset( $charitable_field['required'] ) ? $charitable_field['required'] : false;
+$charitable_value       = isset( $charitable_field['value'] ) ? $charitable_field['value'] : '';
+$charitable_editor_args = isset( $charitable_field['editor'] ) ? wpautop( $charitable_field['editor'] ) : array();
 
 /**
  * Change the editor settings.
@@ -28,7 +35,7 @@ $editor_args = isset( $field['editor'] ) ? wpautop( $field['editor'] ) : array()
  *
  * @param array $settings The default settings.
  */
-$default_editor_args = array(
+$charitable_default_editor_args = array(
 	'media_buttons' => true,
 	'teeny'         => true,
 	'quicktags'     => false,
@@ -38,18 +45,18 @@ $default_editor_args = array(
 	),
 );
 
-$editor_args = wp_parse_args( $editor_args, $default_editor_args );
+$charitable_editor_args = wp_parse_args( $charitable_editor_args, $charitable_default_editor_args );
 ?>
-<div id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>" class="<?php echo esc_attr( $classes ); ?>">
-	<?php if ( isset( $field['label'] ) ) : ?>
-		<label for="<?php echo esc_attr( $field['key'] ); ?>">
-			<?php echo wp_kses_post( $field['label'] ); ?>
-			<?php if ( $is_required ) : ?>
+<div id="charitable_field_<?php echo esc_attr( $charitable_field['key'] ); ?>" class="<?php echo esc_attr( $charitable_classes ); ?>">
+	<?php if ( isset( $charitable_field['label'] ) ) : ?>
+		<label for="<?php echo esc_attr( $charitable_field['key'] ); ?>">
+			<?php echo wp_kses_post( $charitable_field['label'] ); ?>
+			<?php if ( $charitable_is_required ) : ?>
 				<abbr class="required" title="<?php esc_html_e( 'Required', 'charitable' ); ?>">*</abbr>
 			<?php endif ?>
 		</label>
 	<?php endif ?>
 	<?php
-		wp_editor( $value, $field['key'], $editor_args );
+		wp_editor( $charitable_value, $charitable_field['key'], $charitable_editor_args );
 	?>
 </div>

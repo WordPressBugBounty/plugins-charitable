@@ -8,6 +8,7 @@
  * @package Charitable/Templates/Donation Receipt
  * @since   1.0.0
  * @version 1.0.0
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -15,8 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$content  = $view_args['content'];
-$donation = $view_args['donation'];
+$charitable_content  = $view_args['content'];
+$charitable_donation = $view_args['donation'];
 
 /**
  * Add something before the donation receipt and the page content.
@@ -25,9 +26,9 @@ $donation = $view_args['donation'];
  *
  * @param   Charitable_Donation $donation The Donation object.
  */
-do_action( 'charitable_donation_receipt_before', $donation );
+do_action( 'charitable_donation_receipt_before', $charitable_donation );
 
-echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+echo $charitable_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 /**
  * Display the donation receipt content.
@@ -36,7 +37,7 @@ echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
  *
  * @param   Charitable_Donation $donation The Donation object.
  */
-do_action( 'charitable_donation_receipt', $donation );
+do_action( 'charitable_donation_receipt', $charitable_donation );
 
 /**
  * Add something after the donation receipt.
@@ -45,4 +46,4 @@ do_action( 'charitable_donation_receipt', $donation );
  *
  * @param   Charitable_Donation $donation The Donation object.
  */
-do_action( 'charitable_donation_receipt_after', $donation );
+do_action( 'charitable_donation_receipt_after', $charitable_donation );

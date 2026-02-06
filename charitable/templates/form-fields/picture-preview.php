@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * The template used to display a preview of an uploaded photo.
  *
@@ -6,42 +12,43 @@
  * @package Charitable/Templates/Form Fields
  * @since   1.4.0
  * @version 1.6.43
+ * @version 1.8.8.6
  */
 
 if ( ! isset( $view_args['image'] ) || ! isset( $view_args['field'] ) ) {
 	return;
 }
 
-$image              = $view_args['image'];
-$field              = $view_args['field'];
-$size               = isset( $field['size'] ) ? $field['size'] : 'thumbnail';
-$multiple           = isset( $field['max_uploads'] ) && $field['max_uploads'] > 1 ? '[]' : '';
-$is_src             = strpos( $image, 'img' ) !== false;
-$remove_button_text = isset( $field['remove_button_text'] ) ? $field['remove_button_text'] : __( 'Remove', 'charitable' );
-$remove_button_show = isset( $field['remove_button_show'] ) && $field['remove_button_show'];
+$charitable_image              = $view_args['image'];
+$charitable_field              = $view_args['field'];
+$charitable_size               = isset( $charitable_field['size'] ) ? $charitable_field['size'] : 'thumbnail';
+$charitable_multiple           = isset( $charitable_field['max_uploads'] ) && $charitable_field['max_uploads'] > 1 ? '[]' : '';
+$charitable_is_src             = strpos( $charitable_image, 'img' ) !== false;
+$charitable_remove_button_text = isset( $charitable_field['remove_button_text'] ) ? $charitable_field['remove_button_text'] : __( 'Remove', 'charitable' );
+$charitable_remove_button_show = isset( $charitable_field['remove_button_show'] ) && $charitable_field['remove_button_show'];
 
-if ( is_numeric( $size ) ) {
-	$size = array( $size, $size );
+if ( is_numeric( $charitable_size ) ) {
+	$charitable_size = array( $charitable_size, $charitable_size );
 }
 
 ?>
-<li <?php echo ! $is_src ? 'data-attachment-id="' . esc_attr( $image ) . '"' : ''; ?>>
+<li <?php echo ! $charitable_is_src ? 'data-attachment-id="' . esc_attr( $charitable_image ) . '"' : ''; ?>>
 	<a href="#" class="remove-image button"
 	<?php
-	if ( $remove_button_show ) {
+	if ( $charitable_remove_button_show ) {
 		echo 'style="display:block;"';}
 	?>
-	><?php echo esc_html( $remove_button_text ); ?></a>
+	><?php echo esc_html( $charitable_remove_button_text ); ?></a>
 	<?php
-	if ( $is_src ) :
-		echo $image; // phpcs:ignore
+	if ( $charitable_is_src ) :
+		echo $charitable_image; // phpcs:ignore
 	else :
 		?>
 		<input type="hidden"
-			name="<?php echo esc_attr( $field['key'] . $multiple ); ?>"
-			id="charitable_field_<?php echo esc_attr( $field['key'] ); ?>_element"
-			value="<?php echo esc_attr( $image ); ?>"
+			name="<?php echo esc_attr( $charitable_field['key'] . $charitable_multiple ); ?>"
+			id="charitable_field_<?php echo esc_attr( $charitable_field['key'] ); ?>_element"
+			value="<?php echo esc_attr( $charitable_image ); ?>"
 		/>
-		<?php echo wp_get_attachment_image( $image, $size ); ?>
+		<?php echo wp_get_attachment_image( $charitable_image, $charitable_size ); ?>
 	<?php endif ?>
 </li>

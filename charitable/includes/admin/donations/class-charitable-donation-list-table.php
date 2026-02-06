@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.5.0
- * @version   1.8.1.5
+ * @version   1.8.1.5, 1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -374,7 +374,7 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 			/* Bail out if this is not a status-changing action. */
 			if ( strpos( $action, 'set-' ) === false ) {
 				$sendback = remove_query_arg( array( 'trashed', 'untrashed', 'deleted', 'locked', 'ids' ), wp_get_referer() );
-				wp_redirect( esc_url_raw( $sendback ) );
+				wp_safe_redirect( esc_url_raw( $sendback ) );
 
 				exit();
 			}
@@ -563,7 +563,7 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 				3  => __( 'Custom field deleted.', 'charitable' ),
 				4  => __( 'Donation updated.', 'charitable' ),
 				// translators: %s: post title.
-				5  => isset( $_GET['revision'] ) ? sprintf( __( 'Donation restored to revision from %s', 'charitable' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+				5  => isset( $_GET['revision'] ) ? sprintf( __( 'Donation restored to revision from %s', 'charitable' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false, // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				// translators: %s: the URL.
 				6  => sprintf( __( 'Donation published. <a href="%s">View Donation</a>', 'charitable' ), esc_url( get_permalink( $post_ID ) ) ),
 				7  => __( 'Donation saved.', 'charitable' ),
@@ -746,11 +746,12 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 				$vars['post_status'] = array_keys( charitable_get_valid_donation_statuses() );
 			}
 
-			if ( isset( $_GET['charitable_nonce'] ) && wp_verify_nonce( $_GET['charitable_nonce'], 'charitable_filter_campaigns' ) ) :
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			if ( isset( $_GET['charitable_nonce'] ) && wp_verify_nonce( wp_unslash( $_GET['charitable_nonce'] ), 'charitable_filter_campaigns' ) ) :
 
 				/* Set up date query */
 				if ( isset( $_GET['start_date'] ) && ! empty( $_GET['start_date'] ) ) {
-					$start_date                  = $this->get_parsed_date( $_GET['start_date'] );
+					$start_date                  = $this->get_parsed_date( sanitize_text_field( wp_unslash( $_GET['start_date'] ) ) );
 					$vars['date_query']['after'] = array(
 						'year'  => $start_date['year'],
 						'month' => $start_date['month'],
@@ -759,7 +760,7 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 				}
 
 				if ( isset( $_GET['end_date'] ) && ! empty( $_GET['end_date'] ) ) {
-					$end_date                     = $this->get_parsed_date( $_GET['end_date'] );
+					$end_date                     = $this->get_parsed_date( sanitize_text_field( wp_unslash( $_GET['end_date'] ) ) );
 					$vars['date_query']['before'] = array(
 						'year'  => $end_date['year'],
 						'month' => $end_date['month'],
@@ -775,7 +776,7 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 
 			/* Filter by campaign. */
 			if ( isset( $_GET['campaign_id'] ) && 'all' !== $_GET['campaign_id'] ) {
-				$vars['post__in'] = charitable_get_table( 'campaign_donations' )->get_donation_ids_for_campaign( $_GET['campaign_id'] );
+				$vars['post__in'] = charitable_get_table( 'campaign_donations' )->get_donation_ids_for_campaign( (int) sanitize_text_field( wp_unslash( $_GET['campaign_id'] ) ) );
 			}
 
 			/* If the user cannot view/edit others donations, filter by author. */
@@ -803,14 +804,14 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 				return $clauses;
 			}
 
-			if ( ! isset( $_GET['orderby'] ) ) {
+			if ( ! isset( $_GET['orderby'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				return $clauses;
 			}
 
 			/* Sorting */
-			$order = isset( $_GET['order'] ) && strtoupper( $_GET['order'] ) == 'ASC' ? 'ASC' : 'DESC';
+			$order = isset( $_GET['order'] ) && strtoupper( sanitize_text_field( wp_unslash( $_GET['order'] ) ) ) == 'ASC' ? 'ASC' : 'DESC'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-			switch ( $_GET['orderby'] ) {
+			switch ( sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				case 'amount':
 					$clauses['join']    = "JOIN {$wpdb->prefix}charitable_campaign_donations cd ON cd.donation_id = $wpdb->posts.ID ";
 					$clauses['orderby'] = 'cd.amount ' . $order;
@@ -832,17 +833,28 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 
 				$args = array();
 
-				if ( isset( $_GET['s'] ) && strlen( $_GET['s'] ) ) {
-					$args['s'] = $_GET['s'];
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended
+			if ( isset( $_GET['s'] ) ) {
+				$s_value = sanitize_text_field( wp_unslash( $_GET['s'] ) );
+				if ( strlen( $s_value ) ) {
+					$args['s'] = $s_value;
 				}
+			}
 
-				if ( isset( $_GET['start_date'] ) && strlen( $_GET['start_date'] ) ) {
-					$args['start_date'] = $this->get_parsed_date( $_GET['start_date'] );
+			if ( isset( $_GET['start_date'] ) ) {
+				$start_date_value = sanitize_text_field( wp_unslash( $_GET['start_date'] ) );
+				if ( strlen( $start_date_value ) ) {
+					$args['start_date'] = $this->get_parsed_date( $start_date_value );
 				}
+			}
 
-				if ( isset( $_GET['end_date'] ) && strlen( $_GET['end_date'] ) ) {
-					$args['end_date'] = $this->get_parsed_date( $_GET['end_date'] );
+			if ( isset( $_GET['end_date'] ) ) {
+				$end_date_value = sanitize_text_field( wp_unslash( $_GET['end_date'] ) );
+				if ( strlen( $end_date_value ) ) {
+					$args['end_date'] = $this->get_parsed_date( $end_date_value );
 				}
+			}
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 				/* If the user cannot view/edit others donations, filter by author. */
 				if ( ! current_user_can( 'edit_others_donations' ) ) {
@@ -873,40 +885,61 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 			$time = charitable_sanitize_date_alt_format( $date );
 
 			return array(
-				'year'  => date( 'Y', $time ),
-				'month' => date( 'm', $time ),
-				'day'   => date( 'd', $time ),
+				'year'  => date( 'Y', $time ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
+				'month' => date( 'm', $time ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
+				'day'   => date( 'd', $time ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 			);
 		}
 
-		/**
-		 * Show blank slate.
-		 *
-		 * @since 1.8.1.5
-		 *
-		 * @param string $which String which tablenav is being shown.
-		 *
-		 * @return void
-		 */
-		public function maybe_render_blank_state( $which = '' ) {
-			global $post_type;
+	/**
+	 * Show blank slate.
+	 *
+	 * @since   1.8.1.5
+	 * @version 1.8.8.6, 1.8.9.1
+	 *
+	 * @param string $which String which tablenav is being shown.
+	 *
+	 * @return void
+	 */
+	public function maybe_render_blank_state( $which = '' ) {
+		global $post_type, $typenow;
 
-			if ( $post_type === $this->list_table_type && 'bottom' === $which ) {
-				$counts = (array) wp_count_posts( $post_type );
-				unset( $counts['auto-draft'] );
-				$count = array_sum( $counts );
+		// Static flag to prevent double rendering
+		static $blank_state_rendered = false;
 
-				if ( ! defined( 'CHARITABLE_FORCE_BLANK_SLATE' ) ) :
-					if ( 0 < $count || ( defined( 'CHARITABLE_DISABLE_BLANK_SLATE' ) && CHARITABLE_DISABLE_BLANK_SLATE ) ) {
-						return;
-					}
-				endif;
+		// Use $typenow as fallback if $post_type is not set
+		$current_post_type = $post_type ? $post_type : $typenow;
 
-				$this->render_blank_state();
+		// Only proceed if we're on the correct post type
+		if ( $current_post_type !== $this->list_table_type ) {
+			return;
+		}
 
-				echo '<style type="text/css">#posts-filter .wp-list-table, #posts-filter .tablenav.top, .tablenav.bottom .actions, .wrap .subsubsub, .wrap .search-box, .wrap .tablenav-pages  { display: none; } #posts-filter .tablenav.bottom { height: auto; } body.post-type-donation .page-title-action { display: inline-block; } </style>';
+		// Check post count
+		$counts = (array) wp_count_posts( $current_post_type );
+		unset( $counts['auto-draft'] );
+		$count = array_sum( $counts );
+
+		// Skip if there are posts or blank slate is disabled
+		if ( ! defined( 'CHARITABLE_FORCE_BLANK_SLATE' ) ) {
+			if ( 0 < $count || ( defined( 'CHARITABLE_DISABLE_BLANK_SLATE' ) && CHARITABLE_DISABLE_BLANK_SLATE ) ) {
+				return;
 			}
 		}
+
+		// Prefer bottom, but render in top if bottom doesn't fire (when there are 0 posts)
+		if ( 'bottom' === $which && ! $blank_state_rendered ) {
+			$blank_state_rendered = true;
+			$this->render_blank_state();
+			echo '<style type="text/css">#posts-filter .wp-list-table, #posts-filter .tablenav.top, .tablenav.bottom .actions, .wrap .subsubsub, .wrap .search-box, .wrap .tablenav-pages  { display: none; } #posts-filter .tablenav.bottom { height: auto; } body.post-type-donation .page-title-action { display: inline-block; } </style>';
+		} elseif ( 'top' === $which && ! $blank_state_rendered ) {
+			// Fallback: if bottom never fires (WordPress doesn't render it with 0 posts), render in top
+			// We'll use JavaScript to move it to the correct position if needed
+			$blank_state_rendered = true;
+			$this->render_blank_state();
+			echo '<style type="text/css">#posts-filter .wp-list-table, #posts-filter .tablenav.top .actions, .wrap .subsubsub, .wrap .search-box, .wrap .tablenav-pages  { display: none; } #posts-filter .tablenav.top { height: auto; } body.post-type-donation .page-title-action { display: inline-block; } </style>';
+		}
+	}
 
 		/**
 		 * Renders advice in the event that no orders exist yet.

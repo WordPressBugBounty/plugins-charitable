@@ -8,6 +8,7 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
  * @version   1.6.60
+ * @version   1.8.9.2
  */
 
 // Exit if accessed directly.
@@ -592,4 +593,282 @@ function charitable_user_can_access_donation( $donation_id ) {
 	$donation = charitable_get_donation( $donation_id );
 
 	return $donation && $donation->is_from_current_user();
+}
+
+/**
+ * Log a donation form error.
+ *
+ * @since  1.8.9.2
+ *
+ * @param  string $error_type The type of error (validation_failure, ajax_failure, security_failure, email_failure).
+ * @param  string $error_details Specific error details or code.
+ * @param  array  $context Additional context data for the error.
+ *
+ * @return int|false The activity ID on success, false on failure.
+ */
+function charitable_log_form_error( $error_type, $error_details, $context = array() ) {
+	// Check if logging is enabled
+	if ( ! apply_filters( 'charitable_form_error_logging_enabled', true ) ) {
+		return false;
+	}
+
+	// Basic spam protection - rate limiting per IP
+	$ip_address = charitable_get_user_ip_address();
+	if ( ! charitable_check_basic_rate_limit( $ip_address ) ) {
+		return false; // Rate limit exceeded
+	}
+
+	// Basic burst protection - total errors per minute
+	if ( ! charitable_check_basic_burst_limit() ) {
+		return false; // Burst limit exceeded
+	}
+
+	// Get the activity logger instance (defensive: avoid fatal if class not loaded, e.g. cron/frontend edge cases).
+	if ( ! class_exists( 'Charitable_Admin_Activities' ) ) {
+		return false;
+	}
+	$activity_logger = Charitable_Admin_Activities::get_instance();
+	if ( ! is_object( $activity_logger ) || ! method_exists( $activity_logger, 'log_form_error' ) ) {
+		return false;
+	}
+
+	// Prepare context with current request data
+	$default_context = array(
+		'url'        => isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( $_SERVER['REQUEST_URI'] ) : '',
+		'user_agent' => isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( $_SERVER['HTTP_USER_AGENT'] ) : '',
+		'ip_address' => $ip_address,
+	);
+
+	$context = array_merge( $default_context, $context );
+
+	return $activity_logger->log_form_error( $error_type, $error_details, $context );
+}
+
+/**
+ * Get user IP address safely.
+ *
+ * @since  1.8.9.2
+ *
+ * @return string User IP address.
+ */
+function charitable_get_user_ip_address() {
+	$ip_address = '';
+
+	// Check for IP from shared internet
+	if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+		$ip_address = $_SERVER['HTTP_CLIENT_IP'];
+	}
+	// Check for IP passed from proxy (may be comma-separated list: client, proxy1, proxy2)
+	elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+		$ip_address = trim( strtok( $_SERVER['HTTP_X_FORWARDED_FOR'], ',' ) );
+	}
+	// Check for IP from remote address
+	elseif ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
+		$ip_address = $_SERVER['REMOTE_ADDR'];
+	}
+
+	// Validate and sanitize IP (prevents using invalid/comma-separated value)
+	$ip_address = filter_var( $ip_address, FILTER_VALIDATE_IP );
+
+	return $ip_address ? $ip_address : '';
+}
+
+/**
+ * Get recent donation form errors.
+ *
+ * @since  1.8.9.2
+ *
+ * @param  int $limit The number of errors to retrieve.
+ *
+ * @return array Array of error records.
+ */
+function charitable_get_recent_form_errors( $limit = 50 ) {
+	if ( ! class_exists( 'Charitable_Admin_Activities' ) ) {
+		return array();
+	}
+	$activity_logger = Charitable_Admin_Activities::get_instance();
+	if ( ! is_object( $activity_logger ) || ! method_exists( $activity_logger, 'get_recent_form_errors' ) ) {
+		return array();
+	}
+	return $activity_logger->get_recent_form_errors( $limit );
+}
+
+/**
+ * Get donation form error statistics.
+ *
+ * @since  1.8.9.2
+ *
+ * @param  int $days Number of days to look back.
+ *
+ * @return array Statistics array.
+ */
+function charitable_get_form_error_stats( $days = 7 ) {
+	if ( ! class_exists( 'Charitable_Admin_Activities' ) ) {
+		return array();
+	}
+	$activity_logger = Charitable_Admin_Activities::get_instance();
+	if ( ! is_object( $activity_logger ) || ! method_exists( $activity_logger, 'get_form_error_stats' ) ) {
+		return array();
+	}
+	return $activity_logger->get_form_error_stats( $days );
+}
+
+/**
+ * Clean up old donation form error logs.
+ *
+ * @since  1.8.9.2
+ *
+ * @param  int $days Number of days to retain.
+ *
+ * @return int Number of records deleted.
+ */
+function charitable_cleanup_old_form_errors( $days = 7 ) {
+	// Allow customization of retention period
+	$days = apply_filters( 'charitable_form_error_retention_days', $days );
+
+	if ( ! class_exists( 'Charitable_Admin_Activities' ) ) {
+		return 0;
+	}
+	$activity_logger = Charitable_Admin_Activities::get_instance();
+	if ( ! is_object( $activity_logger ) || ! method_exists( $activity_logger, 'cleanup_old_form_errors' ) ) {
+		return 0;
+	}
+	return $activity_logger->cleanup_old_form_errors( $days );
+}
+
+/**
+ * Schedule daily cleanup of old donation form error logs.
+ *
+ * @since  1.8.9.2
+ *
+ * @return void
+ */
+function charitable_schedule_error_log_cleanup() {
+	if ( ! wp_next_scheduled( 'charitable_daily_error_log_cleanup' ) ) {
+		// Schedule daily cleanup at 3 AM local time
+		wp_schedule_event( strtotime( '03:00:00' ), 'daily', 'charitable_daily_error_log_cleanup' );
+	}
+}
+
+/**
+ * Register the deactivation hook for error log cleanup.
+ *
+ * @since  1.8.9.2
+ *
+ * @return void
+ */
+function charitable_register_error_log_deactivation_hook() {
+	$charitable = charitable();
+	if ( ! $charitable || ! is_callable( array( $charitable, 'get_path' ) ) ) {
+		return;
+	}
+	register_deactivation_hook( $charitable->get_path(), 'charitable_cleanup_error_log_cron_on_deactivation' );
+}
+
+/**
+ * Clean up scheduled cron jobs on plugin deactivation.
+ *
+ * @since  1.8.9.2
+ *
+ * @return void
+ */
+function charitable_cleanup_error_log_cron_on_deactivation() {
+	// Clear all scheduled events for this hook (avoids orphaned events if scheduled multiple times).
+	wp_clear_scheduled_hook( 'charitable_daily_error_log_cleanup' );
+}
+
+/**
+ * Basic rate limiting check per IP address.
+ *
+ * @since  1.8.9.2
+ *
+ * @param  string $ip_address IP address to check.
+ *
+ * @return bool True if within rate limit, false if exceeded.
+ */
+function charitable_check_basic_rate_limit( $ip_address ) {
+	$rate_limit = apply_filters( 'charitable_error_rate_limit_per_ip', 10 ); // 10 errors per minute per IP
+	$time_window = apply_filters( 'charitable_error_rate_limit_window', 60 ); // 60 seconds
+
+	if ( empty( $ip_address ) ) {
+		return true; // Can't rate limit without IP
+	}
+
+	$transient_key = 'charitable_error_rate_' . md5( $ip_address );
+	$current_count = get_transient( $transient_key );
+
+	if ( false === $current_count ) {
+		// First error from this IP in this time window
+		set_transient( $transient_key, 1, $time_window );
+		return true;
+	}
+
+	if ( $current_count >= $rate_limit ) {
+		// Rate limit exceeded
+		return false;
+	}
+
+	// Increment counter
+	set_transient( $transient_key, $current_count + 1, $time_window );
+	return true;
+}
+
+/**
+ * Basic burst protection check.
+ *
+ * @since  1.8.9.2
+ *
+ * @return bool True if within burst limit, false if exceeded.
+ */
+function charitable_check_basic_burst_limit() {
+	$burst_limit = apply_filters( 'charitable_error_burst_limit', 50 ); // 50 errors per minute system-wide
+	$time_window = apply_filters( 'charitable_error_burst_window', 60 ); // 60 seconds
+
+	$transient_key = 'charitable_error_burst_count';
+	$current_count = get_transient( $transient_key );
+
+	if ( false === $current_count ) {
+		// First error in this time window
+		set_transient( $transient_key, 1, $time_window );
+		return true;
+	}
+
+	if ( $current_count >= $burst_limit ) {
+		// Burst limit exceeded
+		return false;
+	}
+
+	// Increment counter
+	set_transient( $transient_key, $current_count + 1, $time_window );
+	return true;
+}
+
+/**
+ * Get current spam protection status.
+ *
+ * @since  1.8.9.2
+ *
+ * @return array Status information.
+ */
+function charitable_get_spam_protection_status() {
+	$ip_address = charitable_get_user_ip_address();
+	$ip_transient_key = 'charitable_error_rate_' . md5( $ip_address );
+	$burst_transient_key = 'charitable_error_burst_count';
+
+	$ip_count = get_transient( $ip_transient_key );
+	$burst_count = get_transient( $burst_transient_key );
+
+	$rate_limit = apply_filters( 'charitable_error_rate_limit_per_ip', 10 );
+	$burst_limit = apply_filters( 'charitable_error_burst_limit', 50 );
+
+	return array(
+		'ip_address' => $ip_address,
+		'ip_errors_this_minute' => $ip_count ?: 0,
+		'ip_rate_limit' => $rate_limit,
+		'ip_rate_limit_exceeded' => ( $ip_count >= $rate_limit ),
+		'total_errors_this_minute' => $burst_count ?: 0,
+		'burst_limit' => $burst_limit,
+		'burst_limit_exceeded' => ( $burst_count >= $burst_limit ),
+		'logging_enabled' => apply_filters( 'charitable_form_error_logging_enabled', true ),
+	);
 }

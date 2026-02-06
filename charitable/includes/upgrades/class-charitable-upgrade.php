@@ -399,7 +399,12 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 		 */
 		public function perform_immediate_upgrade( $action, $upgrade ) {
 			if ( $this->do_upgrade_immediately( $upgrade ) ) {
-				$ret = call_user_func( $upgrade['callback'], $action );
+				$callback = $upgrade['callback'];
+				if ( is_callable( $callback ) ) {
+					$ret = $callback( $action );
+				} else {
+					$ret = false;
+				}
 
 				/* If the upgrade succeeded, update the log. */
 				if ( $ret ) {
@@ -434,12 +439,14 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 				if ( ! $this->upgrade_has_been_completed( $action ) ) {
 
 					/* If the upgrade has an active_callback, check whether the upgrade is required. If not, mark it as done. */
-					if ( array_key_exists( 'active_callback', $upgrade ) && ! call_user_func( $upgrade['active_callback'] ) ) {
+					$active_callback = $upgrade['active_callback'] ?? null;
+					$is_active = $active_callback && is_callable( $active_callback ) ? $active_callback() : true;
+					if ( array_key_exists( 'active_callback', $upgrade ) && ! $is_active ) {
 						$this->update_upgrade_log( $action );
 						continue;
 					}
 
-					call_user_func( $callback, $action, $upgrade );
+					$callback( $action, $upgrade );
 
 				}
 
@@ -609,11 +616,13 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 
 			ignore_user_abort( true );
 
-			if ( ! charitable_is_func_disabled( 'set_time_limit' ) && ! ini_get( 'safe_mode' ) ) {
-				@set_time_limit( 0 );
-			}
+		if ( ! charitable_is_func_disabled( 'set_time_limit' ) && ! ini_get( 'safe_mode' ) ) {
+			@set_time_limit( 0 ); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
+		}
 
-			$step   = isset( $_GET['step'] ) ? absint( $_GET['step'] ) : 1;
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$step   = isset( $_GET['step'] ) ? absint( sanitize_text_field( wp_unslash( $_GET['step'] ) ) ) : 1;
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 			$number = 20;
 
 			$total = Charitable_Donations::count_all();
@@ -687,7 +696,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 					admin_url( 'index.php' )
 				);
 
-				wp_redirect( $redirect );
+				wp_safe_redirect( $redirect );
 
 				exit;
 			}//end if
@@ -718,11 +727,13 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 
 			ignore_user_abort( true );
 
-			if ( ! charitable_is_func_disabled( 'set_time_limit' ) && ! ini_get( 'safe_mode' ) ) {
-				@set_time_limit( 0 );
-			}
+		if ( ! charitable_is_func_disabled( 'set_time_limit' ) && ! ini_get( 'safe_mode' ) ) {
+			@set_time_limit( 0 ); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
+		}
 
-			$step     = array_key_exists( 'step', $_GET ) ? absint( $_GET['step'] ) : 1;
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$step     = array_key_exists( 'step', $_GET ) ? absint( sanitize_text_field( wp_unslash( $_GET['step'] ) ) ) : 1;
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 			$number   = 20;
 			$subquery = "SELECT GROUP_CONCAT(donor_id, ':', user_id) AS donor, COUNT(*) AS count
 				FROM {$wpdb->prefix}charitable_donors
@@ -799,7 +810,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 					admin_url( 'index.php' )
 				);
 
-				wp_redirect( $redirect );
+				wp_safe_redirect( $redirect );
 
 				exit;
 			}//end if
@@ -1049,7 +1060,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 				}
 			}
 
-			wp_redirect( $redirect_url );
+			wp_safe_redirect( $redirect_url );
 
 			exit();
 		}
@@ -1204,18 +1215,22 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 				);
 			}
 
-			$placeholders = charitable_get_query_placeholders( count( $skipped ), '%d' );
+		$placeholders = charitable_get_query_placeholders( count( $skipped ), '%d' );
 
-			return $wpdb->get_col(
-				$wpdb->prepare(
-					"SELECT DISTINCT donation_id
-				FROM {$wpdb->prefix}charitable_campaign_donations
-				WHERE donor_id = 0
-				AND donation_id NOT IN ( $placeholders )
-				LIMIT $number;", // phpcs:ignore
-					$skipped
-				)
-			); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- $placeholders is built by charitable_get_query_placeholders() which returns safe placeholder strings like '%d, %d, %d'. Values are passed to prepare().
+		return $wpdb->get_col(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $placeholders is dynamically built and sanitized
+			$wpdb->prepare(
+				"SELECT DISTINCT donation_id
+			FROM {$wpdb->prefix}charitable_campaign_donations
+			WHERE donor_id = 0
+			AND donation_id NOT IN ( $placeholders )
+			LIMIT %d;",
+				...array_merge( $skipped, array( $number ) )
+			)
+		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 		}
 
 		/**
@@ -1234,11 +1249,13 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 
 			ignore_user_abort( true );
 
-			if ( ! charitable_is_func_disabled( 'set_time_limit' ) && ! ini_get( 'safe_mode' ) ) {
-				@set_time_limit( 0 );
-			}
+		if ( ! charitable_is_func_disabled( 'set_time_limit' ) && ! ini_get( 'safe_mode' ) ) {
+			@set_time_limit( 0 ); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
+		}
 
-			$step    = array_key_exists( 'step', $_GET ) ? absint( $_GET['step'] ) : 1;
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$step    = array_key_exists( 'step', $_GET ) ? absint( sanitize_text_field( wp_unslash( $_GET['step'] ) ) ) : 1;
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 			$number  = 20;
 			$skipped = get_option( 'charitable_skipped_donations_with_empty_donor_id', array() );
 			$total   = $this->count_empty_donor_id_donations( $skipped );
@@ -1307,7 +1324,7 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 					admin_url( 'index.php' )
 				);
 
-				wp_redirect( $redirect );
+				wp_safe_redirect( $redirect );
 
 				exit;
 			}//end if
@@ -1404,7 +1421,9 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 
 				if ( self::requires_upgrade( $this->db_version, $version ) ) {
 
-					call_user_func( array( $this, $method ) );
+					if ( method_exists( $this, $method ) ) {
+						$this->$method();
+					}
 
 				}
 			}

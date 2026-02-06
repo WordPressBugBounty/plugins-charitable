@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.1
- * @version   1.8.1
+ * @version   1.8.9.1
  */
 
 // Exit if accessed directly.
@@ -113,7 +113,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 							<?php $this->render_stats_section(); ?>
 							<?php $this->render_tabs_section(); ?>
 							<?php $this->render_upgrade_section(); ?>
-							<?php 
+							<?php
 							// Show Quick Access in left column for Pro users (when upgrade section is hidden)
 							if ( charitable_is_pro() ) {
 								$this->render_quick_access_section();
@@ -125,7 +125,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 						<div class="charitable-dashboard-v2-right-column">
 							<?php $this->render_enhance_campaign_section(); ?>
 							<?php $this->render_latest_updates_section(); ?>
-							<?php 
+							<?php
 							// Show Quick Access in right column for non-Pro users
 							if ( ! charitable_is_pro() ) {
 								$this->render_quick_access_section();
@@ -320,7 +320,9 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 
 						<?php
 						// Get current date range for print functionality
+						// phpcs:disable WordPress.Security.NonceVerification.Recommended
 						$time_period = isset( $_GET['time-period'] ) ? sanitize_text_field( wp_unslash( $_GET['time-period'] ) ) : 'last-7-days';
+						// phpcs:enable WordPress.Security.NonceVerification.Recommended
 						$date_range = $this->get_date_range_for_period( $time_period );
 						?>
 						<form action="" method="post" target="_blank" class="charitable-report-print" id="charitable-dashboard-v2-print">
@@ -350,10 +352,12 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		 *
 		 * @since 1.8.8
 		 */
-		private function render_stats_row() {
-			// Get the selected time period from request, default to 'last-7-days'
-			$time_period = isset( $_GET['time-period'] ) ? sanitize_text_field( wp_unslash( $_GET['time-period'] ) ) : 'last-7-days';
-			$stats = $this->get_dashboard_stats( $time_period );
+	private function render_stats_row() {
+		// Get the selected time period from request, default to 'last-7-days'
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$time_period = isset( $_GET['time-period'] ) ? sanitize_text_field( wp_unslash( $_GET['time-period'] ) ) : 'last-7-days';
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+		$stats = $this->get_dashboard_stats( $time_period );
 			?>
 			<div class="charitable-dashboard-v2-stats-row">
 				<div class="charitable-dashboard-v2-stat-item">
@@ -415,19 +419,25 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		 */
 	public function get_dashboard_stats( $time_period = 'last-7-days' ) {
 		// Clear stats cache if requested via URL parameter
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['charitable_clear_stats_cache'] ) && '1' === $_GET['charitable_clear_stats_cache'] ) {
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 			$this->clear_dashboard_stats_cache();
 		}
 
 		// TEMPORARY TESTING: Return empty stats if testing mode is enabled
 		if ( self::SHOW_EMPTY_DASHBOARD ) {
+			// Decode HTML entities in currency-formatted strings to prevent double-encoding in JSON.
+			$empty_total = html_entity_decode( charitable_format_money( 0 ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+			$empty_avg = html_entity_decode( charitable_format_money( 0 ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+			$empty_refunds = html_entity_decode( charitable_format_money( 0 ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 			return array(
-				'total_donations' => charitable_format_money( 0 ),
+				'total_donations' => $empty_total,
 				'donations_change' => '0%',
-				'avg_donations' => charitable_format_money( 0 ),
+				'avg_donations' => $empty_avg,
 				'avg_change' => '0%',
 				'total_donors' => 0,
-				'total_refunds' => charitable_format_money( 0 ),
+				'total_refunds' => $empty_refunds,
 				'total_refunds_count' => 0
 			);
 		}
@@ -461,6 +471,13 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		$refunds_data = $charitable_reports->get_refunds();
 		$total_amount_refunds = charitable_format_money( $refunds_data['total_amount'] );
 		$total_count_refunds = $refunds_data['total_count'];
+
+		// Decode HTML entities in currency-formatted strings to prevent double-encoding in JSON.
+		// charitable_format_money() returns HTML entities (e.g., &#36; for $), so we decode them
+		// before sending via AJAX to avoid double-encoding issues.
+		$donation_total = html_entity_decode( $donation_total, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+		$donation_average = html_entity_decode( $donation_average, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+		$total_amount_refunds = html_entity_decode( $total_amount_refunds, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 
 		// Calculate percentage changes
 		$changes = $this->calculate_percentage_changes( $time_period, $total_amount_donations, $donation_average );
@@ -669,7 +686,9 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 			);
 		} catch ( Exception $e ) {
 			// Log error and return false
-			error_log( 'Charitable Dashboard: Error getting previous period data - ' . $e->getMessage() );
+			if ( charitable_is_debug() ) {
+				error_log( 'Charitable Dashboard: Error getting previous period data - ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			}
 			return false;
 		}
 	}
@@ -735,12 +754,14 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	/**
 	 * Clear dashboard stats cache.
 	 *
-	 * @since 1.8.8
+	 * @since   1.8.8
+	 * @version 1.8.8.4 - added blog posts cache clearing
 	 */
 	public function clear_dashboard_stats_cache() {
 		// Delete all dashboard stats cache transients
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
 			$wpdb->prepare(
 				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
@@ -749,154 +770,160 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		);
 
 		// Also delete the transient timeout entries
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
 			$wpdb->prepare(
 				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
 				$wpdb->esc_like( '_transient_timeout_charitable_dashboard_stats_changes_' ) . '%'
 			)
 		);
+
+		// Clear blog posts cache
+		delete_transient( 'charitable_blog_posts_cache' );
 	}
 
-		/**
-		 * Get the default tab from URL parameter.
-		 *
-		 * @since 1.8.8
-		 * @return string
-		 */
-		private function get_default_tab() {
-			$valid_tabs = array( 'top-campaigns', 'latest-donations', 'top-donors', 'comments' );
-			$default_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'top-campaigns';
+	/**
+	 * Get the default tab from URL parameter.
+	 *
+	 * @since 1.8.8
+	 * @return string
+	 */
+	private function get_default_tab() {
+		$valid_tabs = array( 'top-campaigns', 'latest-donations', 'top-donors', 'comments' );
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$default_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'top-campaigns';
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
-			// Validate the tab parameter
-			if ( ! in_array( $default_tab, $valid_tabs, true ) ) {
-				$default_tab = 'top-campaigns';
-			}
-
-			return $default_tab;
+		// Validate the tab parameter
+		if ( ! in_array( $default_tab, $valid_tabs, true ) ) {
+			$default_tab = 'top-campaigns';
 		}
 
-		/**
-		 * Check if a tab should be active.
-		 *
-		 * @since 1.8.8
-		 * @param string $tab_name The tab name to check.
-		 * @return bool
-		 */
-		private function is_tab_active( $tab_name ) {
-			return $this->get_default_tab() === $tab_name;
-		}
+		return $default_tab;
+	}
 
-		/**
-		 * Render the tabs section with campaigns, donations, donors, and comments.
-		 *
-		 * @since 1.8.8
-		 */
-		public function render_tabs_section() {
-			?>
-			<section class="charitable-dashboard-v2-section charitable-dashboard-top-campaigns">
-				<header class="charitable-dashboard-v2-section-header">
-					<nav class="charitable-dashboard-v2-tab-nav">
-						<a href="#" class="charitable-dashboard-v2-tab-nav-item<?php echo $this->is_tab_active( 'top-campaigns' ) ? ' charitable-dashboard-v2-tab-nav-active' : ''; ?>" data-tab="top-campaigns">
-							Top Campaigns
-						</a>
-						<a href="#" class="charitable-dashboard-v2-tab-nav-item<?php echo $this->is_tab_active( 'latest-donations' ) ? ' charitable-dashboard-v2-tab-nav-active' : ''; ?>" data-tab="latest-donations">
-							Latest Donations
-						</a>
-						<a href="#" class="charitable-dashboard-v2-tab-nav-item<?php echo $this->is_tab_active( 'top-donors' ) ? ' charitable-dashboard-v2-tab-nav-active' : ''; ?>" data-tab="top-donors">
-							Top Donors
-						</a>
-						<a href="#" class="charitable-dashboard-v2-tab-nav-item<?php echo $this->is_tab_active( 'comments' ) ? ' charitable-dashboard-v2-tab-nav-active' : ''; ?>" data-tab="comments">
-							Comments
-						</a>
-					</nav>
-				</header>
-				<div class="charitable-dashboard-v2-section-content">
-					<?php $this->render_top_campaigns_tab(); ?>
-					<?php $this->render_latest_donations_tab(); ?>
-					<?php $this->render_top_donors_tab(); ?>
-					<?php $this->render_comments_tab(); ?>
-				</div>
-			</section>
-			<?php
-		}
+	/**
+	 * Check if a tab should be active.
+	 *
+	 * @since 1.8.8
+	 * @param string $tab_name The tab name to check.
+	 * @return bool
+	 */
+	private function is_tab_active( $tab_name ) {
+		return $this->get_default_tab() === $tab_name;
+	}
 
-		/**
-		 * Render the top campaigns tab content.
-		 *
-		 * @since 1.8.8
-		 */
-		private function render_top_campaigns_tab() {
-			$campaigns = $this->get_top_campaigns();
-			?>
-			<div class="charitable-dashboard-v2-tab-content<?php echo $this->is_tab_active( 'top-campaigns' ) ? ' charitable-dashboard-v2-tab-content-active' : ''; ?>" data-tab="top-campaigns">
-				<?php if ( ! empty( $campaigns ) ) : ?>
-					<div class="charitable-dashboard-v2-campaigns-table">
-						<table class="charitable-dashboard-v2-table">
-							<thead>
-								<tr>
-									<th>Campaign Title</th>
-									<th>Goal</th>
-									<th>Raised</th>
-									<th>Status</th>
-									<th>Progress</th>
-								</tr>
-							</thead>
-							<tbody>
-								<?php foreach ( $campaigns as $campaign ) : ?>
-									<tr>
-										<td class="campaign-title">
-											<a href="<?php echo esc_url( $campaign['url'] ); ?>">
-												<?php echo esc_html( $campaign['title'] ); ?>
-												<svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-													<path d="M1.09091 11.0001C0.790908 11.0001 0.53409 10.8932 0.320454 10.6796C0.106818 10.466 0 10.2091 0 9.90915V2.27279C0 1.97279 0.106818 1.71598 0.320454 1.50234C0.53409 1.2887 0.790908 1.18188 1.09091 1.18188H4.36363V2.27279H1.09091V9.90915H8.72726V6.63642H9.81817V9.90915C9.81817 10.2091 9.71135 10.466 9.49772 10.6796C9.28408 10.8932 9.02726 11.0001 8.72726 11.0001H1.09091Z" fill="#191D2D" fill-opacity="0.6"/>
-													<path d="M4 6.16363L4.76364 6.92726L9.83636 1.85454V3.81818H10.9273V0H7.10909V1.09091H9.07272L4 6.16363Z" fill="#191D2D" fill-opacity="0.6"/>
-												</svg>
-											</a>
-										</td>
-										<td><?php echo esc_html( $campaign['goal'] ); ?></td>
-										<td><?php echo esc_html( $campaign['reach'] ); ?></td>
-										<td><span class="status-badge status-<?php echo esc_attr( $campaign['status'] ); ?>"><?php echo esc_html( $campaign['status_label'] ); ?></span></td>
-										<td>
-											<div class="progress-circle" data-progress="<?php echo esc_attr( $campaign['progress'] ); ?>">
-												<svg width="40" height="40" viewBox="0 0 40 40">
-													<circle cx="20" cy="20" r="18" fill="none" stroke="rgba(222, 234, 255, 1)" stroke-width="3"/>
-													<circle cx="20" cy="20" r="18" fill="none" stroke="rgba(76, 123, 207, 1)" stroke-width="3"/>
-												</svg>
-												<span class="progress-text"><?php echo esc_html( $campaign['progress'] ); ?>%</span>
-											</div>
-										</td>
-									</tr>
-								<?php endforeach; ?>
-							</tbody>
-						</table>
-					</div>
-				<?php else : ?>
-					<div class="charitable-dashboard-v2-empty-state">
-						<div class="charitable-dashboard-v2-empty-state-content">
-							<h3><?php esc_html_e( 'No Campaigns Yet!', 'charitable' ); ?></h3>
-							<p><?php esc_html_e( 'Create your first campaign to start receiving donations.', 'charitable' ); ?></p>
-							<?php if ( charitable_disable_legacy_campaigns() ) : ?>
-								<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ) ); ?>" class="charitable-dashboard-v2-button charitable-dashboard-v2-button-primary">
-									<?php esc_html_e( 'Create Campaign', 'charitable' ); ?>
-								</a>
-							<?php else : ?>
-								<a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=campaign' ) ); ?>" class="charitable-dashboard-v2-button charitable-dashboard-v2-button-primary">
-									<?php esc_html_e( 'Create Campaign', 'charitable' ); ?>
-								</a>
-							<?php endif; ?>
-						</div>
-					</div>
-				<?php endif; ?>
+	/**
+	 * Render the tabs section with campaigns, donations, donors, and comments.
+	 *
+	 * @since 1.8.8
+	 */
+	public function render_tabs_section() {
+		?>
+		<section class="charitable-dashboard-v2-section charitable-dashboard-top-campaigns">
+			<header class="charitable-dashboard-v2-section-header">
+				<nav class="charitable-dashboard-v2-tab-nav">
+					<a href="#" class="charitable-dashboard-v2-tab-nav-item<?php echo $this->is_tab_active( 'top-campaigns' ) ? ' charitable-dashboard-v2-tab-nav-active' : ''; ?>" data-tab="top-campaigns">
+						Top Campaigns
+					</a>
+					<a href="#" class="charitable-dashboard-v2-tab-nav-item<?php echo $this->is_tab_active( 'latest-donations' ) ? ' charitable-dashboard-v2-tab-nav-active' : ''; ?>" data-tab="latest-donations">
+						Latest Donations
+					</a>
+					<a href="#" class="charitable-dashboard-v2-tab-nav-item<?php echo $this->is_tab_active( 'top-donors' ) ? ' charitable-dashboard-v2-tab-nav-active' : ''; ?>" data-tab="top-donors">
+						Top Donors
+					</a>
+					<a href="#" class="charitable-dashboard-v2-tab-nav-item<?php echo $this->is_tab_active( 'comments' ) ? ' charitable-dashboard-v2-tab-nav-active' : ''; ?>" data-tab="comments">
+						Comments
+					</a>
+				</nav>
+			</header>
+			<div class="charitable-dashboard-v2-section-content">
+				<?php $this->render_top_campaigns_tab(); ?>
+				<?php $this->render_latest_donations_tab(); ?>
+				<?php $this->render_top_donors_tab(); ?>
+				<?php $this->render_comments_tab(); ?>
 			</div>
-			<?php
-		}
+		</section>
+		<?php
+	}
 
-		/**
-		 * Get top campaigns data.
-		 *
-		 * @since 1.8.8
-		 * @return array
-		 */
+	/**
+	 * Render the top campaigns tab content.
+	 *
+	 * @since 1.8.8
+	 */
+	private function render_top_campaigns_tab() {
+		$campaigns = $this->get_top_campaigns();
+		?>
+		<div class="charitable-dashboard-v2-tab-content<?php echo $this->is_tab_active( 'top-campaigns' ) ? ' charitable-dashboard-v2-tab-content-active' : ''; ?>" data-tab="top-campaigns">
+			<?php if ( ! empty( $campaigns ) ) : ?>
+				<div class="charitable-dashboard-v2-campaigns-table">
+					<table class="charitable-dashboard-v2-table">
+						<thead>
+							<tr>
+								<th>Campaign Title</th>
+								<th>Goal</th>
+								<th>Raised</th>
+								<th>Status</th>
+								<th>Progress</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php foreach ( $campaigns as $campaign ) : ?>
+								<tr>
+									<td class="campaign-title">
+										<a href="<?php echo esc_url( $campaign['url'] ); ?>">
+											<?php echo esc_html( $campaign['title'] ); ?>
+											<svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<path d="M1.09091 11.0001C0.790908 11.0001 0.53409 10.8932 0.320454 10.6796C0.106818 10.466 0 10.2091 0 9.90915V2.27279C0 1.97279 0.106818 1.71598 0.320454 1.50234C0.53409 1.2887 0.790908 1.18188 1.09091 1.18188H4.36363V2.27279H1.09091V9.90915H8.72726V6.63642H9.81817V9.90915C9.81817 10.2091 9.71135 10.466 9.49772 10.6796C9.28408 10.8932 9.02726 11.0001 8.72726 11.0001H1.09091Z" fill="#191D2D" fill-opacity="0.6"/>
+												<path d="M4 6.16363L4.76364 6.92726L9.83636 1.85454V3.81818H10.9273V0H7.10909V1.09091H9.07272L4 6.16363Z" fill="#191D2D" fill-opacity="0.6"/>
+											</svg>
+										</a>
+									</td>
+									<td><?php echo esc_html( $campaign['goal'] ); ?></td>
+									<td><?php echo esc_html( $campaign['reach'] ); ?></td>
+									<td><span class="status-badge status-<?php echo esc_attr( $campaign['status'] ); ?>"><?php echo esc_html( $campaign['status_label'] ); ?></span></td>
+									<td>
+										<div class="progress-circle" data-progress="<?php echo esc_attr( $campaign['progress'] ); ?>">
+											<svg width="40" height="40" viewBox="0 0 40 40">
+												<circle cx="20" cy="20" r="18" fill="none" stroke="rgba(222, 234, 255, 1)" stroke-width="3"/>
+												<circle cx="20" cy="20" r="18" fill="none" stroke="rgba(76, 123, 207, 1)" stroke-width="3"/>
+											</svg>
+											<span class="progress-text"><?php echo esc_html( $campaign['progress'] ); ?>%</span>
+										</div>
+									</td>
+								</tr>
+							<?php endforeach; ?>
+						</tbody>
+					</table>
+				</div>
+			<?php else : ?>
+				<div class="charitable-dashboard-v2-empty-state">
+					<div class="charitable-dashboard-v2-empty-state-content">
+						<h3><?php esc_html_e( 'No Campaigns Yet!', 'charitable' ); ?></h3>
+						<p><?php esc_html_e( 'Create your first campaign to start receiving donations.', 'charitable' ); ?></p>
+						<?php if ( charitable_disable_legacy_campaigns() ) : ?>
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ) ); ?>" class="charitable-dashboard-v2-button charitable-dashboard-v2-button-primary">
+								<?php esc_html_e( 'Create Campaign', 'charitable' ); ?>
+							</a>
+						<?php else : ?>
+							<a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=campaign' ) ); ?>" class="charitable-dashboard-v2-button charitable-dashboard-v2-button-primary">
+								<?php esc_html_e( 'Create Campaign', 'charitable' ); ?>
+							</a>
+						<?php endif; ?>
+					</div>
+				</div>
+			<?php endif; ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Get top campaigns data.
+	 *
+	 * @since 1.8.8
+	 * @return array
+	 */
 	private function get_top_campaigns() {
 		// TEMPORARY TESTING: Return empty campaigns if testing mode is enabled
 		if ( self::SHOW_EMPTY_DASHBOARD ) {
@@ -1057,7 +1084,9 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		}
 
 		// Check for test parameter to simulate empty state
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['charitable_test_no_donations'] ) && '1' === $_GET['charitable_test_no_donations'] ) {
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 			return array();
 		}
 
@@ -1421,7 +1450,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 										<div class="comment-details">
 											<div class="comment-header">
 												<span class="comment-name"><?php echo esc_html( $comment['name'] ); ?></span>
-												<span class="comment-text">"<?php echo $comment['text']; ?>"</span>
+												<span class="comment-text">"<?php echo esc_html( $comment['text'] ); ?>"</span>
 											</div>
 										</div>
 									</td>
@@ -1626,8 +1655,10 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		 */
 		public function ajax_activate_addon() {
 			// Verify nonce
-			if ( ! wp_verify_nonce( $_POST['nonce'], 'charitable-admin' ) ) {
-				wp_die( __( 'Security check failed', 'charitable' ) );
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'charitable-admin' ) ) {
+				wp_die( esc_html( __( 'Security check failed', 'charitable' ) ) );
 			}
 
 			// Check user capabilities
@@ -1635,7 +1666,8 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 				wp_send_json_error( array( 'message' => __( 'You do not have permission to activate plugins.', 'charitable' ) ) );
 			}
 
-			$plugin = sanitize_text_field( $_POST['plugin'] );
+			$plugin = isset( $_POST['plugin'] ) ? sanitize_text_field( wp_unslash( $_POST['plugin'] ) ) : '';
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			if ( empty( $plugin ) ) {
 				wp_send_json_error( array( 'message' => __( 'Plugin not specified.', 'charitable' ) ) );
@@ -1664,8 +1696,10 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		 */
 		public function ajax_approve_comment() {
 			// Verify nonce
-			if ( ! wp_verify_nonce( $_POST['nonce'], 'charitable-admin' ) ) {
-				wp_die( __( 'Security check failed', 'charitable' ) );
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'charitable-admin' ) ) {
+				wp_die( esc_html( __( 'Security check failed', 'charitable' ) ) );
 			}
 
 			// Check user capabilities
@@ -1673,7 +1707,8 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 				wp_send_json_error( array( 'message' => __( 'You do not have permission to moderate comments.', 'charitable' ) ) );
 			}
 
-			$comment_id = intval( $_POST['comment_id'] );
+			$comment_id = isset( $_POST['comment_id'] ) ? intval( wp_unslash( $_POST['comment_id'] ) ) : 0;
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			if ( empty( $comment_id ) ) {
 				wp_send_json_error( array( 'message' => __( 'Comment ID not specified.', 'charitable' ) ) );
@@ -1707,8 +1742,10 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		 */
 		public function ajax_delete_comment() {
 			// Verify nonce
-			if ( ! wp_verify_nonce( $_POST['nonce'], 'charitable-admin' ) ) {
-				wp_die( __( 'Security check failed', 'charitable' ) );
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'charitable-admin' ) ) {
+				wp_die( esc_html( __( 'Security check failed', 'charitable' ) ) );
 			}
 
 			// Check user capabilities
@@ -1716,7 +1753,8 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 				wp_send_json_error( array( 'message' => __( 'You do not have permission to moderate comments.', 'charitable' ) ) );
 			}
 
-			$comment_id = intval( $_POST['comment_id'] );
+			$comment_id = isset( $_POST['comment_id'] ) ? intval( wp_unslash( $_POST['comment_id'] ) ) : 0;
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			if ( empty( $comment_id ) ) {
 				wp_send_json_error( array( 'message' => __( 'Comment ID not specified.', 'charitable' ) ) );
@@ -1948,12 +1986,17 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 					<div class="charitable-dashboard-v2-enhance-grid-content">
 						<div class="charitable-dashboard-v2-enhance-grid-header">
 							<div class="charitable-dashboard-v2-enhance-grid-icon">
-								<?php echo $item['icon']; ?>
+								<?php
+								// Allow SVG icons through as trusted raw output.
+								if ( isset( $item['icon'] ) && is_string( $item['icon'] ) ) {
+									echo $item['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SVG markup is trusted as curated/provided internally.
+								}
+								?>
 							</div>
 							<h4 class="charitable-dashboard-v2-enhance-grid-title"><?php echo esc_html( $item['title'] ); ?></h4>
 						</div>
 						<p class="charitable-dashboard-v2-enhance-grid-description"><?php echo esc_html( $item['description'] ); ?></p>
-						<button class="charitable-dashboard-v2-enhance-grid-button <?php echo esc_attr( $item['button_class'] ); ?>" <?php echo $button_attributes; ?>><?php echo esc_html( $item['button_text'] ); ?></button>
+						<button class="charitable-dashboard-v2-enhance-grid-button <?php echo esc_attr( $item['button_class'] ); ?>" <?php echo wp_kses_post( $button_attributes ); ?>><?php echo esc_html( $item['button_text'] ); ?></button>
 					</div>
 				</div>
 				<?php
@@ -2023,7 +2066,9 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	 */
 	public function ajax_install_charitable_addon() {
 		// Security check
-		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'charitable-admin' ) ) {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'charitable-admin' ) ) {
 			wp_send_json_error( 'Invalid nonce.' );
 			return;
 		}
@@ -2034,7 +2079,8 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 			return;
 		}
 
-		$slug = isset( $_POST['slug'] ) ? sanitize_text_field( $_POST['slug'] ) : '';
+		$slug = isset( $_POST['slug'] ) ? sanitize_text_field( wp_unslash( $_POST['slug'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 		if ( empty( $slug ) ) {
 			wp_send_json_error( 'Addon slug is required.' );
 			return;
@@ -2082,7 +2128,9 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	 */
 	public function ajax_activate_charitable_addon() {
 		// Security check
-		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'charitable-admin' ) ) {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'charitable-admin' ) ) {
 			wp_send_json_error( 'Invalid nonce.' );
 			return;
 		}
@@ -2093,7 +2141,8 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 			return;
 		}
 
-		$slug = isset( $_POST['slug'] ) ? sanitize_text_field( $_POST['slug'] ) : '';
+		$slug = isset( $_POST['slug'] ) ? sanitize_text_field( wp_unslash( $_POST['slug'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 		if ( empty( $slug ) ) {
 			wp_send_json_error( 'Addon slug is required.' );
 			return;
@@ -2273,7 +2322,9 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 				'action' => $is_active ? 'deactivate' : 'activate',
 				'path' => $plugin_file,
 				'plugin_allow' => true,
-				'upgrade_url' => ''
+				'upgrade_url' => '',
+				// Installed plugin may not have directory metadata; default license to empty
+				'license' => array(),
 			);
 		}
 
@@ -2291,7 +2342,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 
 		$final_data = array(
 			'title' => $title,
-			'description' => __( 'Manage all your WordPress privacy compliance needs', 'charitable' ),
+			'description' => $this->get_charitable_addon_description( $slug ),
 			'icon' => $icon,
 			'installed' => $addon['status'] === 'installed' || $addon['status'] === 'active',
 			'active' => $addon['status'] === 'active',
@@ -2302,10 +2353,46 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 			'status' => $addon['status'],
 			'action' => $addon['action'],
 			'plugin_allow' => $addon['plugin_allow'],
-			'upgrade_url' => $addon['upgrade_url'] ?? ''
+			'upgrade_url' => $addon['upgrade_url'] ?? '',
+			'license' => isset( $addon['license'] ) ? (array) $addon['license'] : array(),
 		);
 
 		return $final_data;
+	}
+
+	/**
+	 * Get Charitable addon description.
+	 *
+	 * @since 1.8.8.4
+	 * @param string $slug Addon slug.
+	 * @return string Description.
+	 */
+	public function get_charitable_addon_description( $slug ) {
+
+		$descriptions = array(
+			// Charitable official addons
+			'charitable-recurring' => __( 'Let donors give automatically on a daily, weekly, monthly, or yearly schedule.', 'charitable' ),
+			'charitable-donortrust' => __( 'Build Trust and Boost Donations with Real-Time Social Proof.', 'charitable' ),
+			'charitable-gift-aid' => __( 'Allow UK donors to add Gift Aid and boost eligible donations by 25%.', 'charitable' ),
+			'charitable-anonymous-donations' => __( 'Give supporters the option to hide their name from public donations.', 'charitable' ),
+			'charitable-fee-relief' => __( 'Let donors optionally cover processing fees.', 'charitable' ),
+
+			// Add more addon descriptions here as they are surfaced in the dashboard
+			'google-analytics-for-wordpress' => __( 'Get detailed insights into your donation traffic and campaign performance.', 'charitable' ),
+			'wpforms-lite' => __( 'Create custom donation forms and surveys to engage with supporters.', 'charitable' ),
+			'all-in-one-seo-pack' => __( 'Optimize your campaigns for search engines to reach more potential donors.', 'charitable' ),
+			'duplicator' => __( 'Safely backup and migrate your donation data and campaign content.', 'charitable' ),
+			'pushengage' => __( 'Send targeted push notifications to re-engage donors and drive contributions.', 'charitable' ),
+			'uncanny-automator' => __( 'Automate your donation workflows and connect with other fundraising tools.', 'charitable' ),
+			'envira-gallery' => __( 'Create beautiful photo galleries to showcase your charitable impact.', 'charitable' ),
+		);
+
+		if ( isset( $descriptions[ $slug ] ) ) {
+			return $descriptions[ $slug ];
+		}
+
+		// Sensible default if an addon is missing a curated description
+		return __( 'Enhance your campaign with powerful fundraising features.', 'charitable' );
 	}
 
 	/**
@@ -2377,7 +2464,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 
 		$item = array(
 			'title' => $plugin_data['title'],
-			'description' => __( 'Manage all your WordPress privacy compliance needs', 'charitable' ),
+			'description' => $this->get_charitable_addon_description( $plugin_data['slug'] ),
 			'button_text' => $button_state['text'],
 			'button_class' => $button_state['class'],
 			'button_action' => $button_state['action'],
@@ -2407,7 +2494,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 
 		$item = array(
 			'title' => $addon_data['title'],
-			'description' => __( 'Manage all your WordPress privacy compliance needs', 'charitable' ),
+			'description' => isset( $addon_data['description'] ) ? $addon_data['description'] : $this->get_charitable_addon_description( $addon_data['slug'] ),
 			'button_text' => $button_state['text'],
 			'button_class' => $button_state['class'],
 			'button_action' => $button_state['action'],
@@ -2455,7 +2542,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		// Get the WordPress filesystem
 		$wp_filesystem = $this->get_wp_filesystem();
 		if ( ! $wp_filesystem ) {
-			unlink( $temp_file );
+			unlink( $temp_file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
 			return new WP_Error( 'filesystem_error', 'Unable to access WordPress filesystem.' );
 		}
 
@@ -2469,7 +2556,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		$result = unzip_file( $temp_file, WP_PLUGIN_DIR );
 
 		// Clean up temp file
-		unlink( $temp_file );
+		unlink( $temp_file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
 
 		if ( is_wp_error( $result ) ) {
 			return new WP_Error( 'unzip_failed', 'Failed to extract addon: ' . $result->get_error_message() );
@@ -2498,6 +2585,8 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	 * Process raw addon data to add status, action, and plugin_allow fields.
 	 * This mimics what get_addon() does but for raw data from get_addons().
 	 *
+	 * @version 1.8.8.4
+	 *
 	 * @param array  $raw_addon The raw addon data from get_addons().
 	 * @param string $slug      The addon slug.
 	 * @return array The processed addon data.
@@ -2507,8 +2596,12 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		$plugin_file = $slug . '/' . $slug . '.php';
 		$is_installed = file_exists( WP_PLUGIN_DIR . '/' . $plugin_file );
 		$is_active = $is_installed ? is_plugin_active( $plugin_file ) : false;
+		$is_pro = charitable_is_pro();
+		$current_plan = Charitable_Addons_Directory::get_current_plan_slug();
+		$required_plans = isset( $raw_addon['license'] ) ? (array) $raw_addon['license'] : array();
+		$plan_allows = empty( $required_plans ) ? false : in_array( $current_plan, $required_plans, true );
 
-		// Determine status and action based on installation state
+		// Determine status and action based on installation state and license
 		if ( $is_active ) {
 			$status = 'active';
 			$action = 'deactivate';
@@ -2519,8 +2612,19 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 			$plugin_allow = true;
 		} else {
 			$status = 'uninstalled';
-			$action = 'install';
-			$plugin_allow = true; // User has license, so they can install
+			// Check if user has a valid license and required plan before allowing install
+			if ( $is_pro && $plan_allows ) {
+				$action = 'install';
+				$plugin_allow = true;
+			} else {
+				$action = 'upgrade';
+				$plugin_allow = false;
+				// Provide upgrade URL so the button can link to pricing
+				$addons_directory = Charitable_Addons_Directory::get_instance();
+				if ( method_exists( $addons_directory, 'charitable_get_upgrade_link' ) ) {
+					$raw_addon['upgrade_url'] = $addons_directory->charitable_get_upgrade_link();
+				}
+			}
 		}
 
 		// Add the processed fields to the raw addon data
@@ -2718,12 +2822,13 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		}
 
 		$tracked_data = get_option( 'charitable_recommended_plugins_' . $action, array() );
+		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
 		$tracked_data[] = array(
 			'plugin' => $plugin_slug,
 			'type' => $plugin_type,
 			'context' => $context,
 			'timestamp' => time(),
-			'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? '',
+			'user_agent' => $user_agent,
 			'referrer' => wp_get_referer() ?: 'direct'
 		);
 
@@ -2840,11 +2945,13 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		 *
 		 * @since 1.8.8
 		 */
-		private function render_blog_posts() {
-			$posts = $this->get_blog_posts();
+	private function render_blog_posts() {
+		$posts = $this->get_blog_posts();
 
-			$is_simulating = isset( $_GET['charitable_simulate_api_failure'] ) && '1' === $_GET['charitable_simulate_api_failure'];
-			$clear_cache = isset( $_GET['charitable_clear_cache'] ) && '1' === $_GET['charitable_clear_cache'];
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$is_simulating = isset( $_GET['charitable_simulate_api_failure'] ) && '1' === sanitize_text_field( wp_unslash( $_GET['charitable_simulate_api_failure'] ) );
+		$clear_cache = isset( $_GET['charitable_clear_cache'] ) && '1' === sanitize_text_field( wp_unslash( $_GET['charitable_clear_cache'] ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 
 			?>
@@ -2883,7 +2990,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 										<img src="<?php echo esc_url( $post['image']['img'] ); ?>" alt="<?php echo esc_attr( $post['title'] ); ?>" class="charitable-dashboard-v2-blog-post-image" width="106" height="56" style="object-fit: cover; border-radius: 4px;" />
 									<?php elseif ( ! empty( $post['image']['svg'] ) ) : ?>
 										<!-- Custom SVG placeholder -->
-										<?php echo $post['image']['svg']; ?>
+										<?php echo wp_kses_post( $post['image']['svg'] ); ?>
 									<?php else : ?>
 										<!-- Default SVG placeholder -->
 										<svg class="charitable-dashboard-v2-blog-post-image-placeholder" width="106" height="56" viewBox="0 0 106 56" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2927,12 +3034,14 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		 *
 		 * @return array|false Returns array on success, false on failure
 		 */
-		private function fetch_blog_posts_feed() {
+	private function fetch_blog_posts_feed() {
 
-			// Allow simulating API failure for testing
-			if ( isset( $_GET['charitable_simulate_api_failure'] ) && '1' === $_GET['charitable_simulate_api_failure'] ) {
-				return false;
-			}
+		// Allow simulating API failure for testing
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['charitable_simulate_api_failure'] ) && '1' === sanitize_text_field( wp_unslash( $_GET['charitable_simulate_api_failure'] ) ) ) {
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
+			return false;
+		}
 
 			$args = [
 				'timeout'    => 10,
@@ -2962,6 +3071,60 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 
 
 			return $this->verify_blog_posts( $decoded );
+		}
+
+		/**
+		 * Calculate relative time from a date string.
+		 *
+		 * @since 1.8.8.4
+		 *
+		 * @param string $date_string Date string in format 'Y-m-d H:i:s'.
+		 *
+		 * @return string Relative time string (e.g., '2 days ago', '1 week ago').
+		 */
+		private function calculate_relative_time( $date_string ) {
+			if ( empty( $date_string ) ) {
+				return '';
+			}
+
+			$post_date = strtotime( $date_string );
+			$current_time = current_time( 'timestamp' );
+			$time_diff = $current_time - $post_date;
+
+			// If the date is in the future, return empty string
+			if ( $time_diff < 0 ) {
+				return '';
+			}
+
+			// Calculate relative time
+			$minutes = floor( $time_diff / 60 );
+			$hours = floor( $time_diff / 3600 );
+			$days = floor( $time_diff / 86400 );
+			$weeks = floor( $time_diff / 604800 );
+			$months = floor( $time_diff / 2592000 );
+			$years = floor( $time_diff / 31536000 );
+
+			if ( $years > 0 ) {
+				/* translators: %s: number of years */
+				return $years === 1 ? _x( '1 year ago', 'relative time', 'charitable' ) : sprintf( _nx( '%s year ago', '%s years ago', $years, 'relative time', 'charitable' ), number_format_i18n( $years ) );
+			} elseif ( $months > 0 ) {
+				/* translators: %s: number of months */
+				return $months === 1 ? _x( '1 month ago', 'relative time', 'charitable' ) : sprintf( _nx( '%s month ago', '%s months ago', $months, 'relative time', 'charitable' ), number_format_i18n( $months ) );
+			} elseif ( $weeks > 0 ) {
+				/* translators: %s: number of weeks */
+				return $weeks === 1 ? _x( '1 week ago', 'relative time', 'charitable' ) : sprintf( _nx( '%s week ago', '%s weeks ago', $weeks, 'relative time', 'charitable' ), number_format_i18n( $weeks ) );
+			} elseif ( $days > 0 ) {
+				/* translators: %s: number of days */
+				return $days === 1 ? _x( '1 day ago', 'relative time', 'charitable' ) : sprintf( _nx( '%s day ago', '%s days ago', $days, 'relative time', 'charitable' ), number_format_i18n( $days ) );
+			} elseif ( $hours > 0 ) {
+				/* translators: %s: number of hours */
+				return $hours === 1 ? _x( '1 hour ago', 'relative time', 'charitable' ) : sprintf( _nx( '%s hour ago', '%s hours ago', $hours, 'relative time', 'charitable' ), number_format_i18n( $hours ) );
+			} elseif ( $minutes > 0 ) {
+				/* translators: %s: number of minutes */
+				return $minutes === 1 ? _x( '1 minute ago', 'relative time', 'charitable' ) : sprintf( _nx( '%s minute ago', '%s minutes ago', $minutes, 'relative time', 'charitable' ), number_format_i18n( $minutes ) );
+			} else {
+				return _x( 'Just now', 'relative time', 'charitable' );
+			}
 		}
 
 		/**
@@ -3025,10 +3188,18 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 					}
 				}
 
+				// Calculate timestamp from date field if available, otherwise use provided timestamp
+				$calculated_timestamp = '';
+				if ( ! empty( $post['date'] ) ) {
+					$calculated_timestamp = $this->calculate_relative_time( $post['date'] );
+				} elseif ( ! empty( $post['timestamp'] ) ) {
+					$calculated_timestamp = sanitize_text_field( $post['timestamp'] );
+				}
+
 				$data[] = array(
 					'title'     => sanitize_text_field( $post['title'] ),
 					'url'       => esc_url_raw( $post['url'] ),
-					'timestamp' => ! empty( $post['timestamp'] ) ? sanitize_text_field( $post['timestamp'] ) : '',
+					'timestamp' => $calculated_timestamp,
 					'featured'  => ! empty( $post['featured'] ) ? (bool) $post['featured'] : false,
 					'image'     => $image_data,
 				);
@@ -3047,7 +3218,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		 */
 		private function get_blog_posts_from_cache() {
 
-			$cached_data = false; // get_transient( 'charitable_blog_posts_cache' );
+			$cached_data = get_transient( 'charitable_blog_posts_cache' );
 
 			if ( false === $cached_data ) {
 				return [];
@@ -3081,10 +3252,12 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		 * @since 1.8.8
 		 * @return array
 		 */
-		private function get_blog_posts() {
+	private function get_blog_posts() {
 
-			$is_simulating = isset( $_GET['charitable_simulate_api_failure'] ) && '1' === $_GET['charitable_simulate_api_failure'];
-			$clear_cache = isset( $_GET['charitable_clear_cache'] ) && '1' === $_GET['charitable_clear_cache'];
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$is_simulating = isset( $_GET['charitable_simulate_api_failure'] ) && '1' === sanitize_text_field( wp_unslash( $_GET['charitable_simulate_api_failure'] ) );
+		$clear_cache = isset( $_GET['charitable_clear_cache'] ) && '1' === sanitize_text_field( wp_unslash( $_GET['charitable_clear_cache'] ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 			// If simulating API failure, always return error
 			if ( $is_simulating ) {
@@ -3134,9 +3307,11 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		 * @since 1.8.8
 		 * @return array
 		 */
-		private function get_blog_posts_error() {
-			$is_simulating = isset( $_GET['charitable_simulate_api_failure'] ) && '1' === $_GET['charitable_simulate_api_failure'];
-			$error_title = $is_simulating ? __( 'Unable to load blog posts (Simulated API Failure)', 'charitable' ) : __( 'Unable to load blog posts', 'charitable' );
+	private function get_blog_posts_error() {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$is_simulating = isset( $_GET['charitable_simulate_api_failure'] ) && '1' === sanitize_text_field( wp_unslash( $_GET['charitable_simulate_api_failure'] ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+		$error_title = $is_simulating ? __( 'Unable to load blog posts (Simulated API Failure)', 'charitable' ) : __( 'Unable to load blog posts', 'charitable' );
 
 			return array(
 				array(
@@ -3281,6 +3456,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		 * Render the quick access section.
 		 *
 		 * @since 1.8.8
+		 * @version 1.8.8.6
 		 */
 		public function render_quick_access_section() {
 			?>
@@ -3300,7 +3476,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 					<footer class="charitable-dashboard-v2-quick-access-footer">
 						<div class="charitable-dashboard-v2-quick-access-footer-content">
 							<div class="charitable-dashboard-v2-quick-access-footer-left">
-								<a href="https://wordpress.org/support/plugin/charitable/reviews/?filter=5#new-post" class="charitable-dashboard-v2-rate-link" target="_blank" rel="noopener noreferrer">
+								<a href="https://wordpress.org/support/plugin/charitable/reviews/#new-post" class="charitable-dashboard-v2-rate-link" target="_blank" rel="noopener noreferrer">
 									<span class="charitable-dashboard-v2-rate-text">Rate us 5 stars</span>
 									<svg class="charitable-dashboard-v2-arrow-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 										<path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -3335,7 +3511,51 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 				?>
 				<div class="charitable-dashboard-v2-quick-access-item">
 					<div class="charitable-dashboard-v2-quick-access-icon">
-						<?php echo $item['icon']; ?>
+						<?php
+						// Only allow specific SVG-related tags and attributes for safety.
+						echo wp_kses(
+							$item['icon'],
+							array(
+								'svg'   => array(
+									'xmlns'       => true,
+									'width'       => true,
+									'height'      => true,
+									'viewbox'     => true,
+									'fill'        => true,
+									'class'       => true,
+									'aria-hidden' => true,
+									'role'        => true,
+								),
+								'path'  => array(
+									'd'             => true,
+									'fill'          => true,
+									'stroke'        => true,
+									'stroke-width'  => true,
+									'stroke-linecap' => true,
+									'stroke-linejoin'=> true,
+								),
+								'rect'  => array(
+									'x'      => true,
+									'y'      => true,
+									'width'  => true,
+									'height' => true,
+									'fill'   => true,
+								),
+								'mask'  => array(
+									'id'            => true,
+									'style'         => true,
+									'maskunits'     => true,
+									'x'             => true,
+									'y'             => true,
+									'width'         => true,
+									'height'        => true,
+								),
+								'g'     => array(
+									'mask' => true,
+								),
+							)
+						);
+						?>
 					</div>
 					<div class="charitable-dashboard-v2-quick-access-title">
 						<a href="<?php echo esc_url( $item['url'] ); ?>" target="_blank"><?php echo esc_html( $item['title'] ); ?></a>
@@ -3406,15 +3626,24 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 				}, $donation_axis );
 			}
 			?>
+			<?php
+			// Decode HTML entities in currency symbol before passing to JavaScript.
+			// The currency symbol comes as HTML entities (e.g., &#36; for $), so we decode it
+			// before using esc_js() to avoid double-encoding issues.
+			$currency_helper = charitable_get_currency_helper();
+			$currency_symbol = html_entity_decode( $currency_helper->get_currency_symbol(), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+			$decimal_count = $currency_helper->get_decimals();
+			?>
 			<script id="charitable-dashboard-report-data-js">
 				var charitable_dashboard_reporting = {
 					version: '<?php echo esc_js( Charitable::VERSION ); ?>',
-					user_id: '<?php echo get_current_user_id(); ?>',
-					nonce: '<?php echo wp_create_nonce( 'charitable-reporting' ); ?>',
-					dashboard_nonce: '<?php echo wp_create_nonce( 'charitable-dashboard' ); ?>',
-					admin_nonce: '<?php echo wp_create_nonce( 'charitable-admin' ); ?>',
-					currency_symbol: '<?php echo charitable_get_currency_helper()->get_currency_symbol(); ?>',
-					ajax_url: '<?php echo admin_url( 'admin-ajax.php' ); ?>',
+					user_id: '<?php echo esc_js( get_current_user_id() ); ?>',
+					nonce: '<?php echo esc_js( wp_create_nonce( 'charitable-reporting' ) ); ?>',
+					dashboard_nonce: '<?php echo esc_js( wp_create_nonce( 'charitable-dashboard' ) ); ?>',
+					admin_nonce: '<?php echo esc_js( wp_create_nonce( 'charitable-admin' ) ); ?>',
+					currency_symbol: '<?php echo esc_js( $currency_symbol ); ?>',
+					decimal_count: <?php echo (int) $decimal_count; ?>,
+					ajax_url: '<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>',
 					date_select_day: 'DD',
 					date_select_month: 'MM',
 					strings: {

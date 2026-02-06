@@ -1,11 +1,18 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display the Filters modal.
  *
  * @author  WP Charitable LLC
  * @package Charitable/Admin View/Campaigns Page
  * @since   1.6.36
- * @version 1.8.0
+ * @version 1.8.9.1
+ * @version 1.8.8.6
  */
 
 /**
@@ -15,15 +22,17 @@
  *
  * @param string $class The modal window class.
  */
-$modal_class = apply_filters( 'charitable_modal_window_class', 'charitable-modal' );
+$charitable_modal_class = apply_filters( 'charitable_modal_window_class', 'charitable-modal' );
 
-$start_date_from = isset( $_GET['start_date_from'] ) ? charitable_sanitize_date_filter_format( $_GET['start_date_from'] ) : null;
-$start_date_to   = isset( $_GET['start_date_to'] ) ? charitable_sanitize_date_filter_format( $_GET['start_date_to'] ) : null;
-$end_date_from   = isset( $_GET['end_date_from'] ) ? charitable_sanitize_date_filter_format( $_GET['end_date_from'] ) : null;
-$end_date_to     = isset( $_GET['end_date_to'] ) ? charitable_sanitize_date_filter_format( $_GET['end_date_to'] ) : null;
-$status          = isset( $_GET['status'] ) ? esc_html( $_GET['status'] ) : 'all';
+// phpcs:disable WordPress.Security.NonceVerification.Recommended
+$charitable_start_date_from = isset( $_GET['start_date_from'] ) ? charitable_sanitize_date_filter_format( wp_unslash( $_GET['start_date_from'] ) ) : null; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by charitable_sanitize_date_filter_format
+$charitable_start_date_to   = isset( $_GET['start_date_to'] ) ? charitable_sanitize_date_filter_format( wp_unslash( $_GET['start_date_to'] ) ) : null; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by charitable_sanitize_date_filter_format
+$charitable_end_date_from   = isset( $_GET['end_date_from'] ) ? charitable_sanitize_date_filter_format( wp_unslash( $_GET['end_date_from'] ) ) : null; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by charitable_sanitize_date_filter_format
+$charitable_end_date_to     = isset( $_GET['end_date_to'] ) ? charitable_sanitize_date_filter_format( wp_unslash( $_GET['end_date_to'] ) ) : null; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by charitable_sanitize_date_filter_format
+$charitable_status          = isset( $_GET['status'] ) ? esc_html( wp_unslash( $_GET['status'] ) ) : 'all'; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by esc_html
+// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
-$statuses = array(
+$charitable_statuses = array(
 	'all'     => __( 'All', 'charitable' ),
 	'pending' => __( 'Pending', 'charitable' ),
 	'draft'   => __( 'Draft', 'charitable' ),
@@ -32,26 +41,26 @@ $statuses = array(
 	'publish' => __( 'Published', 'charitable' ),
 );
 ?>
-<div id="charitable-campaigns-filter-modal" style="display: none" class="charitable-campaigns-modal <?php echo esc_attr( $modal_class ); ?>" tabindex="0">
+<div id="charitable-campaigns-filter-modal" style="display: none" class="charitable-campaigns-modal <?php echo esc_attr( $charitable_modal_class ); ?>" tabindex="0">
 	<a class="modal-close"></a>
-	<h3><?php _e( 'Filter Campaigns', 'charitable' ); ?></h3>
+	<h3><?php esc_html_e( 'Filter Campaigns', 'charitable' ); ?></h3>
 	<form class="charitable-campaigns-modal-form charitable-modal-form" method="get" action="">
 		<input type="hidden" name="post_type" class="post_type_page" value="campaign">
 		<?php wp_nonce_field( 'charitable_filter_campaigns', 'charitable_nonce', false ); ?>
 		<fieldset>
-			<legend><?php _e( 'Filter by Start Date', 'charitable' ); ?></legend>
-			<input type="text" id="charitable-filter-start_date_from" name="start_date_from" class="charitable-datepicker" autocomplete="off" value="<?php echo $start_date_from; ?>" placeholder="<?php esc_attr_e( 'From:', 'charitable' ); ?>" />
-			<input type="text" id="charitable-filter-start_date_to" name="start_date_to" class="charitable-datepicker" autocomplete="off" value="<?php echo $start_date_to; ?>" placeholder="<?php esc_attr_e( 'To:', 'charitable' ); ?>" />
+			<legend><?php esc_html_e( 'Filter by Start Date', 'charitable' ); ?></legend>
+			<input type="text" id="charitable-filter-start_date_from" name="start_date_from" class="charitable-datepicker" autocomplete="off" value="<?php echo esc_attr( $charitable_start_date_from ); ?>" placeholder="<?php esc_attr_e( 'From:', 'charitable' ); ?>" />
+			<input type="text" id="charitable-filter-start_date_to" name="start_date_to" class="charitable-datepicker" autocomplete="off" value="<?php echo esc_attr( $charitable_start_date_to ); ?>" placeholder="<?php esc_attr_e( 'To:', 'charitable' ); ?>" />
 		</fieldset>
 		<fieldset>
-			<legend><?php _e( 'Filter by End Date', 'charitable' ); ?></legend>
-			<input type="text" id="charitable-filter-end_date_from" name="end_date_from" class="charitable-datepicker" autocomplete="off" value="<?php echo $end_date_from; ?>" placeholder="<?php esc_attr_e( 'From:', 'charitable' ); ?>" />
-			<input type="text" id="charitable-filter-end_date_to" name="end_date_to" class="charitable-datepicker" autocomplete="off" value="<?php echo $end_date_to; ?>" placeholder="<?php esc_attr_e( 'To:', 'charitable' ); ?>" />
+			<legend><?php esc_html_e( 'Filter by End Date', 'charitable' ); ?></legend>
+			<input type="text" id="charitable-filter-end_date_from" name="end_date_from" class="charitable-datepicker" autocomplete="off" value="<?php echo esc_attr( $charitable_end_date_from ); ?>" placeholder="<?php esc_attr_e( 'From:', 'charitable' ); ?>" />
+			<input type="text" id="charitable-filter-end_date_to" name="end_date_to" class="charitable-datepicker" autocomplete="off" value="<?php echo esc_attr( $charitable_end_date_to ); ?>" placeholder="<?php esc_attr_e( 'To:', 'charitable' ); ?>" />
 		</fieldset>
-		<label for="charitable-campaigns-filter-status"><?php _e( 'Filter by Status', 'charitable' ); ?></label>
+		<label for="charitable-campaigns-filter-status"><?php esc_html_e( 'Filter by Status', 'charitable' ); ?></label>
 		<select id="charitable-campaigns-filter-status" name="post_status">
-			<?php foreach ( $statuses as $key => $label ) : ?>
-				<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $status, $key ); ?>><?php echo $label; ?></option>
+			<?php foreach ( $charitable_statuses as $charitable_key => $charitable_label ) : ?>
+				<option value="<?php echo esc_attr( $charitable_key ); ?>" <?php selected( $charitable_status, $charitable_key ); ?>><?php echo esc_html( $charitable_label ); ?></option>
 			<?php endforeach ?>
 		</select>
 		<?php
@@ -62,6 +71,6 @@ $statuses = array(
 		 */
 		do_action( 'charitable_filter_campaigns_form' );
 		?>
-		<button type="submit" class="button button-primary"><?php _e( 'Apply', 'charitable' ); ?></button>
+		<button type="submit" class="button button-primary"><?php esc_html_e( 'Apply', 'charitable' ); ?></button>
 	</form>
 </div>

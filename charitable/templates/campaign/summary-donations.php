@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Displays the campaign's donation summary.
  *
@@ -8,20 +14,21 @@
  * @package Charitable/Templates/Campaign Page
  * @since   1.0.0
  * @version 1.8.1.9
+ * @version 1.8.8.6
  */
 
-$campaign = $view_args['campaign'];
+$charitable_campaign = $view_args['campaign'];
 
-if ( ! class_exists( 'Charitable_Campaign' ) || ! $campaign instanceof Charitable_Campaign ) {
+if ( ! class_exists( 'Charitable_Campaign' ) || ! $charitable_campaign instanceof Charitable_Campaign ) {
 	return;
 }
-$donation_summary_content = $campaign->get_donation_summary();
+$charitable_donation_summary_content = $charitable_campaign->get_donation_summary();
 
-if ( '' !== trim( $donation_summary_content ) ) :
+if ( '' !== trim( $charitable_donation_summary_content ) ) :
 
 	?>
 <div class="campaign-figures campaign-summary-item">
-	<?php echo $campaign->get_donation_summary(); // phpcs:ignore ?>
+	<?php echo $charitable_campaign->get_donation_summary(); // phpcs:ignore ?>
 </div>
 
 <?php endif; ?>

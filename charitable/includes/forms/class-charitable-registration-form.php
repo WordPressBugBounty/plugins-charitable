@@ -99,33 +99,36 @@ if ( ! class_exists( 'Charitable_Registration_Form' ) ) :
 		 * Profile fields to be displayed.
 		 *
 		 * @since  1.0.0
+		 * @version 1.8.9.1
 		 *
 		 * @return array
 		 */
 		public function get_fields() {
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
 			$fields = array(
 				'user_email' => array(
 					'label'    => __( 'Email', 'charitable' ),
 					'type'     => 'email',
 					'required' => true,
 					'priority' => 4,
-					'value'    => isset( $_POST['user_email'] ) ? $_POST['user_email'] : '',
+					'value'    => isset( $_POST['user_email'] ) ? sanitize_text_field( wp_unslash( $_POST['user_email'] ) ) : '',
 				),
 				'user_login' => array(
 					'label'    => __( 'Username', 'charitable' ),
 					'type'     => 'text',
 					'priority' => 6,
 					'required' => true,
-					'value'    => isset( $_POST['user_login'] ) ? $_POST['user_login'] : '',
+					'value'    => isset( $_POST['user_login'] ) ? sanitize_text_field( wp_unslash( $_POST['user_login'] ) ) : '',
 				),
 				'user_pass'  => array(
 					'label'    => __( 'Password', 'charitable' ),
 					'type'     => 'password',
 					'priority' => 8,
 					'required' => true,
-					'value'    => isset( $_POST['user_pass'] ) ? $_POST['user_pass'] : '',
+					'value'    => isset( $_POST['user_pass'] ) ? sanitize_text_field( wp_unslash( $_POST['user_pass'] ) ) : '',
 				),
 			);
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			$fields = $this->maybe_add_terms_conditions_fields( $fields );
 
@@ -147,6 +150,7 @@ if ( ! class_exists( 'Charitable_Registration_Form' ) ) :
 		 * Maybe add terms and conditions fields to the form.
 		 *
 		 * @since  1.6.2
+		 * @version 1.8.9.1
 		 *
 		 * @param  array $fields The registered form fields.
 		 * @return array
@@ -161,12 +165,15 @@ if ( ! class_exists( 'Charitable_Registration_Form' ) ) :
 			}
 
 			if ( charitable_is_contact_consent_activated() ) {
+				// phpcs:disable WordPress.Security.NonceVerification.Missing
+				$checked = isset( $_POST['contact_consent'] ) && ! empty( sanitize_text_field( wp_unslash( $_POST['contact_consent'] ) ) );
+				// phpcs:enable WordPress.Security.NonceVerification.Missing
 				$fields['contact_consent'] = array(
 					'type'     => 'checkbox',
 					'label'    => charitable_get_option( 'contact_consent_label', __( 'Yes, I am happy for you to contact me via email or phone.', 'charitable' ) ),
 					'priority' => 22,
 					'required' => false,
-					'checked'  => array_key_exists( 'contact_consent', $_POST ) && $_POST['contact_consent'],
+					'checked'  => $checked,
 				);
 			}
 
@@ -284,6 +291,7 @@ if ( ! class_exists( 'Charitable_Registration_Form' ) ) :
 		 * Return the link to the login page, or false if we are not going to display it.
 		 *
 		 * @since  1.4.2
+		 * @version 1.8.9.1
 		 *
 		 * @return false|string
 		 */
@@ -298,9 +306,12 @@ if ( ! class_exists( 'Charitable_Registration_Form' ) ) :
 				return false;
 			}
 
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended
 			if ( isset( $_GET['redirect_to'] ) ) {
-				$login_link = add_query_arg( 'redirect_to', $_GET['redirect_to'], $login_link );
+				$redirect_to = sanitize_text_field( wp_unslash( $_GET['redirect_to'] ) );
+				$login_link  = add_query_arg( 'redirect_to', $redirect_to, $login_link );
 			}
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 			return sprintf(
 				'<a href="%1$s">%2$s</a>',
@@ -313,17 +324,23 @@ if ( ! class_exists( 'Charitable_Registration_Form' ) ) :
 		 * Get the redirect URL.
 		 *
 		 * @since  1.5.0
+		 * @version 1.8.9.1
 		 *
 		 * @return string|false
 		 */
 		protected function get_redirect_url() {
 			$redirect = false;
 
-			if ( isset( $_GET['redirect_to'] ) && strlen( $_GET['redirect_to'] ) ) {
-				$redirect = $_GET['redirect_to'];
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended
+			if ( isset( $_GET['redirect_to'] ) ) {
+				$redirect_to = sanitize_text_field( wp_unslash( $_GET['redirect_to'] ) );
+				if ( strlen( $redirect_to ) ) {
+					$redirect = $redirect_to;
+				}
 			} elseif ( isset( $this->shortcode_args['redirect'] ) && strlen( $this->shortcode_args['redirect'] ) ) {
 				$redirect = $this->shortcode_args['redirect'];
 			}
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 			return $redirect;
 		}

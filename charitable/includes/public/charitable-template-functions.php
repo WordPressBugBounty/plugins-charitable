@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
- * @version   1.6.49
+ * @version   1.8.9.1
  */
 
 // Exit if accessed directly.
@@ -28,6 +28,7 @@ if ( ! function_exists( 'charitable_template_custom_styles' ) ) :
 	 * This is used on the wp_head action.
 	 *
 	 * @since  1.2.0
+	 * @version 1.8.9.1
 	 *
 	 * @return void
 	 */
@@ -56,7 +57,7 @@ if ( ! function_exists( 'charitable_template_custom_styles' ) ) :
 			set_transient( 'charitable_custom_styles', $styles, 0 );
 		}
 
-		echo $styles;
+		echo $styles; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 endif;
@@ -642,6 +643,7 @@ if ( ! function_exists( 'charitable_template_responsive_styles' ) ) :
 	 * Add responsive styles for the campaign loop.
 	 *
 	 * @since  1.4.0
+	 * @version 1.8.9.1
 	 *
 	 * @param  WP_Query $campaigns The campaigns that will be displayed.
 	 * @param  array    $args      The view arguments.
@@ -670,7 +672,7 @@ if ( ! function_exists( 'charitable_template_responsive_styles' ) ) :
 		}
 		?>
 <style type="text/css" media="screen">
-@media only screen and (max-width: <?php echo $breakpoint; ?>) {
+@media only screen and (max-width: <?php echo esc_attr( $breakpoint ); ?>) {
 	.campaign-loop.campaign-grid.masonry { -moz-column-count: 1; -webkit-column-count: 1; column-count: 1; }
 	.campaign-loop.campaign-grid .campaign,.campaign-loop.campaign-grid .campaign.hentry { width: 100% !important; }
 }
@@ -1209,7 +1211,7 @@ if ( ! function_exists( 'charitable_template_forgot_password_content' ) ) :
 
 		ob_start();
 
-		if ( isset( $_GET['email_sent'] ) ) {
+		if ( isset( $_GET['email_sent'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			charitable_template( 'account/forgot-password-sent.php' );
 
@@ -1268,6 +1270,7 @@ if ( ! function_exists( 'charitable_template_form_login_link' ) ) :
 	 * Display a link to the login form.
 	 *
 	 * @since  1.4.2
+	 * @version 1.8.9.1
 	 *
 	 * @param  Charitable_Registration_Form|null $form Instance of `Charitable_Registration_Form`, or
 	 *                                                 null in previous versions of Charitable.
@@ -1286,7 +1289,7 @@ if ( ! function_exists( 'charitable_template_form_login_link' ) ) :
 			return;
 		}
 
-		printf( '<p>%s</p>', $form->get_login_link() );
+		printf( '<p>%s</p>', wp_kses_post( $form->get_login_link() ) );
 	}
 
 endif;

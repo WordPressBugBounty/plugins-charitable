@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.5.0
- * @version   1.6.55
+ * @version   1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -154,6 +154,7 @@ if ( ! class_exists( 'Charitable_Forgot_Password_Endpoint' ) ) :
 		 * Get the content to display for the endpoint.
 		 *
 		 * @since  1.5.0
+		 * @version 1.8.9.1
 		 *
 		 * @param  string $content Default content.
 		 * @return string
@@ -161,7 +162,7 @@ if ( ! class_exists( 'Charitable_Forgot_Password_Endpoint' ) ) :
 		public function get_content( $content ) {
 			ob_start();
 
-			if ( isset( $_GET['email_sent'] ) ) {
+			if ( isset( $_GET['email_sent'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				charitable_template( 'account/forgot-password-sent.php' );
 			} else {
 				charitable_template(

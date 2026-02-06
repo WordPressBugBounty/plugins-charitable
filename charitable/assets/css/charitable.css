@@ -1370,7 +1370,7 @@ h3.charitable-header {
 #charitable-gateway-fields-stripe.charitable-cc-fields-multiple > div:first-child input {
   font-family: sans-serif !important;
   font-size: 16px !important;
-  padding: 15px 10px !important;
+  padding: 10px 10px !important;
   min-height: 15px !important;
   font-weight: 500 !important;
 }
@@ -1381,7 +1381,7 @@ h3.charitable-header {
   border-width: 0.078rem !important;
   border-style: solid !important;
   border-radius: 0.25rem !important;
-  padding: 15px 10px !important;
+  padding: 10px 10px !important;
   background-color: #fff !important;
   color: #4d4d4d !important;
   font-size: 1rem !important;

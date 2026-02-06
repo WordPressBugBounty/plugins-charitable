@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display the legacy add button in the campaign filters box.
  *
@@ -9,6 +15,7 @@
  * @since     1.8.0
  * @version   1.8.0
  * @version   1.8.3.5
+ * @version   1.8.8.6
  */
 
 if ( ! empty( $_GET['post_status'] ) && 'trash' === $_GET['post_status'] ) { // phpcs:ignore WordPress.Security.NonceVerification
@@ -16,8 +23,8 @@ if ( ! empty( $_GET['post_status'] ) && 'trash' === $_GET['post_status'] ) { // 
 }
 
 // check the advanced setting for disabled legacy campaigns.
-$disable_legacy_campaign = charitable_get_option( 'disable_campaign_legacy_mode', false ) ? true : false;
-$disable_legacy_campaign = apply_filters( 'charitable_disable_legacy_campaign', $disable_legacy_campaign );
+$charitable_disable_legacy_campaign = charitable_get_option( 'disable_campaign_legacy_mode', false ) ? true : false;
+$charitable_disable_legacy_campaign = apply_filters( 'charitable_disable_legacy_campaign', $charitable_disable_legacy_campaign );
 
 ?>
 <div class="alignleft actions charitable-legacy-actions charitable-campaign-legacy-actions">

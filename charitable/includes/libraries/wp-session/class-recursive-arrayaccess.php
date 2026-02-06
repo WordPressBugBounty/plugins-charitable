@@ -16,7 +16,7 @@
  * @package WordPress
  * @since 3.7.0
  */
-class Recursive_ArrayAccess implements ArrayAccess, Iterator, Countable {
+class Recursive_ArrayAccess implements ArrayAccess, Iterator, Countable { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- This is a bundled library class. Changing it would break existing functionality.
 	/**
 	 * Internal data collection.
 	 *

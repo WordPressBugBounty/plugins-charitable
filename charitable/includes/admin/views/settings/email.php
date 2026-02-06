@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display email field.
  *
@@ -7,23 +13,23 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
- * @version   1.0.0
+ * @version   1.8.8.6
  */
 
-$value = charitable_get_option( $view_args['key'] );
+$charitable_value = charitable_get_option( $view_args['key'] );
 
-if ( empty( $value ) ) :
-	$value = isset( $view_args['default'] ) ? $view_args['default'] : '';
+if ( empty( $charitable_value ) ) :
+	$charitable_value = isset( $view_args['default'] ) ? $view_args['default'] : '';
 endif;
 
-$escaped_key  = implode( '_', $view_args['key'] );
-$escaped_name = $view_args['name'];
+$charitable_escaped_key  = implode( '_', $view_args['key'] );
+$charitable_escaped_name = $view_args['name'];
 
 ?>
 <input type="email"
-	id="charitable_settings_<?php echo esc_attr( $escaped_key ); ?>"
-	name="charitable_settings[<?php echo esc_attr( $escaped_name ); ?>]"
-	value="<?php echo esc_attr( $value ); ?>"
+	id="charitable_settings_<?php echo esc_attr( $charitable_escaped_key ); ?>"
+	name="charitable_settings[<?php echo esc_attr( $charitable_escaped_name ); ?>]"
+	value="<?php echo esc_attr( $charitable_value ); ?>"
 	class="<?php echo esc_attr( $view_args['classes'] ); ?>"
 	<?php echo charitable_get_arbitrary_attributes( $view_args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 />

@@ -211,7 +211,7 @@ if ( ! class_exists( 'Charitable_Export' ) ) :
 			ignore_user_abort( true );
 
 			if ( ! charitable_is_func_disabled( 'set_time_limit' ) && ! ini_get( 'safe_mode' ) ) {
-				set_time_limit( 0 );
+				set_time_limit( 0 ); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
 			}
 
 			/* Check for PHP 5.3+ */
@@ -224,7 +224,7 @@ if ( ! class_exists( 'Charitable_Export' ) ) :
 
 			nocache_headers();
 			header( 'Content-Type: text/csv; charset=utf-8' );
-			header( 'Content-Disposition: attachment; filename=charitable-export-' . $export . '-' . date( 'm-d-Y' ) . '.csv' );
+			header( 'Content-Disposition: attachment; filename=charitable-export-' . $export . '-' . date( 'm-d-Y' ) . '.csv' ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 			header( 'Expires: 0' );
 		}
 

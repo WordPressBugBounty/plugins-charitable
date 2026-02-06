@@ -3,6 +3,7 @@
  * Admin Dashboard template.
  *
  * @since 1.8.2
+ * @version 1.8.8.6
  *
  * @var array $notifications
  */
@@ -15,8 +16,8 @@ if ( empty( $notifications ) || ! is_array( $notifications ) ) {
 	return;
 }
 
-$notifications_count = 1;
-$notifications_total = count( $notifications );
+$charitable_notifications_count = 1;
+$charitable_notifications_total = count( $notifications );
 
 
 ?>
@@ -25,7 +26,7 @@ $notifications_total = count( $notifications );
 
 	<div class="charitable-dashboard-notification-bar">
 
-			<?php if ( (int) $notifications_total > 1 ) : ?>
+			<?php if ( (int) $charitable_notifications_total > 1 ) : ?>
 				<div class="charitable-dashboard-notification-navigation">
 					<a class="prev">
 						<span class="screen-reader-text"><?php esc_attr_e( 'Previous message', 'charitable' ); ?></span>
@@ -46,14 +47,14 @@ $notifications_total = count( $notifications );
 
 	<?php
 
-	foreach ( $notifications as $notification_slug => $notification ) :
+	foreach ( $notifications as $charitable_notification_slug => $charitable_notification ) :
 
-		$css_class     = ! empty( $notification['custom_css'] ) ? $notification['custom_css'] : '';
-		$css_class    .= $notifications_count === 1 ? '' : ' charitable-hidden';
-		$message_title = ! empty( $notification['title'] ) ? sanitize_text_field( $notification['title'] ) : esc_html__( 'Important', 'charitable' );
-		$message       = ! empty( $notification['message'] ) ? $notification['message'] : '';
-		$message       = wp_kses(
-			$message,
+		$charitable_css_class     = ! empty( $charitable_notification['custom_css'] ) ? $charitable_notification['custom_css'] : '';
+		$charitable_css_class    .= $charitable_notifications_count === 1 ? '' : ' charitable-hidden';
+		$charitable_message_title = ! empty( $charitable_notification['title'] ) ? sanitize_text_field( $charitable_notification['title'] ) : esc_html__( 'Important', 'charitable' );
+		$charitable_message       = ! empty( $charitable_notification['message'] ) ? $charitable_notification['message'] : '';
+			$charitable_message       = wp_kses(
+			$charitable_message,
 			array(
 				'a'      => array(
 					'href'  => array(),
@@ -75,18 +76,18 @@ $notifications_total = count( $notifications );
 
 		?>
 
-			<div class="charitable-dashboard-notification <?php echo esc_attr( $css_class ); ?>" data-notification-number="<?php echo (int) $notifications_count; ?>" data-notification-id="<?php echo esc_attr( $notification_slug ); ?>" data-notification-type="<?php echo esc_attr( $notification['type'] ); ?>">
+			<div class="charitable-dashboard-notification <?php echo esc_attr( $charitable_css_class ); ?>" data-notification-number="<?php echo (int) $charitable_notifications_count; ?>" data-notification-id="<?php echo esc_attr( $charitable_notification_slug ); ?>" data-notification-type="<?php echo esc_attr( $charitable_notification['type'] ); ?>">
 
 				<div class="charitable-dashboard-notification-message">
-				<h4 class="charitable-dashboard-notification-headline"><?php echo esc_html( $message_title ); ?></h4>
-					<?php echo $message; // phpcs:ignore ?>
+				<h4 class="charitable-dashboard-notification-headline"><?php echo esc_html( $charitable_message_title ); ?></h4>
+					<?php echo $charitable_message; // phpcs:ignore ?>
 				</div>
 
 			</div>
 
 		<?php
 
-		++$notifications_count;
+		++$charitable_notifications_count;
 
 	endforeach;
 	?>

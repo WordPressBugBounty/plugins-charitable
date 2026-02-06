@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display a list of campaigns.
  *
@@ -8,13 +14,14 @@
  * @author  WP Charitable LLC
  * @since   1.0.0
  * @version 1.4.18
+ * @version 1.8.8.6
  */
 
-$campaigns      = $view_args['campaigns'];
-$show_thumbnail = isset( $view_args['show_thumbnail'] ) ? $view_args['show_thumbnail'] : true;
-$thumbnail_size = apply_filters( 'charitable_campaign_widget_thumbnail_size', 'medium' );
+$charitable_campaigns      = $view_args['campaigns'];
+$charitable_show_thumbnail = isset( $view_args['show_thumbnail'] ) ? $view_args['show_thumbnail'] : true;
+$charitable_thumbnail_size = apply_filters( 'charitable_campaign_widget_thumbnail_size', 'medium' );
 
-if ( ! $campaigns->have_posts() ) :
+if ( ! $charitable_campaigns->have_posts() ) :
 	return;
 endif;
 
@@ -28,23 +35,23 @@ endif;
 ?>
 <ol class="campaigns">
 <?php
-while ( $campaigns->have_posts() ) :
+while ( $charitable_campaigns->have_posts() ) :
 
-	$campaigns->the_post();
+	$charitable_campaigns->the_post();
 
-	$campaign = new Charitable_Campaign( get_the_ID() );
+	$charitable_campaign = new Charitable_Campaign( get_the_ID() );
 	?>
 	<li class="campaign">
 		<?php
-		if ( $show_thumbnail && has_post_thumbnail() ) :
+		if ( $charitable_show_thumbnail && has_post_thumbnail() ) :
 
-			the_post_thumbnail( $thumbnail_size );
+			the_post_thumbnail( $charitable_thumbnail_size );
 
 		endif;
 		?>
 		<h6 class="campaign-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h6>
-		<?php if ( ! $campaign->is_endless() ) : ?>
-			<div class="campaign-time-left"><?php echo esc_html( $campaign->get_time_left() ); ?></div>
+		<?php if ( ! $charitable_campaign->is_endless() ) : ?>
+			<div class="campaign-time-left"><?php echo esc_html( $charitable_campaign->get_time_left() ); ?></div>
 		<?php endif ?>
 	</li>
 	<?php

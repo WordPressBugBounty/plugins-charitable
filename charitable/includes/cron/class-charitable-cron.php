@@ -3,7 +3,7 @@
  * Charitable Events
  *
  * @package   Charitable/Classes/Charitable_Cron
- * @version   1.1.0
+ * @version   1.8.9.1
  * @author    David Bisset
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -77,11 +77,12 @@ if ( ! class_exists( 'Charitable_Cron' ) ) :
 		 * Check for expired campaigns.
 		 *
 		 * @since  1.1.0
+		 * @version 1.8.9.1
 		 *
 		 * @return void
 		 */
 		public function check_expired_campaigns() {
-			$yesterday = date( 'Y-m-d H:i:s', strtotime( '-24 hours' ) );
+			$yesterday = date( 'Y-m-d H:i:s', strtotime( '-24 hours' ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 
 			$args = array(
 				'fields' => 'ids',
@@ -91,7 +92,7 @@ if ( ! class_exists( 'Charitable_Cron' ) ) :
 				'meta_query' => array(
 					array(
 						'key'       => '_campaign_end_date',
-						'value'     => array( $yesterday, date( 'Y-m-d H:i:s' ) ),
+						'value'     => array( $yesterday, date( 'Y-m-d H:i:s' ) ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 						'compare'   => 'BETWEEN',
 						'type'      => 'datetime'
 					)

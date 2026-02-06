@@ -272,8 +272,12 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 				'category_id' => false,
 			);
 
-			// break up array into individual vars.
-			extract( $defaults ); // phpcs:ignore
+			// Extract individual variables from defaults array.
+			$start_date  = $defaults['start_date'];
+			$end_date    = $defaults['end_date'];
+			$post_status = $defaults['post_status'];
+			$campaign_id = $defaults['campaign_id'];
+			$category_id = $defaults['category_id'];
 
 			$where_sql   = array();
 			$where_sql[] = 'WHERE 1=1';

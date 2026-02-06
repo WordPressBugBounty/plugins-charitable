@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
- * @version   1.0.0
+ * @version   1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -79,6 +79,7 @@ if ( ! class_exists( 'Charitable_Campaigns' ) ) :
 		 * Returns a WP_Query that will return active campaigns, ordered by the date they're ending.
 		 *
 		 * @since  1.0.0
+		 * @version 1.8.9.1
 		 *
 		 * @param  array $args Additional arguments to pass to WP_Query.
 		 * @return WP_Query
@@ -88,7 +89,7 @@ if ( ! class_exists( 'Charitable_Campaigns' ) ) :
 				'meta_query' => array(
 					array(
 						'key'     => '_campaign_end_date',
-						'value'   => date( 'Y-m-d H:i:s' ),
+						'value'   => date( 'Y-m-d H:i:s' ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 						'compare' => '>=',
 						'type'    => 'datetime',
 					),

@@ -168,6 +168,15 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 		public $payment_labels = array( 'No donations found' );
 
 		/**
+		 * The payment gateway keys for the payment report/graph (used for color mapping).
+		 *
+		 * @since 1.8.1
+		 *
+		 * @var   array
+		 */
+		public $payment_keys = array();
+
+		/**
 		 * The activities data.
 		 *
 		 * @since 1.8.1
@@ -1229,9 +1238,11 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 		 */
 		public function report_vars() {
 
+			$localized_strings = $this->get_localized_strings();
+
 			?>
 			<script id="charitable-report-data-js">
-				var charitable_reporting = <?php echo wp_json_encode( $this->get_localized_strings() ); ?>;
+				var charitable_reporting = <?php echo wp_json_encode( $localized_strings, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); ?>;
 			</script>
 
 			<?php
@@ -1296,15 +1307,31 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 
 				$payment = ( ! empty( $donation->payment_gateway ) ? strtolower( esc_attr( $donation->payment_gateway ) ) : $payment = 'unknown' );
 
-				// cap the P in Paypal manually.
-				$label = ( 'paypal' === strtolower( $donation->payment_gateway ) ) ? 'PayPal' : ucwords( $donation->payment_gateway );
+				// Get the proper label from the gateway object if available.
+				$label = '';
+				$gateways = charitable_get_helper( 'gateways' );
+				if ( $gateways && $gateways->is_valid_gateway( $payment ) ) {
+					$gateway_object = $gateways->get_gateway_object( $payment );
+					if ( $gateway_object ) {
+						$label = $gateway_object->get_label();
+					}
+				}
+
+				// Fallback to manual label generation if gateway object is not available.
+				if ( empty( $label ) ) {
+					// cap the P in Paypal manually.
+					$label = ( 'paypal' === strtolower( $donation->payment_gateway ) ) ? 'PayPal' : ucwords( str_replace( '_', ' ', $donation->payment_gateway ) );
+				}
 
 				if ( isset( $donations_by_payment[ $payment ] ) ) {
-					// $donations_by_payment[ $payment ]['label'] = esc_html( $donation->payment_gateway );
+					// Update the label if it wasn't set in the default array.
+					if ( ! empty( $label ) ) {
+						$donations_by_payment[ $payment ]['label'] = esc_html( $label );
+					}
 					$donations_by_payment[ $payment ]['amount'] += $donation->total_amount;
 					$donations_by_payment[ $payment ]['donors'] += 1;
 				} else {
-					$donations_by_payment[ $payment ]['label']  = esc_html( ( $label ) );
+					$donations_by_payment[ $payment ]['label']  = esc_html( $label );
 					$donations_by_payment[ $payment ]['amount'] = $donation->total_amount;
 					$donations_by_payment[ $payment ]['donors'] = 1;
 					$donations_by_payment[ $payment ]['title']  = $donation->title;
@@ -1313,6 +1340,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 
 			$this->payment_percentages = array();
 			$this->payment_labels      = array();
+			$this->payment_keys        = array();
 
 			foreach ( $donations_by_payment as $key => $donation ) {
 
@@ -1322,6 +1350,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 
 				$this->payment_percentages[] = $percentage;
 				$this->payment_labels[]      = $donation['label']; // . '% (' . charitable_format_money( $donation['amount'] ) . ')';
+				$this->payment_keys[]        = $key; // Store the payment gateway key for color mapping.
 
 			}
 
@@ -1329,9 +1358,11 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 				// no donations were likely found so let's add the "not found" data.
 				$this->payment_percentages[] = 100;
 				$this->payment_labels[]      = __( 'No donations found.', 'charitable' );
+				$this->payment_keys[]        = 'none';
 			} else {
 				$this->payment_percentages[] = 0;
 				$this->payment_labels[]      = '';
+				$this->payment_keys[]        = '';
 			}
 
 			$donations_by_payment = apply_filters( 'charitable_reports_donations_by_payment_data', $donations_by_payment );
@@ -1555,8 +1586,17 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 
 			$args = wp_parse_args( $args, $defaults );
 
-			// break up array into individual vars.
-			extract( $args ); // phpcs:ignore
+			// Extract individual variables from args array.
+			$activity_filter_types = $args['activity_filter_types'] ?? array();
+			$activity_action_types = $args['activity_action_types'] ?? array();
+			$start_date            = $args['start_date'] ?? false;
+			$end_date              = $args['end_date'] ?? false;
+			$status                = $args['status'] ?? false;
+			$campaign_id           = $args['campaign_id'] ?? false;
+			$category_id           = $args['category_id'] ?? false;
+			$limit                 = $args['limit'] ?? false;
+			$offset                = $args['offset'] ?? false;
+			$ppage                 = $args['ppage'] ?? false;
 
 			if ( ! class_exists( 'Charitable_Admin_Activities' ) || ! class_exists( 'Charitable_Donation_Activities_DB' ) || ! class_exists( 'Charitable_Campaign_Activities_DB' ) ) {
 				return;
@@ -1906,8 +1946,10 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 
 			$args = wp_parse_args( $args, $defaults );
 
-			// break up array into individual vars.
-			extract( $args ); // phpcs:ignore
+			// Extract individual variables from args array.
+			$limit  = $args['limit'] ?? false;
+			$offset = $args['offset'] ?? false;
+			$ppage  = $args['ppage'] ?? false;
 
 			if ( ! $offset && $ppage && $limit ) {
 				$offset = ( $ppage - 1 ) * $limit;
@@ -2034,10 +2076,14 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 			}
 
 			// sort multi-dimensional array by 'total_donation_amount'.
+			// @since 1.8.8.6 - Fixed undefined property warning by checking if property exists before accessing.
 			usort(
 				$donations_by_donors,
 				function ( $a, $b ) {
-					return $b->total_donation_amount - $a->total_donation_amount;
+					// @since 1.8.8.6 - Check if total_donation_amount exists, default to 0 if not set.
+					$a_amount = isset( $a->total_donation_amount ) ? $a->total_donation_amount : 0;
+					$b_amount = isset( $b->total_donation_amount ) ? $b->total_donation_amount : 0;
+					return $b_amount - $a_amount;
 				}
 			);
 
@@ -2177,8 +2223,13 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 
 			$args = wp_parse_args( $args, $defaults );
 
-			// break up array into individual vars.
-			extract( $args ); // phpcs:ignore
+			// Extract individual variables from args array.
+			$report_type = $args['report_type'] ?? 'overview';
+			$start_date  = $args['start_date'] ?? false;
+			$end_date    = $args['end_date'] ?? false;
+			$post_status = $args['post_status'] ?? 'charitable-completed';
+			$campaign_id = $args['campaign_id'] ?? false;
+			$category_id = $args['category_id'] ?? false;
 
 			// Check the post_status and set it to the default if it's not a valid status.
 			if ( ! in_array( $post_status, array( 'charitable-completed', 'charitable-pending', 'charitable-failed', 'charitable-cancelled', 'charitable-refunded' ), true ) ) {
@@ -2429,8 +2480,15 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 
 			$args = wp_parse_args( $args, $defaults );
 
-			// break up array into individual vars.
-			extract( $args ); // phpcs:ignore
+			// Extract individual variables from args array.
+			$report_type = $args['report_type'] ?? 'donors-top';
+			$start_date  = $args['start_date'] ?? false;
+			$end_date    = $args['end_date'] ?? false;
+			$campaign_id = $args['campaign_id'] ?? false;
+			$category_id = $args['category_id'] ?? false;
+			$limit       = $args['limit'] ?? false;
+			$offset      = $args['offset'] ?? false;
+			$ppage       = $args['ppage'] ?? false;
 
 			// Determine if this particular report gets sample data, or if not if it's has been cached recently.
 			$this->donors = ! charitable_is_pro() ? $this->get_data_sample( $report_type ) : false; // $this->get_cached_report( $report_type, $start_date, $end_date, false, $campaign_id, $category_id );
@@ -2711,6 +2769,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 		 * This accepts a report type and date and attemps to create a refund "report".
 		 *
 		 * @since  1.8.1
+		 * @version 1.8.8.6
 		 *
 		 * @param  string $campaign_id The campaign ID.
 		 * @param  string $limit The limit of refunds to get.
@@ -2722,59 +2781,93 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 			global $wpdb;
 
 			$where_sql   = array();
-			$where_sql[] = 'p.post_status = "charitable-refunded"';
+			$prepare_args = array();
+
+			$where_sql[] = 'p.post_status = %s';
+			$prepare_args[] = 'charitable-refunded';
 
 			// add to $where_sql depending on the values of $start_date and $end_date.
 			if ( $this->start_date ) {
-				$where_sql[] = "p.post_date >= '{$this->start_date} 00:00:00'";
+				$where_sql[] = 'p.post_date >= %s';
+				$prepare_args[] = $this->start_date . ' 00:00:00';
 			}
 			if ( $this->end_date ) {
-				$where_sql[] = "p.post_date <= '{$this->end_date} 23:59:59'";
+				$where_sql[] = 'p.post_date <= %s';
+				$prepare_args[] = $this->end_date . ' 23:59:59';
 			}
 
-			$where_sql[] = 'pm1.meta_key = "donation_gateway"';
+			$where_sql[] = 'pm1.meta_key = %s';
+			$prepare_args[] = 'donation_gateway';
 
-			$where_args = implode( ' AND ', $where_sql );
+			$where_clause = implode( ' AND ', $where_sql );
+
+			// Build prepare args with post_type first, then where clause args.
+			$all_prepare_args = array_merge( array( 'donation' ), $prepare_args );
 
 			// get all donations (posts with a post type of donation) between a start date and an end date.
-			$refunded_donations = $wpdb->get_results( // phpcs:ignore
-				$wpdb->prepare(
-					"SELECT SUM(cd.amount) AS total_amount,
-					COUNT(p.ID) AS total_number_of_refunds,
-					cd.donation_id AS donation_id,
-					cd.campaign_id AS campaign_id,
-					cd.donor_id AS donor_id,
-					cd.amount AS amount,
-					pm1.meta_value AS payment_gateway,
-					p.post_date AS post_date,
-					p.post_date_gmt AS post_date_gmt
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+			// $where_clause is built with placeholders (%s) that are properly processed by $wpdb->prepare().
+			// The interpolation is safe because all values in $where_clause are placeholders, not raw values.
+			$refunded_donations = $wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT SUM(cd.amount) AS total_amount,
+						COUNT(p.ID) AS total_number_of_refunds,
+						cd.donation_id AS donation_id,
+						cd.campaign_id AS campaign_id,
+						cd.donor_id AS donor_id,
+						cd.amount AS amount,
+						pm1.meta_value AS payment_gateway,
+						p.post_date AS post_date,
+						p.post_date_gmt AS post_date_gmt
 					FROM {$wpdb->posts} p
 					LEFT JOIN {$wpdb->prefix}charitable_campaign_donations cd ON p.ID = cd.donation_id
 					LEFT JOIN {$wpdb->prefix}postmeta pm1 ON p.ID = pm1.post_id
-					WHERE p.post_type = %s AND {$where_args}
+					WHERE p.post_type = %s AND {$where_clause}
 					GROUP BY p.ID",
-					'donation'
-				)
-			);
+						...$all_prepare_args
+					)
+				);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 			$refunds_by_day                  = array();
 			$refunded_donations_total_amount = 0;
 			$refunded_donations_total_count  = 0;
+			$processed_donation_ids         = array(); // Track unique donation IDs to avoid double-counting
 
 			$days = $this->get_days_between_dates( $this->start_date, $this->end_date );
 
+			// First, calculate totals from all refunded donations (regardless of day matching)
+			// This ensures count and amount are consistent
+			if ( ! empty( $refunded_donations ) ) {
+				foreach ( $refunded_donations as $refunded_donation ) {
+					// Only count each unique donation ID once
+					$donation_id = isset( $refunded_donation->donation_id ) ? intval( $refunded_donation->donation_id ) : 0;
+					if ( $donation_id > 0 && ! in_array( $donation_id, $processed_donation_ids, true ) ) {
+						$refunded_donations_total_amount += floatval( $refunded_donation->amount );
+						$refunded_donations_total_count++;
+						$processed_donation_ids[] = $donation_id;
+					}
+				}
+			}
+
+			// Then, organize by day for the breakdown
 			foreach ( $days as $day ) {
 				$donation_day             = gmdate( 'Y-m-d', strtotime( $day ) );
 				$refunded_donation_amount = 0;
 				$refunded_donation_count  = 0;
+				$processed_day_donation_ids = array(); // Track unique donation IDs per day
 				if ( ! empty( $refunded_donations ) ) :
 					foreach ( $refunded_donations as $refunded_donation ) {
 						// if the refunded donation post date is the same day as the donation_day, add it to the refunded total.
-						if ( gmdate( 'Y-m-d', strtotime( $refunded_donation->post_date_gmt ) ) === $donation_day ) {
-							$refunded_donation_amount        += $refunded_donation->amount;
-							$refunded_donations_total_amount += $refunded_donation->amount;
-							++$refunded_donation_count;
-							++$refunded_donations_total_count;
+						$refund_date = gmdate( 'Y-m-d', strtotime( $refunded_donation->post_date_gmt ) );
+						if ( $refund_date === $donation_day ) {
+							$donation_id = isset( $refunded_donation->donation_id ) ? intval( $refunded_donation->donation_id ) : 0;
+							// Only count each unique donation ID once per day
+							if ( $donation_id > 0 && ! in_array( $donation_id, $processed_day_donation_ids, true ) ) {
+								$refunded_donation_amount += floatval( $refunded_donation->amount );
+								++$refunded_donation_count;
+								$processed_day_donation_ids[] = $donation_id;
+							}
 						}
 					}
 				endif;
@@ -3544,11 +3637,21 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 
 			$currency_helper = charitable_get_currency_helper();
 
+			// Decode HTML entities in currency symbol to prevent double-encoding in JSON.
+			// The currency symbol comes as HTML entities (e.g., &#36; for $), so we decode it
+			// before passing to JavaScript to avoid double-encoding issues.
+			// This ensures the currency symbol is a plain character that won't be double-encoded.
+			$currency_symbol = $currency_helper->get_currency_symbol();
+			// Decode HTML entities to get the plain character (e.g., &#36; becomes $).
+			$currency_symbol = html_entity_decode( $currency_symbol, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+			$decimal_count   = $currency_helper->get_decimals();
+
 			$strings = array(
 				'version'                       => Charitable::VERSION,
 				'nonce'                         => wp_create_nonce( 'charitable-reporting' ),
 				'admin_nonce'                   => wp_create_nonce( 'charitable-admin' ),
-				'currency_symbol'               => $currency_helper->get_currency_symbol(),
+				'currency_symbol'               => $currency_symbol,
+				'decimal_count'                 => (int) $decimal_count,
 				'ajax_url'                      => admin_url( 'admin-ajax.php' ),
 				'date_select_day'               => 'DD',
 				'date_select_month'             => 'MM',
@@ -3559,6 +3662,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 				'payment_methods_chart_options' => array(
 					'payment_percentages' => (array) array_reverse( $this->payment_percentages ),
 					'payment_labels'      => (array) array_reverse( $this->payment_labels ),
+					'payment_keys'        => (array) array_reverse( $this->payment_keys ),
 				),
 				'default_start_date'            => current_time( gmdate( 'Y-m-d', strtotime( '-1 month' ) ) ),
 				'default_end_date'              => current_time( gmdate( 'Y-m-d' ) ),

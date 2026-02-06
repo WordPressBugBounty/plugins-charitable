@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version.  1.8.0
+ * @version   1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -20,6 +20,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Donation_Options' ) ) :
 	 * General subpanel for Settings Panel for campaign builder.
 	 *
 	 * @since 1.8.0
+	 * @version 1.8.9.1
 	 */
 	class Charitable_Builder_Panel_Settings_Donation_Options {
 
@@ -75,7 +76,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Donation_Options' ) ) :
 
 			$active = ( true === apply_filters( 'charitable_campaign_builder_settings_sidebar_active', $this->active, $this->slug ) ) ? 'active' : false;
 
-			echo '<a href="#" class="charitable-panel-sidebar-section charitable-panel-sidebar-section-' . $this->slug . ' ' . $active . '" data-section="' . $this->slug . '">' . $this->primary_label . ' <i class="fa fa-angle-right charitable-toggle-arrow"></i></a>';
+			echo '<a href="#" class="charitable-panel-sidebar-section charitable-panel-sidebar-section-' . esc_attr( $this->slug ) . ' ' . esc_attr( $active ) . '" data-section="' . esc_attr( $this->slug ) . '">' . esc_html( $this->primary_label ) . ' <i class="fa fa-angle-right charitable-toggle-arrow"></i></a>';
 		}
 
 		/**
@@ -124,6 +125,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Donation_Options' ) ) :
 		 * Generate panel content.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.9.1
 		 */
 		public function panel_content( $campaign_data = false ) { // phpcs:ignore
 
@@ -143,42 +145,50 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Donation_Options' ) ) :
 
 				<?php
 
-					echo $charitable_builder_form_fields->generate_donation_amounts(
-						$settings->campaign_data_settings( 'donation_amounts', 'donation-options' ),
-						esc_html__( 'Suggested Donation Amounts', 'charitable' ),
-						array(
-							'id'      => 'campaign_donation_amounts',
-							'name'    => array( 'settings', esc_attr( $this->slug ), 'donation_amounts' ),
-							'default' => $settings->campaign_data_settings( 'suggested_donations_default', 'donation-options' ),
-						)
-					);
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				$suggested_donations_default = $settings->campaign_data_settings( 'suggested_donations_default', 'donation-options' );
 
-					echo $charitable_builder_form_fields->generate_text(
-						$settings->campaign_data_settings( 'minimum_donation_amount', 'donation-options' ),
-						esc_html__( 'Minimum Donation Amount', 'charitable' ),
-						array(
-							'id'              => 'campaign_minimum_donation_amount',
-							'name'            => array( 'settings', esc_attr( $this->slug ), 'minimum_donation_amount' ),
-							'placeholder'     => '',
-							// 'add_commas'  => true,
-							'description'     => esc_html__( 'Leave empty to allow no restrictions on how small the donation can be.', 'charitable' ),
-							'icon'        => function_exists( 'charitable_get_currency_helper' ) ? charitable_get_currency_helper()->get_currency_symbol() : 'images/campaign-builder/settings/goal_dollar.png',
-							'container_class' => 'charitable-format-money',
-						)
-					);
+				echo $charitable_builder_form_fields->generate_donation_amounts( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					$settings->campaign_data_settings( 'donation_amounts', 'donation-options' ),
+					esc_html__( 'Suggested Donation Amounts', 'charitable' ),
+					array(
+						'id'      => 'campaign_donation_amounts',
+						'name'    => array( 'settings', esc_attr( $this->slug ), 'donation_amounts' ),
+						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						'default' => $suggested_donations_default,
+					)
+				);
 
-					$default_allow_custom = ! empty( $_GET['campaign_id'] ) ? $settings->campaign_data_settings( 'allow_custom_donations', 'donation-options' ) : '1';
+				$currency_symbol_raw = function_exists( 'charitable_get_currency_helper' ) ? charitable_get_currency_helper()->get_currency_symbol() : 'images/campaign-builder/settings/goal_dollar.png';
+				$currency_symbol = wp_kses_post( $currency_symbol_raw );
 
-					echo $charitable_builder_form_fields->generate_toggle(
-						$default_allow_custom,
-						esc_html__( 'Allow Custom Donations', 'charitable' ),
-						array(
-							'id'              => 'campaign_allow_custom_donations',
-							'checked_value'   => '1',
-							'name'            => array( 'settings', esc_attr( $this->slug ), 'allow_custom_donations' ),
-							'container_class' => 'charitable-campaign-builder-allow-custom-donations',
-						)
-					);
+				echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					$settings->campaign_data_settings( 'minimum_donation_amount', 'donation-options' ),
+					esc_html__( 'Minimum Donation Amount', 'charitable' ),
+					array(
+						'id'              => 'campaign_minimum_donation_amount',
+						'name'            => array( 'settings', esc_attr( $this->slug ), 'minimum_donation_amount' ),
+						'placeholder'     => '',
+						// 'add_commas'  => true,
+						'description'     => esc_html__( 'Leave empty to allow no restrictions on how small the donation can be.', 'charitable' ),
+						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						'icon'        => $currency_symbol,
+						'container_class' => 'charitable-format-money',
+					)
+				);
+
+					$default_allow_custom = ! empty( $_GET['campaign_id'] ) ? $settings->campaign_data_settings( 'allow_custom_donations', 'donation-options' ) : '1'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+				echo $charitable_builder_form_fields->generate_toggle( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					$default_allow_custom,
+					esc_html__( 'Allow Custom Donations', 'charitable' ),
+					array(
+						'id'              => 'campaign_allow_custom_donations',
+						'checked_value'   => '1',
+						'name'            => array( 'settings', esc_attr( $this->slug ), 'allow_custom_donations' ),
+						'container_class' => 'charitable-campaign-builder-allow-custom-donations',
+					)
+				);
 
 					do_action( 'charitable_campaign_builder_settings_donation_options_after', $this->active, $this->slug );
 
@@ -190,7 +200,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings_Donation_Options' ) ) :
 
 			$html = ob_get_clean();
 
-			echo $html;
+			echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	}
 

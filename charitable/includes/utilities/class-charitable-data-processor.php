@@ -65,6 +65,15 @@ if ( ! class_exists( 'Charitable_Data_Processor' ) ) :
 		protected $output;
 
 		/**
+		 * Whether the data is invalid.
+		 *
+		 * @since 1.5.9
+		 *
+		 * @var   boolean
+		 */
+		protected $invalid;
+
+		/**
 		 * Instantiate the formatter with a dataset and array of fields.
 		 *
 		 * @since 1.5.9
@@ -309,7 +318,12 @@ if ( ! class_exists( 'Charitable_Data_Processor' ) ) :
 		/**
 		 * Sanitize a value received from a datepicker.
 		 *
-		 * @since  1.5.9
+		 * When decline_months is on, the JS datepicker sends yy-mm-dd (e.g. 2026-2-1).
+		 * We normalize to Y-m-d (e.g. 2026-02-01) so MySQL and PHP never interpret
+		 * the string as d-m-y (e.g. January 2 instead of February 1).
+		 *
+		 * @since   1.5.9
+		 * @version 1.8.9.2
 		 *
 		 * @param  string $value The datepicker value.
 		 * @return string|int If a date was chosen, returns the date in YYYY-MM-DD format.
@@ -322,6 +336,21 @@ if ( ! class_exists( 'Charitable_Data_Processor' ) ) :
 
 			if ( ! charitable()->registry()->get( 'i18n' )->decline_months() ) {
 				$value = charitable_sanitize_date( $value, 'Y-m-d' );
+				if ( false === $value ) {
+					$value = 0;
+				}
+			} else {
+				// Normalize to canonical Y-m-d so MySQL/PHP never interpret as d-m-y.
+				$value = trim( $value );
+				$dt    = DateTime::createFromFormat( 'Y-m-d', $value );
+				if ( ! $dt ) {
+					$dt = DateTime::createFromFormat( 'Y-n-j', $value );
+				}
+				if ( $dt ) {
+					$value = $dt->format( 'Y-m-d' );
+				} else {
+					$value = 0;
+				}
 			}
 
 			return $value;
@@ -447,7 +476,7 @@ if ( ! class_exists( 'Charitable_Data_Processor' ) ) :
 		 * @return boolean
 		 */
 		protected function picture_file_exists( $key ) {
-			return isset( $_FILES ) && isset( $_FILES[ $key ] );
+			return isset( $_FILES ) && isset( $_FILES[ $key ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		}
 
 		/**

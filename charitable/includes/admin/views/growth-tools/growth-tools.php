@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display the main tools page wrapper.
  *
@@ -8,30 +14,31 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.1.6
  * @version   1.8.1.6
+ * @version   1.8.8.6
  */
 
-$active_tab      = isset( $_GET['tab'] ) ? esc_html( $_GET['tab'] ) : '';  // phpcs:ignore
+$charitable_active_tab      = isset( $_GET['tab'] ) ? esc_html( $_GET['tab'] ) : '';  // phpcs:ignore
 
-$sections      = [
+$charitable_sections      = [
 	'featured'   => esc_html__( 'Featured', 'charitable' ),
 	'traffic'    => esc_html__( 'Traffic', 'charitable' ),
 	'engagement' => esc_html__( 'Engagement', 'charitable' ),
 	'revenue'    => esc_html__( 'Revenue', 'charitable' ),
 	'guides'     => esc_html__( 'Guides & Resources', 'charitable' ),
 ];
-$section_tools = array();
+$charitable_section_tools = array();
 
-$growth_tools = Charitable_Guide_Tools::get_instance();
+$charitable_growth_tools = Charitable_Guide_Tools::get_instance();
 
-$tools       = $growth_tools->get_growth_tools();
-$show_button = true;
+$charitable_tools       = $charitable_growth_tools->get_growth_tools();
+$charitable_show_button = true;
 
-if ( is_array( $tools ) && ! empty( $tools ) ) :
+if ( is_array( $charitable_tools ) && ! empty( $charitable_tools ) ) :
 
-	foreach ( $tools as $slug => $tool_info ) :
+	foreach ( $charitable_tools as $charitable_slug => $charitable_tool_info ) :
 
-		if ( isset( $tool_info['gt_section'] ) ) {
-			$section_tools[ $tool_info['gt_section'] ][ $slug ] = $tool_info;
+		if ( isset( $charitable_tool_info['gt_section'] ) ) {
+			$charitable_section_tools[ $charitable_tool_info['gt_section'] ][ $charitable_slug ] = $charitable_tool_info;
 		}
 
 endforeach;
@@ -44,14 +51,14 @@ ob_start();
 <div id="charitable-growth-tools" class="wrap">
 	<h2 class="nav-tab-wrapper">
 		<?php
-		foreach ( $sections as $section_slug => $section_title ) :
+		foreach ( $charitable_sections as $charitable_section_slug => $charitable_section_title ) :
 
-			if ( ! isset( $section_tools[ $section_slug ] ) || empty( $section_tools[ $section_slug ] ) ) {
+			if ( ! isset( $charitable_section_tools[ $charitable_section_slug ] ) || empty( $charitable_section_tools[ $charitable_section_slug ] ) ) {
 				continue;
 			}
 
 			?>
-		<a href="#<?php echo esc_attr( sanitize_title( $section_slug ) ); ?>" class="nav-tab <?php echo $active_tab === $section_slug ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( $section_title ); ?></a>
+		<a href="#<?php echo esc_attr( sanitize_title( $charitable_section_slug ) ); ?>" class="nav-tab <?php echo $charitable_active_tab === $charitable_section_slug ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( $charitable_section_title ); ?></a>
 		<?php endforeach; ?>
 
 	</h2>
@@ -62,53 +69,53 @@ ob_start();
 
 			<?php
 
-			if ( is_array( $sections ) && ! empty( $sections ) ) :
+			if ( is_array( $charitable_sections ) && ! empty( $charitable_sections ) ) :
 
-				foreach ( $sections as $section_slug => $section_title ) :
+				foreach ( $charitable_sections as $charitable_section_slug => $charitable_section_title ) :
 
-					if ( ! isset( $section_tools[ $section_slug ] ) || empty( $section_tools[ $section_slug ] ) ) {
+					if ( ! isset( $charitable_section_tools[ $charitable_section_slug ] ) || empty( $charitable_section_tools[ $charitable_section_slug ] ) ) {
 						continue;
 					}
 
 					?>
 
-					<section id="charitable-section-<?php echo esc_attr( $section_slug ); ?>" class="charitable-growth-block">
-						<a id="wpchr-<?php echo esc_attr( $section_slug ); ?>"></a>
-						<h2 class="charitable-growth-block-title"><?php echo esc_html( $section_title ); ?></h2>
+					<section id="charitable-section-<?php echo esc_attr( $charitable_section_slug ); ?>" class="charitable-growth-block">
+						<a id="wpchr-<?php echo esc_attr( $charitable_section_slug ); ?>"></a>
+						<h2 class="charitable-growth-block-title"><?php echo esc_html( $charitable_section_title ); ?></h2>
 						<div class="charitable-growth-item">
 
 						<?php
 
-						foreach ( $section_tools[ $section_slug ] as $tool_slug => $tool_info ) :
+						foreach ( $charitable_section_tools[ $charitable_section_slug ] as $charitable_tool_slug => $charitable_tool_info ) :
 
-							if ( empty( $tool_info ) ) {
+							if ( empty( $charitable_tool_info ) ) {
 								continue;
 							}
 
-							$content_class = '';
+							$charitable_content_class = '';
 
-							if ( isset( $tool_info['coming_soon'] ) && true === $tool_info['coming_soon'] ) {
-								$content_class = 'charitable-growth-coming-soon';
-								$show_button   = false;
+							if ( isset( $charitable_tool_info['coming_soon'] ) && true === $charitable_tool_info['coming_soon'] ) {
+								$charitable_content_class = 'charitable-growth-coming-soon';
+								$charitable_show_button   = false;
 							}
 
 							?>
 
-								<div class="charitable-growth-content <?php echo esc_attr( $content_class ); ?>" id="charitable-growth-content-<?php echo esc_attr( $tool_info['id'] ); ?>">
+								<div class="charitable-growth-content <?php echo esc_attr( $charitable_content_class ); ?>" id="charitable-growth-content-<?php echo esc_attr( $charitable_tool_info['id'] ); ?>">
 
-									<a id="wpchr-<?php echo esc_attr( $tool_info['id'] ); ?>"></a>
+									<a id="wpchr-<?php echo esc_attr( $charitable_tool_info['id'] ); ?>"></a>
 
 									<div class="charitable-growth-content-icon_container">
-										<div class="charitable-growth-content-icon icon-<?php echo esc_attr( $tool_info['id'] ); ?>"></div>
+										<div class="charitable-growth-content-icon icon-<?php echo esc_attr( $charitable_tool_info['id'] ); ?>"></div>
 									</div>
 
 									<div class="charitable-growth-content-desc_container">
-										<h3 class="charitable-growth-desc-title"><?php echo esc_html( $tool_info['title'] ); ?></h3>
-										<?php if ( ! empty( $tool_info['excerpt'] ) ) : ?>
+										<h3 class="charitable-growth-desc-title"><?php echo esc_html( $charitable_tool_info['title'] ); ?></h3>
+										<?php if ( ! empty( $charitable_tool_info['excerpt'] ) ) : ?>
 										<p class="charitable-growth-desc-excerpt">
 											<?php
 											echo wp_kses(
-												$tool_info['excerpt'],
+												$charitable_tool_info['excerpt'],
 												[
 													'a'    => [
 														'href'   => [],
@@ -123,18 +130,18 @@ ob_start();
 											?>
 										</p>
 										<?php endif; ?>
-										<?php if ( ! empty( $tool_info['why'] ) ) : ?>
-												<p class="charitable-growth-desc-why"><strong><?php echo esc_html__( 'TIP:', 'charitable' ); ?></strong> <?php echo $tool_info['why']; // phpcs:ignore ?></p>
+										<?php if ( ! empty( $charitable_tool_info['why'] ) ) : ?>
+												<p class="charitable-growth-desc-why"><strong><?php echo esc_html__( 'TIP:', 'charitable' ); ?></strong> <?php echo $charitable_tool_info['why']; // phpcs:ignore ?></p>
 										<?php endif; ?>
 									</div>
 									<div class="charitable-growth-content-button_container">
 										<div>
-											<?php if ( $show_button ) : ?>
+											<?php if ( $charitable_show_button ) : ?>
 												<?php
 
 													$charitable_plugins_third_party = new Charitable_Admin_Plugins_Third_Party();
-													$plugin_button_html             = $charitable_plugins_third_party->get_plugin_button_html( $tool_slug, false, '' );
-                                                    echo $plugin_button_html; // phpcs:ignore
+													$charitable_plugin_button_html             = $charitable_plugins_third_party->get_plugin_button_html( $charitable_tool_slug, false, '' );
+                                                    echo $charitable_plugin_button_html; // phpcs:ignore
 
 												?>
 											<?php endif; ?>

@@ -93,7 +93,7 @@ if ( ! class_exists( 'Charitable_About' ) ) :
 			// If the user tries to load an invalid view - redirect to About Us.
 			$valid_views = [ 'about', 'lite-vs-pro' ];
 			if ( ! in_array( $this->view, $valid_views, true ) ) {
-				wp_redirect( admin_url( 'admin.php?page=charitable-about&view=about' ) );
+				wp_safe_redirect( admin_url( 'admin.php?page=charitable-about&view=about' ) );
 				exit;
 			}
 

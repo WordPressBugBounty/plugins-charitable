@@ -354,7 +354,7 @@ function charitable_find_photo_in_campaign_settings( $campaign_settings ) {
  *
  * @return mixed
  */
-function chartitable_get_image_attached_id_from_url( $image_url = false ) {
+function chartitable_get_image_attached_id_from_url( $image_url = false ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- This is a legacy function that cannot be renamed.
 	global $wpdb;
 	if ( ! $image_url ) {
 		return false;

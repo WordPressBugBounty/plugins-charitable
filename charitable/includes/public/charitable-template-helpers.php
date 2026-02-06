@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
- * @version   1.6.34
+ * @version   1.8.9.1
  */
 
 // Exit if accessed directly.
@@ -290,7 +290,7 @@ function charitable_get_current_url() {
 
 	return trailingslashit(
 		add_query_arg(
-			array_key_exists( 'QUERY_STRING', $_SERVER ) ? $_SERVER['QUERY_STRING'] : '',
+			array_key_exists( 'QUERY_STRING', $_SERVER ) ? $_SERVER['QUERY_STRING'] : '', // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			'',
 			home_url( $wp->request )
 		)
@@ -305,8 +305,8 @@ function charitable_get_current_url() {
  * @return string
  */
 function charitable_get_login_redirect_url() {
-	if ( isset( $_REQUEST['redirect_to'] ) ) {
-		$redirect = $_REQUEST['redirect_to'];
+	if ( isset( $_REQUEST['redirect_to'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$redirect = $_REQUEST['redirect_to']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 	} elseif ( charitable_get_permalink( 'profile_page' ) ) {
 		$redirect = charitable_get_permalink( 'profile_page' );
 	} else {

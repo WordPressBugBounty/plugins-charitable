@@ -10,6 +10,8 @@
  * @version   1.3.0
  */
 
+// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r,WordPress.PHP.DevelopmentFunctions.error_log_var_export
+
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -150,16 +152,16 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 			$webhook = $this->get_webhook();
 
 			if ( charitable_is_debug() ) {
-				error_log( 'add_webook' );
-				error_log( print_r( $webhook, true ) );
+				error_log( 'add_webook' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( print_r( $webhook, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 			}
 
 			if ( false === $webhook ) {
 				try {
 
 					if ( charitable_is_debug() ) {
-						error_log( 'add_webook false' );
-						error_log( print_r( $this->secret_key, true ) );
+						error_log( 'add_webook false' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+						error_log( print_r( $this->secret_key, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 					}
 
 					$this->gateway->setup_api( $this->secret_key );

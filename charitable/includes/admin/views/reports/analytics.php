@@ -1,10 +1,17 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display the MonsterInsights integration step for the Analytics report.
  *
  * @author  WP Charitable LLC
  * @since   1.0.0
  * @package Charitable/Admin Views/Reports
+ * @version 1.8.8.6
  */
 
 ?>
@@ -41,12 +48,12 @@
 		$charitable_plugins_third_party = new Charitable_Admin_Plugins_Third_Party();
 
 		// determine if the MonsterInsights plugin is installed and activated.
-		$is_monsterinsights_installed = $charitable_plugins_third_party->is_plugin_installed( 'monsterinsights' );
-		$is_monsterinsights_active    = $charitable_plugins_third_party->is_plugin_activated( 'monsterinsights' );
+		$charitable_is_monsterinsights_installed = $charitable_plugins_third_party->is_plugin_installed( 'monsterinsights' );
+		$charitable_is_monsterinsights_active    = $charitable_plugins_third_party->is_plugin_activated( 'monsterinsights' );
 
-		if ( ! $is_monsterinsights_installed ) {
+		if ( ! $charitable_is_monsterinsights_installed ) {
 
-			$install_button_html = $charitable_plugins_third_party->get_install_button_html( 'monsterinsights', esc_html__( 'Install MonsterInsights', 'charitable' ) );
+			$charitable_install_button_html = $charitable_plugins_third_party->get_install_button_html( 'monsterinsights', esc_html__( 'Install MonsterInsights', 'charitable' ) );
 
 			?>
 
@@ -54,7 +61,7 @@
 			<div class="instructions">
 				<h3><?php echo esc_html__( 'Install and Activate MonsterInsights', 'charitable' ); ?></h3>
 				<p><?php echo esc_html__( 'Install the MonsterInsights plugin by clicking this button', 'charitable' ); ?></p>
-				<?php echo $install_button_html; // phpcs:ignore ?>
+				<?php echo $charitable_install_button_html; // phpcs:ignore ?>
 			</div>
 			<div class="step">
 				<div class="vertical-wrapper">
@@ -64,13 +71,13 @@
 		</div>
 
 			<?php
-		} elseif ( ! $is_monsterinsights_active ) {
+		} elseif ( ! $charitable_is_monsterinsights_active ) {
 
-			$basename = $charitable_plugins_third_party->get_basename_from_slug( 'monsterinsights' );
+			$charitable_basename = $charitable_plugins_third_party->get_basename_from_slug( 'monsterinsights' );
 
-			if ( $basename ) :
+			if ( $charitable_basename ) :
 
-				$activate_button_html = $charitable_plugins_third_party->get_activation_button_html( 'monsterinsights', esc_html__( 'Activate MonsterInsights', 'charitable' ) );
+				$charitable_activate_button_html = $charitable_plugins_third_party->get_activation_button_html( 'monsterinsights', esc_html__( 'Activate MonsterInsights', 'charitable' ) );
 
 				?>
 
@@ -78,7 +85,7 @@
 			<div class="instructions">
 				<h3><?php echo esc_html__( 'Activate MonsterInsights', 'charitable' ); ?></h3>
 				<p><?php echo esc_html__( 'Activate MonsterInsights plugin by clicking this button:', 'charitable' ); ?></p>
-				<?php echo $activate_button_html; // phpcs:ignore ?>
+				<?php echo $charitable_activate_button_html; // phpcs:ignore ?>
 			</div>
 			<div class="step">
 				<div class="vertical-wrapper">
@@ -93,7 +100,7 @@
 
 		} else {
 
-			$setup_url = $charitable_plugins_third_party->get_setup_screen_for_plugin( 'monsterinsights' );
+			$charitable_setup_url = $charitable_plugins_third_party->get_setup_screen_for_plugin( 'monsterinsights' );
 
 			?>
 
@@ -101,7 +108,7 @@
 			<div class="instructions">
 				<h3><?php echo esc_html__( 'Setup MonsterInsights', 'charitable' ); ?></h3>
 				<p><?php echo esc_html__( 'Setup MonsterInsights plugin by clicking this button:', 'charitable' ); ?></p>
-				<a href="<?php echo esc_url( $setup_url ); ?>" target="_blank" class="charitable-button button-link charitable-button-setup"><?php echo esc_html__( 'Set Up MonsterInsights', 'charitable' ); ?></a>
+				<a href="<?php echo esc_url( $charitable_setup_url ); ?>" target="_blank" class="charitable-button button-link charitable-button-setup"><?php echo esc_html__( 'Set Up MonsterInsights', 'charitable' ); ?></a>
 			</div>
 			<div class="step">
 				<div class="vertical-wrapper">

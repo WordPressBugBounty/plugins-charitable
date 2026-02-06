@@ -3,23 +3,24 @@
  * Admin Notifications template.
  *
  * @since 1.8.3
+ * @version 1.8.8.6
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$active_count        = intval( $args['notifications']['active_count'] );
-$dismissed_count     = intval( $args['notifications']['dismissed_count'] );
-$notifications_title = $active_count > 1 ? esc_html__( 'New Notifications', 'charitable' ) : esc_html__( 'New Notifications', 'charitable' );
+$charitable_active_count        = intval( $args['notifications']['active_count'] );
+$charitable_dismissed_count     = intval( $args['notifications']['dismissed_count'] );
+$charitable_notifications_title = $charitable_active_count > 1 ? esc_html__( 'New Notifications', 'charitable' ) : esc_html__( 'New Notifications', 'charitable' );
 
 ?>
 
 <div class="charitable-plugin-notifications" id="charitable-plugin-notifications">
 	<div class="notification-menu">
 		<div class="notification-header">
-			<span class="new-notifications notifications-visible">(<span id="new-notifications-count"><strong><?php echo intval( $active_count ); ?></strong></span>) <?php echo esc_html( $notifications_title ); ?></span>
-			<span class="old-notifications">(<span id="dismissed-notifications-count"><strong><?php echo intval( $dismissed_count ); ?></strong></span>) <?php esc_attr_e( 'Dismissed Notifications', 'charitable' ); ?></span>
+			<span class="new-notifications notifications-visible">(<span id="new-notifications-count"><strong><?php echo intval( $charitable_active_count ); ?></strong></span>) <?php echo esc_html( $charitable_notifications_title ); ?></span>
+			<span class="old-notifications">(<span id="dismissed-notifications-count"><strong><?php echo intval( $charitable_dismissed_count ); ?></strong></span>) <?php esc_attr_e( 'Dismissed Notifications', 'charitable' ); ?></span>
 			<div class="dismissed-notifications">
 				<!---->
 				<a href="#" data-status="dismissed"><?php esc_attr_e( 'Dismissed Notifications', 'charitable' ); ?></a>
@@ -50,7 +51,7 @@ $notifications_title = $active_count > 1 ? esc_html__( 'New Notifications', 'cha
 			<?php
 
 				// Show the dismiss all button if there are active notifications.
-			if ( $active_count > 0 ) :
+			if ( $charitable_active_count > 0 ) :
 
 				?>
 			<div class="dismiss-all"><a href="#" class="dismiss"><?php esc_attr_e( 'Dismiss All', 'charitable' ); ?></a></div>

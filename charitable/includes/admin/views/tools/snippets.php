@@ -17,47 +17,50 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <?php
+/**
+ * @version 1.8.8.6
+ */
 
-$action_required    = false;
-$plugin_slug        = 'wpcode';
-$plugin_button_html = '';
-$snippets           = charitable_get_intergration_wpcode()->load_charitable_snippets();
+$charitable_action_required    = false;
+$charitable_plugin_slug        = 'wpcode';
+$charitable_plugin_button_html = '';
+$charitable_snippets           = charitable_get_intergration_wpcode()->load_charitable_snippets();
 
 $charitable_plugins_third_party = new Charitable_Admin_Plugins_Third_Party();
 
-$is_installed = $charitable_plugins_third_party->is_plugin_installed( $plugin_slug );
-$is_activated = $charitable_plugins_third_party->is_plugin_activated( $plugin_slug );
+$charitable_is_installed = $charitable_plugins_third_party->is_plugin_installed( $charitable_plugin_slug );
+$charitable_is_activated = $charitable_plugins_third_party->is_plugin_activated( $charitable_plugin_slug );
 
-if ( ! $is_installed ) {
-	$action_required = true;
+if ( ! $charitable_is_installed ) {
+	$charitable_action_required = true;
 
-	$popup_title       = esc_html__( 'Please Install WPCode to Use the Charitable Snippet Library', 'charitable' );
-	$popup_button_text = esc_html__( 'Install WPCode', 'charitable' );
+	$charitable_popup_title       = esc_html__( 'Please Install WPCode to Use the Charitable Snippet Library', 'charitable' );
+	$charitable_popup_button_text = esc_html__( 'Install WPCode', 'charitable' );
 
-	$plugin_button_html = $charitable_plugins_third_party->get_plugin_button_html( $plugin_slug, false, '' );
+	$charitable_plugin_button_html = $charitable_plugins_third_party->get_plugin_button_html( $charitable_plugin_slug, false, '' );
 
-} elseif ( ! $is_activated ) {
-	$action_required = true;
+} elseif ( ! $charitable_is_activated ) {
+	$charitable_action_required = true;
 
-	$popup_title       = esc_html__( 'Please Activate WPCode to Use the Charitable Snippet Library', 'charitable' );
-	$popup_button_text = esc_html__( 'Activate WPCode', 'charitable' );
+	$charitable_popup_title       = esc_html__( 'Please Activate WPCode to Use the Charitable Snippet Library', 'charitable' );
+	$charitable_popup_button_text = esc_html__( 'Activate WPCode', 'charitable' );
 
-	$plugin_button_html = $charitable_plugins_third_party->get_plugin_button_html( $plugin_slug, false, '' );
+	$charitable_plugin_button_html = $charitable_plugins_third_party->get_plugin_button_html( $charitable_plugin_slug, false, '' );
 }
 
-$container_class = $action_required ? 'charitable-wpcode-blur' : '';
+$charitable_container_class = $charitable_action_required ? 'charitable-wpcode-blur' : '';
 
 ?>
 
 <div class="charitable-wpcode">
-	<?php if ( $action_required ) : ?>
+	<?php if ( $charitable_action_required ) : ?>
 		<div class="charitable-wpcode-popup">
-			<div class="charitable-wpcode-popup-title"><?php echo esc_html( $popup_title ); ?></div>
+			<div class="charitable-wpcode-popup-title"><?php echo esc_html( $charitable_popup_title ); ?></div>
 			<div class="charitable-wpcode-popup-description">
 				<?php esc_html_e( 'Using WPCode, you can install Charitable code snippets with 1 click right from this page or the WPCode Library in the WordPress admin.', 'charitable' ); ?>
 			</div>
 
-			<?php echo $plugin_button_html; // phpcs:ignore ?>
+			<?php echo $charitable_plugin_button_html; // phpcs:ignore ?>
 
 			<a
 					href="https://wordpress.org/plugins/insert-headers-and-footers/?utm_source=charitableplugin&utm_medium=WPCode+WordPress+Repo&utm_campaign=plugin&utm_content=WPCode"
@@ -68,7 +71,8 @@ $container_class = $action_required ? 'charitable-wpcode-blur' : '';
 		</div>
 	<?php endif; ?>
 
-	<div class="charitable-wpcode-container <?php echo sanitize_html_class( $container_class ); ?>">
+	<div class="charitable-wpcode-container <?php echo sanitize_html_class( $charitable_container_class ); ?>">
+		<h4 id="code-snippets"><?php esc_html_e( 'Code Snippets', 'charitable' ); ?></h4>
 		<div class="charitable-setting-row tools charitable-wpcode-header">
 			<div class="charitable-wpcode-header-meta">
 				<p>
@@ -120,27 +124,27 @@ $container_class = $action_required ? 'charitable-wpcode-blur' : '';
 		<div id="charitable-wpcode-snippets-list">
 			<div class="charitable-wpcode-snippets-list">
 				<?php
-				foreach ( $snippets as $snippet ) :
-					$button_text       = $snippet['installed'] ? __( 'Edit Snippet', 'charitable' ) : __( 'Install Snippet', 'charitable' );
-					$button_type_class = $snippet['installed'] ? 'button-primary' : 'button-secondary';
-					$button_action     = $snippet['installed'] ? 'edit' : 'install';
-					$badge_text        = $snippet['installed'] ? __( 'Installed', 'charitable' ) : '';
-					$library_id        = ! empty( $snippet['library_id'] ) ? ( $snippet['library_id'] ) : false;
+				foreach ( $charitable_snippets as $charitable_snippet ) :
+					$charitable_button_text       = $charitable_snippet['installed'] ? __( 'Edit Snippet', 'charitable' ) : __( 'Install Snippet', 'charitable' );
+					$charitable_button_type_class = $charitable_snippet['installed'] ? 'button-primary' : 'button-secondary';
+					$charitable_button_action     = $charitable_snippet['installed'] ? 'edit' : 'install';
+					$charitable_badge_text        = $charitable_snippet['installed'] ? __( 'Installed', 'charitable' ) : '';
+					$charitable_library_id        = ! empty( $charitable_snippet['library_id'] ) ? ( $charitable_snippet['library_id'] ) : false;
 					?>
 					<div class="charitable-wpcode-snippet">
 						<div class="charitable-wpcode-snippet-header">
-							<?php if ( $library_id ) : ?>
-							<a class="charitable-wpcode-snippet-external-link" title="<?php esc_html_e( 'View this snippet on WPCode.com', 'charitable' ); ?>" href="https://library.wpcode.com/profile/wpcharitable/?code_type=all&order=popular&view=all&search=<?php echo rawurlencode( $snippet['title'] ); ?>" target="_blank"><span class="dashicons dashicons-external"></span></a>
+							<?php if ( $charitable_library_id ) : ?>
+							<a class="charitable-wpcode-snippet-external-link" title="<?php esc_html_e( 'View this snippet on WPCode.com', 'charitable' ); ?>" href="https://library.wpcode.com/profile/wpcharitable/?code_type=all&order=popular&view=all&search=<?php echo rawurlencode( $charitable_snippet['title'] ); ?>" target="_blank"><span class="dashicons dashicons-external"></span></a>
 							<?php endif; ?>
-							<h3 class="charitable-wpcode-snippet-title"><?php echo esc_html( $snippet['title'] ); ?></h3>
-							<div class="charitable-wpcode-snippet-note"><?php echo esc_html( $snippet['note'] ); ?></div>
+							<h3 class="charitable-wpcode-snippet-title"><?php echo esc_html( $charitable_snippet['title'] ); ?></h3>
+							<div class="charitable-wpcode-snippet-note"><?php echo esc_html( $charitable_snippet['note'] ); ?></div>
 						</div>
 						<div class="charitable-wpcode-snippet-footer">
-							<div class="charitable-wpcode-snippet-badge"><?php echo esc_html( $badge_text ); ?></div>
+							<div class="charitable-wpcode-snippet-badge"><?php echo esc_html( $charitable_badge_text ); ?></div>
 							<a
-								href="<?php echo esc_url( $snippet['install'] ); ?>"
-								class="button charitable-wpcode-snippet-button <?php echo sanitize_html_class( $button_type_class ); ?>"
-								data-action="<?php echo esc_attr( $button_action ); ?>"><?php echo esc_html( $button_text ); ?> </a>
+								href="<?php echo esc_url( $charitable_snippet['install'] ); ?>"
+								class="button charitable-wpcode-snippet-button <?php echo sanitize_html_class( $charitable_button_type_class ); ?>"
+								data-action="<?php echo esc_attr( $charitable_button_action ); ?>"><?php echo esc_html( $charitable_button_text ); ?> </a>
 						</div>
 					</div>
 				<?php endforeach; ?>

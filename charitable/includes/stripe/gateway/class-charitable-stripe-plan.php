@@ -281,7 +281,9 @@ if ( ! class_exists( 'Charitable_Stripe_Plan' ) ) :
 			} catch ( Exception $e ) {
 				$response = json_decode( $e->getHttpBody() );
 
-				error_log( var_export( $response->error, true ) );
+				if ( function_exists( 'charitable_is_debug' ) ? charitable_is_debug() : ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) {
+					error_log( var_export( $response->error, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_var_export
+				}
 
 				/* The plan already exists. */
 				if ( 'resource_already_exists' != $response->error->code ) {

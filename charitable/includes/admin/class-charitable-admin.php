@@ -273,6 +273,8 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 			require_once $admin_dir . 'dashboard-widgets/charitable-dashboard-widgets-hooks.php';
 			require_once $admin_dir . 'donations/charitable-admin-donation-hooks.php';
 			require_once $admin_dir . 'settings/charitable-settings-admin-hooks.php';
+			// Security hooks are now loaded in charitable.php to ensure CAPTCHA works on frontend.
+			// require_once $admin_dir . 'security/charitable-security-hooks.php';
 			require_once $admin_dir . 'activities/charitable-admin-activity-hooks.php';
 			require_once $admin_dir . 'reports/charitable-core-reports-functions.php';
 			require_once $admin_dir . 'reports/charitable-admin-reports-hooks.php';
@@ -310,10 +312,12 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		 * @return boolean|WP_Error WP_Error in case of error. Mixed results if the action was performed.
 		 */
 		public function maybe_do_admin_action() {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			if ( ! array_key_exists( 'charitable_admin_action', $_GET ) ) {
 				return false;
 			}
 
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Check for required keys only
 			if ( count( array_diff( array( 'action_type', '_nonce', 'object_id' ), array_keys( $_GET ) ) ) ) {
 				return new WP_Error( __( 'Action could not be executed.', 'charitable' ) );
 			}
@@ -333,6 +337,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		 * Loads admin-only scripts and stylesheets.
 		 *
 		 * @since  1.0.0
+		 * @version 1.8.8.6
 		 *
 		 * @return void
 		 */
@@ -540,7 +545,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				$localized_vars = (array) apply_filters( 'charitable_localized_javascript_vars', $localized_vars );
 
 				wp_localize_script( 'charitable-admin', 'CHARITABLE', $localized_vars );
-				
+
 				// Localize script for charitable-admin-2.0.js
 				wp_localize_script( 'charitable-admin-2.0', 'charitable_admin', array(
 					'autoshow_plugin_notifications' => charitable_get_autoshow_plugin_notifications(),
@@ -574,18 +579,23 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 						true
 					);
 
-					wp_register_script(
-						'charitable-report-moment',
-						charitable()->get_path( 'assets', false ) . 'js/libraries/moment.min.js',
-						array( 'jquery' ),
-						$version,
-						true
-					);
+					/**
+					 * Use WordPress core's Moment.js library.
+					 *
+					 * WordPress core includes Moment.js and exposes it via wp_enqueue_script('moment').
+					 * This library is required as a dependency for daterangepicker.min.js, which powers
+					 * the date range picker functionality in the reporting interface.
+					 *
+					 * @see https://github.com/moment/moment
+					 * @since 1.0.0
+					 * @version 1.8.8.6
+					 */
+					wp_enqueue_script( 'moment' );
 
 					wp_register_script(
 						'charitable-report-date-range-picker',
 						charitable()->get_path( 'assets', false ) . 'js/libraries/daterangepicker.min.js',
-						array( 'jquery', 'charitable-report-moment' ),
+						array( 'jquery', 'moment' ),
 						$version,
 						true
 					);
@@ -606,7 +616,6 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 					);
 
 					wp_enqueue_script( 'charitable-apex-charts' );
-					wp_enqueue_script( 'charitable-report-moment' );
 					wp_enqueue_script( 'charitable-report-date-range-picker' );
 					wp_enqueue_script( 'charitable-reporting' );
 
@@ -732,7 +741,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				$version
 			);
 
-			do_action( 'after_charitable_admin_enqueue_scripts', $min, $version, $assets_dir );
+			do_action( 'after_charitable_admin_enqueue_scripts', $min, $version, $assets_dir ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook name is already in use by other code (charitable-admin-hooks.php). Changing it would break existing functionality.
 		}
 
 		/**
@@ -801,14 +810,14 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		 */
 		public function add_notices() {
 			if ( charitable_is_debug( 'square' ) ) {
-				error_log( 'Charitable_Admin::add_notices() - Starting to render admin notices' );
+				error_log( 'Charitable_Admin::add_notices() - Starting to render admin notices' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			}
 
 			// Render notices.
 			charitable_get_admin_notices()->render();
 
 			if ( charitable_is_debug( 'square' ) ) {
-				error_log( 'Charitable_Admin::add_notices() - Current admin notices: ' . print_r( charitable_get_admin_notices()->get_notices(), true ) ); // phpcs:ignore
+				error_log( 'Charitable_Admin::add_notices() - Current admin notices: ' . print_r( charitable_get_admin_notices()->get_notices(), true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
 			}
 
 			// Check for PHP version deprecation.
@@ -1533,8 +1542,10 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		 * @since 1.8.7.6
 		 */
 		public function install_addon() {
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
 			// Check nonce.
-			if ( ! wp_verify_nonce( $_POST['nonce'], 'charitable_admin_addons' ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- wp_verify_nonce handles validation
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'charitable_admin_addons' ) ) {
 				wp_send_json_error( 'Invalid nonce' );
 			}
 
@@ -1543,8 +1554,9 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				wp_send_json_error( 'Insufficient permissions' );
 			}
 
-			$plugin = sanitize_text_field( wp_unslash( $_POST['plugin'] ) );
-			$type   = sanitize_text_field( wp_unslash( $_POST['type'] ) );
+			$plugin = isset( $_POST['plugin'] ) ? sanitize_text_field( wp_unslash( $_POST['plugin'] ) ) : '';
+			$type   = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : '';
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			if ( empty( $plugin ) ) {
 				wp_send_json_error( 'Plugin not specified' );
@@ -1592,8 +1604,10 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		 * @since 1.8.7.6
 		 */
 		public function activate_addon() {
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
 			// Check nonce.
-			if ( ! wp_verify_nonce( $_POST['nonce'], 'charitable_admin_addons' ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- wp_verify_nonce handles validation
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'charitable_admin_addons' ) ) {
 				wp_send_json_error( 'Invalid nonce' );
 			}
 
@@ -1602,7 +1616,8 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				wp_send_json_error( 'Insufficient permissions' );
 			}
 
-			$plugin = sanitize_text_field( wp_unslash( $_POST['plugin'] ) );
+			$plugin = isset( $_POST['plugin'] ) ? sanitize_text_field( wp_unslash( $_POST['plugin'] ) ) : '';
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			if ( empty( $plugin ) ) {
 				wp_send_json_error( 'Plugin not specified' );
@@ -1629,8 +1644,10 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		 * @since 1.8.7.6
 		 */
 		public function deactivate_addon() {
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
 			// Check nonce.
-			if ( ! wp_verify_nonce( $_POST['nonce'], 'charitable_admin_addons' ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- wp_verify_nonce handles validation
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['nonce'] ), 'charitable_admin_addons' ) ) {
 				wp_send_json_error( 'Invalid nonce' );
 			}
 
@@ -1639,7 +1656,8 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				wp_send_json_error( 'Insufficient permissions' );
 			}
 
-			$plugin = sanitize_text_field( wp_unslash( $_POST['plugin'] ) );
+			$plugin = isset( $_POST['plugin'] ) ? sanitize_text_field( wp_unslash( $_POST['plugin'] ) ) : '';
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			if ( empty( $plugin ) ) {
 				wp_send_json_error( 'Plugin not specified' );

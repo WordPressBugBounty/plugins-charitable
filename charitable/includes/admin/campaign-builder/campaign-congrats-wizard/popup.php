@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Campaign Congrats Wizard.
  * Congrats popup HTML template.
@@ -9,21 +15,22 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
  * @version   1.8.0
+ * @version   1.8.8.6
  */
 
 if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
-$pages_exists = ! empty( $args['dropdown_pages'] ) ? 1 : 0;
-$campaign_id  = isset( $_GET['campaign_id'] ) ? intval( $_GET['campaign_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-$campaign_url = get_permalink( $campaign_id );
-$show_url     = apply_filters( 'charitable_show_campaign_url_in_popup', false );
+$charitable_pages_exists = ! empty( $args['dropdown_pages'] ) ? 1 : 0;
+$charitable_campaign_id  = isset( $_GET['campaign_id'] ) ? intval( $_GET['campaign_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$charitable_campaign_url = get_permalink( $charitable_campaign_id );
+$charitable_show_url      = apply_filters( 'charitable_show_campaign_url_in_popup', false );
 
 ?>
 
 <div id="charitable-admin-campaign-congrats-wizard-container" class="charitable-admin-popup-container charitable-admin-popup-congrats-wizard">
 
-	<div id="charitable-admin-campaign-congrats-wizard" class="charitable-admin-popup" data-pages-exists="<?php echo esc_attr( $pages_exists ); ?>">
+	<div id="charitable-admin-campaign-congrats-wizard" class="charitable-admin-popup" data-pages-exists="<?php echo esc_attr( $charitable_pages_exists ); ?>">
 
 		<div class="charitable-admin-popup-content">
 			<p class="icon">🎉</p>
@@ -36,11 +43,11 @@ $show_url     = apply_filters( 'charitable_show_campaign_url_in_popup', false );
 
 
 			<div class="charitable-admin-popup-section charitable-admin-popup-section-view">
-				<a href="<?php echo esc_url( $campaign_url ); ?>" target="_blank" class="charitable-admin-congrats-popup-btn"><?php esc_html_e( 'View Campaign', 'charitable' ); ?> <img class="popup_icon" src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/icons/view_live.svg' ); ?>" /></a>
+				<a href="<?php echo esc_url( $charitable_campaign_url ); ?>" target="_blank" class="charitable-admin-congrats-popup-btn"><?php esc_html_e( 'View Campaign', 'charitable' ); ?> <img class="popup_icon" src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/icons/view_live.svg' ); ?>" /></a>
 
-				<?php if ( $show_url ) : ?>
+				<?php if ( $charitable_show_url ) : ?>
 
-				<p><a class="charitable-admin-campaign-link show-url" href="<?php echo esc_url( $campaign_url ); ?>" target="_blank"><?php echo esc_url( $campaign_url ); ?></a></p>
+				<p><a class="charitable-admin-campaign-link show-url" href="<?php echo esc_url( $charitable_campaign_url ); ?>" target="_blank"><?php echo esc_url( $charitable_campaign_url ); ?></a></p>
 
 				<?php endif; ?>
 

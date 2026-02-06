@@ -40,11 +40,7 @@ if ( ! class_exists( 'Charitable_User_Management' ) ) :
 		 * @return Charitable_User_Management
 		 */
 		public static function get_instance() {
-			if ( is_null( self::$instance ) ) {
-				self::$instance = new self();
-			}
-
-			return self::$instance;
+			return self::$instance ??= new self();
 		}
 
 		/**
@@ -69,11 +65,11 @@ if ( ! class_exists( 'Charitable_User_Management' ) ) :
 				return false;
 			}
 
-			if ( ! isset( $_GET['key'] ) || ! isset( $_GET['login'] ) ) {
+			if ( ! isset( $_GET['key'] ) || ! isset( $_GET['login'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				return false;
 			}
 
-			$value = sprintf( '%s:%s', wp_unslash( $_GET['login'] ), wp_unslash( $_GET['key'] ) );
+			$value = sprintf( '%s:%s', wp_unslash( $_GET['login'] ), wp_unslash( $_GET['key'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 			$this->set_reset_cookie( $value );
 
@@ -101,8 +97,8 @@ if ( ! class_exists( 'Charitable_User_Management' ) ) :
 			}
 
 			$redirect_url = charitable_get_permalink( 'reset_password_page' );
-			$redirect_url = add_query_arg( 'login', esc_attr( $_REQUEST['login'] ), $redirect_url );
-			$redirect_url = add_query_arg( 'key', esc_attr( $_REQUEST['key'] ), $redirect_url );
+			$redirect_url = add_query_arg( 'login', esc_attr( $_REQUEST['login'] ), $redirect_url ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotValidated,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$redirect_url = add_query_arg( 'key', esc_attr( $_REQUEST['key'] ), $redirect_url ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotValidated,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 			wp_safe_redirect( esc_url_raw( $redirect_url ) );
 
@@ -121,7 +117,7 @@ if ( ! class_exists( 'Charitable_User_Management' ) ) :
 		 * @return WP_User|void
 		 */
 		public function maybe_redirect_at_authenticate( $user_or_error, $username ) {
-			if ( 'POST' != $_SERVER['REQUEST_METHOD'] ) {
+			if ( 'POST' != $_SERVER['REQUEST_METHOD'] ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
 				return $user_or_error;
 			}
 
@@ -129,7 +125,7 @@ if ( ! class_exists( 'Charitable_User_Management' ) ) :
 				return $user_or_error;
 			}
 
-			if ( ! isset( $_POST['charitable'] ) || ! $_POST['charitable'] ) {
+			if ( ! isset( $_POST['charitable'] ) || ! $_POST['charitable'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 				return $user_or_error;
 			}
 
@@ -201,7 +197,7 @@ if ( ! class_exists( 'Charitable_User_Management' ) ) :
 				return;
 			}
 
-			if ( $_SERVER['REQUEST_METHOD'] != 'GET' ) {
+			if ( $_SERVER['REQUEST_METHOD'] != 'GET' ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
 				return;
 			}
 
@@ -224,7 +220,7 @@ if ( ! class_exists( 'Charitable_User_Management' ) ) :
 		 */
 		public function set_reset_cookie( $value = '' ) {
 			$rp_cookie = 'wp-resetpass-' . COOKIEHASH;
-			$rp_path   = current( explode( '?', wp_unslash( $_SERVER['REQUEST_URI'] ) ) );
+			$rp_path   = current( explode( '?', wp_unslash( $_SERVER['REQUEST_URI'] ) ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 			if ( $value ) {
 				setcookie( $rp_cookie, $value, 0, $rp_path, COOKIE_DOMAIN, is_ssl(), true );
@@ -323,7 +319,7 @@ if ( ! class_exists( 'Charitable_User_Management' ) ) :
 			}
 
 			/* Don't prevent logging out. */
-			if ( 'GET' != $_SERVER['REQUEST_METHOD'] ) {
+			if ( 'GET' != $_SERVER['REQUEST_METHOD'] ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
 				return;
 			}
 
@@ -345,7 +341,7 @@ if ( ! class_exists( 'Charitable_User_Management' ) ) :
 		 * @return boolean True if the email is sent. False otherwise.
 		 */
 		public function send_verification_email( $user = '', $redirect_url = '', $force_send = null ) {
-			if ( empty( $user ) && array_key_exists( 'user', $_GET ) ) {
+			if ( empty( $user ) && array_key_exists( 'user', $_GET ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$user = wp_get_current_user();
 			}
 
@@ -354,11 +350,11 @@ if ( ! class_exists( 'Charitable_User_Management' ) ) :
 			}
 
 			if ( is_null( $force_send ) ) {
-				$force_send = array_key_exists( 'force_send', $_GET ) && $_GET['force_send'];
+				$force_send = array_key_exists( 'force_send', $_GET ) && $_GET['force_send']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			}
 
-			if ( empty( $redirect_url ) && array_key_exists( 'redirect_url', $_GET ) ) {
-				$redirect_url = $_GET['redirect_url'];
+			if ( empty( $redirect_url ) && array_key_exists( 'redirect_url', $_GET ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$redirect_url = $_GET['redirect_url']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			}
 
 			/* Prepare the email. */

@@ -96,75 +96,90 @@ if ( ! class_exists( 'Charitable_Upgrade_Page' ) ) :
 		 * Return the current upgrade action.
 		 *
 		 * @since  1.3.0
+		 * @version 1.8.9.1
 		 *
 		 * @return false|string False if no action was specified.
 		 */
 		public function get_action() {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display/routing parameter
 			if ( ! isset( $_GET['charitable-upgrade'] ) ) {
 				return false;
 			}
 
-			return sanitize_text_field( $_GET['charitable-upgrade'] );
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display/routing parameter
+			return sanitize_text_field( wp_unslash( $_GET['charitable-upgrade'] ) );
 		}
 
 		/**
 		 * Return the current upgrade step.
 		 *
 		 * @since  1.3.0
+		 * @version 1.8.9.1
 		 *
 		 * @return int
 		 */
 		public function get_step() {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display/routing parameter
 			if ( ! isset( $_GET['step'] ) ) {
 				return 1;
 			}
 
-			return absint( $_GET['step'] );
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display/routing parameter
+			return absint( wp_unslash( $_GET['step'] ) );
 		}
 
 		/**
 		 * Return the total number of records to be updated.
 		 *
 		 * @since  1.3.0
+		 * @version 1.8.9.1
 		 *
 		 * @return false|int
 		 */
 		public function get_total() {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display/routing parameter
 			if ( ! isset( $_GET['total'] ) ) {
 				return false;
 			}
 
-			return absint( $_GET['total'] );
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display/routing parameter
+			return absint( wp_unslash( $_GET['total'] ) );
 		}
 
 		/**
 		 * Return the... number?
 		 *
 		 * @since  1.3.0
+		 * @version 1.8.9.1
 		 *
 		 * @return int
 		 */
 		public function get_number() {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display/routing parameter
 			if ( ! isset( $_GET['number'] ) ) {
 				return 100;
 			}
 
-			return absint( $_GET['number'] );
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display/routing parameter
+			return absint( wp_unslash( $_GET['number'] ) );
 		}
 
 		/**
 		 * Return the nonce
 		 *
 		 * @since  1.8.1
+		 * @version 1.8.9.1
 		 *
-		 * @return int
+		 * @return false|string
 		 */
 		public function get_nonce() {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display/routing parameter
 			if ( ! isset( $_GET['nonce'] ) ) {
 				return false;
 			}
 
-			return sanitize_text_field( $_GET['nonce'] );
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display/routing parameter
+			return sanitize_text_field( wp_unslash( $_GET['nonce'] ) );
 		}
 
 

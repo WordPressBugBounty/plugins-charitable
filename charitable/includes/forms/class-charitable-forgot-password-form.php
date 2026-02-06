@@ -117,6 +117,7 @@ if ( ! class_exists( 'Charitable_Forgot_Password_Form' ) ) :
 				$user  = get_user_by( 'login', $login );
 			}
 
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- lostpassword_post is a WordPress core hook for password reset functionality.
 			do_action( 'lostpassword_post' );
 
 			/* If we are missing user data, proceed no further. */

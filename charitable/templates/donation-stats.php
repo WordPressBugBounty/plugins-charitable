@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display the site donation stats.
  *
@@ -8,6 +14,7 @@
  * @author  WP Charitable LLC
  * @since   1.5.0
  * @version 1.6.57
+ * @version 1.8.8.6
  */
 
 /**
@@ -19,13 +26,13 @@
  */
 do_action( 'charitable_donation_stats_before', $view_args );
 
-$campaigns_count = Charitable_Campaigns::query(
+$charitable_campaigns_count = Charitable_Campaigns::query(
 	array(
 		'posts_per_page' => -1,
 		'fields'         => 'ids',
 	)
 )->found_posts;
-$campaigns_text  = 1 === $campaigns_count ? __( 'Campaign', 'charitable' ) : __( 'Campaigns', 'charitable' );
+$charitable_campaigns_text  = 1 === $charitable_campaigns_count ? __( 'Campaign', 'charitable' ) : __( 'Campaigns', 'charitable' );
 
 /**
  * Filter the donation stats to show.
@@ -35,12 +42,12 @@ $campaigns_text  = 1 === $campaigns_count ? __( 'Campaign', 'charitable' ) : __(
  * @param array $donation_stats The default stats to show.
  * @param array $view_args      All arguments passed to the view.
  */
-$donation_stats = apply_filters(
+$charitable_donation_stats = apply_filters(
 	'charitable_donation_stats',
 	array(
 		'campaign_count' => array(
-			'amount'      => $campaigns_count,
-			'description' => $campaigns_text,
+			'amount'      => $charitable_campaigns_count,
+			'description' => $charitable_campaigns_text,
 		),
 		'donated'        => array(
 			'amount'      => charitable_format_money( charitable_get_table( 'campaign_donations' )->get_total() ),
@@ -57,8 +64,8 @@ $donation_stats = apply_filters(
 ?>
 <ul class="donation-stats">
 <?php
-foreach ( $donation_stats as $stat ) :
-	printf( '<li><span class="figure">%s</span> %s</li>', esc_html( $stat['amount'] ), esc_html( $stat['description'] ) );
+foreach ( $charitable_donation_stats as $charitable_stat ) :
+	printf( '<li><span class="figure">%s</span> %s</li>', esc_html( $charitable_stat['amount'] ), esc_html( $charitable_stat['description'] ) );
 endforeach;
 ?>
 </ul><!-- .donation-stats -->

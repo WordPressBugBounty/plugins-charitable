@@ -236,7 +236,7 @@ if ( ! class_exists( 'Charitable_Form' ) ) :
 				charitable_get_notices()->add_error( __( 'Unable to submit form. Please try again.', 'charitable' ) );
 
 				if ( charitable_is_debug() ) {
-					error_log(
+					error_log( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 						sprintf(
 							/* translators: %1$s: nonce name; %2$s: nonce action; %3$s: submitted nonce */
 							__( 'Nonce verification failed for nonce with name "%1$s" and action "%2$s". Submitted nonce is "%3$s".', 'charitable' ),
@@ -329,9 +329,12 @@ if ( ! class_exists( 'Charitable_Form' ) ) :
 				}
 
 				/* If a value was not provided, check if it's in the $_FILES array. */
+				// phpcs:disable WordPress.Security.NonceVerification.Missing
 				if ( ! $exists ) {
+					// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- $_FILES array, validated by isset and empty checks
 					$exists = ( 'picture' == $field['type'] && isset( $_FILES[ $key ] ) && ! empty( $_FILES[ $key ]['name'] ) );
 				}
+				// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 				$exists = apply_filters( 'charitable_required_field_exists', $exists, $key, $field, $submitted, $this );
 
@@ -488,6 +491,7 @@ if ( ! class_exists( 'Charitable_Form' ) ) :
 		 * Upload a file.
 		 *
 		 * @since  1.0.0
+		 * @version 1.8.9.1
 		 *
 		 * @param  string $file_key  Reference to a single element of `$_FILES`. Call the
 		 *                           function once for each uploaded file.
@@ -500,8 +504,15 @@ if ( ! class_exists( 'Charitable_Form' ) ) :
 		public function upload_file( $file_key, $overrides = array() ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
 
+			// phpcs:disable WordPress.Security.NonceVerification.Missing
+			if ( ! isset( $_FILES[ $file_key ] ) ) {
+				return new WP_Error( 'upload_error', __( 'No file was uploaded.', 'charitable' ) );
+			}
+
 			$overrides = $this->get_file_overrides( $file_key, $overrides );
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- $_FILES array, sanitized by wp_handle_upload
 			$file      = wp_handle_upload( $_FILES[ $file_key ], $overrides );
+			// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 			if ( isset( $file['error'] ) ) {
 				return new WP_Error( 'upload_error', $file['error'] );

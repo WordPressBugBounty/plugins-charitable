@@ -301,7 +301,7 @@ if ( ! class_exists( 'Charitable_Reports_Download' ) ) :
 			ignore_user_abort( true );
 
 			if ( ! charitable_is_func_disabled( 'set_time_limit' ) && ! ini_get( 'safe_mode' ) ) {
-				set_time_limit( 0 );
+				set_time_limit( 0 ); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
 			}
 
 			if ( '' !== $report_type ) {

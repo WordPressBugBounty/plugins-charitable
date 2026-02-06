@@ -38,6 +38,14 @@ if ( ! class_exists( 'Charitable_Emails' ) ) :
 		private $emails;
 
 		/**
+		 * Registration flag to prevent multiple calls.
+		 *
+		 * @since 1.8.9.2
+		 * @var bool
+		 */
+		private $emails_registered = false;
+
+		/**
 		 * Set up the class.
 		 *
 		 * Note that the only way to instantiate an object is with the charitable_start method,
@@ -47,6 +55,10 @@ if ( ! class_exists( 'Charitable_Emails' ) ) :
 		 * @since 1.0.0
 		 */
 		private function __construct() {
+			// Initialize state
+			$this->emails_registered = false;
+			$this->emails = null;
+
 			/* 3rd party hook for overriding anything we've done so far. */
 			do_action( 'charitable_emails_start', $this );
 
@@ -64,6 +76,44 @@ if ( ! class_exists( 'Charitable_Emails' ) ) :
 			foreach ( charitable_get_approval_statuses() as $approval_status ) {
 				add_action( $approval_status . '_' . Charitable::DONATION_POST_TYPE, array( 'Charitable_Email_Donation_Receipt', 'send_with_donation_id' ) );
 				add_action( $approval_status . '_' . Charitable::DONATION_POST_TYPE, array( 'Charitable_Email_New_Donation', 'send_with_donation_id' ) );
+			}
+		}
+
+		/**
+		 * Ensure emails are registered before accessing them.
+		 * Implements lazy loading to handle timing race conditions.
+		 *
+		 * @since 1.8.9.2
+		 * @return bool True if emails are available, false on failure.
+		 */
+		private function ensure_emails_registered() {
+			// Quick check - if emails exist, we're done
+			if ( is_array( $this->emails ) && ! empty( $this->emails ) ) {
+				return true;
+			}
+
+			// Multiple detection methods for maximum compatibility
+			if ( did_action( 'init' ) || doing_action( 'init' ) || wp_doing_ajax() || is_admin() ) {
+				return $this->safe_register_emails();
+			}
+
+			// Fallback registration with error handling
+			return $this->safe_register_emails();
+		}
+
+		/**
+		 * Safely register emails with error handling and guard.
+		 *
+		 * @since 1.8.9.2
+		 * @return bool True if registration successful, false otherwise.
+		 */
+		private function safe_register_emails() {
+			try {
+				$this->register_emails();
+				return is_array( $this->emails ) && ! empty( $this->emails );
+			} catch ( Exception $e ) {
+				error_log( 'Charitable: Email registration failed - ' . $e->getMessage() );
+				return false;
 			}
 		}
 
@@ -90,6 +140,13 @@ if ( ! class_exists( 'Charitable_Emails' ) ) :
 		 * @return string[]
 		 */
 		public function register_emails() {
+			// Guard against multiple registrations
+			if ( $this->emails_registered && is_array( $this->emails ) ) {
+				return $this->emails;
+			}
+
+			$this->emails_registered = true;
+
 			$this->emails = apply_filters(
 				'charitable_emails',
 				array(
@@ -192,6 +249,11 @@ if ( ! class_exists( 'Charitable_Emails' ) ) :
 				wp_die( __( 'Missing email.', 'charitable' ) ); // phpcs:ignore
 			}
 
+			/* Ensure emails are registered. */
+			if ( ! $this->ensure_emails_registered() ) {
+				wp_die( __( 'Email system not available.', 'charitable' ) );
+			}
+
 			/* Validate email. */
 			if ( ! isset( $this->emails[ $email ] ) ) {
 				wp_die( __( 'Invalid email.', 'charitable' ) ); // phpcs:ignore
@@ -213,6 +275,9 @@ if ( ! class_exists( 'Charitable_Emails' ) ) :
 		 * @return string
 		 */
 		public function get_available_emails() {
+			if ( ! $this->ensure_emails_registered() ) {
+				return null; // Changed from array() for better error detection
+			}
 			return $this->emails;
 		}
 
@@ -265,6 +330,9 @@ if ( ! class_exists( 'Charitable_Emails' ) ) :
 		 *                      email is registered; false if it is not registered.
 		 */
 		public function get_email( $email ) {
+			if ( ! $this->ensure_emails_registered() ) {
+				return false;
+			}
 			return isset( $this->emails[ $email ] ) ? $this->emails[ $email ] : false;
 		}
 

@@ -1,4 +1,10 @@
 <?php
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Display the main settings page wrapper.
  *
@@ -8,11 +14,12 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
  * @version   1.6.19
+ * @version   1.8.8.6
  */
 
 do_action( 'charitable_addons_directory_page_start' );
 
-$plan_slug = Charitable_Addons_Directory::get_current_plan_slug();
+$charitable_plan_slug = Charitable_Addons_Directory::get_current_plan_slug();
 
 ob_start();
 ?>

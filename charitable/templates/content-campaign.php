@@ -8,6 +8,7 @@
  * @package Charitable/Templates/Campaign
  * @since   1.0.0
  * @version 1.0.0
+ * @version 1.8.8.6
  */
 
 // Exit if accessed directly.
@@ -15,8 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$campaign = $view_args['campaign'];
-$content  = $view_args['content'];
+$charitable_campaign = $view_args['campaign'];
+$charitable_content  = $view_args['content'];
 
 /**
  * Add something before the campaign content.
@@ -25,9 +26,9 @@ $content  = $view_args['content'];
  *
  * @param $campaign Charitable_Campaign Instance of `Charitable_Campaign`.
  */
-do_action( 'charitable_campaign_content_before', $campaign );
+do_action( 'charitable_campaign_content_before', $charitable_campaign );
 
-echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+echo $charitable_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 /**
  * Add something after the campaign content.
@@ -36,4 +37,4 @@ echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
  *
  * @param $campaign Charitable_Campaign Instance of `Charitable_Campaign`.
  */
-do_action( 'charitable_campaign_content_after', $campaign );
+do_action( 'charitable_campaign_content_after', $charitable_campaign );

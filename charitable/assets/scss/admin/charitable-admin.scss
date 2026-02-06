@@ -1755,8 +1755,7 @@ body.charitable_page_charitable-about {
                 border-bottom: 2px solid #5AA152;
             }
             &.nav-tab-marketing::after,
-            &.nav-tab-donors::after,
-            &.nav-tab-security::after {
+            &.nav-tab-donors::after {
                 // insert content before element.
                 content: "Pro";
                 background-color: #F99E36;
@@ -2118,6 +2117,26 @@ body.wp-admin #wpbody .charitable-wrap .badge.v2 {
 div#charitable-settings table.form-table tbody tr.section-heading th[scope="row"] h4,
 div#charitable-settings table.form-table tbody tr:first-child th[scope="row"] h4 {
     font-weight: 600 !important;
+}
+
+div#charitable-tools table.form-table tbody tr:first-child th[scope="row"] h4 {
+    font-weight: 600 !important;
+    font-size: 20px;
+    margin: 0 0 -20px 0;
+    line-height: 20px;
+}
+
+div#charitable-tools h4#system-information,
+div#charitable-tools h4#code-snippets {
+    font-weight: 600 !important;
+    font-size: 20px;
+    margin: 20px 0;
+    line-height: 20px;
+}
+
+// Charitable notice padding
+.notice.charitable-notice {
+    padding: 10px 10px;
 }
 
 /* modal */
@@ -3219,6 +3238,11 @@ body.charitable_page_charitable-reports {
 
             li.offline .icon span {
                 background-color: #9e36f9;
+            }
+
+            li.square_core .icon span,
+            li.square .icon span {
+                background-color: #d21561;
             }
 
             li.none .icon span {
@@ -6086,6 +6110,7 @@ tr.charitable-settings-field.charitable-test-mode-checkbox.charitable-test-mode-
       color: white;
       cursor: pointer;
       transition: background 0.2s ease;
+      text-decoration: none;
 
       &:hover {
         background: rgba(196, 130, 30, 1);

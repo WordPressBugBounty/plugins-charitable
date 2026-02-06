@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version   1.8.0
+ * @version   1.8.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,6 +18,8 @@ if ( ! class_exists( 'Charitable_Field_Donate_Button' ) ) :
 
 	/**
 	 * Class to add campaign donate button field to a campaign form in the builder.
+	 *
+	 * @version 1.8.9.1
 	 */
 	class Charitable_Field_Donate_Button extends Charitable_Builder_Field {
 
@@ -109,7 +111,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Button' ) ) :
 			$html  = $this->field_title( $this->name );
 			$html .= $this->field_wrapper( $this->render( $field_data, $campaign_data, $field_id ), $field_data );
 
-			echo $html;
+			echo wp_kses_post( $html );
 		}
 
 		/**
@@ -162,10 +164,10 @@ if ( ! class_exists( 'Charitable_Field_Donate_Button' ) ) :
 						data-campaign-id="<?php echo intval( $campaign->ID ); ?>"
 						class="<?php echo esc_attr( charitable_get_button_class( 'donate' ) ); ?>"
 						href="<?php echo esc_url( charitable_get_permalink( 'campaign_donation_page', array( 'campaign_id' => $campaign->ID ) ) ); ?>"
-						<?php // translators: %s is the campaign title. ?>
-						aria-label="<?php echo esc_attr( sprintf( _x( 'Make a donation to %s', 'make a donation to campaign', 'charitable' ), get_the_title( $campaign->ID ) ) ); ?>">
-						<?php echo wp_strip_all_tags( $button_label ); ?>
-					</a>
+					<?php // translators: %s is the campaign title. ?>
+					aria-label="<?php echo esc_attr( sprintf( _x( 'Make a donation to %s', 'make a donation to campaign', 'charitable' ), get_the_title( $campaign->ID ) ) ); ?>">
+					<?php echo esc_html( wp_strip_all_tags( $button_label ) ); ?>
+				</a>
 				</div>
 
 
@@ -179,7 +181,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Button' ) ) :
 					<?php // translators: %s is the campaign title. ?>
 					aria-label="<?php echo esc_attr( sprintf( _x( 'Make a donation to %s', 'make a donation to campaign', 'charitable' ), get_the_title( $campaign->ID ) ) ); ?>"
 				>
-					<?php echo wp_strip_all_tags( $button_label ); ?>
+					<?php echo esc_html( wp_strip_all_tags( $button_label ) ); ?>
 				</a>
 
 
@@ -191,7 +193,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Button' ) ) :
 					<input type="hidden" name="campaign_id" value="<?php echo esc_html( $campaign->ID ); ?>" />
 					<input type="hidden" name="charitable_donation_amount" value="<?php $donation_amount; ?>" />
 					<input type="hidden" name="charitable_builder" value="true" />
-					<button type="submit" name="charitable_submit" class="<?php echo esc_attr( charitable_get_button_class( 'donate' ) ); ?>"><?php echo wp_strip_all_tags( $button_label ); ?></button>
+					<button type="submit" name="charitable_submit" class="<?php echo esc_attr( charitable_get_button_class( 'donate' ) ); ?>"><?php echo esc_html( wp_strip_all_tags( $button_label ) ); ?></button>
 				</form>
 
 			<?php } ?>
@@ -206,7 +208,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Button' ) ) :
 
 			$html = $this->field_display_wrapper( $html, $field_data );
 
-			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data ); // phpcs:ignore
+			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/**
@@ -238,13 +240,13 @@ if ( ! class_exists( 'Charitable_Field_Donate_Button' ) ) :
 
 			<div class="charitable-panel-field charitable-panel-field-section" data-field-id="<?php echo intval( $field_id ); ?>">
 
-				<?php echo do_action( 'charitable_builder_' . $this->type . '_settings_display_start', $field_id, $campaign_data ); ?>
+				<?php echo do_action( 'charitable_builder_' . $this->type . '_settings_display_start', $field_id, $campaign_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 
 			</div>
 
 			<?php
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['button_label'] ) ? $settings['button_label'] : esc_html__( 'Donate', 'charitable' ),
 				esc_html__( 'Button Label', 'charitable' ),
 				array(
@@ -255,7 +257,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Button' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_number_slider(
+			echo $charitable_builder_form_fields->generate_number_slider( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['width_percentage'] ) ? $settings['width_percentage'] : 100,
 				esc_html__( 'Width', 'charitable' ),
 				array(
@@ -270,7 +272,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Button' ) ) :
 				)
 			);
 
-			echo $charitable_builder_form_fields->generate_align(
+			echo $charitable_builder_form_fields->generate_align( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['align'] ) ? $settings['align'] : esc_attr( $this->align_default ),
 				esc_html__( 'Align', 'charitable' ),
 				array(
@@ -282,7 +284,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Button' ) ) :
 
 			/* CSS CLASS */
 
-			echo $charitable_builder_form_fields->generate_text(
+			echo $charitable_builder_form_fields->generate_text( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				isset( $settings['css_class'] ) ? $settings['css_class'] : false,
 				esc_html__( 'CSS Class', 'charitable' ),
 				array(
