@@ -134,7 +134,7 @@ if ( ! class_exists( 'Charitable_Email_Offline_Donation_Receipt' ) && class_exis
 				$email->log( $donation_id, $sent );
 			}
 
-			return true;
+			return $sent;
 		}
 
 		/**

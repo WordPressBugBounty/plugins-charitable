@@ -364,6 +364,9 @@ if ( ! class_exists( 'Charitable_Tools_Email_Diagnostics' ) ) :
 									$email_test['has_name'] = ! empty( $email_instance->get_name() );
 								}
 
+								// Phase 1 Integration: Test recipient extraction with real donation data
+								$email_test['recipient_extraction'] = $this->test_recipient_extraction_for_email( $email_instance, $email_id );
+
 								$successful_accesses++;
 							} catch ( Exception $e ) {
 								$email_test['instantiation_error'] = $e->getMessage();
@@ -392,13 +395,36 @@ if ( ! class_exists( 'Charitable_Tools_Email_Diagnostics' ) ) :
 				$result['details']['total_emails_tested'] = count( $this->priority_emails );
 				$result['average_time'] = round( $total_time / count( $this->priority_emails ), 1 );
 
+				// Phase 1 Integration: Count recipient extraction failures
+				$recipient_failures = 0;
+				foreach ( $result['email_tests'] as $email_test ) {
+					if ( isset( $email_test['recipient_extraction']['tested'] ) &&
+						 $email_test['recipient_extraction']['tested'] &&
+						 ! $email_test['recipient_extraction']['success'] ) {
+						$recipient_failures++;
+					}
+				}
+				$result['details']['recipient_extraction_failures'] = $recipient_failures;
+
 				// Determine status and score
 				if ( $successful_accesses === count( $this->priority_emails ) ) {
 					$result['status'] = 'success';
 					$result['score'] = 20;
+
+					// Reduce score for recipient extraction failures
+					if ( $recipient_failures > 0 ) {
+						$result['score'] -= ( $recipient_failures * 3 ); // -3 points per failure
+						$result['status'] = 'partial';
+						$result['details']['recipient_warning'] = "Recipient extraction failing for {$recipient_failures} email(s)";
+					}
 				} elseif ( $successful_accesses > 0 ) {
 					$result['status'] = 'partial';
 					$result['score'] = round( ( $successful_accesses / count( $this->priority_emails ) ) * 20 );
+
+					// Additional penalty for recipient failures
+					if ( $recipient_failures > 0 ) {
+						$result['score'] -= ( $recipient_failures * 2 );
+					}
 				}
 
 				// Performance check
@@ -919,14 +945,115 @@ if ( ! class_exists( 'Charitable_Tools_Email_Diagnostics' ) ) :
 		 * Count recent email errors from logs.
 		 *
 		 * @since 1.8.9.2
+		 * @since 1.8.9.5 Enhanced to connect with Phase 1 error logging improvements.
 		 *
 		 * @return int Number of recent email errors.
 		 */
 		private function count_recent_email_errors() {
-			// This would typically check error logs or database for email failures
-			// For now, return 0 as we don't have a built-in error tracking system
-			// This could be enhanced to check wp_mail failures or charitable-specific logs
-			return 0;
+			$error_count = 0;
+
+			try {
+				// Connect to Phase 1 enhanced error logging via activities table
+				if ( function_exists( 'charitable_get_table' ) ) {
+					$activities_table = charitable_get_table( 'charitable_activities' );
+					if ( $activities_table ) {
+						global $wpdb;
+						$table_name = $activities_table->get_table_name();
+						$seven_days_ago = date( 'Y-m-d H:i:s', strtotime( '-7 days' ) );
+
+						// Count email failures from the last 7 days
+						$error_count = (int) $wpdb->get_var( $wpdb->prepare(
+							"SELECT COUNT(*) FROM {$table_name}
+							 WHERE type = 'form_error'
+							 AND error_type = 'email_failure'
+							 AND timestamp >= %s",
+							$seven_days_ago
+						) );
+					}
+				}
+			} catch ( Exception $e ) {
+				// Fail silently for diagnostics - don't break the diagnostic system
+				error_log( 'Charitable Email Diagnostics: Error counting recent email errors - ' . $e->getMessage() );
+			}
+
+			return $error_count;
+		}
+
+		/**
+		 * Test recipient extraction for a specific email with real donation data.
+		 *
+		 * @since 1.8.9.5 Phase 1 Integration
+		 *
+		 * @param object $email_instance Email instance to test.
+		 * @param string $email_id Email ID being tested.
+		 * @return array Test results.
+		 */
+		private function test_recipient_extraction_for_email( $email_instance, $email_id ) {
+			$extraction_test = array(
+				'tested' => false,
+				'success' => false,
+				'recipient_valid' => false,
+				'recipient_value' => '',
+				'donation_context' => 'none',
+				'error' => null
+			);
+
+			try {
+				// Skip recipient extraction test for emails that don't need donations
+				$non_donation_emails = array( 'password_reset', 'email_verification' );
+				if ( in_array( $email_id, $non_donation_emails ) ) {
+					$extraction_test['tested'] = true;
+					$extraction_test['success'] = true;
+					$extraction_test['recipient_value'] = 'N/A - No donation required';
+					return $extraction_test;
+				}
+
+				// Find a recent completed donation for testing
+				$recent_donations = get_posts( array(
+					'post_type' => 'donation',
+					'post_status' => 'charitable-completed',
+					'posts_per_page' => 1,
+					'orderby' => 'date',
+					'order' => 'DESC'
+				) );
+
+				if ( empty( $recent_donations ) ) {
+					$extraction_test['donation_context'] = 'no_donations';
+					$extraction_test['error'] = 'No completed donations available for testing';
+					return $extraction_test;
+				}
+
+				$donation = charitable_get_donation( $recent_donations[0]->ID );
+				if ( ! $donation ) {
+					$extraction_test['donation_context'] = 'invalid_donation';
+					$extraction_test['error'] = 'Could not load donation object';
+					return $extraction_test;
+				}
+
+				$extraction_test['donation_context'] = 'donation_' . $donation->get_donation_id();
+				$extraction_test['tested'] = true;
+
+				// Create new email instance with donation context
+				$email_class = get_class( $email_instance );
+				$test_email = new $email_class( array( 'donation' => $donation ) );
+
+				// Test recipient extraction
+				if ( method_exists( $test_email, 'get_recipient' ) ) {
+					$recipient = $test_email->get_recipient();
+					$extraction_test['recipient_value'] = $recipient;
+					$extraction_test['recipient_valid'] = is_email( $recipient );
+					$extraction_test['success'] = ! empty( $recipient ) && is_email( $recipient );
+				} else {
+					$extraction_test['error'] = 'get_recipient method not available';
+				}
+
+			} catch ( Exception $e ) {
+				$extraction_test['error'] = $e->getMessage();
+				$extraction_test['exception_file'] = basename( $e->getFile() );
+				$extraction_test['exception_line'] = $e->getLine();
+			}
+
+			return $extraction_test;
 		}
 
 		/**

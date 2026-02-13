@@ -121,6 +121,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 		 * Run the processor.
 		 *
 		 * @since  1.3.0
+		 * @since  1.8.9.5 Fixed fatal error when ErrorException is thrown by using type-safe exception handling.
 		 *
 		 * @return void
 		 */
@@ -140,15 +141,25 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 				die( __( 'Webhook processed.', 'charitable' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 			} catch ( Exception $e ) {
-				$body = $e->getJsonBody();
-				// phpcs:disable
-				if ( charitable_is_debug() ) {
-					error_log( $body['error']['message'] );
+				// Handle Stripe API exceptions that have getJsonBody method
+				if ( method_exists( $e, 'getJsonBody' ) ) {
+					$body = $e->getJsonBody();
+					// phpcs:disable
+					if ( charitable_is_debug() ) {
+						error_log( 'Stripe API Error: ' . $body['error']['message'] );
+					}
+					// phpcs:enable
+				} else {
+					// Handle generic PHP exceptions (ErrorException, etc.)
+					// phpcs:disable
+					if ( charitable_is_debug() ) {
+						error_log( 'Webhook Processing Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine() );
+					}
+					// phpcs:enable
 				}
-				// phpcs:enable
-				status_header( 500 );
 
-				die( __( 'Error while retrieving event.', 'charitable' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				status_header( 500 );
+				die( __( 'Error while processing webhook.', 'charitable' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}//end try
 		}
 

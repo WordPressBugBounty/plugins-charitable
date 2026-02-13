@@ -1089,10 +1089,29 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 		 * @return boolean
 		 */
 		public static function cancel_subscription( $cancelled, Charitable_Recurring_Donation $donation ) {
+			// Enhanced logging for cancellation debugging
+			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				error_log( sprintf(
+					'CHARITABLE_STRIPE_CANCEL_DEBUG: Starting cancellation for donation #%d',
+					$donation->get_donation_id()
+				) );
+			}
+
 			$subscription_id = $donation->get_gateway_subscription_id();
 
 			if ( ! $subscription_id ) {
+				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					error_log( 'CHARITABLE_STRIPE_CANCEL_DEBUG: No subscription ID found - cancellation aborted' );
+				}
+				$donation->log()->add( __( 'Cancellation failed: No gateway subscription ID found.', 'charitable' ) );
 				return false;
+			}
+
+			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				error_log( sprintf(
+					'CHARITABLE_STRIPE_CANCEL_DEBUG: Attempting to cancel subscription %s',
+					$subscription_id
+				) );
 			}
 
 			$gateway = new Charitable_Gateway_Stripe_AM();
@@ -1102,14 +1121,54 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 			$options = $account ? [ 'stripe_account' => $account ] : null;
 
 			if ( ! $api_key ) {
+				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					error_log( sprintf(
+						'CHARITABLE_STRIPE_CANCEL_DEBUG: No API key found for mode %s - cancellation aborted',
+						$donation->get_test_mode( false ) ? 'test' : 'live'
+					) );
+				}
+				$donation->log()->add( __( 'Cancellation failed: No Stripe API key configured.', 'charitable' ) );
 				return false;
+			}
+
+			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				error_log( sprintf(
+					'CHARITABLE_STRIPE_CANCEL_DEBUG: Using %s mode, account: %s',
+					$donation->get_test_mode( false ) ? 'test' : 'live',
+					$account ? $account : 'none'
+				) );
 			}
 
 			$gateway->setup_api( $api_key );
 
 			try {
+				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					error_log( sprintf(
+						'CHARITABLE_STRIPE_CANCEL_DEBUG: Retrieving subscription %s from Stripe',
+						$subscription_id
+					) );
+				}
+
 				$subscription = \Stripe\Subscription::retrieve( $subscription_id, $options );
+
+				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					error_log( sprintf(
+						'CHARITABLE_STRIPE_CANCEL_DEBUG: Retrieved subscription status: %s',
+						$subscription->status
+					) );
+				}
+
+				// Log current subscription state before cancellation
+				$donation->log()->add( sprintf(
+					__( 'Retrieved subscription from Stripe - Current status: %s', 'charitable' ),
+					$subscription->status
+				) );
+
 				$subscription->cancel( null, $options );
+
+				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					error_log( 'CHARITABLE_STRIPE_CANCEL_DEBUG: Stripe cancellation API call completed successfully' );
+				}
 
 				$donation->log()->add( __( 'Subscription cancelled in Stripe.', 'charitable' ) );
 
@@ -1130,6 +1189,12 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 				$cancelled = false;
 
 			} finally {
+				if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+					error_log( sprintf(
+						'CHARITABLE_STRIPE_CANCEL_DEBUG: Cancellation result: %s',
+						$cancelled ? 'SUCCESS' : 'FAILED'
+					) );
+				}
 				return $cancelled;
 			}
 		}

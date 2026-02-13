@@ -1,10 +1,10 @@
 === Charitable - Donation Plugin for WordPress - Fundraising with Recurring Donations & More ===
-Contributors: WPCharitable, griffinjt, smub, dimensionmedia
+Contributors: WPCharitable, smub, dimensionmedia
 Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.9.1
 Requires PHP: 7.2
-Stable tag: 1.8.9.4
+Stable tag: 1.8.9.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -267,6 +267,12 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.9.5 =
+* FIX: Added additional checks to resolved issue with Stripe webhook that was causing a fatal error a certain scenario.
+* FIX: Allow more international characters into campaign title fields in campaign visual builder.
+* IMPROVED: Email shortcode processing with recursion prevention for better reliability.
+* IMPROVED: Added additional enhanced email error logging and diagnostics.
 
 = Donation Form & Fundraising Campaigns v1.8.9.4 =
 * FIX: Resolved seemingly missing social media icons in some campaign builder template previews in certain scenarios.

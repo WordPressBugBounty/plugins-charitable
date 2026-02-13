@@ -23,7 +23,7 @@ const CharitableUtils = window.CharitableUtils || ( function( document, window, 
 		 */
 		santitizeTitle: function ( stringValue ) {
 
-			return stringValue.replace(/[^a-z0-9 _.,!"()'/$[]:]/gi, '');
+			return stringValue.replace(/[^\w\s\u00C0-\u024F\u1E00-\u1EFF\u2C60-\u2C7F\uA720-\uA7FF _.,!"()'\/$[\]:@#%-]/gi, '');
 
 		},
 
@@ -39,7 +39,7 @@ const CharitableUtils = window.CharitableUtils || ( function( document, window, 
 		 */
 		santitizeTextInput: function ( stringValue ) {
 
-			return stringValue.replace(/[^a-z0-9 _.,!"()'/$[]:-]/gi, '');
+			return stringValue.replace(/[^\w\s\u00C0-\u024F\u1E00-\u1EFF\u2C60-\u2C7F\uA720-\uA7FF _.,!"()'\/$[\]:@#%-]/gi, '');
 
 		},
 

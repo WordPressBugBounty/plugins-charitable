@@ -961,6 +961,7 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 		 * Safely get email recipient with error handling.
 		 *
 		 * @since  1.8.9.2
+		 * @since  1.8.9.5 Enhanced with detailed diagnostic context for recipient extraction failures.
 		 *
 		 * @return string|false Email recipient or false on error.
 		 */
@@ -968,8 +969,39 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 			try {
 				$recipient = $this->get_recipient();
 
-				if ( empty( $recipient ) || ! is_email( $recipient ) ) {
-					$this->log_email_error( 'invalid_recipient', 'Recipient email is empty or invalid: ' . $recipient );
+				if ( empty( $recipient ) || ! $this->is_valid_recipient( $recipient ) ) {
+					// Phase 1: Enhanced diagnostics - minimal overhead, only on errors
+					$diagnostic_context = array(
+						'recipient_value' => $recipient,
+						'recipient_type' => gettype( $recipient ),
+						'recipient_length' => strlen( (string) $recipient )
+					);
+
+					// Add donation context if available (safe checks)
+					if ( is_object( $this->donation ) && method_exists( $this->donation, 'get_donor_id' ) ) {
+						$donor_id = $this->donation->get_donor_id();
+						$diagnostic_context['donation_id'] = method_exists( $this->donation, 'get_donation_id' ) ? $this->donation->get_donation_id() : 'unknown';
+						$diagnostic_context['donor_id'] = $donor_id;
+						$diagnostic_context['donor_id_type'] = gettype( $donor_id );
+
+						// Check campaign donations count (common failure point)
+						if ( method_exists( $this->donation, 'get_campaign_donations' ) ) {
+							$campaign_donations = $this->donation->get_campaign_donations();
+							$diagnostic_context['campaign_donations_count'] = is_array( $campaign_donations ) ? count( $campaign_donations ) : 'not_array';
+						}
+
+						// Check donor object validity if donor_id exists
+						if ( ! empty( $donor_id ) && $donor_id !== false && method_exists( $this->donation, 'get_donor' ) ) {
+							$donor = $this->donation->get_donor();
+							$diagnostic_context['donor_object_type'] = gettype( $donor );
+							$diagnostic_context['donor_object_class'] = is_object( $donor ) ? get_class( $donor ) : 'not_object';
+						}
+					} else {
+						$diagnostic_context['donation_object_type'] = gettype( $this->donation );
+					}
+
+					$this->log_email_error( 'invalid_recipient',
+						'Recipient email is empty or invalid - Enhanced diagnosis: ' . wp_json_encode( $diagnostic_context ) );
 					return false;
 				}
 
@@ -1019,6 +1051,7 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 		 * Safely build email body with error handling.
 		 *
 		 * @since  1.8.9.2
+		 * @since  1.8.9.5 Enhanced with detailed diagnostic context for email build failures.
 		 *
 		 * @return string|false Email body or false on error.
 		 */
@@ -1045,7 +1078,35 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 				if ( isset( $original_handler ) && $original_handler !== null ) {
 					restore_error_handler();
 				}
-				$this->log_email_error( 'email_build_failed', $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine() );
+
+				// Phase 1: Enhanced email build diagnostics
+				$build_context = array(
+					'email_class' => get_class( $this ),
+					'email_id' => method_exists( $this, 'get_email_id' ) ? $this->get_email_id() : 'unknown',
+					'error_message' => $e->getMessage(),
+					'error_file' => basename( $e->getFile() ),
+					'error_line' => $e->getLine(),
+					'ob_level' => ob_get_level()
+				);
+
+				// Add donation context for template building
+				if ( is_object( $this->donation ) ) {
+					$build_context['has_donation_data'] = true;
+					$build_context['donation_id'] = method_exists( $this->donation, 'get_donation_id' ) ? $this->donation->get_donation_id() : 'unknown';
+				} else {
+					$build_context['has_donation_data'] = false;
+				}
+
+				// Check template availability
+				$template_dir = CHARITABLE_DIRECTORY_PATH . 'templates/emails/';
+				$build_context['templates_exist'] = array(
+					'header' => file_exists( $template_dir . 'header.php' ),
+					'body' => file_exists( $template_dir . 'body.php' ),
+					'footer' => file_exists( $template_dir . 'footer.php' )
+				);
+
+				$this->log_email_error( 'email_build_failed',
+					'Email template build failed - Enhanced diagnosis: ' . wp_json_encode( $build_context ) );
 				return false;
 			}
 		}
@@ -1123,6 +1184,36 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 
 			// Log using the existing error logging system
 			return charitable_log_form_error( 'email_failure', $error_details, $context );
+		}
+
+		/**
+		 * Check if recipient string is valid (handles single emails and comma-separated lists).
+		 *
+		 * @since  1.8.9.5
+		 *
+		 * @param  string $recipient The recipient string to validate.
+		 * @return boolean True if valid, false otherwise.
+		 */
+		private function is_valid_recipient( $recipient ) {
+			if ( empty( $recipient ) ) {
+				return false;
+			}
+
+			// If it's a single email, use is_email()
+			if ( strpos( $recipient, ',' ) === false ) {
+				return is_email( trim( $recipient ) );
+			}
+
+			// Handle comma-separated emails
+			$emails = explode( ',', $recipient );
+			foreach ( $emails as $email ) {
+				$email = trim( $email );
+				if ( empty( $email ) || ! is_email( $email ) ) {
+					return false;
+				}
+			}
+
+			return true;
 		}
 	}
 

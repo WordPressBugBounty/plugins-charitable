@@ -2103,7 +2103,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 			}
 
 			// Clean the string.
-			title = title.replace(/[^a-z0-9 _.,!"'/$]/gi, '');
+			title = title.replace(/[^\w\s\u00C0-\u024F\u1E00-\u1EFF\u2C60-\u2C7F\uA720-\uA7FF _.,!"()'\/$[\]:@#%-]/gi, '');
 
 			// Should we allow a blank title even temp?
 			// if ( '' === $.trim(title) ) {

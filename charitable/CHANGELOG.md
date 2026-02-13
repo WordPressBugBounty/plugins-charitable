@@ -1,3 +1,9 @@
+# 1.8.9.5
+* FIX: Added additional checks to resolved issue with Stripe webhook that was causing a fatal error a certain scenario.
+* FIX: Allow more international characters into campaign title fields in campaign visual builder.
+* IMPROVED: Email shortcode processing with recursion prevention for better reliability.
+* IMPROVED: Added additional enhanced email error logging and diagnostics.
+
 # 1.8.9.4
 * FIX: Resolved seemingly missing social media icons in some campaign builder template previews in certain scenarios.
 * UPDATE: Improved campaign builder templates for cache busting.
