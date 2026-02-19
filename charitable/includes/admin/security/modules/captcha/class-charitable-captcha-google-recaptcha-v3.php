@@ -29,18 +29,18 @@ if ( ! class_exists( 'Charitable_Captcha_Google_ReCAPTCHA_V3' ) ) :
 		 * @since 1.8.9
 		 */
 		public function __construct() {
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug() && charitable_is_debug( 'security' ) ) {
 				$provider = charitable_get_option( 'captcha_provider', 'not_set' );
 				$site_key = $this->get_site_key();
 				$secret_key = $this->get_secret_key();
 				error_log( '[Charitable CAPTCHA v3] Constructor called | Provider: ' . $provider . ' | Site Key: ' . ( ! empty( $site_key ) ? 'SET' : 'EMPTY' ) . ' | Secret Key: ' . ( ! empty( $secret_key ) ? 'SET' : 'EMPTY' ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			}
 			if ( $this->is_active() ) {
-				if ( charitable_is_debug() ) {
+				if ( charitable_is_debug() && charitable_is_debug( 'security' ) ) {
 					error_log( '[Charitable CAPTCHA v3] Module is active, calling setup()' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				}
 				$this->setup();
-			} elseif ( charitable_is_debug() ) {
+			} elseif ( charitable_is_debug() && charitable_is_debug( 'security' ) ) {
 				error_log( '[Charitable CAPTCHA v3] Module is NOT active, setup() not called' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			}
 		}
@@ -198,12 +198,12 @@ if ( ! class_exists( 'Charitable_Captcha_Google_ReCAPTCHA_V3' ) ) :
 		public function add_scripts() {
 			$site_key = $this->get_site_key();
 
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug() && charitable_is_debug( 'security' ) ) {
 				error_log( '[Charitable CAPTCHA v3] add_scripts() called | Site Key: ' . ( ! empty( $site_key ) ? 'SET' : 'EMPTY' ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			}
 
 			if ( empty( $site_key ) ) {
-				if ( charitable_is_debug() ) {
+				if ( charitable_is_debug() && charitable_is_debug( 'security' ) ) {
 					error_log( '[Charitable CAPTCHA v3] Site key is empty, not enqueuing scripts' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				}
 				return;

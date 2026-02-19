@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @author  WP Charitable LLC
  * @since   1.0.0
- * @version 1.0.0
+ * @version 1.8.9.6
  */
 ?>
-<h3 class="charitable-form-header"><?php esc_html_x( 'Your Donation', 'donation form amount section header', 'charitable' ) ?></h3>
+<h3 class="charitable-form-header"><?php echo esc_html_x( 'Your Donation', 'donation form amount section header', 'charitable' ); ?></h3>

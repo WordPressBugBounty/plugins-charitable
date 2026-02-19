@@ -128,6 +128,12 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 		public function run() {
 			$this->set_stripe_api_key();
 
+			// phpcs:disable
+			if ( charitable_is_debug() ) {
+				error_log( sprintf( '[STRIPE_WEBHOOK] run() started - Event: %s | Type: %s', $this->event->id, $this->event->type ) );
+			}
+			// phpcs:enable
+
 			try {
 				status_header( 200 );
 
@@ -138,6 +144,12 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 
 				$this->run_event_processors();
 
+				// phpcs:disable
+				if ( charitable_is_debug() ) {
+					error_log( sprintf( '[STRIPE_WEBHOOK] run() completed successfully - Event: %s | Type: %s', $this->event->id, $this->event->type ) );
+				}
+				// phpcs:enable
+
 				die( __( 'Webhook processed.', 'charitable' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 			} catch ( Exception $e ) {
@@ -146,14 +158,14 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 					$body = $e->getJsonBody();
 					// phpcs:disable
 					if ( charitable_is_debug() ) {
-						error_log( 'Stripe API Error: ' . $body['error']['message'] );
+						error_log( sprintf( '[STRIPE_WEBHOOK] Stripe API Error - Event: %s | Message: %s', $this->event->id, $body['error']['message'] ) );
 					}
 					// phpcs:enable
 				} else {
 					// Handle generic PHP exceptions (ErrorException, etc.)
 					// phpcs:disable
 					if ( charitable_is_debug() ) {
-						error_log( 'Webhook Processing Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine() );
+						error_log( sprintf( '[STRIPE_WEBHOOK] Exception caught - Event: %s | Type: %s | Exception: %s | File: %s:%d', $this->event->id, $this->event->type, get_class( $e ) . ': ' . $e->getMessage(), $e->getFile(), $e->getLine() ) );
 					}
 					// phpcs:enable
 				}
@@ -835,24 +847,67 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			$invoice      = $event->data->object;
 			$subscription = $this->get_subscription_for_webhook_object( $invoice );
 
+			if ( charitable_is_debug() ) {
+				error_log( sprintf( '[STRIPE_WEBHOOK] invoice.payment_succeeded - Invoice: %s | Charge: %s | PaymentIntent: %s | Stripe Sub: %s', $invoice->id, $invoice->charge ?? 'null', $invoice->payment_intent ?? 'null', $invoice->subscription ?? 'null' ) ); // phpcs:ignore
+			}
+
 			if ( empty( $subscription ) || ! is_a( $subscription, 'Charitable_Recurring_Donation' ) ) {
+				if ( charitable_is_debug() ) {
+					error_log( sprintf( '[STRIPE_WEBHOOK] No matching Charitable subscription found for Stripe sub: %s', $invoice->subscription ?? 'null' ) ); // phpcs:ignore
+				}
 				return __( 'Subscription Webhook: Missing subscription', 'charitable' );
 			}
 
-			/* The first donation is pending, which means this is the payment for that webhook. */
-			$first_donation = $subscription->get_first_donation_id();
+			$subscription_status = $subscription->get_status();
 
-			if ( 'charitable-pending' == get_post_status( $first_donation ) ) {
+			if ( charitable_is_debug() ) {
+				error_log( sprintf( '[STRIPE_WEBHOOK] Matched Charitable subscription #%d | Status: %s | Gateway Sub ID: %s', $subscription->get_donation_id(), $subscription_status, $subscription->get_gateway_subscription_id() ) ); // phpcs:ignore
+			}
+
+			/* Do not process payments for cancelled subscriptions. */
+			if ( 'charitable-cancelled' === $subscription_status ) {
+				if ( charitable_is_debug() ) {
+					error_log( sprintf( '[STRIPE_WEBHOOK] BLOCKED: Cancelled subscription #%d received invoice.payment_succeeded (Stripe: %s) - skipping to prevent reactivation', $subscription->get_donation_id(), $invoice->subscription ) ); // phpcs:ignore
+				}
+				return __( 'Subscription Webhook: Subscription is cancelled, skipping payment processing', 'charitable' );
+			}
+
+			/* The first donation is pending, which means this is the payment for that webhook. */
+			$first_donation        = $subscription->get_first_donation_id();
+			$first_donation_status = get_post_status( $first_donation );
+
+			if ( 'charitable-pending' == $first_donation_status ) { // phpcs:ignore
 				$donation_id = $first_donation;
 				$donation    = charitable_get_donation( $donation_id );
+
+				if ( charitable_is_debug() ) {
+					error_log( sprintf( '[STRIPE_WEBHOOK] Processing as FIRST payment - Donation #%d (status: %s)', $donation_id, $first_donation_status ) ); // phpcs:ignore
+				}
 			} else {
-				/* Check whether we've already added this renewal. */
-				if ( charitable_get_donation_by_transaction_id( $invoice->payment_intent ) ) {
+				/* Check whether we've already added this renewal using the charge ID. */
+				$existing_donation = charitable_get_donation_by_transaction_id( $invoice->charge );
+
+				if ( $existing_donation ) {
+					if ( charitable_is_debug() ) {
+						error_log( sprintf( '[STRIPE_WEBHOOK] DUPLICATE BLOCKED: Charge %s already exists as donation #%d - idempotency check passed', $invoice->charge, $existing_donation ) ); // phpcs:ignore
+					}
 					return __( 'Subscription Webhook: Renewal has already been added', 'charitable' );
 				}
 
-				$donation_id = $subscription->create_renewal_donation( [ 'status' => 'charitable-completed' ] );
+				if ( charitable_is_debug() ) {
+					error_log( sprintf( '[STRIPE_WEBHOOK] Creating RENEWAL donation for subscription #%d (Charge: %s not found in existing donations)', $subscription->get_donation_id(), $invoice->charge ) ); // phpcs:ignore
+				}
+
+				$donation_id = $subscription->create_renewal_donation( array( 'status' => 'charitable-completed' ) );
 				$donation    = charitable_get_donation( $donation_id );
+
+				if ( charitable_is_debug() ) {
+					if ( is_wp_error( $donation_id ) ) {
+						error_log( sprintf( '[STRIPE_WEBHOOK] ERROR: Renewal creation failed - %s', $donation_id->get_error_message() ) ); // phpcs:ignore
+					} else {
+						error_log( sprintf( '[STRIPE_WEBHOOK] Renewal donation #%d created successfully', $donation_id ) ); // phpcs:ignore
+					}
+				}
 			}
 
 			/* Update the log. */
@@ -881,6 +936,13 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 				$charge->save();
 			} catch ( Exception $e ) {
 				$donation->update_donation_log( __( 'Unable to save donation ID to Stripe charge metadata.', 'charitable' ) );
+				if ( charitable_is_debug() ) {
+					error_log( sprintf( '[STRIPE_WEBHOOK] Warning: Could not save metadata to Stripe charge %s - %s', $invoice->charge, $e->getMessage() ) ); // phpcs:ignore
+				}
+			}
+
+			if ( charitable_is_debug() ) {
+				error_log( sprintf( '[STRIPE_WEBHOOK] SUCCESS: invoice.payment_succeeded fully processed - Donation #%d | Subscription #%d | Charge: %s', $donation_id, $subscription->get_donation_id(), $invoice->charge ) ); // phpcs:ignore
 			}
 
 			return __( 'Subscription Webhook: Payment complete', 'charitable' );
@@ -903,13 +965,31 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			$subscription = $this->get_subscription_for_webhook_object( $object );
 
 			if ( empty( $subscription ) ) {
+				if ( charitable_is_debug() ) {
+					error_log( sprintf( '[STRIPE_WEBHOOK] customer.subscription.updated - No matching Charitable subscription for Stripe sub: %s', $object->id ?? 'null' ) ); // phpcs:ignore
+				}
 				return __( 'Subscription Webhook: Missing subscription', 'charitable' );
 			}
 
 			$stripe_status  = $this->get_subscription_status( $object->status );
 			$current_status = $subscription->get_status();
 
-			if ( $stripe_status != $current_status && 'charitable-completed' != $current_status ) {
+			if ( charitable_is_debug() ) {
+				error_log( sprintf( '[STRIPE_WEBHOOK] customer.subscription.updated - Subscription #%d | Stripe status: %s → Charitable status: %s | Current Charitable status: %s', $subscription->get_donation_id(), $object->status, $stripe_status, $current_status ) ); // phpcs:ignore
+			}
+
+			/* Do not allow Stripe to reactivate a subscription that was cancelled in Charitable. */
+			if ( 'charitable-cancelled' === $current_status && 'charitable-cancelled' !== $stripe_status ) {
+				if ( charitable_is_debug() ) {
+					error_log( sprintf( '[STRIPE_WEBHOOK] BLOCKED: Stripe tried to change cancelled subscription #%d to %s (Stripe status: %s) - preserving cancelled status', $subscription->get_donation_id(), $stripe_status, $object->status ) ); // phpcs:ignore
+				}
+				return __( 'Subscription Webhook: Subscription is cancelled in Charitable, ignoring Stripe status update', 'charitable' );
+			}
+
+			if ( $stripe_status != $current_status && 'charitable-completed' != $current_status ) { // phpcs:ignore
+				if ( charitable_is_debug() ) {
+					error_log( sprintf( '[STRIPE_WEBHOOK] Updating subscription #%d status: %s → %s', $subscription->get_donation_id(), $current_status, $stripe_status ) ); // phpcs:ignore
+				}
 				$subscription->update_status( $stripe_status );
 			}
 
@@ -933,11 +1013,23 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			$subscription = $this->get_subscription_for_webhook_object( $object );
 
 			if ( empty( $subscription ) ) {
+				if ( charitable_is_debug() ) {
+					error_log( sprintf( '[STRIPE_WEBHOOK] customer.subscription.deleted - No matching Charitable subscription for Stripe sub: %s', $object->id ?? 'null' ) ); // phpcs:ignore
+				}
 				return __( 'Subscription Webhook: Missing subscription', 'charitable' );
 			}
 
-			if ( 'charitable-completed' != $subscription->get_status() ) {
+			$current_status = $subscription->get_status();
+
+			if ( charitable_is_debug() ) {
+				error_log( sprintf( '[STRIPE_WEBHOOK] customer.subscription.deleted - Subscription #%d | Current status: %s', $subscription->get_donation_id(), $current_status ) ); // phpcs:ignore
+			}
+
+			if ( 'charitable-completed' != $current_status ) { // phpcs:ignore
 				$subscription->update_status( 'charitable-cancelled' );
+				if ( charitable_is_debug() ) {
+					error_log( sprintf( '[STRIPE_WEBHOOK] Subscription #%d cancelled (was: %s)', $subscription->get_donation_id(), $current_status ) ); // phpcs:ignore
+				}
 			}
 
 			return __( 'Subscription Webhook: Recurring donation cancelled', 'charitable' );

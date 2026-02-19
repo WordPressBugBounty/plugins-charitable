@@ -1,3 +1,8 @@
+# 1.8.9.6
+* IMPROVED: Enhanced license validation process with improved performance when downloading Charitable Pro automatically.
+* FIX: Improved email reliability in certain scenarios, especially with certain aggressive WordPress themes.
+* FIX: Updated translation strings and minor updates to PHP and CSS regarding best practices.
+
 # 1.8.9.5
 * FIX: Added additional checks to resolved issue with Stripe webhook that was causing a fatal error a certain scenario.
 * FIX: Allow more international characters into campaign title fields in campaign visual builder.

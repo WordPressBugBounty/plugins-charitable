@@ -3,11 +3,11 @@
  * Plugin Name: Charitable
  * Plugin URI: https://www.wpcharitable.com
  * Description: The best WordPress donation plugin. Fundraising with recurring donations, and powerful features to help you raise more money online.
- * Version: 1.8.9.5
+ * Version: 1.8.9.6
  * Author: Charitable Donations & Fundraising Team
  * Author URI: https://wpcharitable.com
  * Requires at least: 5.0
- * Stable tag: 1.8.9.5
+ * Stable tag: 1.8.9.6
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
@@ -39,7 +39,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		const AUTHOR = 'WP Charitable';
 
 		/* Plugin version. */
-		const VERSION = '1.8.9.5';
+		const VERSION = '1.8.9.6';
 
 		/* Version of database schema. */
 		const DB_VERSION = '20180522';
@@ -141,6 +141,11 @@ if ( ! class_exists( 'Charitable' ) ) :
 			add_action( 'plugins_loaded', array( $this, 'start' ), 3 );
 
 			add_action( 'plugins_loaded', array( $this, 'check_for_version_conflicts' ), 2 );
+
+			// Run upgrade-server callback before any redirect (e.g. login) can run. Request from connect-callback.php.
+			if ( defined( 'CHARITABLE_CONNECT_CALLBACK' ) && CHARITABLE_CONNECT_CALLBACK ) {
+				add_action( 'init', array( $this, 'run_connect_callback' ), -9999 );
+			}
 
 			// Initialize error handler early.
 			add_action(
@@ -499,6 +504,29 @@ if ( ! class_exists( 'Charitable' ) ) :
 			new Charitable_Stripe_Admin();
 
 			return $admin;
+		}
+
+		/**
+		 * Run the upgrade-server connect callback on init before any redirect (e.g. to login) can run.
+		 * Only registered when CHARITABLE_CONNECT_CALLBACK is defined (request came from connect-callback.php).
+		 *
+		 * @since 1.8.9.6
+		 */
+		public function run_connect_callback() {
+			ini_set( 'display_errors', '0' );
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+			$connect_file = $this->get_path( 'admin' ) . 'class-charitable-admin-connect.php';
+			if ( file_exists( $connect_file ) ) {
+				require_once $connect_file;
+			}
+			if ( ! class_exists( 'Charitable_Admin_Connect' ) ) {
+				header( 'Content-Type: application/json' );
+				wp_send_json( array( 'success' => false, 'data' => array( 'message' => 'Charitable not loaded.' ) ) );
+			}
+			Charitable_Admin_Connect::get_instance()->process();
+			exit;
 		}
 
 		/**

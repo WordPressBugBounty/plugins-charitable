@@ -586,8 +586,7 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 
 		/**
 		 * Check if splash modal is allowed.
-		 * Only allow in Form Builder, Charitable pages, and the Dashboard.
-		 * And only if it's not a new installation.
+		 * Only allow on Charitable dashboard or settings screens; never on onboarding/setup welcome.
 		 *
 		 * @since 1.8.6
 		 *
@@ -595,8 +594,54 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 		 */
 		public function is_allow_splash(): bool {
 
+			// Never show on onboarding/setup welcome flow (splash would sit on top of onboarding UI).
+			if ( $this->is_onboarding_setup_page() ) {
+				return false;
+			}
+
 			// Only show on Charitable pages OR dashboard.
 			return charitable_is_admin_screen() || $this->is_dashboard();
+		}
+
+		/**
+		 * Check if current screen is the onboarding/setup welcome flow.
+		 * Splash must not show here so it doesn't overlay the onboarding UI.
+		 *
+		 * @since 1.8.9.6
+		 *
+		 * @return bool True if on onboarding setup page, false otherwise.
+		 */
+		private function is_onboarding_setup_page(): bool {
+
+			if ( ! is_admin() || empty( $_GET['page'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				return false;
+			}
+
+			$page = sanitize_text_field( $_GET['page'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+			// Block splash on the setup wizard, checklist, and any charitable-setup* pages.
+			if ( strpos( $page, 'charitable-setup' ) !== false ) {
+				return true;
+			}
+
+			// Block splash on the welcome/onboarding flow (page=charitable&wpchar_lite=lite&setup=...).
+			if ( 'charitable' !== $page ) {
+				return false;
+			}
+
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( empty( $_GET['wpchar_lite'] ) || 'lite' !== $_GET['wpchar_lite'] ) {
+				return false;
+			}
+
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( empty( $_GET['setup'] ) ) {
+				return false;
+			}
+
+			$setup = sanitize_key( $_GET['setup'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+			return in_array( $setup, array( 'welcome', 'cancelled', 'return' ), true );
 		}
 
 		/**

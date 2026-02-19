@@ -62,3 +62,50 @@ add_action( 'charitable_campaign_end', array( 'Charitable_Email_Campaign_End', '
  */
 add_action( 'charitable_enable_email', array( Charitable_Emails::get_instance(), 'handle_email_settings_request' ) );
 add_action( 'charitable_disable_email', array( Charitable_Emails::get_instance(), 'handle_email_settings_request' ) );
+
+/**
+ * Process deferred emails scheduled during AJAX to avoid Oxygen output buffer conflicts.
+ *
+ * When Oxygen + Braintree + Recurring donations are active, email sending is deferred
+ * via wp_cron to prevent email HTML from contaminating the AJAX JSON response.
+ *
+ * @since 1.8.9.6
+ *
+ * @param array $email_data Contains 'class', 'args', and 'timestamp'.
+ */
+add_action( 'charitable_send_deferred_email', function( $email_data ) {
+	if ( empty( $email_data['class'] ) || ! class_exists( $email_data['class'] ) ) {
+		return;
+	}
+
+	$args  = isset( $email_data['args'] ) ? $email_data['args'] : array();
+	$class = $email_data['class'];
+
+	// Reconstruct donation object from ID.
+	$donation = null;
+	if ( ! empty( $args['donation_id'] ) ) {
+		$donation = charitable_get_donation( $args['donation_id'] );
+	}
+
+	if ( ! $donation ) {
+		return;
+	}
+
+	// Reconstruct campaign donations.
+	$campaign_donations = $donation->get_campaign_donations();
+
+	// Clean output buffers to ensure no contamination.
+	while ( ob_get_level() > 0 ) {
+		ob_end_clean();
+	}
+
+	// Instantiate and send the email.
+	$email_object = new $class( array(
+		'donation' => $donation,
+		'campaign' => ! empty( $campaign_donations ) ? charitable_get_campaign( current( $campaign_donations )->campaign_id ) : null,
+	) );
+
+	if ( method_exists( $email_object, 'send' ) ) {
+		$email_object->send();
+	}
+} );

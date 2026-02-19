@@ -2066,9 +2066,19 @@ div#charitable-settings .charitable-btn-orange {
   border-color: #e27730;
   color: #fff;
 }
+div#charitable-settings .charitable-btn-orange:hover:not(:disabled) {
+  background-color: #c96528;
+  border-color: #c96528;
+  color: #fff;
+}
 div#charitable-settings .charitable-btn-green {
   background-color: #5aa152;
   border-color: #5aa152;
+  color: #fff;
+}
+div#charitable-settings .charitable-btn-green:hover:not(:disabled) {
+  background-color: #4c8a45;
+  border-color: #4c8a45;
   color: #fff;
 }
 div#charitable-settings p.submit .button.button-secondary {

@@ -29,18 +29,18 @@ if ( ! class_exists( 'Charitable_Captcha_Cloudflare_Turnstile' ) ) :
 		 * @since 1.8.9
 		 */
 		public function __construct() {
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug() && charitable_is_debug( 'security' ) ) {
 				$provider = charitable_get_option( 'captcha_provider', 'not_set' );
 				$site_key = $this->get_site_key();
 				$secret_key = $this->get_secret_key();
 				error_log( '[Charitable CAPTCHA Turnstile] Constructor called | Provider: ' . $provider . ' | Site Key: ' . ( ! empty( $site_key ) ? 'SET' : 'EMPTY' ) . ' | Secret Key: ' . ( ! empty( $secret_key ) ? 'SET' : 'EMPTY' ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			}
 			if ( $this->is_active() ) {
-				if ( charitable_is_debug() ) {
+				if ( charitable_is_debug() && charitable_is_debug( 'security' ) ) {
 					error_log( '[Charitable CAPTCHA Turnstile] Module is active, calling setup()' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				}
 				$this->setup();
-			} elseif ( charitable_is_debug() ) {
+			} elseif ( charitable_is_debug() && charitable_is_debug( 'security' ) ) {
 				error_log( '[Charitable CAPTCHA Turnstile] Module is NOT active, setup() not called' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			}
 		}
@@ -169,7 +169,7 @@ if ( ! class_exists( 'Charitable_Captcha_Cloudflare_Turnstile' ) ) :
 		 * @return void
 		 */
 		public function add_turnstile_to_form( Charitable_Form $form ) {
-			if ( charitable_is_debug() ) {
+			if ( charitable_is_debug() && charitable_is_debug( 'security' ) ) {
 				$form_class = get_class( $form );
 				$form_key = $this->get_current_form_from_class( $form );
 				$is_enabled = $this->is_enabled_for_form( $form_key );
@@ -178,14 +178,14 @@ if ( ! class_exists( 'Charitable_Captcha_Cloudflare_Turnstile' ) ) :
 
 			/* Don't show captcha for logged in users. */
 			if ( is_user_logged_in() && 'no' === charitable_get_option( 'captcha_logged_in', 'no' ) ) {
-				if ( charitable_is_debug() ) {
+				if ( charitable_is_debug() && charitable_is_debug( 'security' ) ) {
 					error_log( '[Charitable CAPTCHA Turnstile] Skipping - user is logged in and captcha_logged_in is "no"' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				}
 				return;
 			}
 
 			if ( $this->is_enabled_for_form( $this->get_current_form_from_class( $form ) ) ) {
-				if ( charitable_is_debug() ) {
+				if ( charitable_is_debug() && charitable_is_debug( 'security' ) ) {
 					error_log( '[Charitable CAPTCHA Turnstile] Adding Turnstile widget to form' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				}
 				$form_key = $this->get_current_form_from_class( $form );

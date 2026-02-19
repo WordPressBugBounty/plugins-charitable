@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Charitable 1.8.9.5\n"
+"Project-Id-Version: Charitable 1.8.9.6\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/charitable\n"
 "Last-Translator: Charitable Team\n"
 "Language-Team: Charitable Team\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-13T00:21:50+00:00\n"
+"POT-Creation-Date: 2026-02-19T19:36:41+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: charitable\n"
@@ -47,17 +47,17 @@ msgstr ""
 msgid "https://wpcharitable.com"
 msgstr ""
 
-#: charitable.php:1078
+#: charitable.php:1106
 msgid "Cloning this object is forbidden."
 msgstr ""
 
-#: charitable.php:1093
+#: charitable.php:1121
 msgid "Unserializing instances of this class is forbidden."
 msgstr ""
 
 #. Translators: This is an action link users can click to purchase a license for All in One SEO Pro.
 #. translators: Suggestion on completion of checklist on checklist page.
-#: charitable.php:1283
+#: charitable.php:1311
 #: includes/admin/charitable-core-admin-functions.php:392
 #: includes/admin/class-charitable-admin-getting-started.php:521
 #: includes/admin/dashboard/class-charitable-dashboard.php:1522
@@ -66,7 +66,7 @@ msgid "Upgrade to Pro"
 msgstr ""
 
 #. translators: %s is the version number.
-#: charitable.php:1363
+#: charitable.php:1391
 msgid "<p><strong style=\"color:red;\">NOTICE:</strong> <strong>Charitable</strong> detected an out-of-date and incompatible version of <strong>Charitable Stripe</strong> addon. To avoid issues with Stripe donations, <strong>Charitable Stripe</strong> %s was deactivated. Please update <strong>Charitable Stripe</strong> to version 1.5.0 or higher.</p><p>You can get the latest version of <strong>Charitable Stripe</strong> through your <a href=\"https://www.wpcharitable.com/account/\" target=\"_blank\">Charitable account at wpcharitable.com</a>. All active licenses are accessible in the \"My Downloads\" tab.</p>"
 msgstr ""
 
@@ -117,13 +117,13 @@ msgid "Plugin already installed."
 msgstr ""
 
 #: custom-packages/charitable-licenses/src/CharitableLicenses.php:1214
-#: includes/admin/class-charitable-admin-connect.php:269
+#: includes/admin/class-charitable-admin-connect.php:321
 #: _vendor/wpcharitable/charitable-licenses/src/CharitableLicenses.php:1216
 msgid "There was an error while installing an upgrade. Please check file system permissions and try again. Also, you can download the plugin from charitable.com and install it manually."
 msgstr ""
 
 #: custom-packages/charitable-licenses/src/CharitableLicenses.php:1234
-#: includes/admin/class-charitable-admin-connect.php:289
+#: includes/admin/class-charitable-admin-connect.php:341
 #: _vendor/wpcharitable/charitable-licenses/src/CharitableLicenses.php:1236
 msgid "No install method found."
 msgstr ""
@@ -4884,23 +4884,23 @@ msgstr ""
 msgid "A comma-separated list of email address that will receive this email."
 msgstr ""
 
-#: includes/abstracts/abstract-class-charitable-email.php:540
+#: includes/abstracts/abstract-class-charitable-email.php:546
 msgid "A `resend` method has not been defined for this class."
 msgstr ""
 
-#: includes/abstracts/abstract-class-charitable-email.php:559
+#: includes/abstracts/abstract-class-charitable-email.php:565
 msgid "A `can_be_resent` method has not been defined for this class."
 msgstr ""
 
-#: includes/abstracts/abstract-class-charitable-email.php:733
+#: includes/abstracts/abstract-class-charitable-email.php:739
 msgid "You cannot send this email without a donation!"
 msgstr ""
 
-#: includes/abstracts/abstract-class-charitable-email.php:753
+#: includes/abstracts/abstract-class-charitable-email.php:759
 msgid "You cannot send this email without a campaign!"
 msgstr ""
 
-#: includes/abstracts/abstract-class-charitable-email.php:859
+#: includes/abstracts/abstract-class-charitable-email.php:865
 msgid "The following options are available with the <code>[charitable_email]</code> shortcode:"
 msgstr ""
 
@@ -4980,7 +4980,7 @@ msgstr ""
 #: includes/admin/addons-directory/class-charitable-addons-directory.php:107
 #: includes/admin/addons-directory/class-charitable-addons-directory.php:136
 #: includes/admin/addons-directory/class-charitable-addons-directory.php:151
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:919
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:935
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:930
 #: includes/admin/campaign-builder/panels/class-marketing.php:477
 #: includes/admin/campaign-builder/panels/class-payment.php:575
@@ -4998,7 +4998,7 @@ msgid "Activated"
 msgstr ""
 
 #: includes/admin/addons-directory/class-charitable-addons-directory.php:109
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:1000
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:1016
 #: includes/admin/campaign-builder/templates/class-templates.php:1715
 #: includes/admin/charitable-admin-addons-functions.php:289
 #: includes/admin/dashboard/class-charitable-dashboard.php:967
@@ -5010,20 +5010,20 @@ msgid "Active"
 msgstr ""
 
 #: includes/admin/addons-directory/class-charitable-addons-directory.php:110
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:913
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:929
 msgid "Deactivate"
 msgstr ""
 
 #: includes/admin/addons-directory/class-charitable-addons-directory.php:111
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:1001
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:1017
 #: includes/admin/charitable-admin-addons-functions.php:297
 #: includes/admin/views/metaboxes/campaign-benefactors/summary.php:27
 msgid "Inactive"
 msgstr ""
 
 #: includes/admin/addons-directory/class-charitable-addons-directory.php:112
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:937
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:942
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:953
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:958
 msgid "Install Addon"
 msgstr ""
 
@@ -5186,79 +5186,144 @@ msgstr ""
 msgid "To enable this payment method, enable Express Checkout"
 msgstr ""
 
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:317
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:158
+msgid "Activate Now"
+msgstr ""
+
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:159
+msgid "Activate Later"
+msgstr ""
+
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:160
+msgid "Download Pro"
+msgstr ""
+
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:161
+msgid "Downloading..."
+msgstr ""
+
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:162
+msgid "Please wait while we download Charitable Pro."
+msgstr ""
+
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:163
+#: includes/admin/dashboard/class-charitable-dashboard.php:1568
+msgid "Activating..."
+msgstr ""
+
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:164
+msgid "Please wait while we activate Charitable Pro."
+msgstr ""
+
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:165
+msgid "Download failed. Please try again."
+msgstr ""
+
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:166
+msgid "Activation failed. You can activate it manually from the Plugins page."
+msgstr ""
+
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:167
+msgid "Visit Addons Page"
+msgstr ""
+
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:168
+msgid "Ready to Use"
+msgstr ""
+
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:169
+msgid "Charitable Pro has been downloaded and is ready to activate when you're ready. You can activate it from the Plugins page."
+msgstr ""
+
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:170
+msgid "Verifying..."
+msgstr ""
+
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:171
+msgid "Deactivating..."
+msgstr ""
+
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:172
+msgid "Manual Install"
+msgstr ""
+
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:173
+msgid "License Validated"
+msgstr ""
+
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:333
 #: includes/admin/class-charitable-admin-pages.php:249
 #: includes/admin/growth-tools/class-charitable-growth-tools.php:487
 msgid "Charitable Addons"
 msgstr ""
 
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:321
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:337
 msgid "There are some communication or license issues. Please make sure your server is able to communicate with wpcharitable.com. Contact Charitable Support for additional assistance."
 msgstr ""
 
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:402
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:418
 #: includes/admin/views/growth-tools/growth-tools.php:23
 msgid "Featured"
 msgstr ""
 
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:406
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:837
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:422
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:853
 #: includes/admin/dashboard/class-charitable-dashboard.php:2180
 #: includes/admin/dashboard/class-charitable-dashboard.php:2693
 #: includes/admin/views/tools/snippets.php:131
 msgid "Installed"
 msgstr ""
 
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:410
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:426
 msgid "Available In Your Plan"
 msgstr ""
 
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:414
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:430
 msgid "Premium Addons"
 msgstr ""
 
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:425
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:441
 msgid "There was an issue retrieving the addons for this site. Please click on the button below the refresh the addons data."
 msgstr ""
 
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:428
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:446
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:444
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:462
 msgid "Refresh Addons"
 msgstr ""
 
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:450
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:466
 msgid "Search Addons"
 msgstr ""
 
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:832
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:848
 msgid "Included In Pro"
 msgstr ""
 
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:897
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:913
 #: includes/admin/class-charitable-admin-getting-started.php:460
 #: includes/admin/views/checklist/checklist.php:593
 msgid "Upgrade Now"
 msgstr ""
 
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:978
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:994
 msgid "License Data Warning:"
 msgstr ""
 
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:979
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:995
 msgid "Some addon download URLs appear to be invalid. This may indicate that your license data is not fully synchronized with the license server. You may need to reconnect your license by removing it and adding it back in the"
 msgstr ""
 
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:981
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:997
 msgid "Charitable Settings page"
 msgstr ""
 
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:1002
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:1018
 #: includes/admin/charitable-admin-addons-functions.php:311
 msgid "Not Installed"
 msgstr ""
 
 #. translators: %s - addon name.
-#: includes/admin/addons-directory/class-charitable-addons-directory.php:1064
+#: includes/admin/addons-directory/class-charitable-addons-directory.php:1080
 msgid "%s addon"
 msgstr ""
 
@@ -8951,67 +9016,121 @@ msgstr ""
 msgid "You can read more about the donors block and donors shortcode on our site."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-connect.php:89
+#: includes/admin/class-charitable-admin-connect.php:110
+#: includes/admin/class-charitable-admin-connect.php:560
 msgid "You are not allowed to install plugins."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-connect.php:101
-msgid "The automatic upgrade to Charitable Pro is not available on localhost. We suggest you install the plugin manually."
-msgstr ""
-
-#: includes/admin/class-charitable-admin-connect.php:114
+#: includes/admin/class-charitable-admin-connect.php:124
 msgid "Please enter your license key to connect."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-connect.php:121
+#: includes/admin/class-charitable-admin-connect.php:131
 msgid "Only the Lite version of Charitable can be upgraded."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-connect.php:128
-#: includes/admin/class-charitable-admin-connect.php:248
-msgid "Charitable Pro plugin not found. Please ensure it is properly installed before upgrading."
+#: includes/admin/class-charitable-admin-connect.php:148
+msgid "Invalid license key. Please check your license key and try again."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-connect.php:146
-msgid "Charitable Pro is installed but not activated."
+#: includes/admin/class-charitable-admin-connect.php:180
+#: includes/admin/class-charitable-admin-connect.php:763
+msgid "License validated successfully! Since you're on localhost, please install Charitable Pro manually using the link below."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-connect.php:198
+#: includes/admin/class-charitable-admin-connect.php:194
+#: includes/admin/class-charitable-admin-connect.php:750
+msgid "Your license is valid. Pro is installed but inactive. Activate now?"
+msgstr ""
+
+#: includes/admin/class-charitable-admin-connect.php:236
 msgid "There was an error while installing an upgrade. Please download the plugin from charitable.com and install it manually."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-connect.php:212
-msgid "No oth or file found."
+#: includes/admin/class-charitable-admin-connect.php:253
+msgid "Missing verification token or download URL. This endpoint must be called by the upgrade server."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-connect.php:219
+#: includes/admin/class-charitable-admin-connect.php:263
 msgid "No oth found."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-connect.php:223
+#: includes/admin/class-charitable-admin-connect.php:270
 msgid "Invalid oth."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-connect.php:242
-#: includes/admin/class-charitable-admin-connect.php:261
-#: includes/admin/class-charitable-admin-connect.php:438
+#: includes/admin/class-charitable-admin-connect.php:298
+#: includes/admin/class-charitable-admin-connect.php:311
+#: includes/admin/class-charitable-admin-connect.php:492
 msgid "Plugin installed & activated."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-connect.php:299
+#: includes/admin/class-charitable-admin-connect.php:351
 msgid "No key provided."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-connect.php:322
+#: includes/admin/class-charitable-admin-connect.php:374
 msgid "Newly installed plugin not found. Cannot safely deactivate Lite version."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-connect.php:442
+#: includes/admin/class-charitable-admin-connect.php:496
 msgid "Pro version installed but needs to be activated on the Plugins page inside your WordPress admin."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-connect.php:446
+#: includes/admin/class-charitable-admin-connect.php:500
 msgid "No plugin installed."
+msgstr ""
+
+#: includes/admin/class-charitable-admin-connect.php:569
+msgid "Download URL missing. Please visit the %1$sAddons page%2$s to download manually."
+msgstr ""
+
+#: includes/admin/class-charitable-admin-connect.php:589
+msgid "Unable to access file system. Please visit the %1$sAddons page%2$s to download manually, or see our %3$sinstallation guide%4$s."
+msgstr ""
+
+#: includes/admin/class-charitable-admin-connect.php:615
+msgid "Installation method not available. Please visit the %1$sAddons page%2$s to download manually."
+msgstr ""
+
+#: includes/admin/class-charitable-admin-connect.php:636
+msgid "Plugin download completed but files not found. Please try again."
+msgstr ""
+
+#: includes/admin/class-charitable-admin-connect.php:641
+msgid "Charitable Pro downloaded successfully!"
+msgstr ""
+
+#: includes/admin/class-charitable-admin-connect.php:644
+msgid "Download Complete!"
+msgstr ""
+
+#: includes/admin/class-charitable-admin-connect.php:645
+msgid "Charitable Pro downloaded successfully! Activate now?"
+msgstr ""
+
+#: includes/admin/class-charitable-admin-connect.php:652
+msgid "Download failed. Please visit the %1$sAddons page%2$s to try again, or see our %3$sinstallation guide%4$s."
+msgstr ""
+
+#: includes/admin/class-charitable-admin-connect.php:676
+msgid "You are not allowed to activate plugins."
+msgstr ""
+
+#: includes/admin/class-charitable-admin-connect.php:682
+msgid "Plugin basename missing."
+msgstr ""
+
+#: includes/admin/class-charitable-admin-connect.php:688
+msgid "Plugin files not found. Cannot activate."
+msgstr ""
+
+#: includes/admin/class-charitable-admin-connect.php:705
+msgid "Charitable Pro activated successfully!"
+msgstr ""
+
+#: includes/admin/class-charitable-admin-connect.php:712
+msgid "Charitable Pro installed but activation failed. You can activate it manually from the Plugins page."
 msgstr ""
 
 #: includes/admin/class-charitable-admin-getting-started.php:159
@@ -10040,10 +10159,6 @@ msgstr ""
 msgid "Activate Addon"
 msgstr ""
 
-#: includes/admin/dashboard/class-charitable-dashboard.php:1568
-msgid "Activating..."
-msgstr ""
-
 #: includes/admin/dashboard/class-charitable-dashboard.php:1613
 msgid "Anonymous"
 msgstr ""
@@ -10051,9 +10166,9 @@ msgstr ""
 #: includes/admin/dashboard/class-charitable-dashboard.php:1661
 #: includes/admin/dashboard/class-charitable-dashboard.php:1702
 #: includes/admin/dashboard/class-charitable-dashboard.php:1748
-#: includes/admin/tools/class-charitable-tools-system-info.php:806
-#: includes/admin/tools/class-charitable-tools-system-info.php:1129
-#: includes/admin/tools/class-charitable-tools-system-info.php:1403
+#: includes/admin/tools/class-charitable-tools-system-info.php:807
+#: includes/admin/tools/class-charitable-tools-system-info.php:1130
+#: includes/admin/tools/class-charitable-tools-system-info.php:1404
 msgid "Security check failed"
 msgstr ""
 
@@ -11824,7 +11939,7 @@ msgid "License Key"
 msgstr ""
 
 #: includes/admin/settings/class-charitable-general-settings.php:97
-#: includes/admin/settings/class-charitable-licenses-settings.php:537
+#: includes/admin/settings/class-charitable-licenses-settings.php:553
 msgid "Your license key provides access to updates and addons."
 msgstr ""
 
@@ -12033,109 +12148,109 @@ msgstr ""
 msgid "Save & Re-check All Licenses"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:527
+#: includes/admin/settings/class-charitable-licenses-settings.php:543
 msgid "Paste license key here"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:529
+#: includes/admin/settings/class-charitable-licenses-settings.php:545
 msgid "Verify Key"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:531
+#: includes/admin/settings/class-charitable-licenses-settings.php:547
 msgid "Deactivate Key"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:590
-#: includes/admin/settings/class-charitable-licenses-settings.php:665
+#: includes/admin/settings/class-charitable-licenses-settings.php:606
+#: includes/admin/settings/class-charitable-licenses-settings.php:681
 msgid "You're using "
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:592
+#: includes/admin/settings/class-charitable-licenses-settings.php:608
 msgid " - no license needed. Enjoy!"
 msgstr ""
 
 #. translators: %s - charitable.com upgrade URL.
-#: includes/admin/settings/class-charitable-licenses-settings.php:598
+#: includes/admin/settings/class-charitable-licenses-settings.php:614
 msgid "To unlock more features consider <strong><a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"charitable-upgrade-modal\">upgrading to PRO</a></strong>."
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:615
+#: includes/admin/settings/class-charitable-licenses-settings.php:631
 msgid "As a valued Charitable Lite user, you receive up to <strong>$300 off</strong>, automatically applied at checkout!"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:624
+#: includes/admin/settings/class-charitable-licenses-settings.php:640
 msgid "Already registered? You might have an expired or invalid license. Reach out to us for support."
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:626
-#: includes/admin/settings/class-charitable-licenses-settings.php:633
+#: includes/admin/settings/class-charitable-licenses-settings.php:642
+#: includes/admin/settings/class-charitable-licenses-settings.php:649
 msgid "There was an error attempting to validate your license key. Check and see if you have exceeded your license activations."
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:628
+#: includes/admin/settings/class-charitable-licenses-settings.php:644
 msgid "There was an error attempting to contact the license server. Please try again later."
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:631
+#: includes/admin/settings/class-charitable-licenses-settings.php:647
 msgid "There was an error attempting to validate your license key. Please try again later."
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:635
+#: includes/admin/settings/class-charitable-licenses-settings.php:651
 msgid "There was a problem attempting to validate your license key. Please try again later."
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:638
+#: includes/admin/settings/class-charitable-licenses-settings.php:654
 msgid "Already purchased? Simply enter your license key below to enable Charitable PRO!"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:669
+#: includes/admin/settings/class-charitable-licenses-settings.php:685
 msgid ". You have a lifetime license"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:671
+#: includes/admin/settings/class-charitable-licenses-settings.php:687
 msgid ". Your license expires on "
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:675
+#: includes/admin/settings/class-charitable-licenses-settings.php:691
 msgid ". Enjoy!"
 msgstr ""
 
 #. translators: %s - charitable.com upgrade URL.
-#: includes/admin/settings/class-charitable-licenses-settings.php:681
+#: includes/admin/settings/class-charitable-licenses-settings.php:697
 msgid "Your license may be expiring soon. Please renew to continue receiving updates and support. <a target=\"_blank\" href=\"%s\">Learn more</a>."
 msgstr ""
 
 #. translators: %s - charitable.com upgrade URL.
-#: includes/admin/settings/class-charitable-licenses-settings.php:700
+#: includes/admin/settings/class-charitable-licenses-settings.php:716
 msgid "It appears your license may have expired. Please renew to continue receiving updates and support. <a target=\"_blank\" href=\"%s\">Learn more</a>."
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:727
+#: includes/admin/settings/class-charitable-licenses-settings.php:743
 msgid "License data:"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:729
+#: includes/admin/settings/class-charitable-licenses-settings.php:745
 msgid "Settings data:"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:732
+#: includes/admin/settings/class-charitable-licenses-settings.php:748
 msgid "Plan name:"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:740
+#: includes/admin/settings/class-charitable-licenses-settings.php:756
 msgid "Lite"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:742
+#: includes/admin/settings/class-charitable-licenses-settings.php:758
 msgid "Your license is not valid or has expired."
 msgstr ""
 
-#: includes/admin/settings/class-charitable-licenses-settings.php:766
+#: includes/admin/settings/class-charitable-licenses-settings.php:782
 msgid "Your license key has been removed."
 msgstr ""
 
 #. translators: %s - charitable.com upgrade URL.
-#: includes/admin/settings/class-charitable-licenses-settings.php:798
+#: includes/admin/settings/class-charitable-licenses-settings.php:814
 msgid "You're using <strong>Charitable</strong> with one or more <a href=\"%s\">activated legacy licenses</a>. Enjoy! 🙂"
 msgstr ""
 
@@ -13039,42 +13154,42 @@ msgstr ""
 msgid "Test Connection"
 msgstr ""
 
-#: includes/admin/tools/class-charitable-tools-system-info.php:811
-#: includes/admin/tools/class-charitable-tools-system-info.php:1134
-#: includes/admin/tools/class-charitable-tools-system-info.php:1408
+#: includes/admin/tools/class-charitable-tools-system-info.php:812
+#: includes/admin/tools/class-charitable-tools-system-info.php:1135
+#: includes/admin/tools/class-charitable-tools-system-info.php:1409
 msgid "Insufficient permissions"
 msgstr ""
 
-#: includes/admin/tools/class-charitable-tools-system-info.php:1161
+#: includes/admin/tools/class-charitable-tools-system-info.php:1162
 msgid "Test email failed: %s"
 msgstr ""
 
-#: includes/admin/tools/class-charitable-tools-system-info.php:1273
-#: includes/admin/tools/class-charitable-tools-system-info.php:1328
+#: includes/admin/tools/class-charitable-tools-system-info.php:1274
+#: includes/admin/tools/class-charitable-tools-system-info.php:1329
 msgid "Security check failed: invalid or expired nonce. Refresh the page and try again."
 msgstr ""
 
-#: includes/admin/tools/class-charitable-tools-system-info.php:1281
-#: includes/admin/tools/class-charitable-tools-system-info.php:1336
+#: includes/admin/tools/class-charitable-tools-system-info.php:1282
+#: includes/admin/tools/class-charitable-tools-system-info.php:1337
 msgid "You do not have the manage_charitable_settings capability."
 msgstr ""
 
 #. translators: %d: number of deleted error logs
-#: includes/admin/tools/class-charitable-tools-system-info.php:1294
+#: includes/admin/tools/class-charitable-tools-system-info.php:1295
 msgid "%d error log cleared successfully."
 msgid_plural "%d error logs cleared successfully."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/admin/tools/class-charitable-tools-system-info.php:1309
+#: includes/admin/tools/class-charitable-tools-system-info.php:1310
 msgid "Error clearing logs: %s"
 msgstr ""
 
-#: includes/admin/tools/class-charitable-tools-system-info.php:1375
+#: includes/admin/tools/class-charitable-tools-system-info.php:1376
 msgid "Error logs exported successfully."
 msgstr ""
 
-#: includes/admin/tools/class-charitable-tools-system-info.php:1385
+#: includes/admin/tools/class-charitable-tools-system-info.php:1386
 msgid "Error exporting logs: %s"
 msgstr ""
 
@@ -17014,7 +17129,7 @@ msgid "Subscription initialised for cancellation in Square."
 msgstr ""
 
 #: includes/gateways/class-charitable-gateway-square.php:2402
-#: includes/gateways/class-charitable-gateway-stripe-am.php:1163
+#: includes/gateways/class-charitable-gateway-stripe-am.php:1179
 msgid "Unknown error."
 msgstr ""
 
@@ -17236,7 +17351,7 @@ msgid "For security reasons, credit card donations require Javascript. Please en
 msgstr ""
 
 #: includes/gateways/class-charitable-gateway-stripe-am.php:841
-#: includes/gateways/class-charitable-gateway-stripe-am.php:1579
+#: includes/gateways/class-charitable-gateway-stripe-am.php:1597
 msgid "Missing keys for Stripe payment gateway. Unable to proceed with payment."
 msgstr ""
 
@@ -17254,29 +17369,29 @@ msgstr ""
 msgid "Stripe refund failed: %s"
 msgstr ""
 
-#: includes/gateways/class-charitable-gateway-stripe-am.php:1102
+#: includes/gateways/class-charitable-gateway-stripe-am.php:1106
 msgid "Cancellation failed: No gateway subscription ID found."
 msgstr ""
 
-#: includes/gateways/class-charitable-gateway-stripe-am.php:1122
+#: includes/gateways/class-charitable-gateway-stripe-am.php:1130
 msgid "Cancellation failed: No Stripe API key configured."
 msgstr ""
 
-#: includes/gateways/class-charitable-gateway-stripe-am.php:1149
+#: includes/gateways/class-charitable-gateway-stripe-am.php:1163
 msgid "Retrieved subscription from Stripe - Current status: %s"
 msgstr ""
 
-#: includes/gateways/class-charitable-gateway-stripe-am.php:1157
+#: includes/gateways/class-charitable-gateway-stripe-am.php:1173
 msgid "Subscription cancelled in Stripe."
 msgstr ""
 
 #. translators: %s: error message
-#: includes/gateways/class-charitable-gateway-stripe-am.php:1168
+#: includes/gateways/class-charitable-gateway-stripe-am.php:1184
 msgid "Stripe cancellation failed: %s"
 msgstr ""
 
-#: includes/gateways/class-charitable-gateway-stripe-am.php:1315
-#: includes/gateways/class-charitable-gateway-stripe-am.php:1416
+#: includes/gateways/class-charitable-gateway-stripe-am.php:1333
+#: includes/gateways/class-charitable-gateway-stripe-am.php:1434
 #: includes/stripe/abstracts/class-charitable-stripe-gateway-processor.php:484
 #: includes/stripe/abstracts/class-charitable-stripe-gateway-processor.php:1354
 #: includes/stripe/gateway/class-charitable-stripe-connected-customer.php:279
@@ -17287,11 +17402,11 @@ msgstr ""
 msgid "Something went wrong."
 msgstr ""
 
-#: includes/gateways/class-charitable-gateway-stripe-am.php:1398
+#: includes/gateways/class-charitable-gateway-stripe-am.php:1416
 msgid "Donor for"
 msgstr ""
 
-#: includes/gateways/class-charitable-gateway-stripe-am.php:1459
+#: includes/gateways/class-charitable-gateway-stripe-am.php:1477
 msgid "Missing credit card details. Unable to proceed with payment."
 msgstr ""
 
@@ -17855,7 +17970,7 @@ msgid "Unable to construct Square object with payload."
 msgstr ""
 
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:176
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:141
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:153
 msgid "Webhook processed."
 msgstr ""
 
@@ -17919,7 +18034,7 @@ msgstr ""
 
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1015
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1028
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:411
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:423
 msgid "Donation Webhook: Refund processed"
 msgstr ""
 
@@ -17929,27 +18044,27 @@ msgstr ""
 
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1041
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1103
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:481
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:769
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:798
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:832
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:912
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1001
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:493
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:781
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:810
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:844
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:961
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1009
 msgid "Subscription Webhook: Unable to process without Charitable Recurring extension."
 msgstr ""
 
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1064
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:776
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:811
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:839
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:937
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1025
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:788
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:823
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:858
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:971
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1019
 msgid "Subscription Webhook: Missing subscription"
 msgstr ""
 
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1088
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1222
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:975
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:996
 msgid "Subscription Webhook: Recurring donation updated"
 msgstr ""
 
@@ -17963,7 +18078,7 @@ msgstr ""
 
 #. translators: %d: threshold
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1310
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1165
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1117
 msgid "The payment intent has been cancelled after %d failed payment attempts."
 msgstr ""
 
@@ -18141,125 +18256,133 @@ msgstr ""
 msgid "Unable to construct Stripe object with payload."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:136
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:142
 msgid "Test webhook successfully received."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:162
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:174
 msgid "Error while processing webhook."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:382
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:431
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:569
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:394
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:443
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:581
 msgid "Donation Webhook: Missing donation ID"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:394
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:406
 msgid "Donation Webhook: Refund donation ID not valid"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:406
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:418
 msgid "Donation Webhook: Charge ID does not match donation reference on this site"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:409
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:421
 msgid "Donation refunded from the Stripe dashboard."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:437
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:581
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:673
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:449
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:593
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:685
 msgid "Donation Webhook: Donation ID not valid"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:449
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:591
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:461
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:603
 msgid "Donation Webhook: Payment Intent does not match donation reference on this site"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:468
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:480
 msgid "Donation Webhook: Donation marked as Failed"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:493
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:505
 msgid "Donation Webhook: Unable to retrieve invoice for failed payment intent."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:499
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:511
 msgid "Donation Webhook: No matching subscription found for invoice with failed payment intent."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:512
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:524
 msgid "Donation Webhook: Recurring donation for payment intent marked as cancelled."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:515
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:527
 msgid "Donation Webhook: Recurring donation for payment intent marked as pending cancellation."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:541
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:553
 msgid "Donation Webhook: Recurring donation and initial payment for payment intent marked as failed"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:639
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:651
 msgid "Donation Webhook: Donation marked as Paid"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:668
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:680
 msgid "Donation Webhook: Session id does not match donation reference on this site"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:683
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:695
 msgid "Donation Webhook: Missing payment intent"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:700
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:712
 msgid "Session Webhook: Donation updated with Payment Intent data"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:717
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:729
 msgid "Session Webhook: Missing subscription"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:726
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:738
 msgid "Session Webhook: Invalid subscription"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:751
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:763
 msgid "Unable to set cancel time for subscription."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:756
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:768
 msgid "Session Webhook: Donation and subscription updated with session data"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:785
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:797
 msgid "Subscription Webhook: Invoice created"
 msgstr ""
 
 #. translators: %s is the invoice status.
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:805
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:817
 msgid "Subscription Webhook: Not processing invoice with a status of %s."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:819
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:831
 msgid "Subscription Webhook: Invoice payment failed"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:851
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:872
+msgid "Subscription Webhook: Subscription is cancelled, skipping payment processing"
+msgstr ""
+
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:894
 msgid "Subscription Webhook: Renewal has already been added"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:883
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:938
 msgid "Unable to save donation ID to Stripe charge metadata."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:886
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:948
 msgid "Subscription Webhook: Payment complete"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1049
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:986
+msgid "Subscription Webhook: Subscription is cancelled in Charitable, ignoring Stripe status update"
+msgstr ""
+
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1035
 msgid "Subscription Webhook: Recurring donation cancelled"
 msgstr ""
 

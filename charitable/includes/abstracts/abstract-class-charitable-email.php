@@ -465,6 +465,12 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 		 * @return boolean
 		 */
 		public function send() {
+			// AJAX DEFERRAL: Prevent email HTML from contaminating AJAX JSON response
+			// when Oxygen page builder + Braintree + Recurring donations are active.
+			if ( $this->should_defer_ajax_send() ) {
+				return $this->defer_ajax_send();
+			}
+
 			/**
 			 * Do something before sending the email.
 			 *
@@ -1026,6 +1032,10 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 				$original_handler = null;
 				if ( function_exists( 'set_error_handler' ) ) {
 					$original_handler = set_error_handler( function( $severity, $message, $file, $line ) {
+						// Skip deprecation warnings - they are not real errors (PHP 8.2+)
+						if ( $severity === E_DEPRECATED || $severity === E_USER_DEPRECATED ) {
+							return false;
+						}
 						throw new ErrorException( $message, 0, $severity, $file, $line );
 					} );
 				}
@@ -1061,7 +1071,11 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 				$original_handler = null;
 				if ( function_exists( 'set_error_handler' ) ) {
 					$original_handler = set_error_handler( function( $severity, $message, $file, $line ) {
-						// Convert errors to exceptions so we can catch them
+						// Skip deprecation warnings - they are not real errors (PHP 8.2+)
+						if ( $severity === E_DEPRECATED || $severity === E_USER_DEPRECATED ) {
+							return false;
+						}
+						// Convert actual errors to exceptions so we can catch them
 						throw new ErrorException( $message, 0, $severity, $file, $line );
 					} );
 				}
@@ -1214,6 +1228,91 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 			}
 
 			return true;
+		}
+		/**
+		 * Check if the current email should be deferred to avoid AJAX response contamination.
+		 *
+		 * Only defers when ALL of these conditions are true:
+		 * - Running in AJAX context
+		 * - Processing a donation form submission
+		 * - Using Braintree gateway
+		 * - Processing a recurring donation
+		 * - Oxygen page builder is active (CT_VERSION defined)
+		 *
+		 * @since  1.8.9.6
+		 *
+		 * @return boolean
+		 */
+		private function should_defer_ajax_send() {
+			if ( ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+				return false;
+			}
+
+			if ( ! isset( $_POST['action'] ) || 'make_donation' !== $_POST['action'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				return false;
+			}
+
+			if ( ! isset( $_POST['gateway'] ) || 'braintree' !== $_POST['gateway'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				return false;
+			}
+
+			if ( ! isset( $_POST['recurring_donation'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				return false;
+			}
+
+			if ( ! defined( 'CT_VERSION' ) ) {
+				return false;
+			}
+
+			return true;
+		}
+
+		/**
+		 * Defer email sending via WordPress cron to avoid AJAX contamination.
+		 *
+		 * @since  1.8.9.6
+		 *
+		 * @return boolean True if successfully scheduled.
+		 */
+		private function defer_ajax_send() {
+			$email_data = array(
+				'class'     => get_class( $this ),
+				'args'      => $this->get_email_args_for_deferral(),
+				'timestamp' => time(),
+			);
+
+			wp_schedule_single_event( time() + 5, 'charitable_send_deferred_email', array( $email_data ) );
+
+			return true;
+		}
+
+		/**
+		 * Get email constructor args for deferred sending.
+		 *
+		 * @since  1.8.9.6
+		 *
+		 * @return array
+		 */
+		private function get_email_args_for_deferral() {
+			$args = array();
+
+			if ( isset( $this->donation ) && is_object( $this->donation ) ) {
+				if ( method_exists( $this->donation, 'get_donation_id' ) ) {
+					$args['donation_id'] = $this->donation->get_donation_id();
+				} elseif ( isset( $this->donation->ID ) ) {
+					$args['donation_id'] = $this->donation->ID;
+				}
+			}
+
+			if ( isset( $this->campaign ) && is_object( $this->campaign ) ) {
+				if ( method_exists( $this->campaign, 'get_campaign_id' ) ) {
+					$args['campaign_id'] = $this->campaign->get_campaign_id();
+				} elseif ( isset( $this->campaign->ID ) ) {
+					$args['campaign_id'] = $this->campaign->ID;
+				}
+			}
+
+			return $args;
 		}
 	}
 

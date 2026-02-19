@@ -496,8 +496,24 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 			$readonly          = false;
 			$show_license_form = true;
 
+			// PRE-VALIDATION: Check for existing valid licenses before showing upgrade prompt
+			$licenses_helper = charitable_get_helper( 'licenses' );
+			$has_stored_valid_license = false;
+
+			// Check if there's already a valid license stored (prevents duplicate prompts)
+			if ( $licenses_helper ) {
+				// Check for v3 license (newer format)
+				if ( method_exists( $licenses_helper, 'is_v3_license_valid' ) && $licenses_helper->is_v3_license_valid() ) {
+					$has_stored_valid_license = true;
+				}
+				// Check for any valid license in the system
+				elseif ( method_exists( $licenses_helper, 'has_valid_license' ) && $licenses_helper->has_valid_license( 'charitable' ) ) {
+					$has_stored_valid_license = true;
+				}
+			}
+
 			if ( $slug === false || strtolower( $slug ) === 'lite' ) {
-				$has_valid_license = false;
+				$has_valid_license = $has_stored_valid_license; // Use stored license status instead of always false
 			} elseif ( charitable_is_pro() ) {
 				$has_valid_license = true;
 			}

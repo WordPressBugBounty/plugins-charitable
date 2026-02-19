@@ -111,7 +111,7 @@ if ( ! class_exists( 'Charitable_Security_Settings' ) ) :
 				if ( class_exists( $class_name ) && method_exists( $class_name, 'get_settings' ) ) {
 					$instance = new $class_name();
 					$this->loaded_modules[] = $instance;
-					if ( charitable_is_debug() && method_exists( $instance, 'is_active' ) ) {
+					if ( charitable_is_debug() && charitable_is_debug( 'security' ) && method_exists( $instance, 'is_active' ) ) {
 						error_log( '[Charitable Security] Loaded module: ' . $class_name . ' | Active: ' . ( $instance->is_active() ? 'YES' : 'NO' ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 					}
 				}

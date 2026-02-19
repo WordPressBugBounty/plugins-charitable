@@ -155,6 +155,22 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					'upgrade_modal'                   => charitable_get_upgrade_modal_text(),
 					'autoshow_plugin_notifications'   => charitable_get_autoshow_plugin_notifications(),
 					'enable_express_checkout_message' => __( 'To enable this payment method, enable Express Checkout', 'charitable' ),
+					'activate_now'                    => esc_html__( 'Activate Now', 'charitable' ),
+					'activate_later'                  => esc_html__( 'Activate Later', 'charitable' ),
+					'download_pro'                    => esc_html__( 'Download Pro', 'charitable' ),
+					'downloading'                     => esc_html__( 'Downloading...', 'charitable' ),
+					'downloading_pro_message'         => esc_html__( 'Please wait while we download Charitable Pro.', 'charitable' ),
+					'activating'                      => esc_html__( 'Activating...', 'charitable' ),
+					'activating_pro_message'          => esc_html__( 'Please wait while we activate Charitable Pro.', 'charitable' ),
+					'download_failed'                 => esc_html__( 'Download failed. Please try again.', 'charitable' ),
+					'activation_failed'               => esc_html__( 'Activation failed. You can activate it manually from the Plugins page.', 'charitable' ),
+					'visit_addons_page'               => esc_html__( 'Visit Addons Page', 'charitable' ),
+					'ready_to_use'                    => esc_html__( 'Ready to Use', 'charitable' ),
+					'pro_ready_to_activate'           => esc_html__( 'Charitable Pro has been downloaded and is ready to activate when you\'re ready. You can activate it from the Plugins page.', 'charitable' ),
+					'verifying'                       => esc_html__( 'Verifying...', 'charitable' ),
+					'deactivating'                    => esc_html__( 'Deactivating...', 'charitable' ),
+					'manual_install'                  => esc_html__( 'Manual Install', 'charitable' ),
+					'license_validated'               => esc_html__( 'License Validated', 'charitable' ),
 				)
 			);
 

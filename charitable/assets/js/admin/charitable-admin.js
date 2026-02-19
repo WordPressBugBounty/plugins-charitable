@@ -206,26 +206,28 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 	var setup_license_check = function() {
 
 		$('#charitable-settings-connect-btn').on( 'click', function( e ){
+			var $btn = $( this );
 			var data = {
 					action 			    : 'charitable_license_check',
 					'license' 	        : $('input[name="license-key"]').val(), // 022effc6d03bdda601503a1dc13672fd
 					'nonce'			    : $('input[name="_wpnonce"]').val(),
-					'charitable_action' : $(this).data('action'),
+					'charitable_action' : $btn.data('action'),
 				};
-
 
 			// If the button contains the 'data-pro-connect' attribute and it's true, don't show the button.
 			if ( $('#charitable-settings-connect-btn').data( 'pro-connect' ) && $('#charitable-settings-connect-btn').data( 'pro-connect' ) == '1' ) {
 				return;
 			}
 
+			var originalHtml = $btn.html();
+			var spinnerHtml = '<i class="fa fa-spinner fa-spin" aria-hidden="true"></i> ';
 			if ( data.charitable_action === 'verify' ) {
-				$(this).html('Verifying...');
+				$btn.html( spinnerHtml + charitable_admin.verifying );
 			} else {
-				$(this).html('Deactivating...');
+				$btn.html( spinnerHtml + charitable_admin.deactivating );
 			}
 
-			$(this).prop('disabled', true);
+			$btn.prop('disabled', true);
 
 			$.ajax({
 				type: 'POST',
@@ -237,6 +239,71 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 				},
 				success: function (response) {
 					if ( response.success ) {
+
+						// Redirect to upgrade.wpcharitable.com when backend returns upgrade_url (e.g. Pro installed but not activated).
+						if ( response.data.upgrade_url ) {
+							$btn.data( 'charitable-skip-restore', true );
+							window.location.href = response.data.upgrade_url;
+							return;
+						}
+						if ( response.data.show_manual_upgrade && response.data.url ) {
+							$.alert( {
+								title: charitable_admin.license_validated || charitable_admin.success,
+								content: response.data.message,
+								icon: 'fa fa-check-circle',
+								type: 'green',
+								boxWidth: '800px',
+								buttons: {
+									confirm: {
+										text: charitable_admin.ok,
+										btnClass: 'btn-confirm',
+										keys: [ 'enter' ],
+										action: function() {
+											window.location.reload();
+										},
+									},
+									manual: {
+										text: charitable_admin.manual_install,
+										btnClass: 'btn-confirm',
+										action: function() {
+											window.open( response.data.url, '_blank' );
+											window.location.reload();
+										},
+									},
+								},
+							} );
+							return;
+						}
+
+						// Pro installed but inactive: show popup to activate (no redirect to upgrade site or valid=valid).
+						if ( response.data.show_activate_pro_popup ) {
+							if ( typeof CharitableConnect !== 'undefined' && CharitableConnect.showActivateProPopup ) {
+								CharitableConnect.showActivateProPopup( response.data );
+							} else {
+								$.alert( {
+									title: charitable_admin.license_validated || charitable_admin.success,
+									content: response.data.message,
+									icon: 'fa fa-check-circle',
+									type: 'green',
+									boxWidth: '800px',
+									buttons: {
+										activate: {
+											text: charitable_admin.activate_now,
+											btnClass: 'btn-confirm',
+											keys: [ 'enter' ],
+											action: function() {
+												window.location.href = ( response.data.redirect_url || ( charitable_admin.admin_url + 'admin.php?page=charitable-settings&tab=general' ) ) + '&valid=valid&pro=activate';
+											},
+										},
+										cancel: {
+											text: charitable_admin.cancel,
+											keys: [ 'esc' ],
+										},
+									},
+								} );
+							}
+							return;
+						}
 
 						if ( response.data.valid === true ) {
 
@@ -271,6 +338,7 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 
 
 							} else {
+								$btn.data( 'charitable-skip-restore', true );
 								if ( 'undefined' !== typeof charitable_admin.admin_url ) {
 									window.location.href = charitable_admin.admin_url + 'admin.php?page=charitable-settings&tab=general&valid=valid';
 								} else {
@@ -283,6 +351,7 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 
 							if ( 'undefined' !== typeof charitable_admin.admin_url ) {
 
+								$btn.data( 'charitable-skip-restore', true );
 								if ( response.data.license_limit === true ) {
 
 									window.location.href = charitable_admin.admin_url + 'admin.php?page=charitable-settings&tab=general&valid=invalid&license_limit=true';
@@ -295,6 +364,7 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 								}
 							} else {
 
+								$btn.data( 'charitable-skip-restore', true );
 								location.reload();
 							}
 						}
@@ -306,7 +376,18 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 					// console.log( data );
 					// $user_fields.removeClass( 'loading-data' );
 				}
+			}).always(function () {
+				var $restoreBtn = $( '#charitable-settings-connect-btn' );
+				if ( $restoreBtn.length && $restoreBtn.data( 'charitable-skip-restore' ) ) {
+					$restoreBtn.removeData( 'charitable-skip-restore' ).removeData( 'charitable-license-original-html' );
+					return;
+				}
+				if ( $restoreBtn.length && $restoreBtn.data( 'charitable-license-original-html' ) ) {
+					$restoreBtn.html( $restoreBtn.data( 'charitable-license-original-html' ) ).prop( 'disabled', false ).removeData( 'charitable-license-original-html' );
+				}
 			});
+
+			$btn.data( 'charitable-license-original-html', originalHtml );
 
 			return false;
 

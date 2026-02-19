@@ -259,7 +259,10 @@ add_action( 'admin_init', array( Charitable_Licenses_Settings::get_instance(), '
  */
 add_action( 'after_charitable_admin_enqueue_scripts', array( Charitable_Admin_Connect::get_instance(), 'settings_enqueues' ), 10, 3 );
 add_action( 'wp_ajax_charitable_connect_url', array( Charitable_Admin_Connect::get_instance(), 'generate_url' ) );
+add_filter( 'charitable_license_verify_success_data', array( Charitable_Admin_Connect::get_instance(), 'add_upgrade_url_to_license_response' ), 10, 2 );
 add_action( 'wp_ajax_nopriv_charitable_connect_process', array( Charitable_Admin_Connect::get_instance(), 'process' ) );
+add_action( 'wp_ajax_charitable_download_pro', array( Charitable_Admin_Connect::get_instance(), 'download_pro_plugin' ) );
+add_action( 'wp_ajax_charitable_activate_pro', array( Charitable_Admin_Connect::get_instance(), 'activate_pro_plugin' ) );
 
 /**
  * Initialize splash data.

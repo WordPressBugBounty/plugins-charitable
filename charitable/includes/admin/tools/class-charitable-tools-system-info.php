@@ -558,6 +558,7 @@ if ( ! class_exists( 'Charitable_Tools_System_Info' ) ) :
 			$data .= 'WP_DEBUG_DISPLAY:         ' . ( defined( 'WP_DEBUG_DISPLAY' ) ? WP_DEBUG_DISPLAY ? 'Enabled' : 'Disabled' : 'Not set' ) . "\n";
 			$data .= 'SCRIPT_DEBUG:             ' . ( defined( 'SCRIPT_DEBUG' ) ? SCRIPT_DEBUG ? 'Enabled' : 'Disabled' : 'Not set' ) . "\n";
 			$data .= 'CHARITABLE_DEBUG:         ' . ( defined( 'CHARITABLE_DEBUG' ) ? CHARITABLE_DEBUG ? 'Enabled' : 'Disabled' : 'Not set' ) . "\n";
+			$data .= 'CHARITABLE_DEBUG_SECURITY: ' . ( defined( 'CHARITABLE_DEBUG_SECURITY' ) ? CHARITABLE_DEBUG_SECURITY ? 'Enabled' : 'Disabled' : 'Not set' ) . "\n";
 			$data .= 'Memory Limit:             ' . WP_MEMORY_LIMIT . "\n";
 			$data .= 'Registered Post Stati:    ' . implode( ', ', get_post_stati() ) . "\n";
 			$data .= 'Revisions:                ' . ( WP_POST_REVISIONS ? WP_POST_REVISIONS > 1 ? 'Limited to ' . WP_POST_REVISIONS : 'Enabled' : 'Disabled' ) . "\n";

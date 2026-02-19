@@ -3,8 +3,8 @@ Contributors: WPCharitable, smub, dimensionmedia
 Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.9.1
-Requires PHP: 7.2
-Stable tag: 1.8.9.5
+Requires PHP: 7.4
+Stable tag: 1.8.9.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -267,6 +267,11 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.9.6 =
+* IMPROVED: Enhanced license validation process with improved performance when downloading Charitable Pro automatically.
+* FIX: Improved email reliability in certain scenarios, especially with certain aggressive WordPress themes.
+* FIX: Updated translation strings and minor updates to PHP and CSS regarding best practices.
 
 = Donation Form & Fundraising Campaigns v1.8.9.5 =
 * FIX: Added additional checks to resolved issue with Stripe webhook that was causing a fatal error a certain scenario.

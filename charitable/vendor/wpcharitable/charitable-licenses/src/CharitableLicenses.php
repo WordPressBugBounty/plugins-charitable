@@ -128,6 +128,8 @@ class CharitableLicenses {
 
 			restore_current_blog();
 
+			return false;
+
 		} else {
 
 			if ( empty( $products ) ) {
@@ -146,6 +148,8 @@ class CharitableLicenses {
 				}
 			}
 		}
+
+		return false;
 	}
 
 	/**
@@ -922,7 +926,7 @@ class CharitableLicenses {
 				// Log this failure so we don't keep trying.
 				$this->log_failed_request();
 
-				if ( charitable_is_debug() ) {
+				if ( defined( 'CHARITABLE_DEBUG_LICENSE' ) && CHARITABLE_DEBUG_LICENSE ) {
 					error_log( 'WPCharitable Debug Error: get_versions (licenses) API call failed' );
 					error_log( print_r( $response, true ) );
 				}
@@ -942,7 +946,7 @@ class CharitableLicenses {
 				)
 			);
 
-			if ( charitable_is_debug() ) {
+			if ( defined( 'CHARITABLE_DEBUG_LICENSE' ) && CHARITABLE_DEBUG_LICENSE ) {
 				error_log( 'WPCharitable Debug Notice v1.8.2: get_versions (licenses) API call successful in licensing and added to site option.' );
 				error_log(
 					print_r(
@@ -1135,6 +1139,11 @@ class CharitableLicenses {
 
 		if ( isset( $license_data['valid'] ) && intval( $license_data['valid'] ) === 1 ) {
 			$license_data['message'] = \Charitable_Licenses_Settings::get_instance()->get_licensed_message();
+			// Allow main plugin to add upgrade_url (or show_manual_upgrade for localhost) so Verify redirects to upgrade site.
+			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
+				error_log( 'CHARITABLE DEBUG: ajax_license_check applying filter charitable_license_verify_success_data' );
+			}
+			$license_data = apply_filters( 'charitable_license_verify_success_data', $license_data, $license );
 		} else {
 			$license_data['message'] = \Charitable_Licenses_Settings::get_instance()->get_unlicensed_message( false, $license_data );
 		}

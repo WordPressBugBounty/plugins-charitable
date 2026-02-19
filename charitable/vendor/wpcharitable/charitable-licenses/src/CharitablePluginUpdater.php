@@ -97,11 +97,11 @@ class CharitablePluginUpdater {
 		if ( version_compare( $this->version, $version_info->new_version, '<' ) ) {
 
 			// Build a plugin list row, with update notification.
-			echo '<tr class="plugin-update-tr" id="' . $this->slug . '-update" data-slug="' . $this->slug . '" data-plugin="' . $this->slug . '/' . $file . '">';
+			echo '<tr class="plugin-update-tr" id="' . esc_attr( $this->slug ) . '-update" data-slug="' . esc_attr( $this->slug ) . '" data-plugin="' . esc_attr( $this->slug . '/' . $file ) . '">';
 			echo '<td colspan="3" class="plugin-update colspanchange">';
 			echo '<div class="update-message notice inline notice-warning notice-alt">';
 
-			$changelog_link = self_admin_url( 'index.php?edd_sl_action=view_plugin_changelog&plugin=' . $this->name . '&slug=' . $this->slug . '&TB_iframe=true&width=772&height=911' );
+			$changelog_link = self_admin_url( 'index.php?edd_sl_action=view_plugin_changelog&plugin=' . rawurlencode( $this->name ) . '&slug=' . rawurlencode( $this->slug ) . '&TB_iframe=true&width=772&height=911' );
 
 			if ( isset( $version_info->download_link ) ) {
 				switch ( $version_info->download_link ) {
@@ -180,7 +180,7 @@ class CharitablePluginUpdater {
 		$version_info = Charitable_Licenses::get_instance()->get_version_info( $_REQUEST['plugin'] );
 
 		if ( $version_info && isset( $version_info->sections['changelog'] ) ) {
-			echo '<div style="padding:10px;">' . $version_info->sections['changelog'] . '</div>';
+			echo '<div style="padding:10px;">' . wp_kses_post( $version_info->sections['changelog'] ) . '</div>';
 		}
 
 		exit;
