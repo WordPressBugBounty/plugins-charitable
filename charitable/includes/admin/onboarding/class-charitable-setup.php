@@ -8,6 +8,7 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.4
  * @version   1.8.4
+ * @version   1.8.9.7
  */
 
 // Exit if accessed directly.
@@ -1354,6 +1355,7 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 		 * @param array $template_settings The template settings.
 		 *
 		 * @since  1.8.4
+		 * @version 1.8.9.7
 		 *
 		 * @return array
 		 */
@@ -1363,12 +1365,15 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 
 			foreach ( $template_settings['layout'] as $row ) {
 				foreach ( $row as $column ) {
-					if ( ! isset( $column ) || empty( $column ) ) {
+					if ( ! is_array( $column ) ) {
 						continue;
 					}
 					foreach ( $column as $section ) {
+						if ( ! is_array( $section ) ) {
+							continue;
+						}
 						foreach ( $section as $mini_sections ) {
-							if ( ! isset( $mini_sections['tabs'] ) ) {
+							if ( ! is_array( $mini_sections ) || ! isset( $mini_sections['tabs'] ) ) {
 								continue;
 							}
 							foreach ( $mini_sections['tabs'] as $found_tabs ) {

@@ -51,7 +51,7 @@ while ( $charitable_campaigns->have_posts() ) :
 		?>
 		<h6 class="campaign-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h6>
 		<?php if ( ! $charitable_campaign->is_endless() ) : ?>
-			<div class="campaign-time-left"><?php echo esc_html( $charitable_campaign->get_time_left() ); ?></div>
+			<div class="campaign-time-left"><?php echo wp_kses_post( $charitable_campaign->get_time_left() ); ?></div>
 		<?php endif ?>
 	</li>
 	<?php

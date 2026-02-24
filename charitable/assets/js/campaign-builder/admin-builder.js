@@ -380,15 +380,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 				cookieActiveTabId              = wpCookies.get( 'charitable_panel_tab_section_tab_id' ),
 				cookieActiveLayoutOptionsGroup = wpCookies.get( 'charitable_panel_design_layout_options_group' );
 
-			if ( $('.charitable-preview').is(':visible') && $('ul.charitable-tabs li#layout-options').is(':visible') && '' !== cookieActiveLayoutOptionsGroup && '' === cookieActiveFieldId ) {
-
-				if ( ! $('ul.charitable-tabs li#layout-options a').hasClass('active') ) {
-					$('ul.charitable-tabs li#layout-options a').click();
-				}
-
-				$('#charitable-field-options div.charitable-layout-options-tab-' + cookieActiveLayoutOptionsGroup + ' a.charitable-group-toggle').click();
-
-			} else if ( $('.charitable-preview').is(':visible') && '' !== cookieActiveTabId && $('nav.charitable-campaign-preview-nav li[data-tab-id="' + cookieActiveTabId + '"] a').is(':visible') ) {
+			if ( $('.charitable-preview').is(':visible') && '' !== cookieActiveTabId && $('nav.charitable-campaign-preview-nav li[data-tab-id="' + cookieActiveTabId + '"] a').is(':visible') ) {
 
 				$('.charitable-preview nav.charitable-campaign-preview-nav li[data-tab-id="' + cookieActiveTabId + '"] a').click();
 
@@ -404,7 +396,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 				$('#charitable-field-' + cookieActiveFieldId ).click();
 
-			} else if ( $('.charitable-panel-sidebar').is(':visible') && cookieContentSection && $('.charitable-tabs').is(':visible') && $('.charitable-tabs li#' + cookieContentSection + ' a').is(':visible') ) { // design tabs
+			} else if ( $('.charitable-panel-sidebar').is(':visible') && cookieContentSection && cookieContentSection !== 'layout-options' && $('.charitable-tabs').is(':visible') && $('.charitable-tabs li#' + cookieContentSection + ' a').is(':visible') ) { // design tabs
 
 				$('.charitable-tabs li#' + cookieContentSection + ' a').click();
 
@@ -1017,6 +1009,13 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 					s.templateID    = $( this ).closest('.charitable-template').data('template-code');
 					s.templateLabel = $( this ).closest('.charitable-template').data('template-label');
+
+					// Auto-populate campaign title with template name if title is blank (for new campaigns only).
+					var $titleInput = $( 'input#charitable_settings_title' );
+					var currentTitle = $titleInput.val() || s.campaignTitle || '';
+					if ( ( ! currentTitle || $.trim( currentTitle ) === '' ) && s.templateLabel ) {
+						app.updateFormUI( 'title', s.templateLabel );
+					}
 
 					s.primaryThemeColorBase = s.primaryThemeColor = $( this ).closest('.charitable-template').data('template-primary');
 					s.secondaryThemeColorBase = s.secondaryThemeColor = $( this ).closest('.charitable-template').data('template-secondary');

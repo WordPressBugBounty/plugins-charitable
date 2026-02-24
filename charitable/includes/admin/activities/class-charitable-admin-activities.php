@@ -1119,6 +1119,21 @@ if ( ! class_exists( 'Charitable_Admin_Activities' ) ) :
 				$meta_data['gateway'] = sanitize_text_field( $context['gateway'] );
 			}
 
+			// Store error message for email and other failures — critical for debugging.
+			if ( isset( $context['error_message'] ) ) {
+				$meta_data['error_message'] = sanitize_text_field( substr( $context['error_message'], 0, 500 ) );
+			}
+
+			// Store email class for email failures.
+			if ( isset( $context['email_class'] ) ) {
+				$meta_data['email_class'] = sanitize_text_field( $context['email_class'] );
+			}
+
+			// Store recipient for email failures (helps debug delivery issues).
+			if ( isset( $context['recipient'] ) ) {
+				$meta_data['recipient'] = sanitize_email( $context['recipient'] );
+			}
+
 			// Apply privacy filter to allow customization
 			$meta_data = apply_filters( 'charitable_form_error_log_data', $meta_data, $context );
 

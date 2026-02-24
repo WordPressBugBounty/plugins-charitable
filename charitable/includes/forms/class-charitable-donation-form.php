@@ -707,7 +707,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 				// Log the security validation failure
 				$error_details = ! $this->validate_nonce() ? 'nonce_failed' : 'honeypot_failed';
 				$context = array(
-					'campaign_id' => $this->get_campaign_id(),
+					'campaign_id' => $this->campaign ? $this->campaign->ID : 0,
 					'amount'      => $this->get_submitted_value( 'donation_amount' ),
 					'gateway'     => $this->get_submitted_value( 'gateway' ),
 				);
@@ -750,7 +750,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 
 				// Log the email validation failure
 				$context = array(
-					'campaign_id' => $this->get_campaign_id(),
+					'campaign_id' => $this->campaign ? $this->campaign->ID : 0,
 					'amount'      => $this->get_submitted_value( 'donation_amount' ),
 					'gateway'     => $this->get_submitted_value( 'gateway' ),
 				);

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-19T19:36:41+00:00\n"
+"POT-Creation-Date: 2026-02-19T01:42:51+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: charitable\n"
@@ -17970,7 +17970,7 @@ msgid "Unable to construct Square object with payload."
 msgstr ""
 
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:176
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:153
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:141
 msgid "Webhook processed."
 msgstr ""
 
@@ -18034,7 +18034,7 @@ msgstr ""
 
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1015
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1028
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:423
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:411
 msgid "Donation Webhook: Refund processed"
 msgstr ""
 
@@ -18044,27 +18044,27 @@ msgstr ""
 
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1041
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1103
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:493
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:781
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:810
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:844
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:961
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1009
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:481
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:769
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:798
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:832
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:899
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:929
 msgid "Subscription Webhook: Unable to process without Charitable Recurring extension."
 msgstr ""
 
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1064
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:788
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:823
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:858
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:971
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1019
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:776
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:811
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:839
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:906
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:936
 msgid "Subscription Webhook: Missing subscription"
 msgstr ""
 
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1088
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1222
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:996
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:916
 msgid "Subscription Webhook: Recurring donation updated"
 msgstr ""
 
@@ -18078,7 +18078,7 @@ msgstr ""
 
 #. translators: %d: threshold
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1310
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1117
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1025
 msgid "The payment intent has been cancelled after %d failed payment attempts."
 msgstr ""
 
@@ -18256,133 +18256,125 @@ msgstr ""
 msgid "Unable to construct Stripe object with payload."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:142
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:136
 msgid "Test webhook successfully received."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:174
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:162
 msgid "Error while processing webhook."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:394
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:443
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:581
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:382
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:431
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:569
 msgid "Donation Webhook: Missing donation ID"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:406
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:394
 msgid "Donation Webhook: Refund donation ID not valid"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:418
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:406
 msgid "Donation Webhook: Charge ID does not match donation reference on this site"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:421
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:409
 msgid "Donation refunded from the Stripe dashboard."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:449
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:593
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:685
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:437
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:581
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:673
 msgid "Donation Webhook: Donation ID not valid"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:461
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:603
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:449
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:591
 msgid "Donation Webhook: Payment Intent does not match donation reference on this site"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:480
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:468
 msgid "Donation Webhook: Donation marked as Failed"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:505
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:493
 msgid "Donation Webhook: Unable to retrieve invoice for failed payment intent."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:511
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:499
 msgid "Donation Webhook: No matching subscription found for invoice with failed payment intent."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:524
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:512
 msgid "Donation Webhook: Recurring donation for payment intent marked as cancelled."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:527
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:515
 msgid "Donation Webhook: Recurring donation for payment intent marked as pending cancellation."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:553
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:541
 msgid "Donation Webhook: Recurring donation and initial payment for payment intent marked as failed"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:651
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:639
 msgid "Donation Webhook: Donation marked as Paid"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:680
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:668
 msgid "Donation Webhook: Session id does not match donation reference on this site"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:695
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:683
 msgid "Donation Webhook: Missing payment intent"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:712
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:700
 msgid "Session Webhook: Donation updated with Payment Intent data"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:729
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:717
 msgid "Session Webhook: Missing subscription"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:738
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:726
 msgid "Session Webhook: Invalid subscription"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:763
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:751
 msgid "Unable to set cancel time for subscription."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:768
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:756
 msgid "Session Webhook: Donation and subscription updated with session data"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:797
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:785
 msgid "Subscription Webhook: Invoice created"
 msgstr ""
 
 #. translators: %s is the invoice status.
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:817
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:805
 msgid "Subscription Webhook: Not processing invoice with a status of %s."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:831
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:819
 msgid "Subscription Webhook: Invoice payment failed"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:872
-msgid "Subscription Webhook: Subscription is cancelled, skipping payment processing"
-msgstr ""
-
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:894
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:851
 msgid "Subscription Webhook: Renewal has already been added"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:938
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:883
 msgid "Unable to save donation ID to Stripe charge metadata."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:948
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:886
 msgid "Subscription Webhook: Payment complete"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:986
-msgid "Subscription Webhook: Subscription is cancelled in Charitable, ignoring Stripe status update"
-msgstr ""
-
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1035
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:943
 msgid "Subscription Webhook: Recurring donation cancelled"
 msgstr ""
 

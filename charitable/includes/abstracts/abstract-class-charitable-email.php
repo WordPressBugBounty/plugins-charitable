@@ -507,11 +507,29 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 					return false;
 				}
 
-				// Attempt to send email
+				// Capture the actual error from wp_mail() failures.
+				// WordPress fires 'wp_mail_failed' action with a WP_Error
+				// containing the real SMTP/mailer error message.
+				$wp_mail_error = null;
+				$capture_error = function( $error ) use ( &$wp_mail_error ) {
+					$wp_mail_error = $error;
+				};
+				add_action( 'wp_mail_failed', $capture_error );
+
 				$sent = wp_mail( $recipient, $subject, $body, $headers, $attachments );
 
+				remove_action( 'wp_mail_failed', $capture_error );
+
 				if ( ! $sent ) {
-					$this->log_email_error( 'wp_mail_failed', 'wp_mail() returned false' );
+					$error_detail = 'wp_mail() returned false';
+					if ( $wp_mail_error instanceof \WP_Error ) {
+						$error_detail .= ' — ' . $wp_mail_error->get_error_code() . ': ' . $wp_mail_error->get_error_message();
+						$error_data = $wp_mail_error->get_error_data();
+						if ( ! empty( $error_data ) ) {
+							$error_detail .= ' | Data: ' . ( is_string( $error_data ) ? $error_data : wp_json_encode( $error_data ) );
+						}
+					}
+					$this->log_email_error( 'wp_mail_failed', $error_detail );
 				}
 
 			} catch ( Throwable $e ) {
@@ -1036,6 +1054,12 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 						if ( $severity === E_DEPRECATED || $severity === E_USER_DEPRECATED ) {
 							return false;
 						}
+						// Skip warnings and notices - common in WordPress plugins (WPML, etc.)
+						// and should not prevent email delivery.
+						if ( $severity === E_WARNING || $severity === E_NOTICE || $severity === E_USER_WARNING || $severity === E_USER_NOTICE || $severity === E_STRICT ) {
+							return false;
+						}
+						// Only convert actual user errors to exceptions
 						throw new ErrorException( $message, 0, $severity, $file, $line );
 					} );
 				}
@@ -1075,7 +1099,12 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 						if ( $severity === E_DEPRECATED || $severity === E_USER_DEPRECATED ) {
 							return false;
 						}
-						// Convert actual errors to exceptions so we can catch them
+						// Skip warnings and notices - common in WordPress plugins (WPML, etc.)
+						// and should not prevent email delivery.
+						if ( $severity === E_WARNING || $severity === E_NOTICE || $severity === E_USER_WARNING || $severity === E_USER_NOTICE || $severity === E_STRICT ) {
+							return false;
+						}
+						// Only convert actual user errors to exceptions
 						throw new ErrorException( $message, 0, $severity, $file, $line );
 					} );
 				}

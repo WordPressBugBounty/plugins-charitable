@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.9.1
 Requires PHP: 7.4
-Stable tag: 1.8.9.6
+Stable tag: 1.8.9.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -268,6 +268,11 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 
 == Changelog ==
 
+= Donation Form & Fundraising Campaigns v1.8.9.7 =
+* NEW: Charitable will add social meta to campaign pages for improved sharing on some social networks (SEO plugins can override this).
+* FIX: Fixed broken social share URLs for Twitter/X, Pinterest, and improved share link defaults.
+* FIX: Corrected sanitization issue that resulted in incorrect display of code in "time left" display for campaigns in certain scenarios.
+
 = Donation Form & Fundraising Campaigns v1.8.9.6 =
 * IMPROVED: Enhanced license validation process with improved performance when downloading Charitable Pro automatically.
 * FIX: Improved email reliability in certain scenarios, especially with certain aggressive WordPress themes.
@@ -380,7 +385,7 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 
 = Donation Form & Fundraising Campaigns v1.8.5.3 =
 * NEW: Added dialog box upon entering license that activates Pro if already installed.
-* FIX: Improve santization of donor widget and video alt text in campaign builder.
+* FIX: Improve sanitization of donor widget and video alt text in campaign builder.
 * FIX: Tweak first/last/email field CSS on a "minimal" format form.
 
 = Donation Form & Fundraising Campaigns v1.8.5.2 =

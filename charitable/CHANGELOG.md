@@ -1,3 +1,8 @@
+# 1.8.9.7
+* NEW: Charitable will add social meta to campaign pages for improved sharing on some social networks (SEO plugins can override this).
+* FIX: Fixed broken social share URLs for Twitter/X, Pinterest, and improved share link defaults.
+* FIX: Corrected sanitization issue that resulted in incorrect display of code in "time left" display for campaigns in certain scenarios.
+
 # 1.8.9.6
 * IMPROVED: Enhanced license validation process with improved performance when downloading Charitable Pro automatically.
 * FIX: Improved email reliability in certain scenarios, especially with certain aggressive WordPress themes.
@@ -104,7 +109,7 @@
 
 # 1.8.5.3
 * NEW: Added dialog box upon entering license that activates Pro if already installed.
-* FIX: Improve santization of donor widget and video alt text in campaign builder.
+* FIX: Improve sanitization of donor widget and video alt text in campaign builder.
 * FIX: Tweak first/last/email field CSS on a "minimal" format form.
 
 # 1.8.5.2

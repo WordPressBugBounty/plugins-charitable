@@ -1220,6 +1220,16 @@ if ( ! class_exists( 'Charitable_Tools_System_Info' ) ) :
 					$data .= sprintf( ' | Gateway: %s', $error->meta_data['gateway'] );
 				}
 
+				// Show error message detail (SMTP errors, exception messages, etc.)
+				if ( ! empty( $error->meta_data ) && isset( $error->meta_data['error_message'] ) ) {
+					$data .= "\n  → " . $error->meta_data['error_message'];
+				}
+
+				// Show email class for email failures
+				if ( ! empty( $error->meta_data ) && isset( $error->meta_data['email_class'] ) ) {
+					$data .= ' [' . $error->meta_data['email_class'] . ']';
+				}
+
 				$data .= "\n";
 			}
 

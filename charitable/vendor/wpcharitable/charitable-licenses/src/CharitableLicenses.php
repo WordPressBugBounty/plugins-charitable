@@ -876,6 +876,7 @@ class CharitableLicenses {
 	 * @since 1.4.0
 	 * @since 1.8.1.1 - Removed cache_get method and site a site option instead.
 	 * @since 1.8.1.3 - Added request_recently_failed check and log_failed_request call.
+	 * @since 1.8.9.7 - Increased version cache TTL from 1 hour to 12 hours.
 	 *
 	 * @return array
 	 */
@@ -941,7 +942,7 @@ class CharitableLicenses {
 			update_site_option(
 				'wpc_plugin_versions',
 				array(
-					'expires' => strtotime( '+1 hour', time() ),
+					'expires' => strtotime( '+12 hours', time() ),
 					'data'    => $versions,
 				)
 			);
@@ -951,7 +952,7 @@ class CharitableLicenses {
 				error_log(
 					print_r(
 						array(
-							'expires' => strtotime( '+1 hour', time() ),
+							'expires' => strtotime( '+12 hours', time() ),
 							'data'    => $versions,
 						),
 						true
@@ -970,20 +971,21 @@ class CharitableLicenses {
 	/**
 	 * Logs a failed HTTP request for this API URL.
 	 *
-	 * We set a timestamp for 1 hour from now. This prevents future API requests from being
-	 * made to this domain for 1 hour. Once the timestamp is in the past, API requests
+	 * We set a timestamp for 2 hours from now. This prevents future API requests from being
+	 * made to this domain for 2 hours. Once the timestamp is in the past, API requests
 	 * will be allowed again. This way if the site is down for some reason we don't bombard
 	 * it with failed API requests.
 	 *
 	 * @see EDD_SL_Plugin_Updater::request_recently_failed
 	 *
 	 * @since 1.8.1.3
+	 * @since 1.8.9.7 - Increased failed request backoff from 1 hour to 2 hours.
 	 */
 	private function log_failed_request() {
 		if ( charitable_is_debug( 'vendor' ) ) {
 			error_log( 'CHARITABLE: NEW VENDOR CALL RECEIVED: log_failed_request()' );
 		}
-		update_option( $this->failed_request_cache_key, strtotime( '+1 hour' ) );
+		update_option( $this->failed_request_cache_key, strtotime( '+2 hours' ) );
 	}
 
 	/**

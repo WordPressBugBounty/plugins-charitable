@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version   1.8.0
+ * @version   1.8.9.7
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -126,8 +126,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Sharing' ) ) :
 			}
 			$social_networks_template = ( $mode === 'template' ) ? $this->get_social_networks( $campaign_data, $mode, $suffix ) : false;
 
-			$open_new_tab = ! empty( $field_data['open_new_tab'] ) ? esc_html( $field_data['open_new_tab'] ) : false;
-			$new_tab      = ( 1 === intval( $open_new_tab ) ) ? 'target="_blank"' : false;
+			$open_new_tab = ! empty( $field_data['open_new_tab'] ) ? esc_html( $field_data['open_new_tab'] ) : 1;
 
 			if ( ! empty( $social_networks_settings ) ) {
 
@@ -148,9 +147,8 @@ if ( ! class_exists( 'Charitable_Field_Social_Sharing' ) ) :
 							if ( 'mastodon' !== $network && ! empty( $social_networks_template[ $label ]['share_url'] ) ) {
 								$share_url = str_replace( '{$text}', rawurlencode( wp_strip_all_tags( $campaign_data['title'] ) ), $social_networks_template[ $label ]['share_url'] );
 								$share_url = str_replace( '{$url}', rawurlencode( get_permalink( $campaign_data['id'] ) ), $share_url );
-								$share_url = str_replace( '{$tags}', '', $share_url );
 								$share_url = apply_filters( 'charitable_campaign_social_sharing_link_' . $network, $share_url, $social_networks_template[ $label ], $campaign_data );
-								$href      = '<a href="' . $share_url . '" ' . $new_tab . '>';
+								$href      = '<a href="' . esc_url( $share_url ) . '" target="_blank">';
 							} elseif ( 'mastodon' === $network ) {
 								$href = '<a href="#" target="mastodon" class="charitable-mastodon-share">';
 							}
@@ -331,7 +329,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Sharing' ) ) :
 			);
 
 			echo $charitable_builder_form_fields->generate_toggle( // phpcs:ignore
-				isset( $settings['open_new_tab'] ) ? $settings['open_new_tab'] : false,
+				isset( $settings['open_new_tab'] ) ? $settings['open_new_tab'] : 1,
 				esc_html__( 'Open Links In New Tab', 'charitable' ),
 				array(
 					'id'       => 'field_' . esc_attr( $this->type ) . '_open_new_tab' . '_' . intval( $field_id ), // phpcs:ignore
@@ -479,7 +477,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Sharing' ) ) :
 						'field_id'     => 'twitter_url',
 						'public_label' => esc_html__( 'Twitter / X', 'charitable' ),
 						'icon_url'     => charitable()->get_path( 'directory', false ) . 'assets/images/campaign-builder/fields/social-sharing/twitter' . $suffix . '.svg',
-						'share_url'    => 'http://twitter.com/share?text={$text}&url={$url}&hashtags={$tags}',
+						'share_url'    => 'https://x.com/intent/post?text={$text}&url={$url}',
 					),
 					'facebook'  => array(
 						'label'        => esc_html__( 'Facebook', 'charitable' ),
@@ -503,7 +501,7 @@ if ( ! class_exists( 'Charitable_Field_Social_Sharing' ) ) :
 						'field_id'     => 'pinterest_url',
 						'public_label' => esc_html__( 'Pinterest', 'charitable' ),
 						'icon_url'     => charitable()->get_path( 'directory', false ) . 'assets/images/campaign-builder/fields/social-sharing/pinterest' . $suffix . '.svg',
-						'share_url'    => 'http://www.pinterest.com/pin/create/button/?url{$url}&description={$text}',
+						'share_url'    => 'https://www.pinterest.com/pin/create/button/?url={$url}&description={$text}',
 					),
 					'mastodon'  => array(
 						'label'        => esc_html__( 'Mastodon', 'charitable' ),

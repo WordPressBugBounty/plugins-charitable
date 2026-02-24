@@ -8,6 +8,7 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
  * @version   1.8.9.1
+ * @version   1.8.9.7
  */
 
 // Exit if accessed directly.
@@ -61,6 +62,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Template' ) ) :
 		 *
 		 * @since 1.8.0
 		 * @version 1.8.9.1
+		 * @version 1.8.9.7
 		 */
 		public function panel_content() {
 
@@ -159,9 +161,9 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Template' ) ) :
 								)
 							);
 
-							echo $builder_template->output_templates_panel(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-
 						endif;
+
+						echo $builder_template->output_templates_panel(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 						?>
 					</p>

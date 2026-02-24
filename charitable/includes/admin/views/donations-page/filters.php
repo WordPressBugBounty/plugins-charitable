@@ -17,10 +17,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 $charitable_filters = $_GET; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 unset(
-	$filters['post_type'],
-	$filters['paged'],
-	$filters['bulk_donation_status_update'],
-	$filters['ids']
+	$charitable_filters['post_type'],
+	$charitable_filters['paged'],
+	$charitable_filters['bulk_donation_status_update'],
+	$charitable_filters['ids']
 );
 
 ?>
