@@ -42,7 +42,14 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor_Payment_Intents' ) ) :
 			$customer_id    = $this->get_stripe_customer( $payment_method );
 
 			if ( ! $customer_id ) {
-				$this->donation_log->add( __( 'Unable to retrieve customer.', 'charitable' ) );
+				if ( ! empty( $this->customer_error ) ) {
+					$this->donation_log->add( $this->customer_error );
+				} else {
+					$this->donation_log->add( __( 'Unable to retrieve customer.', 'charitable' ) );
+				}
+				if ( charitable_is_debug( 'stripe' ) ) {
+					error_log( sprintf( '[Charitable Stripe] Donation FAILED: %s. Donation ID: %s', ! empty( $this->customer_error ) ? $this->customer_error : 'Unable to retrieve customer (no details available)', $this->donation->ID ) );
+				}
 				return false;
 			}
 

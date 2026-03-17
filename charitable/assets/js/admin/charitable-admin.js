@@ -298,6 +298,9 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 										cancel: {
 											text: charitable_admin.cancel,
 											keys: [ 'esc' ],
+											action: function() {
+												window.location.reload();
+											},
 										},
 									},
 								} );

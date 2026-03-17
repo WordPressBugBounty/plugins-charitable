@@ -180,6 +180,7 @@ if ( ! class_exists( 'Charitable_Email_Donation_Receipt' ) ) :
 		 * Return the recipient for the email.
 		 *
 		 * @since   1.0.0
+		 * @since   1.8.9.8 Normalize array return values to prevent TypeError in safe_get_recipient().
 		 *
 		 * @return  string
 		 */
@@ -209,7 +210,8 @@ if ( ! class_exists( 'Charitable_Email_Donation_Receipt' ) ) :
 			 * @param string                            $email_address Recipient email address.
 			 * @param Charitable_Email_Donation_Receipt $email         Instance of `Charitable_Email_Donation_Receipt`.
 			 */
-			return apply_filters( 'charitable_email_donation_receipt_recipient', $email_address, $this );
+			$recipient = apply_filters( 'charitable_email_donation_receipt_recipient', $email_address, $this );
+			return is_array( $recipient ) ? implode( ', ', array_filter( array_map( 'trim', $recipient ) ) ) : $recipient;
 		}
 
 		/**

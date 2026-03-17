@@ -151,6 +151,11 @@
          * Update dashboard data via AJAX
          */
         updateDashboardData: function(timePeriod) {
+            // Guard: reporting data is only localized on the dashboard page.
+            if (typeof charitable_dashboard_reporting === 'undefined') {
+                return;
+            }
+
             var self = this;
 
             // Check if we should clear cache based on URL parameter
@@ -566,10 +571,16 @@
          * Handle enhance campaign button clicks
          */
         handleEnhanceButtonClick: function(e) {
-            e.preventDefault();
-
             var $button = $(this);
             var action = $button.data('action');
+
+            // Allow normal link navigation for elements without a data-action (e.g. Learn More)
+            // or upgrade links that are already <a> tags with href.
+            if (!action || action === 'upgrade') {
+                return;
+            }
+
+            e.preventDefault();
             var slug = $button.data('slug');
             var basename = $button.data('basename');
             var type = $button.data('type');

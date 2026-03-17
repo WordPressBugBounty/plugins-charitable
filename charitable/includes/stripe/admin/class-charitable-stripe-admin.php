@@ -61,6 +61,26 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 			 * When connecting Stripe Connect, check for webhook if secret key has changed.
 			 */
 			add_action( 'wpcharitable_stripe_account_connected', array( $this, 'update_webhook_upon_connection' ), 10, 1 );
+
+			/**
+			 * Run webhook signing secret migration on admin_init.
+			 */
+			add_action( 'admin_init', array( $this, 'maybe_migrate_webhook_signing_secrets' ) );
+
+			/**
+			 * Add webhook security status to Stripe gateway settings.
+			 */
+			add_filter( 'charitable_settings_fields_gateways_gateway_stripe', array( $this, 'add_webhook_security_settings' ), 20 );
+
+			/**
+			 * Display admin notice if webhook signature verification failures are detected.
+			 */
+			add_action( 'admin_notices', array( $this, 'maybe_show_webhook_failure_notice' ) );
+
+			/**
+			 * AJAX handler for refreshing webhook signing secret.
+			 */
+			add_action( 'wp_ajax_charitable_refresh_webhook_signing_secret', array( $this, 'ajax_refresh_webhook_signing_secret' ) );
 		}
 
 		/**
@@ -361,6 +381,303 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 			}
 
 			return $values;
+		}
+
+		/**
+		 * Migration: Fetch and store webhook signing secrets for existing webhooks.
+		 *
+		 * Runs once on upgrade to 1.8.9.8. Re-creates existing webhooks to obtain
+		 * and store the signing secret for cryptographic signature verification.
+		 *
+		 * @since  1.8.9.8
+		 *
+		 * @return void
+		 */
+		public function maybe_migrate_webhook_signing_secrets() {
+			if ( ! current_user_can( 'manage_charitable_settings' ) ) {
+				return;
+			}
+
+			$upgrade_log  = get_option( 'charitable_stripe_upgrade_log', array() );
+			$upgrade_done = is_array( $upgrade_log ) && array_key_exists( 'stripe_webhook_signing_secrets', $upgrade_log );
+
+			if ( $upgrade_done ) {
+				return;
+			}
+
+			// Check if Stripe gateway is active.
+			if ( ! Charitable_Gateways::get_instance()->is_active_gateway( 'stripe' ) ) {
+				// Mark as done — no Stripe gateway active, nothing to migrate.
+				$this->mark_signing_secret_migration_done( $upgrade_log );
+				return;
+			}
+
+			// Attempt to refresh signing secrets for all webhook configurations.
+			$configurations = array(
+				array( 'test_mode' => true, 'connect' => false ),
+				array( 'test_mode' => true, 'connect' => true ),
+				array( 'test_mode' => false, 'connect' => false ),
+				array( 'test_mode' => false, 'connect' => true ),
+			);
+
+			$any_refreshed = false;
+			$any_failed    = false;
+
+			foreach ( $configurations as $config ) {
+				$webhook_api = new Charitable_Stripe_Webhook_API( $config['test_mode'], null, $config['connect'] );
+
+				// Only process if there's a webhook ID stored and no signing secret yet.
+				$webhook_id = charitable_get_option( array( 'gateways_stripe', $webhook_api->setting_key ) );
+
+				if ( empty( $webhook_id ) || $webhook_api->has_signing_secret() ) {
+					continue;
+				}
+
+				$result = $webhook_api->refresh_webhook_signing_secret();
+
+				if ( $result ) {
+					$any_refreshed = true;
+				} else {
+					$any_failed = true;
+				}
+			}
+
+			// Log the migration result.
+			if ( $any_failed ) {
+				// Store a flag so the admin warning can reference it.
+				set_transient( 'charitable_stripe_signing_secret_migration_failed', true, DAY_IN_SECONDS * 30 );
+			}
+
+			$this->mark_signing_secret_migration_done( $upgrade_log );
+		}
+
+		/**
+		 * Mark the signing secret migration as completed.
+		 *
+		 * @since  1.8.9.8
+		 *
+		 * @param  array $upgrade_log The current upgrade log.
+		 * @return void
+		 */
+		private function mark_signing_secret_migration_done( $upgrade_log ) {
+			if ( ! is_array( $upgrade_log ) ) {
+				$upgrade_log = array();
+			}
+
+			$upgrade_log['stripe_webhook_signing_secrets'] = array(
+				'time'    => time(),
+				'version' => charitable()->get_version(),
+			);
+
+			update_option( 'charitable_stripe_upgrade_log', $upgrade_log );
+		}
+
+		/**
+		 * Add webhook security status fields to the Stripe settings page.
+		 *
+		 * Shows an inline warning if no signing secret is stored, and a button
+		 * to manually refresh the signing secret.
+		 *
+		 * @since  1.8.9.8
+		 *
+		 * @param  array $settings The current Stripe settings fields.
+		 * @return array
+		 */
+		public function add_webhook_security_settings( $settings ) {
+			$test_mode = charitable_get_option( 'test_mode', false );
+			$has_secret = false;
+
+			// Check if a signing secret exists for the current mode.
+			$secret_keys = $test_mode
+				? array( 'test_connect_webhook_signing_secret', 'test_webhook_signing_secret' )
+				: array( 'live_connect_webhook_signing_secret', 'live_webhook_signing_secret' );
+
+			foreach ( $secret_keys as $key ) {
+				if ( ! empty( charitable_get_option( array( 'gateways_stripe', $key ) ) ) ) {
+					$has_secret = true;
+					break;
+				}
+			}
+
+			// Only show if Stripe is connected.
+			$gateway = new Charitable_Gateway_Stripe_AM();
+			if ( ! $gateway->maybe_stripe_connected() ) {
+				return $settings;
+			}
+
+			$nonce    = wp_create_nonce( 'charitable_refresh_webhook_signing_secret' );
+			$ajax_url = admin_url( 'admin-ajax.php' );
+
+			if ( ! $has_secret ) {
+				$settings['webhook_security_warning'] = array(
+					'type'        => 'content',
+					'title'       => __( 'Webhook Security', 'charitable' ),
+					'priority'    => 50,
+					'content'     => '<div class="charitable-inline-notice warning">'
+						. '<p><strong>' . esc_html__( 'Webhook signature verification is not configured.', 'charitable' ) . '</strong></p>'
+						. '<p>' . esc_html__( 'Your Stripe webhooks are currently verified using a fallback method. For stronger security, click the button below to enable cryptographic signature verification.', 'charitable' ) . '</p>'
+						. '<p><button type="button" class="button" id="charitable-refresh-webhook-secret" data-nonce="' . esc_attr( $nonce ) . '" data-ajax-url="' . esc_url( $ajax_url ) . '">'
+						. esc_html__( 'Enable Webhook Signature Verification', 'charitable' )
+						. '</button> <span class="spinner" style="float:none;"></span></p>'
+						. '<p class="charitable-webhook-secret-result" style="display:none;"></p>'
+						. '</div>',
+				);
+			} else {
+				$settings['webhook_security_status'] = array(
+					'type'     => 'content',
+					'title'    => __( 'Webhook Security', 'charitable' ),
+					'priority' => 50,
+					'content'  => '<div class="charitable-inline-notice info">'
+						. '<p>' . esc_html__( 'Webhook signature verification is active. Incoming Stripe webhooks are cryptographically verified.', 'charitable' ) . '</p>'
+						. '<p><button type="button" class="button button-link" id="charitable-refresh-webhook-secret" data-nonce="' . esc_attr( $nonce ) . '" data-ajax-url="' . esc_url( $ajax_url ) . '">'
+						. esc_html__( 'Refresh Signing Secret', 'charitable' )
+						. '</button> <span class="spinner" style="float:none;"></span></p>'
+						. '<p class="charitable-webhook-secret-result" style="display:none;"></p>'
+						. '</div>',
+				);
+			}
+
+			// Add inline JS for the refresh button.
+			$settings['webhook_security_script'] = array(
+				'type'     => 'content',
+				'title'    => '',
+				'priority' => 51,
+				'content'  => '<script>
+					jQuery(function($) {
+						$("#charitable-refresh-webhook-secret").on("click", function(e) {
+							e.preventDefault();
+							var $btn = $(this),
+								$spinner = $btn.next(".spinner"),
+								$result = $btn.closest("div").find(".charitable-webhook-secret-result");
+
+							$btn.prop("disabled", true);
+							$spinner.addClass("is-active");
+							$result.hide();
+
+							$.post($btn.data("ajax-url"), {
+								action: "charitable_refresh_webhook_signing_secret",
+								_wpnonce: $btn.data("nonce")
+							}, function(response) {
+								$spinner.removeClass("is-active");
+								$btn.prop("disabled", false);
+								$result.show();
+								if (response.success) {
+									$result.html("<span style=\"color: green;\">" + response.data.message + "</span>");
+									if (response.data.reload) {
+										setTimeout(function() { location.reload(); }, 1500);
+									}
+								} else {
+									$result.html("<span style=\"color: red;\">" + response.data.message + "</span>");
+								}
+							}).fail(function() {
+								$spinner.removeClass("is-active");
+								$btn.prop("disabled", false);
+								$result.show().html("<span style=\"color: red;\">' . esc_js( __( 'Request failed. Please try again.', 'charitable' ) ) . '</span>");
+							});
+						});
+					});
+				</script>',
+			);
+
+			return $settings;
+		}
+
+		/**
+		 * Display admin notice when repeated webhook signature verification failures are detected.
+		 *
+		 * @since  1.8.9.8
+		 *
+		 * @return void
+		 */
+		public function maybe_show_webhook_failure_notice() {
+			if ( ! current_user_can( 'manage_charitable_settings' ) ) {
+				return;
+			}
+
+			$failure_count = (int) get_transient( 'charitable_stripe_webhook_verification_failures' );
+
+			if ( $failure_count >= 5 ) {
+				$settings_url = admin_url( 'admin.php?page=charitable-settings&tab=gateways&group=gateways_stripe' );
+				?>
+				<div class="notice notice-error">
+					<p>
+						<strong><?php esc_html_e( 'Charitable: Stripe Webhook Security Alert', 'charitable' ); ?></strong>
+					</p>
+					<p>
+						<?php
+						printf(
+							/* translators: %1$d: number of failures, %2$s: opening link tag, %3$s: closing link tag. */
+							esc_html__( '%1$d failed webhook signature verification attempts detected in the last 24 hours. This may indicate someone is attempting to send forged webhook events. Please check your %2$sStripe settings%3$s.', 'charitable' ),
+							$failure_count,
+							'<a href="' . esc_url( $settings_url ) . '">',
+							'</a>'
+						);
+						?>
+					</p>
+				</div>
+				<?php
+			}
+
+			// Also show migration failure notice.
+			if ( get_transient( 'charitable_stripe_signing_secret_migration_failed' ) ) {
+				$settings_url = admin_url( 'admin.php?page=charitable-settings&tab=gateways&group=gateways_stripe' );
+				?>
+				<div class="notice notice-warning is-dismissible">
+					<p>
+						<strong><?php esc_html_e( 'Charitable: Stripe Webhook Security Setup', 'charitable' ); ?></strong>
+					</p>
+					<p>
+						<?php
+						printf(
+							/* translators: %1$s: opening link tag, %2$s: closing link tag. */
+							esc_html__( 'Charitable was unable to automatically configure webhook signature verification for Stripe. Please visit your %1$sStripe settings%2$s and click "Enable Webhook Signature Verification" to secure your webhook endpoint.', 'charitable' ),
+							'<a href="' . esc_url( $settings_url ) . '">',
+							'</a>'
+						);
+						?>
+					</p>
+				</div>
+				<?php
+			}
+		}
+
+		/**
+		 * AJAX handler for refreshing the webhook signing secret.
+		 *
+		 * @since  1.8.9.8
+		 *
+		 * @return void
+		 */
+		public function ajax_refresh_webhook_signing_secret() {
+			check_ajax_referer( 'charitable_refresh_webhook_signing_secret' );
+
+			if ( ! current_user_can( 'manage_charitable_settings' ) ) {
+				wp_send_json_error( array( 'message' => __( 'You do not have permission to perform this action.', 'charitable' ) ) );
+			}
+
+			$test_mode = charitable_get_option( 'test_mode', false );
+			$use_connect = charitable_using_stripe_connect();
+
+			$webhook_api = new Charitable_Stripe_Webhook_API( $test_mode, null, $use_connect );
+			$result = $webhook_api->refresh_webhook_signing_secret();
+
+			if ( $result ) {
+				// Clear the migration failure transient if it exists.
+				delete_transient( 'charitable_stripe_signing_secret_migration_failed' );
+
+				wp_send_json_success(
+					array(
+						'message' => __( 'Webhook signature verification has been enabled successfully. The page will reload.', 'charitable' ),
+						'reload'  => true,
+					)
+				);
+			} else {
+				wp_send_json_error(
+					array(
+						'message' => __( 'Unable to configure webhook signature verification. Please ensure your Stripe API keys are valid and try again, or disconnect and reconnect your Stripe account.', 'charitable' ),
+					)
+				);
+			}
 		}
 	}
 

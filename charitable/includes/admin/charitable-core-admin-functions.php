@@ -297,6 +297,16 @@ function charitable_is_tools_view( $tab = '' ) {
 		return $is_settings;
 	}
 
+	/* Check for sub-tab format (e.g. 'import__charitable'). */
+	if ( false !== strpos( $tab, '__' ) ) {
+		$tab_parts = explode( '__', $tab );
+		$main_tab  = $tab_parts[0];
+		$sub_tab   = $tab_parts[1];
+
+		return isset( $_GET['tab'] ) && $main_tab == $_GET['tab'] // phpcs:ignore
+			&& isset( $_GET['sub_tab'] ) && $sub_tab == $_GET['sub_tab']; // phpcs:ignore
+	}
+
 	/* The general tab can be loaded when tab is not set. */
 	if ( 'general' === $tab ) {
 		return ! isset( $_GET['tab'] ) || 'general' == $_GET['tab']; // phpcs:ignore

@@ -23,6 +23,12 @@
   flex-direction: row;
 }
 
+.campaign-summary:before,
+.campaign-summary:after {
+  content: " ";
+  display: table;
+}
+
 .campaign-summary:after {
   clear: both;
 }
@@ -594,6 +600,12 @@ h3.charitable-header {
   *zoom: 1;
 }
 
+.campaign-loop.campaign-grid:before,
+.campaign-loop.campaign-grid:after {
+  content: " ";
+  display: table;
+}
+
 .campaign-loop.campaign-grid:after {
   clear: both;
 }
@@ -630,6 +642,11 @@ h3.charitable-header {
   float: none;
 }
 
+.campaign-grid-2 li.campaign,
+.campaign-grid-2 .campaign.hentry {
+  width: 49%;
+}
+
 .campaign-grid-2 li.campaign:nth-child(2n+2),
 .campaign-grid-2 .campaign.hentry:nth-child(2n+2) {
   margin-right: 0;
@@ -641,6 +658,11 @@ h3.charitable-header {
   column-count: 2;
 }
 
+.campaign-grid-3 li.campaign,
+.campaign-grid-3 .campaign.hentry {
+  width: 32%;
+}
+
 .campaign-grid-3 li.campaign:nth-child(3n+3),
 .campaign-grid-3 .campaign.hentry:nth-child(3n+3) {
   margin-right: 0;
@@ -650,6 +672,11 @@ h3.charitable-header {
   -moz-column-count: 3;
   -webkit-column-count: 3;
   column-count: 3;
+}
+
+.campaign-grid-4 li.campaign,
+.campaign-grid-4 .campaign.hentry {
+  width: 23.5%;
 }
 
 .campaign-grid-4 li.campaign:nth-child(4n+4),

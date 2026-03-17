@@ -138,6 +138,9 @@ var CharitableConnect = window.CharitableConnect || ( function( document, window
 					cancel: {
 						text: charitable_admin.cancel,
 						keys: [ 'esc' ],
+						action: function() {
+							window.location.reload();
+						},
 					},
 				},
 			} );
@@ -399,6 +402,9 @@ var CharitableConnect = window.CharitableConnect || ( function( document, window
 					cancel: {
 						text: charitable_admin.cancel,
 						keys: [ 'esc' ],
+						action: function() {
+							window.location.reload();
+						},
 					},
 				},
 			} );

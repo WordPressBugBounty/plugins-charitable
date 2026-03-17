@@ -274,6 +274,20 @@ add_action( 'admin_enqueue_scripts', [ Charitable_Admin_Splash::get_instance(), 
 add_action( 'admin_footer', [ Charitable_Admin_Splash::get_instance(), 'admin_footer' ] );
 
 /**
+ * Show a notice if GiveWP is detected.
+ *
+ * @see Charitable_GiveWP_Notice::get_dashboard_notices()
+ */
+add_filter( 'charitable_admin_dashboard_init_end', array( Charitable_GiveWP_Notice::get_instance(), 'get_dashboard_notices' ), 10 );
+
+/**
+ * Display Charitable banners on external (non-Charitable) admin screens.
+ *
+ * @see Charitable_External_Banner
+ */
+Charitable_External_Banner::get_instance();
+
+/**
  * Dashboard AJAX handlers.
  *
  * @see Charitable_Dashboard::ajax_activate_addon()

@@ -197,13 +197,42 @@ if ( ! class_exists( 'Charitable_Stripe_Connected_Customer' ) ) :
 					if ( isset( $this->connected_customer->deleted ) && $this->connected_customer->deleted ) {
 						$this->connected_customer = null;
 					}
+				} catch ( \Stripe\Exception\ApiErrorException $e ) {
+					if ( charitable_is_debug( 'stripe' ) ) {
+						error_log( sprintf(
+							'[Charitable Stripe] Connected customer retrieval failed (ApiErrorException) for ID: %s. Error: %s (HTTP %s)',
+							$connected_customer_id,
+							$e->getMessage(),
+							$e->getHttpStatus()
+						) );
+					}
+					$this->connected_customer = null;
 				} catch ( Stripe\Error\InvalidRequest $e ) {
+					if ( charitable_is_debug( 'stripe' ) ) {
+						error_log( sprintf(
+							'[Charitable Stripe] Connected customer retrieval failed (InvalidRequest) for ID: %s. Error: %s',
+							$connected_customer_id,
+							$e->getMessage()
+						) );
+					}
+					$this->connected_customer = null;
+				} catch ( Exception $e ) {
+					if ( charitable_is_debug( 'stripe' ) ) {
+						error_log( sprintf(
+							'[Charitable Stripe] Connected customer retrieval failed (Exception) for ID: %s. Error: %s',
+							$connected_customer_id,
+							$e->getMessage()
+						) );
+					}
 					$this->connected_customer = null;
 				}
 			}
 
 			/* We don't have a connected customer, so create one now. */
-			if (  is_null( $this->connected_customer ) ) {
+			if ( is_null( $this->connected_customer ) ) {
+				if ( charitable_is_debug( 'stripe' ) ) {
+					error_log( sprintf( '[Charitable Stripe] No connected customer found (saved ID: %s). Creating new one.', $connected_customer_id ? $connected_customer_id : 'none' ) );
+				}
 				$this->connected_customer = $this->create_connected_customer();
 			}
 
@@ -262,6 +291,9 @@ if ( ! class_exists( 'Charitable_Stripe_Connected_Customer' ) ) :
 		 */
 		public function get_payment_method() {
 			if ( is_null( $this->payment_method ) ) {
+				if ( charitable_is_debug( 'stripe' ) ) {
+					error_log( '[Charitable Stripe] Connected customer get_payment_method: no payment method provided (null). Skipping.' );
+				}
 				return false;
 			}
 
@@ -277,6 +309,15 @@ if ( ! class_exists( 'Charitable_Stripe_Connected_Customer' ) ) :
 			} catch ( Exception $e ) {
 				$body    = $e->getJsonBody();
 				$message = isset( $body['error']['message'] ) ? $body['error']['message'] : __( 'Something went wrong.', 'charitable' );
+
+				if ( charitable_is_debug( 'stripe' ) ) {
+					error_log( sprintf(
+						'[Charitable Stripe] Connected customer get_payment_method FAILED. Platform customer: %s, Payment method: %s. Error: %s',
+						$this->platform_customer->get( 'id' ),
+						$this->payment_method,
+						$message
+					) );
+				}
 
 				charitable_get_notices()->add_error( $message );
 
@@ -317,9 +358,12 @@ if ( ! class_exists( 'Charitable_Stripe_Connected_Customer' ) ) :
 				return $customer;
 
 			} catch ( Exception $e ) {
-				if ( function_exists( 'charitable_is_debug' ) ? charitable_is_debug() : ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) {
-					error_log( $e->getCode() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-					error_log( $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				if ( charitable_is_debug( 'stripe' ) ) {
+					error_log( sprintf(
+						'[Charitable Stripe] create_connected_customer FAILED. Error code: %s, Message: %s',
+						$e->getCode(),
+						$e->getMessage()
+					) );
 				}
 				return null;
 			}

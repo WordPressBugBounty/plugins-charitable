@@ -1,3 +1,12 @@
+# 1.8.10
+* NEW: Expanded Import tools with sub-tabs for Charitable, GiveWP, and GiveButter imports including CSV donations import and GiveWP Migration Tool (Beta).
+* NEW: Redesigned blank slate pages for campaigns and donations.
+* IMPROVED: Strengthened Stripe webhook processing with additional verification.
+* IMPROVED: Redesigned dashboard notification bar.
+* FIX: Restored campaign grid column widths for the [campaigns] shortcode so multi-column layouts display correctly.
+* FIX: Improved email reliability when processing certain recipient formats.
+* FIX: Improved error diagnostics in System Info with detailed error messages and email class info.
+
 # 1.8.9.7
 * NEW: Charitable will add social meta to campaign pages for improved sharing on some social networks (SEO plugins can override this).
 * FIX: Fixed broken social share URLs for Twitter/X, Pinterest, and improved share link defaults.

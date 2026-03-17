@@ -246,7 +246,6 @@ if ( ! class_exists( 'Charitable_Tools_Email_Diagnostics' ) ) :
 				try {
 					$reflection = new ReflectionClass( $emails_helper );
 					$method = $reflection->getMethod( 'ensure_emails_registered' );
-					$method->setAccessible( true );
 					$registration_success = $method->invoke( $emails_helper );
 					$result['details']['registration_method_exists'] = true;
 					$result['details']['registration_successful'] = $registration_success;
@@ -953,8 +952,9 @@ if ( ! class_exists( 'Charitable_Tools_Email_Diagnostics' ) ) :
 			$error_count = 0;
 
 			try {
-				// Connect to Phase 1 enhanced error logging via activities table
-				if ( function_exists( 'charitable_get_table' ) ) {
+				// Connect to Phase 1 enhanced error logging via activities table (Pro only)
+				$registered_tables = (array) apply_filters( 'charitable_db_tables', array() );
+				if ( function_exists( 'charitable_get_table' ) && array_key_exists( 'charitable_activities', $registered_tables ) ) {
 					$activities_table = charitable_get_table( 'charitable_activities' );
 					if ( $activities_table ) {
 						global $wpdb;
@@ -983,6 +983,7 @@ if ( ! class_exists( 'Charitable_Tools_Email_Diagnostics' ) ) :
 		 * Test recipient extraction for a specific email with real donation data.
 		 *
 		 * @since 1.8.9.5 Phase 1 Integration
+		 * @since 1.8.10 Handle array recipients to prevent fatal TypeError in is_email().
 		 *
 		 * @param object $email_instance Email instance to test.
 		 * @param string $email_id Email ID being tested.
@@ -1041,8 +1042,13 @@ if ( ! class_exists( 'Charitable_Tools_Email_Diagnostics' ) ) :
 				if ( method_exists( $test_email, 'get_recipient' ) ) {
 					$recipient = $test_email->get_recipient();
 					$extraction_test['recipient_value'] = $recipient;
-					$extraction_test['recipient_valid'] = is_email( $recipient );
-					$extraction_test['success'] = ! empty( $recipient ) && is_email( $recipient );
+					if ( is_array( $recipient ) ) {
+						$extraction_test['recipient_valid'] = ! empty( $recipient ) && ( array_filter( $recipient, 'is_email' ) === $recipient );
+						$extraction_test['success'] = ! empty( $recipient );
+					} else {
+						$extraction_test['recipient_valid'] = is_email( $recipient );
+						$extraction_test['success'] = ! empty( $recipient ) && is_email( $recipient );
+					}
 				} else {
 					$extraction_test['error'] = 'get_recipient method not available';
 				}

@@ -183,13 +183,18 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 						error_log( 'add_webook after WebhookEndpoint' );
 						error_log( print_r( $webhook, true ) );
 					}
-					// Override the signing secret, for teseting purposes (perhaps with the Stripe API CLI)
+					// Override the signing secret, for testing purposes (perhaps with the Stripe API CLI).
 					if ( defined( 'CHARITABLE_WEBHOOK_SIGNING_SECRET' ) && CHARITABLE_WEBHOOK_SIGNING_SECRET ) {
 						$webhook->secret = CHARITABLE_WEBHOOK_SIGNING_SECRET;
 					}
 					if ( charitable_is_debug() ) {
 						error_log( 'add_webook after WebhookEndpoint UPDATED FOR CLI' );
 						error_log( print_r( $webhook, true ) );
+					}
+
+					// Store the webhook signing secret for signature verification.
+					if ( ! empty( $webhook->secret ) ) {
+						$this->save_webhook_signing_secret( $webhook->secret );
 					}
 
 				} catch ( Exception $e ) {
@@ -388,6 +393,105 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 			}
 
 			return $this->connect_application ? 'live_connect_webhook_id' : 'live_webhook_id';
+		}
+
+		/**
+		 * Returns the option key for the webhook signing secret.
+		 *
+		 * @since  1.8.9.8
+		 *
+		 * @return string
+		 */
+		private function get_signing_secret_key() {
+			if ( $this->test_mode ) {
+				return $this->connect_application ? 'test_connect_webhook_signing_secret' : 'test_webhook_signing_secret';
+			}
+
+			return $this->connect_application ? 'live_connect_webhook_signing_secret' : 'live_webhook_signing_secret';
+		}
+
+		/**
+		 * Fetch the signing secret from an existing Stripe webhook and store it locally.
+		 *
+		 * Note: Stripe only returns the full signing secret at webhook creation time.
+		 * For existing webhooks, we must re-create the webhook to get a new secret.
+		 *
+		 * @since  1.8.9.8
+		 *
+		 * @return bool True if the signing secret was stored, false otherwise.
+		 */
+		public function refresh_webhook_signing_secret() {
+			try {
+				$this->gateway->setup_api( $this->secret_key );
+
+				$webhook = $this->get_webhook();
+
+				if ( ! $webhook ) {
+					return false;
+				}
+
+				// Stripe does not return the signing secret for existing webhooks via retrieve().
+				// We need to delete and re-create the webhook to get a new secret.
+				$this->deactivate_webhook();
+
+				$new_webhook_id = $this->add_webhook();
+
+				if ( 'invalid_request' === $new_webhook_id || empty( $new_webhook_id ) ) {
+					// Re-creation failed — try to restore old webhook.
+					return false;
+				}
+
+				// add_webhook() already stores the signing secret and returns the new ID.
+				// Update the stored webhook ID.
+				$settings = get_option( 'charitable_settings', array() );
+
+				if ( ! isset( $settings['gateways_stripe'] ) ) {
+					$settings['gateways_stripe'] = array();
+				}
+
+				$settings['gateways_stripe'][ $this->setting_key ] = $new_webhook_id;
+				update_option( 'charitable_settings', $settings );
+
+				return true;
+
+			} catch ( \Exception $e ) {
+				if ( charitable_is_debug() ) {
+					error_log( 'Charitable: Failed to refresh webhook signing secret: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				}
+				return false;
+			}
+		}
+
+		/**
+		 * Check if a webhook signing secret is stored for this webhook.
+		 *
+		 * @since  1.8.9.8
+		 *
+		 * @return bool
+		 */
+		public function has_signing_secret() {
+			$secret = charitable_get_option( array( 'gateways_stripe', $this->get_signing_secret_key() ) );
+			return ! empty( $secret );
+		}
+
+		/**
+		 * Save the webhook signing secret to Charitable options.
+		 *
+		 * @since  1.8.9.8
+		 *
+		 * @param  string $secret The webhook signing secret from Stripe.
+		 * @return void
+		 */
+		public function save_webhook_signing_secret( $secret ) {
+			$settings = get_option( 'charitable_settings', array() );
+
+			if ( ! isset( $settings['gateways_stripe'] ) ) {
+				$settings['gateways_stripe'] = array();
+			}
+
+			$settings['gateways_stripe'][ $this->get_signing_secret_key() ] = $secret;
+
+			update_option( 'charitable_settings', $settings );
 		}
 
 		/**

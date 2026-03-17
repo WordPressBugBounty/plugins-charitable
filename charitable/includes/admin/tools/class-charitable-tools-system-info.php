@@ -289,6 +289,12 @@ if ( ! class_exists( 'Charitable_Tools_System_Info' ) ) :
 									<?php if ( $error->amount ) : ?>
 										<small>| Amount: <?php echo esc_html( charitable_format_money( $error->amount ) ); ?></small>
 									<?php endif; ?>
+									<?php if ( ! empty( $error->meta_data['error_message'] ) ) : ?>
+										<br><small style="color: #826200;">→ <?php echo esc_html( $error->meta_data['error_message'] ); ?></small>
+									<?php endif; ?>
+									<?php if ( ! empty( $error->meta_data['email_class'] ) ) : ?>
+										<small style="color: #888;">[<?php echo esc_html( $error->meta_data['email_class'] ); ?>]</small>
+									<?php endif; ?>
 								</div>
 							<?php endforeach; ?>
 						</div>

@@ -163,6 +163,45 @@
     color: rgba(14, 33, 33, 0.7);
 }
 
+/* Print Button */
+.charitable-dashboard-v2-print-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: #fff;
+    border: 1px solid #E4E4E7;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: #F9F9FA;
+        border-color: rgba(14, 33, 33, 0.2);
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 1px #E4E4E7;
+    }
+
+    .charitable-dashboard-v2-print-icon {
+        display: block;
+        width: 16px;
+        height: 16px;
+    }
+}
+
+/* Print form inline */
+#charitable-dashboard-v2-print {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
 /* Remove padding for stats row section */
 .charitable-dashboard-v2-stats-row-section {
     padding: 0 0 20px 0 !important;
@@ -393,6 +432,15 @@
         &:has(.charitable-dashboard-v2-latest-updates-background) {
             padding-top: 0;
         }
+
+        // Tab content: hide inactive panels, show active.
+        .charitable-dashboard-v2-tab-content {
+            display: none;
+
+            &.charitable-dashboard-v2-tab-content-active {
+                display: block;
+            }
+        }
     }
 
     // Collapsible Functionality
@@ -457,9 +505,10 @@
         display: flex;
         justify-content: center;
         margin-bottom: 30px;
+        padding: 0 25px;
 
         .charitable-dashboard-v2-quick-access-items {
-            width: 392px;
+            width: 100%;
 
                             .charitable-dashboard-v2-quick-access-item {
                     display: flex;
@@ -513,7 +562,7 @@
     .charitable-dashboard-v2-quick-access-footer {
         height: 70px;
         background: rgba(254, 248, 243, 1);
-        margin: 20px -25px -20px -25px; // Extend to section content edges
+        margin: 20px 0 0 0;
         display: flex;
         align-items: center;
 
@@ -656,7 +705,7 @@
         // Latest Updates Background Section
     .charitable-dashboard-v2-latest-updates-background {
         background: rgba(254, 248, 243, 1); // Same warm cream as Quick Access footer
-        margin: 0 -25px; // Extend edge to edge within section content
+        margin: 0;
         padding: 20px 25px; // Add padding for content
         border-bottom: 1px solid rgba(24, 36, 69, 0.1);
 
@@ -743,7 +792,7 @@
     .charitable-dashboard-v2-latest-updates-footer {
         height: 70px;
         background: white;
-        margin: 0 -25px -20px -25px; // Extend to section content edges
+        margin: 0;
         display: flex;
         align-items: center;
         border-top: 1px solid rgba(24, 36, 69, 0.1); // Add top border for separation
@@ -797,6 +846,7 @@
     .charitable-dashboard-v2-blog-posts {
         margin-top: 35px;
         margin-bottom: 15px;
+        padding: 0 25px;
 
         .charitable-dashboard-v2-blog-post-row {
             display: flex;
@@ -933,7 +983,7 @@
     .charitable-dashboard-v2-enhance-campaign-footer {
         height: 70px;
         background: white;
-        margin: 0 -25px -20px -25px; // No top margin, extend to section content edges
+        margin: 0;
         display: flex;
         align-items: center;
         border-top: 1px solid rgba(24, 36, 69, 0.1); // Add top border for separation
@@ -1198,38 +1248,68 @@
 
 /* Dashboard v2 Notifications */
 .charitable-dashboard-v2-notifications {
-  display: flex;
-  gap: 20px;
+  display: block;
   margin-top: 20px;
   max-width: 1172px;
   margin-left: auto;
   margin-right: auto;
   padding: 0;
+  position: relative;
+  background: white;
+  border: 1px solid rgba(24, 36, 69, 0.1);
+  border-radius: 4px;
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.05);
+
+  // Bar sits in the top-right corner with the close button and nav arrows.
+  .charitable-dashboard-notification-bar {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 1;
+
+    .charitable-dashboard-notification-navigation {
+      position: static;
+      top: auto;
+      right: auto;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      min-height: auto;
+      padding: 0;
+
+      a {
+        position: static;
+        top: auto;
+        font-size: 24px;
+        line-height: 1;
+        padding: 2px 4px;
+      }
+
+      .charitable-dashboard-notification-counter {
+        font-size: 13px;
+        color: #666;
+        white-space: nowrap;
+        padding: 0 2px;
+        line-height: 1;
+      }
+    }
+
+    .charitable-remove-dashboard-notification {
+      position: static;
+      top: auto;
+      right: auto;
+    }
+  }
 
   .charitable-dashboard-notification {
     margin: 0;
-    border-left: 4px solid #ffb900;
-    border-top: 0;
-    border-bottom: 0;
-    border-right: 0;
+    border: 0;
     background: white;
-    border-radius: 4px;
+    border-radius: 0;
     box-shadow: none;
-
-    &[data-notification-type="warning"] {
-      border-left-color: #ffb900;
-      background: white;
-    }
-
-    &[data-notification-type="error"] {
-      border-left-color: #dc3232;
-      background: #fbeaea;
-    }
-
-    &[data-notification-type="notice"] {
-      border-left-color: #00a0d2;
-      background: transparent;
-    }
 
     .charitable-dashboard-notification-message {
       padding: 15px 20px;
@@ -1239,6 +1319,17 @@
         font-size: 16px;
         font-weight: 600;
         color: #1d2327;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .charitable-notification-type-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        line-height: 1;
+        flex-shrink: 0;
       }
 
       p {
@@ -1254,6 +1345,37 @@
           margin-bottom: 5px;
         }
       }
+
+      .charitable-notification-cta-button {
+        display: inline-block;
+        padding: 8px 16px;
+        background-color: #5aa152;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.5;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-top: 5px;
+
+        &:hover {
+          background-color: #4a8a44;
+          color: #fff;
+        }
+      }
+    }
+
+    // Icon colors matched to notification type border colors.
+    &[data-notification-type="notice"] .charitable-notification-type-icon {
+      color: #00a0d2;
+    }
+
+    &[data-notification-type="warning"] .charitable-notification-type-icon {
+      color: #ffb900;
+    }
+
+    &[data-notification-type="error"] .charitable-notification-type-icon {
+      color: #dc3232;
     }
 
     .charitable-dashboard-notification-bar {

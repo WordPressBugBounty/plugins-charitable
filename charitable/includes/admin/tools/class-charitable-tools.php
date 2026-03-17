@@ -113,6 +113,57 @@ if ( ! class_exists( 'Charitable_Tools' ) ) :
 		}
 
 		/**
+		 * Return the sub-sections for the Import tab.
+		 *
+		 * @since 1.8.10
+		 *
+		 * @return array
+		 */
+		public function get_sub_sections_import() {
+			/**
+			 * Filter the import sub-tabs.
+			 *
+			 * @since 1.8.10
+			 *
+			 * @param array $sub_tabs List of sub-tabs in key=>label format.
+			 */
+			return apply_filters(
+				'charitable_tools_import_sub_tabs',
+				array(
+					'import__charitable'  => __( 'Charitable', 'charitable' ),
+					'import__givewp'      => __( 'GiveWP', 'charitable' ),
+					'import__givebutter'  => __( 'GiveButter', 'charitable' ),
+				)
+			);
+		}
+
+		/**
+		 * Redirect to default sub-tab when on the import tab without a sub_tab parameter.
+		 *
+		 * @since 1.8.10
+		 *
+		 * @return void
+		 */
+		public function tools_sub_tab_default() {
+			// Don't redirect during form submissions.
+			if ( ! empty( $_POST ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				return;
+			}
+
+			if ( ! charitable_is_tools_view( 'import' ) ) {
+				return;
+			}
+
+			if ( isset( $_GET['sub_tab'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				return;
+			}
+
+			$link = admin_url( 'admin.php?page=charitable-tools&tab=import&sub_tab=charitable' );
+			wp_safe_redirect( $link );
+			exit();
+		}
+
+		/**
 		 * Return the array of tabs used on the settings page.
 		 *
 		 * @since  1.8.1.6
@@ -163,7 +214,7 @@ if ( ! class_exists( 'Charitable_Tools' ) ) :
 				return;
 			}
 
-			$sections = array_merge( $this->get_sections(), $this->get_dynamic_groups() );
+			$sections = array_merge( $this->get_sections(), $this->get_sub_sections_import(), $this->get_dynamic_groups() );
 
 			/* Register each section */
 			foreach ( $sections as $section_key => $section ) {
@@ -293,15 +344,23 @@ if ( ! class_exists( 'Charitable_Tools' ) ) :
 			 */
 			$fields = array();
 
-			foreach ( $this->get_sections() as $section_key => $section ) {
+			$all_sections = array_merge( $this->get_sections(), $this->get_sub_sections_import() );
+
+			foreach ( $all_sections as $section_key => $section ) {
 				/**
 				 * Filter the array of fields to display in a particular tab.
+				 *
+				 * For sub-tabs, uses the filter name charitable_tools_tab_fields_sub_{key}.
 				 *
 				 * @since 1.0.0
 				 *
 				 * @param array $fields Array of fields.
 				 */
-				$fields[ $section_key ] = apply_filters( 'charitable_tools_tab_fields_' . $section_key, array() );
+				$filter_name = ( false !== strpos( $section_key, '__' ) )
+					? 'charitable_tools_tab_fields_sub_' . $section_key
+					: 'charitable_tools_tab_fields_' . $section_key;
+
+				$fields[ $section_key ] = apply_filters( $filter_name, array() );
 			}
 
 			/**

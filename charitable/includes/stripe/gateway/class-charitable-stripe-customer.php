@@ -67,6 +67,15 @@ if ( ! class_exists( 'Charitable_Stripe_Customer' ) ) :
 		private $update_args = [];
 
 		/**
+		 * Last error message from a Stripe API call.
+		 *
+		 * @since 1.8.10
+		 *
+		 * @var   string
+		 */
+		private $last_error = '';
+
+		/**
 		 * Create class object.
 		 *
 		 * @since 1.4.0
@@ -76,6 +85,17 @@ if ( ! class_exists( 'Charitable_Stripe_Customer' ) ) :
 		public function __construct( $customer_id = null ) {
 			$this->customer_id = $customer_id;
 			$this->gateway     = new Charitable_Gateway_Stripe_AM();
+		}
+
+		/**
+		 * Return the last error message from a Stripe API call.
+		 *
+		 * @since  1.8.9.7
+		 *
+		 * @return string
+		 */
+		public function get_last_error() {
+			return $this->last_error;
 		}
 
 		/**
@@ -130,7 +150,36 @@ if ( ! class_exists( 'Charitable_Stripe_Customer' ) ) :
 						if ( isset( $this->customer->deleted ) && $this->customer->deleted ) {
 							$this->customer = null;
 						}
+					} catch ( \Stripe\Exception\ApiErrorException $e ) {
+						if ( charitable_is_debug( 'stripe' ) ) {
+							error_log( sprintf(
+								'[Charitable Stripe] Customer retrieval error (ApiErrorException) for ID: %s. Error: %s (HTTP %s, code: %s)',
+								$this->customer_id,
+								$e->getMessage(),
+								$e->getHttpStatus(),
+								$e->getStripeCode()
+							) );
+						}
+						$this->customer = null;
 					} catch ( Stripe\Error\InvalidRequest $e ) {
+						if ( charitable_is_debug( 'stripe' ) ) {
+							error_log( sprintf(
+								'[Charitable Stripe] Customer retrieval error (InvalidRequest) for ID: %s. Exception: %s (code: %s)',
+								$this->customer_id,
+								$e->getMessage(),
+								$e->getCode()
+							) );
+						}
+						$this->customer = null;
+					} catch ( Exception $e ) {
+						if ( charitable_is_debug( 'stripe' ) ) {
+							error_log( sprintf(
+								'[Charitable Stripe] Customer retrieval error (Exception) for ID: %s. Exception: %s (code: %s)',
+								$this->customer_id,
+								$e->getMessage(),
+								$e->getCode()
+							) );
+						}
 						$this->customer = null;
 					}
 
@@ -269,6 +318,16 @@ if ( ! class_exists( 'Charitable_Stripe_Customer' ) ) :
 				$body    = $e->getJsonBody();
 				$message = isset( $body['error']['message'] ) ? $body['error']['message'] : __( 'Something went wrong.', 'charitable' );
 
+				if ( charitable_is_debug( 'stripe' ) ) {
+					error_log( sprintf(
+						'[Charitable Stripe] create_for_donor FAILED for donor email: %s, user ID: %s. Stripe error: %s (code: %s)',
+						$donor->get_email(),
+						$user_id ? $user_id : '0 (guest)',
+						$message,
+						$e->getCode()
+					) );
+				}
+
 				charitable_get_notices()->add_error( $message );
 
 				return null;
@@ -278,6 +337,10 @@ if ( ! class_exists( 'Charitable_Stripe_Customer' ) ) :
 
 			if ( $user_id ) {
 				$customer->save_customer_id( $user_id );
+			}
+
+			if ( charitable_is_debug( 'stripe' ) ) {
+				error_log( sprintf( '[Charitable Stripe] Created new customer: %s for donor email: %s', $stripe_customer->id, $donor->get_email() ) );
 			}
 
 			return $customer;
@@ -323,14 +386,52 @@ if ( ! class_exists( 'Charitable_Stripe_Customer' ) ) :
 				return $payment_method;
 
 			} catch ( \Stripe\Exception\ApiErrorException $e ) {
-				charitable_get_notices()->add_error(
-					$e->getError()->message
-				);
+				$error        = $e->getError();
+				$message      = $error->message;
+				$decline_code = isset( $error->decline_code ) ? $error->decline_code : '';
+				$error_code   = isset( $error->code ) ? $error->code : '';
+
+				// Build a detailed error for the donation log.
+				$detail_parts = array( $message );
+				if ( $error_code ) {
+					$detail_parts[] = sprintf( 'Code: %s', $error_code );
+				}
+				if ( $decline_code ) {
+					$detail_parts[] = sprintf( 'Decline code: %s', $decline_code );
+				}
+				$detail_parts[] = sprintf( 'Payment method: %s', $payment_method_id );
+				$detail_parts[] = 'Note: Card declines occur during verification when attaching the payment method to the customer. This happens before any charge is created, so the attempt will not appear in the Stripe Dashboard Payments section (check Developers > Logs in Stripe instead).';
+
+				$this->last_error = implode( ' | ', $detail_parts );
+
+				if ( charitable_is_debug( 'stripe' ) ) {
+					error_log( sprintf(
+						'[Charitable Stripe] add_payment_method FAILED (ApiErrorException). Payment method: %s, Customer: %s. Error: %s, Code: %s, Decline code: %s',
+						$payment_method_id,
+						$this->get( 'id' ),
+						$message,
+						$error_code,
+						$decline_code
+					) );
+				}
+
+				charitable_get_notices()->add_error( $message );
 
 				return null;
 			} catch ( Exception $e ) {
 				$body    = $e->getJsonBody();
 				$message = isset( $body['error']['message'] ) ? $body['error']['message'] : __( 'Something went wrong.', 'charitable' );
+
+				$this->last_error = $message;
+
+				if ( charitable_is_debug( 'stripe' ) ) {
+					error_log( sprintf(
+						'[Charitable Stripe] add_payment_method FAILED (Exception). Payment method: %s, Customer: %s. Error: %s',
+						$payment_method_id,
+						$this->get( 'id' ),
+						$message
+					) );
+				}
 
 				charitable_get_notices()->add_error( $message );
 

@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.5.0
- * @version   1.8.1.5, 1.8.9.1
+ * @version   1.8.1.5, 1.8.9.1, 1.8.10
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -498,7 +498,7 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 	 * Show blank slate.
 	 *
 	 * @since   1.8.1.5
-	 * @version 1.8.8.6, 1.8.9.1
+	 * @version 1.8.8.6, 1.8.9.1, 1.8.10
 	 *
 	 * @param string $which String which tablenav is being shown.
 	 *
@@ -524,7 +524,7 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 		$count = array_sum( $counts );
 
 		// Skip if there are posts or blank slate is disabled
-		if ( ! defined( 'CHARITABLE_FORCE_BLANK_SLATE' ) ) {
+		if ( ! defined( 'CHARITABLE_FORCE_BLANK_SLATE' ) || ! CHARITABLE_FORCE_BLANK_SLATE ) {
 			if ( 0 < $count || ( defined( 'CHARITABLE_DISABLE_BLANK_SLATE' ) && CHARITABLE_DISABLE_BLANK_SLATE ) ) {
 				return;
 			}
@@ -533,86 +533,284 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 		// Prefer bottom, but render in top if bottom doesn't fire (when there are 0 posts)
 		if ( 'bottom' === $which && ! $blank_state_rendered ) {
 			$blank_state_rendered = true;
+			$this->enqueue_blank_slate_assets();
 			$this->render_blank_state();
-			echo '<style type="text/css">#posts-filter .wp-list-table, #posts-filter .tablenav.top, .tablenav.bottom .actions, .wrap .subsubsub, .wrap .search-box, .wrap .tablenav-pages  { display: none; } #posts-filter .tablenav.bottom { height: auto; } body.post-type-donation .page-title-action { display: inline-block; } </style>';
+			echo '<style type="text/css">#posts-filter .wp-list-table, #posts-filter .tablenav.top, .tablenav.bottom .actions, .wrap .subsubsub, .wrap .search-box, .wrap .tablenav-pages  { display: none; } #posts-filter .tablenav.bottom { height: auto; } body.post-type-campaign .page-title-action { display: none; } </style>';
 		} elseif ( 'top' === $which && ! $blank_state_rendered ) {
 			// Fallback: if bottom never fires (WordPress doesn't render it with 0 posts), render in top
 			$blank_state_rendered = true;
+			$this->enqueue_blank_slate_assets();
 			$this->render_blank_state();
-			echo '<style type="text/css">#posts-filter .wp-list-table, #posts-filter .tablenav.top .actions, .wrap .subsubsub, .wrap .search-box, .wrap .tablenav-pages  { display: none; } #posts-filter .tablenav.top { height: auto; } body.post-type-donation .page-title-action { display: inline-block; } </style>';
+			echo '<style type="text/css">#posts-filter .wp-list-table, #posts-filter .tablenav.top .actions, .wrap .subsubsub, .wrap .search-box, .wrap .tablenav-pages  { display: none; } #posts-filter .tablenav.top { height: auto; } body.post-type-campaign .page-title-action { display: none; } </style>';
 		}
 	}
 
 		/**
-		 * Renders advice in the event that no orders exist yet.
+		 * Renders advice in the event that no campaigns exist yet.
 		 *
-		 * @since 1.8.1.5
+		 * @since   1.8.1.5
+		 * @version 1.8.10
 		 *
 		 * @return void
 		 */
 		public function render_blank_state() {
 			?>
-				<div class="charitable-blank-slate">
+			<div class="charitable-blank-slate">
+				<!-- Page Header -->
+				<div class="page-header">
+					<h1 class="page-title"><?php esc_html_e( 'Campaigns', 'charitable' ); ?></h1>
+					<?php if ( charitable_disable_legacy_campaigns() ) : ?>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ) ); ?>" class="btn-primary"><?php esc_html_e( '+ Create Campaign', 'charitable' ); ?></a>
+					<?php else : ?>
+						<a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=campaign' ) ); ?>" class="btn-primary"><?php esc_html_e( '+ Create Legacy Campaign', 'charitable' ); ?></a>
+					<?php endif; ?>
+				</div>
 
-					<img class="charitable-blank-slate-hero-image" src="<?php echo esc_url( charitable()->get_path( 'directory', false ) ) . 'assets/images/icons/blank-slate-campaigns.svg'; ?>" alt=""  />
+				<!-- Primary Welcome Section -->
+				<div class="welcome-card">
+					<h2 class="welcome-title"><?php esc_html_e( 'Ready to Start Fundraising?', 'charitable' ); ?></h2>
+					<p class="welcome-description">
+						<?php esc_html_e( 'Create your first campaign to start accepting donations and building your supporter community.', 'charitable' ); ?>
+					</p>
+					<?php if ( charitable_disable_legacy_campaigns() ) : ?>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ) ); ?>" class="btn-primary btn-large"><?php esc_html_e( 'Create Your First Campaign', 'charitable' ); ?></a>
+					<?php else : ?>
+						<a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=campaign' ) ); ?>" class="btn-primary btn-large"><?php esc_html_e( 'Create Your First Campaign', 'charitable' ); ?></a>
+					<?php endif; ?>
+				</div>
 
-					<h2 class="charitable-blank-slate-message">
-						<?php esc_html_e( 'Get Started And Create Your First Campaign!', 'charitable' ); ?>
-					</h2>
+				<!-- Secondary Actions -->
+				<div class="secondary-actions">
+					<div class="action-card">
+						<h3><?php esc_html_e( 'Already Have Campaigns Elsewhere?', 'charitable' ); ?></h3>
+						<?php
+						$givewp_installed = $this->is_givewp_installed();
+						$givewp_count     = $givewp_installed ? $this->get_givewp_campaign_count() : 0;
 
-					<div class="charitable-blank-slate-buttons">
-						<a class="charitable-blank-slate-cta charitable-button" target="_blank" href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ) ); ?>"><?php esc_html_e( 'Create Campaign', 'charitable' ); ?></a>
-						<div class="charitable-blank-slate-buttons-legacy">
-							<div><a target="_blank" href="https://www.wpcharitable.com/documentation/creating-your-first-campaign/?utm_campaign=liteplugin&utm_source=charitableplugin&utm_medium=campaign-page&utm_content=Read%20The%20Full%20Guide"><?php esc_html_e( 'Read The Guide On Creating Your First Campaign', 'charitable' ); ?></a></div>
-							<?php if ( ! charitable_disable_legacy_campaigns() ) : ?>
-								<div><a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=campaign' ) ); ?>"><?php esc_html_e( 'Create Campaign (Legacy)', 'charitable' ); ?></a></div>
-							<?php endif; ?>
-						</div>
-					</div>
-
-					<?php
-					/**
-					 * Renders after the 'blank state' message for the order list table has rendered.
-					 *
-					 * @since 1.8.1.5
-					 */
-					do_action( 'charitable_marketplace_suggestions_campaigns_empty_state' ); // phpcs:ignore
-
-					$recommendations = $this->render_blank_slate_recommendations();
-
-					?>
-
-					<div class="marketplace-suggestions-container showing-suggestion" data-marketplace-suggestions-context="orders-list-empty-header">
-						<?php if ( false !== $recommendations ) : ?>
-							<div class="marketplace-suggestion-container" data-suggestion-slug="orders-empty-header">
-									<h4><?php esc_html_e( 'Improve The Potential Of Your Campaigns:', 'charitable' ); ?></h4>
-							</div>
+						if ( $givewp_installed && $givewp_count > 0 ) :
+						?>
+						<p class="givewp-detection-text">
+							<?php
+							printf(
+								wp_kses(
+									/* translators: 1: bolded "GiveWP", 2: number of campaigns. */
+									__( 'We detected %1$s with %2$s campaigns installed on your site. Use our import tool to import them into Charitable.', 'charitable' ),
+									[
+										'strong' => [],
+										'span'   => [ 'class' => [] ],
+									]
+								),
+								'<strong>GiveWP</strong>',
+								'<span class="givewp-count">' . absint( $givewp_count ) . '</span>'
+							);
+							?>
+						</p>
+						<a href="https://www.wpcharitable.com/documentation/import-export-tool-givewp-to-charitable/" class="btn-secondary" target="_blank"><?php esc_html_e( 'Import GiveWP Campaigns', 'charitable' ); ?></a>
+						<?php elseif ( $givewp_installed && 0 === $givewp_count ) : ?>
+						<p class="givewp-detection-text">
+							<?php
+							printf(
+								wp_kses(
+									/* translators: %s: bolded "GiveWP". */
+									__( 'Did you know you can import %s campaigns, donations, and donors right into Charitable?', 'charitable' ),
+									[ 'strong' => [] ]
+								),
+								'<strong>GiveWP</strong>'
+							);
+							?>
+						</p>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=import&sub_tab=givewp' ) ); ?>" class="btn-secondary"><?php esc_html_e( 'Import Tools', 'charitable' ); ?></a>
+						<?php else : ?>
+						<p><?php esc_html_e( 'Import your existing campaigns from your old fundraising platform to get started quickly with Charitable.', 'charitable' ); ?></p>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=import&sub_tab=charitable' ) ); ?>" class="btn-secondary"><?php esc_html_e( 'Import Campaigns', 'charitable' ); ?></a>
 						<?php endif; ?>
 					</div>
-						<?php if ( false !== $recommendations ) : ?>
-						<div class="charitable-intergration-steps">
-							<?php echo $recommendations; // phpcs:ignore ?>
+
+					<div class="blank-slate-feature-card">
+						<div class="blank-slate-feature-title-icon-row">
+							<div class="blank-slate-feature-icon">
+								<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/icons/group.svg' ); ?>" alt="<?php esc_attr_e( 'Peer-to-Peer', 'charitable' ); ?>" width="32" height="32" />
+							</div>
+							<h3 class="blank-slate-feature-title"><?php esc_html_e( 'Enable Peer-to-Peer', 'charitable' ); ?> <span class="blank-slate-pro-badge"><?php esc_html_e( 'PRO', 'charitable' ); ?></span></h3>
 						</div>
-					<?php endif; ?>
-					<div class="marketplace-suggestions-container marketplace-suggestions-container-footer showing-suggestion">
-						<div class="marketplace-suggestion-container marketplace-suggestion-container-footer">
-							<div class="marketplace-suggestion-container-content"></div>
-							<div class="marketplace-suggestion-container-cta">
-								<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-addons' ) ); ?>" class="linkout"><?php esc_html_e( 'Browse all addons', 'charitable' ); ?></a>
-								<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-growth-tools' ) ); ?>" target="_blank" class="linkout"><?php esc_html_e( 'Growth Tools', 'charitable' ); ?></a>
+						<div class="blank-slate-feature-content">
+							<p class="blank-slate-feature-description"><?php esc_html_e( 'Charitable Ambassadors transforms your website into a peer-to-peer fundraising or crowdfunding platform.', 'charitable' ); ?></p>
+							<div class="blank-slate-button-row">
+							<?php
+							$ambassadors_state = $this->get_ambassadors_addon_state();
+
+							if ( 'upgrade' === $ambassadors_state['button_action'] ) {
+								$upgrade_url = isset( $ambassadors_state['upgrade_url'] ) ? $ambassadors_state['upgrade_url'] : '#';
+								?>
+								<a href="<?php echo esc_url( $upgrade_url ); ?>" class="charitable-dashboard-v2-enhance-grid-button <?php echo esc_attr( $ambassadors_state['button_class'] ); ?>" data-action="upgrade" target="_blank"><?php echo esc_html( $ambassadors_state['button_text'] ); ?></a>
+								<?php
+							} else {
+								$button_attributes = [
+									'data-action="' . esc_attr( $ambassadors_state['button_action'] ) . '"',
+									'data-slug="charitable-ambassadors"',
+									'data-type="charitable_addon"',
+								];
+
+								if ( $ambassadors_state['button_disabled'] ) {
+									$button_attributes[] = 'disabled';
+								}
+								?>
+								<button class="charitable-dashboard-v2-enhance-grid-button <?php echo esc_attr( $ambassadors_state['button_class'] ); ?>" <?php echo implode( ' ', $button_attributes ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html( $ambassadors_state['button_text'] ); ?></button>
+								<?php
+							}
+							?>
+							<a href="https://www.wpcharitable.com/features/peer-to-peer-fundraising/" class="charitable-dashboard-v2-enhance-grid-button charitable-dashboard-v2-learn-more-button" target="_blank"><?php esc_html_e( 'Learn More', 'charitable' ); ?></a>
 							</div>
 						</div>
 					</div>
-
-
 				</div>
+
+				<!-- Help Resources -->
+				<div class="help-resources">
+					<h3><?php esc_html_e( 'Additional Resources', 'charitable' ); ?></h3>
+					<ul class="help-links">
+						<li><a href="https://www.wpcharitable.com/documentation/start-here/?utm_campaign=liteplugin&utm_source=charitableplugin&utm_medium=campaign-page&utm_content=Start%20Here%20Guide" target="_blank"><?php esc_html_e( 'Get Started With Charitable', 'charitable' ); ?></a></li>
+						<li><a href="https://www.wpcharitable.com/documentation/creating-your-first-campaign/?utm_campaign=liteplugin&utm_source=charitableplugin&utm_medium=campaign-page&utm_content=Campaign%20Guide" target="_blank"><?php esc_html_e( 'Creating Your First Campaign', 'charitable' ); ?></a></li>
+						<?php if ( $givewp_installed ) : ?>
+							<li><a href="https://www.wpcharitable.com/documentation/import-export-tool-givewp-to-charitable/?utm_campaign=liteplugin&utm_source=charitableplugin&utm_medium=campaign-page&utm_content=Import%20Guide" target="_blank"><?php esc_html_e( 'Import Campaigns from GiveWP', 'charitable' ); ?></a></li>
+						<?php else : ?>
+							<li><a href="https://www.wpcharitable.com/documentation/installing-extensions/?utm_campaign=liteplugin&utm_source=charitableplugin&utm_medium=campaign-page&utm_content=Extension%20Guide" target="_blank"><?php esc_html_e( 'How to Install and Activate Charitable Extensions', 'charitable' ); ?></a></li>
+						<?php endif; ?>
+						<?php if ( charitable_disable_legacy_campaigns() ) : ?>
+							<li><a class="legacy-campaign-link" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=campaign' ) ); ?>"><?php esc_html_e( 'Create a Legacy Campaign', 'charitable' ); ?></a></li>
+						<?php else : ?>
+							<li><a class="modern-campaign-link" href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-campaign-builder&view=template' ) ); ?>"><?php esc_html_e( 'Create A Modern Campaign', 'charitable' ); ?></a></li>
+						<?php endif; ?>
+					</ul>
+				</div>
+			</div>
 			<?php
+		}
+
+		/**
+		 * Enqueue dashboard assets for AJAX button functionality on blank slate.
+		 *
+		 * @since 1.8.10
+		 *
+		 * @return void
+		 */
+		private function enqueue_blank_slate_assets() {
+			$version = charitable()->get_version();
+			$suffix  = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+
+			wp_enqueue_script(
+				'charitable-admin-dashboard',
+				charitable()->get_path( 'assets', false ) . 'js/admin/charitable-admin-dashboard' . $suffix . '.js',
+				[ 'jquery' ],
+				$version,
+				true
+			);
+
+			wp_localize_script(
+				'charitable-admin-dashboard',
+				'charitable_admin',
+				[
+					'nonce'   => wp_create_nonce( 'charitable-admin' ),
+					'ajaxurl' => admin_url( 'admin-ajax.php' ),
+				]
+			);
+		}
+
+		/**
+		 * Check if GiveWP is installed and active.
+		 *
+		 * @since 1.8.10
+		 *
+		 * @return bool
+		 */
+		private function is_givewp_installed() {
+			if ( ! function_exists( 'is_plugin_active' ) ) {
+				include_once ABSPATH . 'wp-admin/includes/plugin.php';
+			}
+
+			return is_plugin_active( 'give/give.php' );
+		}
+
+		/**
+		 * Count GiveWP forms (campaigns).
+		 *
+		 * @since 1.8.10
+		 *
+		 * @return int
+		 */
+		private function get_givewp_campaign_count() {
+			global $wpdb;
+
+			return (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = %s AND post_status IN ('publish', 'draft', 'private')",
+					'give_forms'
+				)
+			);
+		}
+
+		/**
+		 * Get the Ambassadors addon button state based on install/license status.
+		 *
+		 * @since 1.8.10
+		 *
+		 * @return array
+		 */
+		private function get_ambassadors_addon_state() {
+			$slug = 'charitable-ambassadors';
+
+			if ( ! function_exists( 'is_plugin_active' ) ) {
+				include_once ABSPATH . 'wp-admin/includes/plugin.php';
+			}
+
+			$plugin_file       = $slug . '/' . $slug . '.php';
+			$is_installed      = file_exists( WP_PLUGIN_DIR . '/' . $plugin_file );
+			$is_active         = $is_installed && is_plugin_active( $plugin_file );
+			$current_plan      = Charitable_Addons_Directory::get_current_plan_slug();
+			$required_plans    = [ 'pro', 'agency' ];
+			$has_required_plan = in_array( $current_plan, $required_plans, true );
+
+			if ( $is_installed && $is_active ) {
+				return [
+					'button_text'     => __( 'Installed', 'charitable' ),
+					'button_class'    => 'charitable-dashboard-v2-installed-button',
+					'button_action'   => 'installed',
+					'button_disabled' => true,
+				];
+			}
+
+			if ( $is_installed && ! $is_active ) {
+				return [
+					'button_text'     => __( 'Activate', 'charitable' ),
+					'button_class'    => 'charitable-dashboard-v2-activate-button',
+					'button_action'   => 'activate_addon',
+					'button_disabled' => false,
+				];
+			}
+
+			if ( ! $has_required_plan ) {
+				return [
+					'button_text'     => __( 'Upgrade To Pro', 'charitable' ),
+					'button_class'    => 'charitable-dashboard-v2-upgrade-button',
+					'button_action'   => 'upgrade',
+					'button_disabled' => false,
+					'upgrade_url'     => 'https://wpcharitable.com/lite-upgrade/?discount=LITEUPGRADE&utm_source=WordPress&utm_campaign=liteplugin&utm_medium=blank-slate&utm_content=Ambassadors',
+				];
+			}
+
+			return [
+				'button_text'     => __( 'Install & Activate', 'charitable' ),
+				'button_class'    => 'charitable-dashboard-v2-install-button',
+				'button_action'   => 'install_addon',
+				'button_disabled' => false,
+			];
 		}
 
 		/**
 		 * Renders the blank slate recommendations.
 		 *
-		 * @since 1.8.1.5
+		 * @since      1.8.1.5
+		 * @deprecated 1.8.10 No longer used. Replaced by card-based layout in render_blank_state().
 		 *
 		 * @return string
 		 */

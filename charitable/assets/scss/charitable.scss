@@ -25,8 +25,8 @@
 
 .campaign-summary:before,
 .campaign-summary:after {
-  // content: " ";
-  // display: table;
+  content: " ";
+  display: table;
 }
 
 .campaign-summary:after {
@@ -605,8 +605,8 @@ h3.charitable-header {
 
 .campaign-loop.campaign-grid:before,
 .campaign-loop.campaign-grid:after {
-  // content: " ";
-  // display: table;
+  content: " ";
+  display: table;
 }
 
 .campaign-loop.campaign-grid:after {
@@ -647,7 +647,7 @@ h3.charitable-header {
 
 .campaign-grid-2 li.campaign,
 .campaign-grid-2 .campaign.hentry {
-  // width: 49%;
+  width: 49%;
 }
 
 .campaign-grid-2 li.campaign:nth-child(2n+2),
@@ -663,7 +663,7 @@ h3.charitable-header {
 
 .campaign-grid-3 li.campaign,
 .campaign-grid-3 .campaign.hentry {
-  // width: 32%;
+  width: 32%;
 }
 
 .campaign-grid-3 li.campaign:nth-child(3n+3),
@@ -679,7 +679,7 @@ h3.charitable-header {
 
 .campaign-grid-4 li.campaign,
 .campaign-grid-4 .campaign.hentry {
-  // width: 23.5%;
+  width: 23.5%;
 }
 
 .campaign-grid-4 li.campaign:nth-child(4n+4),

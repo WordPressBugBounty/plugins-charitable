@@ -59,22 +59,41 @@ if ( ! class_exists( 'Charitable_Tools_Settings' ) ) :
 		/**
 		 * Add the tools tab settings fields.
 		 *
-		 * @since   1.8.1.6
+		 * @since      1.8.1.6
+		 * @deprecated 1.8.10 Use add_tools_import_charitable_fields() instead.
 		 *
 		 * @return  array<string,array>
 		 */
 		public function add_tools_import_fields() {
+			return $this->add_tools_import_charitable_fields();
+		}
 
-			if ( ! charitable_is_tools_view( 'import' ) ) {
+		/**
+		 * Add the Charitable sub-tab import fields (Campaign Import + Campaign Donations).
+		 *
+		 * @since 1.8.10
+		 *
+		 * @return array<string,array>
+		 */
+		public function add_tools_import_charitable_fields() {
+
+			if ( ! charitable_is_tools_view( 'import' ) || ! charitable_is_tools_view( 'import__charitable' ) ) {
 				return array();
 			}
 
 			return array(
-				'section'          => array(
+				'section'              => array(
 					'title'    => '',
 					'type'     => 'hidden',
 					'priority' => 1000,
 					'value'    => 'import',
+				),
+				'charitable_heading'   => array(
+					'title'    => __( 'Charitable', 'charitable' ),
+					'type'     => 'heading',
+					'class'    => 'charitable-tools-heading-pro',
+					'help'     => __( 'Import campaigns and donations from Charitable JSON export files.', 'charitable' ),
+					'priority' => 15,
 				),
 				'import_campaign'  => array(
 					'label_for'         => __( 'Campaign Import', 'charitable' ),
@@ -86,7 +105,7 @@ if ( ! class_exists( 'Charitable_Tools_Settings' ) ) :
 					'action'            => 'tools-campaign',
 					'button_label'      => esc_html__( 'Import Campaign', 'charitable' ),
 					'help'              => sprintf(
-						/* translators: %1$s: HTML strong tag. %2$s: HTML closing strong tag. %1$s: HTML break tag. */
+						/* translators: %1$s: HTML strong tag. %2$s: HTML closing strong tag. %3$s: HTML break tag. */
 						esc_html__( 'Imports a campaign JSON file into this website. It will not overwrite any previous campaigns, and it will set to "inactive" with a new campaign ID.%3$s %1$sCampaign tools do not include donations or campaign creators%2$s.', 'charitable' ),
 						'<strong>',
 						'</strong>',
@@ -105,7 +124,7 @@ if ( ! class_exists( 'Charitable_Tools_Settings' ) ) :
 					'action'            => 'tools-donation',
 					'button_label'      => esc_html__( 'Import Donations', 'charitable' ),
 					'help'              => sprintf(
-						/* translators: %1$s: HTML strong tag. %2$s: HTML closing strong tag. %1$s: HTML break tag. */
+						/* translators: %1$s: HTML strong tag. %2$s: HTML closing strong tag. %3$s: HTML break tag. */
 						esc_html__( 'Imports a donation JSON file into the selected campaign. It will not overwrite any previous donations or prevent duplicates.%3$s %1$sDonation tools do not include users - if a donor\'s email address is not found, the donation will not be assigned to a user%2$s.', 'charitable' ),
 						'<strong>',
 						'</strong>',
@@ -115,6 +134,238 @@ if ( ! class_exists( 'Charitable_Tools_Settings' ) ) :
 					'default'           => 2,
 					'options'           => $this->get_campaign_list( true ),
 					'select_name'       => 'tools_campaign',
+				),
+			);
+		}
+
+		/**
+		 * Add the GiveWP sub-tab import fields (CSV Donations Import + Migration Tool).
+		 *
+		 * @since 1.8.10
+		 *
+		 * @return array<string,array>
+		 */
+		public function add_tools_import_givewp_fields() {
+
+			if ( ! charitable_is_tools_view( 'import' ) || ! charitable_is_tools_view( 'import__givewp' ) ) {
+				return array();
+			}
+
+			return array(
+				'section'                     => array(
+					'title'    => '',
+					'type'     => 'hidden',
+					'priority' => 1000,
+					'value'    => 'import',
+				),
+				'givewp_heading'              => array(
+					'title'    => __( 'GiveWP', 'charitable' ),
+					'type'     => 'heading',
+					'class'    => 'charitable-tools-heading-pro',
+					'help'     => __( 'Manually import donations from GiveWP.', 'charitable' ),
+					'priority' => 15,
+				),
+				'import_donations_givewp_csv' => array(
+					'label_for'         => __( 'GiveWP CSV Donations Import', 'charitable' ),
+					'type'              => 'file',
+					'wrapper_class'     => 'test',
+					'nonce_action_name' => 'import_donations_givewp',
+					'nonce_field_name'  => 'charitable_nonce',
+					'name'              => 'donations_givewp',
+					'action'            => 'tools-givewp-donations',
+					'button_label'      => esc_html__( 'Import GiveWP Donations', 'charitable' ),
+					'help'              => esc_html__( 'Import donations from a GiveWP CSV export file. Donors will be created or matched by email address during the import process.', 'charitable' ),
+					'accept'            => '.csv',
+					'priority'          => 25,
+					'default'           => 2,
+				),
+				'givewp_migration_heading'    => array(
+					'title'    => __( 'GiveWP Migration Tool', 'charitable' ),
+					'type'     => 'heading',
+					'class'    => 'charitable-tools-heading-pro',
+					'help'     => __( 'Import data directly from the GiveWP database.', 'charitable' ),
+					'priority' => 45,
+				),
+				'givewp_migration_tool'       => array(
+					'title'     => __( 'GiveWP Migration', 'charitable' ) . ' <span class="badge beta">' . __( 'BETA', 'charitable' ) . '</span>',
+					'label_for' => 'charitable-givewp-migrate-start',
+					'type'      => 'content',
+					'render'    => true,
+					'callback'  => array( $this, 'render_givewp_migration_tool' ),
+					'priority'  => 50,
+					'class'     => 'charitable-givewp-migration-row',
+				),
+			);
+		}
+
+		/**
+		 * Render the GiveWP Pro upsell notice.
+		 *
+		 * @since 1.8.10
+		 *
+		 * @return void
+		 */
+		public function render_givewp_pro_notice() {
+			echo '<div class="charitable-import-pro-notice">';
+			echo '<p>';
+			printf(
+				/* translators: %1$s: opening anchor tag. %2$s: closing anchor tag. */
+				esc_html__( '%1$sUpgrade to Charitable Pro%2$s for full GiveWP migration capabilities including recurring donations, standalone donor imports, rollback support, and import history.', 'charitable' ),
+				'<a href="' . esc_url( 'https://wpcharitable.com/lite-upgrade/' ) . '" target="_blank"><strong>',
+				'</strong></a>'
+			);
+			echo '</p>';
+			echo '</div>';
+		}
+
+		/**
+		 * Render the GiveWP Migration Tool UI.
+		 *
+		 * @since 1.8.10
+		 *
+		 * @return void
+		 */
+		public function render_givewp_migration_tool() {
+			$importer  = Charitable_GiveWP_Importer::get_instance();
+			$is_active = $importer->is_givewp_active();
+
+			echo '<div class="charitable-givewp-migration-wrap">';
+
+			if ( ! $is_active ) {
+				echo '<div class="migration-info-box">';
+				echo '<p>' . esc_html__( 'GiveWP is not active on this site. Please install and activate GiveWP to use the migration tool.', 'charitable' ) . '</p>';
+				echo '</div>';
+				echo '</div>';
+				return;
+			}
+
+			$counts = $importer->get_counts();
+
+			// Pro upsell notice.
+			$this->render_givewp_pro_notice();
+
+			// Before You Begin box.
+			echo '<div class="migration-info-box charitable-before-import">';
+			echo '<p class="info-box-heading"><strong>' . esc_html__( 'Before You Begin:', 'charitable' ) . '</strong></p>';
+			echo '<ul>';
+			echo '<li>' . esc_html__( 'Back up your database before importing.', 'charitable' ) . '</li>';
+			echo '<li>' . esc_html__( 'Imported campaigns will be set to draft status for your review.', 'charitable' ) . '</li>';
+			echo '<li>' . esc_html__( 'Duplicate items (previously imported) will be automatically skipped.', 'charitable' ) . '</li>';
+			echo '<li>' . esc_html__( 'Keep GiveWP activated until you verify the import completed correctly.', 'charitable' ) . '</li>';
+			echo '</ul>';
+			echo '</div>';
+
+			// GiveWP Data Found box.
+			echo '<div class="migration-info-box">';
+			echo '<p class="info-box-heading"><strong>' . esc_html__( 'GiveWP Data Found:', 'charitable' ) . '</strong></p>';
+			echo '<table class="migration-data-found">';
+			echo '<tr><td class="data-count">' . intval( $counts['campaigns'] ) . '</td><td>' . esc_html__( 'Campaigns (Forms)', 'charitable' ) . '</td></tr>';
+			echo '<tr><td class="data-count">' . intval( $counts['donations'] ) . '</td><td>' . esc_html__( 'Donations', 'charitable' ) . '</td></tr>';
+			echo '</table>';
+			echo '</div>';
+
+			// Select What to Import.
+			echo '<div class="migration-select-section">';
+			echo '<p class="select-heading"><strong>' . esc_html__( 'Select What to Import:', 'charitable' ) . '</strong></p>';
+			echo '<div class="migration-options">';
+			echo '<label><input type="checkbox" name="givewp_import_campaigns" value="1" checked="checked" /> ';
+			/* translators: %d: number of GiveWP forms found. */
+			echo sprintf( esc_html__( 'Campaigns (%d GiveWP forms)', 'charitable' ), intval( $counts['campaigns'] ) );
+			echo '</label>';
+			echo '<label><input type="checkbox" name="givewp_import_donations" value="1" checked="checked" /> ';
+			/* translators: %d: number of GiveWP donations found. */
+			echo sprintf( esc_html__( 'Donations (%d)', 'charitable' ), intval( $counts['donations'] ) );
+			echo '</label>';
+			echo '</div>';
+
+			echo '<div class="migration-extra-options">';
+			echo '<label><input type="checkbox" name="givewp_dry_run" value="1" /> ';
+			echo esc_html__( 'Dry Run (Preview Only)', 'charitable' );
+			echo '<span class="option-description"> ' . esc_html__( 'Preview what will be imported without making changes', 'charitable' ) . '</span>';
+			echo '</label>';
+			echo '</div>';
+			echo '</div>';
+
+			// Start button.
+			echo '<p class="migration-button-wrap">';
+			echo '<button type="button" id="charitable-givewp-migrate-start" class="charitable-migration-btn">';
+			echo '<span class="dashicons dashicons-migrate"></span> ';
+			echo esc_html__( 'Start GiveWP Import', 'charitable' );
+			echo '</button>';
+			echo '</p>';
+
+			// Progress.
+			echo '<div class="migration-progress">';
+			echo '<div class="progress-bar-outer"><div class="progress-bar-inner"></div></div>';
+			echo '<div class="progress-status"></div>';
+			echo '</div>';
+
+			// Results.
+			echo '<div class="migration-results">';
+			echo '<h4>' . esc_html__( 'Migration Results', 'charitable' ) . '</h4>';
+			echo '<table>';
+			echo '<thead><tr><th>' . esc_html__( 'Type', 'charitable' ) . '</th><th>' . esc_html__( 'Imported', 'charitable' ) . '</th><th>' . esc_html__( 'Skipped', 'charitable' ) . '</th><th>' . esc_html__( 'Errors', 'charitable' ) . '</th></tr></thead>';
+			echo '<tbody></tbody>';
+			echo '</table>';
+			echo '</div>';
+
+			// Dry-run results.
+			echo '<div class="migration-dry-run-results" style="display:none;">';
+			echo '<h4>' . esc_html__( 'Dry Run Results', 'charitable' ) . '</h4>';
+			echo '<table>';
+			echo '<thead><tr><th>' . esc_html__( 'Type', 'charitable' ) . '</th><th>' . esc_html__( 'Would Import', 'charitable' ) . '</th><th>' . esc_html__( 'Would Skip', 'charitable' ) . '</th><th>' . esc_html__( 'Potential Issues', 'charitable' ) . '</th></tr></thead>';
+			echo '<tbody></tbody>';
+			echo '</table>';
+			echo '</div>';
+
+			// Error.
+			echo '<div class="migration-error"></div>';
+
+			echo '</div>';
+
+			wp_nonce_field( 'charitable_givewp_migration', 'charitable_givewp_migration_nonce' );
+		}
+
+		/**
+		 * Add the GiveButter sub-tab import fields (CSV Donations Import only).
+		 *
+		 * @since 1.8.10
+		 *
+		 * @return array<string,array>
+		 */
+		public function add_tools_import_givebutter_fields() {
+
+			if ( ! charitable_is_tools_view( 'import' ) || ! charitable_is_tools_view( 'import__givebutter' ) ) {
+				return array();
+			}
+
+			return array(
+				'section'                         => array(
+					'title'    => '',
+					'type'     => 'hidden',
+					'priority' => 1000,
+					'value'    => 'import',
+				),
+				'givebutter_heading'              => array(
+					'title'    => __( 'GiveButter', 'charitable' ),
+					'type'     => 'heading',
+					'class'    => 'charitable-tools-heading-pro',
+					'help'     => __( 'Manually import donations from GiveButter.', 'charitable' ),
+					'priority' => 15,
+				),
+				'import_donations_givebutter_csv' => array(
+					'label_for'         => __( 'GiveButter CSV Donations Import', 'charitable' ),
+					'type'              => 'file',
+					'wrapper_class'     => 'test',
+					'nonce_action_name' => 'import_donations_givebutter',
+					'nonce_field_name'  => 'charitable_nonce',
+					'name'              => 'donations_givebutter',
+					'action'            => 'tools-givebutter-donations',
+					'button_label'      => esc_html__( 'Import GiveButter Donations', 'charitable' ),
+					'help'              => esc_html__( 'Import donations from a GiveButter CSV export file. Donors will be created or matched by email address during the import process.', 'charitable' ),
+					'accept'            => '.csv',
+					'priority'          => 25,
+					'default'           => 2,
 				),
 			);
 		}

@@ -31,9 +31,17 @@ add_action( 'admin_init', array( Charitable_Tools::get_instance(), 'register_set
  * @see Charitable_Tools_Settings::add_import_fields()
  */
 add_filter( 'charitable_tools_tab_fields_export', array( Charitable_Tools_Settings::get_instance(), 'add_tools_export_fields' ), 5 );
-add_filter( 'charitable_tools_tab_fields_import', array( Charitable_Tools_Settings::get_instance(), 'add_tools_import_fields' ), 5 );
 add_filter( 'charitable_tools_tab_fields_snippets', array( Charitable_Tools_Settings::get_instance(), 'add_tools_snippets_fields' ), 5 );
 add_filter( 'charitable_tools_tab_fields_customize', array( Charitable_Tools_Settings::get_instance(), 'add_tools_customize_fields' ), 5 );
+
+/**
+ * Import sub-tab fields.
+ *
+ * @since 1.8.10
+ */
+add_filter( 'charitable_tools_tab_fields_sub_import__charitable', array( Charitable_Tools_Settings::get_instance(), 'add_tools_import_charitable_fields' ), 5 );
+add_filter( 'charitable_tools_tab_fields_sub_import__givewp', array( Charitable_Tools_Settings::get_instance(), 'add_tools_import_givewp_fields' ), 5 );
+add_filter( 'charitable_tools_tab_fields_sub_import__givebutter', array( Charitable_Tools_Settings::get_instance(), 'add_tools_import_givebutter_fields' ), 5 );
 
 /**
  * Add settings to the Misc tab.
@@ -62,6 +70,29 @@ add_action( 'admin_init', array( Charitable_Export_Items::get_instance(), 'admin
 add_action( 'admin_init', array( Charitable_Export_Items::get_instance(), 'admin_accept_export_donations_request' ) );
 add_action( 'admin_init', array( Charitable_Import_Items::get_instance(), 'admin_accept_import_campaign_request' ) );
 add_action( 'admin_init', array( Charitable_Import_Items::get_instance(), 'admin_accept_import_donations_request' ) );
+
+/**
+ * Import sub-tab default redirect.
+ *
+ * @since 1.8.10
+ */
+add_action( 'admin_init', array( Charitable_Tools::get_instance(), 'tools_sub_tab_default' ), 5 );
+
+/**
+ * GiveWP and GiveButter CSV import handlers.
+ *
+ * @since 1.8.10
+ */
+add_action( 'admin_init', array( Charitable_Import_Items::get_instance(), 'admin_accept_import_donations_givewp_request' ) );
+add_action( 'admin_init', array( Charitable_Import_Items::get_instance(), 'admin_accept_import_donations_givebutter_request' ) );
+
+/**
+ * GiveWP migration tool AJAX handlers.
+ *
+ * @since 1.8.10
+ */
+add_action( 'wp_ajax_charitable_givewp_import_start', array( Charitable_GiveWP_Importer::get_instance(), 'ajax_import_start' ) );
+add_action( 'wp_ajax_charitable_givewp_import_batch', array( Charitable_GiveWP_Importer::get_instance(), 'ajax_import_batch' ) );
 
 
 /**
@@ -116,3 +147,10 @@ add_action( 'wp_ajax_charitable_export_error_logs', array( Charitable_Tools_Syst
 add_action( 'wp_ajax_charitable_debug_log_scan', array( Charitable_Tools_System_Info::get_instance(), 'ajax_debug_log_scan' ) );
 
 add_action( 'admin_enqueue_scripts', array( Charitable_Tools_Misc::get_instance(), 'enqueue_scripts' ) );
+
+/**
+ * Enqueue GiveWP migration tool scripts.
+ *
+ * @since 1.8.10
+ */
+add_action( 'admin_enqueue_scripts', array( Charitable_GiveWP_Importer::get_instance(), 'enqueue_scripts' ) );

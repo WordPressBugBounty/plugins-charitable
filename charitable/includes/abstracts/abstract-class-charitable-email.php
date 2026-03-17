@@ -219,11 +219,13 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 		 * Return the email recipients.
 		 *
 		 * @since  1.0.0
+		 * @since  1.8.9.8 Normalize array values to comma-separated string to prevent downstream TypeErrors.
 		 *
 		 * @return string
 		 */
 		public function get_recipient() {
-			return $this->get_option( 'recipient', $this->get_default_recipient() );
+			$recipient = $this->get_option( 'recipient', $this->get_default_recipient() );
+			return is_array( $recipient ) ? implode( ', ', $recipient ) : $recipient;
 		}
 
 		/**
@@ -986,6 +988,7 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 		 *
 		 * @since  1.8.9.2
 		 * @since  1.8.9.5 Enhanced with detailed diagnostic context for recipient extraction failures.
+		 * @since  1.8.9.8 Normalize array recipients from child class overrides before validation.
 		 *
 		 * @return string|false Email recipient or false on error.
 		 */
@@ -993,12 +996,17 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 			try {
 				$recipient = $this->get_recipient();
 
+				// Normalize array recipients (e.g. from child class overrides or filters) to comma-separated string.
+				if ( is_array( $recipient ) ) {
+					$recipient = implode( ', ', array_filter( array_map( 'trim', $recipient ) ) );
+				}
+
 				if ( empty( $recipient ) || ! $this->is_valid_recipient( $recipient ) ) {
 					// Phase 1: Enhanced diagnostics - minimal overhead, only on errors
 					$diagnostic_context = array(
 						'recipient_value' => $recipient,
 						'recipient_type' => gettype( $recipient ),
-						'recipient_length' => strlen( (string) $recipient )
+						'recipient_length' => is_string( $recipient ) ? strlen( $recipient ) : 0,
 					);
 
 					// Add donation context if available (safe checks)
@@ -1216,10 +1224,11 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 				$context['amount']      = method_exists( $this->donation, 'get_total_donation_amount' ) ? $this->donation->get_total_donation_amount() : null;
 			}
 
-			// Try to get recipient for context (safely)
+			// Try to get recipient for context (safely) — normalize to string in case a subclass or filter returns an array.
 			try {
 				if ( method_exists( $this, 'get_recipient' ) ) {
-					$context['recipient'] = $this->get_recipient();
+					$raw_recipient         = $this->get_recipient();
+					$context['recipient']  = is_array( $raw_recipient ) ? implode( ', ', $raw_recipient ) : $raw_recipient;
 				}
 			} catch ( Throwable $e ) {
 				// Ignore if we can't get recipient
@@ -1230,16 +1239,27 @@ if ( ! class_exists( 'Charitable_Email' ) ) :
 		}
 
 		/**
-		 * Check if recipient string is valid (handles single emails and comma-separated lists).
+		 * Check if recipient string is valid (handles single emails, comma-separated lists, and arrays).
 		 *
 		 * @since  1.8.9.5
+		 * @since  1.8.9.8 Handle array recipients explicitly to prevent TypeError on PHP 8+.
 		 *
-		 * @param  string $recipient The recipient string to validate.
+		 * @param  string|array $recipient The recipient string or array to validate.
 		 * @return boolean True if valid, false otherwise.
 		 */
 		private function is_valid_recipient( $recipient ) {
 			if ( empty( $recipient ) ) {
 				return false;
+			}
+
+			// Handle array recipients gracefully.
+			if ( is_array( $recipient ) ) {
+				foreach ( $recipient as $email ) {
+					if ( empty( $email ) || ! is_email( trim( $email ) ) ) {
+						return false;
+					}
+				}
+				return true;
 			}
 
 			// If it's a single email, use is_email()

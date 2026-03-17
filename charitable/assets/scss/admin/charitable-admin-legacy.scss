@@ -2305,11 +2305,21 @@ div#charitable-settings {
 			background-color: #e27730;
 			border-color: #e27730;
 			color: #fff;
+			&:hover:not(:disabled) {
+				background-color: darken(#e27730, 8%);
+				border-color: darken(#e27730, 8%);
+				color: #fff;
+			}
 		}
 		&-green {
 			background-color: #5aa152;
 			border-color: #5aa152;
 			color: #fff;
+			&:hover:not(:disabled) {
+				background-color: darken(#5aa152, 8%);
+				border-color: darken(#5aa152, 8%);
+				color: #fff;
+			}
 		}
 	}
 	p.submit .button.button-secondary {
@@ -3047,6 +3057,73 @@ form.form-contains-file {
 	margin-top: 15px;
 	input[type="file"].charitable-settings-field {
 		font-size: 14px;
+	}
+}
+
+.charitable-setting-file-container {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	max-width: 650px;
+	margin-top: -5px;
+
+	input[type=file] {
+		padding: 4px;
+		margin: -4px;
+		position: relative;
+		outline: none;
+
+		&::file-selector-button {
+			border-radius: 4px;
+			padding: 0 16px;
+			height: 40px;
+			cursor: pointer;
+			background-color: white;
+			border: 1px solid rgba(0, 0, 0, 0.16);
+			box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.05);
+			margin-right: 16px;
+			width: 132px;
+			color: transparent;
+
+			&:hover {
+				background-color: #f3f4f6;
+			}
+			&:active {
+				background-color: #e5e7eb;
+			}
+		}
+
+		&::before {
+			position: absolute;
+			pointer-events: none;
+			top: 11px;
+			left: 16px;
+			height: 20px;
+			width: 20px;
+			content: "";
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230964B0'%3E%3Cpath d='M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3h-2zM7 9l1.41 1.41L11 7.83V16h2V7.83l2.59 2.58L17 9l-5-5-5 5z'/%3E%3C/svg%3E");
+		}
+
+		&::after {
+			position: absolute;
+			pointer-events: none;
+			top: 10px;
+			left: 43px;
+			color: #0964B0;
+			content: "Upload File";
+		}
+
+		&:focus-within::file-selector-button,
+		&:focus::file-selector-button {
+			outline: 2px solid #0964B0;
+			outline-offset: 2px;
+		}
+	}
+}
+
+@supports (-moz-appearance: none) {
+	.charitable-setting-file-container input[type=file]::file-selector-button {
+		color: #0964B0;
 	}
 }
 

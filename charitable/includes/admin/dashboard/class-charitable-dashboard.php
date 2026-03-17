@@ -211,7 +211,8 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 				return;
 			}
 
-			// Sort notifications by type = 'error' first, then 'warning', followed by 'notice'
+			// Sort notifications by type = 'error' first, then 'warning', followed by 'notice'.
+			// Within the same type, sort by priority (lower number = shown first, default 10).
 			uasort(
 				$notifications,
 				function ( $a, $b ) {
@@ -219,7 +220,14 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 					$pos_a = array_search( $a['type'], $types );
 					$pos_b = array_search( $b['type'], $types );
 
-					return $pos_a - $pos_b;
+					if ( $pos_a !== $pos_b ) {
+						return $pos_a - $pos_b;
+					}
+
+					$priority_a = isset( $a['priority'] ) ? (int) $a['priority'] : 10;
+					$priority_b = isset( $b['priority'] ) ? (int) $b['priority'] : 10;
+
+					return $priority_a - $priority_b;
 				}
 			);
 
@@ -235,6 +243,16 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 								<span class="screen-reader-text"><?php esc_attr_e( 'Previous message', 'charitable' ); ?></span>
 								<span aria-hidden="true">&lsaquo;</span>
 							</a>
+							<span class="charitable-dashboard-notification-counter">
+								<?php
+								printf(
+									/* translators: 1: current notification number, 2: total notifications */
+									esc_html__( '%1$d of %2$d', 'charitable' ),
+									1,
+									(int) $notifications_total
+								);
+								?>
+							</span>
 							<a class="next">
 								<span class="screen-reader-text"><?php esc_attr_e( 'Next message', 'charitable' ); ?></span>
 								<span aria-hidden="true">&rsaquo;</span>
@@ -273,12 +291,27 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 							'h5'     => array(),
 						)
 					);
+					$notification_type = ! empty( $notification['type'] ) ? $notification['type'] : 'notice';
+					$type_icons        = array(
+						'notice'  => 'dashicons-info',
+						'warning' => 'dashicons-warning',
+						'error'   => 'dashicons-dismiss',
+					);
+					$icon_class        = isset( $type_icons[ $notification_type ] ) ? $type_icons[ $notification_type ] : 'dashicons-info';
+					$button_url        = ! empty( $notification['button_url'] ) ? esc_url( $notification['button_url'] ) : '';
+					$button_text       = ! empty( $notification['button_text'] ) ? sanitize_text_field( $notification['button_text'] ) : '';
 					?>
 
-					<div class="charitable-dashboard-notification <?php echo esc_attr( $css_class ); ?>" data-notification-number="<?php echo (int) $notifications_count; ?>" data-notification-id="<?php echo esc_attr( $notification_slug ); ?>" data-notification-type="<?php echo esc_attr( $notification['type'] ); ?>">
+					<div class="charitable-dashboard-notification <?php echo esc_attr( $css_class ); ?>" data-notification-number="<?php echo (int) $notifications_count; ?>" data-notification-id="<?php echo esc_attr( $notification_slug ); ?>" data-notification-type="<?php echo esc_attr( $notification_type ); ?>">
 						<div class="charitable-dashboard-notification-message">
-							<h4 class="charitable-dashboard-notification-headline"><?php echo esc_html( $message_title ); ?></h4>
+							<h4 class="charitable-dashboard-notification-headline">
+								<span class="dashicons <?php echo esc_attr( $icon_class ); ?> charitable-notification-type-icon"></span>
+								<?php echo esc_html( $message_title ); ?>
+							</h4>
 							<?php echo $message; // phpcs:ignore ?>
+							<?php if ( $button_url && $button_text ) : ?>
+								<a href="<?php echo esc_url( $button_url ); ?>" class="charitable-notification-cta-button"><?php echo esc_html( $button_text ); ?></a>
+							<?php endif; ?>
 						</div>
 					</div>
 

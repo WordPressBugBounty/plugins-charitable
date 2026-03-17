@@ -930,10 +930,19 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 				$keys = $this->get_keys();
 
 				if ( ! array_key_exists( 'secret_key', $keys ) ) {
+					if ( charitable_is_debug( 'stripe' ) ) {
+						error_log( '[Charitable Stripe] setup_api FAILED: No secret_key in keys array.' ); // phpcs:ignore
+					}
 					return false;
 				}
 
 				$api_key = $keys['secret_key'];
+			}
+
+			if ( charitable_is_debug( 'stripe' ) ) {
+				$key_preview = ! empty( $api_key ) ? substr( $api_key, 0, 7 ) . '...' . substr( $api_key, -4 ) : 'EMPTY';
+				$test_mode   = charitable_get_option( 'test_mode' ) ? 'test' : 'live';
+				error_log( sprintf( '[Charitable Stripe] setup_api called. Mode: %s, Key: %s', $test_mode, $key_preview ) ); // phpcs:ignore
 			}
 
 			/**

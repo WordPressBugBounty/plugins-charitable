@@ -323,7 +323,8 @@ if ( ! class_exists( 'Charitable_Admin_Activities' ) ) :
 			$left_join['campaign']   = array_filter( $left_join['campaign'] ); // remove all empty values from the array.
 			$left_join_campaign_args = 'LEFT JOIN ' . implode( ' LEFT JOIN ', $left_join['campaign'] );
 
-			// Variables already extracted from args array above.
+			$start_date = $args['start_date'] ?? '';
+			$end_date   = $args['end_date'] ?? '';
 
 			$sql = "SELECT {$table_shortcuts['campaign']}.activity_id,
 				{$table_shortcuts['campaign']}.campaign_id,
@@ -400,7 +401,8 @@ if ( ! class_exists( 'Charitable_Admin_Activities' ) ) :
 			$left_join['donation']   = array_filter( $left_join['donation'] ); // remove all empty values from the array.
 			$left_join_donation_args = 'LEFT JOIN ' . implode( ' LEFT JOIN ', $left_join['donation'] );
 
-			// Variables already extracted from args array above.
+			$start_date = $args['start_date'] ?? '';
+			$end_date   = $args['end_date'] ?? '';
 
 				$sql = "SELECT {$table_shortcuts['donation']}.activity_id,
 								{$table_shortcuts['donation']}.campaign_id,
@@ -1094,6 +1096,7 @@ if ( ! class_exists( 'Charitable_Admin_Activities' ) ) :
 		 * Prepare error meta data for storage.
 		 *
 		 * @since  1.8.9.2
+		 * @since  1.8.9.8 Handle array recipients to prevent fatal TypeError in sanitize_email().
 		 *
 		 * @param  array $context The error context.
 		 *
@@ -1131,7 +1134,12 @@ if ( ! class_exists( 'Charitable_Admin_Activities' ) ) :
 
 			// Store recipient for email failures (helps debug delivery issues).
 			if ( isset( $context['recipient'] ) ) {
-				$meta_data['recipient'] = sanitize_email( $context['recipient'] );
+				$recipient = $context['recipient'];
+				if ( is_array( $recipient ) ) {
+					$meta_data['recipient'] = implode( ', ', array_map( 'sanitize_email', $recipient ) );
+				} else {
+					$meta_data['recipient'] = sanitize_email( $recipient );
+				}
 			}
 
 			// Apply privacy filter to allow customization

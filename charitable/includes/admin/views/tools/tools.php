@@ -18,11 +18,21 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 
 $charitable_active_tab      = isset( $_GET['tab'] ) ? esc_html( $_GET['tab'] ) : 'export';  // phpcs:ignore
+$charitable_active_sub_tab  = isset( $_GET['sub_tab'] ) ? esc_html( $_GET['sub_tab'] ) : ''; // phpcs:ignore
 $charitable_group           = isset( $_GET['group'] ) ? esc_html( $_GET['group'] ) : $charitable_active_tab; // phpcs:ignore
 $charitable_tab_no_form_tag = array( 'import', 'export', 'system-info', 'snippets', 'customize' );
 $charitable_tab_no_fields   = array( 'system-info', 'snippets', 'customize' );
 $charitable_sections        = charitable_get_admin_tools()->get_sections();
 $charitable_show_return     = $charitable_group !== $charitable_active_tab;
+
+/* Determine sub-sections and active sub-tab slug for the import tab. */
+$charitable_sub_sections     = array();
+$charitable_active_sub_tab_slug = '';
+if ( 'import' === $charitable_active_tab && ! empty( $charitable_active_sub_tab ) ) {
+	$charitable_sub_sections        = charitable_get_admin_tools()->get_sub_sections_import();
+	$charitable_active_sub_tab_slug = 'import__' . $charitable_active_sub_tab;
+	$charitable_group               = $charitable_active_sub_tab_slug;
+}
 
 ob_start();
 ?>
@@ -36,6 +46,15 @@ ob_start();
 			<a href="<?php echo esc_url( add_query_arg( array( 'tab' => $charitable_tab ), admin_url( 'admin.php?page=charitable-tools' ) ) ); ?>" class="nav-tab <?php echo $charitable_active_tab == $charitable_tab ? 'nav-tab-active' : ''; ?>"><?php echo $charitable_name; // phpcs:ignore ?></a>
 		<?php endforeach ?>
 	</h2>
+	<?php if ( ! empty( $charitable_sub_sections ) ) : ?>
+	<h3 class="nav-sub-tab-wrapper">
+		<?php foreach ( $charitable_sub_sections as $charitable_sub_tab_key => $charitable_sub_tab_name ) : // phpcs:ignore
+			$charitable_sub_tab_slug = str_replace( 'import__', '', $charitable_sub_tab_key );
+		?>
+			<a href="<?php echo esc_url( add_query_arg( array( 'tab' => $charitable_active_tab, 'sub_tab' => $charitable_sub_tab_slug ), admin_url( 'admin.php?page=charitable-tools' ) ) ); ?>" class="nav-tab <?php echo $charitable_active_sub_tab_slug === $charitable_sub_tab_key ? 'nav-tab-active' : ''; ?>"><?php echo esc_html( $charitable_sub_tab_name ); ?></a>
+		<?php endforeach ?>
+	</h3>
+	<?php endif; ?>
 	<?php
 		/**
 		 * Do or render something right before the tools form.

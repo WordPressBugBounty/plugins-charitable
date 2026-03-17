@@ -912,9 +912,8 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 							<p>
 							<?php
 							printf(
-								/* translators: %1$s: SPAM BUILDER link, %2$s: Documentation URL */
-								esc_html__( 'Please add your license to download the %1$s addon. Advanced features are available in Charitable Pro. Please %2$s on how to download Charitable Pro.', 'charitable' ),
-								'<a href="https://www.wpcharitable.com/extensions/charitable-spam-blocker/" target="_blank">' . esc_html__( 'SPAM BUILDER', 'charitable' ) . '</a>',
+								/* translators: %s: Documentation URL */
+								esc_html__( 'Please add your license and upgrade to Charitable Pro for more advanced security features. Please %s on how to download Charitable Pro.', 'charitable' ),
 								'<a href="https://wpcharitable.com/docs/download-charitable-pro/" target="_blank">' . esc_html__( 'see our documentation', 'charitable' ) . '</a>'
 							);
 							?>

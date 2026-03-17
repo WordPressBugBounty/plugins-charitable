@@ -82,7 +82,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			}
 			// phpcs:enable
 
-			/* Retrieve and validate the request's body. */
+			/* Retrieve and validate the request's body with signature verification. */
 			$event = self::get_validated_incoming_event();
 
 			// phpcs:disable
@@ -92,18 +92,12 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 			// phpcs:enable
 
 			if ( ! $event ) {
-				status_header( 500 );
-				die( __( 'Invalid Stripe event.', 'charitable' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				status_header( 403 );
+				die( __( 'Invalid or unverified Stripe event.', 'charitable' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 
-			try {
-				// phpcs:disable
-				if ( charitable_is_debug() ) {
-					error_log( 'Charitable_Stripe_Webhook_Processor PROCESS FUNCTION TRY' );
-				}
-				// phpcs:enable
-				$event = \Stripe\Event::constructFrom( $event );
-			} catch( \UnexpectedValueException $e ) {
+			// get_validated_incoming_event() now returns a verified \Stripe\Event object.
+			if ( ! ( $event instanceof \Stripe\Event ) ) {
 				status_header( 400 );
 				die( __( 'Unable to construct Stripe object with payload.', 'charitable' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
@@ -1135,20 +1129,124 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 		/**
 		 * For an IPN request, get the validated incoming event object.
 		 *
+		 * Verifies the Stripe webhook signature to prevent forged events.
+		 *
 		 * @since  1.3.0
 		 * @since  1.4.0 Returns an array instead of an object.
+		 * @since  1.8.9.8 Verifies Stripe-Signature header using webhook signing secret.
 		 *
-		 * @return false|array If valid, returns an object. Otherwise false.
+		 * @return false|\Stripe\Event If valid, returns a verified Stripe Event object. Otherwise false.
 		 */
 		private static function get_validated_incoming_event() {
-			$body  = @file_get_contents( 'php://input' );
-			$event = json_decode( $body, true );
+			$body = @file_get_contents( 'php://input' );
 
-			if ( ! is_array( $event ) || ! array_key_exists( 'id', $event ) ) {
+			if ( empty( $body ) ) {
 				return false;
 			}
 
-			return $event;
+			$sig_header     = isset( $_SERVER['HTTP_STRIPE_SIGNATURE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_STRIPE_SIGNATURE'] ) ) : '';
+			$signing_secret = self::get_webhook_signing_secret();
+
+			// If we have both a signature header and a signing secret, verify cryptographically.
+			if ( ! empty( $sig_header ) && ! empty( $signing_secret ) ) {
+				try {
+					$event = \Stripe\Webhook::constructEvent( $body, $sig_header, $signing_secret );
+					return $event;
+				} catch ( \Stripe\Error\SignatureVerification $e ) {
+					if ( charitable_is_debug() ) {
+						error_log( 'Charitable Stripe webhook signature verification failed: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					}
+					self::record_verification_failure();
+					return false;
+				} catch ( \UnexpectedValueException $e ) {
+					if ( charitable_is_debug() ) {
+						error_log( 'Charitable Stripe webhook invalid payload: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					}
+					self::record_verification_failure();
+					return false;
+				}
+			}
+
+			// Fallback: if no signing secret is stored yet (e.g., legacy installs before upgrade),
+			// verify the event by re-fetching it from the Stripe API using the event ID.
+			$event_data = json_decode( $body, true );
+
+			if ( ! is_array( $event_data ) || ! array_key_exists( 'id', $event_data ) ) {
+				self::record_verification_failure();
+				return false;
+			}
+
+			// Do not accept events with obviously forged IDs.
+			if ( 0 !== strpos( $event_data['id'], 'evt_' ) ) {
+				self::record_verification_failure();
+				return false;
+			}
+
+			try {
+				$gateway = new Charitable_Gateway_Stripe_AM();
+				$gateway->setup_api();
+
+				// Re-retrieve the event from Stripe API to confirm authenticity.
+				$event = \Stripe\Event::retrieve( $event_data['id'] );
+				return $event;
+			} catch ( \Exception $e ) {
+				if ( charitable_is_debug() ) {
+					error_log( 'Charitable Stripe webhook event verification via API failed: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				}
+				self::record_verification_failure();
+				return false;
+			}
+		}
+
+		/**
+		 * Retrieve the webhook signing secret for the current mode.
+		 *
+		 * Checks all possible signing secret option keys (live/test, connect/direct)
+		 * and returns the first non-empty one found.
+		 *
+		 * @since  1.8.9.8
+		 *
+		 * @return string|false The signing secret, or false if not found.
+		 */
+		private static function get_webhook_signing_secret() {
+			// Allow override via constant (useful for Stripe CLI testing).
+			if ( defined( 'CHARITABLE_WEBHOOK_SIGNING_SECRET' ) && CHARITABLE_WEBHOOK_SIGNING_SECRET ) {
+				return CHARITABLE_WEBHOOK_SIGNING_SECRET;
+			}
+
+			$test_mode = charitable_get_option( 'test_mode', false );
+
+			// Check the signing secret keys in priority order based on current mode.
+			if ( $test_mode ) {
+				$keys = array( 'test_connect_webhook_signing_secret', 'test_webhook_signing_secret' );
+			} else {
+				$keys = array( 'live_connect_webhook_signing_secret', 'live_webhook_signing_secret' );
+			}
+
+			foreach ( $keys as $key ) {
+				$secret = charitable_get_option( array( 'gateways_stripe', $key ) );
+				if ( ! empty( $secret ) ) {
+					return $secret;
+				}
+			}
+
+			return false;
+		}
+
+		/**
+		 * Record a webhook verification failure for admin alerting.
+		 *
+		 * Increments a transient counter that expires after 24 hours.
+		 * When the count exceeds the threshold, an admin notice is displayed.
+		 *
+		 * @since  1.8.9.8
+		 *
+		 * @return void
+		 */
+		private static function record_verification_failure() {
+			$transient_key = 'charitable_stripe_webhook_verification_failures';
+			$count         = (int) get_transient( $transient_key );
+			set_transient( $transient_key, $count + 1, DAY_IN_SECONDS );
 		}
 	}
 

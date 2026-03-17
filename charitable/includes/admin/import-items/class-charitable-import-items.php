@@ -84,7 +84,7 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 
 			if ( ! $this->has_json_extension() ) {
 				$this->errors[] = __( 'Sorry, but Charitable import files must be in <code>.json</code> format.', 'charitable' );
-				$redirect_link  = admin_url( 'admin.php?page=charitable-tools&tab=import' );
+				$redirect_link  = admin_url( 'admin.php?page=charitable-tools&tab=import&sub_tab=charitable' );
 				wp_safe_redirect( $redirect_link );
 				exit;
 			}
@@ -93,7 +93,7 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 			$contents = $this->get_file_contents();
 			if ( ! $contents ) {
 				$this->errors[] = __( 'Sorry, but there was an error retrieving the contents of the campaign export file. Please try again.', 'charitable' );
-				$redirect_link  = admin_url( 'admin.php?page=charitable-tools&tab=import' );
+				$redirect_link  = admin_url( 'admin.php?page=charitable-tools&tab=import&sub_tab=charitable' );
 				wp_safe_redirect( $redirect_link );
 				exit;
 			}
@@ -278,7 +278,7 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 
 			$this->add_update_message( __( 'Campaign imported.', 'charitable' ) . ' <a href="' . admin_url( 'post.php?post=' . $campaign_id . '&action=edit' ) . '">View campaign</a>.', 'success' );
 
-			$redirect_link = admin_url( 'admin.php?page=charitable-tools&tab=import' );
+			$redirect_link = admin_url( 'admin.php?page=charitable-tools&tab=import&sub_tab=charitable' );
 			wp_safe_redirect( $redirect_link );
 			exit;
 		}
@@ -304,7 +304,7 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 
 			if ( ! $this->has_json_extension( 'import_donations' ) ) {
 				$this->add_update_message( __( 'Sorry, but Charitable import files must be in <code>.json</code> format.', 'charitable' ), 'error' );
-				$redirect_link = admin_url( 'admin.php?page=charitable-tools&tab=import' );
+				$redirect_link = admin_url( 'admin.php?page=charitable-tools&tab=import&sub_tab=charitable' );
 				wp_safe_redirect( $redirect_link );
 				exit;
 			}
@@ -313,7 +313,7 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 			$contents = $this->get_file_contents( 'import_donations' );
 			if ( ! $contents ) {
 				$this->add_update_message( __( 'Sorry, but there was an error retrieving the contents of the donation export file. Please try again.', 'charitable' ), 'error' );
-				$redirect_link = admin_url( 'admin.php?page=charitable-tools&tab=import' );
+				$redirect_link = admin_url( 'admin.php?page=charitable-tools&tab=import&sub_tab=charitable' );
 				wp_safe_redirect( $redirect_link );
 				exit;
 			}
@@ -326,7 +326,7 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 
 			if ( false === $campaign_id || ! isset( $data['campaigns'] ) || count( $data['campaigns'] ) === 0 ) {
 				$this->add_update_message( __( 'Sorry, but there was an error attempting to determine the campaign ID for this import. Please try again.', 'charitable' ), 'error' );
-				$redirect_link = admin_url( 'admin.php?page=charitable-tools&tab=import' );
+				$redirect_link = admin_url( 'admin.php?page=charitable-tools&tab=import&sub_tab=charitable' );
 				wp_safe_redirect( $redirect_link );
 				exit;
 			}
@@ -435,7 +435,7 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 			/* translators: %d is the number of donations imported. */
 			$this->add_update_message( sprintf( __( '%d donations imported.', 'charitable' ), $donations_added ), 'success' );
 
-			$redirect_link = admin_url( 'admin.php?page=charitable-tools&tab=import&status=success+' . $donations_added );
+			$redirect_link = admin_url( 'admin.php?page=charitable-tools&tab=import&sub_tab=charitable&status=success+' . $donations_added );
 			wp_safe_redirect( $redirect_link );
 			exit;
 		}
@@ -552,6 +552,354 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 			}
 
 			return $donor_id;
+		}
+
+		/**
+		 * Process a GiveWP CSV donation upload.
+		 *
+		 * Maps GiveWP CSV columns to Charitable donation creation.
+		 *
+		 * @since 1.8.10
+		 *
+		 * @return void
+		 */
+		public function admin_accept_import_donations_givewp_request() {
+
+			if ( ! is_admin() || empty( $_POST ) ) {
+				return;
+			}
+
+			if ( ! isset( $_POST['charitable_nonce'] ) || ! wp_verify_nonce( $_POST['charitable_nonce'], 'import_donations_givewp' ) ) { // phpcs:ignore
+				return;
+			}
+
+			if ( ! current_user_can( 'manage_charitable_settings' ) ) {
+				return;
+			}
+
+			$redirect_link = admin_url( 'admin.php?page=charitable-tools&tab=import&sub_tab=givewp' );
+
+			if ( ! $this->has_correct_extension( 'import__givewp', 'import_donations_givewp_csv', 'csv' ) ) {
+				$this->add_update_message( __( 'Sorry, but the import file must be in CSV format.', 'charitable' ), 'error' );
+				wp_safe_redirect( $redirect_link );
+				exit;
+			}
+
+			$file = $this->get_csv_file_path( 'import__givewp', 'import_donations_givewp_csv' );
+			if ( ! $file ) {
+				$this->add_update_message( __( 'Sorry, there was an error reading the uploaded file. Please try again.', 'charitable' ), 'error' );
+				wp_safe_redirect( $redirect_link );
+				exit;
+			}
+
+			$handle = fopen( $file, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fopen
+			if ( false === $handle ) {
+				$this->add_update_message( __( 'Sorry, there was an error reading the uploaded file. Please try again.', 'charitable' ), 'error' );
+				wp_safe_redirect( $redirect_link );
+				exit;
+			}
+
+			$headers = fgetcsv( $handle );
+			if ( ! $headers ) {
+				fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose
+				$this->add_update_message( __( 'The CSV file appears to be empty or malformed.', 'charitable' ), 'error' );
+				wp_safe_redirect( $redirect_link );
+				exit;
+			}
+
+			// Normalize headers.
+			$headers = array_map( 'trim', $headers );
+
+			$donations_added = 0;
+			$skipped         = 0;
+
+			while ( false !== ( $row = fgetcsv( $handle ) ) ) { // phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
+				if ( count( $row ) < count( $headers ) ) {
+					++$skipped;
+					continue;
+				}
+
+				$data = array_combine( $headers, $row );
+
+				$first_name = isset( $data['First Name'] ) ? sanitize_text_field( $data['First Name'] ) : '';
+				$last_name  = isset( $data['Last Name'] ) ? sanitize_text_field( $data['Last Name'] ) : '';
+				$email      = isset( $data['Email Address'] ) ? sanitize_email( $data['Email Address'] ) : '';
+				$amount     = isset( $data['Donation Total'] ) ? floatval( $data['Donation Total'] ) : 0;
+				$date       = isset( $data['Donation Date'] ) ? sanitize_text_field( $data['Donation Date'] ) : '';
+				$status     = isset( $data['Donation Status'] ) ? sanitize_text_field( $data['Donation Status'] ) : '';
+				$gateway    = isset( $data['Payment Gateway'] ) ? sanitize_text_field( $data['Payment Gateway'] ) : '';
+
+				if ( empty( $email ) || $amount <= 0 ) {
+					++$skipped;
+					continue;
+				}
+
+				$donation_args = array(
+					'user'      => array(
+						'email'      => $email,
+						'first_name' => $first_name,
+						'last_name'  => $last_name,
+					),
+					'campaigns' => array(
+						array(
+							'campaign_id' => 0,
+							'amount'      => $amount,
+						),
+					),
+					'gateway'   => sanitize_text_field( $gateway ),
+					'status'    => $this->map_givewp_status( $status ),
+					'log_note'  => __( 'Imported from GiveWP CSV.', 'charitable' ),
+				);
+
+				if ( ! empty( $date ) ) {
+					$donation_args['date'] = $date;
+				}
+
+				$donation_id = charitable_create_donation( $donation_args );
+
+				if ( $donation_id ) {
+					update_post_meta( $donation_id, '_givewp_csv_import', 1 );
+					++$donations_added;
+				} else {
+					++$skipped;
+				}
+			}
+
+			fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose
+
+			/* translators: %1$d: number of donations imported. %2$d: number of rows skipped. */
+			$this->add_update_message( sprintf( __( '%1$d donations imported from GiveWP CSV. %2$d rows skipped.', 'charitable' ), $donations_added, $skipped ), 'success' );
+
+			wp_safe_redirect( $redirect_link );
+			exit;
+		}
+
+		/**
+		 * Process a GiveButter CSV donation upload.
+		 *
+		 * Maps GiveButter CSV columns to Charitable donation creation.
+		 *
+		 * @since 1.8.10
+		 *
+		 * @return void
+		 */
+		public function admin_accept_import_donations_givebutter_request() {
+
+			if ( ! is_admin() || empty( $_POST ) ) {
+				return;
+			}
+
+			if ( ! isset( $_POST['charitable_nonce'] ) || ! wp_verify_nonce( $_POST['charitable_nonce'], 'import_donations_givebutter' ) ) { // phpcs:ignore
+				return;
+			}
+
+			if ( ! current_user_can( 'manage_charitable_settings' ) ) {
+				return;
+			}
+
+			$redirect_link = admin_url( 'admin.php?page=charitable-tools&tab=import&sub_tab=givebutter' );
+
+			if ( ! $this->has_correct_extension( 'import__givebutter', 'import_donations_givebutter_csv', 'csv' ) ) {
+				$this->add_update_message( __( 'Sorry, but the import file must be in CSV format.', 'charitable' ), 'error' );
+				wp_safe_redirect( $redirect_link );
+				exit;
+			}
+
+			$file = $this->get_csv_file_path( 'import__givebutter', 'import_donations_givebutter_csv' );
+			if ( ! $file ) {
+				$this->add_update_message( __( 'Sorry, there was an error reading the uploaded file. Please try again.', 'charitable' ), 'error' );
+				wp_safe_redirect( $redirect_link );
+				exit;
+			}
+
+			$handle = fopen( $file, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fopen
+			if ( false === $handle ) {
+				$this->add_update_message( __( 'Sorry, there was an error reading the uploaded file. Please try again.', 'charitable' ), 'error' );
+				wp_safe_redirect( $redirect_link );
+				exit;
+			}
+
+			$headers = fgetcsv( $handle );
+			if ( ! $headers ) {
+				fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose
+				$this->add_update_message( __( 'The CSV file appears to be empty or malformed.', 'charitable' ), 'error' );
+				wp_safe_redirect( $redirect_link );
+				exit;
+			}
+
+			$headers = array_map( 'trim', $headers );
+
+			$donations_added = 0;
+			$skipped         = 0;
+
+			while ( false !== ( $row = fgetcsv( $handle ) ) ) { // phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
+				if ( count( $row ) < count( $headers ) ) {
+					++$skipped;
+					continue;
+				}
+
+				$data = array_combine( $headers, $row );
+
+				$first_name = isset( $data['First Name'] ) ? sanitize_text_field( $data['First Name'] ) : '';
+				$last_name  = isset( $data['Last Name'] ) ? sanitize_text_field( $data['Last Name'] ) : '';
+				$email      = isset( $data['Email'] ) ? sanitize_email( $data['Email'] ) : '';
+				$amount     = isset( $data['Amount'] ) ? floatval( $data['Amount'] ) : 0;
+				$date       = isset( $data['Transaction Date (UTC)'] ) ? sanitize_text_field( $data['Transaction Date (UTC)'] ) : '';
+				$status     = isset( $data['Status Friendly'] ) ? sanitize_text_field( $data['Status Friendly'] ) : '';
+				$method     = isset( $data['Method'] ) ? sanitize_text_field( $data['Method'] ) : '';
+				$message    = isset( $data['Public Message'] ) ? sanitize_text_field( $data['Public Message'] ) : '';
+
+				if ( empty( $email ) || $amount <= 0 ) {
+					++$skipped;
+					continue;
+				}
+
+				$donation_args = array(
+					'user'      => array(
+						'email'      => $email,
+						'first_name' => $first_name,
+						'last_name'  => $last_name,
+					),
+					'campaigns' => array(
+						array(
+							'campaign_id' => 0,
+							'amount'      => $amount,
+						),
+					),
+					'gateway'   => sanitize_text_field( $method ),
+					'status'    => $this->map_givebutter_status( $status ),
+					'log_note'  => __( 'Imported from GiveButter CSV.', 'charitable' ),
+				);
+
+				if ( ! empty( $date ) ) {
+					$donation_args['date'] = $date;
+				}
+
+				$donation_id = charitable_create_donation( $donation_args );
+
+				if ( $donation_id ) {
+					update_post_meta( $donation_id, '_givebutter_csv_import', 1 );
+
+					// Add donor comment if there's a public message.
+					if ( ! empty( $message ) ) {
+						wp_insert_comment(
+							array(
+								'comment_post_ID' => $donation_id,
+								'comment_content'  => $message,
+								'comment_type'     => 'charitable_comment',
+								'comment_approved' => 1,
+								'user_id'          => 0,
+							)
+						);
+					}
+
+					++$donations_added;
+				} else {
+					++$skipped;
+				}
+			}
+
+			fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose
+
+			/* translators: %1$d: number of donations imported. %2$d: number of rows skipped. */
+			$this->add_update_message( sprintf( __( '%1$d donations imported from GiveButter CSV. %2$d rows skipped.', 'charitable' ), $donations_added, $skipped ), 'success' );
+
+			wp_safe_redirect( $redirect_link );
+			exit;
+		}
+
+		/**
+		 * Check if the uploaded file has the correct extension.
+		 *
+		 * Enhanced version supporting sub-tab file field lookups.
+		 *
+		 * @since 1.8.10
+		 *
+		 * @param string $section    The section key (e.g. 'import__givewp').
+		 * @param string $field_name The field name within the section.
+		 * @param string $extension  The expected file extension (e.g. 'csv').
+		 *
+		 * @return bool
+		 */
+		public function has_correct_extension( $section, $field_name, $extension = 'csv' ) {
+			$file_name = isset( $_FILES['charitable_settings']['name'][ $section ][ $field_name ] ) // phpcs:ignore
+				? $_FILES['charitable_settings']['name'][ $section ][ $field_name ] // phpcs:ignore
+				: null;
+
+			if ( empty( $file_name ) ) {
+				return false;
+			}
+
+			$file_parts = explode( '.', $file_name );
+			$file_ext   = strtolower( end( $file_parts ) );
+
+			return $extension === $file_ext;
+		}
+
+		/**
+		 * Get the temporary file path for a CSV upload.
+		 *
+		 * @since 1.8.10
+		 *
+		 * @param string $section    The section key (e.g. 'import__givewp').
+		 * @param string $field_name The field name within the section.
+		 *
+		 * @return string|false The file path or false.
+		 */
+		public function get_csv_file_path( $section, $field_name ) {
+			$file = isset( $_FILES['charitable_settings']['tmp_name'][ $section ][ $field_name ] ) // phpcs:ignore
+				? wp_unslash( $_FILES['charitable_settings']['tmp_name'][ $section ][ $field_name ] ) // phpcs:ignore
+				: false;
+
+			if ( ! $file || ! file_exists( $file ) ) {
+				return false;
+			}
+
+			return $file;
+		}
+
+		/**
+		 * Map a GiveWP donation status to a Charitable status.
+		 *
+		 * @since 1.8.10
+		 *
+		 * @param string $givewp_status The GiveWP status string.
+		 *
+		 * @return string The Charitable donation status.
+		 */
+		public function map_givewp_status( $givewp_status ) {
+			$map = array(
+				'Complete'   => 'charitable-completed',
+				'Pending'    => 'charitable-pending',
+				'Processing' => 'charitable-pending',
+				'Refunded'   => 'charitable-refunded',
+				'Failed'     => 'charitable-failed',
+				'Cancelled'  => 'charitable-cancelled',
+				'Abandoned'  => 'charitable-cancelled',
+				'Revoked'    => 'charitable-cancelled',
+			);
+
+			return isset( $map[ $givewp_status ] ) ? $map[ $givewp_status ] : 'charitable-pending';
+		}
+
+		/**
+		 * Map a GiveButter donation status to a Charitable status.
+		 *
+		 * @since 1.8.10
+		 *
+		 * @param string $givebutter_status The GiveButter status string.
+		 *
+		 * @return string The Charitable donation status.
+		 */
+		public function map_givebutter_status( $givebutter_status ) {
+			$map = array(
+				'Succeeded' => 'charitable-completed',
+				'Pending'   => 'charitable-pending',
+				'Failed'    => 'charitable-failed',
+				'Refunded'  => 'charitable-refunded',
+			);
+
+			return isset( $map[ $givebutter_status ] ) ? $map[ $givebutter_status ] : 'charitable-pending';
 		}
 
 		/**

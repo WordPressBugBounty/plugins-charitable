@@ -144,6 +144,15 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 		protected $customer;
 
 		/**
+		 * Last error encountered during customer retrieval/creation.
+		 *
+		 * @since 1.8.10
+		 *
+		 * @var   string
+		 */
+		protected $customer_error = '';
+
+		/**
 		 * Connected account customer object.
 		 *
 		 * @since 1.4.0
@@ -433,7 +442,19 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 		 * @return string|false Customer id if it exists, or false otherwise.
 		 */
 		public function get_stripe_customer( $payment_method = null ) {
+			$debug = charitable_is_debug( 'stripe' );
+
 			$this->customer = Charitable_Stripe_Customer::init_with_donor( $this->donor );
+
+			if ( $debug ) {
+				if ( is_null( $this->customer ) ) {
+					$user_id  = $this->donor->get_user()->ID;
+					$donor_id = $this->donor->donor_id;
+					error_log( sprintf( '[Charitable Stripe] init_with_donor returned null. Donor ID: %s, User ID: %s. Will attempt to create new customer.', $donor_id, $user_id ? $user_id : '0 (guest)' ) );
+				} else {
+					error_log( sprintf( '[Charitable Stripe] init_with_donor found existing customer: %s', $this->customer->get( 'id' ) ) );
+				}
+			}
 
 			/* Check if customer object exists or has been deleted in Stripe. If needed, create one. */
 			if ( is_null( $this->customer ) || is_null( $this->customer->get( 'id' ) ) ) {
@@ -441,15 +462,31 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 			}
 
 			if ( is_null( $this->customer ) ) {
+				$this->customer_error = __( 'Unable to create Stripe customer. The Stripe API may be unreachable or returned an error.', 'charitable' );
+				if ( $debug ) {
+					error_log( '[Charitable Stripe] get_stripe_customer FAILED: create_for_donor returned null. Customer could not be created.' );
+				}
 				return false;
 			}
 
 			$customer_id = $this->customer->get( 'id' );
 
+			if ( $debug ) {
+				error_log( sprintf( '[Charitable Stripe] Customer ID resolved: %s', $customer_id ) );
+			}
+
 			if ( ! is_null( $payment_method ) ) {
+				if ( $debug ) {
+					error_log( sprintf( '[Charitable Stripe] Attaching payment method: %s to customer: %s', $payment_method, $customer_id ) );
+				}
+
 				$payment_method = $this->customer->add_payment_method( $payment_method, true );
 
 				if ( is_null( $payment_method ) ) {
+					$this->customer_error = $this->customer->get_last_error();
+					if ( $debug ) {
+						error_log( '[Charitable Stripe] get_stripe_customer FAILED: add_payment_method returned null.' );
+					}
 					return false;
 				}
 			}
@@ -461,8 +498,20 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 			 * @see https://stripe.com/docs/connect/shared-customers
 			 */
 			if ( ! empty( $this->options ) && ( 'direct' === $this->connect_mode || $this->is_recurring_donation() ) ) {
+				if ( $debug ) {
+					$account = isset( $this->options['stripe_account'] ) ? $this->options['stripe_account'] : 'unknown';
+					error_log( sprintf( '[Charitable Stripe] Creating connected customer on account: %s (connect_mode: %s)', $account, $this->connect_mode ) );
+				}
+
 				$this->connected_customer = new Charitable_Stripe_Connected_Customer( $this->customer, $this->options, $this->donor, $payment_method );
 				$customer_id              = $this->connected_customer->get( 'id' );
+
+				if ( is_null( $customer_id ) ) {
+					$this->customer_error = __( 'Unable to create customer on connected Stripe account.', 'charitable' );
+					if ( $debug ) {
+						error_log( '[Charitable Stripe] get_stripe_customer FAILED: connected customer ID is null.' );
+					}
+				}
 			}
 
 			return is_null( $customer_id ) ? false : $customer_id;
@@ -1101,6 +1150,7 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 		 * @return void
 		 */
 		public function setup_stripe_connect() {
+			$debug = charitable_is_debug( 'stripe' );
 
 			$campaign_donations = $this->donation->get_campaign_donations();
 
@@ -1111,20 +1161,21 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 				error_log( print_r( $campaign_donations, true ) );
 			}
 
+			if ( $debug ) {
+				$campaign_id = current( $campaign_donations )->campaign_id;
+				error_log( sprintf( '[Charitable Stripe] setup_stripe_connect called. Campaign ID: %s, Using Stripe Connect: %s', $campaign_id, charitable_using_stripe_connect() ? 'yes' : 'no' ) ); // phpcs:ignore
+			}
+
 			$this->application_fee = $this->get_application_fee_amount(
 				current( $campaign_donations )->amount,
 				0
 			);
 
 			if ( ! class_exists( 'Charitable_Stripe_Connect' ) ) {
-				if ( charitable_is_debug() ) {
-					// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-					error_log( 'Charitable_Stripe_Connect not found' );
-					return;
+				if ( $debug ) {
+					error_log( '[Charitable Stripe] Legacy Charitable_Stripe_Connect class not found. Using built-in Stripe Connect handling.' ); // phpcs:ignore
 				}
 			}
-
-			// todo: in theory everything remaining in this function could be removed.
 
 			$campaign_donations = $this->donation->get_campaign_donations();
 
@@ -1136,6 +1187,9 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 			$connected_account = charitable_stripe_get_connected_account_for_campaign( current( $campaign_donations )->campaign_id );
 
 			if ( ! $connected_account ) {
+				if ( $debug ) {
+					error_log( sprintf( '[Charitable Stripe] No legacy connected account for campaign %s. connect_mode: %s, options: %s', current( $campaign_donations )->campaign_id, $this->connect_mode ? $this->connect_mode : 'not set', ! empty( $this->options ) ? wp_json_encode( $this->options ) : 'empty' ) ); // phpcs:ignore
+				}
 				return;
 			}
 
@@ -1146,6 +1200,10 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 				$this->options['stripe_account'] = $connected_account;
 			} else {
 				$this->destination = $connected_account;
+			}
+
+			if ( $debug ) {
+				error_log( sprintf( '[Charitable Stripe] setup_stripe_connect completed. connect_mode: %s, connected_account: %s, destination: %s', $this->connect_mode, $connected_account, $this->destination ? $this->destination : 'none' ) ); // phpcs:ignore
 			}
 
 			$this->application_fee = $this->get_application_fee_amount(

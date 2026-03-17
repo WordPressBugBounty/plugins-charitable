@@ -2,9 +2,9 @@
 Contributors: WPCharitable, smub, dimensionmedia
 Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
-Tested up to: 6.9.1
+Tested up to: 6.9.4
 Requires PHP: 7.4
-Stable tag: 1.8.9.7
+Stable tag: 1.8.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -267,6 +267,14 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.10 =
+* NEW: Expanded Import tools with sub-tabs for Charitable, GiveWP, and GiveButter imports including CSV donations import and GiveWP Migration Tool (Beta).
+* NEW: Redesigned blank slate pages for campaigns and donations.
+* IMPROVED: Strengthened Stripe webhook processing with additional verification.
+* FIX: Restored campaign grid column widths for the [campaigns] shortcode.
+* FIX: Improved email reliability when processing certain recipient formats.
+* FIX: Improved error diagnostics in System Info.
 
 = Donation Form & Fundraising Campaigns v1.8.9.7 =
 * NEW: Charitable will add social meta to campaign pages for improved sharing on some social networks (SEO plugins can override this).

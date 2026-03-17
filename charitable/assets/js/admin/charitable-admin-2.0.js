@@ -460,32 +460,32 @@ var CharitableAdminUI = window.CharitableAdminUI || ( function( document, window
                 e.preventDefault();
 
                 var $this = $(this),
-                    // find the notification id and number of the notification that does not have the charitable-hidden css class.
-                    notification_number = $this.closest('.charitable-dashboard-notifications').find('.charitable-dashboard-notification:not(.charitable-hidden)').data('notification-number'),
-                    notification_id = $this.closest('.charitable-dashboard-notifications').find('.charitable-dashboard-notification:not(.charitable-hidden)').data('notification-id'), // eslint-disable-line no-unused-vars
-                    notification_type = $this.closest('.charitable-dashboard-notifications').find('.charitable-dashboard-notification:not(.charitable-hidden)').data('notification-type'), // eslint-disable-line no-unused-vars
-                    notification_count = $this.closest('.charitable-dashboard-notifications').find('.charitable-dashboard-notification').length,
-                    $container = $this.closest('.charitable-dashboard-notifications');
+                    $container = $this.closest('.charitable-dashboard-notifications'),
+                    $current = $container.find('.charitable-dashboard-notification:not(.charitable-hidden)'),
+                    notification_number = $current.data('notification-number'),
+                    notification_count = $container.find('.charitable-dashboard-notification').length,
+                    new_number = notification_number;
 
                 if ( $this.hasClass('next') ) {
-                    // add the charitable-hidden of the current notification.
-                    $container.find('.charitable-dashboard-notification[data-notification-number="' + notification_number + '"]').addClass('charitable-hidden');
-                    notification_number++;
-                    if ( notification_number > notification_count ) {
-                        notification_number = 1;
+                    new_number++;
+                    if ( new_number > notification_count ) {
+                        new_number = 1;
                     }
-                    // remove the charitable-hidden of the next notification.
-                    $container.find('.charitable-dashboard-notification[data-notification-number="' + notification_number + '"]').removeClass('charitable-hidden');
                 } else if ( $this.hasClass('prev') ) {
-                    // add the charitable-hidden of the current notification.
-                    $container.find('.charitable-dashboard-notification[data-notification-number="' + notification_number + '"]').addClass('charitable-hidden');
-                    notification_number--;
-                    if ( notification_number < 1 ) {
-                        notification_number = notification_count;
+                    new_number--;
+                    if ( new_number < 1 ) {
+                        new_number = notification_count;
                     }
-                    // remove the charitable-hidden of the next notification.
-                    $container.find('.charitable-dashboard-notification[data-notification-number="' + notification_number + '"]').removeClass('charitable-hidden');
                 }
+
+                // Fade out current, then fade in next.
+                $current.fadeOut( 200, function() {
+                    $current.addClass('charitable-hidden').removeAttr('style');
+                    $container.find('.charitable-dashboard-notification[data-notification-number="' + new_number + '"]').hide().removeClass('charitable-hidden').fadeIn( 200 );
+                });
+
+                // Update the counter text.
+                $container.find('.charitable-dashboard-notification-counter').text( new_number + ' of ' + notification_count );
             }
             );
 
@@ -508,14 +508,29 @@ var CharitableAdminUI = window.CharitableAdminUI || ( function( document, window
                     },
                     success: function( response ) {
                         if ( response.success ) {
-                            // remove the element that has the notification id.
-                            $container.find('.charitable-dashboard-notification[data-notification-id="' + notification_id + '"]').remove();
-                            // count the number of notifications that are left.
-                            var notification_count = $container.find('.charitable-dashboard-notification').length;
-                            // if there are no more notifications, remove the entire container.
-                            if ( notification_count === 0 ) {
-                                $container.remove();
-                            }
+                            var $dismissed = $container.find('.charitable-dashboard-notification[data-notification-id="' + notification_id + '"]');
+
+                            $dismissed.fadeOut( 200, function() {
+                                $dismissed.remove();
+                                // count the number of notifications that are left.
+                                var notification_count = $container.find('.charitable-dashboard-notification').length;
+                                // if there are no more notifications, remove the entire container.
+                                if ( notification_count === 0 ) {
+                                    $container.fadeOut( 200, function() { $container.remove(); });
+                                } else {
+                                    // Show the first remaining notification with fade.
+                                    $container.find('.charitable-dashboard-notification').first().removeClass('charitable-hidden').hide().fadeIn( 200 );
+
+                                    if ( notification_count <= 1 ) {
+                                        // Hide navigation when only one notification remains.
+                                        $container.find('.charitable-dashboard-notification-navigation').html('');
+                                    } else {
+                                        // Update the counter text.
+                                        var current_number = $container.find('.charitable-dashboard-notification:not(.charitable-hidden)').first().data('notification-number');
+                                        $container.find('.charitable-dashboard-notification-counter').text( current_number + ' of ' + notification_count );
+                                    }
+                                }
+                            });
                         }
                     }
                 });
