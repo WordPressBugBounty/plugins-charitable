@@ -101,6 +101,15 @@ if ( ! class_exists( 'Charitable_Licenses' ) ) :
 				error_log( 'CHARITABLE: NEW VENDOR CALL THROWN: is_pro()' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			}
 
+			// On multisite subsites, the vendor's is_pro() only checks the network main site's license.
+			// Also check the current subsite's license so subsite admins with valid licenses are recognized.
+			if ( is_multisite() && ! is_main_site() ) {
+				$settings = get_option( 'charitable_settings' );
+				if ( $settings && isset( $settings['licenses']['charitable-v2']['valid'] ) && 1 === intval( $settings['licenses']['charitable-v2']['valid'] ) ) {
+					return true;
+				}
+			}
+
 			$registry = charitable()->registry();
 			return $registry->get( 'CharitableLicenses\CharitableLicenses' )->is_pro();
 		}

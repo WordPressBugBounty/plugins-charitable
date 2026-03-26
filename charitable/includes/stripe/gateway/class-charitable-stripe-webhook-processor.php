@@ -892,6 +892,13 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 					error_log( sprintf( '[STRIPE_WEBHOOK] Creating RENEWAL donation for subscription #%d (Charge: %s not found in existing donations)', $subscription->get_donation_id(), $invoice->charge ) ); // phpcs:ignore
 				}
 
+				/* Transient lock to prevent duplicate renewals from near-simultaneous webhooks. */
+				$lock_key = 'charitable_renewal_' . $invoice->charge;
+				if ( get_transient( $lock_key ) ) {
+					return __( 'Subscription Webhook: Renewal is already being processed', 'charitable' );
+				}
+				set_transient( $lock_key, true, 300 );
+
 				$donation_id = $subscription->create_renewal_donation( array( 'status' => 'charitable-completed' ) );
 				$donation    = charitable_get_donation( $donation_id );
 

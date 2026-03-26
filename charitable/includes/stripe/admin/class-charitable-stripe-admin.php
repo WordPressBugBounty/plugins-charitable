@@ -394,7 +394,7 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 		 * @return void
 		 */
 		public function maybe_migrate_webhook_signing_secrets() {
-			if ( ! current_user_can( 'manage_charitable_settings' ) ) {
+			if ( ! current_user_can( 'manage_options' ) ) {
 				return;
 			}
 
@@ -402,7 +402,26 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 			$upgrade_done = is_array( $upgrade_log ) && array_key_exists( 'stripe_webhook_signing_secrets', $upgrade_log );
 
 			if ( $upgrade_done ) {
-				return;
+				// Retry if migration previously failed, the failure transient expired,
+				// or migration silently succeeded without storing a signing secret.
+				$needs_retry = (bool) get_transient( 'charitable_stripe_signing_secret_migration_failed' );
+
+				if ( ! $needs_retry ) {
+					// Also retry if the current mode has API keys but no signing secret for the
+					// direct webhook. Connect webhook failures are non-blocking.
+					$test_mode = charitable_get_option( 'test_mode', false );
+					$check     = new Charitable_Stripe_Webhook_API( $test_mode, null, false );
+					if ( $check->has_api_key() && ! $check->has_signing_secret() ) {
+						$needs_retry = true;
+					}
+				}
+
+				if ( ! $needs_retry ) {
+					return;
+				}
+
+				unset( $upgrade_log['stripe_webhook_signing_secrets'] );
+				update_option( 'charitable_stripe_upgrade_log', $upgrade_log );
 			}
 
 			// Check if Stripe gateway is active.
@@ -420,16 +439,20 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 				array( 'test_mode' => false, 'connect' => true ),
 			);
 
-			$any_refreshed = false;
-			$any_failed    = false;
+			$any_refreshed      = false;
+			$any_failed         = false;
+			$any_connect_failed = false;
 
 			foreach ( $configurations as $config ) {
 				$webhook_api = new Charitable_Stripe_Webhook_API( $config['test_mode'], null, $config['connect'] );
 
-				// Only process if there's a webhook ID stored and no signing secret yet.
-				$webhook_id = charitable_get_option( array( 'gateways_stripe', $webhook_api->setting_key ) );
+				// Skip if we already have a signing secret for this configuration.
+				if ( $webhook_api->has_signing_secret() ) {
+					continue;
+				}
 
-				if ( empty( $webhook_id ) || $webhook_api->has_signing_secret() ) {
+				// Skip if no API keys are configured for this mode — nothing to connect to.
+				if ( ! $webhook_api->has_api_key() ) {
 					continue;
 				}
 
@@ -437,15 +460,22 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 
 				if ( $result ) {
 					$any_refreshed = true;
+				} elseif ( $config['connect'] ) {
+					// Connect webhook failures are non-blocking — not all sites use Stripe Connect
+					// as a platform. Don't count these as migration failures.
+					$any_connect_failed = true;
 				} else {
 					$any_failed = true;
 				}
 			}
 
-			// Log the migration result.
+			// Only set failure transient for direct webhook failures, not connect webhook failures.
 			if ( $any_failed ) {
 				// Store a flag so the admin warning can reference it.
 				set_transient( 'charitable_stripe_signing_secret_migration_failed', true, DAY_IN_SECONDS * 30 );
+			} else {
+				// No direct failures — clear any stale failure transient so the notice goes away.
+				delete_transient( 'charitable_stripe_signing_secret_migration_failed' );
 			}
 
 			$this->mark_signing_secret_migration_done( $upgrade_log );

@@ -27,6 +27,15 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 	class Charitable_Stripe_Webhook_API {
 
 		/**
+		 * Whether we're in test mode.
+		 *
+		 * @since 1.3.0
+		 *
+		 * @var   boolean
+		 */
+		public $test_mode;
+
+		/**
 		 * Secret key.
 		 *
 		 * @since 1.3.0
@@ -426,18 +435,25 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 
 				$webhook = $this->get_webhook();
 
-				if ( ! $webhook ) {
-					return false;
-				}
+				if ( $webhook ) {
+					// Delete the existing webhook so Stripe will issue a new signing secret on re-creation.
+					try {
+						$webhook->delete();
+					} catch ( \Exception $e ) {
+						if ( charitable_is_debug() ) {
+							error_log( 'Charitable: Could not delete existing webhook before refresh: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+						}
+					}
 
-				// Stripe does not return the signing secret for existing webhooks via retrieve().
-				// We need to delete and re-create the webhook to get a new secret.
-				$this->deactivate_webhook();
+					// Clear the stored webhook ID so add_webhook() creates a new one.
+					$settings = get_option( 'charitable_settings', array() );
+					unset( $settings['gateways_stripe'][ $this->setting_key ] );
+					update_option( 'charitable_settings', $settings );
+				}
 
 				$new_webhook_id = $this->add_webhook();
 
 				if ( 'invalid_request' === $new_webhook_id || empty( $new_webhook_id ) ) {
-					// Re-creation failed — try to restore old webhook.
 					return false;
 				}
 
@@ -460,6 +476,20 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 				}
 				return false;
 			}
+		}
+
+		/**
+		 * Check if an API key is configured for this webhook's mode.
+		 *
+		 * Uses an internal check to avoid __get() returning null for private
+		 * properties in some PHP 8.x multisite contexts.
+		 *
+		 * @since  1.8.10.1
+		 *
+		 * @return bool
+		 */
+		public function has_api_key() {
+			return ! empty( $this->secret_key );
 		}
 
 		/**

@@ -75,11 +75,22 @@ if ( ! class_exists( 'Charitable_Stripe_Recurring_Donation_Log' ) ) :
 		 * Log a new invoice for the subscription.
 		 *
 		 * @since  1.4.0
+		 * @version 1.8.10.1
 		 *
 		 * @param  string $invoice_id The invoice id.
 		 * @return true
 		 */
 		public function log_new_invoice( $invoice_id ) {
+			/* Prevent duplicate log entries for the same invoice. */
+			$existing_log = $this->donation->get_donation_log();
+			if ( is_array( $existing_log ) ) {
+				foreach ( $existing_log as $entry ) {
+					if ( isset( $entry['message'] ) && false !== strpos( $entry['message'], $invoice_id ) ) {
+						return true;
+					}
+				}
+			}
+
 			$this->donation->update_donation_log(
 				sprintf(
 					/* translators: %s: link to invoice object in Stripe dashboard */

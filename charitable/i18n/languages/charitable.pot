@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Charitable 1.8.10\n"
+"Project-Id-Version: Charitable 1.8.10.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/charitable\n"
 "Last-Translator: Charitable Team\n"
 "Language-Team: Charitable Team\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-10T13:52:29+00:00\n"
+"POT-Creation-Date: 2026-03-24T23:53:18+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: charitable\n"
@@ -5533,9 +5533,9 @@ msgid "Done"
 msgstr ""
 
 #: includes/admin/campaign-builder/class-builder-fields.php:178
+#: includes/admin/settings/class-charitable-settings.php:967
 #: includes/admin/settings/class-charitable-settings.php:968
-#: includes/admin/settings/class-charitable-settings.php:969
-#: includes/admin/settings/class-charitable-settings.php:971
+#: includes/admin/settings/class-charitable-settings.php:970
 #: includes/admin/views/about/tabs/lite-vs-pro.php:70
 msgid "Donor Comments"
 msgstr ""
@@ -7419,13 +7419,13 @@ msgstr ""
 
 #: includes/admin/campaign-builder/panels/class-marketing.php:52
 #: includes/admin/settings/class-charitable-settings.php:110
-#: includes/admin/settings/class-charitable-settings.php:1008
+#: includes/admin/settings/class-charitable-settings.php:1007
+#: includes/admin/settings/class-charitable-settings.php:1015
 #: includes/admin/settings/class-charitable-settings.php:1016
-#: includes/admin/settings/class-charitable-settings.php:1017
+#: includes/admin/settings/class-charitable-settings.php:1022
 #: includes/admin/settings/class-charitable-settings.php:1023
-#: includes/admin/settings/class-charitable-settings.php:1024
+#: includes/admin/settings/class-charitable-settings.php:1029
 #: includes/admin/settings/class-charitable-settings.php:1030
-#: includes/admin/settings/class-charitable-settings.php:1031
 msgid "Marketing"
 msgstr ""
 
@@ -8986,9 +8986,9 @@ msgstr ""
 
 #: includes/admin/charitable-core-admin-functions.php:1799
 #: includes/admin/dashboard/class-charitable-dashboard.php:1856
+#: includes/admin/settings/class-charitable-settings.php:953
 #: includes/admin/settings/class-charitable-settings.php:954
-#: includes/admin/settings/class-charitable-settings.php:955
-#: includes/admin/settings/class-charitable-settings.php:957
+#: includes/admin/settings/class-charitable-settings.php:956
 #: includes/admin/views/about/tabs/lite-vs-pro.php:71
 msgid "Donor Dashboard"
 msgstr ""
@@ -12192,11 +12192,11 @@ msgstr ""
 
 #: includes/admin/security/modules/captcha/class-charitable-captcha.php:47
 #: includes/admin/settings/class-charitable-settings.php:123
-#: includes/admin/settings/class-charitable-settings.php:1063
+#: includes/admin/settings/class-charitable-settings.php:1062
+#: includes/admin/settings/class-charitable-settings.php:1070
 #: includes/admin/settings/class-charitable-settings.php:1071
-#: includes/admin/settings/class-charitable-settings.php:1072
+#: includes/admin/settings/class-charitable-settings.php:1077
 #: includes/admin/settings/class-charitable-settings.php:1078
-#: includes/admin/settings/class-charitable-settings.php:1079
 msgid "Security"
 msgstr ""
 
@@ -12834,199 +12834,195 @@ msgstr ""
 msgid "Settings saved"
 msgstr ""
 
-#. translators: %1$s: SPAM BUILDER link, %2$s: Documentation URL
+#. translators: %s: Documentation URL
 #: includes/admin/settings/class-charitable-settings.php:916
 #, php-format
-msgid "Please add your license to download the %1$s addon. Advanced features are available in Charitable Pro. Please %2$s on how to download Charitable Pro."
+msgid "Please add your license and upgrade to Charitable Pro for more advanced security features. Please %s on how to download Charitable Pro."
 msgstr ""
 
 #: includes/admin/settings/class-charitable-settings.php:917
-msgid "SPAM BUILDER"
-msgstr ""
-
-#: includes/admin/settings/class-charitable-settings.php:918
 #: includes/admin/views/donors/donors.php:101
 msgid "see our documentation"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:925
+#: includes/admin/settings/class-charitable-settings.php:924
 #: includes/admin/views/donors/donors.php:88
 msgid "Upgrade to Charitable Pro"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:945
+#: includes/admin/settings/class-charitable-settings.php:944
 msgid "New Donor Features"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:946
+#: includes/admin/settings/class-charitable-settings.php:945
 msgid "Give donors the power to manage their contributions to your organization with a new donor dashboard. Encourage donors to spread the word about your organization by offering rewards for successful referrals. And give donors the ability to post comments to campaigns when they donate."
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:947
+#: includes/admin/settings/class-charitable-settings.php:946
 msgid "All of this is possible with the Charitable Pro plugin."
 msgstr ""
 
+#: includes/admin/settings/class-charitable-settings.php:960
 #: includes/admin/settings/class-charitable-settings.php:961
-#: includes/admin/settings/class-charitable-settings.php:962
-#: includes/admin/settings/class-charitable-settings.php:964
+#: includes/admin/settings/class-charitable-settings.php:963
 msgid "Donor Referrals"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:977
+#: includes/admin/settings/class-charitable-settings.php:976
 msgid "Give donors the power to manage their contributions to your organization."
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:979
+#: includes/admin/settings/class-charitable-settings.php:978
 msgid "Increased Donor Engagement"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:980
+#: includes/admin/settings/class-charitable-settings.php:979
 msgid "Customizable Dashboard"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:981
+#: includes/admin/settings/class-charitable-settings.php:980
 msgid "Donation History"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:982
+#: includes/admin/settings/class-charitable-settings.php:981
 msgid "View Campaigns"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:983
+#: includes/admin/settings/class-charitable-settings.php:982
 msgid "View Comments"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:984
+#: includes/admin/settings/class-charitable-settings.php:983
 #: includes/admin/views/donors/donors.php:72
 msgid "Download Donation Receipts"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:985
+#: includes/admin/settings/class-charitable-settings.php:984
 msgid "Tracking Personalized Notifications"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:986
+#: includes/admin/settings/class-charitable-settings.php:985
 msgid "Donor Profile Management"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:987
+#: includes/admin/settings/class-charitable-settings.php:986
 msgid "See Each Donor's Referrals"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:988
+#: includes/admin/settings/class-charitable-settings.php:987
 msgid "Track Referral Success Rates"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:989
+#: includes/admin/settings/class-charitable-settings.php:988
 msgid "Customizable Referral Rewards"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:990
+#: includes/admin/settings/class-charitable-settings.php:989
 msgid "Easy Promotion of Campaigns"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1009
+#: includes/admin/settings/class-charitable-settings.php:1008
 msgid "Turn one-time donors into ongoing supporters with your newsletter list. This feature allows you to connect to your email marketing account and automatically add donors to your email newsletter list. You can integrate your campaigns seamlessly with MailChimp, Campaign Monitor, MailerLite, ActiveCampaign, Mailster and MailPoet, allowing you to enable one or more providers."
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1019
+#: includes/admin/settings/class-charitable-settings.php:1018
 msgid "Choose a default list"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1026
+#: includes/admin/settings/class-charitable-settings.php:1025
 msgid "Sync lists"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1033
+#: includes/admin/settings/class-charitable-settings.php:1032
 msgid "Donation form options"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1039
+#: includes/admin/settings/class-charitable-settings.php:1038
 msgid "Turn one-time donors into ongoing supporters."
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1041
+#: includes/admin/settings/class-charitable-settings.php:1040
 msgid "Easy Integration"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1042
+#: includes/admin/settings/class-charitable-settings.php:1041
 msgid "Built-in contact consent options"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1043
+#: includes/admin/settings/class-charitable-settings.php:1042
 msgid "Automatically add donors to your email list"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1044
+#: includes/admin/settings/class-charitable-settings.php:1043
 msgid "Organize donors with tags"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1045
+#: includes/admin/settings/class-charitable-settings.php:1044
 msgid "Send email series to keep donors engaged"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1046
+#: includes/admin/settings/class-charitable-settings.php:1045
 msgid "Enable multiple email services"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1064
+#: includes/admin/settings/class-charitable-settings.php:1063
 msgid "It is important to protect against potential misuse while maintaining donor trust. CAPTCHA integration adds an essential layer of protection against automated attacks and spam donations. Every transaction is meticulously logged with IP address documentation and timestamp verification, providing a clear audit trail and helping prevent fraudulent activities."
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1074
+#: includes/admin/settings/class-charitable-settings.php:1073
 msgid "Captchas"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1081
+#: includes/admin/settings/class-charitable-settings.php:1080
 msgid "Form options"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1087
-#: includes/admin/settings/class-charitable-settings.php:1112
+#: includes/admin/settings/class-charitable-settings.php:1086
+#: includes/admin/settings/class-charitable-settings.php:1111
 msgid "Protect against potential misuse while maintaining donor trust."
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1089
+#: includes/admin/settings/class-charitable-settings.php:1088
 msgid "Easy Activation"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1090
+#: includes/admin/settings/class-charitable-settings.php:1089
 msgid "Record IP Addresses"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1091
+#: includes/admin/settings/class-charitable-settings.php:1090
 msgid "Block Bad Bots"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1108
+#: includes/admin/settings/class-charitable-settings.php:1107
 msgid "Advanced Security Features"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1109
+#: includes/admin/settings/class-charitable-settings.php:1108
 msgid "Charitable Pro offers a fortified layer of safety designed for high-volume campaigns. Upgrade to unlock sophisticated spam filtering and enhanced payment protection, ensuring the highest level of trust and security for your donors."
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1114
+#: includes/admin/settings/class-charitable-settings.php:1113
 msgid "General Rate Limiting"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1115
+#: includes/admin/settings/class-charitable-settings.php:1114
 msgid "Stripe Rate Limiting"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1116
+#: includes/admin/settings/class-charitable-settings.php:1115
 msgid "IP Blacklist/Whitelist"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1117
+#: includes/admin/settings/class-charitable-settings.php:1116
 msgid "Email Pattern Blocking"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1118
+#: includes/admin/settings/class-charitable-settings.php:1117
 msgid "Minimum Donation Features"
 msgstr ""
 
-#: includes/admin/settings/class-charitable-settings.php:1119
+#: includes/admin/settings/class-charitable-settings.php:1118
 msgid "Math Field Protection"
 msgstr ""
 

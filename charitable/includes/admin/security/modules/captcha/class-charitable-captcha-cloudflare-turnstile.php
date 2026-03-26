@@ -296,7 +296,7 @@ if ( ! class_exists( 'Charitable_Captcha_Cloudflare_Turnstile' ) ) :
 				case 'password_reset_form':
 					return 'password_reset';
 				case 'password_retrieval_form':
-					return 'password_retrieval';
+					return 'pwd_retrieval';
 				case 'profile_form':
 					return 'profile';
 				case 'campaign_form':
