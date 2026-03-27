@@ -173,7 +173,7 @@ class Charitable_Elementor_Campaign_Widget extends \Elementor\Widget_Base
         }
         $output .= '</div>';
 
-        echo wp_kses_post( $output );
+        echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
 
 

@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.9.4
 Requires PHP: 7.4
-Stable tag: 1.8.10.1
+Stable tag: 1.8.10.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -267,6 +267,11 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.10.2 =
+* NEW: Added Sync Pending Stripe Donations tool to gateway settings (beta).
+* FIX: Fixed some minor PHP warnings and minor CSS issues on dashboard.
+* FIX: Fixed a fatal error involving Stripe webhook migration on sites without an active Stripe connection in certain scenarios.
 
 = Donation Form & Fundraising Campaigns v1.8.10.1 =
 * FIX: Improved Stripe webhook verification and resolved several issues with signing secret setup and auto-migration.

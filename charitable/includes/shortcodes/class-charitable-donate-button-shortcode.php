@@ -29,17 +29,19 @@ if ( ! class_exists( 'Charitable_Donate_Button_Shortcode' ) ) :
 		 * This receives the user-defined attributes and passes the logic off to the class.
 		 *
 		 * @since  1.8.2
+		 * @version 1.8.10.2
 		 *
 		 * @param  array $atts User-defined shortcode attributes.
 		 * @return string
 		 */
 		public static function display( $atts = array() ) {
 			$defaults = array(
-				'url'     => charitable_get_current_url(),
-				'label'   => __( 'Donate', 'charitable' ),
-				'type'    => 'button', // can also be 'link'.
-				'css'     => 'charitable-button',
-				'new_tab' => false,
+				'url'      => charitable_get_current_url(),
+				'label'    => __( 'Donate', 'charitable' ),
+				'type'     => 'button', // can also be 'link'.
+				'css'      => 'charitable-button',
+				'new_tab'  => false,
+				'campaign' => 0,
 			);
 
 			if ( isset( $atts['campaign'] ) ) {

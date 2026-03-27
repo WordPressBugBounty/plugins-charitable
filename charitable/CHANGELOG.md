@@ -1,3 +1,8 @@
+# 1.8.10.2
+* NEW: Added Sync Pending Stripe Donations tool to gateway settings (beta).
+* FIX: Fixed some minor PHP warnings and minor CSS issues on dashboard.
+* FIX: Fixed a fatal error involving Stripe webhook migration on sites without an active Stripe connection in certain scenarios.
+
 # 1.8.10.1
 * FIX: Improved Stripe webhook verification and resolved several issues with signing secret setup and auto-migration.
 * FIX: Improved license detection on WordPress multisite subsites.

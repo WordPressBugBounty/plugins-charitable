@@ -81,6 +81,16 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 			 * AJAX handler for refreshing webhook signing secret.
 			 */
 			add_action( 'wp_ajax_charitable_refresh_webhook_signing_secret', array( $this, 'ajax_refresh_webhook_signing_secret' ) );
+
+			/**
+			 * Add "Sync Pending Donations" UI to Stripe gateway settings.
+			 */
+			add_filter( 'charitable_settings_fields_gateways_gateway_stripe', array( $this, 'add_sync_pending_donations_settings' ), 25 );
+
+			/**
+			 * AJAX handler for syncing pending Stripe donations.
+			 */
+			add_action( 'wp_ajax_charitable_sync_pending_stripe_donations', array( $this, 'ajax_sync_pending_stripe_donations' ) );
 		}
 
 		/**
@@ -394,7 +404,23 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 		 * @return void
 		 */
 		public function maybe_migrate_webhook_signing_secrets() {
+			// Never run during AJAX requests — this migration makes live Stripe API calls
+			// and must only run during a real admin page load.
+			if ( wp_doing_ajax() ) {
+				return;
+			}
+
 			if ( ! current_user_can( 'manage_options' ) ) {
+				return;
+			}
+
+			// Stripe webhook classes are only loaded when Stripe is an active gateway.
+			if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) {
+				return;
+			}
+
+			// Charitable_Gateways must be available before calling is_active_gateway().
+			if ( ! class_exists( 'Charitable_Gateways' ) ) {
 				return;
 			}
 
@@ -402,9 +428,15 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 			$upgrade_done = is_array( $upgrade_log ) && array_key_exists( 'stripe_webhook_signing_secrets', $upgrade_log );
 
 			if ( $upgrade_done ) {
-				// Retry if migration previously failed, the failure transient expired,
-				// or migration silently succeeded without storing a signing secret.
+				// Retry if migration previously failed.
 				$needs_retry = (bool) get_transient( 'charitable_stripe_signing_secret_migration_failed' );
+
+				if ( $needs_retry ) {
+					// Throttle retries — don't hammer the Stripe API on every page load.
+					if ( get_transient( 'charitable_stripe_migration_retry_cooldown' ) ) {
+						return;
+					}
+				}
 
 				if ( ! $needs_retry ) {
 					// Also retry if the current mode has API keys but no signing secret for the
@@ -471,9 +503,12 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 
 			// Only set failure transient for direct webhook failures, not connect webhook failures.
 			if ( $any_failed ) {
+				// Set a cooldown so failed migrations don't retry on every page load.
+				set_transient( 'charitable_stripe_migration_retry_cooldown', true, HOUR_IN_SECONDS );
 				// Store a flag so the admin warning can reference it.
 				set_transient( 'charitable_stripe_signing_secret_migration_failed', true, DAY_IN_SECONDS * 30 );
 			} else {
+				delete_transient( 'charitable_stripe_migration_retry_cooldown' );
 				// No direct failures — clear any stale failure transient so the notice goes away.
 				delete_transient( 'charitable_stripe_signing_secret_migration_failed' );
 			}
@@ -592,17 +627,17 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 								$btn.prop("disabled", false);
 								$result.show();
 								if (response.success) {
-									$result.html("<span style=\"color: green;\">" + response.data.message + "</span>");
+									$result.empty().append($("<span>").text(response.data.message).css("color", "green"));
 									if (response.data.reload) {
 										setTimeout(function() { location.reload(); }, 1500);
 									}
 								} else {
-									$result.html("<span style=\"color: red;\">" + response.data.message + "</span>");
+									$result.empty().append($("<span>").text(response.data.message).css("color", "red"));
 								}
 							}).fail(function() {
 								$spinner.removeClass("is-active");
 								$btn.prop("disabled", false);
-								$result.show().html("<span style=\"color: red;\">' . esc_js( __( 'Request failed. Please try again.', 'charitable' ) ) . '</span>");
+								$result.show().empty().append($("<span>").text(' . esc_js( __( 'Request failed. Please try again.', 'charitable' ) ) . ').css("color", "red"));
 							});
 						});
 					});
@@ -708,6 +743,242 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 					)
 				);
 			}
+		}
+		/**
+		 * Add "Sync Pending Donations" UI block to the Stripe gateway settings page.
+		 *
+		 * Renders a button that checks Stripe for the status of pending donations
+		 * made in the last 30 days and marks them completed when Stripe shows payment succeeded.
+		 *
+		 * @since  1.8.10.2
+		 *
+		 * @param  array $settings The current Stripe settings fields.
+		 * @return array
+		 */
+		public function add_sync_pending_donations_settings( $settings ) {
+			// Only show if Stripe is connected.
+			$gateway = new Charitable_Gateway_Stripe_AM();
+			if ( ! $gateway->maybe_stripe_connected() ) {
+				return $settings;
+			}
+
+			$nonce    = wp_create_nonce( 'charitable_sync_pending_stripe_donations' );
+			$ajax_url = admin_url( 'admin-ajax.php' );
+
+			$settings['sync_pending_donations'] = array(
+				'type'     => 'content',
+				'title'    => __( 'Sync Pending Donations', 'charitable' ),
+				'priority' => 55,
+				'content'  => '<div class="charitable-inline-notice info">'
+					. '<p>' . esc_html__( 'If donations are stuck in Pending due to a webhook issue, use this tool to check Stripe and automatically complete any payments that Stripe has already confirmed as succeeded (last 30 days).', 'charitable' ) . '</p>'
+					. '<p><button type="button" class="button" id="charitable-sync-pending-donations" data-nonce="' . esc_attr( $nonce ) . '" data-ajax-url="' . esc_url( $ajax_url ) . '">' 
+					. esc_html__( 'Sync Pending Donations', 'charitable' )
+					. '</button> <span class="charitable-sync-spinner spinner" style="float:none;"></span></p>'
+					. '<p class="charitable-sync-result" style="display:none;"></p>'
+					. '</div>',
+			);
+
+			$settings['sync_pending_donations_script'] = array(
+				'type'     => 'content',
+				'title'    => '',
+				'priority' => 56,
+				'content'  => '<script>
+					jQuery(function($) {
+						$("#charitable-sync-pending-donations").on("click", function(e) {
+							e.preventDefault();
+							var $btn     = $(this),
+								$spinner = $btn.siblings(".charitable-sync-spinner"),
+								$result  = $btn.closest("div").find(".charitable-sync-result");
+
+							$btn.prop("disabled", true);
+							$spinner.addClass("is-active");
+							$result.hide();
+
+							$.post($btn.data("ajax-url"), {
+								action: "charitable_sync_pending_stripe_donations",
+								_wpnonce: $btn.data("nonce")
+							}, function(response) {
+								$spinner.removeClass("is-active");
+								$btn.prop("disabled", false);
+								$result.show();
+								if (response.success) {
+									$result.empty().append($("<span>").text(response.data.message).css("color", "green"));
+								} else {
+									$result.empty().append($("<span>").text(response.data.message).css("color", "red"));
+								}
+							}).fail(function() {
+								$spinner.removeClass("is-active");
+								$btn.prop("disabled", false);
+								$result.show().empty().append($("<span>").text("Request failed. Please try again.").css("color", "red"));
+							});
+						});
+					});
+				</script>',
+			);
+
+			return $settings;
+		}
+
+		/**
+		 * AJAX handler: check recent pending Stripe donations against the Stripe API
+		 * and mark as completed any where the PaymentIntent status is "succeeded".
+		 *
+		 * Checks donations created within the last 30 days that have a stored
+		 * PaymentIntent ID. Respects test/live mode and Stripe Connect accounts.
+		 *
+		 * @since  1.8.10.2
+		 *
+		 * @return void
+		 */
+		public function ajax_sync_pending_stripe_donations() {
+			check_ajax_referer( 'charitable_sync_pending_stripe_donations' );
+
+			if ( charitable_is_debug() ) {
+				error_log( '[charitable_sync_pending_stripe_donations] AJAX handler fired.' ); // phpcs:ignore
+			}
+
+			if ( ! current_user_can( 'manage_charitable_settings' ) ) {
+				if ( charitable_is_debug() ) {
+					error_log( '[charitable_sync_pending_stripe_donations] Permission check failed.' ); // phpcs:ignore
+				}
+				wp_send_json_error( array( 'message' => __( 'You do not have permission to perform this action.', 'charitable' ) ) );
+				return;
+			}
+
+			// Set up the Stripe API with the current mode's secret key.
+			$gateway = new Charitable_Gateway_Stripe_AM();
+			if ( ! $gateway->setup_api() ) {
+				if ( charitable_is_debug() ) {
+					error_log( '[charitable_sync_pending_stripe_donations] setup_api() failed — no valid API key.' ); // phpcs:ignore
+				}
+				wp_send_json_error( array( 'message' => __( 'Unable to connect to Stripe. Please check that your API keys are configured correctly.', 'charitable' ) ) );
+				return;
+			}
+
+			/**
+			 * Filter the number of days back to look for pending Stripe donations.
+			 *
+			 * @since 1.8.10.2
+			 *
+			 * @param int $days Number of days. Default 30.
+			 */
+			$days = (int) apply_filters( 'charitable_sync_pending_stripe_donations_days', 30 );
+			$days = max( 1, $days );
+
+			if ( charitable_is_debug() ) {
+				error_log( '[charitable_sync_pending_stripe_donations] Stripe API initialized. Querying pending donations (last ' . $days . ' days).' ); // phpcs:ignore
+			}
+
+			$limit = (int) apply_filters( 'charitable_sync_pending_stripe_donations_limit', 50 );
+			$limit = max( 1, $limit );
+
+			// Query pending donations from the last N days that have a Stripe PaymentIntent stored.
+			$query = new WP_Query(
+				array(
+					'post_type'      => Charitable::DONATION_POST_TYPE,
+					'post_status'    => 'charitable-pending',
+					'posts_per_page' => $limit,
+					'fields'         => 'ids',
+					'date_query'     => array(
+						array(
+							'after'     => $days . ' days ago',
+							'inclusive' => true,
+						),
+					),
+					'meta_query'     => array(
+						array(
+							'key'     => '_stripe_payment_intent',
+							'value'   => '',
+							'compare' => '!=',
+						),
+					),
+				)
+			);
+
+			$donation_ids = $query->posts;
+
+			if ( charitable_is_debug() ) {
+				error_log( '[charitable_sync_pending_stripe_donations] Query found ' . count( $donation_ids ) . ' pending donation(s): ' . implode( ', ', $donation_ids ) ); // phpcs:ignore
+			}
+
+			if ( empty( $donation_ids ) ) {
+				wp_send_json_success( array(
+					'message' => sprintf(
+						/* translators: %d: number of days */
+						__( 'No pending Stripe donations found in the last %d days.', 'charitable' ),
+						$days
+					),
+				) );
+				return;
+			}
+
+			$updated = 0;
+			$skipped = 0;
+			$errors  = 0;
+
+			foreach ( $donation_ids as $donation_id ) {
+				$intent_id = get_post_meta( $donation_id, '_stripe_payment_intent', true );
+
+				if ( empty( $intent_id ) ) {
+					if ( charitable_is_debug() ) {
+						error_log( '[charitable_sync_pending_stripe_donations] Donation #' . $donation_id . ' — no PaymentIntent meta, skipping.' ); // phpcs:ignore
+					}
+					$skipped++;
+					continue;
+				}
+
+				// Build options array — pass Stripe Connect account if one is stored on the donation.
+				$options    = array();
+				$account_id = get_post_meta( $donation_id, '_stripe_account_id', true );
+				if ( ! empty( $account_id ) ) {
+					$options['stripe_account'] = $account_id;
+				}
+
+				if ( charitable_is_debug() ) {
+					error_log( '[charitable_sync_pending_stripe_donations] Donation #' . $donation_id . ' — retrieving PaymentIntent ' . $intent_id . ( ! empty( $account_id ) ? ' (Connect account: ' . $account_id . ')' : '' ) . '.' ); // phpcs:ignore
+				}
+
+				try {
+					$intent = \Stripe\PaymentIntent::retrieve( $intent_id, $options );
+
+					if ( charitable_is_debug() ) {
+						error_log( '[charitable_sync_pending_stripe_donations] Donation #' . $donation_id . ' — PaymentIntent status: ' . $intent->status . '.' ); // phpcs:ignore
+					}
+
+					if ( 'succeeded' === $intent->status ) {
+						$donation = new Charitable_Donation( $donation_id );
+						$donation->update_status( 'charitable-completed' );
+						$updated++;
+						if ( charitable_is_debug() ) {
+							error_log( '[charitable_sync_pending_stripe_donations] Donation #' . $donation_id . ' — marked completed.' ); // phpcs:ignore
+						}
+					} else {
+						$skipped++;
+						if ( charitable_is_debug() ) {
+							error_log( '[charitable_sync_pending_stripe_donations] Donation #' . $donation_id . ' — skipped (Stripe status: ' . $intent->status . ').' ); // phpcs:ignore
+						}
+					}
+				} catch ( \Exception $e ) {
+					$errors++;
+					if ( charitable_is_debug() ) {
+						error_log( '[charitable_sync_pending_stripe_donations] Donation #' . $donation_id . ' — Stripe API error: ' . $e->getMessage() ); // phpcs:ignore
+					}
+				}
+			}
+
+			if ( charitable_is_debug() ) {
+				error_log( '[charitable_sync_pending_stripe_donations] Done. Updated: ' . $updated . ', Skipped: ' . $skipped . ', Errors: ' . $errors . '.' ); // phpcs:ignore
+			}
+
+			$message = sprintf(
+				/* translators: 1: updated count, 2: skipped count, 3: error count */
+				__( '%1$d donation(s) marked completed. %2$d still pending in Stripe. %3$d error(s).', 'charitable' ),
+				$updated,
+				$skipped,
+				$errors
+			);
+
+			wp_send_json_success( array( 'message' => $message ) );
 		}
 	}
 

@@ -409,6 +409,9 @@
 .charitable-dashboard-v2-section.charitable-dashboard-top-campaigns .charitable-dashboard-v2-section-content {
   padding: 0 0 20px 0 !important;
 }
+.charitable-dashboard-v2-section.charitable-dashboard-top-campaigns .charitable-dashboard-v2-empty-state {
+  padding: 30px 30px 10px;
+}
 .charitable-dashboard-v2-section .charitable-dashboard-v2-quick-access-content {
   display: flex;
   justify-content: center;
@@ -772,6 +775,35 @@
 }
 .charitable-dashboard-v2-section.no-update-alert .charitable-dashboard-v2-blog-posts {
   margin-top: 0;
+}
+.charitable-dashboard-v2-section .charitable-dashboard-v2-blog-posts .charitable-dashboard-v2-blog-post-row.error-display {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+.charitable-dashboard-v2-section .charitable-dashboard-v2-blog-posts .charitable-dashboard-v2-blog-post-row.error-display .charitable-dashboard-v2-blog-post-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 15px;
+  line-height: 22px;
+  letter-spacing: 0px;
+  color: rgba(25, 29, 45, 0.9);
+  margin: 0;
+}
+.charitable-dashboard-v2-section .charitable-dashboard-v2-blog-posts .charitable-dashboard-v2-blog-post-row.error-display .charitable-dashboard-v2-blog-post-title::before {
+  content: "";
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='26' height='26' viewBox='0 0 26 26' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='13' cy='13' r='13' fill='%23f56565'/%3E%3Cpath d='M13 6.5L19.5 17.5H6.5L13 6.5Z' fill='white'/%3E%3Cpath d='M13 10.5V14.5' stroke='%23f56565' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='13' cy='17' r='1' fill='%23f56565'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 .charitable-dashboard-v2-section .charitable-dashboard-v2-enhance-campaign-footer {
   height: 70px;
