@@ -1,6 +1,12 @@
+# 1.8.10.3
+* IMPROVED: Sync Pending Stripe Donations now uses AJAX processing with new dry run and email options.
+* FIX: Improved Stripe webhook reliability, signing secret handling, and notice wording in certain scenarios.
+* FIX: Fixed refund checkbox not appearing when changing donation status to Refunded in certain scenarios.
+
 # 1.8.10.2
 * NEW: Added Sync Pending Stripe Donations tool to gateway settings (beta).
-* FIX: Fixed some minor PHP warnings and minor CSS issues on dashboard.
+* FIX: Fixed minor CSS issues on dashboard.
+* FIX: Fixed some PHP warnings.
 * FIX: Fixed a fatal error involving Stripe webhook migration on sites without an active Stripe connection in certain scenarios.
 
 # 1.8.10.1

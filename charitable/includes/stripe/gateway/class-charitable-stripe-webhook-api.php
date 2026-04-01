@@ -293,6 +293,12 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 						continue;
 					}
 
+					// Skip disabled webhooks — a disabled endpoint cannot receive events and
+					// should not prevent creation of a new, active one.
+					if ( isset( $webhook->status ) && 'enabled' !== $webhook->status ) {
+						continue;
+					}
+
 					/**
 					 * If we're looking for a Connect application webhook, check that the application
 					 * property is not null. Otherwise, make sure it is null.

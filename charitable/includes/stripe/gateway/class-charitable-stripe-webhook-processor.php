@@ -1171,6 +1171,14 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 					}
 					self::record_verification_failure();
 					return false;
+				} catch ( \Exception $e ) {
+					// Catches \Stripe\Exception\SignatureVerificationException from newer Stripe SDK versions
+					// in addition to the legacy \Stripe\Error\SignatureVerification namespace above.
+					if ( charitable_is_debug() ) {
+						error_log( 'Charitable Stripe webhook signature verification failed: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					}
+					self::record_verification_failure();
+					return false;
 				}
 			}
 

@@ -145,7 +145,16 @@ if ( ! class_exists( 'Charitable_Admin_Actions' ) ) :
 				return;
 			}
 
-			echo '<div class="charitable-action-fields" style="display: none;" data-type="' . esc_attr( $action_id ) . '">' . wp_kses_post( $fields ) . '</div>';
+			$allowed_html         = wp_kses_allowed_html( 'post' );
+			$allowed_html['input'] = array(
+				'type'    => true,
+				'name'    => true,
+				'value'   => true,
+				'id'      => true,
+				'class'   => true,
+				'checked' => true,
+			);
+			echo '<div class="charitable-action-fields" style="display: none;" data-type="' . esc_attr( $action_id ) . '">' . wp_kses( $fields, $allowed_html ) . '</div>';
 		}
 
 		/**

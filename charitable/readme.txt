@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.9.4
 Requires PHP: 7.4
-Stable tag: 1.8.10.2
+Stable tag: 1.8.10.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -268,9 +268,15 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 
 == Changelog ==
 
+= Donation Form & Fundraising Campaigns v1.8.10.3 =
+* IMPROVED: Sync Pending Stripe Donations now uses AJAX processing with new dry run and email options.
+* FIX: Improved Stripe webhook reliability, signing secret handling, and notice wording in certain scenarios.
+* FIX: Fixed refund checkbox not appearing when changing donation status to Refunded in certain scenarios.
+
 = Donation Form & Fundraising Campaigns v1.8.10.2 =
 * NEW: Added Sync Pending Stripe Donations tool to gateway settings (beta).
-* FIX: Fixed some minor PHP warnings and minor CSS issues on dashboard.
+* FIX: Fixed minor CSS issues on dashboard.
+* FIX: Fixed some PHP warnings.
 * FIX: Fixed a fatal error involving Stripe webhook migration on sites without an active Stripe connection in certain scenarios.
 
 = Donation Form & Fundraising Campaigns v1.8.10.1 =
@@ -555,20 +561,5 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 * FIX: Improved loading for the WordPress dashboard widget.
 * FIX: Adjustments to CSS on the Dashboard page.
 * FIX: Minor translation, misc CSS, UI, and PHP coding updates.
-
-= Donation Form & Fundraising Campaigns v1.8.1.15 =
-* NEW: Added exit modal popup on getting started screen when user visits Pro page.
-* NEW: Added ability via two global PHP variables to force/not force "tour" for visual campaign builder.
-* FIX: Resolved issue resolving showing license information for lifetime licenses.
-* FIX: Resolved a misalignment of the icon/field for the minimum donation amount field in the visual campaign builder.
-* FIX: Addressed security issue involving creating new users primarily via Charitable registration shortcode.
-* FIX: Resolved sanitization issue with the custom CSS field for HTML field in visual campaign builder.
-* FIX: Minor translation, CSS, and PHP coding updates.
-
-= Donation Form & Fundraising Campaigns v1.8.1.14 =
-* FIX: Resolved a PHP fatal error when saving information for legacy campaigns.
-* FIX: Resolved error on getting started screen after Stripe was connected.
-* FIX: Improved retrieval of campaign descriptions for legacy campaigns.
-* FIX: Resolved CSS issue in visual builder.
 
 **[View entire donation form and fundraising platform changelog](https://plugins.svn.wordpress.org/charitable/trunk/CHANGELOG.md)**
