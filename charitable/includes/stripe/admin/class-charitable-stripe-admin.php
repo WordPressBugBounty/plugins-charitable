@@ -652,7 +652,7 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 							}).fail(function() {
 								$spinner.removeClass("is-active");
 								$btn.prop("disabled", false);
-								$result.show().empty().append($("<span>").text(' . esc_js( __( 'Request failed. Please try again.', 'charitable' ) ) . ').css("color", "red"));
+								$result.show().empty().append($("<span>").text("' . esc_js( __( 'Request failed. Please try again.', 'charitable' ) ) . '").css("color", "red"));
 							});
 						});
 					});

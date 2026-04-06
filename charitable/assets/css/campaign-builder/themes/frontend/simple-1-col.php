@@ -595,6 +595,10 @@ echo $wrapper; // phpcs:ignore ?> .charitable-field.charitable-field-social-link
 }
 <?php echo $wrapper; // phpcs:ignore ?> .charitable-campaign-field-donate-amount ul li.suggested-donation-amount.selected span.amount {
     color: <?php echo $primary; // phpcs:ignore ?>;
+	/* invert the color */
+	filter: invert(1);
+	/* opacity */
+	opacity: 0.5;
 }
 <?php echo $wrapper; // phpcs:ignore ?> .charitable-template-donation-options ul.charitable-template-donation-amounts {
 	margin: 0;

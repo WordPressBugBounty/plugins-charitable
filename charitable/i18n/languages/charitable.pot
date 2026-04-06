@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-24T23:53:18+00:00\n"
+"POT-Creation-Date: 2026-03-26T15:17:40+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: charitable\n"
@@ -11137,7 +11137,7 @@ msgstr ""
 #: includes/admin/import-items/class-charitable-givewp-importer.php:617
 #: includes/gateways/class-charitable-gateways.php:1651
 #: includes/gateways/class-charitable-gateways.php:1697
-#: includes/stripe/admin/class-charitable-stripe-admin.php:655
+#: includes/stripe/admin/class-charitable-stripe-admin.php:685
 msgid "You do not have permission to perform this action."
 msgstr ""
 
@@ -18667,7 +18667,7 @@ msgstr ""
 #. translators: %s: link to invoice object in Square dashboard
 #. translators: %s: link to invoice object in Stripe dashboard
 #: includes/square/donations/class-charitable-square-recurring-donation-log.php:85
-#: includes/stripe/donations/class-charitable-stripe-recurring-donation-log.php:86
+#: includes/stripe/donations/class-charitable-stripe-recurring-donation-log.php:97
 #, php-format
 msgid "New invoice created for the subscription: %s"
 msgstr ""
@@ -18798,8 +18798,8 @@ msgstr ""
 #: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:775
 #: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:804
 #: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:838
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:955
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1003
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:962
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1010
 msgid "Subscription Webhook: Unable to process without Charitable Recurring extension."
 msgstr ""
 
@@ -18807,14 +18807,14 @@ msgstr ""
 #: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:782
 #: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:817
 #: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:852
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:965
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1013
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:972
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1020
 msgid "Subscription Webhook: Missing subscription"
 msgstr ""
 
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1088
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1222
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:990
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:997
 msgid "Subscription Webhook: Recurring donation updated"
 msgstr ""
 
@@ -18828,7 +18828,7 @@ msgstr ""
 
 #. translators: %d: threshold
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1310
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1111
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1118
 #, php-format
 msgid "The payment intent has been cancelled after %d failed payment attempts."
 msgstr ""
@@ -18897,60 +18897,60 @@ msgstr ""
 msgid "Stripe Data"
 msgstr ""
 
-#: includes/stripe/admin/class-charitable-stripe-admin.php:514
-#: includes/stripe/admin/class-charitable-stripe-admin.php:528
+#: includes/stripe/admin/class-charitable-stripe-admin.php:544
+#: includes/stripe/admin/class-charitable-stripe-admin.php:558
 msgid "Webhook Security"
 msgstr ""
 
-#: includes/stripe/admin/class-charitable-stripe-admin.php:517
+#: includes/stripe/admin/class-charitable-stripe-admin.php:547
 msgid "Webhook signature verification is not configured."
 msgstr ""
 
-#: includes/stripe/admin/class-charitable-stripe-admin.php:518
+#: includes/stripe/admin/class-charitable-stripe-admin.php:548
 msgid "Your Stripe webhooks are currently verified using a fallback method. For stronger security, click the button below to enable cryptographic signature verification."
 msgstr ""
 
-#: includes/stripe/admin/class-charitable-stripe-admin.php:520
+#: includes/stripe/admin/class-charitable-stripe-admin.php:550
 msgid "Enable Webhook Signature Verification"
 msgstr ""
 
-#: includes/stripe/admin/class-charitable-stripe-admin.php:531
+#: includes/stripe/admin/class-charitable-stripe-admin.php:561
 msgid "Webhook signature verification is active. Incoming Stripe webhooks are cryptographically verified."
 msgstr ""
 
-#: includes/stripe/admin/class-charitable-stripe-admin.php:533
+#: includes/stripe/admin/class-charitable-stripe-admin.php:563
 msgid "Refresh Signing Secret"
 msgstr ""
 
-#: includes/stripe/admin/class-charitable-stripe-admin.php:575
+#: includes/stripe/admin/class-charitable-stripe-admin.php:605
 msgid "Request failed. Please try again."
 msgstr ""
 
-#: includes/stripe/admin/class-charitable-stripe-admin.php:604
+#: includes/stripe/admin/class-charitable-stripe-admin.php:634
 msgid "Charitable: Stripe Webhook Security Alert"
 msgstr ""
 
 #. translators: %1$d: number of failures, %2$s: opening link tag, %3$s: closing link tag.
-#: includes/stripe/admin/class-charitable-stripe-admin.php:610
+#: includes/stripe/admin/class-charitable-stripe-admin.php:640
 #, php-format
 msgid "%1$d failed webhook signature verification attempts detected in the last 24 hours. This may indicate someone is attempting to send forged webhook events. Please check your %2$sStripe settings%3$s."
 msgstr ""
 
-#: includes/stripe/admin/class-charitable-stripe-admin.php:627
+#: includes/stripe/admin/class-charitable-stripe-admin.php:657
 msgid "Charitable: Stripe Webhook Security Setup"
 msgstr ""
 
 #. translators: %1$s: opening link tag, %2$s: closing link tag.
-#: includes/stripe/admin/class-charitable-stripe-admin.php:633
+#: includes/stripe/admin/class-charitable-stripe-admin.php:663
 #, php-format
 msgid "Charitable was unable to automatically configure webhook signature verification for Stripe. Please visit your %1$sStripe settings%2$s and click \"Enable Webhook Signature Verification\" to secure your webhook endpoint."
 msgstr ""
 
-#: includes/stripe/admin/class-charitable-stripe-admin.php:670
+#: includes/stripe/admin/class-charitable-stripe-admin.php:700
 msgid "Webhook signature verification has been enabled successfully. The page will reload."
 msgstr ""
 
-#: includes/stripe/admin/class-charitable-stripe-admin.php:677
+#: includes/stripe/admin/class-charitable-stripe-admin.php:707
 msgid "Unable to configure webhook signature verification. Please ensure your Stripe API keys are valid and try again, or disconnect and reconnect your Stripe account."
 msgstr ""
 
@@ -19017,7 +19017,7 @@ msgid "Stripe subscription ID: %s"
 msgstr ""
 
 #. translators: %1$s: invoice id; %2$s: payment intent with link
-#: includes/stripe/donations/class-charitable-stripe-recurring-donation-log.php:121
+#: includes/stripe/donations/class-charitable-stripe-recurring-donation-log.php:132
 #, php-format
 msgid "Payment for invoice %1$s failed. Stripe payment intent: %2$s"
 msgstr ""
@@ -19076,7 +19076,7 @@ msgid "Missing amount in request."
 msgstr ""
 
 #. translators: %s is the error message.
-#: includes/stripe/gateway/class-charitable-stripe-webhook-api.php:205
+#: includes/stripe/gateway/class-charitable-stripe-webhook-api.php:214
 #, php-format
 msgid "Error creating Stripe webhook: %s"
 msgstr ""
@@ -19204,19 +19204,23 @@ msgstr ""
 msgid "Subscription Webhook: Renewal has already been added"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:932
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:898
+msgid "Subscription Webhook: Renewal is already being processed"
+msgstr ""
+
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:939
 msgid "Unable to save donation ID to Stripe charge metadata."
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:942
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:949
 msgid "Subscription Webhook: Payment complete"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:980
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:987
 msgid "Subscription Webhook: Subscription is cancelled in Charitable, ignoring Stripe status update"
 msgstr ""
 
-#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1029
+#: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1036
 msgid "Subscription Webhook: Recurring donation cancelled"
 msgstr ""
 

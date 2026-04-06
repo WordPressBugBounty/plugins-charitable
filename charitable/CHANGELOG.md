@@ -1,4 +1,7 @@
-# 1.8.10.3
+# v1.8.10.4
+* FIX: Fixed an issue where multiple Stripe webhook endpoints could accumulate over time, causing donation webhook events to fail signature verification in certain scenarios.
+
+# v1.8.10.3
 * IMPROVED: Sync Pending Stripe Donations now uses AJAX processing with new dry run and email options.
 * FIX: Improved Stripe webhook reliability, signing secret handling, and notice wording in certain scenarios.
 * FIX: Fixed refund checkbox not appearing when changing donation status to Refunded in certain scenarios.

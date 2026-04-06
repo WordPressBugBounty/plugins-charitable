@@ -154,7 +154,7 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 		 *
 		 * @return string The webhook id.
 		 */
-		public function add_webhook() {
+		public function add_webhook( $idempotency_key = '' ) {
 			/**
 			 * First check whether the webhook has already been added.
 			 */
@@ -179,13 +179,16 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 						error_log( 'add_webook after setup_api' );
 					}
 
+					$request_opts = ! empty( $idempotency_key ) ? [ 'idempotency_key' => $idempotency_key ] : [];
+
 					$webhook = \Stripe\WebhookEndpoint::create(
 						[
 							'url'            => $this->get_webhook_listener(),
 							'enabled_events' => $this->get_webhook_events(),
 							'api_version'    => Charitable_Gateway_Stripe_AM::STRIPE_API_VERSION,
 							'connect'        => $this->connect_application,
-						]
+						],
+						$request_opts
 					);
 
 					if ( charitable_is_debug() ) {
@@ -435,31 +438,112 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_API' ) ) :
 		 *
 		 * @return bool True if the signing secret was stored, false otherwise.
 		 */
+		/**
+		 * Delete all Stripe webhook endpoints for this site's listener URL.
+		 *
+		 * Clears any duplicate endpoints that may have accumulated from repeated
+		 * disconnect/reconnect cycles or multiple clicks of the signature verification
+		 * button. Also clears the stored webhook ID so add_webhook() starts fresh.
+		 *
+		 * @since  1.8.10.4
+		 *
+		 * @return void
+		 */
+		private function delete_all_webhooks_by_url() {
+			try {
+				$this->gateway->setup_api( $this->secret_key );
+
+				$endpoints     = \Stripe\WebhookEndpoint::all( [ 'limit' => 100 ] );
+				$endpoint_urls = $this->get_possible_endpoint_urls();
+
+				foreach ( $endpoints->data as $webhook ) {
+					if ( ! in_array( $webhook->url, $endpoint_urls ) ) {
+						continue;
+					}
+
+					// Only delete webhooks of our type (direct vs. Connect application).
+					if ( $this->connect_application ? is_null( $webhook->application ) : ! is_null( $webhook->application ) ) {
+						continue;
+					}
+
+					try {
+						$webhook->delete();
+
+						if ( charitable_is_debug() ) {
+							error_log( 'Charitable Stripe: deleted webhook endpoint ' . $webhook->id . ' during refresh.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+						}
+					} catch ( \Exception $e ) {
+						if ( charitable_is_debug() ) {
+							error_log( 'Charitable Stripe: could not delete webhook ' . $webhook->id . ': ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+						}
+					}
+				}
+			} catch ( \Exception $e ) {
+				if ( charitable_is_debug() ) {
+					error_log( 'Charitable Stripe: delete_all_webhooks_by_url failed: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				}
+			}
+
+			// Clear the stored webhook ID and signing secret so that add_webhook()
+			// creates a fresh endpoint and has_signing_secret() accurately reflects
+			// whether a new secret was returned (vs. an idempotency-cached response
+			// that omits the secret for an already-deleted endpoint).
+			$settings = get_option( 'charitable_settings', array() );
+			$changed  = false;
+
+			if ( isset( $settings['gateways_stripe'][ $this->setting_key ] ) ) {
+				unset( $settings['gateways_stripe'][ $this->setting_key ] );
+				$changed = true;
+			}
+
+			$signing_secret_key = $this->get_signing_secret_key();
+			if ( isset( $settings['gateways_stripe'][ $signing_secret_key ] ) ) {
+				unset( $settings['gateways_stripe'][ $signing_secret_key ] );
+				$changed = true;
+			}
+
+			if ( $changed ) {
+				update_option( 'charitable_settings', $settings );
+			}
+		}
+
 		public function refresh_webhook_signing_secret() {
 			try {
 				$this->gateway->setup_api( $this->secret_key );
 
-				$webhook = $this->get_webhook();
+				// Delete ALL webhook endpoints for our listener URL, not just the stored one.
+				// Multiple endpoints accumulate when disconnect/reconnect or this button is clicked
+				// repeatedly. Each has a different signing secret; keeping duplicates causes
+				// SignatureVerificationException 500s because Charitable can only store one secret.
+				$this->delete_all_webhooks_by_url();
 
-				if ( $webhook ) {
-					// Delete the existing webhook so Stripe will issue a new signing secret on re-creation.
-					try {
-						$webhook->delete();
-					} catch ( \Exception $e ) {
-						if ( charitable_is_debug() ) {
-							error_log( 'Charitable: Could not delete existing webhook before refresh: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-						}
-					}
+				// Generate a time-windowed idempotency key (30-second window) so that
+				// concurrent or rapidly-retried requests — e.g. a double-click or a
+				// network glitch where Stripe received the request but the response
+				// never made it back — map to a single endpoint creation at Stripe.
+				// After 30 seconds the window rolls over, so intentional re-runs always
+				// get a fresh key and create a new endpoint normally.
+				$idempotency_key = 'charitable_wh_create_' . md5(
+					home_url() . '|'
+					. ( $this->test_mode ? 'test' : 'live' ) . '|'
+					. ( $this->connect_application ? 'connect' : 'direct' ) . '|'
+					. (string) floor( time() / 30 )
+				);
 
-					// Clear the stored webhook ID so add_webhook() creates a new one.
-					$settings = get_option( 'charitable_settings', array() );
-					unset( $settings['gateways_stripe'][ $this->setting_key ] );
-					update_option( 'charitable_settings', $settings );
-				}
-
-				$new_webhook_id = $this->add_webhook();
+				$new_webhook_id = $this->add_webhook( $idempotency_key );
 
 				if ( 'invalid_request' === $new_webhook_id || empty( $new_webhook_id ) ) {
+					return false;
+				}
+
+				// Guard against a Stripe idempotency cache hit: when the same key is
+				// reused within the 30-second window, Stripe returns the cached creation
+				// response but omits ->secret (only returned on true first creation).
+				// delete_all_webhooks_by_url() already cleared the old secret, so if
+				// has_signing_secret() is still false here it means no new secret was
+				// stored — the webhook ID would be stale/deleted. Return false so the
+				// caller sees a failure rather than persisting a broken state.
+				if ( ! $this->has_signing_secret() ) {
 					return false;
 				}
 

@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.9.4
 Requires PHP: 7.4
-Stable tag: 1.8.10.3
+Stable tag: 1.8.10.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -267,6 +267,9 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.10.4 =
+* FIX: Fixed an issue where multiple Stripe webhook endpoints could accumulate over time, causing donation webhook events to fail signature verification in certain scenarios.
 
 = Donation Form & Fundraising Campaigns v1.8.10.3 =
 * IMPROVED: Sync Pending Stripe Donations now uses AJAX processing with new dry run and email options.
@@ -561,5 +564,20 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 * FIX: Improved loading for the WordPress dashboard widget.
 * FIX: Adjustments to CSS on the Dashboard page.
 * FIX: Minor translation, misc CSS, UI, and PHP coding updates.
+
+= Donation Form & Fundraising Campaigns v1.8.1.15 =
+* NEW: Added exit modal popup on getting started screen when user visits Pro page.
+* NEW: Added ability via two global PHP variables to force/not force "tour" for visual campaign builder.
+* FIX: Resolved issue resolving showing license information for lifetime licenses.
+* FIX: Resolved a misalignment of the icon/field for the minimum donation amount field in the visual campaign builder.
+* FIX: Addressed security issue involving creating new users primarily via Charitable registration shortcode.
+* FIX: Resolved sanitization issue with the custom CSS field for HTML field in visual campaign builder.
+* FIX: Minor translation, CSS, and PHP coding updates.
+
+= Donation Form & Fundraising Campaigns v1.8.1.14 =
+* FIX: Resolved a PHP fatal error when saving information for legacy campaigns.
+* FIX: Resolved error on getting started screen after Stripe was connected.
+* FIX: Improved retrieval of campaign descriptions for legacy campaigns.
+* FIX: Resolved CSS issue in visual builder.
 
 **[View entire donation form and fundraising platform changelog](https://plugins.svn.wordpress.org/charitable/trunk/CHANGELOG.md)**
