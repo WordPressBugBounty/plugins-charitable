@@ -97,9 +97,10 @@ if ( ! class_exists( 'Charitable_Dashboard_Ajax' ) ) :
 				$clear_cache = ( isset( $_GET['charitable_clear_stats_cache'] ) && '1' === $_GET['charitable_clear_stats_cache'] ) ||
 							   ( isset( $_POST['charitable_clear_stats_cache'] ) && '1' === $_POST['charitable_clear_stats_cache'] );
 
+				$response_data = array();
+
 				if ( $clear_cache ) { // phpcs:ignore
 					$charitable_dashboard->clear_dashboard_stats_cache();
-					// Add a flag to indicate cache was cleared
 					$response_data['cache_cleared'] = true;
 				}
 
@@ -135,10 +136,10 @@ if ( ! class_exists( 'Charitable_Dashboard_Ajax' ) ) :
 				);
 
 				// Prepare response data.
-				$response_data = array(
+				$response_data = array_merge( $response_data, array(
 					'stats' => $stats,
 					'chart' => $chart_data,
-				);
+				) );
 
 				wp_send_json_success( $response_data );
 

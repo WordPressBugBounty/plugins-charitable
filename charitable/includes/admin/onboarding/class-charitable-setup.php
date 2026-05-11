@@ -136,6 +136,10 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 		 */
 		public function hooks() {
 
+			// Register the resume-banner dismiss listener unconditionally — it
+			// must fire during admin-ajax, which the guards below bail out of.
+			add_action( 'charitable_dashboard_notification_dismissed', [ $this, 'maybe_clear_onboarding_state_on_dismiss' ] );
+
 			// If user is in admin ajax or doing cron, return.
 			if ( wp_doing_ajax() || wp_doing_cron() ) {
 				return;
@@ -208,15 +212,21 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 				return;
 			}
 
-			// Don't redirect if user is on a non-Charitable admin page.
-			if ( ! empty( $_GET['page'] ) && strpos( $_GET['page'], 'charitable' ) === false ) {
+			// Don't redirect when the user is on any Charitable admin page
+			// OTHER than the welcome destination (`?page=charitable`).
+			// Charitable's sub-pages — `charitable-dashboard`, `charitable-settings-checklist`,
+			// etc. — each have their own menu_slug, so strict equality keeps the
+			// redirect scoped to `?page=charitable` itself (which IS the welcome
+			// screen) rather than yanking the user back from every sub-page.
+			if ( ! empty( $_GET['page'] ) && is_string( $_GET['page'] ) && 'charitable' !== $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				return;
 			}
 
-			// Don't redirect from specific WordPress admin pages without page parameter.
-			$current_page = basename( $_SERVER['PHP_SELF'] ?? '' );
-			$wp_admin_pages = array( 'edit.php', 'post-new.php', 'upload.php', 'users.php', 'edit-tags.php', 'edit-comments.php', 'themes.php', 'plugins.php', 'tools.php', 'options-general.php' );
-			if ( in_array( $current_page, $wp_admin_pages ) ) {
+			// Don't redirect from standard WordPress admin scripts that don't
+			// use a `?page=` parameter (e.g. the WP Dashboard, CPT lists, media library).
+			$current_page   = basename( $_SERVER['PHP_SELF'] ?? '' );
+			$wp_admin_pages = array( 'index.php', 'edit.php', 'post-new.php', 'upload.php', 'users.php', 'edit-tags.php', 'edit-comments.php', 'themes.php', 'plugins.php', 'tools.php', 'options-general.php' );
+			if ( in_array( $current_page, $wp_admin_pages, true ) ) {
 				return;
 			}
 
@@ -236,10 +246,38 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 			}
 
 			// Build the URL for going back to the onboarding process.
-			$onboarding_url = 'https://app.wpcharitable.com/setup-wizard-charitable_lite&resume=' . charitable_get_site_token();
+			$onboarding_url = add_query_arg( array( 'resume' => 'true' ), charitable_get_onboarding_url() );
 
 			wp_safe_redirect( admin_url( 'admin.php?page=charitable&wpchar_lite=lite&setup=welcome&resume=true' ) );
 			exit;
+		}
+
+		/**
+		 * Clear the in-progress onboarding flag when the user dismisses the
+		 * dashboard "resume setup wizard" banner.
+		 *
+		 * Triggered by the existing notification rail's dismiss AJAX. The
+		 * action fires for ALL dismissed notifications, so we filter on slug
+		 * here.
+		 *
+		 * Net effect: dismissing the banner ends the resume prompt everywhere.
+		 * The banner is gone (the rail's existing dismissed-key filter handles
+		 * that), and the `?page=charitable` resume redirect also defuses
+		 * because it keys off the same option we delete here.
+		 *
+		 * @since 1.8.10.5
+		 *
+		 * @param string $notification_id Slug of the dismissed notification.
+		 *
+		 * @return void
+		 */
+		public function maybe_clear_onboarding_state_on_dismiss( $notification_id ) {
+
+			if ( 'resume_setup_wizard' !== $notification_id ) {
+				return;
+			}
+
+			delete_option( 'charitable_started_onboarding' );
 		}
 
 		/**

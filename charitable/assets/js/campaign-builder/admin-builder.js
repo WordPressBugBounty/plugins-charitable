@@ -2829,13 +2829,20 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 		bindUIActionsPanels: function() {
 
 			// Panel switching.
-			$builder.on( 'click', '#charitable-panels-toggle button:not(.charitable-panel-help-button), .charitable-panel-switch', function( e ) {
+			$builder.on( 'click', '#charitable-panels-toggle button:not(.charitable-panel-help-button):not(.charitable-panel-form-upgrade), .charitable-panel-switch', function( e ) {
 				e.preventDefault();
 
 				// if the button has a disabled class, then we can't switch the panel because it's disabled.
 				if ( ! $( this ).hasClass('disabled') ) {
 					app.panelSwitch( $( this ).data( 'panel' ) );
 				}
+			} );
+
+			// Form panel (Lite) — opens the Pro upgrade modal instead of switching panels.
+			$builder.on( 'click', '.charitable-panel-form-upgrade', function( e ) {
+				e.preventDefault();
+				e.stopImmediatePropagation();
+				app.formPanelUpgradeModal();
 			} );
 
 			// Help button - allow the link to work by ensuring the anchor's href is followed.
@@ -8680,6 +8687,57 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 				if ( modal.isOpen() ) {
 					modal.setBoxWidth( modalWidth );
+				}
+			} );
+		},
+
+		/**
+		 * Upgrade modal for the Form panel (Lite only). Uses custom copy but
+		 * reuses the shared upgrade modal theme.
+		 *
+		 * @since 1.8.10.5
+		 */
+		formPanelUpgradeModal: function() {
+
+			// Prevent stacking — bail if a modal is already open.
+			if ( app.formPanelUpgradeModalOpen ) {
+				return;
+			}
+
+			var strings = ( typeof charitable_builder !== 'undefined' && charitable_builder.form_upgrade_modal ) ? charitable_builder.form_upgrade_modal : {};
+
+			app.formPanelUpgradeModalOpen = true;
+
+			$.alert( {
+				backgroundDismiss: true,
+				title            : strings.title || '',
+				icon             : 'fa fa-lock',
+				content          : strings.message || '',
+				boxWidth         : app.getUpgradeModalWidth( false ),
+				theme            : 'modern,charitable-upgrade-form-lite',
+				closeIcon        : true,
+				onOpenBefore: function() {
+
+					this.$body.find( '.jconfirm-content' ).addClass( 'lite-upgrade' );
+
+					if ( strings.doc ) {
+						this.$btnc.after( strings.doc );
+					}
+				},
+				onClose: function() {
+					app.formPanelUpgradeModalOpen = false;
+				},
+				buttons: {
+					confirm: {
+						text    : strings.button || '',
+						btnClass: 'btn-confirm',
+						keys    : [ 'enter' ],
+						action: function() {
+							if ( strings.upgrade_url ) {
+								window.open( strings.upgrade_url, '_blank' );
+							}
+						}
+					}
 				}
 			} );
 		},

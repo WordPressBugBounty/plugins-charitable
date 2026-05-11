@@ -587,13 +587,39 @@ CHARITABLE = window.CHARITABLE || {};
     };
 
     /**
-     * Select a donation amount.
+     * Unformat a currency string to a plain float.
      *
-     * @param   int price
-     * @return  string
+     * Handles the case where the site uses a non-period decimal separator (e.g. comma)
+     * but the user types a period as the decimal point — a common mistake on non-US
+     * keyboards. accounting.unformat() would otherwise strip the period as if it were
+     * a thousands separator, turning "5.33" into 533.
+     *
+     * Heuristic: if the configured decimal is not a period, the value contains a period,
+     * and the value does NOT already contain the configured decimal separator:
+     *   - One period followed by 1–2 digits at end → treat as decimal (e.g. "5.33" → "5,33")
+     *   - One period followed by exactly 3 digits at end → treat as thousands (e.g. "1.000" → 1000)
+     *   - Multiple periods → all thousands separators; let accounting.unformat strip them
+     *
+     * @param   string|number price
+     * @return  float
      */
     Donation_Form.prototype.unformat_amount = function( price ) {
-        return Math.abs( parseFloat( accounting.unformat( price, CHARITABLE_VARS.currency_format_decimal_sep ) ) );
+        var decimal = CHARITABLE_VARS.currency_format_decimal_sep;
+
+        price = String( price );
+
+        if ( decimal !== '.' && price.indexOf( '.' ) !== -1 && price.indexOf( decimal ) === -1 ) {
+            var periodCount = ( price.match( /\./g ) || [] ).length;
+
+            if ( periodCount === 1 && ! /\.\d{3}$/.test( price ) ) {
+                // Single period not followed by exactly 3 digits — treat as decimal separator.
+                price = price.replace( '.', decimal );
+            }
+            // Single period followed by 3 digits (thousands) or multiple periods:
+            // fall through and let accounting.unformat strip them.
+        }
+
+        return Math.abs( parseFloat( accounting.unformat( price, decimal ) ) );
     };
 
     /**

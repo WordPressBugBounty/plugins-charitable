@@ -238,6 +238,9 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 			$empty_transient = new \stdClass();
 			set_site_transient( 'update_plugins', $empty_transient ); // Depreciated item.
 
+			// Clear Stripe webhook failure counter so stale notices don't persist after fixing the root cause.
+			delete_transient( 'charitable_stripe_webhook_verification_failures' );
+
 			// Allow an addon to hook into this.
 			do_action( 'charitable_after_clear_expired_options' );
 

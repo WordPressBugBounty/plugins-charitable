@@ -77,6 +77,52 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 
 			// Hook into Charitable's cache clearing mechanism
 			add_action( 'charitable_after_clear_expired_options', array( $this, 'clear_dashboard_stats_cache' ) );
+
+			// Refresh the "resume setup wizard" notification entry just before
+			// the dashboard rail renders.
+			add_action( 'charitable_before_admin_dashboard_v2', array( $this, 'sync_resume_wizard_notification' ) );
+		}
+
+		/**
+		 * Register or refresh the "resume setup wizard" entry in the dashboard
+		 * notification rail when an onboarding session is in progress; remove
+		 * any stale entry when it isn't.
+		 *
+		 * Fires on `charitable_before_admin_dashboard_v2`, immediately before
+		 * `render_dashboard_notifications()` reads the same option.
+		 *
+		 * @since 1.8.10.5
+		 *
+		 * @return void
+		 */
+		public function sync_resume_wizard_notification() {
+
+			$notifications = (array) get_option( 'charitable_dashboard_notifications', array() );
+			$started       = 1 === (int) get_option( 'charitable_started_onboarding', 0 );
+			$present       = isset( $notifications['resume_setup_wizard'] );
+			$dismissed     = $present && isset( $notifications['resume_setup_wizard']['dismissed'] );
+
+			if ( $started && ! $dismissed ) {
+
+				$notifications['resume_setup_wizard'] = array(
+					'type'        => 'notice',
+					'priority'    => 3,
+					'title'       => __( 'Finish Setting Up Charitable', 'charitable' ),
+					'message'     => '<p>' . esc_html__( "Looks like you started the setup wizard but didn't finish. Pick up where you left off and we'll have you ready to accept donations in just a couple more steps.", 'charitable' ) . '</p>',
+					'custom_css'  => 'charitable-notification-type-notice',
+					'button_url'  => add_query_arg( array( 'resume' => 'true' ), charitable_get_onboarding_url() ),
+					'button_text' => __( 'Resume Setup Wizard', 'charitable' ),
+				);
+
+				update_option( 'charitable_dashboard_notifications', $notifications );
+
+				return;
+			}
+
+			if ( $present && ! $started ) {
+				unset( $notifications['resume_setup_wizard'] );
+				update_option( 'charitable_dashboard_notifications', $notifications );
+			}
 		}
 
 

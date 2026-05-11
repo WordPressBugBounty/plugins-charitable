@@ -42,7 +42,7 @@ if ( $charitable_resume_onboarding && ! $charitable_onboarding_welcome ) {
 	$charitable_welcome_headline    = __( 'Welcome back to the Charitable Setup Wizard!', 'charitable' );
 	$charitable_introduction_text   = __( 'You have already started the setup wizard. Would you like to continue where you left off?', 'charitable' );
 	$charitable_button_label        = __( 'Resume Setup Wizard', 'charitable' );
-	$charitable_onboarding_url      = 'https://app.wpcharitable.com/setup-wizard-charitable_lite&resume=' . charitable_get_site_token();
+	$charitable_onboarding_url      = add_query_arg( array( 'resume' => 'true' ), charitable_get_onboarding_url() );
 	$charitable_welcome_go_back_url = admin_url( 'admin.php?page=charitable-setup-checklist&charitable_onboarding=cancel' );
 }
 // Override even more things if the user is returning from a login after the onboarding process by checking for reauth=1 in the query string.
@@ -50,8 +50,7 @@ if ( ! empty( $_GET['lostconnection'] ) ) { // phpcs:ignore WordPress.Security.N
 	$charitable_welcome_headline    = __( 'Welcome back!', 'charitable' );
 	$charitable_introduction_text   = __( 'You seem to have been logged out of your WordPress admin during the onboarding process. In order for the onboarding to install plugins and update settings please go back the last step and submit while you are still logged into WordPress.', 'charitable' );
 	$charitable_button_label        = __( 'Go Back', 'charitable' );
-	$charitable_onboarding_url      = charitable_get_onboarding_url();
-	$charitable_onboarding_url      = 'https://app.wpcharitable.com/setup-wizard-charitable_lite&resume=' . charitable_get_site_token();
+	$charitable_onboarding_url      = add_query_arg( array( 'resume' => 'true' ), charitable_get_onboarding_url() );
 	$charitable_welcome_go_back_url = admin_url( 'admin.php?page=charitable-setup-checklist&charitable_onboarding=cancel' );
 }
 

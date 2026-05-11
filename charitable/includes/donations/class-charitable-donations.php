@@ -86,7 +86,8 @@ if ( ! class_exists( 'Charitable_Donations' ) ) :
 			$where_clause = $wpdb->prepare( 'post_type = %s', $args['post_type'] );
 
 			if ( ! empty( $args['s'] ) ) {
-				$where_clause .= " AND ((post_title LIKE '%{$args['s']}%') OR (post_content LIKE '%{$args['s']}%'))";
+				$like           = '%' . $wpdb->esc_like( $args['s'] ) . '%';
+				$where_clause  .= $wpdb->prepare( ' AND ((post_title LIKE %s) OR (post_content LIKE %s))', $like, $like );
 			}
 
 			if ( ! empty( $args['start_date'] ) ) {

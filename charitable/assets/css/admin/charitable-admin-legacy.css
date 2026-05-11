@@ -1564,8 +1564,34 @@ form#posts-filter .actions.charitable-export-actions {
   width: 80px;
 }
 
+/*
+ * The Lite -> Pro upgrade banner ("You're using Charitable Lite!").
+ *
+ * Visual properties (orange background, white text, font, base padding) live
+ * at the base selector so they apply at every viewport. Previously they were
+ * scoped inside @media (min-width: 783px), which left mobile admins with a
+ * bare default-styled banner once the WP admin breakpoint flipped.
+ *
+ * Layout properties that depend on the desktop admin column (negative
+ * margin to align with the wider sidebar offset, tighter padding) stay
+ * inside the 783px media query.
+ */
 .charitable-admin-banner-top-of-page {
   text-align: center;
+  background: #E89940;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 10px 46px 10px 22px;
+}
+.charitable-admin-banner-top-of-page a {
+  color: white;
+}
+.charitable-license-expiring-banner.charitable-admin-banner-top-of-page {
+  background: #e84040;
+}
+.charitable-license-expiring-banner.charitable-admin-banner-top-of-page a:hover {
+  color: white !important;
 }
 .charitable-admin-banner-top-of-page .button-link {
   position: absolute;
@@ -1579,39 +1605,28 @@ form#posts-filter .actions.charitable-export-actions {
   padding: 6px 10px;
 }
 
-@media screen and (min-width: 783px) {
-  .charitable-admin-banner-top-of-page {
-    padding: 10px 46px 10px 22px;
-    font-size: 13px;
-    line-height: 1.4;
-    color: #fff;
-    margin-left: -20px;
-    padding: 9px 32px 9px 20px;
-    background: #E89940;
-    display: none;
-  }
-  .charitable-admin-banner-top-of-page a {
-    color: white;
-  }
-  [dir=rtl] .charitable-admin-banner-top-of-page {
-    margin-left: 0;
-    margin-right: -20px;
-  }
-  .charitable-license-expiring-banner.charitable-admin-banner-top-of-page {
-    background: #e84040;
-  }
-  .charitable-license-expiring-banner.charitable-admin-banner-top-of-page a:hover {
-    color: white !important;
-  }
-}
 @media screen and (min-width: 601px) {
   .charitable-admin-banner-top-of-page .button-link {
     top: 0;
   }
 }
 @media screen and (min-width: 783px) {
+  .charitable-admin-banner-top-of-page {
+    margin-left: -20px;
+    padding: 9px 32px 9px 20px;
+    display: none;
+  }
+  [dir=rtl] .charitable-admin-banner-top-of-page {
+    margin-left: 0;
+    margin-right: -20px;
+  }
   .charitable-admin-banner-top-of-page .button-link {
     right: 9px;
+  }
+}
+@media screen and (max-width: 782px) {
+  .charitable-admin-banner-top-of-page {
+    margin-left: -10px;
   }
 }
 .charitable-notice.notice-five-star-review {

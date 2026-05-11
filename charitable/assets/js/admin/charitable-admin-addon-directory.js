@@ -450,6 +450,17 @@
 			CharitableDirAdmin.setAddonState( plugin, state, pluginType, function( res ) {
 
 				if ( res.success ) {
+
+					// Server may include a `redirect` URL when the just-completed
+					// action should navigate the admin somewhere new (e.g. installing
+					// Charitable Pro auto-deactivates Lite, so we send the user to the
+					// Charitable dashboard rather than letting them land on the
+					// no-longer-existing Lite Addons screen).
+					if ( res.data && 'object' === typeof res.data && res.data.redirect ) {
+						window.location.href = res.data.redirect;
+						return;
+					}
+
 					if ( 'install' === state ) {
 						$btn.attr( 'data-plugin', res.data.basename );
 						successText = res.data.msg;

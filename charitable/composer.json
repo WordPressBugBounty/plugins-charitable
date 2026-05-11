@@ -8,6 +8,7 @@
 			"Charitable\\": "includes/"
 		}
 	},
-	"require": {}
+	"require-dev": {
+		"yoast/phpunit-polyfills": "^4.0"
+	}
 }
-

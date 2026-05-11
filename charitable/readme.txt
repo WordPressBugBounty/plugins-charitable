@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 6.9.4
 Requires PHP: 7.4
-Stable tag: 1.8.10.4
+Stable tag: 1.8.10.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,7 +23,7 @@ Over 10,000+ nonprofits, charity foundations, clubs & NGOs get more donations fr
 > <strong>Charitable Pro</strong><br />
 > This plugin is the Lite version of Charitable Pro, which comes with additional email marketing & payment integrations, crowdfunding, peer-to-peer fundraising, automated workflows, and more. [Click here to purchase the best premium WordPress donation & fundraising plugin now!](https://wpcharitable.com/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin&utm_content=charitablepro)
 
-[youtube https://www.youtube.com/watch?v=834h3huzzk8]
+https://vimeo.com/1182636888
 
 = Fully Customizable Donation Forms with Drag & Drop =
 
@@ -267,6 +267,13 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.10.5 =
+* NEW: Redesigned the "What's New" splash screen with a new hero section, video, and upgrade buttons.
+* NEW: Added a Form navigation icon in the campaign builder with an upgrade prompt for the Charitable Pro visual form builder.
+* IMPROVED: System Info now includes a Hosting Environment section.
+* FIX: Hardened input handling in the donations admin search to improve query safety.
+* FIX: Resolved a custom donation amount parsing issue with the decimal separator on non-US currency sites in certain scenarios.
 
 = Donation Form & Fundraising Campaigns v1.8.10.4 =
 * FIX: Fixed an issue where multiple Stripe webhook endpoints could accumulate over time, causing donation webhook events to fail signature verification in certain scenarios.

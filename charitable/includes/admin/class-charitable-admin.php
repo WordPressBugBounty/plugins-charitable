@@ -569,7 +569,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 			if ( ! is_null( $screen ) && ( $screen->id === 'charitable_page_charitable-reports' || $screen->id === 'charitable_page_charitable-dashboard' ) ) {
 
 				// Specific styles for the "overview" and main reporting tabs.
-				if ( empty( $_GET['tab'] ) || ( ! empty( $_GET['tab'] && charitable_reports_allow_tab_load_scripts( strtolower( $_GET['tab'] ) ) ) ) ) { // phpcs:ignore
+				if ( empty( $_GET['tab'] ) || ( ! empty( $_GET['tab'] ) && charitable_reports_allow_tab_load_scripts( strtolower( sanitize_text_field( wp_unslash( $_GET['tab'] ) ) ) ) ) ) { // phpcs:ignore
 
 					wp_register_script(
 						'charitable-apex-charts',
@@ -619,7 +619,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 					wp_enqueue_script( 'charitable-report-date-range-picker' );
 					wp_enqueue_script( 'charitable-reporting' );
 
-				} else if ( ! empty( $_GET['tab'] && 'analytics' === $_GET['tab'] ) ) { // phpcs:ignore
+				} elseif ( ! empty( $_GET['tab'] ) && 'analytics' === $_GET['tab'] ) { // phpcs:ignore
 
 					// this loads a specific script for the analytics tab.
 					do_action( 'charitable_admin_enqueue_analytics_scripts' );
@@ -1258,7 +1258,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 		 */
 		public function export_donations() {
 
-			if ( ! wp_verify_nonce( $_GET['_charitable_export_nonce'], 'charitable_export_donations' ) ) { // phpcs:ignore
+			if ( ! isset( $_GET['_charitable_export_nonce'] ) || ! wp_verify_nonce( $_GET['_charitable_export_nonce'], 'charitable_export_donations' ) ) { // phpcs:ignore
 				return false;
 			}
 
@@ -1581,6 +1581,20 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				wp_send_json_success( array( 'form' => $form ) );
 			}
 
+			// Snapshot installed plugins BEFORE the install so we can identify what
+			// was actually unzipped. The legacy slug-derivation in
+			// charitable_get_plugin_basename_from_slug() reduces a download URL like
+			// `…/charitable-pro-plugin-1.8.13.5.zip` to the slug
+			// `charitable-pro-plugin-1.8.13.5`, then expects an installed plugin
+			// directory whose name *starts* with that slug — which doesn't hold for
+			// any addon whose zip filename includes a version suffix and whose
+			// directory does not (e.g. Charitable Pro lives at `charitable-pro/`).
+			// The before/after diff sidesteps that mismatch entirely.
+			if ( ! function_exists( 'get_plugins' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			}
+			$plugins_before = array_keys( get_plugins() );
+
 			// Download and install the plugin.
 			$result = charitable_install_wporg_plugin( $plugin );
 
@@ -1588,11 +1602,21 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				wp_send_json_error( $result->get_error_message() );
 			}
 
-			// Get plugin basename.
-			$plugin_basename = charitable_get_plugin_basename_from_slug( $plugin );
+			// Force a fresh re-scan of the plugins directory and compute the diff.
+			wp_cache_delete( 'plugins', 'plugins' );
+			$plugins_after   = array_keys( get_plugins() );
+			$newly_installed = array_values( array_diff( $plugins_after, $plugins_before ) );
+
+			if ( ! empty( $newly_installed ) ) {
+				$plugin_basename = $newly_installed[0];
+			} else {
+				// Fallback to the legacy slug-derived guess if for some reason no new
+				// plugin was detected (e.g. the zip overwrote an existing install).
+				$plugin_basename = charitable_get_plugin_basename_from_slug( $plugin );
+			}
 
 			wp_send_json_success( array(
-				'msg'         => 'Plugin installed successfully',
+				'msg'         => __( 'Plugin installed successfully', 'charitable' ),
 				'basename'    => $plugin_basename,
 				'is_activated' => false,
 			) );
@@ -1635,7 +1659,17 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				wp_send_json_error( $result->get_error_message() );
 			}
 
-			wp_send_json_success( 'Plugin activated successfully' );
+			$response = array( 'msg' => __( 'Plugin activated successfully', 'charitable' ) );
+
+			// Activating Charitable Pro auto-deactivates Charitable Lite, which means
+			// the screen the user came from (page=charitable-addons, served by Lite)
+			// no longer exists in the menu. Redirect them to the Charitable dashboard
+			// so they don't land on a 404 / blank admin page after the AJAX returns.
+			if ( 0 === strpos( $plugin, 'charitable-pro/' ) ) {
+				$response['redirect'] = admin_url( 'admin.php?page=charitable-dashboard' );
+			}
+
+			wp_send_json_success( $response );
 		}
 
 		/**

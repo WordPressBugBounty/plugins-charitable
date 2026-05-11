@@ -355,6 +355,7 @@ if ( ! class_exists( 'Charitable_Tools_System_Info' ) ) :
 			$data .= $this->email_diagnostics();
 			$data .= $this->donation_error_logs();
 			$data .= $this->debug_log_scanner();
+			$data .= $this->hosting_environment_info();
 
 			$data .= "\n" . '### End System Info ###';
 
@@ -1682,6 +1683,298 @@ if ( ! class_exists( 'Charitable_Tools_System_Info' ) ) :
 			}
 
 			return self::$instance;
+		}
+
+		/**
+		 * Hosting Environment, Filesystem, and recent Plugin Install error details.
+		 *
+		 * Designed to surface the signals that matter most when troubleshooting
+		 * plugin upload/install failures on managed hosts (WordPress.com, WP
+		 * Engine, Kinsta, etc.) where standard PHP limits are misleading.
+		 *
+		 * @since 1.8.10.5
+		 *
+		 * @return string
+		 */
+		private function hosting_environment_info() {
+
+			$data  = "\n" . '-- Hosting Environment' . "\n\n";
+			$data .= 'Detected Host:            ' . self::detect_host() . "\n";
+			$data .= 'Reverse Proxy/CDN:        ' . self::detect_proxy() . "\n";
+
+			$data .= "\n" . '-- Filesystem & Updates' . "\n\n";
+			$data .= 'DISALLOW_FILE_EDIT:       ' . self::format_constant_state( 'DISALLOW_FILE_EDIT' ) . "\n";
+			$data .= 'DISALLOW_FILE_MODS:       ' . self::format_constant_state( 'DISALLOW_FILE_MODS' ) . "\n";
+			$data .= 'AUTOMATIC_UPDATER_DISABLED: ' . self::format_constant_state( 'AUTOMATIC_UPDATER_DISABLED' ) . "\n";
+			$data .= 'WP_AUTO_UPDATE_CORE:      ' . self::format_constant_state( 'WP_AUTO_UPDATE_CORE' ) . "\n";
+			$data .= 'FS_METHOD:                ' . ( defined( 'FS_METHOD' ) ? esc_html( (string) FS_METHOD ) : '(auto-detect)' ) . "\n";
+			$data .= 'Plugin Dir Writable:      ' . ( is_writable( WP_PLUGIN_DIR ) ? 'Yes' : 'No' ) . ' (' . WP_PLUGIN_DIR . ')' . "\n";
+			$data .= 'wp-content Writable:      ' . ( is_writable( WP_CONTENT_DIR ) ? 'Yes' : 'No' ) . "\n";
+
+			// Note about misleading PHP limits on managed hosts.
+			if ( self::is_known_managed_host() ) {
+				$data .= "\n" . 'Note: PHP upload/memory limits shown above reflect OS-level config.' . "\n";
+				$data .= 'Managed hosts may enforce stricter platform-level caps that override them.' . "\n";
+			}
+
+			// Recent install errors (captured by the upgrader_install_package_result filter).
+			$errors = (array) get_option( 'charitable_recent_install_errors', array() );
+			if ( ! empty( $errors ) ) {
+				$data .= "\n" . '-- Recent Plugin Install/Update Errors (last 5)' . "\n\n";
+				foreach ( array_reverse( $errors ) as $err ) {
+					$ts     = isset( $err['time'] ) ? gmdate( 'Y-m-d H:i:s', (int) $err['time'] ) . ' UTC' : '?';
+					$action = isset( $err['action'] ) ? $err['action'] : '?';
+					$plugin = isset( $err['plugin'] ) && $err['plugin'] ? $err['plugin'] : '(unknown)';
+					$code   = isset( $err['code'] ) ? $err['code'] : '?';
+					$msg    = isset( $err['message'] ) ? $err['message'] : '';
+					$data  .= '[' . $ts . '] ' . $action . ' ' . $plugin . "\n";
+					$data  .= '  Code:    ' . $code . "\n";
+					$data  .= '  Message: ' . wp_strip_all_tags( $msg ) . "\n";
+				}
+			}
+
+			return $data;
+		}
+
+		/**
+		 * Detect the hosting platform.
+		 *
+		 * Read-only: only checks defined constants, loaded classes, and
+		 * already-installed mu-plugin filenames. No filesystem scanning beyond
+		 * the existing get_mu_plugins() result, no network calls.
+		 *
+		 * @since 1.8.10.5
+		 *
+		 * @return string Human-readable host description, or "Unknown / generic".
+		 */
+		private static function detect_host() {
+
+			// Cache the result — this is called at least twice per render
+			// (once directly, once via is_known_managed_host()).
+			static $cached = null;
+			if ( null !== $cached ) {
+				return $cached;
+			}
+
+			// WordPress.com (Atomic infrastructure).
+			$is_wpcom = defined( 'WPCOMSH_VERSION' )
+				|| defined( 'IS_ATOMIC' )
+				|| defined( 'IS_WPCOM' );
+
+			if ( ! $is_wpcom && function_exists( 'get_mu_plugins' ) ) {
+				$mu = get_mu_plugins();
+				if ( isset( $mu['wpcomsh-loader.php'] ) ) {
+					$is_wpcom = true;
+				}
+			}
+
+			if ( $is_wpcom ) {
+				$cached = 'WordPress.com (' . self::detect_wpcom_plan() . ')';
+			} elseif ( defined( 'WPE_APIKEY' ) || defined( 'IS_WPE' ) || defined( 'WPE_ATLAS_PLUGIN_VERSION' ) ) {
+				$cached = 'WP Engine';
+			} elseif ( defined( 'KINSTAMU_VERSION' ) || defined( 'KINSTA_CACHE_ZONE' ) || class_exists( 'Kinsta\\Cache' ) ) {
+				$cached = 'Kinsta';
+			} elseif ( defined( 'PANTHEON_ENVIRONMENT' ) || isset( $_SERVER['PANTHEON_ENVIRONMENT'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+				$cached = 'Pantheon';
+			} elseif ( defined( 'IS_PRESSABLE' ) || defined( 'PRESSABLE_VERSION' ) ) {
+				$cached = 'Pressable';
+			} elseif ( defined( 'CLOUDWAYS_VERSION' ) || isset( $_SERVER['cw_allowed_ip'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+				$cached = 'Cloudways';
+			} elseif ( defined( 'GD_SYSTEM_PLUGIN_DIR' ) || class_exists( 'WPaaS\\Plugin' ) ) {
+				$cached = 'GoDaddy Managed WordPress';
+			} elseif ( defined( 'MM_BASE_DIR' ) || class_exists( 'EPC_Loader' ) ) {
+				$cached = 'Bluehost / Endurance';
+			} elseif ( defined( 'DH_LITESPEED_PLUGIN' ) || isset( $_SERVER['DH_USER'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+				$cached = 'DreamHost (DreamPress)';
+			} elseif ( class_exists( 'SiteGround_Optimizer\\Loader' ) || class_exists( 'SG_CachePress\\Loader' ) ) {
+				$cached = 'SiteGround';
+			} elseif ( defined( 'FLYWHEEL_CONFIG_DIR' ) || defined( 'FLYWHEEL_PLUGIN_DIR' ) ) {
+				$cached = 'Flywheel';
+			} elseif ( defined( 'HOSTINGER_LOCAL_BIN' ) || defined( 'HOSTINGER_AMP_INSTALLED' ) ) {
+				$cached = 'Hostinger';
+			} else {
+				$cached = 'Unknown / generic';
+			}
+
+			return $cached;
+		}
+
+		/**
+		 * Detect WordPress.com plan tier where possible.
+		 *
+		 * Tries several known surfaces in order; returns "plan unknown" if none
+		 * are accessible (WP.com hides this info from most plugin contexts).
+		 *
+		 * @since 1.8.10.5
+		 *
+		 * @return string
+		 */
+		private static function detect_wpcom_plan() {
+
+			// Direct constant (rare, but possible).
+			if ( defined( 'WPCOMSH_PLAN' ) && constant( 'WPCOMSH_PLAN' ) ) {
+				return (string) constant( 'WPCOMSH_PLAN' ) . ' plan';
+			}
+
+			// Jetpack Plan API: present on WP.com sites because Jetpack is bundled.
+			// Wrapped in try/catch because Jetpack_Plan::get() has historically
+			// thrown on partially-initialised Jetpack states, and System Info
+			// must never fatal.
+			if ( class_exists( 'Jetpack_Plan' ) && method_exists( 'Jetpack_Plan', 'get' ) ) {
+				try {
+					$plan = Jetpack_Plan::get();
+					if ( is_array( $plan ) ) {
+						if ( ! empty( $plan['product_name_short'] ) ) {
+							return $plan['product_name_short'] . ' plan';
+						}
+						if ( ! empty( $plan['product_slug'] ) ) {
+							return $plan['product_slug'] . ' plan';
+						}
+					}
+				} catch ( \Throwable $e ) { // phpcs:ignore
+					// Fall through to "plan unknown" on any Jetpack internal error.
+					unset( $e );
+				}
+			}
+
+			return 'plan unknown';
+		}
+
+		/**
+		 * Detect a reverse proxy or CDN in front of the site.
+		 *
+		 * @since 1.8.10.5
+		 *
+		 * @return string
+		 */
+		private static function detect_proxy() {
+
+			$signals = array();
+
+			// phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+			if ( ! empty( $_SERVER['HTTP_CF_RAY'] ) || ! empty( $_SERVER['HTTP_CF_CONNECTING_IP'] ) ) {
+				$signals[] = 'Cloudflare';
+			}
+			if ( ! empty( $_SERVER['HTTP_X_SUCURI_CLIENTIP'] ) ) {
+				$signals[] = 'Sucuri';
+			}
+			if ( ! empty( $_SERVER['HTTP_X_FORWARDED_HOST'] ) && is_string( $_SERVER['HTTP_X_FORWARDED_HOST'] ) ) {
+				$fwd_host = wp_unslash( $_SERVER['HTTP_X_FORWARDED_HOST'] );
+				if ( is_string( $fwd_host ) && false !== stripos( $fwd_host, 'cdn' ) ) {
+					$signals[] = 'CDN (X-Forwarded-Host)';
+				}
+			}
+			if ( ! empty( $_SERVER['HTTP_FASTLY_CLIENT_IP'] ) ) {
+				$signals[] = 'Fastly';
+			}
+			if ( ! empty( $_SERVER['HTTP_X_AKAMAI_EDGESCAPE'] ) ) {
+				$signals[] = 'Akamai';
+			}
+			// phpcs:enable
+
+			return empty( $signals ) ? 'None detected' : implode( ', ', $signals );
+		}
+
+		/**
+		 * Whether the current host is one we know enforces platform-level limits.
+		 *
+		 * @since 1.8.10.5
+		 *
+		 * @return bool
+		 */
+		private static function is_known_managed_host() {
+
+			$host = self::detect_host();
+
+			$managed = array(
+				'WordPress.com',
+				'WP Engine',
+				'Kinsta',
+				'Pantheon',
+				'Pressable',
+				'GoDaddy Managed WordPress',
+				'Bluehost / Endurance',
+				'DreamHost (DreamPress)',
+				'SiteGround',
+				'Flywheel',
+			);
+
+			foreach ( $managed as $needle ) {
+				if ( false !== strpos( $host, $needle ) ) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/**
+		 * Render a "constant defined and truthy" report line in a single string.
+		 *
+		 * @since 1.8.10.5
+		 *
+		 * @param  string $name Constant name.
+		 * @return string
+		 */
+		private static function format_constant_state( $name ) {
+
+			if ( ! defined( $name ) ) {
+				return 'Not defined';
+			}
+
+			$value = constant( $name );
+
+			if ( is_bool( $value ) ) {
+				return 'Defined (' . ( $value ? 'true' : 'false' ) . ')';
+			}
+
+			if ( is_scalar( $value ) ) {
+				return 'Defined (' . (string) $value . ')';
+			}
+
+			return 'Defined';
+		}
+
+		/**
+		 * Capture failed plugin installs/updates into a small ring buffer.
+		 *
+		 * Hooked on `upgrader_install_package_result`. Pure pass-through on
+		 * success (the filter must return its first argument unchanged in
+		 * all branches). Only records WP_Error results for plugin-type
+		 * operations. Caps storage at 5 most recent errors.
+		 *
+		 * @since 1.8.10.5
+		 *
+		 * @param  array|WP_Error $result     The install package result.
+		 * @param  array          $hook_extra Extra args from the upgrader.
+		 * @return array|WP_Error             Unchanged result.
+		 */
+		public static function log_install_result( $result, $hook_extra = array() ) {
+
+			// Pass-through: only act on plugin install/update errors.
+			if ( ! is_wp_error( $result ) ) {
+				return $result;
+			}
+
+			if ( ! is_array( $hook_extra ) || empty( $hook_extra['type'] ) || 'plugin' !== $hook_extra['type'] ) {
+				return $result;
+			}
+
+			$entry = array(
+				'time'    => time(),
+				'action'  => isset( $hook_extra['action'] ) ? (string) $hook_extra['action'] : '',
+				'plugin'  => isset( $hook_extra['plugin'] ) ? (string) $hook_extra['plugin'] : '',
+				'code'    => $result->get_error_code(),
+				'message' => $result->get_error_message(),
+			);
+
+			$errors   = (array) get_option( 'charitable_recent_install_errors', array() );
+			$errors[] = $entry;
+			$errors   = array_slice( $errors, -5 );
+
+			update_option( 'charitable_recent_install_errors', $errors, false );
+
+			return $result;
 		}
 	}
 

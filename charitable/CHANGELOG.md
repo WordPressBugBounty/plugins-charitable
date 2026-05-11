@@ -1,10 +1,17 @@
-# v1.8.10.4
+# 1.8.10.5
+* NEW: Redesigned the "What's New" splash screen with a new hero section, video, and upgrade buttons.
+* NEW: Added a Form navigation icon in the campaign builder.
+* IMPROVED: System Info now includes a Hosting Environment section.
+* FIX: Hardened input handling in the donations admin search to improve query safety.
+* FIX: Resolved a custom donation amount parsing issue with the decimal separator on non-US currency sites in certain scenarios.
+
+# 1.8.10.4
 * FIX: Fixed an issue where multiple Stripe webhook endpoints could accumulate over time, causing donation webhook events to fail signature verification in certain scenarios.
 
-# v1.8.10.3
+# 1.8.10.3
 * IMPROVED: Sync Pending Stripe Donations now uses AJAX processing with new dry run and email options.
 * FIX: Improved Stripe webhook reliability, signing secret handling, and notice wording in certain scenarios.
-* FIX: Fixed refund checkbox not appearing when changing donation status to Refunded in certain scenarios.
+* FIX: Fixed refund checkbox not appearing when changing donation status to Refunded in certain scenarios
 
 # 1.8.10.2
 * NEW: Added Sync Pending Stripe Donations tool to gateway settings (beta).

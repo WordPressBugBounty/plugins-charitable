@@ -146,6 +146,15 @@ add_action( 'wp_ajax_charitable_export_error_logs', array( Charitable_Tools_Syst
  */
 add_action( 'wp_ajax_charitable_debug_log_scan', array( Charitable_Tools_System_Info::get_instance(), 'ajax_debug_log_scan' ) );
 
+/**
+ * Capture failed plugin installs/updates into a small ring buffer so the
+ * "Recent Plugin Install/Update Errors" section of System Info has data
+ * to show. Pure pass-through on success.
+ *
+ * @since 1.8.10.5
+ */
+add_filter( 'upgrader_install_package_result', array( 'Charitable_Tools_System_Info', 'log_install_result' ), 10, 2 );
+
 add_action( 'admin_enqueue_scripts', array( Charitable_Tools_Misc::get_instance(), 'enqueue_scripts' ) );
 
 /**

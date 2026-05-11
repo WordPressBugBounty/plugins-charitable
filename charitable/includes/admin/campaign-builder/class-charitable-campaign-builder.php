@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
- * @version   1.8.9.1
+ * @version   1.8.10.5
  */
 
 // Exit if accessed directly.
@@ -226,6 +226,11 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 
 			$this->view        = isset( $_GET['view'] ) ? esc_attr( $_GET['view'] ) : false; // phpcs:ignore
 			$this->campaign_id = isset( $_GET['campaign_id'] ) ? intval( $_GET['campaign_id'] ) : false; // phpcs:ignore
+
+			// Lite has no Form panel content; fall back if ?view=form is requested directly.
+			if ( 'form' === $this->view ) {
+				$this->view = false;
+			}
 
 			// if no view was past, determine if the new campaign cofmr has been used (check settings) and if not redirect to template screen.
 			if ( $this->campaign_id && ! $this->view ) {
@@ -952,6 +957,17 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 					)
 				),
 				'charitable_addons_page'            => esc_url( admin_url( 'admin.php?page=charitable-addons' ) ),
+				'form_upgrade_modal'                => array(
+					'title'       => esc_html__( 'Unlock the Visual Form Builder', 'charitable' ),
+					'message'     => '<p>' . esc_html__( "The Charitable Pro plugin's visual form builder lets you drag and drop fields, build multi-step donation flows, and customize every part of your donation form - all without writing code.", 'charitable' ) . '</p><p>' . esc_html__( 'Upgrade to any paid Charitable plan to unlock the Charitable Pro plugin and design your forms exactly the way you want.', 'charitable' ) . '</p>',
+					'button'      => esc_html__( 'Get Charitable Pro', 'charitable' ),
+					'doc'         => sprintf(
+						'<div class="already-purchased-div"><a href="%1$s" target="_blank" rel="noopener noreferrer" class="already-purchased">%2$s</a></div>',
+						esc_url( 'https://www.wpcharitable.com/documentation/how-to-use-donation-form-visual-builder/' ),
+						esc_html__( 'Learn More', 'charitable' )
+					),
+					'upgrade_url' => charitable_admin_upgrade_link( 'Campaign+Builder+Form+Panel+Modal' ),
+				),
 				'charitable_license_label'          => esc_html( Charitable_Licenses_Settings::get_instance()->get_license_label_from_plan_id() ),
 				'charitable_form_name'              => $campaign_name,
 				'charitable_assets_dir'             => apply_filters(
@@ -1156,6 +1172,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 		 * Load panels.
 		 *
 		 * @since 1.0.0
+		 * @version 1.8.10.5 Added Form panel (Lite upgrade-prompt stub).
 		 */
 		public function load_panels() {
 
@@ -1176,6 +1193,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder' ) ) :
 				array(
 					'template',
 					'design',
+					'form',
 					'settings',
 					'marketing',
 					'payment',

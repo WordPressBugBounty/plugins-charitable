@@ -220,6 +220,17 @@
 			$btn.removeClass( 'loading' );
 
 			if ( res.success ) {
+
+				// Server may include a `redirect` URL when the just-completed action
+				// should navigate the admin somewhere new (e.g. installing/activating
+				// Charitable Pro auto-deactivates Lite, so we send the user to the
+				// Charitable dashboard rather than letting them land on a now-missing
+				// admin screen).
+				if ( res.data && 'object' === typeof res.data && res.data.redirect ) {
+					window.location.href = res.data.redirect;
+					return;
+				}
+
 				var successText = '';
 				var stateText = '';
 				var buttonText = '';
@@ -233,7 +244,7 @@
 						cssClass = 'plugin' === pluginType ? 'status-installed button button-secondary' : 'status-installed';
 					}
 				} else {
-					successText = res.data;
+					successText = ( res.data && 'object' === typeof res.data && res.data.msg ) ? res.data.msg : res.data;
 					// Reflect new state in UI.
 					if ( state === 'activate' ) {
 						stateText = 'Active';

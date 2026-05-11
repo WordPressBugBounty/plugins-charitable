@@ -9,6 +9,7 @@
  * @since   1.0.0
  * @version 1.4.7
  * @version 1.8.8.6
+ * @version 1.8.10.5
  */
 
 // Exit if accessed directly.
@@ -40,7 +41,7 @@ $charitable_amount   = $charitable_donation->get_total();
 		 * @param  string              $context  The context in which this is being shown.
 		 * @return string
 		 */
-		echo apply_filters( 'charitable_donation_receipt_donation_amount', charitable_format_money( $charitable_amount ), $charitable_amount, $charitable_donation, 'summary' ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo apply_filters( 'charitable_donation_receipt_donation_amount', charitable_format_money( $charitable_amount, false, true, $charitable_donation->get_currency() ), $charitable_amount, $charitable_donation, 'summary' ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	?>
 	</dd>
 	<dt class="donation-method"><?php esc_html_e( 'Payment Method:', 'charitable' ); ?></dt>

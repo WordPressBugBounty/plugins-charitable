@@ -483,3 +483,131 @@ body.charitable-splash-modal div.jconfirm .jconfirm-box-container .jconfirm-box 
     display: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * Splash redesign (1.8.10): dark hero, full-width sections, video, more-features.
+ * Ported from Charitable Pro splash. Scoped to #charitable-splash-modal so it
+ * only affects the splash screen, not other admin UI.
+ * ------------------------------------------------------------------------- */
+#charitable-splash-modal header {
+  padding: 50px 40px;
+  background: #2c3338;
+  color: #ffffff;
+}
+#charitable-splash-modal header h2 {
+  color: #ffffff;
+}
+#charitable-splash-modal header .charitable-splash-header-content p {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+#charitable-splash-modal main .charitable-splash-section {
+  margin-bottom: 0;
+  padding: 40px;
+  border-bottom: 1px solid #ccc;
+}
+#charitable-splash-modal main .charitable-splash-section:last-child {
+  border-bottom: none;
+}
+
+#charitable-splash-modal main .charitable-splash-section:first-child {
+  background: #2c3338;
+  padding: 0 40px 40px 40px;
+  margin-bottom: 0;
+  border-bottom: none;
+}
+#charitable-splash-modal main .charitable-splash-section:first-child .charitable-splash-section-content,
+#charitable-splash-modal main .charitable-splash-section:first-child .charitable-splash-section-content h3 {
+  color: #ffffff;
+}
+#charitable-splash-modal main .charitable-splash-section:first-child .charitable-splash-section-content p {
+  color: rgba(255, 255, 255, 0.7);
+}
+#charitable-splash-modal main .charitable-splash-section:first-child .charitable-splash-badge {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+#charitable-splash-modal main .charitable-splash-section.charitable-splash-section-one-third-two-thirds .charitable-splash-section-content {
+  text-align: left !important;
+}
+#charitable-splash-modal main .charitable-splash-section.charitable-splash-section-one-third-two-thirds .charitable-splash-section-content .charitable-splash-section-buttons {
+  justify-content: start !important;
+}
+#charitable-splash-modal main .charitable-splash-section .charitable-splash-section-image {
+  order: 1;
+}
+#charitable-splash-modal main .charitable-splash-section .charitable-splash-section-content {
+  order: 2;
+}
+#charitable-splash-modal main .charitable-splash-section.no-order .charitable-splash-section-content,
+#charitable-splash-modal main .charitable-splash-section.no-order .charitable-splash-section-image {
+  order: revert;
+}
+
+#charitable-splash-modal main .charitable-splash-section .charitable-splash-video-wrap {
+  width: 100%;
+}
+#charitable-splash-modal main .charitable-splash-section .charitable-splash-video-wrap .charitable-splash-video-embed {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #000;
+}
+#charitable-splash-modal main .charitable-splash-section .charitable-splash-video-wrap .charitable-splash-video-embed iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+#charitable-splash-modal main .charitable-splash-section .charitable-splash-video-wrap video {
+  display: block;
+  width: 100%;
+  border-radius: 6px;
+}
+#charitable-splash-modal main .charitable-splash-section .charitable-splash-video-wrap video::-webkit-media-controls {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+#charitable-splash-modal main .charitable-splash-section .charitable-splash-video-wrap:hover video::-webkit-media-controls {
+  opacity: 1;
+}
+
+#charitable-splash-modal main .charitable-splash-section-more-features {
+  display: block;
+  padding: 30px 40px 40px;
+  text-align: left;
+}
+#charitable-splash-modal main .charitable-splash-section-more-features h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1d2327;
+  margin: 0 15px 15px 0px !important;
+  text-align: left;
+}
+#charitable-splash-modal main .charitable-splash-section-more-features ul.charitable-splash-more-features-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 30px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: #acacac;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
+  text-align: left;
+}
+#charitable-splash-modal main .charitable-splash-section-more-features ul.charitable-splash-more-features-list li {
+  margin: 0;
+  text-align: left;
+  list-style: none;
+}
+
+body.charitable-splash-modal div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane .jconfirm-content p {
+  color: #acacac;
+}

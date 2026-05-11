@@ -479,27 +479,114 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			// phpcs:enable
 
 			/*
-			* Remove addons that are not needed for pro.
+			* Pro addon card visibility in the Charitable → Addons screen.
+			*
+			* Default: both `charitable-pro-plugin` and `charitable-pro` slugs are hidden
+			* so the normal upgrade path (wpcharitable.com checkout → Plugins → Add New
+			* upload) is the only way to install Pro.
+			*
+			* With CHARITABLE_SHOW_PRO_IN_ADDONS defined truthy (wp-config.php or a
+			* code-snippet plugin), the Pro card is exposed so Pro can be installed
+			* server-to-server from this screen — unblocking managed-host customers
+			* (WP.com, Kinsta, WP Engine, SiteGround) whose manual-upload path rejects
+			* the Pro zip with `http_error`.
+			*
+			* The wpcharitable.com addons API currently returns Pro under the legacy slug
+			* `charitable-pro-plugin`, while on disk Pro lives at `charitable-pro/
+			* charitable-pro.php`. If we rendered the raw entry, install-state detection,
+			* basename lookup, and activation would all use the wrong path and the flow
+			* would fail at activation. So when we expose Pro we NORMALISE the entry in
+			* place: rewrite its slug to `charitable-pro` and its path to match the
+			* on-disk location.
+			*
+			* Wrapped in try/catch so that any unexpected payload shape cannot fatal the
+			* admin Addons screen. On failure we fall back to the safe pre-1.8.10.5
+			* behaviour of hiding both Pro slugs.
 			*
 			* @since 1.8.5
 			*/
-			$addons_to_remove = array(
-				'charitable-pro-plugin',
-				'charitable-pro',
-			);
+			try {
+				$show_pro = defined( 'CHARITABLE_SHOW_PRO_IN_ADDONS' ) && CHARITABLE_SHOW_PRO_IN_ADDONS;
 
-			// Recursively remove specified addons.
-			foreach ( $addon_categories as $slug => &$category ) {
-				foreach ( $category['addons'] as $k => &$v ) {
-					if ( is_array( $v ) && isset( $v['slug'] ) && in_array( $v['slug'], $addons_to_remove ) ) {
-						unset( $category['addons'][ $k ] );
+				foreach ( $addon_categories as $slug => &$category ) {
+					if ( ! is_array( $category ) || ! isset( $category['addons'] ) || ! is_array( $category['addons'] ) ) {
+						continue;
 					}
+					foreach ( $category['addons'] as $k => &$v ) {
+						if ( ! is_array( $v ) || ! isset( $v['slug'] ) ) {
+							continue;
+						}
+
+						$is_pro_legacy    = 'charitable-pro-plugin' === $v['slug'];
+						$is_pro_canonical = 'charitable-pro' === $v['slug'];
+
+						if ( ! $is_pro_legacy && ! $is_pro_canonical ) {
+							continue;
+						}
+
+						if ( ! $show_pro ) {
+							unset( $category['addons'][ $k ] );
+							continue;
+						}
+
+						// Normalise the legacy slug onto the canonical on-disk layout so
+						// install, activation, and "is installed" detection all line up.
+						if ( $is_pro_legacy ) {
+							$v['slug'] = 'charitable-pro';
+							$v['path'] = 'charitable-pro/charitable-pro.php';
+						}
+					}
+					// Reindex array after any removal.
+					$category['addons'] = array_values( $category['addons'] );
 				}
-				// Reindex array after removal.
-				$category['addons'] = array_values( $category['addons'] );
+				unset( $category ); // Break the reference.
+				unset( $v ); // Break the reference.
+
+				// Defensive dedup: if both the legacy and canonical slugs were present
+				// server-side, the rename above could produce two `charitable-pro`
+				// entries. Keep only the first across all categories.
+				if ( $show_pro ) {
+					$seen_pro = false;
+					foreach ( $addon_categories as $slug => &$category ) {
+						if ( ! is_array( $category ) || ! isset( $category['addons'] ) || ! is_array( $category['addons'] ) ) {
+							continue;
+						}
+						foreach ( $category['addons'] as $k => &$v ) {
+							if ( is_array( $v ) && isset( $v['slug'] ) && 'charitable-pro' === $v['slug'] ) {
+								if ( $seen_pro ) {
+									unset( $category['addons'][ $k ] );
+								} else {
+									$seen_pro = true;
+								}
+							}
+						}
+						$category['addons'] = array_values( $category['addons'] );
+					}
+					unset( $category );
+					unset( $v );
+				}
+			} catch ( \Throwable $e ) {
+				// Fall back to the pre-1.8.10.5 behaviour: always hide both Pro slugs.
+				$addons_to_remove = array( 'charitable-pro-plugin', 'charitable-pro' );
+				if ( is_array( $addon_categories ) ) {
+					foreach ( $addon_categories as $slug => &$category ) {
+						if ( ! is_array( $category ) || ! isset( $category['addons'] ) || ! is_array( $category['addons'] ) ) {
+							continue;
+						}
+						foreach ( $category['addons'] as $k => &$v ) {
+							if ( is_array( $v ) && isset( $v['slug'] ) && in_array( $v['slug'], $addons_to_remove, true ) ) {
+								unset( $category['addons'][ $k ] );
+							}
+						}
+						$category['addons'] = array_values( $category['addons'] );
+					}
+					unset( $category );
+					unset( $v );
+				}
+				if ( function_exists( 'charitable_is_debug' ) && charitable_is_debug() ) {
+					error_log( 'CHARITABLE: Pro addon card gating failed: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				}
 			}
-			unset( $category ); // Break the reference.
-			unset( $v ); // Break the reference.
 			?>
 
 			<div id="charitable-addons">
@@ -723,6 +810,35 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 						$addon['action'] = 'install';
 					}
 				}
+
+				/*
+				 * Charitable Pro is available to every legitimate license tier (Basic,
+				 * Plus, Pro, Agency). The tier-match loop above would otherwise show
+				 * "Upgrade Now" to Basic/Plus customers because Pro's API license field
+				 * typically only lists `pro`. Override to "install" when the current
+				 * site has any valid license AND the API actually returned a usable
+				 * download_link — without a download_link the install step would fail,
+				 * so we fall back to the upgrade CTA in that case.
+				 *
+				 * Wrapped in try/catch so that a failure in the licence helper chain
+				 * (registry / vendor licence lookup) cannot fatal an admin page render.
+				 * On failure the card simply keeps whatever action the tier-match loop
+				 * above assigned — i.e. the original pre-1.8.10.5 behaviour.
+				 */
+				try {
+					if ( 'charitable-pro' === $addon['slug']
+						&& 'install' !== $addon['action']
+						&& function_exists( 'charitable_is_pro' )
+						&& charitable_is_pro()
+						&& ! empty( $addon['download_link'] ) ) {
+						$addon['status'] = 'missing';
+						$addon['action'] = 'install';
+					}
+				} catch ( \Throwable $e ) {
+					if ( function_exists( 'charitable_is_debug' ) && charitable_is_debug() ) {
+						error_log( 'CHARITABLE: Pro install-action override failed: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					}
+				}
 			} else { // phpcs:ignore
 				// Plugin is installed.
 				if ( $addon['is_active'] ) {
@@ -763,22 +879,55 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 			$status_label = $this->get_addon_status_label( $addon['status'] );
 
-			// get the icon/graphic.
-			$icon = isset( $addon['icon'] ) ? esc_url( $addon['icon'] ) : 'placeholder';
+			// Resolve the icon. Lookup order:
+			//   1. Local SVG  (assets/images/addons/addon-icon-{slug}.svg)
+			//   2. Local PNG  (assets/images/addons/addon-icon-{slug}.png)
+			//   3. API-supplied icon URL (so newly added addons show the right art
+			//      even before a local asset ships in a Lite release)
+			//   4. Stripe placeholder (last resort so the card never renders broken)
+			$icon_file_name   = str_replace( array( 'charitable-', '-banner' ), '', $addon['slug'] );
+			$assets_path_fs   = charitable()->get_path( 'assets', true ) . 'images/addons/';
+			$assets_path_url  = charitable()->get_path( 'assets', false ) . 'images/addons/';
+			$placeholder_icon = $assets_path_url . 'addon-icon-stripe.png';
 
-			$icon_file_name = str_replace( 'charitable-', '', $addon['slug'] );
-			$icon_file_name = str_replace( '-banner', '', $icon_file_name );
-
-			// Locate icon, if it exists.
-			if ( ! file_exists( charitable()->get_path( 'assets', true ) . 'images/addons/addon-icon-' . $icon_file_name . '.png' ) ) {
-				$icon = charitable()->get_path( 'assets', false ) . 'images/addons/addon-icon-stripe.png';
+			if ( file_exists( $assets_path_fs . 'addon-icon-' . $icon_file_name . '.svg' ) ) {
+				$icon = $assets_path_url . 'addon-icon-' . $icon_file_name . '.svg';
+			} elseif ( file_exists( $assets_path_fs . 'addon-icon-' . $icon_file_name . '.png' ) ) {
+				$icon = $assets_path_url . 'addon-icon-' . $icon_file_name . '.png';
+			} elseif ( ! empty( $addon['icon'] ) && filter_var( $addon['icon'], FILTER_VALIDATE_URL ) ) {
+				$icon = esc_url( $addon['icon'] );
 			} else {
-				$icon = charitable()->get_path( 'assets', false ) . 'images/addons/addon-icon-' . $icon_file_name . '.png';
+				$icon = $placeholder_icon;
 			}
 
 			// get the plugin description.
-			$sections       = unserialize( $addon['sections'] ); // phpcs:ignore
-			$description    = wp_strip_all_tags( ( $sections['description'] ) );
+			// Guard against a missing / malformed `sections` entry from the API so a
+			// single bad addon row can't blow up the whole directory render. Belt +
+			// suspenders: the conditions below handle normal failure modes, and the
+			// try/catch handles anything pathological.
+			$sections    = array();
+			$description = '';
+			try {
+				if ( isset( $addon['sections'] ) && is_string( $addon['sections'] ) && '' !== $addon['sections'] ) {
+					$maybe_sections = @unserialize( $addon['sections'], array( 'allowed_classes' => false ) ); // phpcs:ignore
+					if ( is_array( $maybe_sections ) ) {
+						$sections = $maybe_sections;
+					}
+				}
+				$description = wp_strip_all_tags( isset( $sections['description'] ) ? (string) $sections['description'] : '' );
+			} catch ( \Throwable $e ) {
+				$description = '';
+				if ( function_exists( 'charitable_is_debug' ) && charitable_is_debug() ) {
+					error_log( 'CHARITABLE: Addon description parse failed: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				}
+			}
+
+			// The wpcharitable.com addons API currently returns an empty description for
+			// the Charitable Pro entry. Provide a hard-coded fallback so the card always
+			// has a meaningful description on this screen.
+			if ( 'charitable-pro' === $addon['slug'] && '' === trim( $description ) ) {
+				$description = __( 'Charitable Pro is the upgraded version of your current Charitable plugin, with built-in features and compatibility for more advanced addons. Installing Pro will replace this Lite version while keeping all your existing settings and data.', 'charitable' );
+			}
 			$is_recommended = ( isset( $addon['featured'] ) && is_array( $addon['featured'] ) && in_array( 'recommended', $addon['featured'] ) ) ? true : false; // phpcs:ignore
 
 			// css.
@@ -789,8 +938,13 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			}
 
 			// Output the card.
-
-			$addon_name       = str_replace( 'Charitable ', '', $addon['name'] );
+			// Most addon cards strip the redundant "Charitable " prefix so the title
+			// reads cleanly (e.g. "Fee Relief" instead of "Charitable Fee Relief").
+			// The Pro card is the exception — without the brand name it just reads as
+			// "Pro", which is meaningless. Keep the full name only for that slug.
+			$addon_name       = ( 'charitable-pro' === $addon['slug'] )
+				? $addon['name']
+				: str_replace( 'Charitable ', '', $addon['name'] );
 			$landing_page_url = ! empty( $addon['homepage'] ) ? $addon['homepage'] : false;
 			$landing_page_url = false === $landing_page_url ? $addon['upgrade_url'] : $landing_page_url;
 			?>
@@ -798,7 +952,7 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 
 			<div class="charitable-addons-list-item <?php echo esc_attr( implode( ' ', $css ) ); ?>">
 				<div class="charitable-addons-list-item-header">
-					<img src="<?php echo esc_url( $icon ); ?>" alt="<?php echo esc_html( $addon['name'] ); ?> logo">
+					<img src="<?php echo esc_url( $icon ); ?>" alt="<?php echo esc_html( $addon['name'] ); ?> logo" onerror="this.onerror=null;this.src='<?php echo esc_url( $placeholder_icon ); ?>';">
 
 					<div class="charitable-addons-list-item-header-meta">
 						<div class="charitable-addons-list-item-header-meta-title">
@@ -819,7 +973,17 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 				<div class="charitable-addons-list-item-footer charitable-addons-list-item-footer-installed" data-plugin="<?php echo esc_attr( $addon['path'] ); ?>" data-type="addon">
 					<div>
 						<?php if ( ! empty( $addon['license'] ) ) : ?>
-						<span class="charitable-badge charitable-badge-lg charitable-badge-inline charitable-badge-titanium charitable-badge-rounded"><?php echo esc_html( end( $addon['license'] ) ); ?></span>
+						<?php
+						// The license badge defaults to the highest tier the addon is
+						// available in. Charitable Pro is available to every legitimate
+						// license tier, so showing the "Pro" tier label is misleading —
+						// surface "All Plans" instead so customers on Basic/Plus realise
+						// they can install it too.
+						$license_badge_text = ( 'charitable-pro' === $addon['slug'] )
+							? __( 'All Plans', 'charitable' )
+							: end( $addon['license'] );
+						?>
+						<span class="charitable-badge charitable-badge-lg charitable-badge-inline charitable-badge-titanium charitable-badge-rounded"><?php echo esc_html( $license_badge_text ); ?></span>
 						<?php endif; ?>
 					</div>
 

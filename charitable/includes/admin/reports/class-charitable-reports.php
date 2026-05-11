@@ -375,7 +375,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 								<p class="cr"><?php echo esc_html__( 'Goal', 'charitable' ); ?>: <strong><?php echo charitable_format_money( $donation_goal ); // phpcs:ignore ?></strong></p>
 								<?php endif; ?>
 								<?php if ( $end_date ) : ?>
-								<p class="cr"><?php echo esc_html__( 'End Date', 'charitable' ); ?>: <strong><?php echo $end_date; // phpcs:ignore ?></strong></p>
+								<p class="cr"><?php echo esc_html__( 'End Date', 'charitable' ); ?>: <strong><?php echo esc_html( $end_date ); ?></strong></p>
 								<?php endif; ?>
 							</div>
 						</div>
@@ -761,13 +761,13 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 				case 'charitable-failed':
 					$admin_campaign_url = ! empty( $activity->campaign_id ) ? charitable_get_admin_campaign_edit_url( $activity->campaign_id ) : '#';
 					$admin_donation_url = ! empty( $activity->item_id ) ? charitable_get_admin_donation_edit_url( $activity->item_id ) : false;
-					$campaign_title     = ! empty( $activity->campaign_title ) ? ' to <a target="_blank" href="' . $admin_campaign_url . '"><span class="campaign-title">' . $activity->campaign_title . '</span></a> ' : '';
+					$campaign_title     = ! empty( $activity->campaign_title ) ? ' to <a target="_blank" href="' . $admin_campaign_url . '"><span class="campaign-title">' . esc_html( $activity->campaign_title ) . '</span></a> ' : '';
 					$secondary_info     = $admin_donation_url ? '<p class="charitable-reports-activity-secondary-info amount"><a href="' . $admin_donation_url . '" target="_blank">' . charitable_format_money( $activity->amount, 2, true ) . '</a>' . $campaign_title . '</p>' : '<p class="charitable-reports-activity-secondary-info amount">' . charitable_format_money( $activity->amount, 2, true ) . $campaign_title . '</p>';
 					break;
 				default:
 					$admin_campaign_url = ! empty( $activity->campaign_id ) ? charitable_get_admin_campaign_edit_url( $activity->campaign_id ) : '#';
 					$admin_donation_url = ! empty( $activity->item_id ) ? charitable_get_admin_donation_edit_url( $activity->item_id ) : false;
-					$campaign_title     = ! empty( $activity->campaign_title ) ? ' to <a target="_blank" href="' . $admin_campaign_url . '"><span class="campaign-title">' . $activity->campaign_title . '</span></a> ' : '';
+					$campaign_title     = ! empty( $activity->campaign_title ) ? ' to <a target="_blank" href="' . $admin_campaign_url . '"><span class="campaign-title">' . esc_html( $activity->campaign_title ) . '</span></a> ' : '';
 					$secondary_info     = $admin_donation_url ? '<p class="charitable-reports-activity-secondary-info amount"><a href="' . $admin_donation_url . '" target="_blank">' . charitable_format_money( $activity->amount, 2, true ) . '</a>' . $campaign_title . '</p>' : '<p class="charitable-reports-activity-secondary-info amount">' . charitable_format_money( $activity->amount, 2, true ) . $campaign_title . '</p>';
 					break;
 			}
@@ -790,10 +790,10 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 
 			switch ( $activity->primary_action ) {
 				case 'update':
-					$secondary_info = '<p class="campaign-title">' . $activity->campaign_title . '</p>';
+					$secondary_info = '<p class="campaign-title">' . esc_html( $activity->campaign_title ) . '</p>';
 					break;
 				default:
-					$secondary_info = '<p class="campaign-title">' . $activity->campaign_title . '</p>';
+					$secondary_info = '<p class="campaign-title">' . esc_html( $activity->campaign_title ) . '</p>';
 					break;
 			}
 

@@ -234,132 +234,185 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 		public function retrieve_sections_for_user( array $sections = array() ): array {
 
 			$sections = array(
+				// Hero: Mini Donation Widget upsell with Vimeo video.
+				array(
+					'new-for-pro' => true,
+					'layout'      => 'fifty-fifty',
+					'class'       => 'no-order',
+					'title'       => __( 'Mini Donation Widget', 'charitable' ),
+					'content'     => __( 'Embed a compact donation form anywhere on your site, no page redirect required. Add it to sidebars, landing pages, or any widget area using a simple block or shortcode.', 'charitable' ),
+					'video'       => array(
+						'vimeo_id' => '1186687749',
+					),
+					'buttons'     => array(
+						'main'      => array(
+							'text' => __( 'Get Started', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/documentation/mini-donation-widget/', 'splash-modal', 'Mini Donation Widget Main' ),
+						),
+						'upgrade'   => array(
+							'text' => __( 'Upgrade to Pro', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/lite-upgrade/', 'splash-modal', 'Mini Donation Widget Upgrade' ),
+						),
+					),
+				),
+				// 1.8.10 lite headline feature.
+				array(
+					'new'     => true,
+					'version' => '1.8.10',
+					'layout'  => 'one-third-two-thirds',
+					'class'   => 'no-order',
+					'title'   => __( 'Migration & Import Tools', 'charitable' ),
+					'content' => __( 'Move from GiveWP or GiveButter to Charitable in minutes. Expanded import tools include CSV donations import and a new GiveWP Migration Tool (Beta) under a redesigned, tabbed interface.', 'charitable' ),
+					'img'     => array(
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-10-import-tools.svg',
+						'shadow' => 'none',
+					),
+					'buttons' => array(
+						'main'      => array(
+							'text' => __( 'Get Started', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/how-to-switch-from-givewp-to-charitable/', 'splash-modal', 'Import Tools Main' ),
+						),
+					),
+				),
+				// 1.8.9 lite security feature (kept).
 				array(
 					'new'     => true,
 					'version' => '1.8.9',
-					'layout'  => 'fifty-fifty',
+					'layout'  => 'one-third-two-thirds',
 					'class'   => 'no-order',
 					'title'   => __( 'Security Enhancements', 'charitable' ),
 					'content' => __( 'Charitable Lite now supports Google reCAPTCHA, hCaptcha, and Cloudflare Turnstile for improved security.', 'charitable' ),
 					'img'     => array(
-						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-9-security.png',
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-9-security.svg',
 						'shadow' => 'none',
 					),
 					'buttons' => array(
 						'main'      => array(
 							'text' => __( 'Get Started', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/get-started/1-8-9-security/', 'splash-modal', 'Square Widgets Main' ),
-						),
-						'secondary' => array(
-							'text' => __( 'Learn More', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/learn-more/1-8-9-security/', 'splash-modal', 'Square Widgets Secondary' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/introducing-improved-security-and-clean-donation-tool/', 'splash-modal', 'Security Main' ),
 						),
 					),
 				),
+				// Pro upsells.
 				array(
-					'new'     => true,
-					'version' => '1.8.8',
-					'layout'  => 'fifty-fifty',
-					'class'   => 'no-order',
-					'title'   => __( 'New Dashboard!', 'charitable' ),
-					'content' => __( 'Charitable now has a new dashboard design with top campaigns, latest donations, top donors, and comments. New "30 Day" period added.', 'charitable' ),
-					'img'     => array(
-						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-8-dashboard.png',
+					'new-for-pro' => true,
+					'layout'      => 'one-third-two-thirds',
+					'class'       => 'no-order',
+					'title'       => __( 'Campaign Showcase', 'charitable' ),
+					'content'     => __( 'Display all your campaigns beautifully with full layout control including grid, list, or masonry. No coding required.', 'charitable' ),
+					'img'         => array(
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-13-campaign-showcase.png',
 						'shadow' => 'none',
 					),
-					'buttons' => array(
+					'buttons'     => array(
 						'main'      => array(
 							'text' => __( 'Get Started', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/get-started/square/', 'splash-modal', 'Square Widgets Main' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/campaign-showcase-getting-started/', 'splash-modal', 'Campaign Showcase Main' ),
 						),
-						'secondary' => array(
-							'text' => __( 'Learn More', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/learn-more/square/', 'splash-modal', 'Square Widgets Secondary' ),
+						'upgrade'   => array(
+							'text' => __( 'Upgrade to Pro', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/lite-upgrade/', 'splash-modal', 'Campaign Showcase Upgrade' ),
 						),
 					),
 				),
 				array(
 					'new-for-pro' => true,
-					'layout'    => 'one-third-two-thirds-flipped',
-					'class'     => 'no-order',
-					'title'     => __( 'Advanced Elementor Widgets', 'charitable' ),
-					'content'   => __( 'When you create pages with the Elementor page builder, you\'ll now find four ready-made Charitable widgets (campaigns, donation button, donation form, campaigns).', 'charitable' ),
-					'img'       => array(
-						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-8-elementor.png',
+					'layout'      => 'one-third-two-thirds',
+					'class'       => 'no-order',
+					'title'       => __( 'Donations Feed', 'charitable' ),
+					'content'     => __( 'Display recent donations in beautiful list or card views with sorting, filtering, pagination, and live polling that automatically refreshes when new donations arrive.', 'charitable' ),
+					'img'         => array(
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-13-donate-feed.png',
 						'shadow' => 'none',
 					),
-					'buttons'   => array(
+					'buttons'     => array(
 						'main'      => array(
 							'text' => __( 'Get Started', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/documentation/how-to-use-charitable-widgets-in-elementor/', 'splash-modal', 'Elementor Widgets Main' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/donations-feed-getting-started/', 'splash-modal', 'Donations Feed Main' ),
 						),
-						'secondary' => array(
-							'text' => __( 'Learn More', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/introducing-charitable-1-8-6-elementor-widgets-reply-to-and-new-splash-screen/', 'splash-modal', 'Elementor Widgets Secondary' ),
+						'upgrade'   => array(
+							'text' => __( 'Upgrade to Pro', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/lite-upgrade/', 'splash-modal', 'Donations Feed Upgrade' ),
 						),
 					),
 				),
 				array(
-					'new-addon' => true,
-					'layout'    => 'one-third-two-thirds',
-					'class'     => 'no-order',
-					'title'     => __( 'DonorTrust', 'charitable' ),
-					'content'   => __( 'Showcase real-time, verified donations to your website visitors and encourage more people to donate to your cause.', 'charitable' ),
-					'img'       => array(
-						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-8-donortrust.gif',
+					'new-for-pro' => true,
+					'layout'      => 'one-third-two-thirds',
+					'class'       => 'no-order',
+					'title'       => __( 'Campaign Modal Button', 'charitable' ),
+					'content'     => __( 'Add a donate button anywhere on your site that opens a donation form in a modal popup, no page redirect required. Available as a block or shortcode.', 'charitable' ),
+					'img'         => array(
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-13-modal-button.png',
 						'shadow' => 'none',
 					),
-					'buttons'   => array(
+					'buttons'     => array(
 						'main'      => array(
 							'text' => __( 'Get Started', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/documentation/charitable-donortrust/', 'splash-modal', 'DonorTrust Main' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/campaign-modal-button-getting-started/', 'splash-modal', 'Campaign Modal Button Main' ),
 						),
-						'secondary' => array(
-							'text' => __( 'Learn More', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/introducing-donortrust/', 'splash-modal', 'DonorTrust Secondary' ),
+						'upgrade'   => array(
+							'text' => __( 'Upgrade to Pro', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/lite-upgrade/', 'splash-modal', 'Campaign Modal Button Upgrade' ),
 						),
 					),
 				),
 				array(
-					'new-for-pro'     => true,
-					'layout'  => 'one-third-two-thirds-flipped',
-					'class'   => 'no-order',
-					'title'   => __( 'More Stripe Options!', 'charitable' ),
-					'content' => __( 'Charitable now supports ACH Direct Debit, SEPA Direct Debit, Cash App, and BECS Direct Debit for Stripe users.', 'charitable' ),
-					'img'     => array(
-						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-8-stripe.png',
+					'new-for-pro' => true,
+					'layout'      => 'one-third-two-thirds',
+					'class'       => 'no-order',
+					'title'       => __( 'Prefill Donation Forms', 'charitable' ),
+					'content'     => __( 'Pre-populate donation form fields via URL query strings. Perfect for email campaigns, targeted landing pages, and personalized donor outreach.', 'charitable' ),
+					'img'         => array(
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-13-prefill-forms.png',
 						'shadow' => 'none',
 					),
-					'buttons' => array(
+					'buttons'     => array(
 						'main'      => array(
 							'text' => __( 'Get Started', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/introducing-charitable-1-8-8/', 'splash-modal', 'Square Widgets Main' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/prefill-donation-forms-getting-started/', 'splash-modal', 'Prefill Donation Forms Main' ),
 						),
-						'secondary' => array(
-							'text' => __( 'Learn More', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/introducing-charitable-1-8-8/', 'splash-modal', 'Square Widgets Secondary' ),
+						'upgrade'   => array(
+							'text' => __( 'Upgrade to Pro', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/lite-upgrade/', 'splash-modal', 'Prefill Donation Forms Upgrade' ),
 						),
 					),
 				),
 				array(
-					'new-addon' => true,
-					'layout'    => 'one-third-two-thirds',
-					'class'     => 'no-order',
-					'title'     => __( 'Google Analytics', 'charitable' ),
-					'content'   => __( 'The new Google Analytics addon means you can track your campaign performance and see how your donors are engaging with your campaign.', 'charitable' ),
-					'img'       => array(
-						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-7-ga.png',
+					'new-for-pro' => true,
+					'layout'      => 'one-third-two-thirds',
+					'class'       => 'no-order',
+					'title'       => __( 'Campaign Featured Image', 'charitable' ),
+					'content'     => __( 'Set your campaign\'s featured image directly from the Campaign Builder. No need to switch to the post editor. Perfect for giving your campaigns a polished, visual identity.', 'charitable' ),
+					'img'         => array(
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-13-featured-image.png',
 						'shadow' => 'none',
 					),
-					'buttons'   => array(
+					'buttons'     => array(
 						'main'      => array(
 							'text' => __( 'Get Started', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/get-started/google-analytics/', 'splash-modal', 'GA Main' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/campaign-featured-image-getting-started/', 'splash-modal', 'Campaign Featured Image Main' ),
 						),
-						'secondary' => array(
-							'text' => __( 'Learn More', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/learn-more/google-analytics/', 'splash-modal', 'GA Secondary' ),
+						'upgrade'   => array(
+							'text' => __( 'Upgrade to Pro', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/lite-upgrade/', 'splash-modal', 'Campaign Featured Image Upgrade' ),
 						),
+					),
+				),
+				// Two-column "More Recent Features" list.
+				array(
+					'layout' => 'more-features',
+					'class'  => 'no-order',
+					'title'  => __( 'More Recent Features:', 'charitable' ),
+					'items'  => array(
+						__( 'Campaign Selector', 'charitable' ),
+						__( 'Envira Gallery Integration', 'charitable' ),
+						__( 'Visual Form Builder', 'charitable' ),
+						__( 'Donor Leaderboards', 'charitable' ),
+						__( 'Magic Donor Dashboard Link', 'charitable' ),
+						__( 'DIVI Integration', 'charitable' ),
+						__( 'DonorTrust', 'charitable' ),
+						__( 'Google Analytics', 'charitable' ),
 					),
 				),
 			);
@@ -525,20 +578,20 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 			// If the chartiable_pro is active, that means they are licensed but not using Charitable Pro plugin.
 			if ( ! charitable_is_pro() ) :
 				$default_data['footer'] = array(
-					'title'       => __( 'Add Your License To Activate Charitable Pro Plugin Now!', 'charitable' ),
+					'title'       => __( 'Add Your License To Activate Charitable Pro Plugin Now And Start Getting More Donations!', 'charitable' ),
 					'description' => __( 'Charitable Pro is a powerful upgrade that allows you to manage donors along with built-in features like videos, donor comments, PDF receipts, a dashboard for donors, and more.', 'charitable' ),
 					'upgrade'     => array(
 						'text' => __( 'Learn More', 'charitable' ),
-						'url'  => charitable_utm_link( 'https://www.wpcharitable.com/introducing-charitable-pro/', 'splash-modal', 'learn-more' ),
+						'url'  => charitable_utm_link( 'https://www.wpcharitable.com/lite-upgrade/', 'splash-modal', 'learn-more' ),
 					),
 				);
 			else :
 				$default_data['footer'] = array(
-					'title'       => __( 'Thank you for using Charitable Pro!', 'charitable' ),
-					'description' => __( 'We hope you love the new features and updates we\'ve made to Charitable Pro. Learn more about the latest updates and improvements.', 'charitable' ),
+					'title'       => __( 'Upgrade To The Charitable Pro Plugin At No Cost!', 'charitable' ),
+					'description' => __( 'Registered users with active license can upgrade to Charitable Pro plugin at NO COST. It\'s included in all plans (basic, plus, pro, elite).', 'charitable' ),
 					'upgrade'     => array(
 						'text' => __( 'Learn More', 'charitable' ),
-						'url'  => charitable_utm_link( 'https://www.wpcharitable.com/blog/', 'splash-modal', 'learn-more' ),
+						'url'  => charitable_utm_link( 'https://www.wpcharitable.com/pricing/upgrade-lite-to-pro/', 'splash-modal', 'learn-more' ),
 					),
 				);
 			endif;

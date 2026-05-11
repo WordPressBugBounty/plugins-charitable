@@ -493,7 +493,7 @@ body.post-type-campaign.charitable-trash #delete_all {
 
 @media screen and (max-width: 1200px) {
   body.post-type-campaign form#posts-filter .tablenav.top {
-    max-width: 500px;
+    /* max-width: 500px; */
     display: table;
   }
   body.post-type-campaign form#posts-filter .tablenav.top select {
@@ -553,6 +553,17 @@ body.post-type-campaign.charitable-trash #delete_all {
   body.charitable_page_charitable-dashboard .tablenav .view-switch {
     display: block !important;
     width: 100%;
+  }
+}
+/*
+ * Override the margin-top: 46px rule above for the campaign header — keep it
+ * flush against the admin bar at narrow viewports rather than leaving an
+ * empty 46px gap. Cascade order makes this rule win at <=782px since both
+ * media queries match and this one is declared later.
+ */
+@media screen and (max-width: 782px) {
+  body.post-type-campaign.admin-bar #charitable-admin-header {
+    margin-top: 0;
   }
 }
 @media screen and (max-width: 600px) {

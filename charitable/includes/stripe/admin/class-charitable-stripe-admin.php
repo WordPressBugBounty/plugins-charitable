@@ -770,6 +770,8 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 			if ( $result ) {
 				// Clear the migration failure transient if it exists.
 				delete_transient( 'charitable_stripe_signing_secret_migration_failed' );
+				// Clear the failure counter — signing secret is fresh, past failures are no longer relevant.
+				delete_transient( 'charitable_stripe_webhook_verification_failures' );
 
 				wp_send_json_success(
 					array(

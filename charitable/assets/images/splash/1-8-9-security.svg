@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 830 600" fill="none" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+	<!-- Background -->
+	<rect width="830" height="600" fill="#f3f4f6"/>
+
+	<!-- Card shadow -->
+	<rect x="92" y="58" width="646" height="440" rx="14" fill="#000" opacity="0.06"/>
+	<rect x="90" y="56" width="646" height="440" rx="14" fill="#000" opacity="0.04"/>
+
+	<!-- Card -->
+	<rect x="90" y="54" width="650" height="440" rx="14" fill="#ffffff"/>
+
+	<!-- Header bar -->
+	<path d="M90,68 Q90,54 104,54 H726 Q740,54 740,68 V118 H90 Z" fill="#1d2327"/>
+	<text x="415" y="92" text-anchor="middle" fill="#ffffff" font-size="17" font-weight="600">Make a Donation</text>
+
+	<!-- Donation amount label -->
+	<text x="124" y="156" fill="#6b7280" font-size="11" font-weight="700" letter-spacing="0.8">DONATION AMOUNT</text>
+
+	<!-- Donation amount field (highlighted) -->
+	<rect x="120" y="166" width="590" height="48" rx="6" fill="#fff7ed" stroke="#e27730" stroke-width="1.5"/>
+	<text x="140" y="197" fill="#1d2327" font-size="20" font-weight="700">$100.00</text>
+
+	<!-- Email label -->
+	<text x="124" y="248" fill="#6b7280" font-size="11" font-weight="700" letter-spacing="0.8">EMAIL ADDRESS</text>
+
+	<!-- Email field -->
+	<rect x="120" y="258" width="590" height="48" rx="6" fill="#f9fafb" stroke="#e5e7eb"/>
+	<text x="140" y="288" fill="#9ca3af" font-size="14">your@email.com</text>
+
+	<!-- Captcha widget -->
+	<rect x="120" y="332" width="320" height="76" rx="6" fill="#f9fafb" stroke="#d1d5db"/>
+
+	<!-- Checkbox with check -->
+	<rect x="140" y="356" width="28" height="28" rx="4" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>
+	<path d="M146,370 l6,6 11,-11" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+	<text x="184" y="375" fill="#1d2327" font-size="14">I'm not a robot</text>
+
+	<!-- reCAPTCHA-style brand badge -->
+	<g transform="translate(382,344)">
+		<!-- Rotational arrows icon -->
+		<g stroke="#1c4587" stroke-width="2.4" fill="none" stroke-linecap="round">
+			<path d="M22,8 a14,14 0 0 1 13,9"/>
+			<path d="M36,22 a14,14 0 0 1 -13,14"/>
+			<path d="M22,36 a14,14 0 0 1 -13,-9"/>
+			<path d="M8,22 a14,14 0 0 1 13,-14"/>
+		</g>
+		<polygon points="35,15 35,21 29,18" fill="#1c4587"/>
+		<polygon points="9,29 9,23 15,26" fill="#1c4587"/>
+		<text x="22" y="58" text-anchor="middle" fill="#5f6368" font-size="9" font-weight="600">reCAPTCHA</text>
+		<text x="22" y="68" text-anchor="middle" fill="#9aa0a6" font-size="7">Privacy &#183; Terms</text>
+	</g>
+
+	<!-- Captcha "Active" badge in top right of captcha box -->
+	<rect x="376" y="338" width="58" height="22" rx="11" fill="#dcfce7"/>
+	<text x="405" y="354" text-anchor="middle" fill="#166534" font-size="10" font-weight="700">ACTIVE</text>
+
+	<!-- Donate button -->
+	<rect x="120" y="426" width="590" height="50" rx="6" fill="#e27730"/>
+	<text x="415" y="458" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">Donate $100  &#8594;</text>
+
+	<!-- Bottom: provider badges row -->
+	<text x="415" y="530" text-anchor="middle" fill="#6b7280" font-size="12" font-weight="500">Spam protection enabled</text>
+
+	<!-- reCAPTCHA pill -->
+	<g transform="translate(190,544)">
+		<rect width="130" height="36" rx="18" fill="#ffffff" stroke="#e5e7eb"/>
+		<circle cx="22" cy="18" r="10" fill="none" stroke="#1c4587" stroke-width="2"/>
+		<path d="M22,8 v10 l7,0" stroke="#1c4587" stroke-width="2" stroke-linecap="round" fill="none"/>
+		<text x="40" y="23" fill="#1d2327" font-size="12" font-weight="600">reCAPTCHA</text>
+	</g>
+
+	<!-- hCaptcha pill -->
+	<g transform="translate(330,544)">
+		<rect width="120" height="36" rx="18" fill="#ffffff" stroke="#e5e7eb"/>
+		<circle cx="22" cy="18" r="11" fill="#0074bf"/>
+		<text x="22" y="23" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="800">h</text>
+		<text x="40" y="23" fill="#1d2327" font-size="12" font-weight="600">hCaptcha</text>
+	</g>
+
+	<!-- Turnstile pill -->
+	<g transform="translate(460,544)">
+		<rect width="180" height="36" rx="18" fill="#ffffff" stroke="#e5e7eb"/>
+		<!-- Cloudflare-style cloud -->
+		<g transform="translate(10,8)">
+			<path d="M5,15 q-4,0 -4,-4 q0,-3 3,-4 q1,-3 5,-3 q4,0 5,3 h2 q3,0 3,3 q0,2 -2,3 z" fill="#f48120"/>
+			<path d="M9,17 q-3,0 -3,-3 q0,-2 2,-3 q1,-2 4,-2 q3,0 4,2 h1 q2,0 2,2 q0,2 -2,2 z" fill="#fbad41"/>
+		</g>
+		<text x="40" y="23" fill="#1d2327" font-size="12" font-weight="600">Cloudflare Turnstile</text>
+	</g>
+</svg>

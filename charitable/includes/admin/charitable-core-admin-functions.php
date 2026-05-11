@@ -1208,13 +1208,23 @@ function charitable_ajax_install_addon() {
 			// attempt to activate the installed addon, save the user a step.
 			$activate = activate_plugins( $plugin_basename );
 			if ( ! is_wp_error( $activate ) ) {
-				wp_send_json_success(
-					array(
-						'basename'     => $plugin_basename,
-						'is_activated' => true,
-						'msg'          => esc_html__( 'Addon installed and activated.', 'charitable' ),
-					)
+				$response = array(
+					'basename'     => $plugin_basename,
+					'is_activated' => true,
+					'msg'          => esc_html__( 'Addon installed and activated.', 'charitable' ),
 				);
+
+				// When Charitable Pro is what was just installed and activated, point
+				// the user at the Charitable dashboard. Activating Pro auto-deactivates
+				// Lite, which means the addons screen they're currently on (served by
+				// Lite) no longer exists in the menu — without a redirect they'd land
+				// on a 404 / blank admin page once the AJAX returns. Pro's main file
+				// lives at charitable-pro/charitable.php, so we match by directory.
+				if ( 0 === strpos( $plugin_basename, 'charitable-pro/' ) ) {
+					$response['redirect'] = admin_url( 'admin.php?page=charitable-dashboard' );
+				}
+
+				wp_send_json_success( $response );
 			} else {
 				wp_send_json_success(
 					array(
@@ -1530,6 +1540,22 @@ function charitable_disable_dashboard_notification_ajax() {
 		// add a 'dismissed' key to the notification with the current time.
 		$notifications[ $notification_id ]['dismissed'] = time();
 		update_option( 'charitable_dashboard_notifications', $notifications );
+
+		/**
+		 * Fires after a dashboard rail notification has been dismissed.
+		 *
+		 * Listeners can attach side effects keyed off the dismissed slug —
+		 * e.g. the resume-setup-wizard module clears
+		 * `charitable_started_onboarding` when its banner is dismissed,
+		 * so the underlying onboarding state is also turned off, not just
+		 * the banner.
+		 *
+		 * @since 1.8.10.5
+		 *
+		 * @param string $notification_id Slug of the dismissed notification.
+		 */
+		do_action( 'charitable_dashboard_notification_dismissed', $notification_id );
+
 		wp_send_json_success( array( 'message' => esc_html__( 'Notification removed.', 'charitable' ) ) );
 	} else {
 		wp_send_json_error( array( 'message' => esc_html__( 'Notification not found.', 'charitable' ) ) );

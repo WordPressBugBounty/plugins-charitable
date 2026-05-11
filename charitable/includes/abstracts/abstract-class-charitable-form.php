@@ -632,7 +632,7 @@ if ( ! class_exists( 'Charitable_Form' ) ) :
 				'Charitable_Public_Form_View::get_template_name()'
 			);
 
-			return $form->view()->get_template_name( $field );
+			return $this->view()->get_template_name( $field );
 		}
 
 		/**

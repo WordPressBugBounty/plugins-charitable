@@ -93,12 +93,49 @@ const CharitableAdminSplash = window.CharitableAdminSplash || ( function( docume
 				onOpen() {
 					$( '.jconfirm' ).css( 'bottom', 0 );
 					$( '.charitable-dash-widget-welcome-block' ).remove();
+					app.injectVideoEmbeds();
 				},
 				onDestroy() {
 					$( 'body' )
 						.removeClass( 'charitable-splash-modal' )
 						.css( '--charitable-body-scrollbar-width', null );
 				},
+			} );
+		},
+
+		/**
+		 * Inject video iframes into placeholder divs.
+		 *
+		 * The PHP template renders empty divs with data-vimeo-id; we build the
+		 * iframe client-side because admin output filters can strip server-rendered
+		 * iframes from the response.
+		 *
+		 * @since 1.8.10.6
+		 */
+		injectVideoEmbeds() {
+			$( '.charitable-splash-video-embed[data-vimeo-id]' ).each( function() {
+				const $el = $( this );
+
+				if ( $el.children( 'iframe' ).length ) {
+					return;
+				}
+
+				const id = String( $el.attr( 'data-vimeo-id' ) || '' ).replace( /[^0-9]/g, '' );
+
+				if ( ! id ) {
+					return;
+				}
+
+				const title = $el.attr( 'data-video-title' ) || '';
+				const iframe = document.createElement( 'iframe' );
+
+				iframe.src = 'https://player.vimeo.com/video/' + id + '?autoplay=1&muted=1&controls=1&dnt=1';
+				iframe.setAttribute( 'frameborder', '0' );
+				iframe.setAttribute( 'allow', 'autoplay; fullscreen; picture-in-picture' );
+				iframe.setAttribute( 'allowfullscreen', '' );
+				iframe.setAttribute( 'title', title );
+
+				$el.append( iframe );
 			} );
 		},
 	};
