@@ -54,6 +54,7 @@ if ( ! class_exists( 'Charitable_Cron' ) ) :
 		 */
 		private function __construct() {
 			add_action( 'charitable_daily_scheduled_events', array( $this, 'check_expired_campaigns' ) );
+			add_action( 'charitable_daily_scheduled_events', array( $this, 'cleanup_old_logs' ) );
 		}
 
 		/**
@@ -107,6 +108,36 @@ if ( ! class_exists( 'Charitable_Cron' ) ) :
 
 			foreach ( $campaigns as $campaign_id ) {
 				do_action( 'charitable_campaign_end', $campaign_id );
+			}
+		}
+
+		/**
+		 * Cleanup old log records based on retention setting.
+		 *
+		 * @since 1.8.11
+		 *
+		 * @return void
+		 */
+		public function cleanup_old_logs() {
+			if ( ! class_exists( 'Charitable_Log' ) ) {
+				return;
+			}
+
+			$days = Charitable_Log::get_retention_days();
+
+			/**
+			 * Filter the number of days to retain log records.
+			 *
+			 * @since 1.8.11
+			 *
+			 * @param int $days Number of days to retain.
+			 */
+			$days = apply_filters( 'charitable_logs_retention_days', $days );
+
+			$db = Charitable_Log::get_instance()->get_db();
+
+			if ( $db->table_exists() ) {
+				$db->delete_older_than( $days );
 			}
 		}
 	}

@@ -91,8 +91,10 @@ class Charitable_Skin extends WP_Upgrader_Skin {
 
 			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
 				// phpcs:disable
-				error_log( 'Charitable: There was an error installing the addon' );
-				error_log( print_r( $errors, true ) ); // phpcs:ignore
+				if ( charitable_is_debug() ) {
+					error_log( 'Charitable: There was an error installing the addon' );
+					error_log( print_r( $errors, true ) ); // phpcs:ignore
+				}
 				// phpcs:enable
 			}
 

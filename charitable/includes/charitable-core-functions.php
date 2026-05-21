@@ -1072,3 +1072,5 @@ function charitable_square_legacy_mode() {
 function charitable_is_square_addon_active() {
 	return is_plugin_active( 'charitable-square/charitable-square.php' );
 }
+
+require_once dirname( __FILE__ ) . '/logger/charitable-log-functions.php';

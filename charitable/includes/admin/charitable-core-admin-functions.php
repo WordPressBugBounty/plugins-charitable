@@ -444,7 +444,7 @@ function charitable_add_footer_text( $footer_text ) {
 		__( 'Please rate %1$sCharitable%2$s %3$s★★★★★%4$s on %3$sWordPress.org%4$s to help us spread the word. Thank you from the Charitable team!', 'charitable' ),
 		'<strong>',
 		'</strong>',
-		'<a href="https://wordpress.org/support/plugin/charitable/reviews/#new-post" rel="noopener noreferrer" target="_blank">',
+		'<a href="https://wpcharitable.com/charitable-admin-review/" rel="noopener noreferrer" target="_blank">',
 		'</a>'
 	);
 }
@@ -1146,9 +1146,11 @@ function charitable_ajax_install_addon() {
 		}
 
 		if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-			error_log( 'charitable_ajax_install_addon' ); // phpcs:ignore
-			error_log( print_r( $_POST, true ) ); // phpcs:ignore
-			error_log( print_r( $download_url, true ) ); // phpcs:ignore
+			if ( charitable_is_debug() ) {
+				error_log( 'charitable_ajax_install_addon' ); // phpcs:ignore
+				error_log( print_r( $_POST, true ) ); // phpcs:ignore
+				error_log( print_r( $download_url, true ) ); // phpcs:ignore
+			}
 		}
 
 		// Set the current screen to avoid undefined notices.

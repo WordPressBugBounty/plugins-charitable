@@ -1617,7 +1617,9 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 				update_option( 'charitable_activate_pro', true );
 			} else {
 			// Log this for debugging
-			error_log( 'Charitable: Pro plugin not found during setup completion - skipping Pro activation' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			if ( charitable_is_debug() ) {
+				error_log( 'Charitable: Pro plugin not found during setup completion - skipping Pro activation' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			}
 			}
 
 			wp_send_json_success(
@@ -1838,7 +1840,9 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 			$settings[ $setting ] = $value;
 
 			if ( defined( 'CHARITABLE_DEBUG_SETUP' ) ) {
-				error_log( 'Charitable Setup: Updated ' . $setting . ' to ' . $value ); // phpcs:ignore
+				if ( charitable_is_debug() ) {
+					error_log( 'Charitable Setup: Updated ' . $setting . ' to ' . $value ); // phpcs:ignore
+				}
 			}
 
 			update_option( 'charitable_settings', $settings );
@@ -1862,7 +1866,9 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 					if ( ! key_exists( 'donation_receipt', $enabled_emails ) ) {
 						$enabled_emails['donation_receipt'] = 'Charitable_Email_Donation_Receipt';
 						if ( defined( 'CHARITABLE_DEBUG_SETUP' ) ) {
-							error_log( 'Charitable Setup: Added donation_receipt to enabled_emails' ); // phpcs:ignore
+							if ( charitable_is_debug() ) {
+								error_log( 'Charitable Setup: Added donation_receipt to enabled_emails' ); // phpcs:ignore
+							}
 						}
 					}
 					break;
@@ -1870,7 +1876,9 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 					if ( ! key_exists( 'new_donation', $enabled_emails ) ) {
 						$enabled_emails['new_donation'] = 'Charitable_Email_New_Donation';
 						if ( defined( 'CHARITABLE_DEBUG_SETUP' ) ) {
-							error_log( 'Charitable Setup: Added new_donation to enabled_emails' ); // phpcs:ignore
+							if ( charitable_is_debug() ) {
+								error_log( 'Charitable Setup: Added new_donation to enabled_emails' ); // phpcs:ignore
+							}
 						}
 					}
 					break;

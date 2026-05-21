@@ -119,7 +119,7 @@ $classes_output = charitable_sanitize_classes( $classes, true );
 					data-vimeo-id="<?php echo esc_attr( $vimeo_id ); ?>"
 					data-video-title="<?php echo esc_attr( $section['title'] ); ?>"></div>
 			<?php elseif ( ! empty( $section['video']['url'] ) ) : ?>
-				<video autoplay muted playsinline controls>
+				<video muted playsinline controls preload="metadata">
 					<source src="<?php echo esc_url( $section['video']['url'] ); ?>" type="video/mp4">
 				</video>
 			<?php endif; ?>

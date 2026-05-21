@@ -5401,3 +5401,52 @@ tr.charitable-settings-field.charitable-test-mode-checkbox.charitable-test-mode-
   margin: auto !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+
+/* Payment Gateways tab — 1.8.11: help icons + additional gateways link. */
+.charitable-gateway .gateway-logo-name .charitable-gateway-help {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+  text-decoration: none;
+  line-height: 1;
+  color: #8c8f94;
+  position: relative;
+  left: -12px;
+}
+.charitable-gateway .gateway-logo-name .charitable-gateway-help:hover,
+.charitable-gateway .gateway-logo-name .charitable-gateway-help:focus {
+  color: #2271b1;
+  text-decoration: none;
+}
+.charitable-gateway .gateway-logo-name .charitable-gateway-help .dashicons {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  line-height: 1;
+  vertical-align: middle;
+}
+body.charitable-settings-page-gateways .charitable-admin-ui.charitable-admin-ui-field.charitable-admin-ui-toggle {
+  margin-top: 5px;
+  align-items: baseline;
+}
+.charitable-settings-page-gateways .charitable-gateways-additional-link {
+  margin-top: 30px !important;
+  margin-bottom: 0 !important;
+}
+.charitable-settings-page-gateways .charitable-settings-object {
+  max-width: 925px;
+}
+body.charitable_page_charitable-settings tr.charitable-test-mode-checkbox > th[scope="row"],
+body.charitable-settings-page-gateways tr.charitable-test-mode-checkbox > th[scope="row"] {
+  min-width: 200px !important;
+}
+body.charitable_page_charitable-settings .charitable-settings-field.charitable-test-mode-checkbox,
+body.charitable-settings-page-gateways .charitable-settings-field.charitable-test-mode-checkbox {
+  align-items: baseline !important;
+  padding-left: 0 !important;
+}
+body.charitable_page_charitable-settings .charitable-settings-field.charitable-test-mode-checkbox h4,
+body.charitable-settings-page-gateways .charitable-settings-field.charitable-test-mode-checkbox h4 {
+  width: 180px !important;
+  padding-right: 20px !important;
+}

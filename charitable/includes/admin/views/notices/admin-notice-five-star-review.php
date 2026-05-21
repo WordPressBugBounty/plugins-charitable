@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$charitable_feedback_url = 'https://wordpress.org/support/plugin/charitable/reviews/#new-post';
+$charitable_feedback_url = 'https://wpcharitable.com/charitable-admin-review/';
 
 ?><div class="charitable-admin-notice-five-star-rating" data-step="1" data-id="five-star-review">
 	<p style="margin: 0;">
@@ -82,7 +82,7 @@ $charitable_feedback_url = 'https://wordpress.org/support/plugin/charitable/revi
 	</p>
 
 	<p style="display: flex; align-items: center;">
-		<a href="https://wordpress.org/support/plugin/charitable/reviews/#new-post" class="button button-link charitable-notice-dismiss" target="_blank" rel="noopener noreferrer">
+		<a href="https://wpcharitable.com/charitable-admin-review/" class="button button-link charitable-notice-dismiss" target="_blank" rel="noopener noreferrer">
 			<?php esc_html_e( 'Ok, you deserve it', 'charitable' ); ?>
 		</a>
 

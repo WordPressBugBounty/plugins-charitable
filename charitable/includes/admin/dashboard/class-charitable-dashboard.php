@@ -3555,7 +3555,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 					<footer class="charitable-dashboard-v2-quick-access-footer">
 						<div class="charitable-dashboard-v2-quick-access-footer-content">
 							<div class="charitable-dashboard-v2-quick-access-footer-left">
-								<a href="https://wordpress.org/support/plugin/charitable/reviews/#new-post" class="charitable-dashboard-v2-rate-link" target="_blank" rel="noopener noreferrer">
+								<a href="https://wpcharitable.com/charitable-admin-review/" class="charitable-dashboard-v2-rate-link" target="_blank" rel="noopener noreferrer">
 									<span class="charitable-dashboard-v2-rate-text">Rate us 5 stars</span>
 									<svg class="charitable-dashboard-v2-arrow-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 										<path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

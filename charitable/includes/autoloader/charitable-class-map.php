@@ -227,6 +227,13 @@ $array_to_return = array( // phpcs:ignore WordPress.NamingConventions.PrefixAllG
 	'Charitable_Admin_Splash'                        => 'admin/splash/class-charitable-admin-splash.php', // v1.8.6.
 	'Charitable_Gateway_Square_Legacy'               => 'gateways/class-charitable-gateway-square-legacy.php', // v1.8.7.
 	'Charitable_Tools_Misc'						     => 'admin/tools/class-charitable-tools-misc.php', // v1.8.9
+	'Charitable_Log'                                 => 'logger/class-charitable-log.php', // v1.8.11.
+	'Charitable_Log_DB'                              => 'logger/class-charitable-log-db.php', // v1.8.11.
+	'Charitable_Log_Record'                          => 'logger/class-charitable-log-record.php', // v1.8.11.
+	'Charitable_Log_Records'                         => 'logger/class-charitable-log-records.php', // v1.8.11.
+	'Charitable_Log_Query'                           => 'logger/class-charitable-log-query.php', // v1.8.11.
+	'Charitable_Log_List_Table'                      => 'logger/class-charitable-log-list-table.php', // v1.8.11.
+	'Charitable_Log_Export'                          => 'logger/class-charitable-log-export.php', // v1.8.11.
 );
 
 return $array_to_return; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- '$array_to_return' is a local variable within a function.

@@ -88,8 +88,14 @@ if ( ! class_exists( 'Charitable_Gateway_Settings' ) ) :
 				'test_mode'        => array(
 					'title'    => __( 'Turn on Test Mode', 'charitable' ),
 					'type'     => 'checkbox',
+					'help'     => __( 'When test mode is on, donations are routed to each gateway\'s sandbox/test credentials instead of live, no real charges are made, and the donation form displays a "Test Mode" banner. Use this to verify your setup end-to-end before accepting real donations. Turn off when you\'re ready to go live.', 'charitable' ),
 					'priority' => 15,
 					'class'    => 'charitable-test-mode-checkbox',
+				),
+				'additional_gateways' => array(
+					'type'     => 'content',
+					'content'  => '<p class="charitable-gateways-additional-link"><a href="https://www.wpcharitable.com/multiple-payment-gateways/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'View Additional Payment Gateways', 'charitable' ) . '</a></p>',
+					'priority' => 20,
 				),
 			);
 		}

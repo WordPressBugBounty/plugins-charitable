@@ -112,7 +112,9 @@ if ( ! class_exists( 'Charitable_Emails' ) ) :
 				$this->register_emails();
 				return is_array( $this->emails ) && ! empty( $this->emails );
 			} catch ( Exception $e ) {
-				error_log( 'Charitable: Email registration failed - ' . $e->getMessage() );
+				if ( charitable_is_debug() ) {
+					error_log( 'Charitable: Email registration failed - ' . $e->getMessage() );
+				}
 				return false;
 			}
 		}

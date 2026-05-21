@@ -1240,7 +1240,9 @@ if ( ! class_exists( 'Charitable_Checklist' ) ) :
 				// Clear the option to prevent future attempts
 				delete_option( 'charitable_activate_pro' );
 			// Log this for debugging
-			error_log( 'Charitable: Pro plugin not found at ' . $pro_plugin_path . ' - preventing Lite deactivation' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			if ( charitable_is_debug() ) {
+				error_log( 'Charitable: Pro plugin not found at ' . $pro_plugin_path . ' - preventing Lite deactivation' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			}
 				return;
 			}
 

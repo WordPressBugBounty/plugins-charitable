@@ -349,7 +349,9 @@ if ( ! class_exists( 'Charitable_Stripe_Admin' ) ) :
 					// phpcs:disable
 					error_log( 'add webhook We do not have a webhook, so create one.' );
 					$webhook_id = $webhook_api->add_webhook();
-					error_log( 'add webhook' );
+					if ( charitable_is_debug( 'stripe' ) ) {
+						error_log( 'add webhook' );
+					}
 					// phpcs:enable
 
 					/* add_webhook() saves the signing secret directly to the DB. Sync it back

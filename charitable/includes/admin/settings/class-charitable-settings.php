@@ -436,8 +436,10 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 			}
 
 			if ( defined( 'CHARITABLE_DEBUG' ) && CHARITABLE_DEBUG ) {
-				error_log( 'santiize_settings values updated' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-				error_log( print_r( $values, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
+				if ( charitable_is_debug() ) {
+					error_log( 'santiize_settings values updated' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					error_log( print_r( $values, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log,WordPress.PHP.DevelopmentFunctions.error_log_print_r
+				}
 			}
 
 			/**

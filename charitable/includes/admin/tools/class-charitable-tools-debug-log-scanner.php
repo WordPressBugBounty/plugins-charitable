@@ -432,7 +432,9 @@ if ( ! class_exists( 'Charitable_Tools_Debug_Log_Scanner' ) ) :
 				fclose( $handle );
 
 			} catch ( Exception $e ) {
-				error_log( 'Charitable debug log scanner error: ' . $e->getMessage() );
+				if ( charitable_is_debug() ) {
+					error_log( 'Charitable debug log scanner error: ' . $e->getMessage() );
+				}
 			}
 
 			// Sort chronologically (newest first)

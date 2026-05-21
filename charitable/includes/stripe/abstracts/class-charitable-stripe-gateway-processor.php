@@ -464,7 +464,9 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 			if ( is_null( $this->customer ) ) {
 				$this->customer_error = __( 'Unable to create Stripe customer. The Stripe API may be unreachable or returned an error.', 'charitable' );
 				if ( $debug ) {
-					error_log( '[Charitable Stripe] get_stripe_customer FAILED: create_for_donor returned null. Customer could not be created.' );
+					if ( charitable_is_debug( 'stripe' ) ) {
+						error_log( '[Charitable Stripe] get_stripe_customer FAILED: create_for_donor returned null. Customer could not be created.' );
+					}
 				}
 				return false;
 			}
@@ -472,12 +474,16 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 			$customer_id = $this->customer->get( 'id' );
 
 			if ( $debug ) {
-				error_log( sprintf( '[Charitable Stripe] Customer ID resolved: %s', $customer_id ) );
+				if ( charitable_is_debug( 'stripe' ) ) {
+					error_log( sprintf( '[Charitable Stripe] Customer ID resolved: %s', $customer_id ) );
+				}
 			}
 
 			if ( ! is_null( $payment_method ) ) {
 				if ( $debug ) {
-					error_log( sprintf( '[Charitable Stripe] Attaching payment method: %s to customer: %s', $payment_method, $customer_id ) );
+					if ( charitable_is_debug( 'stripe' ) ) {
+						error_log( sprintf( '[Charitable Stripe] Attaching payment method: %s to customer: %s', $payment_method, $customer_id ) );
+					}
 				}
 
 				$payment_method = $this->customer->add_payment_method( $payment_method, true );
@@ -485,7 +491,9 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 				if ( is_null( $payment_method ) ) {
 					$this->customer_error = $this->customer->get_last_error();
 					if ( $debug ) {
-						error_log( '[Charitable Stripe] get_stripe_customer FAILED: add_payment_method returned null.' );
+						if ( charitable_is_debug( 'stripe' ) ) {
+							error_log( '[Charitable Stripe] get_stripe_customer FAILED: add_payment_method returned null.' );
+						}
 					}
 					return false;
 				}
@@ -500,7 +508,9 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 			if ( ! empty( $this->options ) && ( 'direct' === $this->connect_mode || $this->is_recurring_donation() ) ) {
 				if ( $debug ) {
 					$account = isset( $this->options['stripe_account'] ) ? $this->options['stripe_account'] : 'unknown';
-					error_log( sprintf( '[Charitable Stripe] Creating connected customer on account: %s (connect_mode: %s)', $account, $this->connect_mode ) );
+					if ( charitable_is_debug( 'stripe' ) ) {
+						error_log( sprintf( '[Charitable Stripe] Creating connected customer on account: %s (connect_mode: %s)', $account, $this->connect_mode ) );
+					}
 				}
 
 				$this->connected_customer = new Charitable_Stripe_Connected_Customer( $this->customer, $this->options, $this->donor, $payment_method );
@@ -509,7 +519,9 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 				if ( is_null( $customer_id ) ) {
 					$this->customer_error = __( 'Unable to create customer on connected Stripe account.', 'charitable' );
 					if ( $debug ) {
-						error_log( '[Charitable Stripe] get_stripe_customer FAILED: connected customer ID is null.' );
+						if ( charitable_is_debug( 'stripe' ) ) {
+							error_log( '[Charitable Stripe] get_stripe_customer FAILED: connected customer ID is null.' );
+						}
 					}
 				}
 			}
@@ -1173,7 +1185,9 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 
 			if ( ! class_exists( 'Charitable_Stripe_Connect' ) ) {
 				if ( $debug ) {
-					error_log( '[Charitable Stripe] Legacy Charitable_Stripe_Connect class not found. Using built-in Stripe Connect handling.' ); // phpcs:ignore
+					if ( charitable_is_debug( 'stripe' ) ) {
+						error_log( '[Charitable Stripe] Legacy Charitable_Stripe_Connect class not found. Using built-in Stripe Connect handling.' ); // phpcs:ignore
+					}
 				}
 			}
 
@@ -1188,7 +1202,9 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 
 			if ( ! $connected_account ) {
 				if ( $debug ) {
-					error_log( sprintf( '[Charitable Stripe] No legacy connected account for campaign %s. connect_mode: %s, options: %s', current( $campaign_donations )->campaign_id, $this->connect_mode ? $this->connect_mode : 'not set', ! empty( $this->options ) ? wp_json_encode( $this->options ) : 'empty' ) ); // phpcs:ignore
+					if ( charitable_is_debug( 'stripe' ) ) {
+						error_log( sprintf( '[Charitable Stripe] No legacy connected account for campaign %s. connect_mode: %s, options: %s', current( $campaign_donations )->campaign_id, $this->connect_mode ? $this->connect_mode : 'not set', ! empty( $this->options ) ? wp_json_encode( $this->options ) : 'empty' ) ); // phpcs:ignore
+					}
 				}
 				return;
 			}
@@ -1203,7 +1219,9 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor' ) ) :
 			}
 
 			if ( $debug ) {
-				error_log( sprintf( '[Charitable Stripe] setup_stripe_connect completed. connect_mode: %s, connected_account: %s, destination: %s', $this->connect_mode, $connected_account, $this->destination ? $this->destination : 'none' ) ); // phpcs:ignore
+				if ( charitable_is_debug( 'stripe' ) ) {
+					error_log( sprintf( '[Charitable Stripe] setup_stripe_connect completed. connect_mode: %s, connected_account: %s, destination: %s', $this->connect_mode, $connected_account, $this->destination ? $this->destination : 'none' ) ); // phpcs:ignore
+				}
 			}
 
 			$this->application_fee = $this->get_application_fee_amount(

@@ -1,0 +1,283 @@
+/**
+ * Charitable Logger Admin Styles
+ *
+ * @since 1.8.11
+ */
+.charitable-logs-wrap {
+  margin-top: 15px;
+}
+.charitable-logs-wrap h4#charitable-logs-heading {
+  font-weight: 600 !important;
+  font-size: 20px;
+  margin: 20px 0;
+  line-height: 20px;
+}
+.charitable-logs-wrap .tablenav.top {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.charitable-logs-settings {
+  background: #fff;
+  border: 1px solid #ccd0d4;
+  padding: 0 20px;
+  margin-bottom: 20px;
+  max-width: 900px;
+}
+.charitable-logs-settings .form-table th {
+  width: 180px;
+  padding: 15px 10px 15px 0;
+}
+.charitable-logs-settings .form-table td {
+  padding: 15px 10px;
+}
+
+.charitable-toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+.charitable-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.charitable-toggle .charitable-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  border-radius: 24px;
+  transition: 0.3s;
+}
+.charitable-toggle .charitable-toggle-slider::before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+.charitable-toggle input:checked + .charitable-toggle-slider {
+  background-color: #2271b1;
+}
+.charitable-toggle input:checked + .charitable-toggle-slider::before {
+  transform: translateX(20px);
+}
+
+.charitable-logs-status {
+  vertical-align: middle;
+  color: #666;
+}
+
+.charitable-logs-actions {
+  margin-bottom: 15px;
+}
+.charitable-logs-actions .button {
+  margin-right: 8px;
+  font-family: "Inter", sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  line-height: 14px !important;
+  padding: 15px 20px !important;
+  border-radius: 5px !important;
+  text-transform: capitalize !important;
+  background-color: #ffffff !important;
+  color: #1d2327 !important;
+  border-color: #787c82 !important;
+}
+.charitable-logs-actions .button:hover {
+  background-color: #f0f0f1 !important;
+  border-color: #50575e !important;
+}
+.charitable-logs-actions .button-link-delete {
+  color: #b32d2e !important;
+  border-color: #b32d2e !important;
+  background-color: #ffffff !important;
+}
+.charitable-logs-actions .button-link-delete:hover {
+  color: #a00 !important;
+  border-color: #a00 !important;
+  background-color: #fff5f5 !important;
+}
+
+.charitable-log-filters select {
+  margin-right: 6px;
+}
+
+.charitable-log-level {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+.charitable-log-level-error {
+  background-color: #fce4e4;
+  color: #cc1818;
+}
+.charitable-log-level-warning {
+  background-color: #fff3cd;
+  color: #856404;
+}
+.charitable-log-level-info {
+  background-color: #e7f3fe;
+  color: #0a58ca;
+}
+.charitable-log-level-debug {
+  background-color: #f0f0f1;
+  color: #646970;
+}
+
+.charitable-logs-empty {
+  background: #fff;
+  border: 1px solid #ccd0d4;
+  padding: 30px;
+  text-align: center;
+}
+.charitable-logs-empty p {
+  font-size: 14px;
+  color: #646970;
+}
+
+.charitable-log-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 160000;
+}
+
+.charitable-log-modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.charitable-log-modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 6px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 30px;
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+}
+
+.charitable-log-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  line-height: 1;
+  padding: 5px;
+}
+.charitable-log-modal-close:hover {
+  color: #000;
+}
+
+.charitable-log-modal-title {
+  margin: 0 0 15px;
+  font-size: 18px;
+  padding-right: 30px;
+}
+
+.charitable-log-modal-meta {
+  background: #f6f7f7;
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+
+.charitable-log-modal-meta-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.charitable-log-modal-meta-row:last-child {
+  margin-bottom: 0;
+}
+
+.charitable-log-modal-label {
+  font-weight: 600;
+  color: #1d2327;
+  min-width: 60px;
+}
+
+.charitable-log-modal-message-wrap {
+  margin-bottom: 20px;
+}
+.charitable-log-modal-message-wrap h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.charitable-log-modal-message {
+  background: #f6f7f7;
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  padding: 12px 16px;
+  max-height: 300px;
+  overflow-y: auto;
+  word-break: break-word;
+}
+.charitable-log-modal-message pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 12px;
+}
+
+.charitable-log-modal-ids h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.charitable-log-modal-ids-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.charitable-log-modal-id-item {
+  font-size: 13px;
+}
+.charitable-log-modal-id-item a {
+  text-decoration: none;
+}
+
+@media screen and (max-width: 782px) {
+  .charitable-log-modal-content {
+    width: 95%;
+    padding: 20px;
+  }
+  .charitable-log-modal-ids-grid {
+    grid-template-columns: 1fr;
+  }
+  .charitable-logs-settings .form-table th {
+    width: auto;
+  }
+}

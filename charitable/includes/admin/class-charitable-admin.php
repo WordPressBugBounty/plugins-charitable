@@ -1194,6 +1194,13 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 				$classes .= ' post-type-charitable';
 			}
 
+			// Add `charitable-settings-page-{tab}` so per-tab CSS (e.g. Payment
+			// Gateways tab layout overrides in charitable-admin.css) can scope
+			// itself without affecting other settings tabs.
+			if ( isset( $_GET['page'] ) && 'charitable-settings' === $_GET['page'] && isset( $_GET['tab'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$classes .= ' charitable-settings-page-' . sanitize_html_class( wp_unslash( $_GET['tab'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			}
+
 			return $classes;
 		}
 

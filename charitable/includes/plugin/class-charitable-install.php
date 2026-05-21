@@ -96,6 +96,7 @@ if ( ! class_exists( 'Charitable_Install' ) ) :
 				$this->includes_path . 'data/class-charitable-campaign-donations-db.php'  => 'Charitable_Campaign_Donations_DB',
 				$this->includes_path . 'data/class-charitable-donation-activities-db.php' => 'Charitable_Donation_Activities_DB',
 				$this->includes_path . 'data/class-charitable-campaign-activities-db.php' => 'Charitable_Campaign_Activities_DB',
+				$this->includes_path . 'logger/class-charitable-log-db.php'               => 'Charitable_Log_DB',
 			);
 
 			foreach ( $tables as $file => $class ) {

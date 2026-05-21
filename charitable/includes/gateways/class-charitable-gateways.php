@@ -81,6 +81,11 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 
 			// Dequeue Square Legacy scripts if Square Legacy is not active.
 			add_action( 'wp_enqueue_scripts', array( $this, 'maybe_dequeue_square_legacy_scripts' ), 999 );
+
+			// PayPal Hard Fork (1.8.11): last-word defense against third-party
+			// callbacks that re-inject the hidden PayPal gateway. Mirrors the
+			// register_gateways + get_active_gateways strips.
+			add_filter( 'charitable_active_gateways', array( $this, 'apply_paypal_tier_visibility' ), PHP_INT_MAX );
 		}
 
 
@@ -120,9 +125,10 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 			 */
 
 			$gateways = array(
-				'stripe'  => 'Charitable_Gateway_Stripe_AM',
-				'paypal'  => 'Charitable_Gateway_Paypal',
-				'offline' => 'Charitable_Gateway_Offline',
+				'stripe'          => 'Charitable_Gateway_Stripe_AM',
+				'paypal'          => 'Charitable_Gateway_Paypal',
+				'paypal_commerce' => 'Charitable_Gateway_Paypal_Commerce',
+				'offline'         => 'Charitable_Gateway_Offline',
 			);
 
 			// Always add Square Core to the available gateways.
@@ -133,6 +139,10 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 				$gateways
 			);
 
+			// PayPal Hard Fork (1.8.11): hide the off-tier PayPal gateway entirely so it
+			// cannot be enabled, listed in admin, or referenced in active_gateways.
+			$this->gateways = $this->apply_paypal_tier_visibility( $this->gateways );
+
 			// If Legacy mode is active and Square Legacy gateway is active, deactivate Square Core.
 			if ( charitable_square_legacy_mode() && $this->is_active_gateway( 'square' ) ) {
 				$this->disable_gateway( 'square_core' );
@@ -141,6 +151,52 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 					error_log( '[Charitable Square Core] Deactivated Square Core because Square Legacy is active' ); // phpcs:ignore
 				}
 			}
+		}
+
+		/**
+		 * Read the locked PayPal user tier set by the 1.8.11 detection upgrade.
+		 *
+		 * The result is escapable at runtime via the standard `pre_option_*` filter
+		 * (`pre_option_charitable_paypal_user_tier`) since this is a vanilla `get_option`
+		 * read. See `Charitable_Upgrade::detect_paypal_user_tier()` for how the value
+		 * is computed and persisted.
+		 *
+		 * @since  1.8.11
+		 *
+		 * @return string `legacy` or `commerce`. Defaults to `commerce` when unset.
+		 */
+		public function get_paypal_tier() {
+			$tier = get_option( 'charitable_paypal_user_tier', 'commerce' );
+			return ( 'legacy' === $tier ) ? 'legacy' : 'commerce';
+		}
+
+		/**
+		 * Strip the off-tier PayPal gateway from a gateways map.
+		 *
+		 * `legacy` tier hides `paypal_commerce`. `commerce` tier hides `paypal`.
+		 * Used in three places to layer defense:
+		 *   1. `register_gateways()` — strips before `$this->gateways` is exposed.
+		 *   2. `get_active_gateways()` — inline cleanup mirroring the Square pattern.
+		 *   3. `charitable_active_gateways` filter (PHP_INT_MAX priority) — last word
+		 *      against third-party callbacks that re-inject the hidden gateway.
+		 *
+		 * @since  1.8.11
+		 *
+		 * @param  array $gateways Map of gateway_id => class_name (or anything keyed by id).
+		 * @return array Same shape, with the off-tier PayPal key removed when present.
+		 */
+		public function apply_paypal_tier_visibility( $gateways ) {
+			if ( ! is_array( $gateways ) ) {
+				return $gateways;
+			}
+
+			if ( 'legacy' === $this->get_paypal_tier() ) {
+				unset( $gateways['paypal_commerce'] );
+			} else {
+				unset( $gateways['paypal'] );
+			}
+
+			return $gateways;
 		}
 
 		/**
@@ -232,6 +288,10 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 			if ( isset( $active_gateways['square'] ) && ! $this->is_square_addon_active() ) {
 				unset( $active_gateways['square'] );
 			}
+
+			// PayPal Hard Fork (1.8.11): strip the off-tier PayPal gateway in case both
+			// were saved into active_gateways (direct DB edit, multisite weirdness, etc.).
+			$active_gateways = $this->apply_paypal_tier_visibility( $active_gateways );
 
 			uksort( $active_gateways, array( $this, 'sort_by_default' ) );
 
@@ -709,11 +769,15 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 
 				// Log error details for debugging.
 				if ( is_wp_error( $response ) ) {
-					error_log( 'Charitable Stripe Connect Error: ' . $response->get_error_message() . ' | URL: ' . $wpcharitable_credentials_url ); // phpcs:ignore
+					if ( charitable_is_debug( 'stripe' ) ) {
+						error_log( 'Charitable Stripe Connect Error: ' . $response->get_error_message() . ' | URL: ' . $wpcharitable_credentials_url ); // phpcs:ignore
+					}
 				} else {
 					$response_code = wp_remote_retrieve_response_code( $response );
 					$response_body = wp_remote_retrieve_body( $response );
-					error_log( 'Charitable Stripe Connect Error: HTTP ' . $response_code . ' | URL: ' . $wpcharitable_credentials_url . ' | Response: ' . substr( $response_body, 0, 500 ) ); // phpcs:ignore
+					if ( charitable_is_debug( 'stripe' ) ) {
+						error_log( 'Charitable Stripe Connect Error: HTTP ' . $response_code . ' | URL: ' . $wpcharitable_credentials_url . ' | Response: ' . substr( $response_body, 0, 500 ) ); // phpcs:ignore
+					}
 				}
 
 				$stripe_account_settings_url = add_query_arg(

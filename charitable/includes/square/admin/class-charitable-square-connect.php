@@ -441,7 +441,9 @@ if ( ! class_exists( 'Charitable_Square_Connect' ) ) :
 
 			if ( is_wp_error( $response ) ) {
 
-				error_log( 'try_refresh_connection - wp error: ' . print_r( $response, true ) ); // phpcs:ignore
+				if ( charitable_is_debug( 'square' ) ) {
+					error_log( 'try_refresh_connection - wp error: ' . print_r( $response, true ) ); // phpcs:ignore
+				}
 
 				if ( $response->get_error_code() === 'refresh_connection_fail' && $connection->is_valid() ) {
 					$connection

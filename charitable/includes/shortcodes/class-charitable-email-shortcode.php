@@ -286,7 +286,9 @@ if ( ! class_exists( 'Charitable_Email_Shortcode' ) ) :
 				implode( ', ', self::$processing_stack )
 			);
 
-			error_log( $message ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			if ( charitable_is_debug() ) {
+				error_log( $message ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			}
 		}
 	}
 

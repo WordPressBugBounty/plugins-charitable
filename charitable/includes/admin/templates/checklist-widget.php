@@ -132,7 +132,7 @@ $closed_css = $checklist_class->get_checklist_option( 'window_closed' ) ? 'close
 					__( 'Please rate %1$sCharitable%2$s %3$s★★★★★%4$s on %3$sWordPress.org%4$s!', 'charitable' ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					'<strong>',
 					'</strong>',
-					'<a href="https://wordpress.org/support/plugin/charitable/reviews/#new-post" rel="noopener noreferrer" target="_blank">',
+					'<a href="https://wpcharitable.com/charitable-admin-review/" rel="noopener noreferrer" target="_blank">',
 					'</a>'
 				);
 				?>

@@ -6,7 +6,7 @@
  * @copyright Copyright (c) 2023, WPCharitable
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.9
- * @version   1.8.9
+ * @version   1.8.10.5
  */
 
 ( function( $ ) {
@@ -74,81 +74,29 @@
 			helper.add_pending_process( 'recaptcha_v3' );
 		} );
 
-		/**
-		 * Handle regular form submissions (non-donation forms).
-		 */
-		$( 'form' ).not( '.charitable-donation-form' ).on( 'submit', function( e ) {
-			var $form = $( this );
-			var formKey = getFormKey( $form );
+		// All Charitable forms carry `.charitable-form`. Donation form has its own flow above; server-side check is authoritative.
+		$( 'form.charitable-form' )
+			.not( '.charitable-donation-form' )
+			.not( '[data-use-ajax="1"]' )
+			.on( 'submit', function( e ) {
+				var $form = $( this );
 
-			// Check if this form should have reCAPTCHA v3.
-			if ( ! shouldHaveRecaptcha( formKey ) ) {
-				return;
-			}
+				e.preventDefault();
 
-			// Prevent default submission.
-			e.preventDefault();
+				grecaptcha.execute( siteKey, { action: action } ).then( function( token ) {
+					$form.find( '[name="charitable_recaptcha_v3_token"]' ).remove();
 
-			// Generate token.
-			grecaptcha.execute( siteKey, { action: action } ).then( function( token ) {
-				// Add token to form.
-				var tokenInput = $( '<input>' )
-					.attr( 'type', 'hidden' )
-					.attr( 'name', 'charitable_recaptcha_v3_token' )
-					.val( token );
+					$( '<input>' )
+						.attr( 'type', 'hidden' )
+						.attr( 'name', 'charitable_recaptcha_v3_token' )
+						.val( token )
+						.appendTo( $form );
 
-				// Remove existing token input if present.
-				$form.find( '[name="charitable_recaptcha_v3_token"]' ).remove();
-
-				// Add token to form.
-				$form.append( tokenInput );
-
-				// Submit form.
-				$form.off( 'submit' ).submit();
-			} ).catch( function( error ) {
-				// Handle error.
-				alert( errorMessage );
+					$form.off( 'submit' ).submit();
+				} ).catch( function() {
+					alert( errorMessage );
+				} );
 			} );
-		} );
-	}
-
-	/**
-	 * Get form key based on form class or ID.
-	 */
-	function getFormKey( $form ) {
-		if ( $form.hasClass( 'charitable-registration-form' ) ) {
-			return 'registration_form';
-		}
-		if ( $form.hasClass( 'charitable-profile-form' ) ) {
-			return 'profile_form';
-		}
-		if ( $form.hasClass( 'charitable-forgot-password-form' ) ) {
-			return 'password_retrieval_form';
-		}
-		if ( $form.hasClass( 'charitable-reset-password-form' ) ) {
-			return 'password_reset_form';
-		}
-		if ( $form.hasClass( 'charitable-campaign-form' ) ) {
-			return 'campaign_form';
-		}
-		return null;
-	}
-
-	/**
-	 * Check if form should have reCAPTCHA v3.
-	 * This is a simplified check - the server-side validation is the authoritative check.
-	 */
-	function shouldHaveRecaptcha( formKey ) {
-		// Default enabled forms.
-		var enabledForms = {
-			'donation_form': true,
-			'registration_form': true,
-			'password_reset_form': true,
-			'password_retrieval_form': true,
-			'campaign_form': true,
-		};
-
-		return formKey && enabledForms[ formKey ];
 	}
 
 } )( jQuery );

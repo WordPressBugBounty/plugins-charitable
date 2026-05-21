@@ -471,10 +471,12 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			// phpcs:disable
 			if ( defined( 'CHARITABLE_DEBUG_LICENSE' ) && CHARITABLE_DEBUG_LICENSE ) {
 				echo '<p>Plan type is: ' . $type . '</p>';
-				error_log( 'addons_directory_content' );
-				error_log( print_r( $type, true ) );
-				error_log( print_r( $installed_plugins, true ) );
-				error_log( print_r( $upgrade_url, true ) );
+				if ( charitable_is_debug() ) {
+					error_log( 'addons_directory_content' );
+					error_log( print_r( $type, true ) );
+					error_log( print_r( $installed_plugins, true ) );
+					error_log( print_r( $upgrade_url, true ) );
+				}
 			}
 			// phpcs:enable
 

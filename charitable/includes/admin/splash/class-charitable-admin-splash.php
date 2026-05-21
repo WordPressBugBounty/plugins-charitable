@@ -210,6 +210,9 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 				$this->splash_data = $this->get_default_data();
 			}
 
+			// Always reflect the current plugin major version in the header, even if the transient is stale.
+			$this->splash_data['header']['version'] = $this->get_major_version( charitable()->get_version() );
+
 			$this->splash_data['sections'] = $this->retrieve_sections_for_user( $this->splash_data['sections'] ?? array() );
 
 			$template_location = '/admin/templates/splash/splash-modal';
@@ -234,7 +237,111 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 		public function retrieve_sections_for_user( array $sections = array() ): array {
 
 			$sections = array(
-				// Hero: Mini Donation Widget upsell with Vimeo video.
+				// PayPal Commerce — headline feature, uses same self-hosted video as Pro.
+				array(
+					'new'     => true,
+					'version' => '1.8.11',
+					'layout'  => 'fifty-fifty',
+					'class'   => 'no-order',
+					'title'   => __( 'PayPal Commerce', 'charitable' ),
+					'content' => __( 'Accept donations through PayPal, Venmo, Pay Later, cards, Apple Pay, and Google Pay from a single integration. One-click Connect with PayPal setup, with support for one-time and recurring donations, saved payment methods, and refunds handled in the donation admin.', 'charitable' ),
+					'video'   => array(
+						'url' => 'https://wpcharitable-space.nyc3.digitaloceanspaces.com/splash/1-8-15/paypal-commerce.mp4',
+					),
+					'buttons' => array(
+						'main'      => array(
+							'text' => __( 'Get Started', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/paypal-commerce-getting-started/', 'splash-modal', 'PayPal Commerce Main' ),
+						),
+						'secondary' => array(
+							'text' => __( 'Learn More', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/paypal-commerce-learn-more/', 'splash-modal', 'PayPal Commerce Secondary' ),
+						),
+					),
+				),
+				// 1.8.10 — Lite headline feature: Migration & Import Tools.
+				array(
+					'new'     => true,
+					'version' => '1.8.10',
+					'layout'  => 'fifty-fifty',
+					'class'   => 'no-order',
+					'title'   => __( 'Migration & Import Tools', 'charitable' ),
+					'content' => __( 'Move from GiveWP or GiveButter to Charitable in minutes. Expanded import tools include CSV donations import and a new GiveWP Migration Tool (Beta) under a redesigned, tabbed interface.', 'charitable' ),
+					'img'     => array(
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-10-import-tools.svg',
+						'shadow' => 'none',
+					),
+					'buttons' => array(
+						'main' => array(
+							'text' => __( 'Get Started', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/how-to-switch-from-givewp-to-charitable/', 'splash-modal', 'Import Tools Main' ),
+						),
+					),
+				),
+				// 1.8.14 — Campaign Countdown (Pro-only).
+				array(
+					'new-for-pro' => true,
+					'layout'      => 'fifty-fifty',
+					'class'       => 'no-order',
+					'title'       => __( 'Campaign Countdown', 'charitable' ),
+					'content'     => __( 'Add a countdown timer to any campaign with the new Campaign Builder field or Gutenberg block. Fully customizable, with a built-in fireworks effect when the campaign ends.', 'charitable' ),
+					'img'         => array(
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-14-campaign-countdown.png',
+						'shadow' => 'none',
+					),
+					'buttons'     => array(
+						'main'    => array(
+							'text' => __( 'Get Started', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/campaign-countdown-getting-started/', 'splash-modal', 'Campaign Countdown Main' ),
+						),
+						'upgrade' => array(
+							'text' => __( 'Upgrade to Pro', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/lite-upgrade/', 'splash-modal', 'Campaign Countdown Upgrade' ),
+						),
+					),
+				),
+				// 1.8.9 — Lite security feature.
+				array(
+					'new'     => true,
+					'version' => '1.8.9',
+					'layout'  => 'fifty-fifty',
+					'class'   => 'no-order',
+					'title'   => __( 'Security Enhancements', 'charitable' ),
+					'content' => __( 'Charitable Lite now supports Google reCAPTCHA, hCaptcha, and Cloudflare Turnstile for improved security.', 'charitable' ),
+					'img'     => array(
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-9-security.svg',
+						'shadow' => 'none',
+					),
+					'buttons' => array(
+						'main' => array(
+							'text' => __( 'Get Started', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/introducing-improved-security-and-clean-donation-tool/', 'splash-modal', 'Security Main' ),
+						),
+					),
+				),
+				// 1.8.14 — Donorbox CSV Importer (Pro-only).
+				array(
+					'new-for-pro' => true,
+					'layout'      => 'fifty-fifty',
+					'class'       => 'no-order',
+					'title'       => __( 'Donorbox CSV Importer', 'charitable' ),
+					'content'     => __( 'Move from Donorbox to Charitable in a single CSV upload. Import historical donations, donors, campaigns, and recurring plans with preview, dry-run, and rollback.', 'charitable' ),
+					'img'         => array(
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-14-donorbox-importer.png',
+						'shadow' => 'none',
+					),
+					'buttons'     => array(
+						'main'    => array(
+							'text' => __( 'Get Started', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/donorbox-csv-importer-getting-started/', 'splash-modal', 'Donorbox CSV Importer Main' ),
+						),
+						'upgrade' => array(
+							'text' => __( 'Upgrade to Pro', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/lite-upgrade/', 'splash-modal', 'Donorbox CSV Importer Upgrade' ),
+						),
+					),
+				),
+				// 1.8.13 — Mini Donation Widget (Pro-only, Vimeo embed for Lite).
 				array(
 					'new-for-pro' => true,
 					'layout'      => 'fifty-fifty',
@@ -245,58 +352,20 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 						'vimeo_id' => '1186687749',
 					),
 					'buttons'     => array(
-						'main'      => array(
+						'main'    => array(
 							'text' => __( 'Get Started', 'charitable' ),
 							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/documentation/mini-donation-widget/', 'splash-modal', 'Mini Donation Widget Main' ),
 						),
-						'upgrade'   => array(
+						'upgrade' => array(
 							'text' => __( 'Upgrade to Pro', 'charitable' ),
 							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/lite-upgrade/', 'splash-modal', 'Mini Donation Widget Upgrade' ),
-						),
-					),
-				),
-				// 1.8.10 lite headline feature.
-				array(
-					'new'     => true,
-					'version' => '1.8.10',
-					'layout'  => 'one-third-two-thirds',
-					'class'   => 'no-order',
-					'title'   => __( 'Migration & Import Tools', 'charitable' ),
-					'content' => __( 'Move from GiveWP or GiveButter to Charitable in minutes. Expanded import tools include CSV donations import and a new GiveWP Migration Tool (Beta) under a redesigned, tabbed interface.', 'charitable' ),
-					'img'     => array(
-						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-10-import-tools.svg',
-						'shadow' => 'none',
-					),
-					'buttons' => array(
-						'main'      => array(
-							'text' => __( 'Get Started', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/how-to-switch-from-givewp-to-charitable/', 'splash-modal', 'Import Tools Main' ),
-						),
-					),
-				),
-				// 1.8.9 lite security feature (kept).
-				array(
-					'new'     => true,
-					'version' => '1.8.9',
-					'layout'  => 'one-third-two-thirds',
-					'class'   => 'no-order',
-					'title'   => __( 'Security Enhancements', 'charitable' ),
-					'content' => __( 'Charitable Lite now supports Google reCAPTCHA, hCaptcha, and Cloudflare Turnstile for improved security.', 'charitable' ),
-					'img'     => array(
-						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-9-security.svg',
-						'shadow' => 'none',
-					),
-					'buttons' => array(
-						'main'      => array(
-							'text' => __( 'Get Started', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/introducing-improved-security-and-clean-donation-tool/', 'splash-modal', 'Security Main' ),
 						),
 					),
 				),
 				// Pro upsells.
 				array(
 					'new-for-pro' => true,
-					'layout'      => 'one-third-two-thirds',
+					'layout'      => 'fifty-fifty',
 					'class'       => 'no-order',
 					'title'       => __( 'Campaign Showcase', 'charitable' ),
 					'content'     => __( 'Display all your campaigns beautifully with full layout control including grid, list, or masonry. No coding required.', 'charitable' ),
@@ -317,7 +386,7 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 				),
 				array(
 					'new-for-pro' => true,
-					'layout'      => 'one-third-two-thirds',
+					'layout'      => 'fifty-fifty',
 					'class'       => 'no-order',
 					'title'       => __( 'Donations Feed', 'charitable' ),
 					'content'     => __( 'Display recent donations in beautiful list or card views with sorting, filtering, pagination, and live polling that automatically refreshes when new donations arrive.', 'charitable' ),
@@ -338,7 +407,7 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 				),
 				array(
 					'new-for-pro' => true,
-					'layout'      => 'one-third-two-thirds',
+					'layout'      => 'fifty-fifty',
 					'class'       => 'no-order',
 					'title'       => __( 'Campaign Modal Button', 'charitable' ),
 					'content'     => __( 'Add a donate button anywhere on your site that opens a donation form in a modal popup, no page redirect required. Available as a block or shortcode.', 'charitable' ),
@@ -359,7 +428,7 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 				),
 				array(
 					'new-for-pro' => true,
-					'layout'      => 'one-third-two-thirds',
+					'layout'      => 'fifty-fifty',
 					'class'       => 'no-order',
 					'title'       => __( 'Prefill Donation Forms', 'charitable' ),
 					'content'     => __( 'Pre-populate donation form fields via URL query strings. Perfect for email campaigns, targeted landing pages, and personalized donor outreach.', 'charitable' ),
@@ -380,7 +449,7 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 				),
 				array(
 					'new-for-pro' => true,
-					'layout'      => 'one-third-two-thirds',
+					'layout'      => 'fifty-fifty',
 					'class'       => 'no-order',
 					'title'       => __( 'Campaign Featured Image', 'charitable' ),
 					'content'     => __( 'Set your campaign\'s featured image directly from the Campaign Builder. No need to switch to the post editor. Perfect for giving your campaigns a polished, visual identity.', 'charitable' ),
@@ -571,6 +640,7 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 					'image'       => charitable()->get_path( 'assets', false ) . 'images/charitable-logo.svg',
 					'title'       => __( 'What\'s New in Charitable', 'charitable' ),
 					'description' => __( 'Since you\'ve been gone, we\'ve added some great new features to help grow your campaigns and generate more donations. Here are some highlights...', 'charitable' ),
+					'version'     => $this->get_major_version( charitable()->get_version() ),
 				),
 
 			);

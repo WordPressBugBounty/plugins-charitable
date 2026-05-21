@@ -129,9 +129,9 @@ const CharitableAdminSplash = window.CharitableAdminSplash || ( function( docume
 				const title = $el.attr( 'data-video-title' ) || '';
 				const iframe = document.createElement( 'iframe' );
 
-				iframe.src = 'https://player.vimeo.com/video/' + id + '?autoplay=1&muted=1&controls=1&dnt=1';
+				iframe.src = 'https://player.vimeo.com/video/' + id + '?autoplay=0&muted=1&controls=1&dnt=1';
 				iframe.setAttribute( 'frameborder', '0' );
-				iframe.setAttribute( 'allow', 'autoplay; fullscreen; picture-in-picture' );
+				iframe.setAttribute( 'allow', 'fullscreen; picture-in-picture' );
 				iframe.setAttribute( 'allowfullscreen', '' );
 				iframe.setAttribute( 'title', title );
 

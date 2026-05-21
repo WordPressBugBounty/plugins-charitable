@@ -748,9 +748,11 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 						$output .= '<p><strong>' . esc_html__( 'Plan name:', 'charitable' ) . '</strong> ' . print_r( $plan_name, true ) . '</p>'; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 					}
 					$output .= '</fieldset>';
-					error_log( 'get_licensed_message - valid' ); // phpcs:ignore
-					error_log( print_r( $settings, true ) ); // phpcs:ignore
-					error_log( print_r( $plan_name, true ) ); // phpcs:ignore
+					if ( charitable_is_debug() ) {
+						error_log( 'get_licensed_message - valid' ); // phpcs:ignore
+						error_log( print_r( $settings, true ) ); // phpcs:ignore
+						error_log( print_r( $plan_name, true ) ); // phpcs:ignore
+					}
 				}
 			} else {
 				$plan_name = esc_html__( 'Lite', 'charitable' );
@@ -761,8 +763,10 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 				}
 				$output .= $this->get_unlicensed_message( $valid );
 				if ( defined( 'CHARITABLE_DEBUG_LICENSE' ) && CHARITABLE_DEBUG_LICENSE ) {
-					error_log( 'get_licensed_message - not valid' ); // phpcs:ignore
-					error_log( print_r( $valid, true ) ); // phpcs:ignore
+					if ( charitable_is_debug() ) {
+						error_log( 'get_licensed_message - not valid' ); // phpcs:ignore
+						error_log( print_r( $valid, true ) ); // phpcs:ignore
+					}
 				}
 			}
 

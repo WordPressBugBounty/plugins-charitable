@@ -213,6 +213,8 @@ if ( ! class_exists( 'Charitable_Stripe_Payment_Intent' ) ) :
 		 * if none exists.
 		 *
 		 * @since  1.4.0
+		 * @since  1.8.11 Probe-verifies the stored intent against Stripe and discards it if unreachable
+		 *                (e.g. credentials rotated since the prior attempt). Prevents stale-session fatals.
 		 *
 		 * @param  array|null $options Options to pass to Stripe API requests.
 		 * @return false|Charitable_Stripe_Payment_Intent
@@ -224,7 +226,18 @@ if ( ! class_exists( 'Charitable_Stripe_Payment_Intent' ) ) :
 				return false;
 			}
 
-			return new Charitable_Stripe_Payment_Intent( $intent, $options );
+			$payment_intent = new Charitable_Stripe_Payment_Intent( $intent, $options );
+
+			try {
+				$payment_intent->get_intent();
+				return $payment_intent;
+			} catch ( \Exception $e ) {
+				if ( function_exists( 'charitable_is_debug' ) && charitable_is_debug( 'stripe' ) ) {
+					error_log( '[Charitable Stripe] Stale PaymentIntent in session, discarding: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				}
+				charitable_get_session()->remove( 'stripe-payment-intent' );
+				return false;
+			}
 		}
 
 		/**

@@ -3,11 +3,11 @@
  * Plugin Name: Charitable
  * Plugin URI: https://www.wpcharitable.com
  * Description: The best WordPress donation plugin. Fundraising with recurring donations, and powerful features to help you raise more money online.
- * Version: 1.8.10.5
+ * Version: 1.8.11
  * Author: Charitable Donations & Fundraising Team
  * Author URI: https://wpcharitable.com
  * Requires at least: 5.0
- * Stable tag: 1.8.10.5
+ * Stable tag: 1.8.11
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
@@ -39,7 +39,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		const AUTHOR = 'WP Charitable';
 
 		/* Plugin version. */
-		const VERSION = '1.8.10.5';
+		const VERSION = '1.8.11';
 
 		/* Version of database schema. */
 		const DB_VERSION = '20180522';
@@ -215,6 +215,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 			$includes_path = $this->get_path( 'includes' );
 
 			/* Load files with hooks & functions. Classes are autoloaded. */
+			require_once $includes_path . 'class-charitable-log-muter.php';
 			require_once $includes_path . 'charitable-core-functions.php';
 			require_once $includes_path . 'api/charitable-api-functions.php';
 			require_once $includes_path . 'campaigns/charitable-campaign-functions.php';
@@ -279,6 +280,9 @@ if ( ! class_exists( 'Charitable' ) ) :
 				require_once $includes_path . 'stripe/gateway/class-charitable-stripe-webhook-processor.php';
 
 			endif;
+
+			/* Load PayPal Commerce Gateway */
+			require_once $includes_path . 'gateways/paypal-commerce/charitable-paypal-commerce.php';
 		}
 
 		/**

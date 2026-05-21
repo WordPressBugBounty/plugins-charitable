@@ -438,8 +438,12 @@ body.charitable-splash-modal .jconfirm.jconfirm-modern .jconfirm-box div.jconfir
 
 body.charitable-splash-modal div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane {
   display: block;
+  margin-top: 0;
   margin-bottom: 0;
   max-height: none !important;
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
 }
 
 body.charitable-splash-modal div.jconfirm .jconfirm-box-container .jconfirm-box .jconfirm-content-pane .jconfirm-content {
@@ -497,6 +501,13 @@ body.charitable-splash-modal div.jconfirm .jconfirm-box-container .jconfirm-box 
 #charitable-splash-modal header h2 {
   color: #ffffff;
 }
+#charitable-splash-modal header h2 .charitable-splash-header-version {
+  font-size: 12px;
+  line-height: 11px;
+  padding-left: 10px;
+  font-weight: 400;
+  opacity: 0.6;
+}
 #charitable-splash-modal header .charitable-splash-header-content p {
   color: rgba(255, 255, 255, 0.7);
 }
@@ -546,6 +557,7 @@ body.charitable-splash-modal div.jconfirm .jconfirm-box-container .jconfirm-box 
 }
 
 #charitable-splash-modal main .charitable-splash-section .charitable-splash-video-wrap {
+  position: relative;
   width: 100%;
 }
 #charitable-splash-modal main .charitable-splash-section .charitable-splash-video-wrap .charitable-splash-video-embed {
@@ -575,6 +587,26 @@ body.charitable-splash-modal div.jconfirm .jconfirm-box-container .jconfirm-box 
 }
 #charitable-splash-modal main .charitable-splash-section .charitable-splash-video-wrap:hover video::-webkit-media-controls {
   opacity: 1;
+}
+#charitable-splash-modal main .charitable-splash-section .charitable-splash-video-wrap::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 72px;
+  height: 72px;
+  margin: -36px 0 0 -36px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.55);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M8 5v14l11-7z' fill='white'/></svg>");
+  background-repeat: no-repeat;
+  background-position: 55% center;
+  background-size: 40px 40px;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+#charitable-splash-modal main .charitable-splash-section .charitable-splash-video-wrap:hover::after {
+  opacity: 0;
 }
 
 #charitable-splash-modal main .charitable-splash-section-more-features {

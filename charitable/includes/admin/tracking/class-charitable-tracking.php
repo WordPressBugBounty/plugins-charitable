@@ -476,14 +476,18 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 
 			if ( defined( 'CHARITABLE_DEBUG_USAGE' ) && CHARITABLE_DEBUG_USAGE ) { // phpcs:disable
 				// phpcs:disable
-				error_log('send_optin_usage_checkin');
+				if ( charitable_is_debug() ) {
+					error_log('send_optin_usage_checkin');
+				}
 				// phpcs:enable
 			}
 
 			if ( ! $this->usage_optin_allowed() && ! $override ) {
 				if ( defined( 'CHARITABLE_DEBUG_USAGE' ) && CHARITABLE_DEBUG_USAGE ) { // phpcs:disable
 					// phpcs:disable
-					error_log('charitable usage tracking not allowed');
+					if ( charitable_is_debug() ) {
+						error_log('charitable usage tracking not allowed');
+					}
 					// phpcs:enable
 				}
 				return false;
@@ -494,7 +498,9 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 			if ( is_numeric( $last_send ) && $last_send > strtotime( '-1 week' ) && ! $ignore_last_checkin ) {
 				if ( defined( 'CHARITABLE_DEBUG_USAGE' ) && CHARITABLE_DEBUG_USAGE ) { // phpcs:disable
 					// phpcs:disable
-					error_log('charitable usage tracking not allowed because of last checkin');
+					if ( charitable_is_debug() ) {
+						error_log('charitable usage tracking not allowed because of last checkin');
+					}
 					// phpcs:enable
 				}
 				return false;
@@ -519,9 +525,11 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 
 			if ( defined( 'CHARITABLE_DEBUG_USAGE' ) && CHARITABLE_DEBUG_USAGE ) { // phpcs:disable
 				// phpcs:disable
-				error_log( 'send_optin_usage_checkin' );
-				error_log( print_r( $request, true  ) );
-				error_log( print_r( $this->get_optin_data(), true ) );
+				if ( charitable_is_debug() ) {
+					error_log( 'send_optin_usage_checkin' );
+					error_log( print_r( $request, true  ) );
+					error_log( print_r( $this->get_optin_data(), true ) );
+				}
 				// phpcs:enable
 			}
 
@@ -549,24 +557,30 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 
 			if ( defined( 'CHARITABLE_DEBUG_USAGE' ) && CHARITABLE_DEBUG_USAGE ) { // phpcs:disable
 				// phpcs:disable
-				error_log('send_tracking_checkin');
+				if ( charitable_is_debug() ) {
+					error_log('send_tracking_checkin');
+				}
 				// phpcs:enable
 			}
 
 			if ( defined( 'CHARITABLE_DEBUG_USAGE' ) && CHARITABLE_DEBUG_USAGE ) { // phpcs:disable
 				// phpcs:disable
-				error_log( 'send_checkin' );
-				error_log( $override );
-				error_log( $ignore_last_checkin );
-				error_log( 'tracking allowed' );
-				error_log( $this->usage_optin_allowed() );
+				if ( charitable_is_debug() ) {
+					error_log( 'send_checkin' );
+					error_log( $override );
+					error_log( $ignore_last_checkin );
+					error_log( 'tracking allowed' );
+					error_log( $this->usage_optin_allowed() );
+				}
 				// phpcs:enable
 			}
 
 			if ( ! $this->tracking_allowed() && ! $override ) {
 				if ( defined( 'CHARITABLE_DEBUG_USAGE' ) && CHARITABLE_DEBUG_USAGE ) { // phpcs:disable
 					// phpcs:disable
-					error_log( 'charitable tracking not allowed' );
+					if ( charitable_is_debug() ) {
+						error_log( 'charitable tracking not allowed' );
+					}
 					// phpcs:enable
 				}
 				return false;
@@ -577,7 +591,9 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 			if ( is_numeric( $last_send ) && $last_send > strtotime( '-1 week' ) && ! $ignore_last_checkin ) {
 				if ( defined( 'CHARITABLE_DEBUG_USAGE' ) && CHARITABLE_DEBUG_USAGE ) { // phpcs:disable
 					// phpcs:disable
-					error_log('charitable tracking not allowed because of last checkin');
+					if ( charitable_is_debug() ) {
+						error_log('charitable tracking not allowed because of last checkin');
+					}
 					// phpcs:enable
 				}
 				return false;
@@ -602,10 +618,12 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 
 			if ( defined( 'CHARITABLE_DEBUG_USAGE' ) && CHARITABLE_DEBUG_USAGE ) { // phpcs:disable
 				// phpcs:disable
-				error_log( print_r( $request, true ) );
-				error_log( print_r( $last_send, true ) );
-				error_log( print_r( $charitable_version, true ) );
-				error_log( print_r( $this->get_tracking_data(), true ) );
+				if ( charitable_is_debug() ) {
+					error_log( print_r( $request, true ) );
+					error_log( print_r( $last_send, true ) );
+					error_log( print_r( $charitable_version, true ) );
+					error_log( print_r( $this->get_tracking_data(), true ) );
+				}
 			}
 
 			if ( ! is_wp_error( $request ) ) {

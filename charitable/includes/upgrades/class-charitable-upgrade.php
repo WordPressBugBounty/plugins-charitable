@@ -241,6 +241,24 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 					'message' => __( 'Charitable needs to add additional database tables.', 'charitable' ),
 					'prompt'  => true,
 				),
+				'detect_paypal_user_tier'                 => array(
+					'version'  => '1.8.11',
+					'message'  => '',
+					'prompt'   => false,
+					'callback' => array( $this, 'detect_paypal_user_tier' ),
+				),
+				'create_logs_table'                       => array(
+					'version'  => '1.8.11',
+					'message'  => __( 'Create the logs table.', 'charitable' ),
+					'prompt'   => false,
+					'callback' => array( $this, 'create_logs_table' ),
+				),
+				'verify_logs_table'                       => array(
+					'version'  => '1.8.11',
+					'message'  => '',
+					'prompt'   => false,
+					'callback' => array( $this, 'verify_logs_table' ),
+				),
 			);
 		}
 
@@ -1361,6 +1379,45 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 		}
 
 		/**
+		 * Create the charitable_logs table.
+		 *
+		 * Returns true so perform_immediate_upgrade() logs completion. We
+		 * deliberately do NOT call finish_upgrade() here because it forces a
+		 * wp_safe_redirect to the dashboard, which would interrupt whatever
+		 * admin page the user was loading on the init-priority-5 firing.
+		 *
+		 * @since 1.8.11
+		 *
+		 * @return bool
+		 */
+		public function create_logs_table() {
+			$db = new Charitable_Log_DB();
+			$db->create_table();
+
+			return true;
+		}
+
+		/**
+		 * Defensive follow-up to create_logs_table for fresh installs where
+		 * the upgrade flag was pre-marked but the table was never created.
+		 *
+		 * Same no-finish_upgrade rationale as create_logs_table.
+		 *
+		 * @since 1.8.11
+		 *
+		 * @return bool
+		 */
+		public function verify_logs_table() {
+			$db = new Charitable_Log_DB();
+
+			if ( ! $db->table_exists() ) {
+				$db->create_table();
+			}
+
+			return true;
+		}
+
+		/**
 		 * HERE BE DEPRECATED FUNCTIONS...
 		 *
 		 * We're keeping these functions since Charitable add-ons extend this
@@ -1472,6 +1529,71 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 		 */
 		public function get_upgrade_log_key() {
 			return $this->upgrade_log_key;
+		}
+
+		/**
+		 * Detect and lock the PayPal user tier on first 1.8.11 upgrade.
+		 *
+		 * Runs once at the 1.8.11 upgrade. Writes the option `charitable_paypal_user_tier`
+		 * with value `legacy` or `commerce`. The value is permanent — future donations,
+		 * gateway state changes, or imports do NOT re-tag the site.
+		 *
+		 * Tagging rule:
+		 *   - `legacy`   → legacy `paypal` gateway is currently active OR
+		 *                  any donation/recurring-donation post has
+		 *                  `donation_gateway = 'paypal'` postmeta.
+		 *   - `commerce` → otherwise.
+		 *
+		 * The result is escapable at runtime via the `pre_option_charitable_paypal_user_tier`
+		 * filter or by direct UPDATE on `wp_options`.
+		 *
+		 * @since  1.8.11
+		 *
+		 * @return boolean True after the upgrade is recorded.
+		 */
+		public function detect_paypal_user_tier() {
+			$existing = get_option( 'charitable_paypal_user_tier', null );
+
+			if ( null === $existing ) {
+				$tier = 'commerce';
+
+				// Read active_gateways directly from charitable_settings — bypassing
+				// `Charitable_Gateways::is_active_gateway()` because that path runs
+				// `apply_paypal_tier_visibility()`, which strips `paypal` from the
+				// active set when the tier option is unset (default `commerce`).
+				// Without this direct read, the active-gateway detection branch
+				// would never fire, defeating the primary detection signal for
+				// sites with the legacy gateway active but no donation history.
+				$settings        = get_option( 'charitable_settings', array() );
+				$active_gateways = ( ! empty( $settings['active_gateways'] ) && is_array( $settings['active_gateways'] ) )
+					? $settings['active_gateways']
+					: array();
+
+				if ( isset( $active_gateways['paypal'] ) ) {
+					$tier = 'legacy';
+				} else {
+					global $wpdb;
+
+					$has_legacy_history = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+						"SELECT 1 FROM {$wpdb->postmeta} pm
+						JOIN {$wpdb->posts} p ON pm.post_id = p.ID
+						WHERE pm.meta_key = 'donation_gateway'
+						  AND pm.meta_value = 'paypal'
+						  AND p.post_type IN ( 'donation', 'recurring_donation' )
+						LIMIT 1"
+					);
+
+					if ( $has_legacy_history ) {
+						$tier = 'legacy';
+					}
+				}
+
+				add_option( 'charitable_paypal_user_tier', $tier, '', 'yes' );
+			}
+
+			$this->finish_upgrade( 'detect_paypal_user_tier' );
+
+			return true;
 		}
 	}
 

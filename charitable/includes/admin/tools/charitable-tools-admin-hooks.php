@@ -163,3 +163,15 @@ add_action( 'admin_enqueue_scripts', array( Charitable_Tools_Misc::get_instance(
  * @since 1.8.10
  */
 add_action( 'admin_enqueue_scripts', array( Charitable_GiveWP_Importer::get_instance(), 'enqueue_scripts' ) );
+
+/**
+ * Logger AJAX handlers and script enqueue.
+ *
+ * @since 1.8.11
+ */
+add_action( 'wp_ajax_charitable_get_log_record', array( 'Charitable_Log', 'ajax_get_record' ) );
+add_action( 'wp_ajax_charitable_delete_all_logs', array( 'Charitable_Log', 'ajax_delete_all_logs' ) );
+add_action( 'wp_ajax_charitable_export_logs_csv', array( 'Charitable_Log', 'ajax_export_csv' ) );
+add_action( 'wp_ajax_charitable_toggle_logging', array( 'Charitable_Log', 'ajax_toggle_logging' ) );
+add_action( 'wp_ajax_charitable_save_log_retention', array( 'Charitable_Log', 'ajax_save_retention' ) );
+add_action( 'admin_enqueue_scripts', array( 'Charitable_Log', 'enqueue_scripts' ) );

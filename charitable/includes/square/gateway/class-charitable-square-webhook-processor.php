@@ -311,7 +311,9 @@ if ( ! class_exists( 'Charitable_Square_Webhook_Processor' ) ) :
 				 */
 				if ( ! charitable_square_legacy_mode() ) {
 
-					error_log( 'double checked this is not a legacy webhook' ); // phpcs:ignore
+					if ( charitable_is_debug( 'square' ) ) {
+						error_log( 'double checked this is not a legacy webhook' ); // phpcs:ignore
+					}
 
 					$message = call_user_func( $default_processors[ $this->event['type'] ], $this->event );
 

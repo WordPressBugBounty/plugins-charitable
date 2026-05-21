@@ -128,6 +128,15 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			$this->campaign = $campaign;
 			$this->id       = uniqid();
 
+			// paypal_commerce_connection_check() registers the filters that hide
+			// PayPal Commerce from the donor-facing gateway list when no seller
+			// is connected, and that swap the no-active-gateways notice for a
+			// donor-friendly fallback. Both filters must register BEFORE
+			// setup_payment_fields() evaluates the active-gateway count — that
+			// branch only fires (and thus only triggers the friendly fallback)
+			// when the gateway count drops to zero, which depends on the filter
+			// already being wired.
+			$this->paypal_commerce_connection_check();
 			$this->setup_payment_fields();
 			$this->check_test_mode();
 			$this->stripe_key_check();
@@ -1182,7 +1191,11 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 						'legend'   => __( 'Terms and Conditions', 'charitable' ),
 						'type'     => 'fieldset',
 						'fields'   => $terms_fields,
-						'priority' => 80,
+						// Terms must be accepted before the donor commits to
+						// a payment method, so order this fieldset just above
+						// the Payment fieldset (priority 60). Donors see
+						// consent → payment, not payment → consent.
+						'priority' => 56,
 					),
 				)
 			);
@@ -1561,6 +1574,154 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 			);
 
 			return apply_filters( 'charitable_square_connection_warning_notice', $notice, current_user_can( 'manage_charitable_settings' ) );
+		}
+
+		/**
+		 * Tracks whether the donor-facing payment list was stripped of
+		 * PayPal Commerce because the seller account wasn't connected.
+		 * Drives the donor-facing "donations temporarily unavailable"
+		 * message when this is the only reason there are no gateways.
+		 *
+		 * @since 1.8.11
+		 * @var   bool
+		 */
+		protected static $paypal_commerce_hidden_for_disconnect = false;
+
+		/**
+		 * Determine PayPal Commerce's connection status and warn admins when
+		 * the gateway is enabled but no PayPal account is connected.
+		 *
+		 * Also wires the runtime filters that:
+		 *   - hide PayPal Commerce from the donor-facing payment list when
+		 *     it's not connected, so donors never see a broken option, and
+		 *   - swap the generic "no active payment gateways" notice for a
+		 *     donor-friendly "temporarily unavailable" message when PayPal
+		 *     was the only enabled gateway.
+		 *
+		 * Donors never see the admin notice — capability-gated through
+		 * get_credentialed_notice() — but they do see the donor-side
+		 * graceful message.
+		 *
+		 * @since 1.8.11
+		 *
+		 * @return void
+		 */
+		protected function paypal_commerce_connection_check() {
+			if ( defined( 'CHARITABLE_DISABLE_PAYPAL_COMMERCE_CHECK' ) && CHARITABLE_DISABLE_PAYPAL_COMMERCE_CHECK ) {
+				return;
+			}
+
+			if ( ! class_exists( 'Charitable_Gateway_Paypal_Commerce' ) ) {
+				return;
+			}
+
+			$active_gateways = charitable_get_helper( 'gateways' )->get_active_gateways();
+			$has_gateways    = apply_filters( 'charitable_has_active_gateways', ! empty( $active_gateways ) );
+
+			if ( ! $has_gateways ) {
+				return;
+			}
+
+			if ( ! is_array( $active_gateways ) || ! array_key_exists( 'paypal_commerce', $active_gateways ) ) {
+				return;
+			}
+
+			$gateway = new Charitable_Gateway_Paypal_Commerce();
+
+			if ( $gateway->is_seller_connected() ) {
+				return;
+			}
+
+			// Wire the runtime filters once per request — gateway list cleanup
+			// and the donor-friendly fallback notice.
+			add_filter( 'charitable_active_gateways', array( $this, 'filter_active_gateways_hide_disconnected_paypal_commerce' ) );
+			add_filter( 'charitable_no_active_gateways_notice', array( $this, 'filter_no_active_gateways_notice_when_paypal_disconnected' ), 10, 2 );
+
+			// Admin-only notice in the form-level error list (matches Stripe pattern).
+			if ( current_user_can( 'manage_charitable_settings' ) ) { // phpcs:ignore
+				charitable_get_notices()->add_error( $this->get_paypal_commerce_connection_check_notice() );
+			}
+		}
+
+		/**
+		 * Build the admin-only notice text for the PayPal Commerce
+		 * "enabled but not connected" state. Donors never see this — the
+		 * admin-action link is only appended when the current user can
+		 * manage Charitable settings.
+		 *
+		 * @since 1.8.11
+		 *
+		 * @return string
+		 */
+		protected function get_paypal_commerce_connection_check_notice() {
+			$notice = $this->get_credentialed_notice(
+				__( 'PayPal Commerce is enabled but no PayPal account is connected.', 'charitable' ),
+				sprintf(
+					'<a href="%s">%s</a>.',
+					admin_url( 'admin.php?page=charitable-settings&tab=gateways&group=gateways_paypal_commerce' ),
+					__( 'Connect with PayPal', 'charitable' )
+				)
+			);
+
+			return apply_filters( 'charitable_paypal_commerce_connection_check_notice', $notice, current_user_can( 'manage_charitable_settings' ) ); // phpcs:ignore
+		}
+
+		/**
+		 * Remove PayPal Commerce from the active gateway list when its seller
+		 * isn't connected. Donors then never see the option on the donation
+		 * form, and the gateway-selector form field doesn't render a broken
+		 * radio that would have failed at PayPal-side anyway.
+		 *
+		 * Flips $paypal_commerce_hidden_for_disconnect so the companion
+		 * `charitable_no_active_gateways_notice` filter can swap the
+		 * standard message for the donor-friendly variant when PayPal was
+		 * the only enabled gateway.
+		 *
+		 * @since 1.8.11
+		 *
+		 * @param  array $gateways Active gateway map (gateway_id => class name).
+		 * @return array
+		 */
+		public function filter_active_gateways_hide_disconnected_paypal_commerce( $gateways ) {
+			if ( ! is_array( $gateways ) || ! array_key_exists( 'paypal_commerce', $gateways ) ) {
+				return $gateways;
+			}
+
+			unset( $gateways['paypal_commerce'] );
+			self::$paypal_commerce_hidden_for_disconnect = true;
+
+			return $gateways;
+		}
+
+		/**
+		 * Replace the "no active payment gateways" message with a
+		 * donor-friendly fallback when PayPal Commerce is the only
+		 * enabled gateway and we just stripped it for being disconnected.
+		 * Admins still get an actionable link; donors see graceful copy.
+		 *
+		 * @since 1.8.11
+		 *
+		 * @param  string $notice          Default notice text.
+		 * @param  bool   $is_admin        Whether the current user can manage Charitable settings.
+		 * @return string
+		 */
+		public function filter_no_active_gateways_notice_when_paypal_disconnected( $notice, $is_admin = false ) {
+			if ( ! self::$paypal_commerce_hidden_for_disconnect ) {
+				return $notice;
+			}
+
+			if ( $is_admin ) {
+				return $this->get_credentialed_notice(
+					__( 'PayPal Commerce is enabled but no PayPal account is connected.', 'charitable' ),
+					sprintf(
+						'<a href="%s">%s</a>.',
+						admin_url( 'admin.php?page=charitable-settings&tab=gateways&group=gateways_paypal_commerce' ),
+						__( 'Connect with PayPal', 'charitable' )
+					)
+				);
+			}
+
+			return __( 'Online donations are temporarily unavailable. Please check back soon.', 'charitable' );
 		}
 
 		/**

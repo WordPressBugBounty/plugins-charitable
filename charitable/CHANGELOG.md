@@ -1,3 +1,9 @@
+# 1.8.11
+* NEW: PayPal Commerce gateway — accept one-time donations via PayPal wallet (Venmo, Pay Later) and inline credit/debit card (Advanced Card Processing).
+* NEW: Site-level PayPal tier lock — new installs and Commerce-tier sites see PayPal Commerce; existing PayPal Standard sites keep using the legacy gateway.
+* IMPROVED: Test Mode toggle now has descriptive help text explaining sandbox routing. Help icons next to each payment gateway in admin settings, linking to documentation.
+* IMPROVED: Stripe donation flow now self-heals when a previously stored PaymentIntent becomes unreachable (e.g. after a gateway reconnect).
+
 # 1.8.10.5
 * NEW: Redesigned the "What's New" splash screen with a new hero section, video, and upgrade buttons.
 * NEW: Added a Form navigation icon in the campaign builder.

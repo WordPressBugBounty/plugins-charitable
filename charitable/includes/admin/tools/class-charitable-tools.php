@@ -188,6 +188,7 @@ if ( ! class_exists( 'Charitable_Tools' ) ) :
 					'import'      => __( 'Import', 'charitable' ),
 					'system-info' => __( 'System Info', 'charitable' ),
 					'snippets'    => __( 'Code Snippets', 'charitable' ),
+					'logs'        => __( 'Logs', 'charitable' ),
 					'misc'        => __( 'Misc', 'charitable' ),
 				)
 			);
@@ -545,6 +546,7 @@ if ( ! class_exists( 'Charitable_Tools' ) ) :
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=import' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'Import', 'charitable' ); ?></a>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=system-info' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'System Info', 'charitable' ); ?></a>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=snippets' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'Code Snippets', 'charitable' ); ?></a>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=logs' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'Logs', 'charitable' ); ?></a>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=misc' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'Misc', 'charitable' ); ?></a>
 				</h2>
 			</div>

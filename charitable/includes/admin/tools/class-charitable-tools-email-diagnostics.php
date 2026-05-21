@@ -973,7 +973,9 @@ if ( ! class_exists( 'Charitable_Tools_Email_Diagnostics' ) ) :
 				}
 			} catch ( Exception $e ) {
 				// Fail silently for diagnostics - don't break the diagnostic system
-				error_log( 'Charitable Email Diagnostics: Error counting recent email errors - ' . $e->getMessage() );
+				if ( charitable_is_debug() ) {
+					error_log( 'Charitable Email Diagnostics: Error counting recent email errors - ' . $e->getMessage() );
+				}
 			}
 
 			return $error_count;

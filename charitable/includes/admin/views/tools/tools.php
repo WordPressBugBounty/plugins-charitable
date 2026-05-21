@@ -20,8 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 $charitable_active_tab      = isset( $_GET['tab'] ) ? esc_html( $_GET['tab'] ) : 'export';  // phpcs:ignore
 $charitable_active_sub_tab  = isset( $_GET['sub_tab'] ) ? esc_html( $_GET['sub_tab'] ) : ''; // phpcs:ignore
 $charitable_group           = isset( $_GET['group'] ) ? esc_html( $_GET['group'] ) : $charitable_active_tab; // phpcs:ignore
-$charitable_tab_no_form_tag = array( 'import', 'export', 'system-info', 'snippets', 'customize' );
-$charitable_tab_no_fields   = array( 'system-info', 'snippets', 'customize' );
+$charitable_tab_no_form_tag = array( 'import', 'export', 'system-info', 'snippets', 'customize', 'logs' );
+$charitable_tab_no_fields   = array( 'system-info', 'snippets', 'customize', 'logs' );
+$charitable_tab_no_table    = array( 'logs' );
 $charitable_sections        = charitable_get_admin_tools()->get_sections();
 $charitable_show_return     = $charitable_group !== $charitable_active_tab;
 
@@ -68,7 +69,9 @@ ob_start();
 	<?php if ( ! in_array( strtolower( $charitable_active_tab ), $charitable_tab_no_form_tag, true ) ) : ?>
 	<form method="post" action="options.php">
 	<?php endif; ?>
+		<?php if ( ! in_array( strtolower( $charitable_active_tab ), $charitable_tab_no_table, true ) ) : ?>
 		<table class="form-table">
+		<?php endif; ?>
 		<?php
 		if ( ! in_array( strtolower( $charitable_active_tab ), $charitable_tab_no_form_tag, true ) ) :
 			settings_fields( 'charitable_tools' );
@@ -84,7 +87,9 @@ ob_start();
 
 		endif;
 		?>
+		<?php if ( ! in_array( strtolower( $charitable_active_tab ), $charitable_tab_no_table, true ) ) : ?>
 		</table>
+		<?php endif; ?>
 		<?php if ( ! in_array( strtolower( $charitable_active_tab ), $charitable_tab_no_form_tag, true ) ) : ?>
 			<?php
 				/**
