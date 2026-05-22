@@ -110,11 +110,13 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal_Commerce' ) ) :
 				'section_paypal_commerce' => array(
 					'title'    => __( 'PayPal Commerce Settings', 'charitable' ),
 					'type'     => 'heading',
+					'class'    => 'section-heading',
 					'priority' => 2,
 				),
 				'section_connection'      => array(
 					'title'    => __( 'Account Connection', 'charitable' ),
 					'type'     => 'heading',
+					'class'    => 'section-heading',
 					'priority' => 6,
 				),
 				'connection_status'       => array(
@@ -126,6 +128,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal_Commerce' ) ) :
 				'section_webhooks'        => array(
 					'title'    => __( 'Webhooks', 'charitable' ),
 					'type'     => 'heading',
+					'class'    => 'section-heading',
 					'priority' => 28,
 				),
 				'webhook_url_display'     => array(
@@ -137,6 +140,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal_Commerce' ) ) :
 				'section_options'         => array(
 					'title'    => __( 'Payment Options', 'charitable' ),
 					'type'     => 'heading',
+					'class'    => 'section-heading',
 					'priority' => 30,
 				),
 				'button_style'            => array(
@@ -179,6 +183,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal_Commerce' ) ) :
 				'section_advanced_payments' => array(
 					'title'    => __( 'Advanced Payment Methods', 'charitable' ),
 					'type'     => 'heading',
+					'class'    => 'section-heading',
 					'priority' => 40,
 					'help'     => __( 'These options require PPCP approval from PayPal. Check your connection status above.', 'charitable' ),
 				),
@@ -220,10 +225,42 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal_Commerce' ) ) :
 						'guest_only' => __( 'Guest users only (recommended)', 'charitable' ),
 						'all_users'  => __( 'All users', 'charitable' ),
 					),
+					'attrs'    => array(
+						'data-trigger-key'   => '#charitable_settings_gateways_paypal_commerce_enable_fastlane',
+						'data-trigger-value' => 'checked',
+					),
 				),
 			);
 
 			return array_merge( $settings, $paypal_settings );
+		}
+
+		/**
+		 * Retrieve the fees content shown when no active Pro license is present.
+		 *
+		 * Mirrors Charitable_Gateway_Stripe_AM::get_connection_status_content() and
+		 * Charitable_Gateway_Square::get_fees_content().
+		 *
+		 * @since  1.8.11.1
+		 *
+		 * @return string
+		 */
+		public function get_fees_content() {
+
+			if ( ! charitable_is_pro() ) {
+				return '<div class="charitable-inline-notice info">
+						<p>
+						<strong>' . esc_html__( 'Pay as you go pricing:', 'charitable' ) . '</strong> ' .
+						sprintf(
+							/* translators: %1$s: opening link tag, %2$s: closing link tag */
+							esc_html__( '3%% per transaction + PayPal fees. %1$sUpgrade to Pro%2$s for no added fees and priority support.', 'charitable' ),
+							'<a target="_blank" href="' . esc_url( charitable_pro_upgrade_url( 'gateway-paypal-commerce' ) ) . '">',
+							'</a>'
+						) . '</p>
+					</div>';
+			}
+
+			return '';
 		}
 
 		/**
@@ -238,7 +275,8 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal_Commerce' ) ) :
 			$is_connected    = $this->is_seller_connected();
 			$seller_merchant_id = $this->get_seller_merchant_id();
 
-			$html = '<div class="charitable-paypal-commerce-connection">';
+			$html  = $this->get_fees_content();
+			$html .= '<div class="charitable-paypal-commerce-connection">';
 
 			if ( $is_connected ) {
 				// Read via the cached wrapper so the connection panel shares the
@@ -450,7 +488,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal_Commerce' ) ) :
 
 					$html .= '<p style="margin-top: 15px;">';
 					$html .= '<a href="' . esc_url( $connect_url ) . '" class="button button-primary">';
-					$html .= '<span class="dashicons dashicons-admin-links" style="margin-top: 4px;"></span> ';
+					$html .= '<span class="dashicons dashicons-admin-links"></span> ';
 					$html .= __( 'Connect with PayPal', 'charitable' );
 					$html .= '</a>';
 					$html .= '</p>';

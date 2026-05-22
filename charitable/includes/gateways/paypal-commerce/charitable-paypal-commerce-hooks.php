@@ -2146,6 +2146,27 @@ function charitable_paypal_commerce_admin_notices() {
 add_action( 'admin_notices', 'charitable_paypal_commerce_admin_notices' );
 
 /**
+ * Add a body class on the PayPal Commerce settings page so the dedicated
+ * CSS rules in assets/scss/admin/charitable-admin-legacy.scss can scope to
+ * just this gateway's settings page.
+ *
+ * @since 1.8.11.1
+ *
+ * @param string $classes Existing body classes.
+ * @return string
+ */
+function charitable_paypal_commerce_admin_body_class( $classes ) {
+	if ( ! isset( $_GET['page'], $_GET['tab'], $_GET['group'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return $classes;
+	}
+	if ( 'charitable-settings' !== $_GET['page'] || 'gateways' !== $_GET['tab'] || 'gateways_paypal_commerce' !== $_GET['group'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return $classes;
+	}
+	return $classes . ' charitable-paypal-commerce-settings';
+}
+add_filter( 'admin_body_class', 'charitable_paypal_commerce_admin_body_class' );
+
+/**
  * Handle the "Auto-Create Webhook" button click.
  *
  * @since 1.8.11

@@ -2854,3 +2854,20 @@ body.charitable-admin-settings #charitable-settings .settings-lite-cta {
   width: 50%;
   float: left;
 }
+
+/* PayPal Commerce settings page — scoped via body class added by */
+/* charitable_paypal_commerce_admin_body_class() in charitable-paypal-commerce-hooks.php. */
+body.charitable-paypal-commerce-settings div#charitable-settings table.form-table tbody tr.section-heading th[scope=row] h4 {
+  margin: 10px 0 10px 0;
+  padding: 0 !important;
+  /* When a description <p> follows the heading, collapse the h4 */
+  /* bottom margin so the <p> spacing takes over. */
+}
+body.charitable-paypal-commerce-settings div#charitable-settings table.form-table tbody tr.section-heading th[scope=row] h4:has(+ p) {
+  margin-bottom: 0;
+}
+body.charitable-paypal-commerce-settings div#charitable-settings table.form-table tbody tr.section-heading th[scope=row] p {
+  font-weight: 400;
+  margin: 4px 0 16px 0;
+  padding: 0 !important;
+}
