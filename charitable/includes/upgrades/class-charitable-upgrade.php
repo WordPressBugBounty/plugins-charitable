@@ -259,6 +259,12 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 					'prompt'   => false,
 					'callback' => array( $this, 'verify_logs_table' ),
 				),
+				'sync_paypal_license_to_middleware'       => array(
+					'version'  => '1.8.11.2',
+					'message'  => '',
+					'prompt'   => false,
+					'callback' => array( $this, 'sync_paypal_license_to_middleware' ),
+				),
 			);
 		}
 
@@ -1592,6 +1598,41 @@ if ( ! class_exists( 'Charitable_Upgrade' ) ) :
 			}
 
 			$this->finish_upgrade( 'detect_paypal_user_tier' );
+
+			return true;
+		}
+
+		/**
+		 * One-time push of the Charitable license_key so already-connected
+		 * licensed Lite sites self-heal. Skips finish_upgrade() to avoid a
+		 * redirect on init priority 5.
+		 *
+		 * @since  1.8.11.2
+		 *
+		 * @return bool
+		 */
+		public function sync_paypal_license_to_middleware() {
+
+			if ( ! function_exists( 'charitable_paypal_get_license_key' )
+				|| ! function_exists( 'charitable_paypal_send_license_to_connected_modes' ) ) {
+				return true;
+			}
+
+			$license_key = charitable_paypal_get_license_key();
+			if ( '' === $license_key ) {
+				return true;
+			}
+
+			$settings   = get_option( 'charitable_settings', array() );
+			$gw         = isset( $settings['gateways_paypal_commerce'] ) && is_array( $settings['gateways_paypal_commerce'] )
+				? $settings['gateways_paypal_commerce']
+				: array();
+			$has_seller = ! empty( $gw['live_seller_merchant_id'] ) || ! empty( $gw['sandbox_seller_merchant_id'] );
+			if ( ! $has_seller ) {
+				return true;
+			}
+
+			charitable_paypal_send_license_to_connected_modes( $license_key );
 
 			return true;
 		}

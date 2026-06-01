@@ -1693,11 +1693,10 @@ function charitable_paypal_commerce_handle_onboarding_return() {
 	if ( $gateway->is_middleware_mode() ) {
 		$referral_id = get_transient( 'charitable_paypal_onboarding_referral_id_' . $mode );
 		if ( ! empty( $referral_id ) ) {
-			// License key lives at the top level of `charitable_settings`, not nested under
-			// the gateway. Reading from there ensures Pro/Plus/Agency activations all flow
-			// through to the middleware on first onboarding (matters for the freemium fee gate).
-			$root_settings = get_option( 'charitable_settings', array() );
-			$license_key   = isset( $root_settings['license_key'] ) ? (string) $root_settings['license_key'] : '';
+			// Read license_key via the canonical helper. Earlier code read
+			// $root_settings['license_key'] (a UI field key, not the storage
+			// key) which seeded the broker with an empty key on onboarding.
+			$license_key = function_exists( 'charitable_paypal_get_license_key' ) ? charitable_paypal_get_license_key() : '';
 
 			$middleware = Charitable_PayPal_Middleware_Client::get_instance();
 			$exchange   = $middleware->exchange_credentials( array(

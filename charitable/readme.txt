@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.8.11.1
+Stable tag: 1.8.11.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -67,7 +67,7 @@ We’re also proud to be a Square Verified Partner. This partnership allows us t
 
 Our PayPal integration is just as robust, allowing you to easily accept PayPal donations and manage them directly within Charitable. This makes offering PayPal as a payment option seamless for both you and your donors.
 
-Our full list of payment integrations include: Stripe, PayPal, Square, Authorize.net, Braintree, PayFast, Payrexx, Mollie, PayUMoney, GoCardless, Paystack, and Windcave.
+Our full list of payment integrations include: Stripe, PayPal, Square, Authorize.net, Braintree, PayFast, Payrexx, Mollie, PayUMoney, GoCardless, Paystack, Razorpay, and Windcave.
 
 Our Donation Fee Relief feature allows you to ask donors to donate extra to cover payment processing fees to maximize the impact.
 
@@ -105,11 +105,11 @@ We also know that our developer friends may want more control, so we have added 
 
 * Donation Form Builder - powerful drag & drop donation form builder. Create smart donation forms, add custom donate buttons, accept donation payments, and more without writing any code.
 * Visual Donation Form Builder – Design beautiful donation forms in minutes with a true drag & drop visual editor, live previews, and code-free customization.
-* Page Builder & Analytics Integrations – Deeply integrated with Elementor, WPBakery, and Google Analytics 4 for seamless visual design and automatic conversion tracking.
+* Page Builder & Analytics Integrations – Deeply integrated with Elementor, Divi, WPBakery, and Google Analytics 4 for seamless visual design and automatic conversion tracking.
 * Secure Credit Card & Digital Wallet Payments – Securely accept credit cards and Apple Pay/Google Pay with built-in Square support, plus Stripe, PayPal, and more.
 * Comprehensive Donor Management System – A full CRM to manage donor relationships, track activity, log offline gifts, and view donor history from a single dashboard.
 * Donor Dashboard – Provide a dedicated, self-service portal for supporters to manage profiles, view donation history, and download receipts.
-* Donor Leaderboard – Gamify fundraising by showcasing top supporters in list or card views to encourage friendly competition.
+* [Donor Leaderboard](https://www.wpcharitable.com/introducing-donor-leaderboard/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) – Gamify fundraising by showcasing top supporters in list or card views to encourage friendly competition.
 * Social Proof (DonorTrust) – Increase trust and conversions by displaying real-time popup notifications of recent donations to site visitors.
 * Easy Data Migration – Import donors from other platforms or spreadsheets in minutes with the powerful CSV Importer.
 * 100% mobile responsive.
@@ -130,6 +130,9 @@ We also know that our developer friends may want more control, so we have added 
 * [Gift Aid](https://www.wpcharitable.com/extensions/charitable-gift-aid/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - allow donors to boost their donations through the government's gift aid tax incentive.
 * [Spam protection](https://www.wpcharitable.com/extensions/charitable-spam-blocker/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) built-in with support Google reCAPTCHA and hCaptcha.
 * [Workflow Automation](https://www.wpcharitable.com/extensions/charitable-automation-connect/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) to help you save time with Zapier, Webhooks, Zoho Flow, and more.
+* [Donation Recovery](https://www.wpcharitable.com/introducing-donation-recovery-in-charitable-pro/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - automatically recover abandoned donations and failed payments to win back supporters and maximize revenue.
+* [Donations Feed](https://www.wpcharitable.com/introducing-donations-feed/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - display a live, real-time donation feed to build momentum and social proof for your fundraising campaigns.
+* [Campaign Updates](https://www.wpcharitable.com/introducing-campaign-updates/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin) - post timeline-style milestones, news, and progress reports directly on your campaign page to keep donors engaged.
 
 = Donation Payment Integrations =
 
@@ -146,6 +149,7 @@ Allow your users to donate with the payment solution of their choice to reach yo
 * [PayUMoney](https://www.wpcharitable.com/extensions/charitable-payu-money/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin)
 * [GoCardless](https://www.wpcharitable.com/extensions/charitable-gocardless/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin)
 * [Paystack](https://www.wpcharitable.com/extensions/charitable-paystack/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin)
+* [Razorpay](https://www.wpcharitable.com/extensions/charitable-razorpay/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin)
 * [Windcave](https://www.wpcharitable.com/extensions/charitable-windcave/?utm_source=wprepo&utm_medium=link&utm_campaign=liteplugin)
 
 = Marketing & Donation Workflow Integrations =
@@ -267,6 +271,10 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.11.2 =
+* FIX: Hardened profile avatar handling to prevent unauthorized attachment deletion.
+* FIX: PayPal Commerce onboarding reliability improvements.
 
 = Donation Form & Fundraising Campaigns v1.8.11.1 =
 * IMPROVED: Polished PayPal Settings screen, adding notice and improving readability.

@@ -1,3 +1,7 @@
+# 1.8.11.2
+* FIX: Hardened profile avatar handling to prevent unauthorized attachment deletion.
+* FIX: PayPal Commerce onboarding reliability improvements.
+
 # 1.8.11.1
 * IMPROVED: Polished PayPal Settings screen, adding notice and improving readability.
 

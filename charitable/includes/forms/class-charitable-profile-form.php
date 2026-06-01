@@ -712,40 +712,91 @@ if ( ! class_exists( 'Charitable_Profile_Form' ) ) :
 		 * @since   1.0.0
 		 */
 		public function save_avatar( $submitted, $fields, $form ) {
-			if ( isset( $_FILES ) && isset( $_FILES['avatar'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$user_id      = (int) $form->get_user()->ID;
+			$files_avatar = isset( $_FILES['avatar'] ) ? $_FILES['avatar'] : null; // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+			$has_upload   = is_array( $files_avatar )
+				&& ! empty( $files_avatar['name'] )
+				&& UPLOAD_ERR_NO_FILE !== (int) ( $files_avatar['error'] ?? UPLOAD_ERR_NO_FILE );
 
+			if ( $has_upload ) {
 				$attachment_id = $form->upload_post_attachment( 'avatar', 0 );
 
-				if ( ! is_wp_error( $attachment_id ) ) {
+				if ( is_wp_error( $attachment_id ) ) {
+					return $submitted;
+				}
 
-					$submitted['avatar'] = $attachment_id;
+				$submitted['avatar'] = (int) $attachment_id;
 
-					/* Delete the previously upload avatar. */
-					$old_avatar = get_user_meta( $form->get_user()->ID, 'avatar', true );
+				// Delete the previously stored avatar — only if it belongs to this user.
+				// Without this ownership check, a poisoned 'avatar' user-meta value
+				// (planted by a no-file submission, see below) would chain into
+				// wp_delete_attachment() on an attacker-chosen attachment ID.
+				$old_avatar = get_user_meta( $user_id, 'avatar', true );
+				if ( ! empty( $old_avatar )
+					&& $this->user_owns_attachment( $user_id, (int) $old_avatar ) ) {
+					wp_delete_attachment( (int) $old_avatar );
+				}
 
-					if ( ! empty( $old_avatar ) ) {
+				update_user_meta( $user_id, 'avatar', (int) $attachment_id );
 
-						wp_delete_attachment( $old_avatar );
+				return $submitted;
+			}
 
-					}
+			// No file in $_FILES. The avatar uploader (plupload) uploads the image
+			// asynchronously and posts the resulting attachment ID as a hidden field
+			// value, so the normal "change avatar" flow lands here with the new ID and
+			// no $_FILES — we must not reject it.
+			//
+			// Block meta poisoning: only persist an attachment the submitting user
+			// actually owns (a no-op re-save of their current avatar is also allowed).
+			// An attacker-supplied ID owned by someone else is discarded so it cannot
+			// be stored in user meta and later weaponised into wp_delete_attachment()
+			// on a subsequent $_FILES submission.
+			$current = (int) get_user_meta( $user_id, 'avatar', true );
+			$posted  = array_key_exists( 'avatar', $submitted ) ? $submitted['avatar'] : null;
 
-					update_user_meta( $form->get_user()->ID, 'avatar', $attachment_id );
-
-				} else {
-					/**
-					* Handle image upload error.
-					*
-					* @todo
-					*/
-				}//end if
-			} elseif ( ! array_key_exists( 'avatar', $submitted ) ) {
-
+			// Absent, empty, or non-scalar value means the avatar was cleared. The
+			// non-scalar guard blocks array poisoning (e.g. avatar[]=foo would
+			// otherwise coerce via (int) to 1 and bypass the ownership check below).
+			if ( null === $posted || '' === $posted || ! is_scalar( $posted ) ) {
 				/* The picture has been removed. */
 				$submitted['avatar'] = '';
+				return $submitted;
+			}
 
-			}//end if
+			$posted = (int) $posted;
+
+			// Discard anything that is neither the current avatar nor an attachment
+			// this user owns.
+			if ( $posted !== $current && ! $this->user_owns_attachment( $user_id, $posted ) ) {
+				$submitted['avatar'] = $current ?: '';
+				return $submitted;
+			}
+
+			$submitted['avatar'] = $posted;
 
 			return $submitted;
+		}
+
+		/**
+		 * Verify the given user owns the given attachment.
+		 *
+		 * @since  1.8.11.2
+		 *
+		 * @param  int $user_id       The user ID.
+		 * @param  int $attachment_id The attachment ID.
+		 * @return bool
+		 */
+		private function user_owns_attachment( $user_id, $attachment_id ) {
+			if ( $user_id <= 0 || $attachment_id <= 0 ) {
+				return false;
+			}
+
+			$attachment = get_post( $attachment_id );
+
+			return $attachment instanceof WP_Post
+				&& 'attachment' === $attachment->post_type
+				&& (int) $attachment->post_author === (int) $user_id;
 		}
 	}
 
