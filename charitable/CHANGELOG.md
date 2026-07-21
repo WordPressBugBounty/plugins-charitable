@@ -1,3 +1,6 @@
+# 1.8.11.3
+* FIX: Hardened Square (Core) payment webhook processing.
+
 # 1.8.11.2
 * FIX: Hardened profile avatar handling to prevent unauthorized attachment deletion.
 * FIX: PayPal Commerce onboarding reliability improvements.
