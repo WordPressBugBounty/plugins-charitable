@@ -1390,6 +1390,9 @@
   box-shadow: 0 0 0 1px #DADADE;
   transition: box-shadow 0.15s ease-in-out;
 }
+#charitable-template-container .charitable-template-list .charitable-template-list-container .charitable-template-list-container-item.charitable-template-is-new .charitable-template {
+  background-color: #ffebc7;
+}
 #charitable-template-container .charitable-template-list .charitable-template-list-container .charitable-template-list-container-item .charitable-template .template-thumbnail {
   background-color: transparent;
   width: 100%;
@@ -1504,6 +1507,46 @@
   font-size: 14px;
   line-height: 16px;
 }
+
+/* "NEW" pill — sits inline next to the template title, beneath the thumbnail.
+   Matches the small sidebar pill style so it stays unobtrusive but visible. */
+#charitable-template-container .charitable-template-list .charitable-template-list-container .charitable-template-list-container-item .charitable-template h4 .charitable-template-label-new {
+  display: inline-block;
+  background: #f59e0b;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  padding: 3px 5px;
+  border-radius: 3px;
+  margin-left: 6px;
+  vertical-align: middle;
+  text-transform: uppercase;
+}
+
+/* Sidebar "NEW" pill placed BEFORE a category label.
+   Override the float: right that the global "li span" rule applies, so the
+   pill sits inline immediately to the left of the label name. The -39px
+   margin-left nudges the pill into the sidebar's row gutter so the label
+   text stays aligned with the other categories. */
+#charitable-template-container .charitable-setup-templates-sidebar .charitable-setup-templates-categories li span.charitable-template-category-new {
+  float: none;
+  display: inline-block;
+  background: #f59e0b;
+  color: #fff;
+  opacity: 1;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  padding: 3px 5px;
+  border-radius: 3px;
+  margin-left: -39px;
+  margin-right: 6px;
+  vertical-align: middle;
+  text-transform: uppercase;
+}
 #charitable-template-container .charitable-template-list .charitable-template-list-container .charitable-template-list-container-item .charitable-template:hover:not(.active) {
   cursor: pointer;
 }
@@ -1545,7 +1588,7 @@
   border-bottom: 1px solid #cccccc;
 }
 #charitable-template-container .charitable-template-list .charitable-template-upgrade-banner {
-  background: rgba(226, 119, 48, 0.08);
+  background: rgba(226, 119, 48, 0.15);
   border-radius: 6px;
   display: flex;
   flex-direction: row;

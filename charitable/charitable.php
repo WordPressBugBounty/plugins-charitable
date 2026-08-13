@@ -3,11 +3,11 @@
  * Plugin Name: Charitable
  * Plugin URI: https://www.wpcharitable.com
  * Description: The best WordPress donation plugin. Fundraising with recurring donations, and powerful features to help you raise more money online.
- * Version: 1.8.11.3
+ * Version: 1.8.12
  * Author: Charitable Donations & Fundraising Team
  * Author URI: https://wpcharitable.com
- * Requires at least: 5.0
- * Stable tag: 1.8.11.3
+ * Requires at least: 5.9
+ * Stable tag: 1.8.12
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
@@ -39,7 +39,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 		const AUTHOR = 'WP Charitable';
 
 		/* Plugin version. */
-		const VERSION = '1.8.11.3';
+		const VERSION = '1.8.12';
 
 		/* Version of database schema. */
 		const DB_VERSION = '20180522';
@@ -127,6 +127,18 @@ if ( ! class_exists( 'Charitable' ) ) :
 			define( 'CHARITABLE_DIRECTORY_PATH', plugin_dir_path( __FILE__ ) );
 			define( 'CHARITABLE_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 			define( 'CHARITABLE_MARKETING_URL', 'https://wpcharitable.com/' );
+			if ( ! defined( 'CHARITABLE_ANALYSIS_API_URL' ) ) {
+				define( 'CHARITABLE_ANALYSIS_API_URL', apply_filters( 'charitable_analysis_api_url', 'https://nonprofitscore.org/api/v1/charitable/recommendations' ) );
+			}
+			// No credential is shipped. Each site earns a runtime-minted, quota-limited per-site token from
+			// the register endpoint (see Charitable_Site_Analysis::register()); the token is not in plugin source.
+			if ( ! defined( 'CHARITABLE_ANALYSIS_REGISTER_URL' ) ) {
+				define( 'CHARITABLE_ANALYSIS_REGISTER_URL', apply_filters( 'charitable_analysis_register_url', 'https://nonprofitscore.org/api/v1/charitable/register' ) );
+			}
+			// Note: CHARITABLE_ANALYSIS_SALT is intentionally NOT defined here. It would need wp_salt(),
+			// which lives in pluggable.php and is not loaded yet at plugin-construct time. The salt is
+			// resolved lazily in Charitable_Site_Analysis::gather_config() (admin-ajax time), and a host
+			// may still pre-define the CHARITABLE_ANALYSIS_SALT constant (e.g. in wp-config.php).
 
 			define( 'CHARITABLE_BUILDER_SHOW_LEGACY_EDIT_LINKS', true ); // 1.8.0 specific.
 
@@ -230,6 +242,7 @@ if ( ! class_exists( 'Charitable' ) ) :
 			require_once $includes_path . 'privacy/charitable-privacy-functions.php';
 			require_once $includes_path . 'public/charitable-template-helpers.php';
 			require_once $includes_path . 'shortcodes/charitable-shortcodes-hooks.php';
+			require_once $includes_path . 'tracking/charitable-tracking-hooks.php'; // 1.8.12 - MUST be outside the admin gate; see the file header.
 			require_once $includes_path . 'upgrades/charitable-upgrade-hooks.php';
 			require_once $includes_path . 'users/charitable-user-functions.php';
 			require_once $includes_path . 'user-management/charitable-user-management-hooks.php';
@@ -499,6 +512,10 @@ if ( ! class_exists( 'Charitable' ) ) :
 			require_once $this->get_path( 'admin' ) . 'class-charitable-admin-pointers.php';
 			require_once $this->get_path( 'admin' ) . 'plugins/charitable-admin-plugin-hooks.php';
 			require_once $this->get_path( 'admin' ) . 'class-charitable-admin-getting-started.php';
+
+			// Site Analysis / Recommendations tab.
+			require_once $this->get_path( 'admin' ) . 'site-analysis/class-charitable-site-analysis.php';
+			Charitable_Site_Analysis::get_instance();
 
 			$admin = Charitable_Admin::get_instance();
 			$this->registry->register_object( $admin );

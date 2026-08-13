@@ -14,6 +14,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+if ( ! function_exists( 'array_is_list' ) ) {
+	/**
+	 * Polyfill for array_is_list() (PHP 8.1+; WordPress core polyfills it from 6.5).
+	 *
+	 * Charitable's minimum supported WordPress version is 5.9, so on sites running
+	 * WordPress 5.9–6.4 with PHP < 8.1 this function is otherwise undefined. The
+	 * bundled Square SDK relies on it.
+	 *
+	 * @since 1.8.12
+	 *
+	 * @param  array $arr The array being evaluated.
+	 * @return bool  True if the array is a list, false otherwise.
+	 */
+	function array_is_list( array $arr ) {
+		if ( array() === $arr ) {
+			return true;
+		}
+
+		return array_keys( $arr ) === range( 0, count( $arr ) - 1 );
+	}
+}
+
 /**
  * Load plugin compatibility files on plugins_loaded hook.
  *

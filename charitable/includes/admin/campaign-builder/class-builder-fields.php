@@ -99,6 +99,7 @@ class Charitable_Builder_Fields {
 		$fields = [
 			'campaign-title',
 			'campaign-description',
+			'campaign-hero',
 			'donate-button',
 			'donate-amount',
 			'progress-bar',

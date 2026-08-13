@@ -26,6 +26,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_action( 'admin_init', array( Charitable_Settings::get_instance(), 'register_settings' ) );
 
 /**
+ * Redirect to the default Marketing sub-tab (newsletters) when no sub_tab is supplied.
+ *
+ * @see Charitable_Settings::marketing_sub_tab_default()
+ */
+add_action( 'admin_init', array( Charitable_Settings::get_instance(), 'marketing_sub_tab_default' ), 5 );
+
+/**
  * Maybe add "Licenses" settings tab.
  *
  * @see Charitable_Settings::maybe_add_extensions_tab()

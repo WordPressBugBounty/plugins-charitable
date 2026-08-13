@@ -178,7 +178,7 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 					}
 
 					$link    = ( 'publish' === $status || 'private' === $status ) ? get_permalink( $post_id ) : charitable_get_campaign_preview_url( $post_id, true, $status );
-					$display = '<a class="charitable-campaign-action-button" title="' . esc_html__( 'Preview', 'charitable' ) . '" href="' . esc_url( $link ) . '" target="_blank"><img src="' . charitable()->get_path( 'assets', false ) . '/images/icons/eye.svg" width="14" height="14" alt="' . esc_html__( 'Preview', 'charitable' ) . '" /></a><a class="charitable-campaign-action-button" title="' . esc_html__( 'Trash', 'charitable' ) . '" href="' . get_delete_post_link( $post_id ) . '"><img src="' . charitable()->get_path( 'assets', false ) . '/images/icons/trash.svg" width="14" height="14" alt="' . esc_html__( 'Trash', 'charitable' ) . '" /></a>';
+					$display = '<a class="charitable-campaign-action-button" title="' . esc_html__( 'Preview', 'charitable' ) . '" href="' . esc_url( $link ) . '" target="_blank"><img src="' . charitable()->get_path( 'assets', false ) . 'images/icons/eye.svg" width="14" height="14" alt="' . esc_html__( 'Preview', 'charitable' ) . '" /></a><a class="charitable-campaign-action-button" title="' . esc_html__( 'Trash', 'charitable' ) . '" href="' . get_delete_post_link( $post_id ) . '"><img src="' . charitable()->get_path( 'assets', false ) . 'images/icons/trash.svg" width="14" height="14" alt="' . esc_html__( 'Trash', 'charitable' ) . '" /></a>';
 
 					// <button><i class="fa fa-envelope"></i></button>
 

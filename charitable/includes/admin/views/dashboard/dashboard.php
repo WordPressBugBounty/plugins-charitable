@@ -59,7 +59,11 @@ $charitable_dashboard = Charitable_Dashboard::get_instance();
 
 			<!-- Right Column -->
 			<div class="charitable-dashboard-v2-right-column">
+				<?php $charitable_dashboard->render_enjoying_section(); ?>
+
 				<?php $charitable_dashboard->render_enhance_campaign_section(); ?>
+
+				<?php $charitable_dashboard->render_site_analysis_section(); ?>
 
 				<?php $charitable_dashboard->render_latest_updates_section(); ?>
 

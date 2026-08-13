@@ -82,6 +82,10 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 				return;
 			}
 
+			if ( ! current_user_can( 'manage_charitable_settings' ) ) {
+				return;
+			}
+
 			if ( ! $this->has_json_extension() ) {
 				$this->errors[] = __( 'Sorry, but Charitable import files must be in <code>.json</code> format.', 'charitable' );
 				$redirect_link  = admin_url( 'admin.php?page=charitable-tools&tab=import&sub_tab=charitable' );
@@ -137,7 +141,7 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 
 			foreach ( $data['meta'] as $meta_import_id => $meta_to_import ) {
 				if ( is_serialized( $meta_to_import['meta_value'] ) ) {
-					$data_to_import = unserialize( $meta_to_import['meta_value'] );
+					$data_to_import = unserialize( $meta_to_import['meta_value'], array( 'allowed_classes' => false ) );
 				} else {
 					$data_to_import = $meta_to_import['meta_value'];
 				}
@@ -302,6 +306,10 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 				return;
 			}
 
+			if ( ! current_user_can( 'manage_charitable_settings' ) ) {
+				return;
+			}
+
 			if ( ! $this->has_json_extension( 'import_donations' ) ) {
 				$this->add_update_message( __( 'Sorry, but Charitable import files must be in <code>.json</code> format.', 'charitable' ), 'error' );
 				$redirect_link = admin_url( 'admin.php?page=charitable-tools&tab=import&sub_tab=charitable' );
@@ -389,15 +397,15 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 					// import meta.
 					foreach ( $donation_data['meta'] as $meta_import_id => $meta_to_import ) {
 						if ( is_serialized( $meta_to_import['meta_value'] ) ) {
-							$data_to_import = unserialize( $meta_to_import['meta_value'] ); // phpcs:ignore
+							$data_to_import = unserialize( $meta_to_import['meta_value'], array( 'allowed_classes' => false ) ); // phpcs:ignore
 						} else {
 							$data_to_import = $meta_to_import['meta_value'];
 						}
 						if ( $meta_to_import['meta_key'] === 'donor' ) {
-							$donor_data = unserialize( $meta_to_import['meta_value'] ); // phpcs:ignore
+							$donor_data = unserialize( $meta_to_import['meta_value'], array( 'allowed_classes' => false ) ); // phpcs:ignore
 						}
 						if ( $meta_to_import['meta_key'] === '_donation_log' ) {
-							$donation_log = unserialize( $meta_to_import['meta_value'] ); // phpcs:ignore
+							$donation_log = unserialize( $meta_to_import['meta_value'], array( 'allowed_classes' => false ) ); // phpcs:ignore
 						}
 
 						add_post_meta( $donation_id, $meta_to_import['meta_key'], $data_to_import );
@@ -526,13 +534,13 @@ if ( ! class_exists( 'Charitable_Import_Items' ) ) :
 
 			global $wpdb;
 
-			$email = esc_html( $donor_data['email'] );
+			$email = ! empty( $donor_data['email'] ) ? $donor_data['email'] : '';
 
 			// update custom table.
 			$table = $wpdb->prefix . 'charitable_donors';
 
 			// try finding if they still exist first.
-			$donor_id = $wpdb->get_var( "SELECT donor_id FROM $table WHERE email = '$email'" ); // phpcs:ignore
+			$donor_id = $wpdb->get_var( $wpdb->prepare( "SELECT donor_id FROM {$table} WHERE email = %s", $email ) ); // phpcs:ignore
 
 			// if not, create it in the table.
 			if ( $donor_id === null ) {

@@ -102,17 +102,18 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 				'advanced' => __( 'Advanced', 'charitable' ),
 			);
 
-			// Only show marketing tab if newsletter connect addon is not active.
-			if ( ! class_exists( 'Charitable_Newsletter_Connect' ) ) {
-				$tabs = charitable_add_settings_tab(
-					$tabs,
-					'marketing',
-					__( 'Marketing', 'charitable' ),
-					array(
-						'index' => 5,
-					)
-				);
-			}
+			// Always show marketing tab. Sub-tabs (Newsletters, Conversion Tracking, Google Analytics)
+			// handle the per-feature display: Newsletter Connect addon (which works with Lite) renders
+			// its real UI under the Newsletters sub-tab when active; Conversion Tracking and Google
+			// Analytics always render Pro CTAs in Lite.
+			$tabs = charitable_add_settings_tab(
+				$tabs,
+				'marketing',
+				__( 'Marketing', 'charitable' ),
+				array(
+					'index' => 5,
+				)
+			);
 
 			// Always show security tab.
 			// When spam blocker is active, it will handle the settings.
@@ -134,6 +135,58 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 			}
 
 			return apply_filters( 'charitable_settings_tabs', $tabs );
+		}
+
+		/**
+		 * Return the array of sub tabs used on the Marketing settings page.
+		 *
+		 * Each label carries an inline "Pro" badge:
+		 *  - Newsletters: the Newsletter Connect addon works on Lite, but the badge
+		 *    still appears since the bulk of newsletter functionality is Pro-tier.
+		 *  - Conversion Tracking / Google Analytics: Pro-only — badge always shown.
+		 *
+		 * @since 1.8.11.3
+		 *
+		 * @return string[] key => label.
+		 */
+		public function get_sub_sections_marketing() {
+			$pro_badge = ' <span class="charitable-pro-badge">' . esc_html__( 'PRO', 'charitable' ) . '</span>';
+
+			return apply_filters(
+				'charitable_settings_sub_tabs_marketing',
+				array(
+					'marketing__newsletters'         => __( 'Newsletters', 'charitable' ) . $pro_badge,
+					'marketing__conversion_tracking' => __( 'Conversion Tracking', 'charitable' ) . $pro_badge,
+					'marketing__google_analytics'    => __( 'Google Analytics', 'charitable' ) . $pro_badge,
+				)
+			);
+		}
+
+		/**
+		 * Redirect to the default Marketing sub-tab when no sub_tab is supplied.
+		 *
+		 * @since 1.8.11.3
+		 *
+		 * @return void
+		 */
+		public function marketing_sub_tab_default() {
+			// Don't redirect during form submissions.
+			if ( ! empty( $_POST ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				return;
+			}
+
+			if ( ! charitable_is_settings_view( 'marketing' ) ) {
+				return;
+			}
+
+			if ( isset( $_GET['sub_tab'] ) || isset( $_GET['group'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				return;
+			}
+
+			wp_safe_redirect(
+				admin_url( 'admin.php?page=charitable-settings&tab=marketing&sub_tab=newsletters' )
+			);
+			exit;
 		}
 
 		/**
@@ -222,7 +275,29 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 
 			register_setting( 'charitable_settings', 'charitable_settings', array( $this, 'sanitize_settings' ) );
 
+			// Bridge the Newsletter Connect addon (which gates its filter on
+			// charitable_is_settings_view('extensions')) so its fields contribute
+			// when the user is on Marketing → Newsletters. We spoof $_GET['tab']
+			// for the duration of get_fields() so the addon's gate passes; the
+			// extensions section is what the view's form group already targets
+			// on the Newsletters sub-tab. The Extensions top-level tab continues
+			// to work as before — this only adds an additional render path.
+			$charitable_bridge_newsletters = (
+				isset( $_GET['tab'] ) && 'marketing' === $_GET['tab'] // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				&& isset( $_GET['sub_tab'] ) && 'newsletters' === $_GET['sub_tab'] // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				&& class_exists( 'Charitable_Newsletter_Connect' )
+			);
+
+			if ( $charitable_bridge_newsletters ) {
+				$charitable_real_tab = $_GET['tab']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$_GET['tab']         = 'extensions'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			}
+
 			$fields = $this->get_fields();
+
+			if ( $charitable_bridge_newsletters ) {
+				$_GET['tab'] = $charitable_real_tab; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			}
 
 			if ( empty( $fields ) ) {
 				return;
@@ -892,9 +967,16 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 				'security',
 			);
 
-			$tab_value = isset( $_GET['tab'] ) ? esc_attr( $_GET['tab'] ) : ''; // phpcs:ignore
+			$tab_value     = isset( $_GET['tab'] ) ? esc_attr( $_GET['tab'] ) : ''; // phpcs:ignore
+			$sub_tab_value = isset( $_GET['sub_tab'] ) ? esc_attr( $_GET['sub_tab'] ) : ''; // phpcs:ignore
 
 			if ( in_array( $tab_value, $tab_values_to_check ) ) { // phpcs:ignore
+				// UTM medium follows the sub_tab when present (e.g. marketing-conversion-tracking)
+				// so each upgrade button is attributable.
+				$upgrade_medium = ( 'marketing' === $tab_value && ! empty( $sub_tab_value ) )
+					? 'marketing-' . str_replace( '_', '-', $sub_tab_value )
+					: $tab_value;
+
 				ob_start();
 				?>
 
@@ -902,7 +984,18 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 
 					<?php
 					if ( 'marketing' === $tab_value ) {
-						$this->get_settings_cta_education_content_marketing_settings();
+						// Default to the Newsletters CTA when no sub_tab is supplied
+						// (the marketing_sub_tab_default redirect should normally prevent this,
+						// but render safely if a redirect was skipped — e.g. during POST).
+						$marketing_sub_tab = '' !== $sub_tab_value ? $sub_tab_value : 'newsletters';
+
+						if ( 'conversion_tracking' === $marketing_sub_tab ) {
+							$this->get_settings_cta_education_content_conversion_tracking();
+						} elseif ( 'google_analytics' === $marketing_sub_tab ) {
+							$this->get_settings_cta_education_content_google_analytics();
+						} else {
+							$this->get_settings_cta_education_content_marketing_settings();
+						}
 					} elseif ( 'donors' === $tab_value ) {
 						$this->get_settings_cta_education_content_donor_settings();
 					} elseif ( 'security' === $tab_value && ! charitable_is_pro() ) {
@@ -923,7 +1016,7 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 						</div>
 					<?php else : ?>
 					<div class="charitable-education-page-button">
-						<a href="<?php echo esc_url( charitable_utm_link( 'https://wpcharitable.com/lite-upgrade/', $tab_value, __( 'Upgrade to Charitable Pro', 'charitable' ) ) ); ?>" class="button button-primary" target="_blank"><?php esc_html_e( 'Upgrade to Charitable Pro', 'charitable' ); ?></a>
+						<a href="<?php echo esc_url( charitable_utm_link( 'https://wpcharitable.com/lite-upgrade/', $upgrade_medium, __( 'Upgrade to Charitable Pro', 'charitable' ) ) ); ?>" class="button button-primary" target="_blank"><?php esc_html_e( 'Upgrade to Charitable Pro', 'charitable' ); ?></a>
 					</div>
 					<?php endif; ?>
 				</div>
@@ -1045,6 +1138,128 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Organize donors with tags', 'charitable' ); ?></li>
 					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Send email series to keep donors engaged', 'charitable' ); ?></li>
 					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Enable multiple email services', 'charitable' ); ?></li>
+				</ul>
+			</div>
+			<?php
+		}
+
+		/**
+		 * Get the settings CTA education content for the Marketing → Conversion Tracking sub-tab.
+		 *
+		 * @since 1.8.11.3
+		 *
+		 * @return void
+		 */
+		public function get_settings_cta_education_content_conversion_tracking() {
+			$assets_url = charitable()->get_path( 'assets', false );
+			?>
+
+			<div class="charitable-education-page-heading">
+				<h4><?php esc_html_e( 'Conversion Tracking', 'charitable' ); ?></h4>
+				<p><?php esc_html_e( 'Send Charitable donation events into Meta Pixel, TikTok Pixel, and Google Tag Manager. Native, code-free conversion tracking that ties every completed donation to the ad campaigns and audiences that drove it.', 'charitable' ); ?></p>
+				<p><?php esc_html_e( 'See which ads actually produce donations, optimize spend toward real revenue, and build remarketing audiences from your highest-value supporters.', 'charitable' ); ?></p>
+			</div>
+
+			<div class="charitable-education-page-media">
+				<div class="charitable-education-page-video">
+					<figure>
+						<div class="charitable-education-page-video-embed">
+							<iframe src="https://www.youtube-nocookie.com/embed/sS-F6x6F-Fs?rel=0&amp;modestbranding=1&amp;iv_load_policy=3&amp;loop=1&amp;playlist=sS-F6x6F-Fs" title="<?php esc_attr_e( 'Introducing Conversion Tracking', 'charitable' ); ?>" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen frameborder="0"></iframe>
+						</div>
+						<figcaption><a href="https://youtu.be/sS-F6x6F-Fs" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Watch: Introducing Conversion Tracking', 'charitable' ); ?></a></figcaption>
+					</figure>
+				</div>
+				<div class="charitable-education-page-images">
+					<figure>
+						<div class="charitable-education-page-images-image">
+							<img src="<?php echo esc_url( $assets_url ); ?>images/education/conversion-tracking/education-1.png" alt="<?php esc_attr_e( 'Conversion tracking settings', 'charitable' ); ?>">
+							<a href="<?php echo esc_url( $assets_url ); ?>images/education/conversion-tracking/education-1.png" class="hover" data-lity="" data-lity-desc="<?php esc_attr_e( 'Pixel + GTM settings', 'charitable' ); ?>"></a>
+						</div>
+						<figcaption><?php esc_html_e( 'Pixel + GTM settings', 'charitable' ); ?></figcaption>
+					</figure>
+					<figure>
+						<div class="charitable-education-page-images-image">
+							<img src="<?php echo esc_url( $assets_url ); ?>images/education/conversion-tracking/education-2.png" alt="<?php esc_attr_e( 'Per-donation tracking status', 'charitable' ); ?>">
+							<a href="<?php echo esc_url( $assets_url ); ?>images/education/conversion-tracking/education-2.png" class="hover" data-lity="" data-lity-desc="<?php esc_attr_e( 'Per-donation tracking status', 'charitable' ); ?>"></a>
+						</div>
+						<figcaption><?php esc_html_e( 'Per-donation tracking status', 'charitable' ); ?></figcaption>
+					</figure>
+					<figure>
+						<div class="charitable-education-page-images-image">
+							<img src="<?php echo esc_url( $assets_url ); ?>images/education/conversion-tracking/education-3.png" alt="<?php esc_attr_e( 'WP Consent API compliant', 'charitable' ); ?>">
+							<a href="<?php echo esc_url( $assets_url ); ?>images/education/conversion-tracking/education-3.png" class="hover" data-lity="" data-lity-desc="<?php esc_attr_e( 'WP Consent API compliant', 'charitable' ); ?>"></a>
+						</div>
+						<figcaption><?php esc_html_e( 'WP Consent API compliant', 'charitable' ); ?></figcaption>
+					</figure>
+				</div>
+			</div>
+
+			<div class="charitable-education-page-caps">
+				<p><?php esc_html_e( 'Track conversions with…', 'charitable' ); ?></p>
+				<ul>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Meta Pixel (Facebook / Instagram)', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'TikTok Pixel', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Google Tag Manager (GTM)', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Campaign page view tracking', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Donation form open tracking', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'WP Consent API (GDPR) integration', 'charitable' ); ?></li>
+				</ul>
+			</div>
+			<?php
+		}
+
+		/**
+		 * Get the settings CTA education content for the Marketing → Google Analytics sub-tab.
+		 *
+		 * @since 1.8.11.3
+		 *
+		 * @return void
+		 */
+		public function get_settings_cta_education_content_google_analytics() {
+			$assets_url = charitable()->get_path( 'assets', false );
+			?>
+
+			<div class="charitable-education-page-heading">
+				<h4><?php esc_html_e( 'Google Analytics', 'charitable' ); ?></h4>
+				<p><?php esc_html_e( 'Send Charitable donation events into Google Analytics 4. Native GA4 integration fires purchase, refund, sign-up, and login events both browser-side via gtag.js and server-side via the Measurement Protocol — so every donation, including off-site gateways and webhook-confirmed completions, makes it into GA4.', 'charitable' ); ?></p>
+				<p><?php esc_html_e( 'See which campaigns and sources actually produce donations, stitch sessions across devices with hashed-email user_id, and stay EEA-compliant out of the box via Google Consent Mode v2 and the WP Consent API.', 'charitable' ); ?></p>
+			</div>
+
+			<div class="charitable-education-page-media">
+				<div class="charitable-education-page-images">
+					<figure>
+						<div class="charitable-education-page-images-image">
+							<img src="<?php echo esc_url( $assets_url ); ?>images/education/google-analytics/education-1.png" alt="<?php esc_attr_e( 'Google Analytics settings', 'charitable' ); ?>">
+							<a href="<?php echo esc_url( $assets_url ); ?>images/education/google-analytics/education-1.png" class="hover" data-lity="" data-lity-desc="<?php esc_attr_e( 'GA4 settings + Test Connection', 'charitable' ); ?>"></a>
+						</div>
+						<figcaption><?php esc_html_e( 'GA4 settings + Test Connection', 'charitable' ); ?></figcaption>
+					</figure>
+					<figure>
+						<div class="charitable-education-page-images-image">
+							<img src="<?php echo esc_url( $assets_url ); ?>images/education/google-analytics/education-2.png" alt="<?php esc_attr_e( 'Per-donation GA metabox', 'charitable' ); ?>">
+							<a href="<?php echo esc_url( $assets_url ); ?>images/education/google-analytics/education-2.png" class="hover" data-lity="" data-lity-desc="<?php esc_attr_e( 'Per-donation tracking metabox', 'charitable' ); ?>"></a>
+						</div>
+						<figcaption><?php esc_html_e( 'Per-donation tracking metabox', 'charitable' ); ?></figcaption>
+					</figure>
+					<figure>
+						<div class="charitable-education-page-images-image">
+							<img src="<?php echo esc_url( $assets_url ); ?>images/education/google-analytics/education-3.png" alt="<?php esc_attr_e( 'Test connection success', 'charitable' ); ?>">
+							<a href="<?php echo esc_url( $assets_url ); ?>images/education/google-analytics/education-3.png" class="hover" data-lity="" data-lity-desc="<?php esc_attr_e( 'Validate your GA4 setup', 'charitable' ); ?>"></a>
+						</div>
+						<figcaption><?php esc_html_e( 'Validate your GA4 setup', 'charitable' ); ?></figcaption>
+					</figure>
+				</div>
+			</div>
+
+			<div class="charitable-education-page-caps">
+				<p><?php esc_html_e( 'Track donations in GA4 with…', 'charitable' ); ?></p>
+				<ul>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'GA4 purchase events (browser + Measurement Protocol)', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Server-side refund, sign_up, and login events', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Full UTM capture (including utm_term and utm_id)', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Hashed-email user_id for cross-device session stitching', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( 'Google Consent Mode v2 + WP Consent API integration', 'charitable' ); ?></li>
+					<li><i class="fa fa-solid fa-check"></i> <?php esc_html_e( '"Test Connection" button to validate your GA4 setup', 'charitable' ); ?></li>
 				</ul>
 			</div>
 			<?php

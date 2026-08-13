@@ -147,6 +147,23 @@ if ( ! class_exists( 'Charitable_Log_List_Table' ) ) :
 		}
 
 		/**
+		 * Return a clean label for the primary column's row header aria-label.
+		 *
+		 * WordPress 7.1 renders the primary column as the row header and reads this
+		 * method for the accessible row name. See #32892.
+		 *
+		 * Declaring this on older WordPress is harmless — nothing calls it there.
+		 *
+		 * @since  1.8.12
+		 *
+		 * @param  Charitable_Log_Record $item Current record.
+		 * @return string The log title, or an empty string to omit the attribute.
+		 */
+		protected function get_primary_column_aria_label( $item ) {
+			return isset( $item->title ) ? wp_strip_all_tags( $item->title ) : '';
+		}
+
+		/**
 		 * Render the message column (truncated).
 		 *
 		 * @since 1.8.11

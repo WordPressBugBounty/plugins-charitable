@@ -112,7 +112,7 @@ if ( ! class_exists( 'Charitable_Field_Campaign_Overview' ) ) :
 			<div>
 				<p><em><strong>This is an example of a campaign overal.</strong> It can include more text that goes into some details about your campaign - such as the history of the organization, testimonials, and more. An overview can work great as a longer overview under the campaign or inside of the visible tabs on the campaign page. The overview here might say something like this:</em></p>
 				    <p><br/></p>
-                    <p><img src="' . charitable()->get_path( 'assets', false ) . '/images/campaign-builder/photo-default-image.png" alt="" title="" /></p>
+                    <p><img src="' . charitable()->get_path( 'assets', false ) . 'images/campaign-builder/photo-default-image.png" alt="" title="" /></p>
 					<p>Hi there! This campaign is to raise money for equipment, uniforms, and various other supplies for our local school sport team, The Tigers. Hi there! This campaign is to raise money for equipment, uniforms, and various other supplies for our local school sport team, The Tigers. Hi there! This campaign is to raise money for equipment, uniforms, and various other supplies for our local school sport team, The Tigers. Hi there! This campaign is to raise money for equipment, uniforms, and various other supplies for our local school sport team, The Tigers.</p>
 					<p><br/></p>
 					<p>The Tigers basebase team was founded in 1971 and has been providing fun after school activities for young children in the Dalls, Texas USA public schools ever since. The campaign is run by Mr. and Mrs. Smith and employs about 5 people including coaches and staff.</p>

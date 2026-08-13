@@ -172,6 +172,17 @@ if ( 'publish' === $charitable_post_status || ( ( false === $charitable_post_sta
 				$charitable_row_css[] = $charitable_additional_css;
 			}
 
+			$charitable_row_bg     = ! empty( $charitable_row['background_image'] ) ? esc_url( $charitable_row['background_image'] ) : '';
+			$charitable_row_style  = '' !== $charitable_row_bg ? ' style="background-image:url(\'' . $charitable_row_bg . '\');"' : '';
+			$charitable_row_locked = ! empty( $charitable_row['locked'] ) ? ' data-row-locked="1"' : '';
+
+			if ( '' !== $charitable_row_bg ) {
+				$charitable_row_css[] = 'has-background-image';
+			}
+			if ( ! empty( $charitable_row['locked'] ) ) {
+				$charitable_row_css[] = 'is-locked';
+			}
+
 			$charitable_row_css_classes = apply_filters(
 				'charitable_campaign_row_css',
 				$charitable_row_css,
@@ -185,7 +196,7 @@ if ( 'publish' === $charitable_post_status || ( ( false === $charitable_post_sta
 
 					<?php echo '<!-- row START -->'; ?>
 
-					<div id="charitable-template-row-<?php echo intval( $charitable_row_id ); ?>" data-row-id="<?php echo intval( $charitable_row_id ); ?>" data-row-type="<?php echo esc_attr( $charitable_row_type ); ?>" class="<?php echo implode( ' ', array_map( 'esc_attr', $charitable_row_css_classes ) ); ?>">
+					<div id="charitable-template-row-<?php echo intval( $charitable_row_id ); ?>" data-row-id="<?php echo intval( $charitable_row_id ); ?>" data-row-type="<?php echo esc_attr( $charitable_row_type ); ?>"<?php echo $charitable_row_locked; // phpcs:ignore ?> class="<?php echo implode( ' ', array_map( 'esc_attr', $charitable_row_css_classes ) ); ?>"<?php echo $charitable_row_style; // phpcs:ignore ?>>
 
 					<?php
 

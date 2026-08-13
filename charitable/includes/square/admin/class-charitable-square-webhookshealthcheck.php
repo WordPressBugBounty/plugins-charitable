@@ -60,6 +60,13 @@ if ( ! class_exists( 'Charitable_Square_WebhooksHealthCheck' ) ) :
 		private const NOTICE_ID = 'charitable_square_webhooks_site_health';
 
 		/**
+		 * Missing signing secret notice ID.
+		 *
+		 * @since 1.8.12
+		 */
+		private const MISSING_SECRET_NOTICE_ID = 'charitable_square_webhooks_missing_secret';
+
+		/**
 		 * Initialization.
 		 *
 		 * @since 1.8.7
@@ -229,6 +236,60 @@ if ( ! class_exists( 'Charitable_Square_WebhooksHealthCheck' ) ) :
 			// Use WordPress admin notices.
 			?>
 			<div class="notice notice-error is-dismissible" data-notice-id="<?php echo esc_attr( self::NOTICE_ID ); ?>">
+				<p><?php echo wp_kses_post( $notice ); ?></p>
+			</div>
+			<?php
+		}
+
+		/**
+		 * Warn when Square is connected but no webhook signing secret is stored.
+		 *
+		 * Since 1.8.12 the webhook processor fails closed when it has no signing
+		 * secret to verify against, so an affected site quietly stops reconciling
+		 * Square donations and refunds. The hourly health check cannot catch this:
+		 * it keys off the most recent *completed* Square donation, which is the
+		 * very thing a refused webhook prevents. Read the stored setting directly
+		 * instead so the warning does not depend on donation history or the cron.
+		 *
+		 * @since 1.8.12
+		 */
+		public function missing_signing_secret_notice() {
+
+			if ( ! current_user_can( 'manage_options' ) ) {
+				return;
+			}
+
+			// Only warn sites that actually have a valid Square connection.
+			if ( ! Charitable_Square_Helpers::is_square_configured() ) {
+				return;
+			}
+
+			$mode     = Charitable_Square_Helpers::get_mode();
+			$settings = charitable_get_option( 'gateways_square' );
+
+			// A secret is stored for the active mode, so verification works.
+			if ( is_array( $settings ) && ! empty( $settings[ $mode ]['webhooks-secret'] ) ) {
+				return;
+			}
+
+			$notice = sprintf(
+				wp_kses(
+					/* translators: %1$s: URL to the Square settings screen, %2$s: URL to the webhooks documentation */
+					__( 'Charitable cannot verify incoming Square webhooks because no webhook signing secret is stored for the current mode. Unverified webhooks are rejected, so Square donations and refunds will not update automatically. Add your signing secret on the <a href="%1$s">Square settings screen</a>. See our <a href="%2$s" rel="nofollow noopener" target="_blank">documentation</a> for the steps.', 'charitable' ),
+					array(
+						'a' => array(
+							'href'   => array(),
+							'target' => array(),
+							'rel'    => array(),
+						),
+					)
+				),
+				esc_url( admin_url( 'admin.php?page=charitable-settings&tab=gateways&group=gateways_square_core' ) ),
+				esc_url( charitable_utm_link( 'https://wpcharitable.com/docs/setting-up-square-webhooks/', 'Admin', 'Square Webhook Signing Secret Missing' ) )
+			);
+
+			?>
+			<div class="notice notice-error is-dismissible" data-notice-id="<?php echo esc_attr( self::MISSING_SECRET_NOTICE_ID ); ?>">
 				<p><?php echo wp_kses_post( $notice ); ?></p>
 			</div>
 			<?php

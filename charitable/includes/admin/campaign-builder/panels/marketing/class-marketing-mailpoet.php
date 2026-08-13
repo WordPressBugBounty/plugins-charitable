@@ -102,7 +102,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Marketing_Mailpoet' ) ) :
 		 *
 		 * @var string
 		 */
-		private $provider_slug = 'mailpoet';
+		private $provider_slug = 'mailpoet3';
 
 		/**
 		 * Get things going. Add action hooks for the sidebar menu and the panel itself.

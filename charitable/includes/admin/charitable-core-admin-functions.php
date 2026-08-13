@@ -1134,8 +1134,8 @@ function charitable_ajax_install_addon() {
 		$download_url = esc_url_raw( wp_unslash( $_POST['plugin'] ) );
 		global $hook_suffix;
 
-		// If the url doesn't start with 'https://www.wpcharitable.com', then return an error.
-		if ( 0 !== intval( strpos( $download_url, 'https://www.wpcharitable.com' ) ) ) {
+		// If the url doesn't start with 'https://www.wpcharitable.com/', then return an error.
+		if ( strpos( $download_url, 'https://www.wpcharitable.com/' ) !== 0 ) {
 			wp_send_json_error(
 				array(
 					'basename'     => $download_url,

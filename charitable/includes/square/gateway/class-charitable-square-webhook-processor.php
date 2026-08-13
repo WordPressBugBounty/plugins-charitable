@@ -963,7 +963,17 @@ if ( ! class_exists( 'Charitable_Square_Webhook_Processor' ) ) :
 				// phpcs:enable
 			}
 
-			$refund_amount = $charge['refund']['amount_money']['amount'];
+			$refund_amount   = $charge['refund']['amount_money']['amount'];
+			$refund_currency = $charge['refund']['amount_money']['currency'];
+
+			// Square sends amounts in the smallest currency unit (cents for
+			// USD, yen for JPY, etc.). process_refund() expects the site's
+			// display unit, so divide by 100 unless this is a zero-decimal
+			// currency.
+			if ( ! Charitable_Square_Gateway_Processor::is_zero_decimal_currency( $refund_currency ) ) {
+				$refund_amount = $refund_amount / 100;
+			}
+
 			if ( charitable_is_debug( 'square' ) ) {
 				// phpcs:disable
 				error_log( 'Square Webhook - Refund Amount: ' . $refund_amount );
@@ -1450,13 +1460,48 @@ if ( ! class_exists( 'Charitable_Square_Webhook_Processor' ) ) :
 			}
 
 			/*
-			 * No signing secret stored (webhook subscription not yet registered
-			 * via the Square settings screen). Fall through to the legacy
-			 * merchant_id presence check for backwards compatibility; such sites
-			 * remain unverified until they register webhooks.
+			 * No signing secret stored. Historically the processor fell through
+			 * here to a merchant_id presence check and ACCEPTED the (unsigned)
+			 * event, which let an unauthenticated caller forge Square webhooks on
+			 * any site that had not yet stored a signing secret. Fail closed: the
+			 * event is refused unless enforcement is explicitly disabled.
+			 *
+			 * Sites connected through the Square settings screen store a signing
+			 * secret during onboarding, so they never reach this branch and are
+			 * unaffected. For the rare site that has webhooks enabled but no
+			 * stored secret, refused events stop donations/refunds from
+			 * reconciling, which the hourly Charitable_Square_WebhooksHealthCheck
+			 * detects and surfaces as an admin notice prompting a reconnect (which
+			 * re-registers the subscription and stores a fresh signing secret,
+			 * restoring verification).
+			 *
+			 * @since 1.8.12
 			 */
-			if ( empty( $signature_key ) && charitable_is_debug( 'square' ) ) {
-				error_log( 'Square webhook WARNING: no signing secret stored - signature verification skipped. Register webhooks via Square settings to enable verification.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			if ( empty( $signature_key ) ) {
+
+				/**
+				 * Filter whether to enforce Square webhook signature verification
+				 * when no signing secret is stored.
+				 *
+				 * Defaults to true (fail closed). Returning false restores the
+				 * legacy behaviour of accepting unsigned events and re-opens the
+				 * forgery vector, so it should only be used as a temporary escape
+				 * hatch while reconnecting Square.
+				 *
+				 * @since 1.8.12
+				 *
+				 * @param bool $enforce Whether to reject unsigned events. Default true.
+				 */
+				$enforce_signature = (bool) apply_filters( 'charitable_square_webhook_enforce_signature', true );
+
+				if ( $enforce_signature ) {
+					error_log( 'Square webhook REJECTED: no signing secret stored. Reconnect Square (Settings > Payment > Square) to register webhooks and enable signature verification. To temporarily accept unsigned events, use the charitable_square_webhook_enforce_signature filter.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					return false;
+				}
+
+				if ( charitable_is_debug( 'square' ) ) {
+					error_log( 'Square webhook WARNING: no signing secret stored and signature enforcement disabled via the charitable_square_webhook_enforce_signature filter - accepting unsigned event.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				}
 			}
 
 			$event = json_decode( $body, true );

@@ -149,7 +149,7 @@ class Charitable_Elementor {
     public function register_styles() {
         wp_enqueue_style(
             'charitable-elementor-editor',
-            charitable()->get_path( 'assets', false ) . '/css/elementor/charitable-elementor-editor.css',
+            charitable()->get_path( 'assets', false ) . 'css/elementor/charitable-elementor-editor.css',
             array(),
             charitable()->get_version()
         );

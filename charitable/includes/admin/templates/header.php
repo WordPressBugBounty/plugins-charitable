@@ -15,8 +15,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // if there are new notifications add the indicator to the menu title.
 $charitable_notification_count = class_exists( 'Charitable_Notifications' ) ? Charitable_Notifications::get_instance()->get_new_notifications_count() : 0;
-$charitable_display_text = $charitable_notification_count > 0 ? ( $charitable_notification_count > 9 ? '9+' : $charitable_notification_count ) : '';
-$charitable_indictor_html = $charitable_notification_count > 0 ? '<span class="round number">' . $charitable_display_text . '</span>' : '';
+$charitable_has_alerts         = class_exists( 'Charitable_Notifications' ) ? Charitable_Notifications::get_instance()->has_alert_notifications() : false;
+$charitable_display_text       = $charitable_notification_count > 0 ? ( $charitable_notification_count > 9 ? '9+' : $charitable_notification_count ) : '';
+$charitable_badge_type         = $charitable_has_alerts ? 'alert' : 'info';
+$charitable_indictor_html      = $charitable_notification_count > 0 ? '<span class="round number ' . $charitable_badge_type . '">' . $charitable_display_text . '</span>' : '';
 ?>
 
 <?php do_action( 'charitable_admin_before_header' ); ?>

@@ -240,7 +240,7 @@ if ( ! class_exists( 'Charitable_Admin_Donation_Form' ) ) :
 		 */
 		public function get_user_fields() {
 			$fields            = $this->get_section_fields( 'user' );
-			$loading_icon      = charitable()->get_path( 'assets', false ) . '/images/charitable-loading.gif';
+			$loading_icon      = charitable()->get_path( 'assets', false ) . 'images/charitable-loading.gif';
 			$fields['overlay'] = array(
 				'type'     => 'content',
 				'priority' => 1,

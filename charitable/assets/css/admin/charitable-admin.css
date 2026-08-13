@@ -155,6 +155,7 @@ body.charitable_page_charitable-addons #wpbody-content .wrap {
 }
 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-inbox {
   position: relative;
+  height: 27px;
 }
 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-inbox svg {
   width: 30px;
@@ -167,7 +168,7 @@ body.charitable_page_charitable-addons #wpbody-content .wrap {
 }
 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-inbox .number {
   position: absolute;
-  background-color: #df2a4a;
+  background-color: #2271b1;
   width: 16px;
   height: 16px;
   font-weight: 600;
@@ -179,6 +180,9 @@ body.charitable_page_charitable-addons #wpbody-content .wrap {
   margin-left: 0px;
   animation: wpchar-bounce-in 1.2s 5;
   z-index: 2;
+}
+#charitable-admin-header .charitable-header-logos ul li a.charitable-notification-inbox .number.alert {
+  background-color: #df2a4a;
 }
 #charitable-admin-header .charitable-header-logos ul li a:hover {
   opacity: 0.5;
@@ -223,11 +227,13 @@ body.post-type-campaign table thead td,
 body.post-type-campaign table tfoot td {
   border-color: #DDD;
 }
-body.post-type-campaign table td.title {
+body.post-type-campaign table td.title,
+body.post-type-campaign table th.title {
   font-weight: 400;
   padding-right: 50px;
 }
-body.post-type-campaign table td.title a {
+body.post-type-campaign table td.title a,
+body.post-type-campaign table th.title a {
   font-weight: 400;
 }
 body.post-type-campaign h1 {
@@ -362,13 +368,15 @@ body.post-type-campaign input#post-search-input {
 body.post-type-campaign .jconfirm .jconfirm-cell {
   display: block;
 }
-body.post-type-campaign.edit-php.post-type-campaign th.check-column label:hover {
+body.post-type-campaign.edit-php.post-type-campaign tbody th.check-column label:hover,
+body.post-type-campaign.edit-php.post-type-campaign tbody td.check-column label:hover {
   background-color: transparent;
 }
 body.post-type-campaign.edit-php.post-type-campaign .check-column input:hover + label {
   background-color: transparent;
 }
-body.post-type-campaign.edit-php.post-type-campaign tbody#the-list td {
+body.post-type-campaign.edit-php.post-type-campaign tbody#the-list td,
+body.post-type-campaign.edit-php.post-type-campaign tbody#the-list th.column-primary {
   vertical-align: middle;
 }
 body.post-type-campaign.edit-php.post-type-campaign .actions {
@@ -382,11 +390,13 @@ body.post-type-campaign.edit-php.post-type-campaign .actions button {
   background-color: transparent;
   margin: 0 5px 0 0;
 }
-body.post-type-campaign.edit-php.post-type-campaign tbody#the-list th.check-column input[type=checkbox] {
+body.post-type-campaign.edit-php.post-type-campaign tbody#the-list th.check-column input[type=checkbox],
+body.post-type-campaign.edit-php.post-type-campaign tbody#the-list td.check-column input[type=checkbox] {
   margin-top: 3px;
 }
 body.post-type-campaign.edit-php.post-type-campaign tbody#the-list th.check-column,
-body.post-type-campaign.edit-php.post-type-campaign tbody#the-list td {
+body.post-type-campaign.edit-php.post-type-campaign tbody#the-list td,
+body.post-type-campaign.edit-php.post-type-campaign tbody#the-list th.column-primary {
   vertical-align: top;
   padding-top: 20px;
   height: 80px;
@@ -472,7 +482,7 @@ body.post-type-campaign #wpbody-content .page-title-action {
   display: inline-block;
   padding-top: 0;
   padding-bottom: 0;
-  line-height: 26px;
+  line-height: 30px;
   top: -2px;
 }
 body.post-type-campaign #wpbody-content .page-title-action:hover {
@@ -628,7 +638,9 @@ body.post-type-donation .charitable-campaign-action-button:hover {
 
 /* specific to starting from scratch */
 body.post-type-campaign.edit-php.charitable-campaigns-0-published #posts-filter tbody#the-list td,
-body.post-type-campaign.edit-php.charitable-campaigns-0-trash #posts-filter tbody#the-list td {
+body.post-type-campaign.edit-php.charitable-campaigns-0-published #posts-filter tbody#the-list th.column-primary,
+body.post-type-campaign.edit-php.charitable-campaigns-0-trash #posts-filter tbody#the-list td,
+body.post-type-campaign.edit-php.charitable-campaigns-0-trash #posts-filter tbody#the-list th.column-primary {
   vertical-align: middle;
   padding-top: 20px;
   padding-bottom: 20px;
@@ -679,11 +691,13 @@ body.post-type-donation table thead td,
 body.post-type-donation table tfoot td {
   border-color: #DDD;
 }
-body.post-type-donation table td.title {
+body.post-type-donation table td.title,
+body.post-type-donation table th.title {
   font-weight: 400;
   padding-right: 50px;
 }
-body.post-type-donation table td.title a {
+body.post-type-donation table td.title a,
+body.post-type-donation table th.title a {
   font-weight: 400;
   color: #454955;
 }
@@ -828,7 +842,8 @@ body.post-type-donation #wpbody-content .charitable-donation-action-button:hover
 body.post-type-donation .jconfirm .jconfirm-cell {
   display: block;
 }
-body.post-type-donation.edit-php.post-type-donation tbody#the-list td {
+body.post-type-donation.edit-php.post-type-donation tbody#the-list td,
+body.post-type-donation.edit-php.post-type-donation tbody#the-list th.column-primary {
   vertical-align: middle;
 }
 body.post-type-donation.edit-php.post-type-donation .actions {
@@ -842,11 +857,13 @@ body.post-type-donation.edit-php.post-type-donation .actions button {
   background-color: transparent;
   margin: 0 5px 0 0;
 }
-body.post-type-donation.edit-php.post-type-donation tbody#the-list th.check-column input[type=checkbox] {
+body.post-type-donation.edit-php.post-type-donation tbody#the-list th.check-column input[type=checkbox],
+body.post-type-donation.edit-php.post-type-donation tbody#the-list td.check-column input[type=checkbox] {
   margin-top: 3px;
 }
 body.post-type-donation.edit-php.post-type-donation tbody#the-list th.check-column,
-body.post-type-donation.edit-php.post-type-donation tbody#the-list td {
+body.post-type-donation.edit-php.post-type-donation tbody#the-list td,
+body.post-type-donation.edit-php.post-type-donation tbody#the-list th.column-primary {
   vertical-align: top;
   padding-top: 20px;
 }
@@ -1534,18 +1551,28 @@ body.charitable_page_charitable-addons table tfoot td {
   border-color: #DDD;
 }
 body.charitable_page_charitable-settings table td.title,
+body.charitable_page_charitable-settings table th.title,
 body.charitable_page_charitable-reports table td.title,
+body.charitable_page_charitable-reports table th.title,
 body.post-type-charitable.edit-tags-php table td.title,
+body.post-type-charitable.edit-tags-php table th.title,
 body.charitable_page_charitable-tools table td.title,
-body.charitable_page_charitable-addons table td.title {
+body.charitable_page_charitable-tools table th.title,
+body.charitable_page_charitable-addons table td.title,
+body.charitable_page_charitable-addons table th.title {
   font-weight: 400;
   padding-right: 50px;
 }
 body.charitable_page_charitable-settings table td.title a,
+body.charitable_page_charitable-settings table th.title a,
 body.charitable_page_charitable-reports table td.title a,
+body.charitable_page_charitable-reports table th.title a,
 body.post-type-charitable.edit-tags-php table td.title a,
+body.post-type-charitable.edit-tags-php table th.title a,
 body.charitable_page_charitable-tools table td.title a,
-body.charitable_page_charitable-addons table td.title a {
+body.charitable_page_charitable-tools table th.title a,
+body.charitable_page_charitable-addons table td.title a,
+body.charitable_page_charitable-addons table th.title a {
   font-weight: 400;
   color: #454955;
 }
@@ -4280,10 +4307,13 @@ body.modal-open {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #d63638;
+  background-color: #2271b1;
   line-height: 1.6;
   animation: wpchar-menu-notification-indicator-pulse 1.5s infinite;
   float: right;
+}
+.charitable-menu-notification-indicator.alert {
+  background-color: #d63638;
 }
 
 [dir=ltr] #toplevel_page_charitable .charitable-menu-notification-indicator {
@@ -5449,4 +5479,91 @@ body.charitable_page_charitable-settings .charitable-settings-field.charitable-t
 body.charitable-settings-page-gateways .charitable-settings-field.charitable-test-mode-checkbox h4 {
   width: 180px !important;
   padding-right: 20px !important;
+}
+
+/* Marketing sub-tab navigation (Newsletters, Conversion Tracking, Google Analytics).
+   1.8.11.3 */
+body.charitable_page_charitable-settings h3.nav-sub-tab-wrapper {
+  font-family: "Inter", sans-serif;
+  margin: 10px 0 40px;
+  padding: 0;
+  border-bottom: none;
+  font-size: 14px;
+  font-weight: 400;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+body.charitable_page_charitable-settings h3.nav-sub-tab-wrapper a.nav-tab {
+  color: #2F3241;
+  font-weight: 400;
+  border: none;
+  background: transparent;
+  padding: 6px 12px;
+  margin: 0 8px 0 0;
+}
+body.charitable_page_charitable-settings h3.nav-sub-tab-wrapper a.nav-tab.nav-tab-active {
+  color: #2F3241;
+  font-weight: 600;
+  border-bottom: 2px solid #5AA152;
+}
+body.charitable_page_charitable-settings h3.nav-sub-tab-wrapper a.nav-tab:hover {
+  color: #2F3241;
+}
+/* Video embed used in Marketing → Conversion Tracking education CTA. Renders
+   a responsive 16:9 iframe (max-width 720px) with a centered caption link. */
+.charitable-education-page .charitable-education-page-video {
+  margin: 35px 0;
+}
+.charitable-education-page .charitable-education-page-video figure {
+  margin: 0 auto;
+  max-width: 720px;
+}
+.charitable-education-page .charitable-education-page-video-embed {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  background-color: #000;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 5px 0px;
+}
+.charitable-education-page .charitable-education-page-video-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.charitable-education-page .charitable-education-page-video figcaption {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+  text-align: center;
+  margin-top: 10px;
+  max-width: 720px;
+}
+.charitable-education-page .charitable-education-page-video figcaption a {
+  color: #5AA152;
+  text-decoration: none;
+}
+.charitable-education-page .charitable-education-page-video figcaption a:hover {
+  text-decoration: underline;
+}
+/* Inline Pro badge used in Marketing sub-tab labels. Matches the existing
+   ::after badge style applied to top-level Marketing/Donors tabs. */
+.charitable-pro-badge {
+  display: inline-block;
+  background-color: #F99E36;
+  padding: 3px 7px;
+  font-size: 11px;
+  line-height: 11px;
+  text-transform: uppercase;
+  color: #fff;
+  font-weight: 600;
+  margin-left: 5px;
+  position: relative;
+  top: -1px;
+  border-radius: 2px;
 }

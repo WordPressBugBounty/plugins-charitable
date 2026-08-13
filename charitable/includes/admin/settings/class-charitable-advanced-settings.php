@@ -200,6 +200,7 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 			delete_option( 'charitable_notifications' ); // v1.8.3.
 			delete_option( 'charitable_usage_tracking_last_checkin' ); // v1.8.4.
 			delete_option( 'charitable_tracking_last_checkin' ); // v1.8.4.
+			delete_option( 'charitable_telemetry_send_failures' ); // v1.8.12.
 			delete_option( 'charitable_splash_version' ); // v1.8.6.
 
 			// Delete transients (related to notices).

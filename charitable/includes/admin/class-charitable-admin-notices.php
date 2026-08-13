@@ -63,6 +63,7 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 			add_action( 'admin_notices', array( $this, 'render_license_expired_banner' ) );
 			add_action( 'admin_notices', array( $this, 'render_five_star_rating' ) );
 			add_action( 'admin_notices', array( $this, 'render_square_connection_error' ) );
+			add_action( 'admin_notices', array( $this, 'render_paypal_account_type_required_notice' ) );
 			add_action( 'charitable_dismiss_notice', array( $this, 'dismiss_five_star_notice' ), 10, 1 );
 			add_action( 'charitable_dismiss_notice', array( $this, 'dismiss_campaign_builder_notice' ), 10, 1 );
 			add_action( 'charitable_dismiss_notice', array( $this, 'dismiss_dashboard_reporting_notice' ), 10, 1 );
@@ -415,6 +416,12 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 				return;
 			}
 
+			// Dashboard has its own inline version of this notice — skip the top-bar one.
+			$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( 'charitable-dashboard' === $page ) {
+				return;
+			}
+
 			$screen = get_current_screen();
 
 			// determine if we are on the current screen.
@@ -465,6 +472,83 @@ if ( ! class_exists( 'Charitable_Admin_Notices' ) ) :
 			$message = charitable_admin_view( 'notices/admin-notice-square-connection-error', array( 'message' => $admin_notice['message'], 'status_code' => $admin_notice['status_code'] ), true ); // phpcs:ignore
 			$key     = 'square-connection-error';
 			$this->render_notice( $message, 'error', true, $key, false );
+		}
+
+		/**
+		 * Render a persistent banner across all Charitable admin screens when
+		 * the PayPal Commerce gateway is connected but the merchant has not
+		 * yet chosen an Account Type (Nonprofit vs Business).
+		 *
+		 * Per the 1.8.12 spec (B-strict default-handling) this banner is
+		 * intentionally NOT dismissible — the underlying state blocks
+		 * donations at validate_donation(), so dismissing the banner without
+		 * resolving the setting would mask broken donation processing from
+		 * the merchant. The banner persists until the setting is saved.
+		 *
+		 * @since 1.8.12
+		 *
+		 * @return void
+		 */
+		public function render_paypal_account_type_required_notice() {
+			// Gate behind manage_options. The notice exposes gateway
+			// configuration state and links to the settings page; only users
+			// who can actually fix it should see it.
+			if ( ! current_user_can( 'manage_options' ) ) {
+				return;
+			}
+
+			// Only fire on Charitable admin screens to avoid leaking into
+			// unrelated plugins' admin contexts.
+			$screen = get_current_screen();
+			if ( is_null( $screen ) || ! in_array( $screen->id, charitable_get_charitable_screens(), true ) ) {
+				return;
+			}
+
+			if ( ! class_exists( 'Charitable_Gateway_Paypal_Commerce' ) ) {
+				return;
+			}
+
+			// Only fire when PayPal Commerce is actually an enabled gateway.
+			// Stale merchant ID meta can survive from a prior connected session
+			// even after the gateway is disabled in Settings > Payment Gateways;
+			// without this check the notice would scold merchants who are not
+			// using the gateway at all, and the deep-link target (the
+			// gateways_paypal_commerce settings group) is not even registered
+			// when the gateway is off, so clicking the notice's CTA would
+			// bounce them to the gateway list page instead.
+			$gateways = charitable_get_helper( 'gateways' );
+			if ( ! $gateways || ! $gateways->is_active_gateway( Charitable_Gateway_Paypal_Commerce::ID ) ) {
+				return;
+			}
+
+			$gateway = new Charitable_Gateway_Paypal_Commerce();
+
+			// Only relevant for sites that have actually connected PayPal
+			// Commerce. A disconnected gateway has nothing to gate.
+			if ( ! $gateway->is_seller_connected() ) {
+				return;
+			}
+
+			if ( $gateway->is_account_type_configured() ) {
+				return;
+			}
+
+			$settings_url = admin_url( 'admin.php?page=charitable-settings&tab=gateways&group=gateways_paypal_commerce' );
+			$message      = sprintf(
+				/* translators: %s: settings URL */
+				__( '<strong>PayPal Commerce: Action Required.</strong> Donations are currently blocked because your Account Type has not been set. <a href="%s">Choose Nonprofit or Business</a> on the PayPal Commerce settings page to resume accepting donations.', 'charitable' ),
+				esc_url( $settings_url )
+			);
+
+			echo '<div class="notice notice-error" style="border-left-width:4px;"><p>' . wp_kses(
+				$message,
+				array(
+					'strong' => array(),
+					'a'      => array(
+						'href' => array(),
+					),
+				)
+			) . '</p></div>';
 		}
 
 		/**

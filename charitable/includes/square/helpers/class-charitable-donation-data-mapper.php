@@ -157,6 +157,12 @@ class Charitable_Square_Donation_Data_Mapper {
 	 * @return int
 	 */
 	public function get_amount_in_cents() {
+		// Skip the ×100 conversion for zero-decimal currencies (JPY, KRW,
+		// VND, etc.) where Square expects the amount in the full unit.
+		if ( Charitable_Square_Gateway_Processor::is_zero_decimal_currency( $this->get_currency() ) ) {
+			return intval( $this->get_amount() );
+		}
+
 		return intval( $this->get_amount() * 100 );
 	}
 

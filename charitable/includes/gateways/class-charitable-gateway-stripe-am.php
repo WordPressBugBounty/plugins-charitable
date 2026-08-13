@@ -1230,11 +1230,17 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 		 * Cancel a subscription in Stripe after the recurring donation is marked as completed.
 		 *
 		 * @since  1.4.9
+		 * @since  1.8.11.3 Made static. It is registered as a static callback on
+		 *                  charitable_recurring_donation_completed, which fataled
+		 *                  on PHP 8+ while the method was non-static. The body only
+		 *                  calls the already-static cancel_subscription(), so this
+		 *                  is backwards compatible (instance calls to a static
+		 *                  method still work).
 		 *
 		 * @param  Charitable_Recurring_Donation $recurring_donation  The recurring donation object.
 		 * @return boolean
 		 */
-		public function process_completed_subscription( $recurring_donation ) {
+		public static function process_completed_subscription( $recurring_donation ) {
 			return self::cancel_subscription( true, $recurring_donation );
 		}
 

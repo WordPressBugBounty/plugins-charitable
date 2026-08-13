@@ -1114,6 +1114,23 @@ body.post-type-donation .donation-erasure-notice {
 .charitable-settings-field.wide {
   width: 100%;
 }
+/* Radio-list fields (e.g. PayPal Commerce Account Type): the parent `width: 300px`
+   forces multi-option radio lists to wrap onto two lines. Override to natural width
+   so the radios sit on one row, matching Pro 1.8.16+ rendering. @since 1.8.11.3 */
+ul.charitable-radio-list.charitable-settings-field {
+  width: auto;
+  padding: 0;
+}
+
+/* PayPal Commerce connection: tighter spacing between the "Not connected to PayPal"
+   status row and the "Connect your PayPal account..." description below it.
+   Scoped so it doesn't affect any other p.description on the page. Includes the
+   #charitable-settings ID prefix to beat the (1,1,5)-specificity reset rule
+   `div#charitable-settings table.form-table tbody tr td p { margin-top: 0 }`
+   that otherwise wins. @since 1.8.11.3 */
+#charitable-settings .charitable-paypal-commerce-connection p.description {
+  margin-top: 10px;
+}
 
 .charitable-inline-notice {
   background: #fff;
@@ -1308,6 +1325,10 @@ body.charitable_page_charitable-settings div#charitable-settings table.form-tabl
   border-left: 4px solid #dc3232;
 }
 
+.charitable-admin-notice-five-star-rating button.button,
+.charitable-admin-notice-five-star-rating a.button {
+  border: 0;
+}
 .charitable-admin-notice-five-star-rating button.button:hover,
 .charitable-admin-notice-five-star-rating a.button-link:hover {
   background-color: transparent;

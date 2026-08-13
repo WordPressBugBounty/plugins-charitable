@@ -311,6 +311,10 @@ function charitable_save_campaign() {
 					$post_field_data['value'] = str_replace( array( '"', "'", '`' ), '', $post_field_data['value'] );
 					$post_field_data['value'] = preg_replace( '/[^a-zA-Z0-9_,\/$:\-\.!\s;]/', '', $post_field_data['value'] );
 					$post_field_data['value'] = esc_attr( $post_field_data['value'] );
+				} elseif ( in_array( $second_key, array( 'background_image' ), true ) ) {
+					$post_field_data['value'] = esc_url_raw( $post_field_data['value'] );
+				} elseif ( in_array( $second_key, array( 'locked' ), true ) ) {
+					$post_field_data['value'] = ! empty( $post_field_data['value'] ) ? 1 : 0;
 				}
 
 				if ( null !== $third_key && false !== $third_key && '' !== trim( $third_key ) ) {
@@ -751,8 +755,10 @@ function charitable_template_layout_to_campaign_layout( $campaign_settings_v2, $
 
 	foreach ( $template_data['layout'] as $row_id => $row ) :
 
-		$campaign_settings_v2['layout']['rows'][ $row_id ]['type']      = ! empty( $row['type'] ) ? $row['type'] : 'row';
-		$campaign_settings_v2['layout']['rows'][ $row_id ]['css_class'] = ! empty( $row['css_class'] ) ? $row['css_class'] : false;
+		$campaign_settings_v2['layout']['rows'][ $row_id ]['type']             = ! empty( $row['type'] ) ? $row['type'] : 'row';
+		$campaign_settings_v2['layout']['rows'][ $row_id ]['css_class']        = ! empty( $row['css_class'] ) ? $row['css_class'] : false;
+		$campaign_settings_v2['layout']['rows'][ $row_id ]['background_image'] = ! empty( $row['background_image'] ) ? esc_url_raw( $row['background_image'] ) : '';
+		$campaign_settings_v2['layout']['rows'][ $row_id ]['locked']           = ! empty( $row['locked'] ) ? 1 : 0;
 
 		foreach ( $row['columns'] as $column_key => $column ) :
 

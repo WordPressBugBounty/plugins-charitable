@@ -753,6 +753,14 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 				return;
 			}
 
+			// Prefer placing the banner directly above the "...or select from a prebuilt template..." section.
+			const $prebuiltSection = $( '#charitable-template-list .charitable-template-list-section-prebuilt' );
+
+			if ( $prebuiltSection.length ) {
+				$prebuiltSection.before( template() );
+				return;
+			}
+
 			const 	$templates   = $( '#charitable-template-list .charitable-template-list-container-item:not(.charitable-hidden)'),
 					$insertPoint = $( '#charitable-template-list .charitable-template-list-container-item');
 
@@ -3310,6 +3318,21 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 				/* organizer */
 				app.organizerEvents( $builder );
 
+				/* campaign hero */
+				app.campaignHeroEvents( $builder );
+				app.relocateCampaignHeroResetButtons();
+
+				// Re-run when a campaign-hero field's settings panel becomes active
+				// (covers AJAX-rendered settings, freshly-instantiated templates, etc.).
+				$builder.on( 'charitableFieldEdit', function( e, type, section, edit_field_id, field_id, field_type ) {
+					if ( 'campaign-hero' === field_type ) {
+						setTimeout( function() { app.relocateCampaignHeroResetButtons(); }, 50 );
+					}
+				} );
+				// Apply any unsaved-goal from localStorage. Defer slightly so the preview iframe
+				// has time to fully render before we look for hero block DOM nodes.
+				setTimeout( function() { app.applyCampaignHeroUnsavedGoal(); }, 400 );
+
 			// Generalized form fields (in settings/left pane) types.
 
 				/* text fields */
@@ -4000,6 +4023,500 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 		},
 
 		/**
+		 * Add handlers for preview: campaign hero block.
+		 * Wires the right-sidebar settings panel to live-update the preview iframe.
+		 *
+		 * @since 1.8.11.1
+		 *
+		 * @param {object} $builder JQuery object.
+		 */
+		/**
+		 * Move each campaign-hero Reset button into its corresponding uploader's button row
+		 * (next to Upload + Clear). The button is rendered in a separate sibling div by PHP
+		 * because generate_uploader() doesn't have a hook to inject extra buttons inline.
+		 *
+		 * @since 1.8.11.1
+		 */
+		relocateCampaignHeroResetButtons: function() {
+			$( '.charitable-campaign-hero-reset-row' ).each( function() {
+				var $row = $( this );
+				var $btn = $row.find( '.charitable-campaign-hero-reset-image' );
+				if ( ! $btn.length ) {
+					return;
+				}
+				var $uploader = $row.prev( '.charitable-panel-field-uploader' );
+				if ( ! $uploader.length ) {
+					return;
+				}
+				var $buttonRow = $uploader.find( '.charitable-internal > p' ).first();
+				if ( ! $buttonRow.length ) {
+					return;
+				}
+				if ( ! $buttonRow.find( '.charitable-campaign-hero-reset-image' ).length ) {
+					$btn.appendTo( $buttonRow );
+				}
+				$row.remove();
+			} );
+		},
+
+		campaignHeroEvents: function( $builder ) {
+
+			// Title override.
+			$builder.on( 'input', '.charitable-panel-field-text input[data-ajax-label="title_override"]', function( e ) { // eslint-disable-line
+				var field_id = $( this ).closest( '.charitable-panel-field' ).data( 'field-id' );
+				app.updateCampaignHeroTitle( field_id, $( this ).val() );
+			} );
+
+			// Donate button label.
+			$builder.on( 'input', '.charitable-panel-field-text input[data-ajax-label="cta_label"]', function( e ) { // eslint-disable-line
+				var field_id = $( this ).closest( '.charitable-panel-field' ).data( 'field-id' );
+				app.updateCampaignHeroCta( field_id, $( this ).val() );
+			} );
+
+			// Theme primary color (Design → Layout Options → Advanced → Theme Colors → Primary).
+			// The hero block inherits this color, so when it changes update every hero block on the page.
+			$builder.on( 'input change', 'input[name="layout__advanced__theme_color_primary"]', function( e ) { // eslint-disable-line
+				var primary = $( this ).val();
+				$( '.charitable-field.charitable-field-campaign-hero' ).each( function() {
+					var fid = $( this ).data( 'field-id' );
+					app.updateCampaignHeroAccent( fid, primary );
+				} );
+			} );
+
+			// Theme button color (Design → Layout Options → Advanced → Theme Colors → Button).
+			// Drives only the Donate Now CTA on the hero block; raised band + selected amount stay on primary.
+			$builder.on( 'input change', 'input[name="layout__advanced__theme_color_button"]', function( e ) { // eslint-disable-line
+				var button = $( this ).val();
+				$( '.charitable-field.charitable-field-campaign-hero' ).each( function() {
+					var fid = $( this ).data( 'field-id' );
+					app.updateCampaignHeroButton( fid, button );
+				} );
+			} );
+
+			// One-time amounts CSV / default — live rebuild the preview's amount buttons.
+			$builder.on( 'input change', '.charitable-panel-field-text[data-ajax-label="onetime_amounts"] input, .charitable-panel-field-text[data-ajax-label="onetime_default"] input', function( e ) { // eslint-disable-line
+				var field_id = $( this ).closest( '.charitable-panel-field' ).data( 'field-id' );
+				app.rebuildCampaignHeroAmounts( field_id );
+			} );
+
+			// Show raised band toggle.
+			$builder.on( 'change', '.charitable-panel-field-toggle[data-ajax-label="show_raised"] input[type="checkbox"]', function( e ) { // eslint-disable-line
+				var field_id = $( this ).closest( '.charitable-panel-field' ).data( 'field-id' );
+				app.updateCampaignHeroShowRaised( field_id, $( this ).is( ':checked' ) );
+				// Also re-apply the goal-based band logic (so the band gets created if turning on with a goal).
+				var goalRawVal = ( $( 'input[name="settings__general__goal"]' ).val() || '' ).toString().replace( /[^0-9.]/g, '' );
+				var goalVal = parseFloat( goalRawVal ) || 0;
+				if ( ! goalVal ) {
+					try { var stored = window.localStorage.getItem( 'charitable_hero_unsaved_goal_' + s.formID ); if ( stored !== null ) { goalVal = parseFloat( stored ) || 0; } } catch ( err ) {}
+				}
+				if ( ! goalVal ) {
+					goalVal = parseFloat( $( this ).closest( '.charitable-field-campaign-hero, body' ).find( '.charitable-hero-preview__raised span' ).first().text().match( /our \$([\d,]+(?:\.\d+)?)/ ) ? RegExp.$1.replace( /,/g, '' ) : '0' ) || 0;
+				}
+				app.applyCampaignHeroGoal( field_id, goalVal );
+			} );
+
+			// Show "Other" toggle.
+			$builder.on( 'change', '.charitable-panel-field-toggle[data-ajax-label="onetime_show_other"] input[type="checkbox"]', function( e ) { // eslint-disable-line
+				var field_id = $( this ).closest( '.charitable-panel-field' ).data( 'field-id' );
+				app.rebuildCampaignHeroAmounts( field_id );
+			} );
+
+			// Goal input change anywhere in the builder — update the hero raised band on the
+			// current view (create / update / hide) AND persist the value to localStorage so other
+			// views (e.g. switching from Settings → Design) pick it up before a Save.
+			$builder.on( 'input change', 'input#charitable-panel-field-settings-campaign_goal, input[name="settings__general__goal"]', function( e ) { // eslint-disable-line
+				var rawVal = ( $( this ).val() || '' ).toString().replace( /[^0-9.]/g, '' );
+				var goalValue = parseFloat( rawVal ) || 0;
+				app.saveCampaignHeroUnsavedGoal( goalValue );
+				$( '.charitable-field.charitable-field-campaign-hero' ).each( function() {
+					var fid = $( this ).data( 'field-id' );
+					app.applyCampaignHeroGoal( fid, goalValue );
+				} );
+			} );
+
+			// Background image URL change (uploader sets value + triggers change; Clear also triggers).
+			$builder.on( 'input change', '.charitable-panel-field-uploader input[name$="[background_image]"]', function( e ) { // eslint-disable-line
+				var field_id = $( this ).closest( '.charitable-panel-field' ).data( 'field-id' );
+				app.updateCampaignHeroBackground( field_id, $( this ).val() );
+			} );
+
+			// Avatar image URL change.
+			$builder.on( 'input change', '.charitable-panel-field-uploader input[name$="[avatar_image]"]', function( e ) { // eslint-disable-line
+				var field_id = $( this ).closest( '.charitable-panel-field' ).data( 'field-id' );
+				app.updateCampaignHeroAvatar( field_id, $( this ).val() );
+			} );
+
+			// Reset image to template default.
+			$builder.on( 'click', '.charitable-campaign-hero-reset-image', function( e ) { // eslint-disable-line
+				e.preventDefault();
+				var $btn        = $( this );
+				var defaultUrl  = $btn.data( 'default' );
+				var targetLabel = $btn.data( 'target-label' );
+				if ( ! defaultUrl || ! targetLabel ) {
+					return;
+				}
+				// The reset row sits right after the uploader. Walk back to find the uploader's input.
+				var $uploaderInput = $btn.closest( '.charitable-campaign-hero-reset-row' ).prev( '.charitable-panel-field-uploader' ).find( 'input.charitable-uploader' ).first();
+				if ( ! $uploaderInput.length ) {
+					$uploaderInput = $btn.closest( '.charitable-panel-fields' ).find( 'input.charitable-uploader[name$="[' + targetLabel + ']"]' ).first();
+				}
+				$uploaderInput.val( defaultUrl ).trigger( 'change' );
+			} );
+		},
+
+		/**
+		 * Read the current accent color for the hero block.
+		 * The accent is the campaign's theme primary color (Design → Layout Options → Advanced).
+		 * Falls back to the Beacon default if the input is missing or invalid.
+		 *
+		 * @since 1.8.11.1
+		 */
+		getCampaignHeroAccent: function( field_id ) { // eslint-disable-line no-unused-vars
+			var primary = $( 'input[name="layout__advanced__theme_color_primary"]' ).val() || '';
+			if ( primary && primary.charAt( 0 ) !== '#' ) {
+				primary = '#' + primary;
+			}
+			return /^#[0-9a-fA-F]{6}$/.test( primary ) ? primary : '#1d3a8a';
+		},
+
+		/**
+		 * Update the CTA color on a hero block based on the theme Button color setting.
+		 * Only touches the --charitable-hero-button CSS variable; the raised band and
+		 * selected amount stay tied to --charitable-hero-accent (primary).
+		 *
+		 * @since 1.8.12
+		 */
+		updateCampaignHeroButton: function( field_id, value ) {
+			var $preview = $( '#charitable-field-' + field_id );
+			if ( ! $preview.hasClass( 'charitable-field-campaign-hero' ) ) {
+				return;
+			}
+			var button = ( value && /^#?[0-9a-fA-F]{6}$/.test( value ) ) ? ( value.charAt( 0 ) === '#' ? value : '#' + value ) : '';
+			var heroEl = $preview.find( '.charitable-hero-preview' ).get( 0 );
+			if ( ! heroEl ) {
+				return;
+			}
+			if ( button ) {
+				heroEl.style.setProperty( '--charitable-hero-button', button );
+			} else {
+				heroEl.style.removeProperty( '--charitable-hero-button' );
+			}
+			// Nudge Chrome to repaint after a CSS-variable-only change.
+			void heroEl.offsetHeight; // eslint-disable-line no-void
+		},
+
+		/**
+		 * Updating the campaign hero title in the preview.
+		 *
+		 * @since 1.8.11.1
+		 */
+		updateCampaignHeroTitle: function( field_id, value ) {
+			var $preview = $( '#charitable-field-' + field_id );
+			if ( ! $preview.hasClass( 'charitable-field-campaign-hero' ) ) {
+				return;
+			}
+			var displayValue = ( value && value.length > 0 ) ? CharitableUtils.santitizeTextInput( value ) : 'Campaign Title';
+			$preview.find( '.charitable-hero-preview__title' ).text( displayValue );
+		},
+
+		/**
+		 * Updating the donate button label in the preview.
+		 *
+		 * @since 1.8.11.1
+		 */
+		updateCampaignHeroCta: function( field_id, value ) {
+			var $preview = $( '#charitable-field-' + field_id );
+			if ( ! $preview.hasClass( 'charitable-field-campaign-hero' ) ) {
+				return;
+			}
+			var displayValue = ( value && value.length > 0 ) ? CharitableUtils.santitizeTextInput( value ) : 'Donate Now';
+			$preview.find( '.charitable-hero-preview__cta' ).text( displayValue );
+		},
+
+		/**
+		 * Updating the accent color across raised band, progress bar, amounts, and CTA.
+		 *
+		 * @since 1.8.11.1
+		 */
+		updateCampaignHeroAccent: function( field_id, value ) {
+			var $preview = $( '#charitable-field-' + field_id );
+			if ( ! $preview.hasClass( 'charitable-field-campaign-hero' ) ) {
+				return;
+			}
+			var accent = ( value && /^#[0-9a-fA-F]{6}$/.test( value ) ) ? value : '#1d3a8a';
+
+			// Drive the --charitable-hero-accent CSS variable on the hero block wrapper.
+			// The raised band, CTA, and other accent-colored elements pick it up via cascade.
+			var heroEl = $preview.find( '.charitable-hero-preview' ).get( 0 );
+			if ( heroEl ) {
+				heroEl.style.setProperty( '--charitable-hero-accent', accent );
+				// Chrome holds the prior paint until something nudges a reflow when only
+				// a CSS custom property changes. This no-op read forces an immediate repaint.
+				void heroEl.offsetHeight; // eslint-disable-line no-void
+			}
+
+			// Selected amount button — inline style (specificity wins over the generated button styles).
+			$preview.find( '.charitable-hero-preview__amount.is-selected' ).css( {
+				'background': accent,
+				'border-color': accent,
+				'color': '#fff'
+			} );
+
+			// If the hero background is currently in the "cleared" (no image) state, swap to the new accent.
+			var $hero = $preview.find( '.charitable-hero-preview' );
+			var heroStyle = $hero.attr( 'style' ) || '';
+			if ( heroStyle.indexOf( 'background-image' ) === -1 ) {
+				$hero.css( 'background', accent );
+			}
+		},
+
+		/**
+		 * Toggle the raised band visibility in the preview.
+		 *
+		 * @since 1.8.11.1
+		 */
+		updateCampaignHeroShowRaised: function( field_id, isShown ) {
+			var $preview = $( '#charitable-field-' + field_id );
+			if ( ! $preview.hasClass( 'charitable-field-campaign-hero' ) ) {
+				return;
+			}
+			$preview.find( '.charitable-hero-preview__raised' ).toggle( !! isShown );
+		},
+
+		/**
+		 * Apply the current campaign goal to a hero block's preview band.
+		 * Creates, updates, or hides the band as needed. Preserves the server-rendered
+		 * "raised" amount (which JS doesn't know on its own) when the band already exists.
+		 *
+		 * @since 1.8.11.1
+		 */
+		applyCampaignHeroGoal: function( field_id, goalValue ) {
+			var $preview = $( '#charitable-field-' + field_id );
+			if ( ! $preview.hasClass( 'charitable-field-campaign-hero' ) ) {
+				return;
+			}
+			var showToggle = $( '.charitable-panel-field-toggle[data-field-id="' + field_id + '"][data-ajax-label="show_raised"] input[type="checkbox"]' ).is( ':checked' );
+			var $widget = $preview.find( '.charitable-hero-preview__widget' );
+			var $band = $widget.find( '.charitable-hero-preview__raised' );
+
+			// Hide / no-op cases.
+			if ( goalValue <= 0 || ! showToggle ) {
+				$band.hide();
+				return;
+			}
+
+			var goalFmt = '$' + goalValue.toLocaleString( 'en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 } );
+
+			// Reuse the server-rendered raised amount if the band already exists; otherwise default to $0.00.
+			var raisedFmt = '$0.00';
+			var raisedNumeric = 0;
+			if ( $band.length ) {
+				var existingText = $band.find( 'span' ).first().text().trim();
+				var raisedMatch = existingText.match( /^\$[\d,]+(?:\.\d+)?/ );
+				if ( raisedMatch ) {
+					raisedFmt = raisedMatch[ 0 ];
+					raisedNumeric = parseFloat( raisedFmt.replace( /[^0-9.]/g, '' ) ) || 0;
+				}
+			}
+			var percent = Math.min( 100, ( raisedNumeric / goalValue ) * 100 );
+			var textLine = raisedFmt + ' raised toward our ' + goalFmt + ' goal.';
+
+			if ( $band.length ) {
+				$band.find( 'span' ).first().text( textLine );
+				$band.find( '.charitable-hero-preview__bar > span' ).css( 'width', percent + '%' );
+				$band.show();
+			} else {
+				var newBand = '<div class="charitable-hero-preview__raised">' +
+					'<span>' + textLine + '</span>' +
+					'<div class="charitable-hero-preview__bar"><span style="width:' + percent + '%;background:#fff;"></span></div>' +
+					'</div>';
+				$widget.prepend( newBand );
+			}
+		},
+
+		/**
+		 * On builder init, apply any unsaved goal stored in localStorage from a previous tab.
+		 * This is the bridge that lets a Settings-view goal change show up in the Design view
+		 * before the user clicks Save. Also populates the Settings view's goal input so the
+		 * user sees the same value everywhere (no view-to-view inconsistency).
+		 *
+		 * @since 1.8.11.1
+		 */
+		applyCampaignHeroUnsavedGoal: function() {
+			if ( ! s.formID ) {
+				return;
+			}
+			var stored = null;
+			try {
+				stored = window.localStorage.getItem( 'charitable_hero_unsaved_goal_' + s.formID );
+			} catch ( e ) {
+				return;
+			}
+			if ( null === stored ) {
+				return;
+			}
+			var goalValue = parseFloat( stored ) || 0;
+
+			// Update any hero block preview on the current view.
+			$( '.charitable-field.charitable-field-campaign-hero' ).each( function() {
+				var fid = $( this ).data( 'field-id' );
+				app.applyCampaignHeroGoal( fid, goalValue );
+			} );
+
+			// Also restore the value into the Settings view's Goal input so the user
+			// sees the unsaved value when they navigate back to Settings.
+			var $goalInput = $( 'input#charitable-panel-field-settings-campaign_goal, input[name="settings__general__goal"]' );
+			if ( $goalInput.length ) {
+				var displayValue = goalValue > 0 ? goalValue : '';
+				$goalInput.each( function() {
+					if ( $( this ).val().toString() === '' || parseFloat( ( $( this ).val() || '' ).toString().replace( /[^0-9.]/g, '' ) ) !== goalValue ) {
+						$( this ).val( displayValue );
+					}
+				} );
+			}
+
+			// If the goal input isn't on this view (e.g. Design tab), inject a hidden input
+			// into the builder form so the value persists when the user clicks Save.
+			// Without this the Save handler wouldn't see settings__general__goal and would
+			// leave the saved goal unchanged — which is what makes the Design preview band
+			// look like it'll save but doesn't.
+			if ( ! $goalInput.length ) {
+				var $form = $( '#charitable-builder-form' );
+				if ( $form.length ) {
+					var $hidden = $form.find( 'input[type="hidden"][name="settings__general__goal"][data-charitable-hero-bridge="1"]' );
+					if ( ! $hidden.length ) {
+						$hidden = $( '<input type="hidden" name="settings__general__goal" data-charitable-hero-bridge="1" />' );
+						$form.append( $hidden );
+					}
+					$hidden.val( goalValue > 0 ? goalValue : '' );
+				}
+			}
+		},
+
+		/**
+		 * Persist a hero-relevant unsaved goal to localStorage so other views can pick it up.
+		 *
+		 * @since 1.8.11.1
+		 */
+		saveCampaignHeroUnsavedGoal: function( goalValue ) {
+			if ( ! s.formID ) {
+				return;
+			}
+			try {
+				if ( goalValue > 0 ) {
+					window.localStorage.setItem( 'charitable_hero_unsaved_goal_' + s.formID, goalValue.toString() );
+				} else {
+					window.localStorage.removeItem( 'charitable_hero_unsaved_goal_' + s.formID );
+				}
+			} catch ( e ) {}
+		},
+
+		/**
+		 * Clear hero-relevant unsaved state from localStorage. Called after a successful save —
+		 * the saved campaign data is now authoritative and any stale unsaved value should go.
+		 *
+		 * @since 1.8.11.1
+		 */
+		clearCampaignHeroUnsavedState: function() {
+			if ( ! s.formID ) {
+				return;
+			}
+			try {
+				window.localStorage.removeItem( 'charitable_hero_unsaved_goal_' + s.formID );
+			} catch ( e ) {}
+		},
+
+		/**
+		 * Rebuild the amounts grid in the preview from current settings.
+		 *
+		 * @since 1.8.11.1
+		 */
+		rebuildCampaignHeroAmounts: function( field_id ) {
+			var $preview = $( '#charitable-field-' + field_id );
+			if ( ! $preview.hasClass( 'charitable-field-campaign-hero' ) ) {
+				return;
+			}
+			var $panel = $( '.charitable-panel-field[data-field-id="' + field_id + '"]' );
+
+			// data-ajax-label sits on the wrapper .charitable-panel-field-text, not on the <input>.
+			var amountsCsv = $panel.find( '.charitable-panel-field-text[data-ajax-label="onetime_amounts"] input' ).val();
+			if ( typeof amountsCsv === 'undefined' || amountsCsv === null || amountsCsv === '' ) {
+				amountsCsv = '50,150,500,1000';
+			}
+			var defaultAmount = $panel.find( '.charitable-panel-field-text[data-ajax-label="onetime_default"] input' ).val() || '';
+			var showOther = $( '.charitable-panel-field-toggle[data-field-id="' + field_id + '"][data-ajax-label="onetime_show_other"] input[type="checkbox"]' ).is( ':checked' );
+			var accent = app.getCampaignHeroAccent( field_id );
+
+			var amounts = amountsCsv.split( ',' ).map( function( a ) { return a.trim(); } ).filter( function( a ) { return a !== ''; } );
+			var defaultVal = ( defaultAmount && amounts.indexOf( defaultAmount ) !== -1 ) ? defaultAmount : ( amounts.length ? amounts[ 0 ] : '' );
+
+			var html = '';
+			amounts.forEach( function( amount, idx ) { // eslint-disable-line
+				var isSelected = ( amount === defaultVal );
+				var style = isSelected ? ' style="background:' + accent + ';color:#fff;border-color:' + accent + '"' : '';
+				var cls = 'charitable-hero-preview__amount' + ( isSelected ? ' is-selected' : '' );
+				html += '<button type="button" class="' + cls + '"' + style + '>$' + amount + '</button>';
+			} );
+
+			if ( showOther ) {
+				html += '<button type="button" class="charitable-hero-preview__amount">Other</button>';
+			}
+
+			$preview.find( '.charitable-hero-preview__amounts' ).html( html );
+		},
+
+		/**
+		 * Update the hero background image in the preview.
+		 * When cleared, the hero falls back to a solid accent-colored background.
+		 *
+		 * @since 1.8.11.1
+		 */
+		updateCampaignHeroBackground: function( field_id, url ) {
+			var $preview = $( '#charitable-field-' + field_id );
+			if ( ! $preview.hasClass( 'charitable-field-campaign-hero' ) ) {
+				return;
+			}
+			var $hero = $preview.find( '.charitable-hero-preview' );
+			if ( url && url.length && app.isValidURL( url ) ) {
+				$hero.attr( 'style', 'background-image:linear-gradient(rgba(0,0,0,.2),rgba(0,0,0,.5)),url(\'' + url + '\');' );
+			} else {
+				$hero.attr( 'style', 'background:' + app.getCampaignHeroAccent( field_id ) + ';' );
+			}
+		},
+
+		/**
+		 * Update the avatar image in the preview.
+		 * When cleared, the avatar element stays but renders as a solid accent-colored block.
+		 *
+		 * @since 1.8.11.1
+		 */
+		updateCampaignHeroAvatar: function( field_id, url ) {
+			var $preview = $( '#charitable-field-' + field_id );
+			if ( ! $preview.hasClass( 'charitable-field-campaign-hero' ) ) {
+				return;
+			}
+			var $identity = $preview.find( '.charitable-hero-preview__identity' );
+			var $avatar = $identity.find( '.charitable-hero-preview__avatar' );
+			var $title = $identity.find( '.charitable-hero-preview__title' );
+
+			if ( url && url.length && app.isValidURL( url ) ) {
+				// Logo present — render/swap the avatar element, and ensure the title's
+				// "no-logo" modifier class is removed so it sits next to the logo as usual.
+				if ( $avatar.length === 0 ) {
+					$avatar = $( '<div class="charitable-hero-preview__avatar"><img src="" alt=""/></div>' );
+					$identity.prepend( $avatar );
+				}
+				$avatar.find( 'img' ).attr( 'src', url ).show();
+				$title.removeClass( 'charitable-hero-preview__title--no-logo' );
+			} else {
+				// Logo cleared — remove the avatar element entirely. The title slides left
+				// via the --no-logo modifier (left-padding match the original logo gap).
+				$avatar.remove();
+				$title.addClass( 'charitable-hero-preview__title--no-logo' );
+			}
+		},
+
+		/**
 		 * Updating the fields for social sharing.
 		 *
 		 * @since 1.8.0
@@ -4248,7 +4765,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 					const selection = file_frame.state().get( 'selection' );
 					selection.each( function( attachment, index ) { // eslint-disable-line
 						attachment = attachment.toJSON();
-						window.formfield.val( attachment.url );
+						window.formfield.val( attachment.url ).trigger( 'change' );
 						app.updateImagePhotoPreview( window.field_id, attachment.url );
 						window.field_id = false;
 					} );
@@ -4265,7 +4782,7 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 				const 	button   = $( this ),
 						field_id = $( this ).closest('.charitable-panel-field').data('field-id');
 
-				button.closest('.charitable-internal').find('input[type="url"]').val('');
+				button.closest('.charitable-internal').find('input[type="url"]').val('').trigger( 'change' );
 				app.updateImagePhotoPreview( field_id, false );
 
 			} );
@@ -6035,6 +6552,11 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 					wpchar.savedState = wpchar.getFormState( '#charitable-builder-form' );
 					wpchar.initialSave = false;
 
+					// Drop any unsaved hero-goal cross-tab state now that we've persisted.
+					if ( typeof app.clearCampaignHeroUnsavedState === 'function' ) {
+						app.clearCampaignHeroUnsavedState();
+					}
+
 					$builder.trigger( 'charitableSaved', response.data );
 
 					// send the updated form of the campaign builder form to the debug window, along with the returned campaign id.
@@ -6613,6 +7135,11 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 			$( '#charitable-builder-form input#charitable-form-saved' ).val( '' );
 			s.formSaved = '';
+
+			// Clear hero block's unsaved-state localStorage — the saved campaign data is now authoritative.
+			if ( typeof app.clearCampaignHeroUnsavedState === 'function' ) {
+				app.clearCampaignHeroUnsavedState();
+			}
 
 			// For published campaigns disable preview button because there's nothing to currently preview untit the user makes another change...
 			// ...otherwise if it's saved in draft, user should be able to click the preview buton because there's no other way to preview it.
@@ -8771,17 +9298,20 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 				title          = '',
 				message        = '',
 				button         = '',
-				typeCapitlized = 'pro' !== type.toLowerCase() ? type.charAt(0).toUpperCase() + type.slice(1) : 'PRO';
+				typeCapitlized = 'pro' !== type.toLowerCase() ? type.charAt(0).toUpperCase() + type.slice(1) : 'PRO',
+				// The feature name is stored lowercase ( "ability to use Braintree" ) because the
+				// modal body reuses it mid-sentence. Capitalize it for the heading only.
+				featureTitle   = feature ? feature.charAt(0).toUpperCase() + feature.slice(1) : feature;
 
 			if ( elementType ) {
-				title   = feature + ' ' + charitable_builder.upgrade['pro-panel'].title.replace( /%plan%/g, typeCapitlized ),
+				title   = featureTitle + ' ' + charitable_builder.upgrade['pro-panel'].title.replace( /%plan%/g, typeCapitlized ),
 				message = charitable_builder.upgrade[ 'pro-panel' ].message.replace( /%name%/g, feature ),
 				message = message.replace( /%plan%/g, typeCapitlized ),
 				button  = charitable_builder.upgrade[ 'pro-panel' ].button.replace( /%name%/g, feature ).replace( 'addon', '' ),
 				button  = button.replace( /%plan%/g, typeCapitlized );
 
 			} else {
-				title   = feature + ' ' + charitable_builder.upgrade[type].title.replace( /%plan%/g, typeCapitlized ),
+				title   = featureTitle + ' ' + charitable_builder.upgrade[type].title.replace( /%plan%/g, typeCapitlized ),
 				message = charitable_builder.upgrade[ type ].message.replace( /%name%/g, feature ),
 				message = message.replace( /%plan%/g, typeCapitlized ),
 				button  = charitable_builder.upgrade[ type ].button.replace( /%name%/g, feature ).replace( 'addon', '' ),

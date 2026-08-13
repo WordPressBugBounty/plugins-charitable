@@ -237,6 +237,29 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 		public function retrieve_sections_for_user( array $sections = array() ): array {
 
 			$sections = array(
+				// 1.8.12 — Beacon campaign templates (headline feature).
+				array(
+					'new'     => true,
+					'version' => '1.8.12',
+					'layout'  => 'fifty-fifty',
+					'class'   => 'no-order',
+					'title'   => __( 'New Beacon Campaign Templates', 'charitable' ),
+					'content' => __( 'Two new campaign templates — Beacon (1 Column) and Beacon (2 Column) — built on the new Hero layout. Pick either from the template chooser for a bold, modern campaign page.', 'charitable' ),
+					'img'     => array(
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-12-beacon.jpg',
+						'shadow' => 'none',
+					),
+					'buttons' => array(
+						'main'      => array(
+							'text' => __( 'Get Started', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/beacon-templates-getting-started/', 'splash-modal', 'Beacon Templates Main' ),
+						),
+						'secondary' => array(
+							'text' => __( 'Learn More', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/beacon-templates-learn-more/', 'splash-modal', 'Beacon Templates Secondary' ),
+						),
+					),
+				),
 				// PayPal Commerce — headline feature, uses same self-hosted video as Pro.
 				array(
 					'new'     => true,
@@ -275,6 +298,49 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 						'main' => array(
 							'text' => __( 'Get Started', 'charitable' ),
 							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/how-to-switch-from-givewp-to-charitable/', 'splash-modal', 'Import Tools Main' ),
+						),
+					),
+				),
+				// 1.8.17 — DonationExpress (Pro-only).
+				array(
+					'new-for-pro' => true,
+					'layout'      => 'fifty-fifty',
+					'class'       => 'no-order',
+					'title'       => __( 'DonationExpress ⚡', 'charitable' ),
+					'content'     => __( 'DonationExpress opens your donation forms in a full-screen, theme-independent sheet on phones. It loads fast, looks consistent on every device, and avoids theme conflicts.', 'charitable' ),
+					'video'       => array(
+						'url' => 'https://wpcharitable-space.nyc3.digitaloceanspaces.com/splash/1-8-17/donationexpress.mp4',
+					),
+					'buttons'     => array(
+						'main'    => array(
+							'text' => __( 'Get Started', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/donationexpress-getting-started/', 'splash-modal', 'DonationExpress Main' ),
+						),
+						'upgrade' => array(
+							'text' => __( 'Upgrade to Pro', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/lite-upgrade/', 'splash-modal', 'DonationExpress Upgrade' ),
+						),
+					),
+				),
+				// 1.8.17 — Style Your Campaigns Visually (Pro-only).
+				array(
+					'new-for-pro' => true,
+					'layout'      => 'fifty-fifty',
+					'class'       => 'no-order',
+					'title'       => __( 'Style Your Campaigns Visually', 'charitable' ),
+					'content'     => __( 'Campaign styling just got a major upgrade. Beyond the existing options, the new Styles tab brings ready-made design presets, a full global color palette (buttons, tabs, progress bar, text, and background), typography controls, and animations — all with a live preview and no code.', 'charitable' ),
+					'img'         => array(
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-17-campaign-styles.png',
+						'shadow' => 'none',
+					),
+					'buttons'     => array(
+						'main'    => array(
+							'text' => __( 'Get Started', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/campaign-builder-styles-getting-started/', 'splash-modal', 'Campaign Builder Styles Main' ),
+						),
+						'upgrade' => array(
+							'text' => __( 'Upgrade to Pro', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/lite-upgrade/', 'splash-modal', 'Campaign Builder Styles Upgrade' ),
 						),
 					),
 				),
@@ -426,54 +492,14 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 						),
 					),
 				),
-				array(
-					'new-for-pro' => true,
-					'layout'      => 'fifty-fifty',
-					'class'       => 'no-order',
-					'title'       => __( 'Prefill Donation Forms', 'charitable' ),
-					'content'     => __( 'Pre-populate donation form fields via URL query strings. Perfect for email campaigns, targeted landing pages, and personalized donor outreach.', 'charitable' ),
-					'img'         => array(
-						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-13-prefill-forms.png',
-						'shadow' => 'none',
-					),
-					'buttons'     => array(
-						'main'      => array(
-							'text' => __( 'Get Started', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/prefill-donation-forms-getting-started/', 'splash-modal', 'Prefill Donation Forms Main' ),
-						),
-						'upgrade'   => array(
-							'text' => __( 'Upgrade to Pro', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/lite-upgrade/', 'splash-modal', 'Prefill Donation Forms Upgrade' ),
-						),
-					),
-				),
-				array(
-					'new-for-pro' => true,
-					'layout'      => 'fifty-fifty',
-					'class'       => 'no-order',
-					'title'       => __( 'Campaign Featured Image', 'charitable' ),
-					'content'     => __( 'Set your campaign\'s featured image directly from the Campaign Builder. No need to switch to the post editor. Perfect for giving your campaigns a polished, visual identity.', 'charitable' ),
-					'img'         => array(
-						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-13-featured-image.png',
-						'shadow' => 'none',
-					),
-					'buttons'     => array(
-						'main'      => array(
-							'text' => __( 'Get Started', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/campaign-featured-image-getting-started/', 'splash-modal', 'Campaign Featured Image Main' ),
-						),
-						'upgrade'   => array(
-							'text' => __( 'Upgrade to Pro', 'charitable' ),
-							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/lite-upgrade/', 'splash-modal', 'Campaign Featured Image Upgrade' ),
-						),
-					),
-				),
 				// Two-column "More Recent Features" list.
 				array(
 					'layout' => 'more-features',
 					'class'  => 'no-order',
 					'title'  => __( 'More Recent Features:', 'charitable' ),
 					'items'  => array(
+						__( 'Prefill Donation Forms', 'charitable' ),
+						__( 'Campaign Featured Image', 'charitable' ),
 						__( 'Campaign Selector', 'charitable' ),
 						__( 'Envira Gallery Integration', 'charitable' ),
 						__( 'Visual Form Builder', 'charitable' ),

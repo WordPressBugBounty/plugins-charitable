@@ -227,6 +227,8 @@ class Charitable_Builder_Form_Fields {
 			'title'           => '',
 			'visibility'      => false,
 			'checked_value'   => '1',
+			'tooltip'         => false,
+			'disabled'        => false,
 		);
 
 		$params = array_replace_recursive( $defaults, $args );
@@ -241,10 +243,19 @@ class Charitable_Builder_Form_Fields {
 			$params['name'] = str_replace( $params['name'][0] . ']', $params['name'][0], $name );
 		}
 
+		// When disabled, force the value off so the toggle can't visually appear on.
+		if ( $params['disabled'] ) {
+			$value = false;
+		}
+
 		$checked                   = ( $value !== false && $value === $params['checked_value'] ) ? 'checked="checked"' : false;
 		$field_id_attr             = isset( $params['field_id'] ) && '' !== $params['field_id'] ? 'data-field-id="' . intval( $params['field_id'] ) . '"' : false;
 		$field_id_attr            .= isset( $toggle_value ) && '' !== $toggle_value ? ' data-ajax-label="' . $toggle_value . '"' : false;
 		$params['container_class'] = $this->maybe_add_visibility_classes( $params['container_class'], $params['visibility'] );
+
+		if ( $params['disabled'] ) {
+			$params['container_class'] = trim( $params['container_class'] . ' charitable-panel-field-toggle-disabled' );
+		}
 
 		$css_classes     = explode( ' ', $params['class'] );
 		$css_classes     = array_unique( $css_classes );
@@ -254,13 +265,17 @@ class Charitable_Builder_Form_Fields {
 		$css_container_classes     = array_unique( $css_container_classes );
 		$params['container_class'] = implode( ' ', $css_container_classes );
 
+		$tooltip_html = ( isset( $params['tooltip'] ) && false !== $params['tooltip'] ) ? $this->get_tooltip_html( $params['tooltip'] ) : '';
+
+		$disabled_attr = $params['disabled'] ? 'disabled="disabled"' : '';
+
 		$html = isset( $params['title'] ) && '' !== $params['title'] ? '<h5 class="charitable-campaign-builder-setting-subheading">' . esc_html( $params['title'] ) . '</h5>' : false;
 
 		$html .= '<div data-field-id="' . $params['field_id'] . '" id="' . $this->id_slug . '-' . $params['id'] . '-wrap" class="charitable-panel-field charitable-panel-field-toggle ' . $params['container_class'] . '" ' . $field_id_attr . '>
                     <span class="charitable-toggle-control">
-                    <input type="checkbox" id="' . $this->id_slug . '-' . $params['id'] . '" name="' . $params['name'] . '" value="' . $params['checked_value'] . '" class="' . $params['class'] . '" ' . $checked . ' />
+                    <input type="checkbox" id="' . $this->id_slug . '-' . $params['id'] . '" name="' . $params['name'] . '" value="' . $params['checked_value'] . '" class="' . $params['class'] . '" ' . $checked . ' ' . $disabled_attr . ' />
                     <label class="charitable-toggle-control-icon" for="' . $this->id_slug . '-' . $params['id'] . '"></label>
-                    <label for="' . $this->id_slug . '-' . $params['id'] . '">' . $label . '</label>
+                    <label for="' . $this->id_slug . '-' . $params['id'] . '">' . $label . ' ' . $tooltip_html . '</label>
                     </span>
                 </div>';
 

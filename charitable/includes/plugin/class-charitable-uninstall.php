@@ -113,10 +113,12 @@ if ( ! class_exists( 'Charitable_Uninstall' ) ) :
 			delete_option( 'charitable_version' );
 			delete_option( 'charitable_upgrade_log' );
 			delete_option( 'charitable_skipped_donations_with_empty_donor_id' );
+			delete_option( 'charitable_analysis_token' );
 
 			delete_transient( 'charitable_notices' );
 			delete_transient( 'charitable_user_dashboard_objects' );
 			delete_transient( 'charitable_custom_styles' );
+			delete_transient( 'charitable_analysis_cache' );
 
 			/* Stop Charitable from re-adding the notices transient. */
 			if ( function_exists( 'charitable_get_admin_notices' ) ) {

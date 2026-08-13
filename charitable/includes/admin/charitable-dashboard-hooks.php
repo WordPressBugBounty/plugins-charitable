@@ -22,3 +22,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @see Charitable_Dashboard_Ajax::get_dashboard_data()
  */
 add_action( 'wp_ajax_charitable_dashboard_data', array( Charitable_Dashboard_Ajax::get_instance(), 'get_dashboard_data' ) );
+
+/**
+ * Record a click on the dashboard "Free Site Analysis" promo button (consent-gated usage tracking).
+ *
+ * @see Charitable_Dashboard::ajax_track_site_analysis_click()
+ */
+add_action( 'wp_ajax_charitable_track_site_analysis_click', array( Charitable_Dashboard::get_instance(), 'ajax_track_site_analysis_click' ) );

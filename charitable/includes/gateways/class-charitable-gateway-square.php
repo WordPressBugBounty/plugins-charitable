@@ -1720,8 +1720,14 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 			}
 
 		$donation_amount = $this->get_donation_amount_with_fees( $donation );
-		// Conver to cents.
-		$donation_amount = $donation_amount * 100;
+		// Convert to cents — skip for zero-decimal currencies (JPY, KRW,
+		// VND, etc.) where Square expects the amount in the full unit, not
+		// 1/100ths. Without this guard, e.g. a ¥1000 donation would be
+		// submitted as 100000 and the donor charged 100x the intended
+		// amount.
+		if ( ! Charitable_Square_Gateway_Processor::is_zero_decimal_currency( $donation->get_currency() ) ) {
+			$donation_amount = $donation_amount * 100;
+		}
 			$args_name       = 'Donation ID: ' . $donation_id . ' | ' . ( 'custom' === ! empty( $_POST['donation_amount'] ) ? 'Custom Amount' : 'Suggested Amount' ); // phpcs:ignore
 
 			// Set tokens provided by Web Payments SDK.
@@ -2288,8 +2294,11 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 
 				$currency = $donation->get_currency();
 				$amount   = self::get_donation_amount_with_fees_static( $donation );
-				// Convert amount to cents.
-				$amount_cents = $amount * 100;
+				// Convert amount to cents — skip for zero-decimal currencies
+				// (JPY, KRW, VND, etc.).
+				$amount_cents = Charitable_Square_Gateway_Processor::is_zero_decimal_currency( $currency )
+					? $amount
+					: $amount * 100;
 
 				$args = array(
 					'reason'   => 'Refunded from the WordPress dashboard',

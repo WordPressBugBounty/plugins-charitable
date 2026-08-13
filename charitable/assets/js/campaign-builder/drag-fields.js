@@ -325,6 +325,14 @@ Charitable.Admin.Builder.DragFields = Charitable.Admin.Builder.DragFields || ( f
 					wpchar.debug( ui , 'drag-fields' );
 					wpchar.debug( 'ui.item' , 'drag-fields' );
 					wpchar.debug( ui.item , 'drag-fields' );
+
+					// Refuse to drag fields out of a locked row. Pairs with the over:/update: guards
+					// that refuse drops INTO locked rows -- contents of a locked row must stay put.
+					if ( ui.item.closest( '[data-row-locked="1"]' ).length ) {
+						$( this ).sortable( 'cancel' );
+						return false;
+					}
+
 					fieldId    = ui.item.data( 'field-id' );
 					fieldType  = ui.item.data( 'field-type' ) || vars.fieldType;
 					// fieldType = $field.data( 'field-type' )
@@ -382,6 +390,7 @@ Charitable.Admin.Builder.DragFields = Charitable.Admin.Builder.DragFields || ( f
 						$target = $(e.target),
 						$placeholder = $target.find('.charitable-field-drag-placeholder'),
 						isColumn = $target.hasClass('charitable-layout-column'),
+						isRowLocked = $target.closest('[data-row-locked="1"]').length > 0,
 						targetClass = isColumn ? ' charitable-field-drag-to-column' : '',
 						helper = {
 							width: $target.outerWidth(),
@@ -403,18 +412,22 @@ Charitable.Admin.Builder.DragFields = Charitable.Admin.Builder.DragFields || ( f
 
 					// Adjust placeholder height according to the height of the helper.
 					$placeholder
-						.removeClass( 'charitable-field-drag-not-allowed' )
+						.removeClass( 'charitable-field-drag-not-allowed charitable-field-drag-locked-row' )
 						.css( {
 							'height': isNewField ? helper.height + 18 : helper.height,
 						} );
 
 					// Drop to this place is not allowed.
 					if (
-						! fieldLayout.isFieldAllowedInColum( fieldType ) &&
-						isColumn
+						( ! fieldLayout.isFieldAllowedInColum( fieldType ) && isColumn ) ||
+						isRowLocked
 					) {
 						$placeholder.addClass( 'charitable-field-drag-not-allowed' );
 						$field.addClass( 'charitable-field-drag-not-allowed' );
+					}
+
+					if ( isRowLocked ) {
+						$placeholder.addClass( 'charitable-field-drag-locked-row' );
 					}
 
 					// Skip if it is the existing field.
@@ -478,6 +491,16 @@ Charitable.Admin.Builder.DragFields = Charitable.Admin.Builder.DragFields || ( f
 							isColumn              = $sortable.hasClass('charitable-layout-column'),
 							numfieldsDonateButton = el.$preview.find('.charitable-field.charitable-field-donate-button').length,
 							numfieldsDonationForm = el.$preview.find('.charitable-field.charitable-field-donation-form').length;
+
+					// Refuse drops into rows marked as locked (e.g. the Beacon hero row).
+					if ( $field.closest( '[data-row-locked="1"]' ).length ) {
+						$( this ).sortable( 'cancel' );
+						if ( isNewField ) {
+							$field.remove();
+						}
+						el.$builder.find( '.charitable-add-fields .charitable-add-fields-button' ).prop( 'disabled', false );
+						return;
+					}
 
 					wpchar.debug( $sortable );
 					wpchar.debug(  $sortable.data( 'ui-sortable' ) );

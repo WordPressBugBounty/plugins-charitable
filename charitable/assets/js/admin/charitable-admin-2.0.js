@@ -375,6 +375,39 @@ var CharitableAdminUI = window.CharitableAdminUI || ( function( document, window
                     $old_notifications_title.toggleClass('notifications-visible');
                     $dismiss_all_element.toggleClass('charitable-hidden');
                 });
+
+                // Gear icon — toggle settings panel.
+                $( document ).on( 'click', '#charitable-notif-gear-btn', function( e ) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var $panel = $( '#charitable-notif-settings-panel' );
+                    var $btn   = $( this );
+                    var open   = $panel.is( ':visible' );
+                    $panel.slideToggle( 150 );
+                    $btn.attr( 'aria-expanded', open ? 'false' : 'true' );
+                } );
+
+                // Settings toggles — save on change.
+                $( document ).on( 'change', '#charitable-notif-settings-panel input[type="checkbox"]', function() {
+                    var settings = {};
+                    $( '#charitable-notif-settings-panel input[type="checkbox"]' ).each( function() {
+                        settings[ $( this ).data( 'category' ) ] = $( this ).is( ':checked' );
+                    } );
+
+                    $.post(
+                        typeof ajaxurl !== 'undefined' ? ajaxurl : charitable_admin.ajax_url, // eslint-disable-line no-undef
+                        {
+                            action  : 'charitable_save_notification_settings',
+                            nonce   : CHARITABLE.nonce, // eslint-disable-line no-undef
+                            settings: JSON.stringify( settings )
+                        },
+                        function( res ) {
+                            if ( ! res.success ) {
+                                console.log( 'Notification settings save failed', res ); // eslint-disable-line no-console
+                            }
+                        }
+                    );
+                } );
             }
         },
 

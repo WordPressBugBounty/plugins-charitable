@@ -162,17 +162,25 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 		 * @param int    $counter The counter for the template element.
 		 * @param string $additional_css Additional CSS classes to add to the template element.
 		 * @param array  $campaign_data An array of campaign data to pass to the template element.
+		 * @param string $background_image Optional background image URL for the row.
+		 * @param bool   $locked Optional. Whether the row is locked (no move/delete).
 		 * @return string The starting HTML element for the given template type.
 		 */
-		public function get_template_element_start( $type = 'row', $counter = 1, $additional_css = '', $campaign_data = array() ) {
+		public function get_template_element_start( $type = 'row', $counter = 1, $additional_css = '', $campaign_data = array(), $background_image = '', $locked = false ) {
 
 			ob_start();
+
+			$row_bg_url     = '' !== $background_image ? esc_url( $background_image ) : '';
+			$row_style_attr = '' !== $row_bg_url ? ' style="background-image:url(\'' . $row_bg_url . '\');"' : '';
+			$row_locked_css = $locked ? ' is-locked' : '';
+			$row_locked_attr = $locked ? ' data-row-locked="1"' : '';
+			$row_bg_css     = '' !== $row_bg_url ? ' has-background-image' : '';
 
 			switch ( $type ) {
 				case 'header':
 					?>
 					<!-- charitable header start -->
-					<header id="charitable-preview-header-<?php echo intval( $counter ); ?>" class="charitable-preview-header <?php echo esc_attr( $additional_css ); ?>">
+					<header id="charitable-preview-header-<?php echo intval( $counter ); ?>"<?php echo $row_locked_attr; // phpcs:ignore ?> class="charitable-preview-header <?php echo esc_attr( $additional_css ); ?><?php echo esc_attr( $row_bg_css . $row_locked_css ); ?>"<?php echo $row_style_attr; // phpcs:ignore ?>>
 						<div class="row" data-row-id="<?php echo intval( $counter ); ?>" data-row-type="<?php echo esc_attr( $type ); ?>" data-row-css="<?php echo esc_attr( $additional_css ); ?>">
 					<?php
 					break;
@@ -190,7 +198,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 					// likely a row.
 					?>
 					<!-- charitable row/default start -->
-					<div id="charitable-preview-row-<?php echo intval( $counter ); ?>" class="charitable-preview-row <?php echo esc_attr( $additional_css ); ?>">
+					<div id="charitable-preview-row-<?php echo intval( $counter ); ?>"<?php echo $row_locked_attr; // phpcs:ignore ?> class="charitable-preview-row <?php echo esc_attr( $additional_css ); ?><?php echo esc_attr( $row_bg_css . $row_locked_css ); ?>"<?php echo $row_style_attr; // phpcs:ignore ?>>
 						<div class="row" data-row-id="<?php echo intval( $counter ); ?>" data-row-type="<?php echo esc_attr( $type ); ?>" data-row-css="<?php echo esc_attr( $additional_css ); ?>">
 					<?php
 					break;
@@ -253,7 +261,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 		 *
 		 * @return string
 		 */
-		public function render_fields( $fields, $theme, $campaign_data, $last_field_id = 0 ) {
+		public function render_fields( $fields, $theme, $campaign_data, $last_field_id = 0, $row_locked = false ) {
 
 			if ( empty( $fields ) ) {
 				return;
@@ -288,6 +296,23 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						}
 					}
 
+					// Expand template-relative filenames for the campaign-hero block.
+					if ( $field_type === 'campaign-hero' && ! empty( $theme['meta']['slug'] ) ) {
+						$campaign_template_slug = esc_attr( $theme['meta']['slug'] );
+						foreach ( array( 'background_image', 'avatar_image' ) as $img_key ) {
+							if ( ! empty( $field_settings[ $img_key ] ) ) {
+								$image_value     = $field_settings[ $img_key ];
+								$image_basename  = basename( $image_value );
+								if ( $image_basename === $image_value ) {
+									$asset_path = charitable()->get_path( 'assets', true ) . 'images/campaign-builder/templates/' . $campaign_template_slug . '/' . $image_basename;
+									if ( file_exists( $asset_path ) ) {
+										$field_settings[ $img_key ] = charitable()->get_path( 'assets', false ) . 'images/campaign-builder/templates/' . $campaign_template_slug . '/' . $image_basename;
+									}
+								}
+							}
+						}
+					}
+
 					$field_settings['id'] = $field_id;
 
 					$charitable_field_css_classes = array(
@@ -298,14 +323,18 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						$class->can_be_deleted ? 'charitable-can-delete' : 'charitable-no-delete',
 					);
 
+					if ( $row_locked ) {
+						$charitable_field_css_classes[] = 'charitable-field-not-draggable';
+					}
+
 					echo '<div class="' . esc_attr( implode( ' ', $charitable_field_css_classes ) ) . '" id="charitable-field-' . intval( $field_id ) . '" data-field-id="' . intval( $field_id ) . '" data-field-type="' . esc_attr( $field_type ) . '" data-field-max="' . intval( $class->max_allowed ) . '" style="">'; // phpcs:ignore
 					if ( $class->can_be_edited ) :
 						echo '<a href="#" class="charitable-field-edit" data-type="' . esc_attr( $class->edit_type ) . '" data-section="' . esc_attr( $class->edit_section ) . '" data-edit-field-id="' . esc_attr( $class->edit_field_id ) . '" title="' . esc_attr( $class->edit_label ) . '"><i class="fa fa-pencil"></i></a>';
 					endif;
-					if ( $class->can_be_duplicated ) :
+					if ( $class->can_be_duplicated && ! $row_locked ) :
 						echo '<a href="#" class="charitable-field-duplicate" title="Duplicate Field"><i class="fa fa-files-o" aria-hidden="true"></i></a>';
 					endif;
-					if ( $class->can_be_deleted ) :
+					if ( $class->can_be_deleted && ! $row_locked ) :
 						echo '<a href="#" class="charitable-field-delete" title="Delete Field"><i class="fa fa-trash-o"></i></a>';
 					endif;
 
@@ -530,6 +559,23 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 													// see if the thumbnail or default photo exists.
 													if ( false !== $theme_thumbnail && file_exists( $theme_thumbnail ) ) {
 														$field_settings['default'] = charitable()->get_path( 'assets', false ) . 'images/campaign-builder/templates/' . $campaign_template_slug . '/' . $default_filename;
+													}
+												}
+
+												// Expand template-relative filenames for the campaign-hero block.
+												if ( $field_type === 'campaign-hero' && ! empty( $theme['meta']['slug'] ) ) {
+													$campaign_template_slug = esc_attr( $theme['meta']['slug'] );
+													foreach ( array( 'background_image', 'avatar_image' ) as $img_key ) {
+														if ( ! empty( $field_settings[ $img_key ] ) ) {
+															$image_value    = $field_settings[ $img_key ];
+															$image_basename = basename( $image_value );
+															if ( $image_basename === $image_value ) {
+																$asset_path = charitable()->get_path( 'assets', true ) . 'images/campaign-builder/templates/' . $campaign_template_slug . '/' . $image_basename;
+																if ( file_exists( $asset_path ) ) {
+																	$field_settings[ $img_key ] = charitable()->get_path( 'assets', false ) . 'images/campaign-builder/templates/' . $campaign_template_slug . '/' . $image_basename;
+																}
+															}
+														}
 													}
 												}
 												$field_settings['id'] = $field_id;
@@ -1030,10 +1076,12 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 
 					foreach ( $layout as $row ) {
 
-						$additional_css = ! empty( $row['css_class'] ) ? esc_attr( $row['css_class'] ) : '';
-						$row_fields     = ! empty( $row['fields'] ) ? $row['fields'] : false;
+						$additional_css   = ! empty( $row['css_class'] ) ? esc_attr( $row['css_class'] ) : '';
+						$row_fields       = ! empty( $row['fields'] ) ? $row['fields'] : false;
+						$row_bg_image     = ! empty( $row['background_image'] ) ? $row['background_image'] : '';
+						$row_locked       = ! empty( $row['locked'] );
 
-						echo $this->get_template_element_start( $row['type'], $element_counter, $additional_css ); // phpcs:ignore
+						echo $this->get_template_element_start( $row['type'], $element_counter, $additional_css, $campaign_data, $row_bg_image, $row_locked ); // phpcs:ignore
 
 						$tabs_rendered = false;
 
@@ -1054,10 +1102,10 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 										if ( $tabs_rendered ) {
 											++$last_field_id;
 										}
-										$last_field_id = (int) $this->render_fields( $section['fields'], $theme, $campaign_data, $last_field_id );
+										$last_field_id = (int) $this->render_fields( $section['fields'], $theme, $campaign_data, $last_field_id, $row_locked );
 										break;
 									case 'header':
-										$last_field_id = (int) $this->render_fields( $section['fields'], $theme, $campaign_data, $last_field_id );
+										$last_field_id = (int) $this->render_fields( $section['fields'], $theme, $campaign_data, $last_field_id, $row_locked );
 										break;
 									case 'tabs':
 										echo $this->get_template_element_start( 'tabs', null, null, $campaign_data ); // phpcs:ignore
@@ -1438,6 +1486,11 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 
 			$templates_data = $no_cache || ( charitable_is_debug() ) || ( defined( 'CHARITABLE_BUILDER_NO_CACHE_TEMPLATE' ) && CHARITABLE_BUILDER_NO_CACHE_TEMPLATE ) ? false : get_option( 'charitable_campaign_builder_templates' );
 
+			// Invalidate caches written by an older plugin version so newly added templates appear after upgrade.
+			if ( is_array( $templates_data ) && ( empty( $templates_data['cache_version'] ) || Charitable::VERSION !== $templates_data['cache_version'] ) ) {
+				$templates_data = false;
+			}
+
 			if ( empty( $templates_data ) ) {
 
 				// if we cannot locate, we will create the basic choices and add them into the WordPress option, while returning the data.
@@ -1453,6 +1506,8 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						$templates_data['templates'][ $key ]['advanced']['preview_mode']     = charitable_show_preview_mode_by_default( $key ) ? 'normal' : 'minimum';
 					endif;
 				endforeach;
+
+				$templates_data['cache_version'] = Charitable::VERSION;
 
 				if ( ( charitable_is_debug() ) || ( defined( 'CHARITABLE_BUILDER_NO_CACHE_TEMPLATE' ) && CHARITABLE_BUILDER_NO_CACHE_TEMPLATE ) ) {
 					delete_option( 'charitable_campaign_builder_templates', $templates_data );
@@ -1699,7 +1754,8 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 			$template_types       = ( false === $template_types && false !== $campaign_template_data['meta']['template_type'] ) ? esc_attr( $campaign_template_data['meta']['template_type'] ) : $template_types;
 			?>
 
-			<div class="charitable-template-list-container-item charitable-template-<?php echo esc_attr( $campaign_template_slug ); ?> <?php echo esc_attr( $template_types ); ?>">
+			<?php $is_new_class = ! empty( $campaign_template_data['meta']['is_new'] ) ? ' charitable-template-is-new' : ''; ?>
+			<div class="charitable-template-list-container-item charitable-template-<?php echo esc_attr( $campaign_template_slug ); ?> <?php echo esc_attr( $template_types ); ?><?php echo esc_attr( $is_new_class ); ?>">
 
 				<div class="charitable-template
 				<?php
@@ -1736,7 +1792,13 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 					<?php echo $template_thumbnail_html; // phpcs:ignore ?>
 
 					</div>
-				<?php printf( '<h4>%s</h4>', $campaign_template_data['meta']['label'] ); // phpcs:ignore ?>
+				<?php
+				$template_label_html = esc_html( $campaign_template_data['meta']['label'] );
+				if ( ! empty( $campaign_template_data['meta']['is_new'] ) ) {
+					$template_label_html .= ' <span class="charitable-template-label-new">' . esc_html__( 'NEW', 'charitable' ) . '</span>';
+				}
+				printf( '<h4>%s</h4>', $template_label_html ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				?>
 				<?php printf( '<p>%s</p>', $campaign_template_data['meta']['description'] ); // phpcs:ignore ?>
 
 				</div>
@@ -1773,7 +1835,24 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 
 			ksort( $single_templates['templates'] );
 
-			$templates['templates'] = array_merge( $single_templates['templates'], $templates['templates'] );
+			// Pin the Beacon family right after Simple in a deterministic order
+			// (2 Columns first, 1 Column second, then any future Beacon variants alphabetically).
+			$beacon_priority = array( 'beacon-split', 'beacon-single' );
+			$beacon_pinned   = array();
+			foreach ( $beacon_priority as $beacon_slug ) {
+				if ( isset( $templates['templates'][ $beacon_slug ] ) ) {
+					$beacon_pinned[ $beacon_slug ] = $templates['templates'][ $beacon_slug ];
+					unset( $templates['templates'][ $beacon_slug ] );
+				}
+			}
+			foreach ( $templates['templates'] as $template_name => $template_info ) {
+				if ( 0 === strpos( $template_name, 'beacon-' ) ) {
+					$beacon_pinned[ $template_name ] = $template_info;
+					unset( $templates['templates'][ $template_name ] );
+				}
+			}
+
+			$templates['templates'] = array_merge( $single_templates['templates'], $beacon_pinned, $templates['templates'] );
 
 			// Loop through each available template.
 			foreach ( $templates['templates'] as $id => $template ) {
@@ -1855,6 +1934,12 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 		 */
 		private function output_categories( $categories, $templates_count ) {
 
+			// Sidebar slugs that should display a small "NEW" pill next to the label.
+			$new_category_slugs = apply_filters(
+				'charitable_campaign_builder_template_new_category_slugs',
+				array( 'structured-layouts' )
+			);
+
 			foreach ( $categories as $slug => $name ) {
 
 				$class = '';
@@ -1867,12 +1952,17 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 
 				$count = isset( $templates_count[ $slug ] ) ? $templates_count[ $slug ] : '0';
 
+				$badge_html = in_array( $slug, $new_category_slugs, true )
+					? '<span class="charitable-template-category-new">' . esc_html__( 'NEW', 'charitable' ) . '</span>'
+					: '';
+
 				printf(
-					'<li data-category="%1$s"%2$s>%3$s<span>%4$s</span></li>',
+					'<li data-category="%1$s"%2$s>%5$s%3$s<span>%4$s</span></li>',
 					esc_attr( $slug ),
 					$class, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					esc_html( $name ),
-					esc_html( $count )
+					esc_html( $count ),
+					$badge_html // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				);
 			}
 		}
@@ -1889,6 +1979,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 			$this->categories = apply_filters(
 				'charitable_campaign_builder_template_categories',
 				array(
+					'structured-layouts' => esc_html__( 'Structured Layouts', 'charitable' ),
 					'animal-pets'        => esc_html__( 'Animal / Pets', 'charitable' ),
 					'club-organizations' => esc_html__( 'Club / Organizations', 'charitable' ),
 					'environmental'      => esc_html__( 'Environmental', 'charitable' ),
@@ -1967,7 +2058,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						'meta'     => array(
 							'label'         => 'Simple 1 Column',
 							'slug'          => 'simple-1-column',
-							'description'   => 'A simple one column campaign template to build from.',
+							'description'   => 'A clean single-column starting point with the essentials. Drop in your story, photos, and donation form, then customize to match your cause.',
 							'template_type' => array( 'single', 'simple', 'blank' ),
 							'search_tags'   => array(
 								'default',
@@ -2041,7 +2132,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						'meta'     => array(
 							'label'         => 'Simple 2 Column',
 							'slug'          => 'simple-2-column',
-							'description'   => 'A simple two column campaign template to build from.',
+							'description'   => 'Two-column blank layout for storytelling on one side and donation form or media on the other. Ideal when you want side-by-side content without committing to a specific style.',
 							'template_type' => array( 'single', 'simple', 'blank' ),
 							'search_tags'   => array(
 								'default',
@@ -2121,7 +2212,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						'meta'     => array(
 							'label'         => 'Simple 2 Column w/ header',
 							'slug'          => 'simple-2-column-header',
-							'description'   => 'A simple two column layout with a header.',
+							'description'   => 'Two-column layout with a banner header row up top for title and branding. Below, balance your campaign story alongside donation amounts, photos, or a donor wall.',
 							'template_type' => array( 'single', 'simple', 'blank' ),
 							'search_tags'   => array(
 								'default',
@@ -2213,7 +2304,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						'meta'     => array(
 							'label'         => 'Youth Sports',
 							'slug'          => 'youth-sports',
-							'description'   => 'Accept donations for a local school\'s sports or athletics team.',
+							'description'   => 'Accept donations for a local school\'s sports or athletics team. Designed for spirit-driven fundraisers covering uniforms, equipment, travel costs, and seasonal program support.',
 							'template_type' => array( 'single', 'prebuilt' ),
 							'search_tags'   => array(
 								'youth',
@@ -2358,7 +2449,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						'meta'     => array(
 							'label'         => 'School Trip',
 							'slug'          => 'school-trip',
-							'description'   => 'Raise funds for a school trip or fundraiser.',
+							'description'   => 'Raise funds for a school trip or class fundraiser. Tells the story behind the trip, breaks down costs, and lets parents and community members chip in toward the goal.',
 							'template_type' => array( 'single', 'prebuilt' ),
 							'search_tags'   => array(
 								'youth',
@@ -2502,11 +2593,267 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 							),
 						),
 					),
+					'beacon-split'        => array(
+						'meta'     => array(
+							'label'         => 'Beacon (2 Columns)',
+							'slug'          => 'beacon-split',
+							'description'   => 'A bold, structured layout for grassroots campaigns. Locked hero banner with donation widget overlay, plus a two-column story area below.',
+							'template_type' => array( 'single', 'prebuilt' ),
+							'is_new'        => true,
+							'search_tags'   => array(
+								'beacon',
+								'structured',
+								'two-columns',
+								'two-column',
+								'hero-banner',
+								'donation-widget',
+								'modern',
+								'overlay',
+								'environmental',
+							),
+							'categories'    => array(
+								'structured-layouts',
+								'environmental',
+							),
+							'created'       => '2026-06-06', // Y-m-d.
+							'version'       => '1.0',
+							'author'        => 'David Bisset',
+							'dependencies'  => false,
+							'has_access'    => true,
+							'favorite'      => false,
+							'colors'        => array(
+								'primary'   => '#1d3a8a',
+								'secondary' => '#0D0D0D',
+								'tertiary'  => '#5F5F5F',
+								'accent'    => false,
+								'button_bg' => '#1d3a8a',
+							),
+							'parent_theme'  => false,
+							'thumbnail_url' => false,
+						),
+						'layout'   => array(
+							array( // ROW 1 — locked hero.
+								'type'             => 'header',
+								'css_class'        => 'beacon-hero-row',
+								'locked'           => true,
+								'background_image' => '', // Hero image lives inside the campaign-hero block; row bg unused here.
+								'columns'          => array(
+									array(
+										array(
+											'type'   => 'fields',
+											'fields' => array(
+												array(
+													'type'              => 'campaign-hero',
+													'background_image'  => charitable()->get_path( 'assets', false ) . 'images/campaign-builder/templates/beacon-split/hero.jpg',
+													'avatar_image'      => charitable()->get_path( 'assets', false ) . 'images/campaign-builder/templates/beacon-split/avatar.jpg',
+													'title_override'    => 'Save Maple Grove Park',
+													'accent_color'      => '#1d3a8a',
+													'show_raised'       => true,
+													'enable_recurring'  => false,
+													'onetime_amounts'   => '50,150,500,1000',
+													'onetime_default'   => '50',
+													'onetime_show_other'=> true,
+													'cta_label'         => 'Donate Now',
+												),
+											),
+										),
+									),
+								),
+							),
+							array( // ROW 2 — editable body, two columns.
+								'type'      => 'row',
+								'css_class' => 'beacon-body-row',
+								'columns'   => array(
+									array( // Column 1 — story.
+										array(
+											'type'   => 'fields',
+											'fields' => array(
+												array(
+													'type' => 'social-sharing',
+													'headline' => '',
+												),
+												array(
+													'type' => 'campaign-description',
+													'headline' => 'Support Hometown Heroes for Maple Grove',
+													'content' => '<p>For generations, Maple Grove Park has been the beating heart of our community. It is where our children take their first steps, where local musicians find their muse under the shade of ancient trees, and where neighbors gather to escape the hustle of daily life. This park is not just a patch of green space on a map; it is a living sanctuary of shared memories, vibrant wildlife, and irreplaceable local history.</p><p>But right now, this beloved community treasure is facing a quiet but devastating crisis. <strong>Commercial development plans</strong> threaten to bulldoze our history and replace our vibrant canopy with concrete. If we stay silent, the ecosystem that supports local wildlife will be destroyed, and the public space that belongs to every single one of us will be lost forever. We cannot afford to stand by and watch Maple Grove vanish.</p><p>That is why we are launching the <strong>Save Maple Grove Park</strong> initiative. Our mission is simple but powerful: to legally protect this land, restore its natural habitats, and ensure it remains a free, beautiful public park for generations to come. We are working alongside local environmental experts, city planners, and passionate residents to present an airtight preservation alternative to the city council. But an expert plan means nothing without the roaring voice of the community behind it.</p>',
+												),
+												array(
+													'type' => 'text',
+													'headline' => 'How your donation makes a difference',
+													'content' => '<p>Every contribution moves us closer to permanent protection for Maple Grove Park. Here is exactly where your dollars go:</p><ul><li><strong>$50</strong> funds an hour of expert legal counsel reviewing the city development proposal.</li><li><strong>$150</strong> pays for native plant restoration across a quarter-acre of degraded meadow.</li><li><strong>$500</strong> covers an environmental impact study for one section of the park.</li><li><strong>$1,000</strong> sponsors a community meeting - venue, materials, and outreach to mobilize hundreds of neighbors.</li></ul><p>No donation is too small. Every signature, every dollar, and every shared story strengthens our case before the city council on July 14.</p>',
+												),
+												array(
+													'type' => 'text',
+													'headline' => 'A community-led plan, ready to act',
+													'content' => '<p>This is not a protest. It is a plan. Over the past six months, our coalition of biologists, urban planners, attorneys, and lifelong residents has assembled a complete preservation proposal - one that protects the park\'s ecosystem, maintains public access, and even strengthens the city\'s tax base through eco-tourism and community programming. We will present this proposal at the July 14 council session. With your support, we will arrive with the resources, the research, and the unified voice we need to win.</p>',
+												),
+												array(
+													'type'     => 'donation-wall',
+													'headline' => 'Donor Wall',
+												),
+											),
+										),
+									),
+									array( // Column 2 — media.
+										array(
+											'type'   => 'fields',
+											'fields' => array(
+												array(
+													'type' => 'photo',
+													'default' => 'photo-1.jpg',
+												),
+												array(
+													'type' => 'photo',
+													'default' => 'photo-2.jpg',
+												),
+												array(
+													'type' => 'photo',
+													'default' => 'photo-3.jpg',
+												),
+											),
+										),
+									),
+								),
+							),
+						),
+						'advanced' => array(
+							'tab_style' => 'minimum',
+							'tab_size'  => 'small',
+						),
+						'settings' => array(
+							'general' => array(
+								'description' => '<p>Help us protect Maple Grove Park from commercial development and ensure it remains a free, beautiful public park for generations to come.</p>',
+							),
+						),
+					),
+					'beacon-single'       => array(
+						'meta'     => array(
+							'label'         => 'Beacon (1 Column)',
+							'slug'          => 'beacon-single',
+							'description'   => 'A bold, structured layout for grassroots campaigns. Locked hero banner with donation widget overlay, plus a single full-width column for long-form storytelling.',
+							'template_type' => array( 'single', 'prebuilt' ),
+							'is_new'        => true,
+							'search_tags'   => array(
+								'beacon',
+								'structured',
+								'one-column',
+								'single-column',
+								'long-form',
+								'hero-banner',
+								'donation-widget',
+								'modern',
+								'overlay',
+								'environmental',
+							),
+							'categories'    => array(
+								'structured-layouts',
+								'environmental',
+							),
+							'created'       => '2026-06-06', // Y-m-d.
+							'version'       => '1.0',
+							'author'        => 'David Bisset',
+							'dependencies'  => false,
+							'has_access'    => true,
+							'favorite'      => false,
+							'colors'        => array(
+								'primary'   => '#1d3a8a',
+								'secondary' => '#0D0D0D',
+								'tertiary'  => '#5F5F5F',
+								'accent'    => false,
+								'button_bg' => '#1d3a8a',
+							),
+							'parent_theme'  => false,
+							'thumbnail_url' => false,
+						),
+						'layout'   => array(
+							array( // ROW 1 — locked hero.
+								'type'             => 'header',
+								'css_class'        => 'beacon-hero-row',
+								'locked'           => true,
+								'background_image' => '', // Hero image lives inside the campaign-hero block; row bg unused here.
+								'columns'          => array(
+									array(
+										array(
+											'type'   => 'fields',
+											'fields' => array(
+												array(
+													'type'              => 'campaign-hero',
+													'background_image'  => charitable()->get_path( 'assets', false ) . 'images/campaign-builder/templates/beacon-single/hero.jpg',
+													'avatar_image'      => charitable()->get_path( 'assets', false ) . 'images/campaign-builder/templates/beacon-single/avatar.jpg',
+													'title_override'    => 'Save Maple Grove Park',
+													'accent_color'      => '#1d3a8a',
+													'show_raised'       => true,
+													'enable_recurring'  => false,
+													'onetime_amounts'   => '50,150,500,1000',
+													'onetime_default'   => '50',
+													'onetime_show_other'=> true,
+													'cta_label'         => 'Donate Now',
+												),
+											),
+										),
+									),
+								),
+							),
+							array( // ROW 2 — editable body, single full-width column.
+								'type'      => 'row',
+								'css_class' => 'beacon-body-row',
+								'columns'   => array(
+									array( // Column 1 — single body column.
+										array(
+											'type'   => 'fields',
+											'fields' => array(
+												array(
+													'type' => 'social-sharing',
+													'headline' => '',
+												),
+												array(
+													'type' => 'campaign-description',
+													'headline' => 'Support Hometown Heroes for Maple Grove',
+													'content' => '<p>For generations, Maple Grove Park has been the beating heart of our community. It is where our children take their first steps, where local musicians find their muse under the shade of ancient trees, and where neighbors gather to escape the hustle of daily life. This park is not just a patch of green space on a map; it is a living sanctuary of shared memories, vibrant wildlife, and irreplaceable local history.</p><p>But right now, this beloved community treasure is facing a quiet but devastating crisis. <strong>Commercial development plans</strong> threaten to bulldoze our history and replace our vibrant canopy with concrete. If we stay silent, the ecosystem that supports local wildlife will be destroyed, and the public space that belongs to every single one of us will be lost forever. We cannot afford to stand by and watch Maple Grove vanish.</p><p>That is why we are launching the <strong>Save Maple Grove Park</strong> initiative. Our mission is simple but powerful: to legally protect this land, restore its natural habitats, and ensure it remains a free, beautiful public park for generations to come. We are working alongside local environmental experts, city planners, and passionate residents to present an airtight preservation alternative to the city council. But an expert plan means nothing without the roaring voice of the community behind it.</p>',
+												),
+												array(
+													'type' => 'text',
+													'headline' => 'How your donation makes a difference',
+													'content' => '<p>Every contribution moves us closer to permanent protection for Maple Grove Park. Here is exactly where your dollars go:</p><ul><li><strong>$50</strong> funds an hour of expert legal counsel reviewing the city development proposal.</li><li><strong>$150</strong> pays for native plant restoration across a quarter-acre of degraded meadow.</li><li><strong>$500</strong> covers an environmental impact study for one section of the park.</li><li><strong>$1,000</strong> sponsors a community meeting - venue, materials, and outreach to mobilize hundreds of neighbors.</li></ul><p>No donation is too small. Every signature, every dollar, and every shared story strengthens our case before the city council on July 14.</p>',
+												),
+												array(
+													'type' => 'photo',
+													'default' => 'photo-1.jpg',
+												),
+												array(
+													'type' => 'text',
+													'headline' => 'A community-led plan, ready to act',
+													'content' => '<p>This is not a protest. It is a plan. Over the past six months, our coalition of biologists, urban planners, attorneys, and lifelong residents has assembled a complete preservation proposal - one that protects the park\'s ecosystem, maintains public access, and even strengthens the city\'s tax base through eco-tourism and community programming. We will present this proposal at the July 14 council session. With your support, we will arrive with the resources, the research, and the unified voice we need to win.</p>',
+												),
+												array(
+													'type' => 'photo',
+													'default' => 'photo-2.jpg',
+												),
+												array(
+													'type'     => 'donation-wall',
+													'headline' => 'Donor Wall',
+												),
+											),
+										),
+									),
+								),
+							),
+						),
+						'advanced' => array(
+							'tab_style' => 'minimum',
+							'tab_size'  => 'small',
+						),
+						'settings' => array(
+							'general' => array(
+								'description' => '<p>Help us protect Maple Grove Park from commercial development and ensure it remains a free, beautiful public park for generations to come.</p>',
+							),
+						),
+					),
 					'animal-sanctuary'    => array(
 						'meta'     => array(
 							'label'         => 'Animal Sanctuary',
 							'slug'          => 'animal-sanctuary',
-							'description'   => 'Get funds for your mission to rescue or rehabilitate.',
+							'description'   => 'Get funds for your mission to rescue, rehabilitate, or rehome animals in need. Showcase your team, share success stories, and connect donors to the cause that matters most.',
 							'template_type' => array( 'single', 'prebuilt' ),
 							'search_tags'   => array(
 								'animal-pets',
@@ -2631,7 +2978,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						'meta'     => array(
 							'label'         => 'Save The Museum',
 							'slug'          => 'save-the-museum',
-							'description'   => 'Save a historical building, residence, or important landmark.',
+							'description'   => 'Save a historical building, residence, or important landmark. Use compelling imagery and timeline content to rally community support around preserving what matters.',
 							'template_type' => array( 'single', 'prebuilt' ),
 							'search_tags'   => array(
 								'legal',
@@ -2785,7 +3132,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						'meta'     => array(
 							'label'         => 'Environmental',
 							'slug'          => 'environmental',
-							'description'   => 'Preserve nature and the earth for future generations.',
+							'description'   => 'Preserve nature and the earth for future generations. Highlight conservation work, scientific impact, and the local change donors are funding - ideal for habitat, land trust, and climate causes.',
 							'template_type' => array( 'single', 'prebuilt' ),
 							'search_tags'   => array(
 								'environmental',
@@ -2917,7 +3264,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						'meta'     => array(
 							'label'         => 'Disaster Relief',
 							'slug'          => 'disaster-relief',
-							'description'   => 'Help those effected by natural disasters.',
+							'description'   => 'Help those affected by natural disasters and emergency events. Move quickly with a focused story, a clear goal, and transparent allocation so urgent donations turn into immediate aid.',
 							'template_type' => array( 'single', 'prebuilt' ),
 							'search_tags'   => array(
 								'environmental',
@@ -3054,7 +3401,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						'meta'     => array(
 							'label'         => 'Club / Organization',
 							'slug'          => 'club-organization',
-							'description'   => 'Fund programs or help increase funds for a worthy organization.',
+							'description'   => 'Fund programs or grow operating support for a worthy organization or club. Pair member impact stories with sponsor tiers and donor recognition to keep contributors engaged.',
 							'template_type' => array( 'single', 'prebuilt' ),
 							'search_tags'   => array(
 								'club-organizations',
@@ -3206,7 +3553,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						'meta'     => array(
 							'label'         => 'Medical Causes',
 							'slug'          => 'medical-causes',
-							'description'   => 'Have a goal for more research, better treatment or a cure.',
+							'description'   => 'Have a goal for more research, better treatment, or a cure. Built for foundations, advocacy groups, and patient communities raising funds toward a specific medical milestone.',
 							'template_type' => array( 'single', 'prebuilt' ),
 							'search_tags'   => array(
 								'medical',
@@ -3354,7 +3701,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						'meta'     => array(
 							'label'         => 'Medical Bills',
 							'slug'          => 'medical-bills',
-							'description'   => 'Raise funds to devote towards medical treatment of a friend or family member.',
+							'description'   => 'Raise funds to support the medical treatment of a friend or family member. Personal layout with space for the patient\'s story, treatment plan, and updates as donations come in.',
 							'template_type' => array( 'single', 'prebuilt' ),
 							'search_tags'   => array(
 								'medical',

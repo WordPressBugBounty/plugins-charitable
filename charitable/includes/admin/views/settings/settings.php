@@ -17,11 +17,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 
 $charitable_active_tab      = isset( $_GET['tab'] ) ? esc_html( $_GET['tab'] ) : 'general'; // phpcs:ignore
+$charitable_active_sub_tab  = isset( $_GET['sub_tab'] ) ? esc_html( $_GET['sub_tab'] ) : ''; // phpcs:ignore
 $charitable_tab_no_form_tag = array( 'import', 'export', 'tools' );
 $charitable_group           = isset( $_GET['group'] ) ? esc_html( $_GET['group'] ) : $charitable_active_tab; // phpcs:ignore
 $charitable_sections        = charitable_get_admin_settings()->get_sections();
+$charitable_sub_sections    = 'marketing' === $charitable_active_tab ? charitable_get_admin_settings()->get_sub_sections_marketing() : array();
+$charitable_newsletter_addon_active = class_exists( 'Charitable_Newsletter_Connect' );
 $charitable_show_return     = $charitable_group !== $charitable_active_tab;
 $charitable_css             = '';
+
+// Resolve the effective sub_tab for routing. Marketing always has a sub_tab; default to newsletters.
+if ( 'marketing' === $charitable_active_tab && '' === $charitable_active_sub_tab ) {
+	$charitable_active_sub_tab = 'newsletters';
+}
 
 if ( $charitable_show_return ) {
 	/**
@@ -74,10 +82,30 @@ ob_start();
 		<?php foreach ( $charitable_sections as $charitable_section_key => $charitable_section_name ) : ?>
 			<?php
 			$charitable_url_query_arg_array = array( 'tab' => $charitable_section_key );
+			if ( 'marketing' === $charitable_section_key ) {
+				$charitable_url_query_arg_array['sub_tab'] = 'newsletters';
+			}
 			?>
 			<a href="<?php echo esc_url( add_query_arg( $charitable_url_query_arg_array, admin_url( 'admin.php?page=charitable-settings' ) ) ); ?>" class="nav-tab nav-tab-<?php echo esc_attr( $charitable_section_key ); ?> <?php echo ( esc_attr( $charitable_active_tab ) === esc_attr( $charitable_section_key ) ) ? ' nav-tab-active' : ''; ?>"><?php echo esc_html( $charitable_section_name ); ?></a>
 		<?php endforeach ?>
 	</h2>
+	<?php if ( 'marketing' === $charitable_active_tab && ! empty( $charitable_sub_sections ) ) : ?>
+		<h3 class="nav-sub-tab-wrapper">
+			<?php foreach ( $charitable_sub_sections as $charitable_sub_section_key => $charitable_sub_section_label ) :
+				$charitable_sub_tab_slug = str_replace( 'marketing__', '', $charitable_sub_section_key );
+				$charitable_is_active    = ( $charitable_active_sub_tab === $charitable_sub_tab_slug );
+				?>
+				<a href="<?php echo esc_url( add_query_arg( array( 'tab' => 'marketing', 'sub_tab' => $charitable_sub_tab_slug ), admin_url( 'admin.php?page=charitable-settings' ) ) ); ?>" class="nav-tab nav-tab-marketing nav-sub-tab-<?php echo esc_attr( $charitable_sub_tab_slug ); ?><?php echo $charitable_is_active ? ' nav-tab-active' : ''; ?>"><?php
+					echo wp_kses(
+						$charitable_sub_section_label,
+						array(
+							'span' => array( 'class' => array() ),
+						)
+					);
+				?></a>
+			<?php endforeach ?>
+		</h3>
+	<?php endif; ?>
 	<?php if ( $charitable_show_return ) : ?>
 		<?php /* translators: %s: active settings tab label */ ?>
 		<p><a href="<?php echo esc_url( $charitable_return_tab_url ); ?>"><?php echo $charitable_return_tab_text; // phpcs:ignore ?></a></p>
@@ -95,9 +123,25 @@ ob_start();
 	?>
 
 	<?php
-	// Show CTA only for marketing and donors tabs.
-	// Security tab will show actual settings (either from spam blocker or core).
-	if ( 'marketing' === $charitable_active_tab || 'donors' === $charitable_active_tab ) :
+	// Donors → always show CTA in Lite.
+	// Marketing → render the real form only on Newsletters sub-tab when the Newsletter
+	//   Connect addon is active (it works on Lite). All other Marketing sub-tabs
+	//   (conversion_tracking, google_analytics) — and Newsletters with no addon —
+	//   render their CTA via the charitable_pro_settings_cta action.
+	$charitable_show_cta = 'donors' === $charitable_active_tab
+		|| ( 'marketing' === $charitable_active_tab
+			&& ( 'newsletters' !== $charitable_active_sub_tab || ! $charitable_newsletter_addon_active )
+		);
+
+	// When rendering the real form for the Newsletters sub-tab, route fields to the
+	// marketing__newsletters group. The legacy addon still hooks into the extensions
+	// section, so we use 'extensions' as the field-group key for the form (see the
+	// bridge in Charitable_Settings::register_settings()).
+	if ( 'marketing' === $charitable_active_tab && 'newsletters' === $charitable_active_sub_tab && $charitable_newsletter_addon_active && empty( $_GET['group'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$charitable_group = 'extensions';
+	}
+
+	if ( $charitable_show_cta ) :
 		?>
 		<?php do_action( 'charitable_pro_settings_cta', $charitable_active_tab ); ?>
 	<?php else : ?>

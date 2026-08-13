@@ -427,6 +427,13 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 			wp_enqueue_style( 'charitable-admin-2.0' );
 
+			wp_enqueue_style(
+				'charitable-notifications-v2',
+				$assets_dir . 'css/admin/notifications-v2' . $min . '.css',
+				array(),
+				$version
+			);
+
 			wp_register_style(
 				'charitable-admin',
 				$assets_dir . 'css/admin/charitable-admin-legacy' . $min . '.css',

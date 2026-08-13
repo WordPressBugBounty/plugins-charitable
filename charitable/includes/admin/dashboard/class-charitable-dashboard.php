@@ -59,6 +59,14 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 	const BLOG_POSTS_SOURCE_URL = 'https://plugin.wpcharitable.com/wp-content/charitable-blog-posts.json';
 
 	/**
+	 * URL for the v2 Latest Updates feed (hosted on Cloudflare Pages).
+	 *
+	 * @since 1.8.12
+	 * @var string
+	 */
+	const LATEST_UPDATES_SOURCE_URL = 'https://plugin.wpcharitable.com/wp-content/charitable-latest-updates.json';
+
+	/**
 	 * Cached version information from the API.
 	 *
 	 * @since 1.8.8
@@ -857,8 +865,9 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 			)
 		);
 
-		// Clear blog posts cache
+		// Clear blog posts cache and Latest Updates feed cache.
 		delete_transient( 'charitable_blog_posts_cache' );
+		delete_transient( 'charitable_latest_updates_cache' );
 	}
 
 	/**
@@ -1942,6 +1951,98 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		}
 
 		/**
+		 * Render the "Free Site Analysis" promo card in the dashboard right column. Links to the
+		 * Reports > Site Analysis tab, where the user runs their free Fundraising Score analysis.
+		 *
+		 * @since 1.8.12
+		 *
+		 * @return void
+		 */
+		public function render_site_analysis_section() {
+			$charitable_sa_url   = admin_url( 'admin.php?page=charitable-reports&tab=site-analysis' );
+			$charitable_sa_nonce = wp_create_nonce( 'charitable_site_analysis_click' );
+			?>
+			<style>
+			/* This card puts content directly in section-content, which has no horizontal padding by
+			   default; restore the standard section padding for this card only. */
+			#charitable-dashboard-v2-site-analysis .charitable-dashboard-v2-section-content { padding: 0 20px 20px; }
+			#charitable-dashboard-v2-site-analysis .charitable-sa-dash-new {
+				display: inline-block; margin-left: 8px; vertical-align: middle;
+				background: #5AA152; color: #fff; font-size: 10px; font-weight: 700;
+				line-height: 1; letter-spacing: .04em; text-transform: uppercase;
+				padding: 3px 7px; border-radius: 3px;
+			}
+			#charitable-dashboard-v2-site-analysis .charitable-sa-dash-body { display: flex; align-items: flex-start; gap: 14px; }
+			#charitable-dashboard-v2-site-analysis .charitable-sa-dash-icon {
+				flex: none; width: 40px; height: 40px; border-radius: 8px;
+				display: flex; align-items: center; justify-content: center; background: #eaf4e8; color: #5AA152;
+			}
+			#charitable-dashboard-v2-site-analysis .charitable-sa-dash-icon .dashicons { font-size: 22px; width: 22px; height: 22px; }
+			#charitable-dashboard-v2-site-analysis .charitable-sa-dash-text { margin: 0 0 12px; color: #50575e; font-size: 13.5px; line-height: 1.5; }
+			#charitable-dashboard-v2-site-analysis .charitable-sa-dash-button { background-color: #5AA152 !important; border-color: #5AA152 !important; color: #fff !important; text-shadow: none; }
+			#charitable-dashboard-v2-site-analysis .charitable-sa-dash-button:hover,
+			#charitable-dashboard-v2-site-analysis .charitable-sa-dash-button:focus { background-color: #3f7539 !important; border-color: #3f7539 !important; color: #fff !important; }
+			</style>
+
+			<section id="charitable-dashboard-v2-site-analysis" class="charitable-dashboard-v2-section">
+				<header class="charitable-dashboard-v2-section-header">
+					<h3>
+						<?php esc_html_e( 'Free Site Analysis', 'charitable' ); ?>
+						<span class="charitable-sa-dash-new"><?php esc_html_e( 'New', 'charitable' ); ?></span>
+					</h3>
+				</header>
+				<div class="charitable-dashboard-v2-section-content">
+					<div class="charitable-sa-dash-body">
+						<span class="charitable-sa-dash-icon"><span class="dashicons dashicons-chart-area" aria-hidden="true"></span></span>
+						<div>
+							<p class="charitable-sa-dash-text">
+								<?php esc_html_e( 'See how your fundraising setup measures up and get specific, prioritized steps to raise more. Free to run, based on your current Charitable configuration.', 'charitable' ); ?>
+							</p>
+							<a href="<?php echo esc_url( $charitable_sa_url ); ?>" class="button button-primary charitable-sa-dash-button">
+								<?php esc_html_e( 'Run Your Free Analysis', 'charitable' ); ?>
+							</a>
+						</div>
+					</div>
+				</div>
+			</section>
+			<script>
+			/* Record the click via Charitable's consent-gated usage tracking (sendBeacon so it fires
+			   before the link navigates away). No effect if the user hasn't opted into usage tracking. */
+			( function () {
+				var link = document.querySelector( '#charitable-dashboard-v2-site-analysis .charitable-sa-dash-button' );
+				if ( ! link || ! navigator.sendBeacon ) { return; }
+				link.addEventListener( 'click', function () {
+					try {
+						var fd = new FormData();
+						fd.append( 'action', 'charitable_track_site_analysis_click' );
+						fd.append( 'nonce', '<?php echo esc_js( $charitable_sa_nonce ); ?>' );
+						navigator.sendBeacon( '<?php echo esc_url_raw( admin_url( 'admin-ajax.php' ) ); ?>', fd );
+					} catch ( e ) {}
+				} );
+			} )();
+			</script>
+			<?php
+		}
+
+		/**
+		 * AJAX: record a click on the dashboard "Run Your Free Analysis" button via the same
+		 * consent-gated usage-tracking channel as the recommendation cards. Lands in the
+		 * charitable_recommended_plugins_clicked option, which Charitable_Tracking reports to
+		 * awesomemotive as recommended_plugins_clicked (filter by context 'dashboard_site_analysis').
+		 *
+		 * @since 1.8.12
+		 *
+		 * @return void
+		 */
+		public function ajax_track_site_analysis_click() {
+			if ( ! check_ajax_referer( 'charitable_site_analysis_click', 'nonce', false ) || ! current_user_can( 'manage_charitable_settings' ) ) {
+				wp_send_json_error();
+			}
+			$this->track_recommendation_click( 'clicked', 'site-analysis', 'feature', 'dashboard_site_analysis' );
+			wp_send_json_success();
+		}
+
+		/**
 		 * Render the enhance campaign section.
 		 *
 		 * @since 1.8.8
@@ -2936,14 +3037,44 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		 * @since 1.8.8
 		 */
 		public function render_latest_updates_section() {
-			// Check if there are blog posts to determine footer link text
-			$posts = $this->get_blog_posts();
-			$has_posts = ! empty( $posts ) && ! $this->has_blog_posts_error( $posts );
-			$footer_link_text = $has_posts ? __( 'Read More', 'charitable' ) : __( 'Read Blog', 'charitable' );
+			// Try v2 feed first, fall back to legacy blog posts.
+			$updates = $this->get_latest_updates();
+			$has_posts = ! empty( $updates );
+			if ( ! $has_posts ) {
+				$posts = $this->get_blog_posts();
+				$has_posts = ! empty( $posts ) && ! $this->has_blog_posts_error( $posts );
+			}
+			$footer_link_text = __( 'See More Updates', 'charitable' );
 
-			// Check if user is more than 3 updates behind
+			// Threshold resolves in order: feed meta.behind_threshold → WP filter → hardcoded default (3).
 			$updates_behind = $this->get_updates_behind();
-			$show_version_update = $updates_behind > 3;
+			$threshold      = 3;
+			// isset (not ! empty) so a feed-supplied 0 correctly overrides to "always alert".
+			if ( isset( $this->version_info['behind_threshold'] ) ) {
+				$threshold = (int) $this->version_info['behind_threshold'];
+			}
+			/**
+			 * Filter the "behind versions" threshold above which the big update alert renders.
+			 *
+			 * @since 1.8.12
+			 *
+			 * @param int $threshold Default 3, or value supplied by the feed.
+			 */
+			$threshold           = (int) apply_filters( 'charitable_latest_updates_behind_threshold', $threshold );
+			$show_version_update = $updates_behind > $threshold;
+
+			// Version-state pill resolution (mutually exclusive with the big alert). @since 1.8.12
+			//   - on_latest       : remote latest is known AND user is 0 behind.
+			//   - mildly_behind   : 1+ behind but not past the threshold (shows a compact amber nudge).
+			$latest_known_version = $this->get_latest_version();
+			$on_latest            = ! empty( $latest_known_version ) && 0 === $updates_behind;
+			$mildly_behind        = ! empty( $latest_known_version ) && $updates_behind > 0 && ! $show_version_update;
+
+			// If blog posts can't load and there's no version update to show, don't display the section at all
+			if ( ! $has_posts && ! $show_version_update ) {
+				return;
+			}
+	
 			$section_class = 'charitable-dashboard-v2-section';
 			if ( ! $show_version_update ) {
 				$section_class .= ' no-update-alert';
@@ -2953,6 +3084,47 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 				<header class="charitable-dashboard-v2-section-header">
 					<h3>Latest Updates</h3>
 				</header>
+				<?php if ( $on_latest ) : ?>
+					<div class="charitable-dashboard-v2-latest-updates-uptodate">
+						<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14" aria-hidden="true">
+							<path d="M16.7 5.3L7.5 14.6L3.3 10.4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+						<span><?php
+							echo wp_kses(
+								sprintf(
+									/* translators: %s: current installed version number */
+									__( "You're running the latest version (<strong>%s</strong>).", 'charitable' ),
+									esc_html( charitable()->get_version() )
+								),
+								array( 'strong' => array() )
+							);
+						?></span>
+					</div>
+				<?php elseif ( $mildly_behind ) : ?>
+					<div class="charitable-dashboard-v2-latest-updates-behind">
+						<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14" aria-hidden="true">
+							<circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+							<path d="M10 9v4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+							<circle cx="10" cy="6.3" r="1.1" fill="currentColor"/>
+						</svg>
+						<span><?php
+							$versions_label = sprintf(
+								/* translators: %d: number of versions behind */
+								_n( '%d version', '%d versions', $updates_behind, 'charitable' ),
+								$updates_behind
+							);
+							echo wp_kses(
+								sprintf(
+									/* translators: 1: versions-behind label (e.g. "2 versions"), 2: plugins page URL */
+									__( 'You are behind <strong>%1$s</strong>. <a href="%2$s">Update now</a>', 'charitable' ),
+									esc_html( $versions_label ),
+									esc_url( admin_url( 'plugins.php?s=charitable' ) )
+								),
+								array( 'strong' => array(), 'a' => array( 'href' => array() ) )
+							);
+						?></span>
+					</div>
+				<?php endif; ?>
 				<div class="charitable-dashboard-v2-section-content">
 					<?php if ( $show_version_update ) : ?>
 					<div class="charitable-dashboard-v2-latest-updates-background">
@@ -2960,27 +3132,35 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 							<div class="charitable-dashboard-v2-latest-updates-flex">
 								<div class="charitable-dashboard-v2-latest-updates-icon">
 									<svg class="charitable-dashboard-v2-latest-updates-icon-placeholder" width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-										<circle cx="13" cy="13" r="13" fill="#eaa251"/>
-										<path d="M13 6.5L19.5 17.5H6.5L13 6.5Z" fill="white"/>
-										<path d="M13 10.5V14.5" stroke="#eaa251" stroke-width="2" stroke-linecap="round"/>
-										<circle cx="13" cy="17" r="1" fill="#eaa251"/>
+										<path d="M13 2L24 22H2L13 2Z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+										<path d="M13 10V16" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+										<circle cx="13" cy="19.5" r="1.25" fill="#fff"/>
 									</svg>
 								</div>
 								<div class="charitable-dashboard-v2-latest-updates-content">
-									<h4 class="charitable-dashboard-v2-latest-updates-headline">You are currently <?php echo esc_html( $updates_behind ); ?> updates behind. Please upgrade Charitable to take advantage of:</h4>
-									<div class="charitable-dashboard-v2-latest-updates-features">
-										<?php $this->render_update_features(); ?>
-									</div>
+									<h4 class="charitable-dashboard-v2-latest-updates-headline"><?php
+										$version_label = sprintf( '<strong>%s</strong>', esc_html( sprintf( _n( '%d version', '%d versions', $updates_behind, 'charitable' ), $updates_behind ) ) );
+										$update_link   = sprintf( '<a href="%s">%s</a>', esc_url( admin_url( 'plugins.php?s=charitable' ) ), esc_html__( 'Update now', 'charitable' ) );
+										printf(
+											wp_kses(
+												/* translators: 1: versions-behind label (e.g. "4 versions"), 2: "Update now" link */
+												__( 'You are currently %1$s behind. Please upgrade Charitable to take advantage of the features and addons below. %2$s', 'charitable' ),
+												array( 'strong' => array(), 'a' => array( 'href' => array() ) )
+											),
+											$version_label,
+											$update_link
+										);
+									?></h4>
 								</div>
 							</div>
 						</div>
 					</div>
 					<?php endif; ?>
-					<?php $this->render_blog_posts(); ?>
+					<?php $this->render_latest_updates_items(); ?>
 					<footer class="charitable-dashboard-v2-latest-updates-footer">
 						<div class="charitable-dashboard-v2-latest-updates-footer-content">
 							<div class="charitable-dashboard-v2-latest-updates-footer-left">
-								<a href="https://wpcharitable.com/blog" target="_blank" rel="noopener noreferrer" class="charitable-dashboard-v2-blog-link">
+								<a href="https://www.wpcharitable.com/charitable-changelog/" target="_blank" rel="noopener noreferrer" class="charitable-dashboard-v2-blog-link">
 									<span class="charitable-dashboard-v2-blog-text"><?php echo esc_html( $footer_link_text ); ?></span>
 									<svg class="charitable-dashboard-v2-arrow-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 										<path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -2991,6 +3171,318 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 					</footer>
 				</div>
 			</section>
+			<?php
+		}
+	
+
+		/**
+		 * Render the "Are you enjoying Charitable?" section on the dashboard.
+		 * Mirrors the top admin notice (five-star review) but styled to match the dashboard.
+		 * Only shows when the same eligibility conditions are met and it hasn't been dismissed.
+		 *
+		 * @since 1.8.12
+		 */
+		public function render_enjoying_section() {
+			// ?preview_enjoy=1 bypasses all eligibility checks for testing (admins only).
+			$preview = ! empty( $_GET['preview_enjoy'] ) && current_user_can( 'manage_options' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	
+			if ( ! $preview ) {
+				$activated_datetime = get_option( 'wpcharitable_activated_datetime', false );
+				$days               = 0;
+				if ( $activated_datetime ) {
+					$diff = current_time( 'timestamp' ) - $activated_datetime;
+					$days = (int) abs( round( $diff / 86400 ) );
+				}
+	
+				$count_campaigns = wp_count_posts( 'campaign' );
+				$total_campaigns = isset( $count_campaigns->publish ) ? (int) $count_campaigns->publish : 0;
+				$count_donations = wp_count_posts( 'donation' );
+				$total_donations = isset( $count_donations->{'charitable-completed'} ) ? (int) $count_donations->{'charitable-completed'} : 0;
+	
+				if ( $days < apply_filters( 'charitable_days_since_activated', 14 ) || $total_campaigns < 1 || $total_donations < 1 ) {
+					return;
+				}
+	
+				// Use the same transient as the top notice so dismissing either dismisses both.
+				if ( get_transient( 'charitable_five-star-review_banner' ) ) {
+					return;
+				}
+			}
+	
+			$feedback_url = 'https://wpcharitable.com/charitable-admin-review/';
+			$rating_url   = 'https://wpcharitable.com/charitable-admin-review/';
+			?>
+			<section id="charitable-dashboard-enjoy-section" class="charitable-dashboard-v2-section charitable-dashboard-enjoy-section">
+				<button type="button" class="charitable-enjoy-dismiss-btn" aria-label="<?php esc_attr_e( 'Dismiss', 'charitable' ); ?>">
+					<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+				</button>
+	
+				<div class="charitable-enjoy-step" data-step="1">
+					<p class="charitable-enjoy-question"><?php esc_html_e( 'Are You Enjoying Charitable?', 'charitable' ); ?></p>
+					<p class="charitable-enjoy-actions">
+						<button type="button" class="charitable-enjoy-link charitable-enjoy-link--yes" data-navigate="3"><?php esc_html_e( 'Yes', 'charitable' ); ?></button>
+						<button type="button" class="charitable-enjoy-link charitable-enjoy-link--no" data-navigate="2"><?php esc_html_e( 'Not Really', 'charitable' ); ?></button>
+					</p>
+				</div>
+	
+				<div class="charitable-enjoy-step" data-step="2" style="display:none;">
+					<p class="charitable-enjoy-question charitable-enjoy-question--title"><?php esc_html_e( "Sorry To Hear That!", 'charitable' ); ?></p>
+					<p class="charitable-enjoy-question"><?php esc_html_e( "We're sorry to hear you aren't enjoying Charitable. We would love a chance to improve. Could you take a minute and let us know what we can do better?", 'charitable' ); ?></p>
+					<p class="charitable-enjoy-actions">
+						<a href="<?php echo esc_url( $feedback_url ); ?>" class="charitable-enjoy-link charitable-enjoy-link--yes charitable-enjoy-dismiss-action" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Give Feedback', 'charitable' ); ?></a>
+						<button type="button" class="charitable-enjoy-link charitable-enjoy-link--no charitable-enjoy-dismiss-action"><?php esc_html_e( 'No Thanks', 'charitable' ); ?></button>
+					</p>
+				</div>
+	
+				<div class="charitable-enjoy-step" data-step="3" style="display:none;">
+					<p class="charitable-enjoy-question charitable-enjoy-question--title"><?php esc_html_e( "That's Awesome!", 'charitable' ); ?></p>
+					<p class="charitable-enjoy-question"><?php esc_html_e( "Could you please do us a BIG favor and give it a 5-star rating on WordPress to help us spread the word and boost our team motivation?", 'charitable' ); ?></p>
+					<p class="charitable-enjoy-team"><strong><?php esc_html_e( '~ WP Charitable Team', 'charitable' ); ?></strong></p>
+					<p class="charitable-enjoy-actions">
+						<a href="<?php echo esc_url( $rating_url ); ?>" class="charitable-enjoy-link charitable-enjoy-link--yes charitable-enjoy-dismiss-action" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Ok, You Deserve It', 'charitable' ); ?></a>
+						<button type="button" class="charitable-enjoy-link charitable-enjoy-link--no charitable-enjoy-dismiss-action"><?php esc_html_e( 'I Already Did', 'charitable' ); ?></button>
+					</p>
+				</div>
+			</section>
+			<script>
+			( function ( $ ) {
+				var section = $( '#charitable-dashboard-enjoy-section' );
+	
+				// Navigate between steps.
+				section.on( 'click', '[data-navigate]', function () {
+					var target = $( this ).data( 'navigate' );
+					section.find( '.charitable-enjoy-step' ).hide();
+					section.find( '.charitable-enjoy-step[data-step="' + target + '"]' ).show();
+				} );
+	
+				// Dismiss — fires AJAX then removes the section.
+				function dismissSection() {
+					$.post( ajaxurl, {
+						action:    'charitable_dismiss_admin_five_star_rating',
+						banner_id: 'five-star-review',
+					} );
+					section.fadeOut( 300, function () { $( this ).remove(); } );
+				}
+	
+				section.on( 'click', '.charitable-enjoy-dismiss-btn', dismissSection );
+				section.on( 'click', '.charitable-enjoy-dismiss-action', function () {
+					setTimeout( dismissSection, 150 );
+				} );
+			}( jQuery ) );
+			</script>
+			<?php
+		}
+		/**
+		 * Map a URL to a local filesystem path if it lives under WP_CONTENT_URL.
+		 *
+		 * @param string $url URL to check.
+		 * @return string|false Absolute file path, or false if the URL is external.
+		 */
+		private function get_local_file_path_for_url( $url ) {
+			$content_url = untrailingslashit( content_url() );
+			// Normalize schemes so http/https mismatch doesn't break the comparison.
+			$url_norm     = preg_replace( '#^https?://#', '//', $url );
+			$content_norm = preg_replace( '#^https?://#', '//', $content_url );
+			if ( strpos( $url_norm, $content_norm ) !== 0 ) {
+				return false;
+			}
+			$relative = substr( $url_norm, strlen( $content_norm ) );
+			$file     = WP_CONTENT_DIR . $relative;
+			return file_exists( $file ) ? $file : false;
+		}
+		/**
+		 * Return a local video URL for a given post title, if one exists.
+		 * Used to override missing video_url values from the remote feed.
+		 *
+		 * @param  string $title Post title from the feed.
+		 * @return string URL or empty string.
+		 */
+		private function get_local_video_url( $title ) {
+			$map = array(
+				'Mini Donation Widget' => site_url( '/_promo_videos/charitable_dashboard_updates_video_mini-widget.mp4' ),
+			);
+
+			foreach ( $map as $keyword => $url ) {
+				if ( false !== stripos( $title, $keyword ) ) {
+					return $url;
+				}
+			}
+
+			return '';
+		}
+		/**
+		 * Return a local thumbnail URL for a given post title, if one exists.
+		 *
+		 * @param  string $title Post title from the feed.
+		 * @return string URL or empty string.
+		 */
+		private function get_local_thumbnail_url( $title ) {
+			$base = charitable()->get_path( 'assets', false ) . 'images/dashboard/';
+			$map  = array(
+				'Mini Donation Widget' => site_url( '/_promo_videos/mini-widget-thumbnail.svg' ),
+				'Donations Feed'       => site_url( '/_promo_videos/donations-feed-thumbnail.svg' ),
+				'Campaign Showcase'    => $base . 'thumb-campaign-showcase.png',
+				'Campaign Updates'     => $base . 'thumb-campaign-updates.svg',
+			);
+
+			foreach ( $map as $keyword => $url ) {
+				if ( false !== stripos( $title, $keyword ) ) {
+					return $url;
+				}
+			}
+
+			return '';
+		}
+		/**
+		 * Return a local badge type for a given post title, if one should be overridden.
+		 * Values: 'pro', 'addon', or empty string.
+		 *
+		 * @param  string $title Post title from the feed.
+		 * @return string Badge type or empty string.
+		 */
+		private function get_local_badge( $title ) {
+			$pro_keywords = array( 'Mini Donation Widget', 'Donations Feed', 'Campaign Showcase' );
+			foreach ( $pro_keywords as $keyword ) {
+				if ( false !== stripos( $title, $keyword ) ) {
+					return 'pro';
+				}
+			}
+
+			$addon_keywords = array( 'Campaign Updates Addon', 'Campaigns Update Addon' );
+			foreach ( $addon_keywords as $keyword ) {
+				if ( false !== stripos( $title, $keyword ) ) {
+					return 'addon';
+				}
+			}
+
+			return '';
+		}
+		/**
+		 * Fetch and return the v2 Latest Updates feed.
+		 *
+		 * @since 1.8.12
+		 * @return array Array of update items, or empty array on failure.
+		 */
+		private function get_latest_updates() {
+			$cached = get_transient( 'charitable_latest_updates_cache' );
+			if ( false !== $cached ) {
+				if ( isset( $cached['version_info'] ) ) {
+					$this->version_info = $cached['version_info'];
+				}
+				return $cached['updates'] ?? [];
+			}
+
+			$response = wp_remote_get( self::LATEST_UPDATES_SOURCE_URL, [
+				'timeout'   => 10,
+				'sslverify' => false,
+			] );
+
+			if ( is_wp_error( $response ) ) {
+				return [];
+			}
+
+			$body = wp_remote_retrieve_body( $response );
+			if ( empty( $body ) ) {
+				return [];
+			}
+
+			$decoded = json_decode( $body, true );
+			if ( json_last_error() !== JSON_ERROR_NONE || empty( $decoded['updates'] ) ) {
+				return [];
+			}
+
+			// Store version info from meta.
+			if ( isset( $decoded['meta'] ) && is_array( $decoded['meta'] ) ) {
+				$this->version_info = [
+					'current_charitable_version_lite' => ! empty( $decoded['meta']['current_charitable_version_lite'] ) ? sanitize_text_field( $decoded['meta']['current_charitable_version_lite'] ) : '',
+					'current_charitable_version_pro'  => ! empty( $decoded['meta']['current_charitable_version_pro'] ) ? sanitize_text_field( $decoded['meta']['current_charitable_version_pro'] ) : '',
+				];
+			}
+
+			// Sanitize each update item.
+			$updates = [];
+			foreach ( $decoded['updates'] as $item ) {
+				if ( empty( $item['title'] ) || empty( $item['url'] ) ) {
+					continue;
+				}
+				$updates[] = [
+					'id'          => sanitize_key( $item['id'] ?? '' ),
+					'title'       => sanitize_text_field( $item['title'] ),
+					'description' => sanitize_text_field( $item['description'] ?? '' ),
+					'url'         => esc_url_raw( $item['url'] ),
+					'date'        => sanitize_text_field( $item['date'] ?? '' ),
+					'badge'       => sanitize_key( $item['badge'] ?? '' ),
+					'is_new'      => ! empty( $item['is_new'] ),
+					'image'       => ! empty( $item['image'] ) ? esc_url_raw( $item['image'] ) : '',
+				];
+			}
+
+			// Cache for 24 hours.
+			set_transient( 'charitable_latest_updates_cache', [
+				'updates'      => $updates,
+				'version_info' => $this->version_info,
+			], DAY_IN_SECONDS );
+
+			return $updates;
+		}
+		/**
+		 * Render the v2 Latest Updates items.
+		 *
+		 * @since 1.8.12
+		 */
+		private function render_latest_updates_items() {
+			$updates = $this->get_latest_updates();
+
+			if ( empty( $updates ) ) {
+				// Fall back to legacy blog posts.
+				$this->render_blog_posts();
+				return;
+			}
+
+			?>
+			<div class="charitable-dashboard-v2-blog-posts" id="charitable-blog-posts-container">
+				<?php $count = 0; foreach ( $updates as $update ) : if ( $count >= 4 ) break; $count++; ?>
+					<div class="charitable-dashboard-v2-blog-post-row">
+						<div class="charitable-dashboard-v2-blog-post-left">
+							<div class="charitable-dashboard-v2-blog-post-timestamp-row">
+								<?php if ( ! empty( $update['date'] ) ) : ?>
+									<span class="charitable-dashboard-v2-blog-post-timestamp"><?php echo esc_html( $this->calculate_relative_time( $update['date'] ) ); ?></span>
+								<?php endif; ?>
+								<?php if ( ! empty( $update['is_new'] ) ) : ?>
+									<span class="charitable-dashboard-v2-blog-post-badge-new"><?php esc_html_e( 'New', 'charitable' ); ?></span>
+								<?php endif; ?>
+								<?php if ( 'pro' === $update['badge'] ) : ?>
+									<span class="charitable-dashboard-v2-blog-post-badge-pro"><?php esc_html_e( 'Pro', 'charitable' ); ?></span>
+								<?php elseif ( 'addon' === $update['badge'] ) : ?>
+									<span class="charitable-dashboard-v2-blog-post-badge-addon"><?php esc_html_e( 'Addon', 'charitable' ); ?></span>
+								<?php endif; ?>
+							</div>
+							<h5 class="charitable-dashboard-v2-blog-post-title">
+								<a href="<?php echo esc_url( $update['url'] ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $update['title'] ); ?></a>
+							</h5>
+							<?php if ( ! empty( $update['description'] ) ) : ?>
+								<p class="charitable-dashboard-v2-blog-post-desc"><?php echo esc_html( $update['description'] ); ?> <a href="<?php echo esc_url( $update['url'] ); ?>" target="_blank" rel="noopener noreferrer" class="charitable-dashboard-v2-blog-post-learn-more"><?php esc_html_e( 'Learn More', 'charitable' ); ?> →</a></p>
+							<?php endif; ?>
+						</div>
+						<div class="charitable-dashboard-v2-blog-post-right">
+							<?php if ( ! empty( $update['image'] ) ) : ?>
+								<a href="<?php echo esc_url( $update['url'] ); ?>" target="_blank" rel="noopener noreferrer" class="charitable-dashboard-v2-blog-post-thumb charitable-dashboard-v2-blog-post-thumb--bg" style="background-image:url('<?php echo esc_url( $update['image'] ); ?>');">
+								</a>
+							<?php else : ?>
+								<a href="<?php echo esc_url( $update['url'] ); ?>" target="_blank" rel="noopener noreferrer" class="charitable-dashboard-v2-blog-post-thumb">
+									<svg width="96" height="64" viewBox="0 0 96 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<rect width="96" height="64" rx="6" fill="#E5E7EB"/>
+										<path d="M16 46L30 29L46 39L62 21L82 33" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+										<circle cx="30" cy="29" r="2.5" fill="#9CA3AF"/>
+										<circle cx="46" cy="39" r="2.5" fill="#9CA3AF"/>
+										<circle cx="62" cy="21" r="2.5" fill="#9CA3AF"/>
+									</svg>
+								</a>
+							<?php endif; ?>
+						</div>
+					</div>
+				<?php endforeach; ?>
+			</div>
 			<?php
 		}
 

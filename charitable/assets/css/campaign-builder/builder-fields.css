@@ -51,9 +51,22 @@
   margin: 0 0 5px 0;
   width: 100%;
   height: 60px;
+  position: relative;
 }
 .charitable-panel-fields .charitable-field-drag-placeholder.charitable-field-drag-not-allowed {
   border-color: #b32d2e;
+}
+.charitable-panel-fields .charitable-field-drag-placeholder.charitable-field-drag-locked-row::after {
+  content: "\f160";
+  font-family: "dashicons";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #b32d2e;
+  font-size: 24px;
+  line-height: 1;
+  pointer-events: none;
 }
 .charitable-panel-fields .charitable-field-drag-not-allowed {
   cursor: not-allowed !important;
@@ -1288,8 +1301,9 @@
 }
 
 .charitable-toggle-control {
-  display: block;
+  display: flex;
   margin: 6px 1px 5px 0px;
+  align-items: flex-end;
 }
 .charitable-toggle-control input[type=checkbox] {
   display: none;
@@ -1352,6 +1366,22 @@
 }
 .charitable-toggle-control:hover .charitable-toggle-control-icon {
   background-color: #777777;
+}
+
+/* Disabled toggle — dim everything and block interaction; pointer-events on labels
+   so the user can't click them to toggle the input. */
+.charitable-panel-field-toggle-disabled {
+  opacity: 0.55;
+}
+.charitable-panel-field-toggle-disabled .charitable-toggle-control input[type=checkbox] {
+  cursor: not-allowed;
+}
+.charitable-panel-field-toggle-disabled .charitable-toggle-control label {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.charitable-panel-field-toggle-disabled .charitable-toggle-control .charitable-toggle-control-icon {
+  background-color: #c8ced4 !important;
 }
 
 .charitable-group.charitable-layout-options-tab-group .charitable-toggle-control-icon {

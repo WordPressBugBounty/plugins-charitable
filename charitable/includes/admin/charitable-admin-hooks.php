@@ -233,6 +233,67 @@ add_filter( 'wp_ajax_charitable_notification_dismiss_multiple', array( Charitabl
 add_action( 'admin_init', array( Charitable_Notifications::get_instance(), 'maybe_redirect_from_notifications' ), 10 );
 
 /**
+ * Notifications v2 — Settings must init before Local Notifications and Cron
+ * so is_category_enabled() is available to both.
+ *
+ * @since 1.8.12
+ */
+Charitable_Notification_Settings::get_instance()->init();
+
+/**
+ * Local Notifications — manages locally-generated notifications.
+ *
+ * @since 1.8.12
+ */
+Charitable_Local_Notifications::get_instance()->init();
+
+/**
+ * Notification Cron — schedules and runs periodic checks.
+ *
+ * @since 1.8.12
+ */
+Charitable_Notification_Cron::get_instance()->init();
+
+/**
+ * Notification Triggers — hook-based milestone and lifecycle events.
+ *
+ * @since 1.8.12
+ */
+Charitable_Notification_Triggers::get_instance()->init();
+
+/**
+ * Notifications V2 onboarding tour.
+ *
+ * @since 1.8.12
+ */
+// Charitable_Notification_Onboarding::get_instance()->init(); // TODO: re-enable before release
+
+/**
+ * New Announcement Feed.
+ *
+ * @since 1.8.12
+ */
+Charitable_New_Feed::get_instance()->init();
+
+/**
+ * Notifications V2 test helper (admin-only). Triggered by ?charitable_notif_test=<action>.
+ *
+ * This is a development-only QA harness that seeds/clears notification state and
+ * fires cron jobs on demand. It is a state-changing GET handler with no nonce, so
+ * it must never be wired up in a production build. It is gated behind both WP_DEBUG
+ * and an explicit opt-in constant; to enable it locally, define both in wp-config.php:
+ *
+ *     define( 'WP_DEBUG', true );
+ *     define( 'CHARITABLE_NOTIFICATION_TEST_HELPER', true );
+ *
+ * @since 1.8.12
+ */
+if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'CHARITABLE_NOTIFICATION_TEST_HELPER' ) && CHARITABLE_NOTIFICATION_TEST_HELPER ) {
+	Charitable_Notification_Test_Helper::get_instance()->init();
+	add_action( 'admin_notices', array( Charitable_Notification_Test_Helper::get_instance(), 'maybe_show_notice' ) );
+}
+
+/**
  * Event Driven notifications and items, added mostly in 1.8.3.
  *
  * @see Charitable_EventDriven::init()

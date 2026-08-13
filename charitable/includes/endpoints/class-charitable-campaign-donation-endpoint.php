@@ -228,6 +228,22 @@ if ( ! class_exists( 'Charitable_Campaign_Donation_Endpoint' ) ) :
 				return $content;
 			}
 
+			/*
+			 * On block themes, Charitable_Endpoints::template_loader() returns early
+			 * (uses_custom_template() is false), so setup_template() never runs and the
+			 * 'charitable_is_donate_page' action never fires. Without it, URL parameters
+			 * such as ?amount= and ?period= are never added to the session, and the form
+			 * falls back to the campaign default instead of the requested amount. Fire it
+			 * here for block themes so the form can pre-select the requested amount.
+			 */
+			if ( charitable_is_block_theme() ) {
+				$campaign_id = charitable_get_current_campaign_id();
+				$donation_id = get_query_var( 'donation_id', false );
+
+				/** This action is documented in includes/endpoints/class-charitable-campaign-donation-endpoint.php */
+				do_action( 'charitable_is_donate_page', $campaign_id, $donation_id );
+			}
+
 			ob_start();
 
 			charitable_template( 'content-donation-form.php', array() );

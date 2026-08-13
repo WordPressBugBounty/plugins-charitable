@@ -125,6 +125,32 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal_Commerce' ) ) :
 					'content'  => $this->get_connection_status_html(),
 					'priority' => 7,
 				),
+				'section_organization'    => array(
+					'title'    => __( 'Organization', 'charitable' ),
+					'type'     => 'heading',
+					'class'    => 'section-heading',
+					'priority' => 10,
+				),
+				'account_type'            => array(
+					'type'     => 'radio',
+					'title'    => __( 'Account Type', 'charitable' ),
+					'priority' => 11,
+					'default'  => '',
+					'options'  => array(
+						'nonprofit' => __( 'Nonprofit / Charitable Organization', 'charitable' ),
+						'business'  => __( 'Business / Standard', 'charitable' ),
+					),
+					'help'     => sprintf(
+						/* translators: %1$s: opening anchor for help-doc link, %2$s: closing anchor. */
+						__( 'Tells PayPal how to classify donations for fees, disputes, risk, and reporting. %1$sLearn more%2$s.', 'charitable' ),
+						'<a href="https://www.wpcharitable.com/documentation/paypal-commerce-account-type/" target="_blank" rel="noopener noreferrer">',
+						'</a>'
+					),
+					// Custom render callback prepends the "Action Required" banner above the radio
+					// inputs (in the same content cell as the radios). Self-suppresses once the
+					// setting is saved.
+					'callback' => array( __CLASS__, 'render_account_type_field_with_banner' ),
+				),
 				'section_webhooks'        => array(
 					'title'    => __( 'Webhooks', 'charitable' ),
 					'type'     => 'heading',
@@ -1235,8 +1261,11 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal_Commerce' ) ) :
 									'currency_code' => $currency,
 									'value'         => number_format( $amount, 2, '.', '' ),
 								),
-								// Apple Pay and Google Pay do not support 'DONATION' category.
-								'category'    => in_array( $payment_method, array( 'applepay', 'googlepay' ), true ) ? 'PHYSICAL_GOODS' : 'DONATION',
+								// Category resolved via get_donation_category(): honors
+								// the merchant's Account Type setting (1.8.12) and falls
+								// back to PHYSICAL_GOODS for Apple Pay / Google Pay,
+								// which reject DONATION.
+								'category'    => $this->get_donation_category( $payment_method ),
 							),
 						),
 					),
@@ -1374,7 +1403,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal_Commerce' ) ) :
 									'currency_code' => charitable_get_currency(),
 									'value'         => number_format( $donation->get_total_donation_amount(), 2, '.', '' ),
 								),
-								'category'    => 'DONATION',
+								'category'    => $this->get_donation_category(),
 							),
 						),
 					),
@@ -2068,6 +2097,166 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal_Commerce' ) ) :
 		public function is_seller_connected() {
 			$key = $this->is_sandbox() ? 'sandbox_seller_merchant_id' : 'live_seller_merchant_id';
 			return ! empty( $this->get_value( $key ) );
+		}
+
+		/**
+		 * Resolve the merchant's stored Account Type setting.
+		 *
+		 * Returns one of: 'nonprofit', 'business', or '' (unset).
+		 * An empty return value indicates the merchant has not yet declared
+		 * their account type — donation processing must be blocked until set
+		 * (B-strict default-handling per the 1.8.12 spec).
+		 *
+		 * @since 1.8.12
+		 *
+		 * @return string
+		 */
+		public function get_account_type() {
+			return (string) $this->get_value( 'account_type' );
+		}
+
+		/**
+		 * Whether the merchant has explicitly chosen an Account Type.
+		 *
+		 * Used by the gateway's process_donation() entry point to block
+		 * transactions on sites that have not yet completed first-run
+		 * account-type setup.
+		 *
+		 * @since 1.8.12
+		 *
+		 * @return bool
+		 */
+		public function is_account_type_configured() {
+			return in_array( $this->get_account_type(), array( 'nonprofit', 'business' ), true );
+		}
+
+		/**
+		 * Resolve the PayPal Orders v2 line-item `category` value to send for a
+		 * given context.
+		 *
+		 * Mapping:
+		 *  - account_type=nonprofit → DONATION (activates PayPal's discounted
+		 *    donation fee; PPCC-enrolled charities additionally get the lower
+		 *    charity rate)
+		 *  - account_type=business  → DIGITAL_GOODS (standard commerce
+		 *    classification; correct for event tickets, memberships, etc.)
+		 *
+		 * Apple Pay and Google Pay payment sources reject the DONATION category
+		 * on PayPal's side; for those payment methods we fall back to
+		 * PHYSICAL_GOODS, preserving existing 1.8.11 behavior.
+		 *
+		 * The returned value passes through the
+		 * `charitable_paypal_commerce_line_item_category` filter so advanced
+		 * sites can override per-campaign (e.g. PHYSICAL_GOODS when shipping a
+		 * donor reward, or DIGITAL_GOODS on an event-ticket campaign hosted by
+		 * an otherwise-nonprofit account).
+		 *
+		 * @since 1.8.12
+		 *
+		 * @param string $payment_method Optional payment method context
+		 *                               ('applepay' / 'googlepay' trigger the
+		 *                               PHYSICAL_GOODS fallback).
+		 * @param mixed  $context        Optional contextual object (donation,
+		 *                               campaign_donation) passed through to
+		 *                               the filter for fine-grained override.
+		 * @return string PayPal category value.
+		 */
+		public function get_donation_category( $payment_method = '', $context = null ) {
+			// Apple Pay / Google Pay constraint: PayPal rejects DONATION for
+			// these payment sources. Preserved from 1.8.11 hardcoded logic.
+			if ( in_array( $payment_method, array( 'applepay', 'googlepay' ), true ) ) {
+				$category = 'PHYSICAL_GOODS';
+			} else {
+				$account_type = $this->get_account_type();
+				if ( 'business' === $account_type ) {
+					$category = 'DIGITAL_GOODS';
+				} else {
+					// 'nonprofit' (and any unrecognized value) resolves to
+					// DONATION. The B-strict block in process_donation()
+					// prevents the unset case from reaching this code path,
+					// so this default is only ever reached for the nonprofit
+					// branch in practice.
+					$category = 'DONATION';
+				}
+			}
+
+			/**
+			 * Filter the PayPal Orders v2 line-item `category` value.
+			 *
+			 * @since 1.8.12
+			 *
+			 * @param string $category       Resolved category (DONATION /
+			 *                               DIGITAL_GOODS / PHYSICAL_GOODS).
+			 * @param string $payment_method Payment method context.
+			 * @param mixed  $context        Contextual object (donation /
+			 *                               campaign_donation), may be null.
+			 */
+			return (string) apply_filters( 'charitable_paypal_commerce_line_item_category', $category, $payment_method, $context );
+		}
+
+		/**
+		 * Custom render callback for the `account_type` settings field. Used
+		 * via the field's `'callback'` arg so the "Action Required" banner
+		 * renders inline ABOVE the radio inputs, inside the same right-column
+		 * content cell that holds the radios.
+		 *
+		 * The banner self-suppresses once `account_type` is configured, so on
+		 * a properly-set-up site this callback degrades to a plain radio
+		 * render with no visible banner.
+		 *
+		 * Declared static so Charitable's settings registrar can call it
+		 * without re-instantiating the gateway on every render.
+		 *
+		 * @since 1.8.12
+		 *
+		 * @param array $args Field args supplied by add_settings_field.
+		 * @return void
+		 */
+		public static function render_account_type_field_with_banner( $args ) {
+			$gateway = new self();
+			$banner  = $gateway->get_account_type_required_banner_html();
+			if ( '' !== $banner ) {
+				echo $banner; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped — pre-escaped in get_account_type_required_banner_html()
+			}
+			charitable_admin_view( 'settings/radio', $args );
+		}
+
+		/**
+		 * Render the "Account Type required" banner for the gateway settings
+		 * page (Layer B-strict, shown when the merchant has not yet chosen
+		 * Nonprofit or Business). Returns an empty string once the setting is
+		 * configured.
+		 *
+		 * @since 1.8.12
+		 *
+		 * @return string
+		 */
+		public function get_account_type_required_banner_html() {
+			if ( $this->is_account_type_configured() ) {
+				return '';
+			}
+
+			// Suppress when the gateway itself is disabled. The PayPal
+			// Commerce settings page is technically only reachable while the
+			// gateway is active, but this protects against being rendered
+			// from an unexpected entry point (e.g., direct deep-link, custom
+			// admin extension) on a site where the merchant has deactivated
+			// the gateway and the legacy merchant ID meta still exists.
+			$gateways = charitable_get_helper( 'gateways' );
+			if ( ! $gateways || ! $gateways->is_active_gateway( self::ID ) ) {
+				return '';
+			}
+
+			$html  = '<div class="notice notice-error inline" style="border-left-width:4px;margin:0 0 12px;padding:12px 14px;">';
+			$html .= '<p style="margin:0 0 6px;font-size:14px;"><strong>' . esc_html__( 'Action Required: Choose Your PayPal Account Type', 'charitable' ) . '</strong></p>';
+			$html .= '<p style="margin:0;">';
+			$html .= esc_html__(
+				'PayPal Commerce donations are currently blocked on this site. Before donors can complete transactions, you must declare whether this site is operated by a nonprofit/charitable organization or a business. This setting controls how every donation is classified for fees, disputes, fraud risk, and reporting on PayPal\'s side.',
+				'charitable'
+			);
+			$html .= '</p>';
+			$html .= '</div>';
+			return $html;
 		}
 
 		/**
@@ -2842,6 +3031,20 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal_Commerce' ) ) :
 				return false;
 			}
 
+			// B-strict block (1.8.12): donations are halted until the merchant
+			// declares their Account Type (Nonprofit vs Business). This setting
+			// controls how every order is classified at PayPal (fees, disputes,
+			// risk, reporting). The default is intentionally empty so existing
+			// sites upgrading to 1.8.12 must make an explicit choice rather
+			// than silently inheriting a default that may not match their
+			// actual organization type.
+			if ( ! $gateway_object->is_account_type_configured() ) {
+				charitable_get_notices()->add_error(
+					__( 'PayPal Commerce is not fully configured yet. The site administrator must select an Account Type (Nonprofit or Business) on the PayPal Commerce settings page before donations can be accepted.', 'charitable' )
+				);
+				return false;
+			}
+
 			return $valid;
 		}
 
@@ -2858,6 +3061,20 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal_Commerce' ) ) :
 		public static function process_donation( $return, $donation_id, $processor ) {
 			$gateway  = new self();
 			$donation = charitable_get_donation( $donation_id );
+
+			// B-strict block (1.8.12): defense-in-depth in case validate_donation()
+			// is bypassed (e.g., programmatic donation creation, custom AJAX path).
+			// Without an Account Type chosen, every order would mis-classify
+			// the transaction on PayPal's side — refuse to create it.
+			if ( ! $gateway->is_account_type_configured() ) {
+				charitable_get_notices()->add_error(
+					__( 'PayPal Commerce is not fully configured. Please ask the site administrator to choose an Account Type (Nonprofit or Business) in the PayPal Commerce settings before completing this donation.', 'charitable' )
+				);
+				return array(
+					'redirect' => charitable_get_permalink( 'donation_cancel_page' ),
+					'safe'     => true,
+				);
+			}
 
 			// Create the PayPal order.
 			$order = $gateway->create_order( $donation );
@@ -3972,8 +4189,11 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal_Commerce' ) ) :
 									'currency_code' => $currency,
 									'value'         => number_format( $amount, 2, '.', '' ),
 								),
-								// Apple Pay and Google Pay do not support 'DONATION' category.
-								'category'    => in_array( $payment_method, array( 'applepay', 'googlepay' ), true ) ? 'PHYSICAL_GOODS' : 'DONATION',
+								// Category resolved via get_donation_category(): honors
+								// the merchant's Account Type setting (1.8.12) and falls
+								// back to PHYSICAL_GOODS for Apple Pay / Google Pay,
+								// which reject DONATION.
+								'category'    => $this->get_donation_category( $payment_method ),
 							),
 						),
 					),

@@ -76,7 +76,7 @@ $closed_css = $checklist_class->get_checklist_option( 'window_closed' ) ? 'close
 	</div>
 
 	<div class="charitable-checklist-block-timer">
-		<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . '/images/charitable-logo.svg' ); ?>" alt="<?php esc_attr_e( 'Charitable', 'charitable' ); ?>">
+		<img src="<?php echo esc_url( charitable()->get_path( 'assets', false ) . 'images/charitable-logo.svg' ); ?>" alt="<?php esc_attr_e( 'Charitable', 'charitable' ); ?>">
 		<div>
 			<h3><?php esc_html_e( 'Charitable Checklist', 'charitable' ); ?></h3>
 

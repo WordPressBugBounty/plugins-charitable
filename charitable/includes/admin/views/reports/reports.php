@@ -69,7 +69,12 @@ ob_start();
 			break;
 
 		default:
-			charitable_admin_view( 'reports/overview' );
+			// Allow add-on tabs (registered via the charitable_reports_tabs filter) to render their content.
+			if ( has_action( 'charitable_reports_tab_' . $active_tab ) ) {
+				do_action( 'charitable_reports_tab_' . $active_tab );
+			} else {
+				charitable_admin_view( 'reports/overview' );
+			}
 			break;
 	}
 

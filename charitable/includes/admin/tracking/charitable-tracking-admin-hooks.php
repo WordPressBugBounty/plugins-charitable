@@ -22,15 +22,20 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @see     Charitable_Tracking::schedule_send()
  * @see     Charitable_Tracking::add_schedules()
  */
-add_action( 'init', array( Charitable_Tracking::get_instance(), 'schedule_send' ) );
-add_action( 'cron_schedules', array( Charitable_Tracking::get_instance(), 'add_schedules' ) );
+/**
+ * MOVED in 1.8.12 to includes/tracking/charitable-tracking-hooks.php.
+ *
+ * These were admin-only, so the weekly check-in never ran in a wp-cron.php
+ * request and the recurring event was destroyed on its first firing. Do NOT
+ * re-add them here.
+ */
 
 /**
  * Register the check-in.
  *
  * @see     Charitable_Tracking::send_checkin()
  */
-add_action( 'charitable_usage_tracking_cron', array( Charitable_Tracking::get_instance(), 'send_checkins' ) );
+/* The charitable_usage_tracking_cron handler also moved; see above. */
 
 /**
  * Testing the check-in.
@@ -44,11 +49,15 @@ add_action( 'init', array( Charitable_Tracking::get_instance(), 'test_checkin' )
  *
  * @see     Charitable_Tracking::insert_time_to_first_campaign()
  */
-add_action( 'charitable_campaign_processor_save_core', array( Charitable_Tracking::get_instance(), 'insert_time_to_first_campaign' ), 10, 4 );
+/* The first-campaign writer moved; see above. */
 
 /**
  * Save the time to first donation.
  *
  * @see     Charitable_Tracking::insert_time_to_first_donation()
  */
-add_action( 'charitable_after_save_donation', array( Charitable_Tracking::get_instance(), 'insert_time_to_first_donation' ), 10, 2 );
+/*
+ * The first-donation writer moved too. charitable_after_save_donation fires
+ * during front-end checkout, so registering it here meant it never fired for a
+ * real donation. Present since 1.8.4.5.
+ */

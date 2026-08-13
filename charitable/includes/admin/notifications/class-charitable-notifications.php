@@ -67,6 +67,15 @@ class Charitable_Notifications {
 	private $license_type;
 
 	/**
+	 * Cached result of has_alert_notifications() for the current request.
+	 *
+	 * @since 1.8.12
+	 *
+	 * @var bool|null
+	 */
+	private $has_alerts_cache = null;
+
+	/**
 	 * Returns and/or create the single instance of this class.
 	 *
 	 * @since  1.2.0
@@ -112,6 +121,7 @@ class Charitable_Notifications {
 		add_action( 'charitable_maybe_show_plugin_notifications', [ $this, 'output' ], 99 ); // where the notifications comes out in the admin.
 		add_action( 'charitable_admin_notifications_update', [ $this, 'update' ] );
 		add_action( 'deactivate_plugin', [ $this, 'delete' ], 10, 2 );
+		add_filter( 'charitable_notifications_get', [ $this, 'priority_sort' ], 99 );
 	}
 
 	/**
@@ -159,7 +169,8 @@ class Charitable_Notifications {
 
 		// if there are new notifications add the indicator to the menu title.
 		if ( $this->get_new_notifications_count() ) {
-			$notifications_menu_item['menu_title'] .= '<div class="charitable-menu-notification-indicator"></div>';
+			$dot_type = $this->has_alert_notifications() ? 'alert' : 'info';
+			$notifications_menu_item['menu_title'] .= '<div class="charitable-menu-notification-indicator ' . $dot_type . '"></div>';
 		}
 
 		// If the checklist exists in the submenu, add this item after it.
@@ -203,13 +214,16 @@ class Charitable_Notifications {
 		}
 
 		$option = (array) get_option( 'charitable_notifications', [] );
-		// $option = [];
 
 		$this->option = [
-			'update'    => ! empty( $option['update'] ) ? (int) $option['update'] : 0,
-			'feed'      => ! empty( $option['feed'] ) ? (array) $option['feed'] : [],
-			'events'    => ! empty( $option['events'] ) ? (array) $option['events'] : [],
-			'dismissed' => ! empty( $option['dismissed'] ) ? (array) $option['dismissed'] : [],
+			'update'         => ! empty( $option['update'] ) ? (int) $option['update'] : 0,
+			'feed'           => ! empty( $option['feed'] ) ? (array) $option['feed'] : [],
+			'events'         => ! empty( $option['events'] ) ? (array) $option['events'] : [],
+			'dismissed'      => ! empty( $option['dismissed'] ) ? (array) $option['dismissed'] : [],
+			'local'          => ! empty( $option['local'] ) ? (array) $option['local'] : [],
+			'new_feed'       => ! empty( $option['new_feed'] ) ? (array) $option['new_feed'] : [],
+			'dismissed_times' => ! empty( $option['dismissed_times'] ) ? (array) $option['dismissed_times'] : [],
+			'settings'       => ! empty( $option['settings'] ) ? (array) $option['settings'] : [],
 		];
 
 		return $this->option;
@@ -324,7 +338,8 @@ class Charitable_Notifications {
 	/**
 	 * Get notification data.
 	 *
-	 * @since 1.8.3
+	 * @since   1.8.3
+	 * @version 1.8.12
 	 *
 	 * @return array
 	 */
@@ -348,10 +363,76 @@ class Charitable_Notifications {
 			$option = $this->update();
 		}
 
-		$feed   = ! empty( $option['feed'] ) ? $this->verify_active( $option['feed'] ) : [];
-		$events = ! empty( $option['events'] ) ? $this->verify_active( $option['events'] ) : [];
+		$legacy_enabled = ! class_exists( 'Charitable_Notification_Settings' ) ||
+			Charitable_Notification_Settings::get_instance()->is_category_enabled( 'legacy_feed' );
 
-		return array_merge( $feed, $events );
+		$feed   = ( $legacy_enabled && ! empty( $option['feed'] ) ) ? $this->verify_active( $option['feed'] ) : [];
+		$events = ( $legacy_enabled && ! empty( $option['events'] ) ) ? $this->verify_active( $option['events'] ) : [];
+
+		$notifications = array_merge( $feed, $events );
+
+		/**
+		 * Filter the final notifications array before output.
+		 *
+		 * Used by addons (e.g. Pro's Charitable_Dynamic_Notifications) to prepend license-state
+		 * notifications (expiring/expired) above the remote feed.
+		 *
+		 * @since 1.8.12
+		 *
+		 * @param array $notifications Merged feed + events notifications.
+		 */
+		return (array) apply_filters( 'charitable_notifications_get', $notifications );
+	}
+
+	/**
+	 * Final sort — enforces spec priority order regardless of filter injection order.
+	 *
+	 * Order: new_feed (non-dismissible first) → license → health → legal →
+	 *        lifecycle → milestone → nudge → everything else (legacy feed).
+	 *
+	 * @since  1.8.12
+	 *
+	 * @param  array $notifications
+	 * @return array
+	 */
+	public function priority_sort( array $notifications ) {
+		$order = [
+			'new_feed_pinned' => [],
+			'new_feed'        => [],
+			'license'         => [],
+			'health'          => [],
+			'legal'           => [],
+			'lifecycle'       => [],
+			'milestone'       => [],
+			'nudge'           => [],
+			'other'           => [],
+		];
+
+		$license_ids = [ 'license_expired', 'license_expiring' ];
+
+		foreach ( $notifications as $n ) {
+			$id       = isset( $n['id'] ) ? (string) $n['id'] : '';
+			$category = isset( $n['category'] ) ? $n['category'] : '';
+
+			if ( 'new_feed' === $category ) {
+				$dismissible = ! isset( $n['dismissible'] ) || (bool) $n['dismissible'];
+				$order[ $dismissible ? 'new_feed' : 'new_feed_pinned' ][] = $n;
+			} elseif ( in_array( $id, $license_ids, true ) ) {
+				$order['license'][] = $n;
+			} elseif ( isset( $order[ $category ] ) ) {
+				$order[ $category ][] = $n;
+			} else {
+				$order['other'][] = $n;
+			}
+		}
+
+		$result = [];
+		foreach ( $order as $group ) {
+			foreach ( $group as $item ) {
+				$result[] = $item;
+			}
+		}
+		return $result;
 	}
 
 	/**
@@ -393,6 +474,44 @@ class Charitable_Notifications {
 		}
 
 		return (int) $count;
+	}
+
+	/**
+	 * Check if any undismissed notifications are alerts (health or legal category).
+	 *
+	 * @since 1.8.12
+	 *
+	 * @return bool
+	 */
+	public function has_alert_notifications() {
+
+		if ( null !== $this->has_alerts_cache ) {
+			return $this->has_alerts_cache;
+		}
+
+		$option          = $this->get_option();
+		$dismissed_ids   = ! empty( $option['dismissed'] ) ? $option['dismissed'] : [];
+		$notification_feed = $this->get();
+
+		if ( empty( $notification_feed ) ) {
+			$this->has_alerts_cache = false;
+			return $this->has_alerts_cache;
+		}
+
+		$alert_categories = [ 'health', 'legal' ];
+
+		foreach ( $notification_feed as $notification ) {
+			if ( in_array( (string) $notification['id'], $dismissed_ids, true ) ) {
+				continue;
+			}
+			if ( ! empty( $notification['category'] ) && in_array( $notification['category'], $alert_categories, true ) ) {
+				$this->has_alerts_cache = true;
+				return $this->has_alerts_cache;
+			}
+		}
+
+		$this->has_alerts_cache = false;
+		return $this->has_alerts_cache;
 	}
 
 	/**
@@ -543,10 +662,14 @@ class Charitable_Notifications {
 		$option = $this->get_option();
 
 		$data = [
-			'update'    => time(),
-			'feed'      => $this->fetch_feed(),
-			'events'    => $option['events'],
-			'dismissed' => $option['dismissed'],
+			'update'          => time(),
+			'feed'            => $this->fetch_feed(),
+			'events'          => $option['events'],
+			'dismissed'       => $option['dismissed'],
+			'local'           => $option['local'],
+			'new_feed'        => $option['new_feed'],
+			'dismissed_times' => $option['dismissed_times'],
+			'settings'        => $option['settings'],
 		];
 
 		// phpcs:disable Charitable.PHP.ValidateHooks.InvalidHookName
@@ -563,6 +686,22 @@ class Charitable_Notifications {
 		update_option( 'charitable_notifications', $data );
 
 		return $data;
+	}
+
+	/**
+	 * Save specific keys back to the option without triggering a full update.
+	 *
+	 * @since 1.8.12
+	 *
+	 * @param array $partial Associative array of keys to merge into the stored option.
+	 *                       Intended keys: 'local', 'new_feed', 'dismissed_times', 'settings'.
+	 * @return void
+	 */
+	public function save_option_partial( array $partial ) {
+		$option = $this->get_option( false ); // bypass cache
+		$merged = array_merge( $option, $partial );
+		update_option( 'charitable_notifications', $merged );
+		$this->option = false; // invalidate cache
 	}
 
 	/**
@@ -599,7 +738,8 @@ class Charitable_Notifications {
 	/**
 	 * Output notifications on Form Overview admin area.
 	 *
-	 * @since 1.8.3
+	 * @since   1.8.3
+	 * @version 1.8.12
 	 *
 	 * @param string $location Location where the notifications are output.
 	 * @param int    $limit_active Limit of active notifications to show.
@@ -628,6 +768,7 @@ class Charitable_Notifications {
 			'strong' => [],
 			'span'   => [
 				'style' => [],
+				'class' => [],
 			],
 			'a'      => [
 				'href'   => [],
@@ -676,8 +817,19 @@ class Charitable_Notifications {
 				continue;
 			}
 
+			// Non-dismissible notifications (e.g. expired license) always render as active. @since 1.8.12
+			$is_dismissible = ! isset( $notification['dismissible'] ) || false !== $notification['dismissible'];
+
+			// Dynamic notifications (those with an explicit 'dismissible' key) suppress the relative date. @since 1.8.12
+			$is_dynamic = isset( $notification['dismissible'] );
+			$date_string = ! empty( $notification['start'] ) ? $this->human_readable_date_from_mysql( $notification['start'] ) : '';
+			$date_html   = $date_string ? '<span class="charitable-notification-date">' . esc_html( $date_string ) . '</span>' : '';
+
 			// If the notification ID is not a part of the dismissed notifications, add it to the list.
-			if ( ! $this->is_dismissed( $notification ) ) {
+			if ( ! $is_dismissible || ! $this->is_dismissed( $notification ) ) {
+
+				// Dismiss link is suppressed for non-dismissible notifications (e.g. expired license). @since 1.8.12
+				$dismiss_link = $is_dismissible ? '<a href="#" class="dismiss charitable-notif-dismiss-x" aria-label="Dismiss"><svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" width="10" height="10"><path d="M11.8211 1.3415L10.6451 0.166504L5.98305 4.82484L1.32097 0.166504L0.14502 1.3415L4.80711 5.99984L0.14502 10.6582L1.32097 11.8332L5.98305 7.17484L10.6451 11.8332L11.8211 10.6582L7.159 5.99984L11.8211 1.3415Z" fill="currentColor"/></svg></a>' : '';
 
 				if ( 'dashboard' === $location ) {
 
@@ -694,51 +846,58 @@ class Charitable_Notifications {
 									<div class="notification-content">%2$s</div>
 									<div class="actions">
 										%4$s
-										<!----><a href="#" class="dismiss">Dismiss</a>
+										%9$s
 									</div>
 								</div>
 							</div>
 						</div>',
 						esc_html( $title ),
 						wp_kses( $content, $content_allowed_tags ),
-						! empty( $notification['start'] ) ? $this->human_readable_date_from_mysql( $notification['start'] ) : '',
+						$date_html,
 						$this->get_notification_buttons_html( $notification ),
 						esc_attr( $notification['id'] ),
 						esc_attr( $notification['id'] ),
 						$this->get_notification_icon_html( $notification ),
-						esc_attr( $current_class )
+						esc_attr( $current_class ),
+						$dismiss_link // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						// $this->get_video_badge_html( $this->get_component_data( $notification['video'] ) )
 					);
 
 				} else {
 
 					// Notification HTML.
+					$badge_html   = $this->get_notification_badge_html( $notification );
+					$border_type  = ! empty( $notification['badge_type'] ) ? sanitize_html_class( $notification['badge_type'] ) : '';
+					$border_class = $border_type ? ' charitable-notif-border--' . $border_type : '';
+
 					$active_notifications_html .= sprintf(
 						'<div aria-expanded="true" class="charitable-notification charitable-notification-%5$s %8$s" data-notification-id="%6$s">
-							<div>
-								%7$s
+							<div class="charitable-notification-card-inner">
+								%9$s
+								<div class="notif-left">
+									%10$s
+									%7$s
+								</div>
 								<div class="body">
-									<div class="title">
-										<div class="date">%3$s</div>
-										<div>%1$s</div>
-									</div>
+									%3$s
+									<h4>%1$s</h4>
 									<div class="notification-content">%2$s</div>
 									<div class="actions">
 										%4$s
-										<!----><a href="#" class="dismiss">Dismiss</a>
 									</div>
 								</div>
 							</div>
 						</div>',
 						esc_html( $title ),
 						wp_kses( $content, $content_allowed_tags ),
-						! empty( $notification['start'] ) ? $this->human_readable_date_from_mysql( $notification['start'] ) : '',
+						$date_html,
 						$this->get_notification_buttons_html( $notification ),
 						esc_attr( $notification['id'] ),
 						esc_attr( $notification['id'] ),
 						$this->get_notification_icon_html( $notification ),
-						esc_attr( $current_class )
-						// $this->get_video_badge_html( $this->get_component_data( $notification['video'] ) )
+						esc_attr( $current_class ),
+						$dismiss_link, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						$badge_html // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					);
 
 				}
@@ -766,7 +925,7 @@ class Charitable_Notifications {
 					</div>',
 					esc_html( $title ),
 					wp_kses( $content, $content_allowed_tags ),
-					! empty( $notification['start'] ) ? $this->human_readable_date_from_mysql( $notification['start'] ) : '',
+					$date_html,
 					$this->get_notification_buttons_html( $notification ),
 					esc_attr( $notification['id'] ),
 					esc_attr( $notification['id'] ),
@@ -824,12 +983,73 @@ class Charitable_Notifications {
 	 */
 	private function get_notification_icon_html( $notification ) {
 
-		$icon = '';
-
 		$notification_type = ! empty( $notification['notification_type'] ) ? sanitize_text_field( $notification['notification_type'] ) : '';
+		$category          = ! empty( $notification['category'] ) ? sanitize_text_field( $notification['category'] ) : '';
 
+		// Category-specific icons take priority over generic notification_type icons.
+		if ( 'celebration' === $notification_type ) {
+			// Trophy — campaign goal reached.
+			return '<div class="icon">
+				<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="charitable-icon-celebration" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M8 21h8M12 17v4"/>
+					<path d="M7 4H5a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h.5"/>
+					<path d="M17 4h2a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-.5"/>
+					<path d="M7 4h10v7a5 5 0 0 1-10 0V4z"/>
+				</svg>
+			</div>';
+		}
+
+		if ( 'legal' === $category ) {
+			// Same circle exclamation as health alert, orange.
+			return '<div class="icon">
+				<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="charitable-icon-compliance">
+					<path fill-rule="evenodd" clip-rule="evenodd" d="M11.99 2.00012C6.47 2.00012 2 6.48012 2 12.0001C2 17.5201 6.47 22.0001 11.99 22.0001C17.52 22.0001 22 17.5201 22 12.0001C22 6.48012 17.52 2.00012 11.99 2.00012ZM13 13.0001V7.00012H11V13.0001H13ZM13 17.0001V15.0001H11V17.0001H13ZM4 12.0001C4 16.4201 7.58 20.0001 12 20.0001C16.42 20.0001 20 16.4201 20 12.0001C20 7.58012 16.42 4.00012 12 4.00012C7.58 4.00012 4 7.58012 4 12.0001Z" fill="currentColor"></path>
+				</svg>
+			</div>';
+		}
+
+		if ( 'milestone' === $category ) {
+			// Star — donor milestone.
+			return '<div class="icon">
+				<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="charitable-icon-milestone" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+				</svg>
+			</div>';
+		}
+
+		if ( 'lifecycle' === $category ) {
+			// Flag — campaign live or ended.
+			return '<div class="icon">
+				<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="charitable-icon-lifecycle" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+					<line x1="4" y1="22" x2="4" y2="15"/>
+				</svg>
+			</div>';
+		}
+
+		if ( 'nudge' === $category ) {
+			// Lightbulb — engagement nudge.
+			return '<div class="icon">
+				<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="charitable-icon-nudge" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M9 18h6M10 22h4M12 2a7 7 0 00-4 12.87V17h8v-2.13A7 7 0 0012 2z"/>
+				</svg>
+			</div>';
+		}
+
+		if ( 'new_feed' === $category ) {
+			// Megaphone — announcement.
+			return '<div class="icon">
+				<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="charitable-icon-announcement" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M19 3v18M5 8H3a1 1 0 00-1 1v4a1 1 0 001 1h2l4 3V5L5 8z"/>
+					<path d="M19 7l-10 1M19 17L9 16"/>
+				</svg>
+			</div>';
+		}
+
+		// Generic fallback by notification_type.
 		switch ( $notification_type ) {
 			case 'warning':
+				// Circle exclamation — health alert (keep as-is).
 				$html = '<div class="icon">
 					<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="charitable-circle-exclamation warning">
 						<path fill-rule="evenodd" clip-rule="evenodd" d="M11.99 2.00012C6.47 2.00012 2 6.48012 2 12.0001C2 17.5201 6.47 22.0001 11.99 22.0001C17.52 22.0001 22 17.5201 22 12.0001C22 6.48012 17.52 2.00012 11.99 2.00012ZM13 13.0001V7.00012H11V13.0001H13ZM13 17.0001V15.0001H11V17.0001H13ZM4 12.0001C4 16.4201 7.58 20.0001 12 20.0001C16.42 20.0001 20 16.4201 20 12.0001C20 7.58012 16.42 4.00012 12 4.00012C7.58 4.00012 4 7.58012 4 12.0001Z" fill="currentColor"></path>
@@ -837,14 +1057,40 @@ class Charitable_Notifications {
 				</div>';
 				break;
 			case 'success':
-				$html = '<div class="icon"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="charitable-circle-check success""><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM10 14.17L16.59 7.58L18 9L10 17L6 13L7.41 11.59L10 14.17Z" fill="currentColor"></path></svg></div>';
+				$html = '<div class="icon"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="charitable-circle-check success"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM10 14.17L16.59 7.58L18 9L10 17L6 13L7.41 11.59L10 14.17Z" fill="currentColor"></path></svg></div>';
 				break;
 			default:
-				$html = '<div class="icon"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="charitable-circle-check success""><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM10 14.17L16.59 7.58L18 9L10 17L6 13L7.41 11.59L10 14.17Z" fill="currentColor"></path></svg></div>';
+				$html = '<div class="icon"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="charitable-circle-check success"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM10 14.17L16.59 7.58L18 9L10 17L6 13L7.41 11.59L10 14.17Z" fill="currentColor"></path></svg></div>';
 				break;
 		}
 
 		return $html;
+	}
+
+	/**
+	 * Get badge HTML for a notification card.
+	 *
+	 * Badge displays the category label (e.g. "HEALTH ALERT", "MILESTONE").
+	 * Returns empty string if no badge_label is set.
+	 *
+	 * @since  1.8.12
+	 *
+	 * @param  array $notification Notification data.
+	 * @return string
+	 */
+	private function get_notification_badge_html( $notification ) {
+		if ( empty( $notification['badge_label'] ) ) {
+			return '';
+		}
+
+		$badge_type = ! empty( $notification['badge_type'] ) ? sanitize_html_class( $notification['badge_type'] ) : 'info';
+		$label      = esc_html( strtoupper( $notification['badge_label'] ) );
+
+		return sprintf(
+			'<span class="charitable-notif-badge charitable-notif-badge--%s">%s</span>',
+			$badge_type,
+			$label
+		);
 	}
 
 	/**

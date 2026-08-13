@@ -841,18 +841,24 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 		 * @param array  $campaign_data An array of campaign data to pass to the template element.
 		 * @return string The starting HTML element for the given template type.
 		 */
-		public function get_template_element_start( $type = 'row', $counter = 1, $additional_css = '', $campaign_data = array() ) {
+		public function get_template_element_start( $type = 'row', $counter = 1, $additional_css = '', $campaign_data = array(), $background_image = '', $locked = false ) {
 
 			ob_start();
 
 			$counter = intval( $counter );
 			$type    = esc_attr( $type );
 
+			$row_bg_url      = '' !== $background_image ? esc_url( $background_image ) : '';
+			$row_style_attr  = '' !== $row_bg_url ? ' style="background-image:url(\'' . $row_bg_url . '\');"' : '';
+			$row_locked_css  = $locked ? ' is-locked' : '';
+			$row_locked_attr = $locked ? ' data-row-locked="1"' : '';
+			$row_bg_css      = '' !== $row_bg_url ? ' has-background-image' : '';
+
 			switch ( $type ) {
 				case 'header':
 					?>
 				<!-- charitable header start -->
-				<header id="charitable-preview-header-<?php echo intval( $counter ); ?>" class="charitable-preview-header <?php echo esc_attr( $additional_css ); ?>">
+				<header id="charitable-preview-header-<?php echo intval( $counter ); ?>"<?php echo $row_locked_attr; // phpcs:ignore ?> class="charitable-preview-header <?php echo esc_attr( $additional_css ); ?><?php echo esc_attr( $row_bg_css . $row_locked_css ); ?>"<?php echo $row_style_attr; // phpcs:ignore ?>>
 					<div class="row" data-row-id="<?php echo intval( $counter ); ?>" data-row-type="<?php echo esc_attr( $type ); ?>" data-row-css="<?php echo esc_attr( $additional_css ); ?>">
 					<?php
 					break;
@@ -870,8 +876,8 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 					// likely a row.
 					?>
 				<!-- charitable row/default start -->
-					<div id="charitable-preview-row-<?php echo $counter; ?>" class="charitable-preview-row <?php echo $additional_css; ?>"> <?php // phpcs:ignore ?>
-						<div class="row" data-row-id="<?php echo $counter; ?>" data-row-type="<?php echo esc_attr( $type ); ?>" data-row-css="<?php echo $additional_css; ?>"> <?php // phpcs:ignore ?>
+					<div id="charitable-preview-row-<?php echo $counter; ?>"<?php echo $row_locked_attr; // phpcs:ignore ?> class="charitable-preview-row <?php echo $additional_css; // phpcs:ignore ?><?php echo esc_attr( $row_bg_css . $row_locked_css ); ?>"<?php echo $row_style_attr; // phpcs:ignore ?>>
+						<div class="row" data-row-id="<?php echo $counter; ?>" data-row-type="<?php echo esc_attr( $type ); ?>" data-row-css="<?php echo $additional_css; // phpcs:ignore ?>">
 					<?php
 					break;
 			}
@@ -955,8 +961,10 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 				foreach ( $rows as $row_id => $row ) :
 
 					$additional_css = ! empty( $row['css_class'] ) ? esc_attr( $row['css_class'] ) : '';
+					$row_bg_image   = ! empty( $row['background_image'] ) ? $row['background_image'] : '';
+					$row_locked     = ! empty( $row['locked'] );
 
-					echo $this->get_template_element_start( $row['type'], intval( $row_id ), esc_html( $additional_css ) ); // phpcs:ignore
+					echo $this->get_template_element_start( $row['type'], intval( $row_id ), esc_html( $additional_css ), $this->campaign_data, $row_bg_image, $row_locked ); // phpcs:ignore
 
 					foreach ( $row['columns'] as $column_id => $column ) :
 
@@ -989,10 +997,10 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 
 								switch ( $section['type'] ) {
 									case 'fields':
-										$this->render_fields( $section['fields'], $theme, $this->campaign_data, $row['fields'] );
+										$this->render_fields( $section['fields'], $theme, $this->campaign_data, $row['fields'], $row_locked );
 										break;
 									case 'header':
-										$this->render_fields( $section['fields'], $theme, $this->campaign_data, $row['fields'] );
+										$this->render_fields( $section['fields'], $theme, $this->campaign_data, $row['fields'], $row_locked );
 										break;
 									case 'tabs':
 										echo $this->get_template_element_start( 'tabs', null, null, $this->campaign_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -1067,7 +1075,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 		 *
 		 * @return string
 		 */
-		public function render_fields( $fields, $theme, $campaign_data, $row_field_data ) {
+		public function render_fields( $fields, $theme, $campaign_data, $row_field_data, $row_locked = false ) {
 
 			if ( empty( $fields ) ) {
 				return;
@@ -1101,6 +1109,23 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 						}
 					}
 
+					// Expand template-relative filenames for the campaign-hero block.
+					if ( $field_type === 'campaign-hero' && ! empty( $theme['meta']['slug'] ) ) {
+						$campaign_template_slug = esc_attr( $theme['meta']['slug'] );
+						foreach ( array( 'background_image', 'avatar_image' ) as $img_key ) {
+							if ( ! empty( $field_settings[ $img_key ] ) ) {
+								$image_value    = $field_settings[ $img_key ];
+								$image_basename = basename( $image_value );
+								if ( $image_basename === $image_value ) {
+									$asset_path = charitable()->get_path( 'assets', true ) . 'images/campaign-builder/templates/' . $campaign_template_slug . '/' . $image_basename;
+									if ( file_exists( $asset_path ) ) {
+										$field_settings[ $img_key ] = charitable()->get_path( 'assets', false ) . 'images/campaign-builder/templates/' . $campaign_template_slug . '/' . $image_basename;
+									}
+								}
+							}
+						}
+					}
+
 					$field_settings['id'] = $field_id;
 
 					$charitable_field_css_classes = array(
@@ -1111,14 +1136,18 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 						$class->can_be_deleted ? 'charitable-can-delete' : 'charitable-no-delete',
 					);
 
+					if ( $row_locked ) {
+						$charitable_field_css_classes[] = 'charitable-field-not-draggable';
+					}
+
 					echo '<div class="' . implode( ' ', $charitable_field_css_classes ) . '" id="charitable-field-' . intval( $field_id ) . '" data-field-id="' . intval( $field_id ) . '" data-field-type="' . esc_attr( $field_type ) . '" data-field-max="' . esc_attr( $class->max_allowed ) . '" style="">'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					if ( $class->can_be_edited ) :
 						echo '<a href="#" class="charitable-field-edit" data-type="' . esc_attr( $class->edit_type ) . '" data-section="' . esc_attr( $class->edit_section ) . '" data-edit-field-id="' . esc_attr( $class->edit_field_id ) . '" title="' . esc_attr( $class->edit_label ) . '"><i class="fa fa-pencil"></i></a>';
 					endif;
-					if ( $class->can_be_duplicated ) :
+					if ( $class->can_be_duplicated && ! $row_locked ) :
 						echo '<a href="#" class="charitable-field-duplicate" title="Duplicate Field"><i class="fa fa-files-o" aria-hidden="true"></i></a>';
 					endif;
-					if ( $class->can_be_deleted ) :
+					if ( $class->can_be_deleted && ! $row_locked ) :
 						echo '<a href="#" class="charitable-field-delete" title="Delete Field"><i class="fa fa-trash-o"></i></a>';
 					endif;
 

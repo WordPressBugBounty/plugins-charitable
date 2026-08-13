@@ -1153,3 +1153,159 @@
 .charitable-panel-fields .charitable-field-dragging.charitable-field-photo img {
   max-height: 300px;
 }
+
+/* Campaign Hero block — preview placeholder styling. Beacon family templates override with their own positioning. */
+.charitable-hero-preview {
+  position: relative;
+  width: 100%;
+  min-height: 320px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 4px;
+  overflow: visible;
+  margin-bottom: 70px;
+}
+.charitable-hero-preview__overlay {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 32px;
+  padding: 24px;
+  height: 100%;
+  min-height: 320px;
+  align-items: end;
+}
+.charitable-hero-preview__identity {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  min-width: 0;
+}
+.charitable-hero-preview__avatar {
+  width: 140px;
+  height: 140px;
+  flex-shrink: 0;
+  background: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  transform: translateY(67%);
+}
+.charitable-hero-preview__avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.charitable-hero-preview__title {
+  color: #fff;
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.1;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+/* No logo: title sits where the logo would have been (no horizontal flex gap to absorb). */
+.charitable-hero-preview__title.charitable-hero-preview__title--no-logo {
+  margin-left: 0;
+}
+.charitable-hero-preview__widget {
+  background: #fff;
+  border-radius: 4px;
+  padding: 12px;
+  width: 100%;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: end;
+  margin-bottom: -60px;
+  pointer-events: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+.charitable-hero-preview__raised {
+  font-size: 15px;
+  background: var(--charitable-hero-accent, #1d3a8a);
+  color: #fff;
+  padding: 14px 18px;
+  border-radius: 2px;
+  margin: -12px -12px 0;
+}
+.charitable-hero-preview__raised span {
+  display: block;
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+.charitable-hero-preview__bar {
+  background: rgba(255, 255, 255, 0.3);
+  height: 7px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.charitable-hero-preview__bar span {
+  display: block;
+  height: 100%;
+  background: #fff;
+}
+.charitable-hero-preview__amounts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.charitable-hero-preview__amount {
+  padding: 8px 4px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid #d0d5dd;
+  background: #fff;
+  color: #333;
+  border-radius: 3px;
+  cursor: default;
+}
+.charitable-hero-preview__cta {
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--charitable-hero-button, var(--charitable-hero-accent, #1d3a8a));
+  border: 0;
+  border-radius: 3px;
+  text-transform: uppercase;
+  cursor: default;
+}
+
+/* Hero block "Reset" button — JS moves this into the uploader's button row,
+   so it sits inline with Upload + Clear and inherits secondary-button styling. */
+.charitable-campaign-hero-reset-image {
+  margin-left: 4px;
+}
+
+/* Locked rows: prevent fields inside from being deleted, duplicated, or dragged out. */
+.charitable-preview-row[data-row-locked="1"] .charitable-field-delete,
+.charitable-preview-row[data-row-locked="1"] .charitable-field-duplicate,
+.charitable-preview-row.is-locked .charitable-field-delete,
+.charitable-preview-row.is-locked .charitable-field-duplicate,
+.charitable-preview-header[data-row-locked="1"] .charitable-field-delete,
+.charitable-preview-header[data-row-locked="1"] .charitable-field-duplicate,
+.charitable-preview-header.is-locked .charitable-field-delete,
+.charitable-preview-header.is-locked .charitable-field-duplicate {
+  display: none !important;
+}
+.charitable-preview-row[data-row-locked="1"] .charitable-field,
+.charitable-preview-row.is-locked .charitable-field,
+.charitable-preview-header[data-row-locked="1"] .charitable-field,
+.charitable-preview-header.is-locked .charitable-field {
+  cursor: default;
+}
+
+/* When the edit pencil is the only visible action, hug the right edge. */
+.charitable-preview-row[data-row-locked="1"] .charitable-field .charitable-field-edit,
+.charitable-preview-row.is-locked .charitable-field .charitable-field-edit,
+.charitable-preview-header[data-row-locked="1"] .charitable-field .charitable-field-edit,
+.charitable-preview-header.is-locked .charitable-field .charitable-field-edit,
+.charitable-field.charitable-no-duplicate.charitable-no-delete .charitable-field-edit {
+  right: 0 !important;
+}

@@ -1,0 +1,425 @@
+.charitable-notif-badge {
+  display: none;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 20px;
+  line-height: 1.6;
+  margin-right: 6px;
+}
+.charitable-notif-badge--announcement {
+  background: #f8cdb0;
+  color: #9e3510;
+}
+.charitable-notif-badge--critical {
+  background: #fcd0d0;
+  color: #b02020;
+}
+.charitable-notif-badge--warning {
+  background: #fde8a0;
+  color: #7a5000;
+}
+.charitable-notif-badge--success {
+  background: #c6eeca;
+  color: #0a5c1e;
+}
+.charitable-notif-badge--info {
+  background: #c5daf5;
+  color: #1a5298;
+}
+.charitable-notif-badge--nudge {
+  background: #dcdde0;
+  color: #3c4147;
+}
+
+.charitable-notif-tour-step[class*=shepherd-element] {
+  max-width: 320px !important;
+  width: 320px !important;
+}
+
+.shepherd.tippy-popper[x-placement^=bottom] .shepherd-has-title .tippy-arrow,
+.shepherd.tippy-popper[x-placement^=top] .shepherd-has-title .tippy-arrow,
+.shepherd.tippy-popper[x-placement^=left] .shepherd-has-title .tippy-arrow,
+.shepherd.tippy-popper[x-placement^=right] .shepherd-has-title .tippy-arrow {
+  border-top-color: #E38632 !important;
+  border-bottom-color: #E38632 !important;
+  border-left-color: #E38632 !important;
+  border-right-color: #E38632 !important;
+}
+
+.charitable-notif-tour-step [class*=shepherd-header] {
+  background: #E38632 !important;
+  padding: 12px 16px !important;
+  border-radius: 4px 4px 0 0;
+}
+
+.charitable-notif-tour-step [class*=shepherd-title] {
+  color: #fff !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+.charitable-notif-tour-step [class*=shepherd-cancel-icon] {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+.charitable-notif-tour-step [class*=shepherd-cancel-icon]:hover {
+  color: #fff !important;
+}
+
+.charitable-notif-tour-step [class*=shepherd-text] {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  color: #1d2327 !important;
+  text-align: left !important;
+  padding: 12px 16px 6px !important;
+}
+
+.charitable-notif-tour-step [class*=shepherd-footer] {
+  padding: 6px 16px 10px !important;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.charitable-tour-btn-primary,
+.charitable-tour-btn-skip {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.charitable-tour-btn-primary {
+  background: #E38632 !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 3px !important;
+  padding: 6px 14px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.15s !important;
+}
+.charitable-tour-btn-primary:hover {
+  background: #c97428 !important;
+}
+
+.charitable-tour-btn-skip {
+  background: none !important;
+  color: #a7aaad !important;
+  border: none !important;
+  padding: 6px 8px !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  cursor: pointer !important;
+  transition: color 0.15s !important;
+}
+.charitable-tour-btn-skip:hover {
+  color: #50575e !important;
+}
+
+.charitable-notif-tour-step:not(.charitable-notif-tour-step--white) .tippy-arrow {
+  margin-left: 10px !important;
+}
+
+.shepherd.tippy-popper[x-placement^=left] .shepherd-has-title .tippy-arrow {
+  border-left-color: #fff !important;
+}
+
+.charitable-notif-stat {
+  color: #00a32a;
+  font-weight: 700;
+}
+
+.charitable-icon-compliance {
+  color: #bf6000 !important;
+}
+
+.charitable-icon-milestone {
+  color: #00a32a;
+}
+
+.charitable-icon-lifecycle {
+  color: #2271b1;
+}
+
+.charitable-icon-celebration {
+  color: #00a32a;
+}
+
+.charitable-icon-nudge {
+  color: #757575;
+}
+
+.charitable-icon-announcement {
+  color: #E38632;
+}
+
+.charitable-plugin-notifications .notification-menu .notification-cards {
+  padding: 0 !important;
+}
+
+.charitable-notification {
+  margin-bottom: 0 !important;
+  padding: 18px 24px !important;
+  border-bottom: 1px solid #d5d5d5;
+  position: relative;
+}
+.charitable-notification:last-child {
+  border-bottom: none;
+}
+.charitable-notification > .charitable-notification-card-inner {
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
+}
+
+.charitable-notification-card-inner {
+  position: relative;
+}
+
+.charitable-notif-dismiss-x {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: #a7aaad;
+  text-decoration: none;
+  border-radius: 50%;
+  transition: color 0.15s, background 0.15s;
+}
+.charitable-notif-dismiss-x:hover {
+  color: #50575e;
+  background: #f0f0f1;
+}
+
+.charitable-notification .body {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.charitable-notification .body .title {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.charitable-notification .body h4 {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  margin: 0 !important;
+  padding: 0 32px 0 0 !important;
+  color: inherit !important;
+}
+
+.charitable-notification .body .notification-content {
+  margin-top: 4px !important;
+  padding-top: 0 !important;
+}
+
+.notif-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+
+.notif-count-pill {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  padding: 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.notification-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.charitable-notif-gear-btn,
+.charitable-notif-close-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.15s, background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+.charitable-notif-gear-btn:hover,
+.charitable-notif-close-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.charitable-notif-gear-btn svg {
+  width: 18px;
+  height: 18px;
+}
+.charitable-notif-gear-btn[aria-expanded=true] {
+  color: #fff;
+}
+
+.charitable-notif-settings-panel {
+  background: #fff;
+  border-bottom: 1px solid #e5e5e5;
+  padding: 14px 16px;
+}
+
+.charitable-notif-settings-label {
+  font-size: 14px;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #1d2327;
+  margin: 0 0 10px;
+}
+
+.charitable-notif-toggle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.charitable-notif-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 8px 6px;
+  border-bottom: 1px solid #f0f0f1;
+  font-size: 13px;
+  color: #1d2327;
+  cursor: pointer;
+}
+.charitable-notif-toggle-row:nth-last-child(-n+2) {
+  border-bottom: none;
+}
+
+.charitable-notif-toggle-label {
+  flex: 1;
+}
+
+.charitable-notif-toggle {
+  position: relative;
+  width: 48px;
+  height: 26px;
+  flex-shrink: 0;
+}
+.charitable-notif-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+.charitable-notif-toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: #c3c4c7;
+  border-radius: 26px;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+.charitable-notif-toggle-slider::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  left: 3px;
+  top: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+.charitable-notif-toggle input:checked + .charitable-notif-toggle-slider {
+  background: #2271b1;
+}
+.charitable-notif-toggle input:checked + .charitable-notif-toggle-slider::before {
+  transform: translateX(22px);
+}
+.charitable-notif-toggle input:focus + .charitable-notif-toggle-slider {
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1), 0 0 0 2px #2271b1;
+}
+
+/* Notification timestamp */
+.charitable-notification-date {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(25, 29, 45, 0.45);
+  margin-bottom: 3px;
+  line-height: 1.4;
+}
+
+/*# sourceMappingURL=notifications-v2.css.map */
+
+/* Welcome intro card (rendered above the empty state when 0 active notifications). @since 1.8.12 */
+.charitable-icon-intro {
+  color: #2271b1;
+}
+
+.charitable-notification.charitable-notification-intro {
+  cursor: default;
+}
+.charitable-notification.charitable-notification-intro:hover {
+  background: inherit !important;
+}
+.charitable-notification.charitable-notification-intro .body h4 {
+  color: #2271b1;
+}
+
+.charitable-notif-inline-gear {
+  display: inline-block;
+  vertical-align: -1px;
+  width: 12px;
+  height: 12px;
+  color: #50575e;
+  margin: 0 1px;
+}
+
+/* Empty-state card ("You're all caught up!"). @since 1.8.12 */
+.charitable-icon-empty {
+  color: #00a32a;
+}
+
+.charitable-notification.charitable-notification-empty {
+  background: transparent !important;
+  cursor: default;
+}
+.charitable-notification.charitable-notification-empty:hover {
+  background: transparent !important;
+}
+.charitable-notification.charitable-notification-empty .charitable-notification-card-inner {
+  align-items: center;
+}
+.charitable-notification.charitable-notification-empty .notif-left .icon svg {
+  width: 28px;
+  height: 28px;
+}
+.charitable-notification.charitable-notification-empty .body h4 {
+  margin: 0 0 4px;
+  color: #1d2327;
+}
+.charitable-notification.charitable-notification-empty .body .notification-content p {
+  margin: 0;
+  color: #646970;
+}
+
+/* Notification card primary action button. @since 1.8.12 */
+.charitable-notification .button.button-primary {
+  line-height: 2.5 !important;
+}

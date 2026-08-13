@@ -22,6 +22,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_action( 'admin_enqueue_scripts', array( Charitable_Square_Admin::get_instance(), 'enqueue_scripts_styles' ) );
 
 /**
+ * Warn when Square is connected but no webhook signing secret is stored.
+ *
+ * Since 1.8.12 unsigned webhooks are rejected, so a missing signing secret
+ * silently stops Square donations and refunds from reconciling. Registered
+ * here rather than via Charitable_Square_WebhooksHealthCheck::init(), which
+ * is not currently called.
+ *
+ * @since 1.8.12
+ */
+add_action( 'admin_notices', array( new Charitable_Square_WebhooksHealthCheck(), 'missing_signing_secret_notice' ) );
+
+/**
  * Display admin notice about PHP version incompatibility.
  * This is handled by the init hook in Charitable_Square_Compatibility already.
  */

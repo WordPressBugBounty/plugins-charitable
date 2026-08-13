@@ -119,6 +119,12 @@ function charitable_builder_debug_data( $data, $echo_output = true ) {
  */
 function charitable_update_debug_window_ajax() {
 
+	check_ajax_referer( 'charitable-builder', 'nonce' );
+
+	if ( ! current_user_can( 'manage_charitable_settings' ) ) {
+		wp_send_json_error();
+	}
+
 	// data to post is likely be submitted form data from an ajax request.
 	$data = false;
 
@@ -137,7 +143,6 @@ function charitable_update_debug_window_ajax() {
 	exit;
 }
 add_action( 'wp_ajax_charitable_update_debug_window_ajax', 'charitable_update_debug_window_ajax' );
-add_action( 'wp_ajax_nopriv_charitable_update_debug_window_ajax', 'charitable_update_debug_window_ajax' );
 
 /**
  * Log helper.

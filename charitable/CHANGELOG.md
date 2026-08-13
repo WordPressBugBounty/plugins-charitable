@@ -1,3 +1,14 @@
+# 1.8.12
+* NEW: Beacon (2 Columns) campaign template - includes Campaign Hero block and Mini Donation Widget (used internally).
+* NEW: Free Site Analysis (Reports > Site Analysis). Get a free Fundraising Score across four areas (Activation, Health, Growth, and Optimization) with specific, prioritized recommendations.
+* IMPROVED: Campaign builder rows now support a `background_image` property (renders as a CSS background on the row wrapper) and a `locked` property (prevents the row and its contents from being moved or deleted in the builder).
+* IMPROVED: Live-preview updates for campaign-hero settings — background image, logo, title, accent (theme primary), donation amounts, and donate button all reflect in the builder preview as you edit.
+* IMPROVED: Cross-tab goal sync — changing the campaign goal in the Settings tab updates the Campaign Hero raised band in the Design tab preview, even before saving.
+* FIX: Square — donations and refunds now handle zero-decimal currencies, and dashboard-initiated refunds are logged in the site currency.
+* FIX: Donation forms on block themes now honor the `amount` and `period` URL parameters.
+* FIX: Security hardening across the addon installer, campaign builder debug endpoint, and donation import/donor-lookup handling.
+* FIX: Square (Core) — unsigned webhooks are now rejected, closing a donation-status forgery on sites with no signing secret stored.
+
 # 1.8.11.3
 * FIX: Hardened Square (Core) payment webhook processing.
 

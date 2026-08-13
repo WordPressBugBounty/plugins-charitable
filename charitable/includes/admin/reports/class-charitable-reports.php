@@ -1126,7 +1126,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 
 					$donor_id               = isset( $data->donor_id ) ? intval( $data->donor_id ) : 0;
 					$donor_email            = isset( $data->email ) ? esc_html( $data->email ) : '';
-					$donor_avatar           = ( is_email( $donor_email ) ) ? get_avatar_url( $donor_email ) : charitable()->get_path( 'assets', false ) . '/images/misc/placeholder-avatar-small.jpg';
+					$donor_avatar           = ( is_email( $donor_email ) ) ? get_avatar_url( $donor_email ) : charitable()->get_path( 'assets', false ) . 'images/misc/placeholder-avatar-small.jpg';
 					$donor_name             = esc_html( $data->first_name ) . ' ' . esc_html( $data->last_name );
 					$donor_number_donations = isset( $data->total_count_donations ) ? intval( $data->total_count_donations ) : 0;
 					$donor_number_campaigns = isset( $data->total_count_campaigns ) ? intval( $data->total_count_campaigns ) : 0;
@@ -1190,7 +1190,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 						<?php
 						$display = '<td class="donated column-actions " data-colname="Actions">';
 						if ( $action_label !== false ) {
-							$display .= '<a class="charitable-campaign-action-button" title="' . $action_label . '" href="' . esc_url( $action_link ) . '" target="_blank"><img src="' . charitable()->get_path( 'assets', false ) . '/images/icons/eye.svg" width="14" height="14" alt="' . $action_label . '" /></a>';
+							$display .= '<a class="charitable-campaign-action-button" title="' . $action_label . '" href="' . esc_url( $action_link ) . '" target="_blank"><img src="' . charitable()->get_path( 'assets', false ) . 'images/icons/eye.svg" width="14" height="14" alt="' . $action_label . '" /></a>';
 						}
 							$display .= '</td>';
 
@@ -1211,7 +1211,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 							<?php
 							$display = '<td class="donated column-actions" data-colname="Actions">';
 							if ( $action_label !== false ) {
-								$display .= '<a class="charitable-campaign-action-button" title="' . $action_label . '" href="' . esc_url( $action_link ) . '" target="_blank"><img src="' . charitable()->get_path( 'assets', false ) . '/images/icons/eye.svg" width="14" height="14" alt="' . $action_label . '" /</a>';
+								$display .= '<a class="charitable-campaign-action-button" title="' . $action_label . '" href="' . esc_url( $action_link ) . '" target="_blank"><img src="' . charitable()->get_path( 'assets', false ) . 'images/icons/eye.svg" width="14" height="14" alt="' . $action_label . '" /</a>';
 							}
 							$display .= '</td>';
 
@@ -3448,7 +3448,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 
 					$donor_name                         = $data->donor_first_name . ' ' . $data->donor_last_name;
 					$donor_email                        = $data->donor_email;
-					$donor_avatar                       = ( is_email( $donor_email ) ) ? get_avatar_url( $donor_email ) : charitable()->get_path( 'assets', false ) . '/images/misc/placeholder-avatar-small.jpg';
+					$donor_avatar                       = ( is_email( $donor_email ) ) ? get_avatar_url( $donor_email ) : charitable()->get_path( 'assets', false ) . 'images/misc/placeholder-avatar-small.jpg';
 					$total_donation_count_compare_to    = $data->total_donation_count_compare_to;
 					$total_donation_amount_compare_to   = number_format( $data->total_donation_amount_compare_to, 2 );
 					$total_donation_count_compare_from  = $data->total_donation_count_compare_from;
@@ -3474,11 +3474,11 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 						if ( $show_actions ) :
 							if ( $link && charitable_is_pro() ) :
 
-								$actions_display = '<td class="donated column-actions " data-colname="Actions"><a class="charitable-campaign-action-button" title="' . esc_html__( 'View User', 'charitable' ) . '" href="' . esc_url( $link ) . '" target="_blank"><img src="' . charitable()->get_path( 'assets', false ) . '/images/icons/eye.svg" width="14" height="14" alt="' . esc_html__( 'View User', 'charitable' ) . '" /></td>';
+								$actions_display = '<td class="donated column-actions " data-colname="Actions"><a class="charitable-campaign-action-button" title="' . esc_html__( 'View User', 'charitable' ) . '" href="' . esc_url( $link ) . '" target="_blank"><img src="' . charitable()->get_path( 'assets', false ) . 'images/icons/eye.svg" width="14" height="14" alt="' . esc_html__( 'View User', 'charitable' ) . '" /></td>';
 
 							else :
 
-								$actions_display = '<td class="donated column-actions " data-colname="Actions"><a class="charitable-campaign-action-button" title="' . esc_html__( 'View User', 'charitable' ) . '" href="#" target="_blank"><img src="' . charitable()->get_path( 'assets', false ) . '/images/icons/eye.svg" width="14" height="14" alt="' . esc_html__( 'View User', 'charitable' ) . '" /></td>';
+								$actions_display = '<td class="donated column-actions " data-colname="Actions"><a class="charitable-campaign-action-button" title="' . esc_html__( 'View User', 'charitable' ) . '" href="#" target="_blank"><img src="' . charitable()->get_path( 'assets', false ) . 'images/icons/eye.svg" width="14" height="14" alt="' . esc_html__( 'View User', 'charitable' ) . '" /></td>';
 
 							endif;
 						endif;

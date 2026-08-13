@@ -87,58 +87,7 @@ if ( $charitable_donors->count() ) :
 		?>
 	</ol>
 <?php else : ?>
-	<?php if ( is_admin() && 1 === intval( $view_args['builder_preview'] ) ) : ?>
-		<?php
-			/* fake data for preview area */
-			$charitable_limit = isset( $view_args['number'] ) && intval( $view_args['number'] > 0 ) && intval( $view_args['number'] <= 10 ) ? intval( $view_args['number'] ) : 10;
-
-			/**
-			 * Add something before the donors loop.
-			 *
-			 * @since   1.8.1.12
-			 *
-			 * @param   array  $donors      The donors.
-			 * @param   mixed  $campaign_id The campaign ID.
-			 * @param   array  $args        Loop args.
-			 */
-			do_action( 'charitable_campaign_loop_before', $charitable_donors, $charitable_campaign_id, $charitable_args );
-
-		?>
-		<ol class="donors-list donors-list-<?php echo esc_attr( $charitable_orientation ); ?>">
-			<?php for ( $charitable_x = 1; $charitable_x <= $charitable_limit; $charitable_x++ ) : ?>
-			<li class="donor">
-				<?php if ( ! empty( $args['show_avatar'] ) && 1 === intval( $args['show_avatar'] ) ) : ?>
-				<img alt="" src="<?php echo esc_url( charitable()->get_path( 'directory', false ) ) . 'assets/images/campaign-builder/fields/donor-wall/avatar.jpg'; ?>" class="avatar avatar-100 photo" loading="lazy" decoding="async" width="100" height="100">
-				<?php endif; ?>
-				<?php if ( ! empty( $args['show_name'] ) && 1 === intval( $args['show_name'] ) ) : ?>
-				<p class="donor-name"><?php esc_html_e( 'John Smith', 'charitable' ); ?></p>
-				<?php endif; ?>
-				<?php if ( ! empty( $args['show_location'] ) && 1 === intval( $args['show_location'] ) ) : ?>
-				<div class="donor-location"><?php esc_html_e( 'US', 'charitable' ); ?></div>
-				<?php endif; ?>
-				<?php if ( ! empty( $args['show_amount'] ) && 1 === intval( $args['show_amount'] ) ) : ?>
-				<div class="donor-donation-amount"><?php esc_html_e( '$100.00', 'charitable' ); ?></div>
-				<?php endif; ?>
-			</li><!-- .donor-x -->
-			<?php endfor; ?>
-		</ol>
-		<?php
-
-		/**
-		 * Add something before the donors loop.
-		 *
-		 * @since   1.8.1.12
-		 *
-		 * @param   array  $donors      The donors.
-		 * @param   mixed  $campaign_id The campaign ID.
-		 * @param   array  $args        Loop args.
-		 */
-		do_action( 'charitable_donor_list_loop_after', $charitable_donors, $charitable_campaign_id, $charitable_args );
-
-		?>
-		<?php else : ?>
-			<p><?php echo esc_html__( 'No donors yet. Be the first!', 'charitable' ); ?></p>
-		<?php endif; ?>
+	<p><?php echo esc_html__( 'No donors yet. Be the first!', 'charitable' ); ?></p>
 	<?php
 endif;
 
