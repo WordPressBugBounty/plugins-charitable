@@ -2,16 +2,16 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Charitable 1.8.12\n"
+"Project-Id-Version: Charitable 1.8.12.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/charitable\n"
 "Last-Translator: Charitable Team\n"
 "Language-Team: Charitable Team\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-27T21:55:57+00:00\n"
+"POT-Creation-Date: 2026-08-18T13:40:24+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.10.0\n"
+"X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: charitable\n"
 
 #. Plugin Name of the plugin
@@ -50,17 +50,17 @@ msgstr ""
 msgid "https://wpcharitable.com"
 msgstr ""
 
-#: charitable.php:1126
+#: charitable.php:1127
 msgid "Cloning this object is forbidden."
 msgstr ""
 
-#: charitable.php:1141
+#: charitable.php:1142
 msgid "Unserializing instances of this class is forbidden."
 msgstr ""
 
 #. Translators: This is an action link users can click to purchase a license for All in One SEO Pro.
 #. translators: Suggestion on completion of checklist on checklist page.
-#: charitable.php:1331
+#: charitable.php:1332
 #: includes/admin/charitable-core-admin-functions.php:402
 #: includes/admin/class-charitable-admin-getting-started.php:521
 #: includes/admin/dashboard/class-charitable-dashboard.php:1610
@@ -77,24 +77,28 @@ msgid "Upgrade to Pro"
 msgstr ""
 
 #. translators: %s is the version number.
-#: charitable.php:1411
+#: charitable.php:1412
+#, php-format
 msgid "<p><strong style=\"color:red;\">NOTICE:</strong> <strong>Charitable</strong> detected an out-of-date and incompatible version of <strong>Charitable Stripe</strong> addon. To avoid issues with Stripe donations, <strong>Charitable Stripe</strong> %s was deactivated. Please update <strong>Charitable Stripe</strong> to version 1.5.0 or higher.</p><p>You can get the latest version of <strong>Charitable Stripe</strong> through your <a href=\"https://www.wpcharitable.com/account/\" target=\"_blank\">Charitable account at wpcharitable.com</a>. All active licenses are accessible in the \"My Downloads\" tab.</p>"
 msgstr ""
 
 #. translators: %1$s is the plugin name, %2$s is the URL to activate the license, %3$s is the URL to view the changelog, %4$s is the new version number.
 #: custom-packages/charitable-licenses/src/CharitableLicenses.php:367
 #: _vendor/wpcharitable/charitable-licenses/src/CharitableLicenses.php:370
+#, php-format
 msgid "<p>There is a new version of %1$s available but you have not activated your license. <a target=\"_top\" href=\"%2$s\">Activate your license</a> or <a target=\"_blank\" class=\"thickbox\" href=\"%3$s\">view version %4$s details</a>.</p>"
 msgstr ""
 
 #. translators: %1$s is the plugin name, %2$s is the URL to renew the license, %3$s is the URL to view the changelog, %4$s is the new version number.
 #: custom-packages/charitable-licenses/src/CharitableLicenses.php:383
 #: _vendor/wpcharitable/charitable-licenses/src/CharitableLicenses.php:386
+#, php-format
 msgid "<p>There is a new version of %1$s available but your license has expired. <a target=\"_blank\" href=\"%2$s\">Renew your license</a> or <a target=\"_blank\" class=\"thickbox\" href=\"%3$s\">view version %4$s details</a>.</p>"
 msgstr ""
 
 #: custom-packages/charitable-licenses/src/CharitableLicenses.php:431
 #: _vendor/wpcharitable/charitable-licenses/src/CharitableLicenses.php:434
+#, php-format
 msgid "<p>There is a new version of %1$s available but you are missing the following minimum requirements:</p>%2$s"
 msgstr ""
 
@@ -144,6 +148,7 @@ msgstr ""
 #: custom-packages/charitable-licenses/src/CharitablePluginUpdater.php:142
 #: _vendor/wpcharitable/charitable-licenses/src/CharitablePluginUpdater.php:124
 #: _vendor/wpcharitable/charitable-licenses/src/CharitablePluginUpdater.php:142
+#, php-format
 msgid "<p>There is a new version of %1$s available. <a target=\"_blank\" class=\"thickbox\" href=\"%2$s\">View version %3$s details</a> or <a href=\"%4$s\">update now</a>.</p>"
 msgstr ""
 
@@ -4825,6 +4830,7 @@ msgstr ""
 
 #. translators: %$1s: old status; %$2s: new status.
 #: includes/abstracts/abstract-class-charitable-abstract-donation.php:972
+#, php-format
 msgid "Donation status updated from %1$s to %2$s."
 msgstr ""
 
@@ -4834,6 +4840,7 @@ msgstr ""
 
 #. translators: %s: action id
 #: includes/abstracts/abstract-class-charitable-admin-actions.php:279
+#, php-format
 msgid "Action \"%s\" is not registered."
 msgstr ""
 
@@ -4920,12 +4927,14 @@ msgstr ""
 
 #. translators: %1$s: argument key; %2$s: setting
 #: includes/abstracts/abstract-class-charitable-field.php:102
+#, php-format
 msgctxt "argument key"
 msgid "Attempting to set an argument setting for a non-array argument. Argument: %1$s; Setting: %2$s"
 msgstr ""
 
 #. translators: %s: class name
 #: includes/abstracts/abstract-class-charitable-form.php:102
+#, php-format
 msgid "None of the callbacks are required as of Charitable 1.5; use `Charitable_Public_Form_View` instead. Issue encountered in %s class."
 msgstr ""
 
@@ -4935,11 +4944,13 @@ msgstr ""
 
 #. translators: %1$s: nonce name; %2$s: nonce action; %3$s: submitted nonce
 #: includes/abstracts/abstract-class-charitable-form.php:242
+#, php-format
 msgid "Nonce verification failed for nonce with name \"%1$s\" and action \"%2$s\". Submitted nonce is \"%3$s\"."
 msgstr ""
 
 #. translators: %d is the minimum password length required.
 #: includes/abstracts/abstract-class-charitable-form.php:359
+#, php-format
 msgid "Your password must be at least %d characters long."
 msgstr ""
 
@@ -5047,6 +5058,7 @@ msgstr ""
 
 #. translators: %1$s - An addon download URL, %2$s - Link to manual installation guide.
 #: includes/admin/addons-directory/class-charitable-addons-directory.php:115
+#, php-format
 msgid "Could not install the addon. Please <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">download it from wpcharitable.com</a> and <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">install it manually</a>."
 msgstr ""
 
@@ -5344,6 +5356,7 @@ msgstr ""
 
 #. translators: %s - addon name.
 #: includes/admin/addons-directory/class-charitable-addons-directory.php:1246
+#, php-format
 msgid "%s addon"
 msgstr ""
 
@@ -5387,54 +5400,54 @@ msgid "No form name provided."
 msgstr ""
 
 #: includes/admin/campaign-builder/ajax-actions.php:958
-#: includes/admin/campaign-builder/ajax-actions.php:1050
+#: includes/admin/campaign-builder/ajax-actions.php:1070
 msgid "The template you selected is currently not available, but you can try again later. If you continue to have trouble, please reach out to support."
 msgstr ""
 
-#: includes/admin/campaign-builder/ajax-actions.php:993
+#: includes/admin/campaign-builder/ajax-actions.php:1013
 msgid "Error creating form."
 msgstr ""
 
-#: includes/admin/campaign-builder/ajax-actions.php:1038
+#: includes/admin/campaign-builder/ajax-actions.php:1058
 msgid "No form ID provided."
 msgstr ""
 
-#: includes/admin/campaign-builder/ajax-actions.php:1092
+#: includes/admin/campaign-builder/ajax-actions.php:1112
 msgid "Error updating form template."
 msgstr ""
 
-#: includes/admin/campaign-builder/ajax-actions.php:1251
+#: includes/admin/campaign-builder/ajax-actions.php:1271
 #: includes/admin/charitable-core-admin-functions.php:994
 msgid "You do not have permission to perform this operation."
 msgstr ""
 
-#: includes/admin/campaign-builder/ajax-actions.php:1261
+#: includes/admin/campaign-builder/ajax-actions.php:1281
 #: includes/admin/charitable-core-admin-functions.php:1004
 msgid "Success! Your server can make SSL connections."
 msgstr ""
 
-#: includes/admin/campaign-builder/ajax-actions.php:1268
+#: includes/admin/campaign-builder/ajax-actions.php:1288
 #: includes/admin/charitable-core-admin-functions.php:1011
 msgid "There was an error and the connection failed. Please contact your web host with the technical details below."
 msgstr ""
 
-#: includes/admin/campaign-builder/ajax-actions.php:1293
+#: includes/admin/campaign-builder/ajax-actions.php:1313
 msgid "No creator ID provided."
 msgstr ""
 
-#: includes/admin/campaign-builder/ajax-actions.php:1304
+#: includes/admin/campaign-builder/ajax-actions.php:1324
 msgid "Invalid creator ID provided."
 msgstr ""
 
-#: includes/admin/campaign-builder/ajax-actions.php:1328
+#: includes/admin/campaign-builder/ajax-actions.php:1348
 msgid "Error updating campaign creator."
 msgstr ""
 
-#: includes/admin/campaign-builder/ajax-actions.php:1349
+#: includes/admin/campaign-builder/ajax-actions.php:1369
 msgid "No campaign ID provided."
 msgstr ""
 
-#: includes/admin/campaign-builder/ajax-actions.php:1364
+#: includes/admin/campaign-builder/ajax-actions.php:1384
 msgid "View Campaign Page"
 msgstr ""
 
@@ -5459,11 +5472,13 @@ msgstr ""
 
 #. translators: %1$s - css.
 #: includes/admin/campaign-builder/campaign-congrats-wizard/popup.php:61
+#, php-format
 msgid "Want to embed this campaign? Check our <a href=\"#\" class=\"%1$s\">Embed Wizard</a>."
 msgstr ""
 
 #. translators: %1$s - URLs.
 #: includes/admin/campaign-builder/campaign-congrats-wizard/popup.php:125
+#, php-format
 msgid "<a class=\"charitable-see-more-ways\" target=\"_blank\" href=\"%1$s\">View extensions available to <strong>PRO</strong> users</a>."
 msgstr ""
 
@@ -5506,6 +5521,7 @@ msgstr ""
 
 #. translators: %1$s - Video tutorial toggle CSS classes, %2$s - shortcode toggle CSS classes.
 #: includes/admin/campaign-builder/campaign-embed-wizard/popup.php:62
+#, php-format
 msgid "You can also <a href=\"#\" class=\"%1$s\">embed your campaign manually</a> or <a href=\"#\" class=\"%2$s\">use a shortcode</a>"
 msgstr ""
 
@@ -5523,6 +5539,7 @@ msgstr ""
 
 #. translators: %s - link to the Charitable documentation page.
 #: includes/admin/campaign-builder/campaign-embed-wizard/tooltip.php:33
+#, php-format
 msgid "Click the plus button, search for Campaign Builder, click the block to<br>embed it. <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">Learn More</a>."
 msgstr ""
 
@@ -5633,6 +5650,7 @@ msgstr ""
 #. translators: %s - campaign title.
 #: includes/admin/campaign-builder/class-campaign-builder-preview.php:200
 #: includes/admin/campaign-builder/class-campaign-builder-preview.php:415
+#, php-format
 msgid "%s Preview"
 msgstr ""
 
@@ -5680,6 +5698,7 @@ msgstr ""
 
 #. translators: %s - Charitable doc link.
 #: includes/admin/campaign-builder/class-campaign-builder-preview.php:283
+#, php-format
 msgid "You are viewing a preview of a <a href=\"%s\" target=\"_blank\">published campaign</a>. If this does not match your campaign page in the campaign builder, save your changes and then refresh this page. Your current theme can also effect the look of this page."
 msgstr ""
 
@@ -6058,6 +6077,7 @@ msgstr ""
 
 #. translators: %s: configure tab settings link
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:789
+#, php-format
 msgid "This tab is empty. Drag a block from the left into this area or%1$s%2$s%3$s"
 msgstr ""
 
@@ -6073,6 +6093,7 @@ msgstr ""
 
 #. translators: %s: configure tab settings link
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:796
+#, php-format
 msgid "There are no tabs yet for this template. You can %1$s%2$s%3$s to add a tab."
 msgstr ""
 
@@ -6116,6 +6137,7 @@ msgstr ""
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:812
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:829
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:846
+#, php-format
 msgid "is a %1$s feature."
 msgstr ""
 
@@ -6123,6 +6145,7 @@ msgstr ""
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:814
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:831
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:848
+#, php-format
 msgid "We're sorry, the %1$s is not available on your plan. Please upgrade to the %2$s plan to unlock all these awesome features."
 msgstr ""
 
@@ -6138,6 +6161,7 @@ msgstr ""
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:839
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:856
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:872
+#, php-format
 msgid "Upgrade to %1$s And Unlock %2$s"
 msgstr ""
 
@@ -6147,6 +6171,7 @@ msgstr ""
 
 #. translators: %s - addon name.
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:864
+#, php-format
 msgid "We're sorry, %s features are not available on your plan. Please upgrade to the PRO plan to unlock all these awesome features."
 msgstr ""
 
@@ -6160,6 +6185,7 @@ msgstr ""
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:882
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:897
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:912
+#, php-format
 msgid "Good news! You have the %1$s plan. Please install and activate the %2$s to add this feature to your campaign page."
 msgstr ""
 
@@ -6176,6 +6202,7 @@ msgstr ""
 
 #. translators: %s - addon name.
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:928
+#, php-format
 msgid "Good news! You have the %1$s installed, you just need to activate it."
 msgstr ""
 
@@ -6445,6 +6472,7 @@ msgstr ""
 #. translators: %1$s is the link to the getting started guide, %2$s is the link to the documentation, %3$s is the link to the support page.
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:1062
 #: includes/admin/templates/campaign-builder-onboarding.php:90
+#, php-format
 msgid "Remember that you can view our <a href=\"%1$s\" target=\"_blank\">getting started guide</a>, read our <a href=\"%2$s\" target=\"_blank\">documentation</a>, or <a href=\"%3$s\" target=\"_blank\">reach out to us</a> for support if you have any questions."
 msgstr ""
 
@@ -6562,6 +6590,7 @@ msgstr ""
 
 #. translators: %s is the field label
 #: includes/admin/campaign-builder/fields/class-base.php:608
+#, php-format
 msgid "The %s field cannot be rendered in preview mode."
 msgstr ""
 
@@ -6595,7 +6624,7 @@ msgstr ""
 #: includes/admin/campaign-builder/fields/class-donate-form.php:204
 #: includes/admin/campaign-builder/fields/class-donate-form.php:261
 #: includes/admin/campaign-builder/fields/class-donor-wall.php:310
-#: includes/admin/campaign-builder/fields/class-progress-bar.php:260
+#: includes/admin/campaign-builder/fields/class-progress-bar.php:263
 #: includes/admin/campaign-builder/fields/class-shortcode.php:165
 #: includes/admin/campaign-builder/fields/class-social-links.php:236
 #: includes/admin/campaign-builder/fields/class-social-sharing.php:291
@@ -6615,7 +6644,7 @@ msgstr ""
 #: includes/admin/campaign-builder/fields/class-organizer.php:334
 #: includes/admin/campaign-builder/fields/class-photo.php:231
 #: includes/admin/campaign-builder/fields/class-photo.php:301
-#: includes/admin/campaign-builder/fields/class-progress-bar.php:338
+#: includes/admin/campaign-builder/fields/class-progress-bar.php:341
 #: includes/admin/campaign-builder/fields/class-social-links.php:288
 #: includes/admin/campaign-builder/fields/class-social-sharing.php:345
 #: includes/admin/campaign-builder/fields/class-text.php:259
@@ -6630,7 +6659,7 @@ msgstr ""
 #: includes/admin/campaign-builder/fields/class-organizer.php:342
 #: includes/admin/campaign-builder/fields/class-photo.php:241
 #: includes/admin/campaign-builder/fields/class-photo.php:309
-#: includes/admin/campaign-builder/fields/class-progress-bar.php:348
+#: includes/admin/campaign-builder/fields/class-progress-bar.php:351
 #: includes/admin/campaign-builder/fields/class-social-links.php:298
 #: includes/admin/campaign-builder/fields/class-social-sharing.php:355
 #: includes/admin/campaign-builder/fields/class-text.php:269
@@ -6647,7 +6676,7 @@ msgstr ""
 #: includes/admin/campaign-builder/fields/class-organizer.php:348
 #: includes/admin/campaign-builder/fields/class-photo.php:247
 #: includes/admin/campaign-builder/fields/class-photo.php:315
-#: includes/admin/campaign-builder/fields/class-progress-bar.php:354
+#: includes/admin/campaign-builder/fields/class-progress-bar.php:357
 #: includes/admin/campaign-builder/fields/class-social-links.php:304
 #: includes/admin/campaign-builder/fields/class-social-sharing.php:361
 #: includes/admin/campaign-builder/fields/class-text.php:275
@@ -6675,8 +6704,8 @@ msgstr ""
 #: includes/admin/campaign-builder/fields/class-organizer.php:358
 #: includes/admin/campaign-builder/fields/class-photo.php:257
 #: includes/admin/campaign-builder/fields/class-photo.php:325
-#: includes/admin/campaign-builder/fields/class-progress-bar.php:364
-#: includes/admin/campaign-builder/fields/class-progress-bar.php:409
+#: includes/admin/campaign-builder/fields/class-progress-bar.php:367
+#: includes/admin/campaign-builder/fields/class-progress-bar.php:412
 #: includes/admin/campaign-builder/fields/class-shortcode.php:189
 #: includes/admin/campaign-builder/fields/class-social-links.php:317
 #: includes/admin/campaign-builder/fields/class-social-sharing.php:373
@@ -6698,7 +6727,7 @@ msgstr ""
 #: includes/admin/campaign-builder/fields/class-info-bar.php:215
 #: includes/admin/campaign-builder/fields/class-organizer.php:298
 #: includes/admin/campaign-builder/fields/class-photo.php:262
-#: includes/admin/campaign-builder/fields/class-progress-bar.php:369
+#: includes/admin/campaign-builder/fields/class-progress-bar.php:372
 #: includes/admin/campaign-builder/fields/class-shortcode.php:194
 #: includes/admin/campaign-builder/fields/class-social-links.php:322
 #: includes/admin/campaign-builder/fields/class-social-sharing.php:378
@@ -6717,7 +6746,7 @@ msgstr ""
 #: includes/admin/campaign-builder/fields/class-campaign-hero.php:111
 #: includes/admin/campaign-builder/fields/class-campaign-title.php:34
 #: includes/admin/campaign-builder/fields/class-campaign-title.php:190
-#: includes/admin/reports/class-charitable-export-donations.php:166
+#: includes/admin/reports/class-charitable-export-donations.php:181
 msgid "Campaign Title"
 msgstr ""
 
@@ -6731,6 +6760,7 @@ msgstr ""
 #. translators: 1: amount raised, 2: goal amount
 #: includes/admin/campaign-builder/fields/class-campaign-hero.php:178
 #: includes/admin/campaign-builder/fields/class-campaign-hero.php:336
+#, php-format
 msgid "%1$s raised toward our %2$s goal."
 msgstr ""
 
@@ -6848,12 +6878,14 @@ msgstr ""
 #. translators: %s: percentage raised
 #: includes/admin/campaign-builder/fields/class-campaign-summary.php:115
 #: templates/campaign/summary-percentage-raised.php:27
+#, php-format
 msgctxt "percentage raised"
 msgid "%s Raised"
 msgstr ""
 
 #. translators: %s: number of donors
 #: includes/admin/campaign-builder/fields/class-campaign-summary.php:144
+#, php-format
 msgctxt "number of donors"
 msgid "%s Donor"
 msgstr ""
@@ -6862,6 +6894,7 @@ msgstr ""
 #: includes/admin/campaign-builder/fields/class-campaign-summary.php:152
 #: includes/admin/campaign-builder/fields/class-info-bar.php:131
 #: templates/campaign/summary-donors.php:31
+#, php-format
 msgctxt "number of donors"
 msgid "%s Donors"
 msgstr ""
@@ -6980,6 +7013,7 @@ msgstr ""
 #: templates/campaign-loop/donate-modal.php:29
 #: templates/campaign/donate-link.php:32
 #: templates/campaign/donate-modal.php:23
+#, php-format
 msgctxt "make a donation to campaign"
 msgid "Make a donation to %s"
 msgstr ""
@@ -7148,31 +7182,31 @@ msgstr ""
 msgid "Donated: "
 msgstr ""
 
-#: includes/admin/campaign-builder/fields/class-progress-bar.php:251
+#: includes/admin/campaign-builder/fields/class-progress-bar.php:254
 msgid "Note: Progress bars will be visible only when there is a goal set for the campaign."
 msgstr ""
 
-#: includes/admin/campaign-builder/fields/class-progress-bar.php:271
+#: includes/admin/campaign-builder/fields/class-progress-bar.php:274
 msgid "Campaign Information"
 msgstr ""
 
-#: includes/admin/campaign-builder/fields/class-progress-bar.php:293
+#: includes/admin/campaign-builder/fields/class-progress-bar.php:296
 msgid "Round Amounts"
 msgstr ""
 
-#: includes/admin/campaign-builder/fields/class-progress-bar.php:313
+#: includes/admin/campaign-builder/fields/class-progress-bar.php:316
 msgid "Donated:"
 msgstr ""
 
-#: includes/admin/campaign-builder/fields/class-progress-bar.php:314
+#: includes/admin/campaign-builder/fields/class-progress-bar.php:317
 msgid "Donate Label:"
 msgstr ""
 
-#: includes/admin/campaign-builder/fields/class-progress-bar.php:324
+#: includes/admin/campaign-builder/fields/class-progress-bar.php:327
 msgid "Goal:"
 msgstr ""
 
-#: includes/admin/campaign-builder/fields/class-progress-bar.php:325
+#: includes/admin/campaign-builder/fields/class-progress-bar.php:328
 msgid "Goal Label:"
 msgstr ""
 
@@ -7661,7 +7695,7 @@ msgstr ""
 #: includes/admin/campaign-builder/panels/class-marketing.php:290
 #: includes/admin/campaign-builder/panels/class-payment.php:230
 #: includes/admin/campaign-builder/panels/class-template.php:100
-#: includes/admin/reports/class-charitable-export-donations.php:169
+#: includes/admin/reports/class-charitable-export-donations.php:184
 #: includes/admin/reports/class-charitable-reports-download.php:577
 #: includes/admin/reports/class-charitable-reports-download.php:672
 #: includes/fields/default-fields/donation-fields.php:98
@@ -7751,16 +7785,19 @@ msgstr ""
 #. translators: %s is the name of the addon.
 #: includes/admin/campaign-builder/panels/class-marketing.php:388
 #: includes/admin/campaign-builder/panels/class-payment.php:525
+#, php-format
 msgid "You have the %s addon activated."
 msgstr ""
 
 #. translators: %1$s is the name of the addon, %2$s is the marketing item label, %3$s is the link to the documentation.
 #: includes/admin/campaign-builder/panels/class-marketing.php:405
+#, php-format
 msgid "The %1$s addon allows you to integrate seamlessly with %2$s. %3$s for assistance or click the button below to access your webhook settings."
 msgstr ""
 
 #. translators: %1$s is the name of the addon, %2$s is the marketing item label, %3$s is the service name, %4$s is the link to the documentation.
 #: includes/admin/campaign-builder/panels/class-marketing.php:413
+#, php-format
 msgid "The %1$s addon allows you to integrate seamlessly with %2$s via services such as %3$s. %4$s for assistance or click the button below to access your webhook settings."
 msgstr ""
 
@@ -7768,6 +7805,7 @@ msgstr ""
 #: includes/admin/campaign-builder/panels/class-marketing.php:424
 #: includes/admin/campaign-builder/panels/class-marketing.php:595
 #: includes/admin/campaign-builder/panels/class-payment.php:721
+#, php-format
 msgid "The %1$s addon allows you to integrate seamlessly with %2$s."
 msgstr ""
 
@@ -7791,30 +7829,35 @@ msgstr ""
 #. translators: %s is the name of the addon.
 #: includes/admin/campaign-builder/panels/class-marketing.php:539
 #: includes/admin/campaign-builder/panels/class-payment.php:665
+#, php-format
 msgid "You have the %s addon installed, but not activated."
 msgstr ""
 
 #. translators: %s is the name of the addon.
 #: includes/admin/campaign-builder/panels/class-marketing.php:549
 #: includes/admin/campaign-builder/panels/class-payment.php:675
+#, php-format
 msgid "You have the %s addon installed and activated."
 msgstr ""
 
 #. translators: %s is the name of the addon.
 #: includes/admin/campaign-builder/panels/class-marketing.php:559
 #: includes/admin/campaign-builder/panels/class-payment.php:685
+#, php-format
 msgid "You need to install the %s addon."
 msgstr ""
 
 #. translators: %1$s is the name of the addon, %2$s is the marketing item label, %3$s is the link to the documentation.
 #: includes/admin/campaign-builder/panels/class-marketing.php:576
 #: includes/admin/campaign-builder/panels/class-payment.php:702
+#, php-format
 msgid "The %1$s addon allows you to integrate seamlessly with %2$s. %3$s for assistance."
 msgstr ""
 
 #. translators: %1$s is the name of the addon, %2$s is the marketing item label, %3$s is the service name, %4$s is the link to the documentation.
 #: includes/admin/campaign-builder/panels/class-marketing.php:584
 #: includes/admin/campaign-builder/panels/class-payment.php:710
+#, php-format
 msgid "The %1$s addon allows you to integrate seamlessly with %2$s via services such as %3$s. %4$s for assistance."
 msgstr ""
 
@@ -7826,6 +7869,7 @@ msgstr ""
 
 #. translators: %s is the name of the addon.
 #: includes/admin/campaign-builder/panels/class-payment.php:176
+#, php-format
 msgid "Charitable has %s built in."
 msgstr ""
 
@@ -7938,6 +7982,7 @@ msgstr ""
 
 #. translators: %s is the name of the addon.
 #: includes/admin/campaign-builder/panels/class-payment.php:532
+#, php-format
 msgid "The %1$s addon allows you to integrate seamlessly with %2$s as a payment gateway."
 msgstr ""
 
@@ -7965,11 +8010,13 @@ msgstr ""
 
 #. translators: 1: Template ID
 #: includes/admin/campaign-builder/panels/class-template.php:149
+#, php-format
 msgid "You are currently using the <strong class=\"template-name\">\"%1$s\"</strong> template. Changing a template now might result in losing fields and data. Proceed carefully."
 msgstr ""
 
 #. translators: 1: Site URL
 #: includes/admin/campaign-builder/panels/class-template.php:159
+#, php-format
 msgid "To speed up the process you can select from one of our pre-made templates or start from scratch <a href=\"%1$s\" class=\"charitable-trigger-blank\">with our simple column templates</a>. Have a suggestion for a new template? <a href=\"#\" class=\"send-feedback\">We would love to hear it</a>!"
 msgstr ""
 
@@ -8246,16 +8293,19 @@ msgstr ""
 
 #. translators: %s is the URL to the Charitable settings campaign tags page.
 #: includes/admin/campaign-builder/panels/settings/class-settings-general.php:224
+#, php-format
 msgid "<a href=\"%s\" target=\"_blank\">Visit the Tags page in Charitable's tool menu</a> to create, edit, and remove tags."
 msgstr ""
 
 #. translators: %s is the URL to the Charitable settings campaign categories page.
 #: includes/admin/campaign-builder/panels/settings/class-settings-general.php:248
+#, php-format
 msgid "<a href=\"%s\" target=\"_blank\">Visit the Categories page in Charitable's tool menu</a> to create, edit, and remove categories."
 msgstr ""
 
 #. translators: %s is the URL to the WordPress users page.
 #: includes/admin/campaign-builder/panels/settings/class-settings-general.php:290
+#, php-format
 msgid "Campaign creators can be any registered <a href=\"%s\" target=\"_blank\">WordPress user</a> with create or edit campaign permissions."
 msgstr ""
 
@@ -8422,11 +8472,13 @@ msgstr ""
 
 #. translators: %s is the amount saved.
 #: includes/admin/campaign-builder/templates/class-templates.php:3891
+#, php-format
 msgid "With Charitable addons you can enable crowdfunding, provide additional payment methods, add videos, offer recurring donations, and more. As thanks to you for being a lite user you can unlock access and save up to $%s, automatically applied at checkout! "
 msgstr ""
 
 #. translators: %d - a post ID.
 #: includes/admin/campaign-builder/util.php:34
+#, php-format
 msgid "#%d (no title)"
 msgstr ""
 
@@ -8490,6 +8542,7 @@ msgstr ""
 
 #. translators: %s: number of items
 #: includes/admin/campaigns/class-charitable-campaign-list-table.php:226
+#, php-format
 msgid "%d campaign updated."
 msgid_plural "%d campaigns updated."
 msgstr[0] ""
@@ -8501,6 +8554,7 @@ msgstr ""
 
 #. translators: %s: number of items
 #: includes/admin/campaigns/class-charitable-campaign-list-table.php:230
+#, php-format
 msgid "%s campaign not updated, somebody is editing it."
 msgid_plural "%s campaigns not updated, somebody is editing them."
 msgstr[0] ""
@@ -8508,6 +8562,7 @@ msgstr[1] ""
 
 #. translators: %s: number of items
 #: includes/admin/campaigns/class-charitable-campaign-list-table.php:232
+#, php-format
 msgid "%s campaign permanently deleted."
 msgid_plural "%s campaigns permanently deleted."
 msgstr[0] ""
@@ -8515,6 +8570,7 @@ msgstr[1] ""
 
 #. translators: %s: number of items
 #: includes/admin/campaigns/class-charitable-campaign-list-table.php:234
+#, php-format
 msgid "%s campaign moved to the Trash."
 msgid_plural "%s campaigns moved to the Trash."
 msgstr[0] ""
@@ -8522,6 +8578,7 @@ msgstr[1] ""
 
 #. translators: %s: number of items
 #: includes/admin/campaigns/class-charitable-campaign-list-table.php:236
+#, php-format
 msgid "%s campaign restored from the Trash."
 msgid_plural "%s campaigns restored from the Trash."
 msgstr[0] ""
@@ -8571,6 +8628,7 @@ msgstr ""
 
 #. translators: 1: bolded "GiveWP", 2: number of campaigns.
 #: includes/admin/campaigns/class-charitable-campaign-list-table.php:597
+#, php-format
 msgid "We detected %1$s with %2$s campaigns installed on your site. Use our import tool to import them into Charitable."
 msgstr ""
 
@@ -8580,6 +8638,7 @@ msgstr ""
 
 #. translators: %s: bolded "GiveWP".
 #: includes/admin/campaigns/class-charitable-campaign-list-table.php:615
+#, php-format
 msgid "Did you know you can import %s campaigns, donations, and donors right into Charitable?"
 msgstr ""
 
@@ -8682,6 +8741,7 @@ msgstr ""
 
 #. Translators: %s is the permalink to the campaign.
 #: includes/admin/campaigns/class-charitable-campaign-meta-boxes.php:331
+#, php-format
 msgid "Campaign updated. <a href=\"%s\">View Campaign</a>"
 msgstr ""
 
@@ -8703,11 +8763,13 @@ msgstr ""
 
 #. Translators: %s is the revision date.
 #: includes/admin/campaigns/class-charitable-campaign-meta-boxes.php:341
+#, php-format
 msgid "Campaign restored to revision from %s"
 msgstr ""
 
 #. Translators: %s is the permalink to the campaign.
 #: includes/admin/campaigns/class-charitable-campaign-meta-boxes.php:347
+#, php-format
 msgid "Campaign published. <a href=\"%s\">View Campaign</a>"
 msgstr ""
 
@@ -8717,16 +8779,19 @@ msgstr ""
 
 #. Translators: %s is the preview link to the campaign.
 #: includes/admin/campaigns/class-charitable-campaign-meta-boxes.php:353
+#, php-format
 msgid "Campaign submitted. <a target=\"_blank\" href=\"%s\">Preview Campaign</a>"
 msgstr ""
 
 #. Translators: %1$s is the date the campaign is scheduled for, %2$s is the preview link to the campaign.
 #: includes/admin/campaigns/class-charitable-campaign-meta-boxes.php:358
+#, php-format
 msgid "Campaign scheduled for: <strong>%1$s</strong>. <a target=\"_blank\" href=\"%2$s\">Preview Campaign</a>"
 msgstr ""
 
 #. Translators: %s is the preview link to the campaign.
 #: includes/admin/campaigns/class-charitable-campaign-meta-boxes.php:364
+#, php-format
 msgid "Campaign draft updated. <a target=\"_blank\" href=\"%s\">Preview Campaign</a>"
 msgstr ""
 
@@ -8960,11 +9025,13 @@ msgstr ""
 
 #. translators: %s: Filename of passed view
 #: includes/admin/charitable-core-admin-functions.php:53
+#, php-format
 msgid "Passed view (%s) not found or is not readable."
 msgstr ""
 
 #. translators: %1$s Opening strong tag, do not translate. %2$s Closing strong tag, do not translate. %3$s Opening anchor tag, do not translate. %4$s Closing anchor tag, do not translate.
 #: includes/admin/charitable-core-admin-functions.php:444
+#, php-format
 msgid "Please rate %1$sCharitable%2$s %3$s★★★★★%4$s on %3$sWordPress.org%4$s to help us spread the word. Thank you from the Charitable team!"
 msgstr ""
 
@@ -8983,6 +9050,7 @@ msgstr ""
 
 #. translators: %s: Heart icon
 #: includes/admin/charitable-core-admin-functions.php:544
+#, php-format
 msgid "Made with %s by the Charitable Team"
 msgstr ""
 
@@ -9230,57 +9298,57 @@ msgstr ""
 msgid "Priority Email Support"
 msgstr ""
 
-#: includes/admin/class-charitable-admin-blocks.php:477
-#: includes/admin/class-charitable-admin-blocks.php:482
-#: includes/admin/class-charitable-admin-blocks.php:487
-#: includes/admin/class-charitable-admin-blocks.php:492
-#: includes/admin/class-charitable-admin-blocks.php:497
-#: includes/admin/class-charitable-admin-blocks.php:502
-#: includes/admin/class-charitable-admin-blocks.php:507
 #: includes/admin/class-charitable-admin-blocks.php:512
+#: includes/admin/class-charitable-admin-blocks.php:517
+#: includes/admin/class-charitable-admin-blocks.php:522
+#: includes/admin/class-charitable-admin-blocks.php:527
+#: includes/admin/class-charitable-admin-blocks.php:532
+#: includes/admin/class-charitable-admin-blocks.php:537
+#: includes/admin/class-charitable-admin-blocks.php:542
+#: includes/admin/class-charitable-admin-blocks.php:547
 msgid "Need Some Help?"
 msgstr ""
 
-#: includes/admin/class-charitable-admin-blocks.php:478
+#: includes/admin/class-charitable-admin-blocks.php:513
 msgid "Check out our docs for information about this block."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-blocks.php:480
-#: includes/admin/class-charitable-admin-blocks.php:485
-#: includes/admin/class-charitable-admin-blocks.php:490
-#: includes/admin/class-charitable-admin-blocks.php:495
-#: includes/admin/class-charitable-admin-blocks.php:500
-#: includes/admin/class-charitable-admin-blocks.php:505
-#: includes/admin/class-charitable-admin-blocks.php:510
 #: includes/admin/class-charitable-admin-blocks.php:515
+#: includes/admin/class-charitable-admin-blocks.php:520
+#: includes/admin/class-charitable-admin-blocks.php:525
+#: includes/admin/class-charitable-admin-blocks.php:530
+#: includes/admin/class-charitable-admin-blocks.php:535
+#: includes/admin/class-charitable-admin-blocks.php:540
+#: includes/admin/class-charitable-admin-blocks.php:545
+#: includes/admin/class-charitable-admin-blocks.php:550
 msgid "Check out our docs."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-blocks.php:483
+#: includes/admin/class-charitable-admin-blocks.php:518
 msgid "You can read more about the campaigns shortcode and block on our site."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-blocks.php:488
+#: includes/admin/class-charitable-admin-blocks.php:523
 msgid "You can read more about the donations shortcode and block on our site."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-blocks.php:493
+#: includes/admin/class-charitable-admin-blocks.php:528
 msgid "You can read more about the shortcode and block for the donation button on our site."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-blocks.php:498
+#: includes/admin/class-charitable-admin-blocks.php:533
 msgid "You can read more about the shortcode and block for the progress bar on our site."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-blocks.php:503
+#: includes/admin/class-charitable-admin-blocks.php:538
 msgid "You can read more about the stats shortcode and the block on our site."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-blocks.php:508
+#: includes/admin/class-charitable-admin-blocks.php:543
 msgid "You can read more about this block along with other related blocks and shortcodes on our site."
 msgstr ""
 
-#: includes/admin/class-charitable-admin-blocks.php:513
+#: includes/admin/class-charitable-admin-blocks.php:548
 msgid "You can read more about the donors block and donors shortcode on our site."
 msgstr ""
 
@@ -9350,14 +9418,17 @@ msgid "No plugin installed."
 msgstr ""
 
 #: includes/admin/class-charitable-admin-connect.php:569
+#, php-format
 msgid "Download URL missing. Please visit the %1$sAddons page%2$s to download manually."
 msgstr ""
 
 #: includes/admin/class-charitable-admin-connect.php:589
+#, php-format
 msgid "Unable to access file system. Please visit the %1$sAddons page%2$s to download manually, or see our %3$sinstallation guide%4$s."
 msgstr ""
 
 #: includes/admin/class-charitable-admin-connect.php:615
+#, php-format
 msgid "Installation method not available. Please visit the %1$sAddons page%2$s to download manually."
 msgstr ""
 
@@ -9378,6 +9449,7 @@ msgid "Charitable Pro downloaded successfully! Activate now?"
 msgstr ""
 
 #: includes/admin/class-charitable-admin-connect.php:652
+#, php-format
 msgid "Download failed. Please visit the %1$sAddons page%2$s to try again, or see our %3$sinstallation guide%4$s."
 msgstr ""
 
@@ -9478,6 +9550,7 @@ msgstr ""
 #. translators: Suggestion on completion of checklist on checklist page.
 #: includes/admin/class-charitable-admin-getting-started.php:295
 #: includes/admin/views/checklist/checklist.php:221
+#, php-format
 msgid "<strong>Stripe not available in your country?</strong> Charitable works with payment gateways like PayPal, Authorize.net, Braintree, Payrexx, PayUMoney, GoCardless, and others. <a target=\"_blank\" href=\"%s\">View additional payment options</a> available with PRO extensions."
 msgstr ""
 
@@ -9658,6 +9731,7 @@ msgstr ""
 
 #. translators: %s: settings URL
 #: includes/admin/class-charitable-admin-notices.php:539
+#, php-format
 msgid "<strong>PayPal Commerce: Action Required.</strong> Donations are currently blocked because your Account Type has not been set. <a href=\"%s\">Choose Nonprofit or Business</a> on the PayPal Commerce settings page to resume accepting donations."
 msgstr ""
 
@@ -9758,6 +9832,7 @@ msgstr ""
 
 #. translators: %s: URL to upgrade to Pro
 #: includes/admin/class-charitable-admin-pointers.php:133
+#, php-format
 msgid "Maintain detailed donor profiles, monitor donation histories, and streamline your communication with supporters. Consider upgrading to %s."
 msgstr ""
 
@@ -9820,26 +9895,31 @@ msgstr ""
 
 #. Translators: %s: link.
 #: includes/admin/class-charitable-admin.php:861
+#, php-format
 msgid "You appear to be using a code snippet plugin. Please <a href='%s' target='_blank'>review best practices</a> when using snippets to avoid problems when upgrading or deactivating Charitable."
 msgstr ""
 
 #. translators: %s: link
 #: includes/admin/class-charitable-admin.php:895
+#, php-format
 msgid "Charitable 1.5 is packed with new features and improvements. <a href='%s' target='_blank'>Find out what's new</a>."
 msgstr ""
 
 #. translators: %s: link
 #: includes/admin/class-charitable-admin.php:900
+#, php-format
 msgid "Charitable 1.6 introduces important new user privacy features and other improvements. <a href=\"%s\" target=\"_blank\">Find out what's new</a>."
 msgstr ""
 
 #. Translators: 1 - Opening HTML bold tag, 2 - Closing HTML bold tag, 3 - Opening HTML link tag, 4 - Closing HTML link tag.
 #: includes/admin/class-charitable-admin.php:932
+#, php-format
 msgid "Your site is running an %1$soutdated version%2$s of PHP that is no longer supported and may cause issues with %3$s. Please contact your web hosting provider to update your PHP version or switch to a %4$srecommended WordPress hosting company%5$s."
 msgstr ""
 
 #. Translators: 1 - Opening HTML bold tag, 2 - Closing HTML bold tag, 3 - The PHP version, 4 - The current year, 5 - The short plugin name ("Charitable"), 6 - Opening HTML link tag, 7 - Closing HTML link tag.
 #: includes/admin/class-charitable-admin.php:955
+#, php-format
 msgid "%1$sNote:%2$s Support for PHP %3$s will be discontinued in %4$s. After this, if no further action is taken, %5$s functionality will be disabled. %6$sRead more for additional information.%7$s"
 msgstr ""
 
@@ -9891,16 +9971,19 @@ msgstr ""
 
 #. translators: %s: number of campaigns
 #: includes/admin/class-charitable-external-banner.php:443
+#, php-format
 msgid "You have <strong>%s campaigns</strong> in GiveWP. Import them into Charitable in just a few clicks."
 msgstr ""
 
 #. translators: %s: number of donations
 #: includes/admin/class-charitable-external-banner.php:452
+#, php-format
 msgid "You have <strong>%s donations</strong> in GiveWP. Import them into Charitable in just a few clicks."
 msgstr ""
 
 #. translators: %s: number of donors
 #: includes/admin/class-charitable-external-banner.php:461
+#, php-format
 msgid "You have <strong>%s donors</strong> in GiveWP. Bring them into Charitable and keep your donor relationships intact."
 msgstr ""
 
@@ -10044,6 +10127,7 @@ msgstr ""
 #. translators: %d: number of donations
 #: includes/admin/dashboard-widgets/donations-widget.php:45
 #: includes/admin/views/dashboard-widgets/donations-widget.php:47
+#, php-format
 msgid "%d donation <span class=\"time-period\">today</span>"
 msgid_plural "%d donations <span class=\"time-period\">today</span>"
 msgstr[0] ""
@@ -10052,6 +10136,7 @@ msgstr[1] ""
 #. translators: %d: number of donations
 #: includes/admin/dashboard-widgets/donations-widget.php:59
 #: includes/admin/views/dashboard-widgets/donations-widget.php:68
+#, php-format
 msgid "%d donation <span class=\"time-period\">this month</span>"
 msgid_plural "%d donations <span class=\"time-period\">this month</span>"
 msgstr[0] ""
@@ -10060,6 +10145,7 @@ msgstr[1] ""
 #. translators: %d: number of donations
 #: includes/admin/dashboard-widgets/donations-widget.php:73
 #: includes/admin/views/dashboard-widgets/donations-widget.php:89
+#, php-format
 msgid "%d donation <span class=\"time-period\">last month</span>"
 msgid_plural "%d donations <span class=\"time-period\">last month</span>"
 msgstr[0] ""
@@ -10068,6 +10154,7 @@ msgstr[1] ""
 #. translators: %d: number of donations
 #: includes/admin/dashboard-widgets/donations-widget.php:87
 #: includes/admin/views/dashboard-widgets/donations-widget.php:110
+#, php-format
 msgid "%d donation <span class=\"time-period\">this year</span>"
 msgid_plural "%d donations <span class=\"time-period\">this year</span>"
 msgstr[0] ""
@@ -10212,6 +10299,7 @@ msgstr ""
 
 #. translators: %s: extension title
 #: includes/admin/dashboard/class-charitable-dashboard-legacy.php:741
+#, php-format
 msgctxt "extension banner"
 msgid "%s banner"
 msgstr ""
@@ -10260,6 +10348,7 @@ msgstr ""
 
 #. translators: %s: currency code
 #: includes/admin/dashboard/class-charitable-dashboard-legacy.php:1113
+#, php-format
 msgid "Collect donations in %s"
 msgstr ""
 
@@ -10355,6 +10444,7 @@ msgstr ""
 
 #. translators: 1: current notification number, 2: total notifications
 #: includes/admin/dashboard/class-charitable-dashboard.php:304
+#, php-format
 msgid "%1$d of %2$d"
 msgstr ""
 
@@ -10656,12 +10746,14 @@ msgstr ""
 
 #. translators: %s: current installed version number
 #: includes/admin/dashboard/class-charitable-dashboard.php:3096
+#, php-format
 msgid "You're running the latest version (<strong>%s</strong>)."
 msgstr ""
 
 #. translators: %d: number of versions behind
 #: includes/admin/dashboard/class-charitable-dashboard.php:3113
 #: includes/admin/dashboard/class-charitable-dashboard.php:3142
+#, php-format
 msgid "%d version"
 msgid_plural "%d versions"
 msgstr[0] ""
@@ -10669,6 +10761,7 @@ msgstr[1] ""
 
 #. translators: 1: versions-behind label (e.g. "2 versions"), 2: plugins page URL
 #: includes/admin/dashboard/class-charitable-dashboard.php:3119
+#, php-format
 msgid "You are behind <strong>%1$s</strong>. <a href=\"%2$s\">Update now</a>"
 msgstr ""
 
@@ -10678,6 +10771,7 @@ msgstr ""
 
 #. translators: 1: versions-behind label (e.g. "4 versions"), 2: "Update now" link
 #: includes/admin/dashboard/class-charitable-dashboard.php:3147
+#, php-format
 msgid "You are currently %1$s behind. Please upgrade Charitable to take advantage of the features and addons below. %2$s"
 msgstr ""
 
@@ -10747,6 +10841,7 @@ msgstr ""
 
 #. translators: %s: number of years
 #: includes/admin/dashboard/class-charitable-dashboard.php:3680
+#, php-format
 msgctxt "relative time"
 msgid "%s year ago"
 msgid_plural "%s years ago"
@@ -10761,6 +10856,7 @@ msgstr ""
 
 #. translators: %s: number of months
 #: includes/admin/dashboard/class-charitable-dashboard.php:3683
+#, php-format
 msgctxt "relative time"
 msgid "%s month ago"
 msgid_plural "%s months ago"
@@ -10775,6 +10871,7 @@ msgstr ""
 
 #. translators: %s: number of weeks
 #: includes/admin/dashboard/class-charitable-dashboard.php:3686
+#, php-format
 msgctxt "relative time"
 msgid "%s week ago"
 msgid_plural "%s weeks ago"
@@ -10789,6 +10886,7 @@ msgstr ""
 
 #. translators: %s: number of days
 #: includes/admin/dashboard/class-charitable-dashboard.php:3689
+#, php-format
 msgctxt "relative time"
 msgid "%s day ago"
 msgid_plural "%s days ago"
@@ -10803,6 +10901,7 @@ msgstr ""
 
 #. translators: %s: number of hours
 #: includes/admin/dashboard/class-charitable-dashboard.php:3692
+#, php-format
 msgctxt "relative time"
 msgid "%s hour ago"
 msgid_plural "%s hours ago"
@@ -10817,6 +10916,7 @@ msgstr ""
 
 #. translators: %s: number of minutes
 #: includes/admin/dashboard/class-charitable-dashboard.php:3695
+#, php-format
 msgctxt "relative time"
 msgid "%s minute ago"
 msgid_plural "%s minutes ago"
@@ -10897,24 +10997,28 @@ msgstr ""
 
 #. translators: %1$d is the donation ID, %2$s is the donor name
 #: includes/admin/donations/class-charitable-donation-list-table.php:126
+#, php-format
 msgctxt "number symbol"
 msgid "#%1$d by %2$s"
 msgstr ""
 
 #. translators: %s is the donor email
 #: includes/admin/donations/class-charitable-donation-list-table.php:133
+#, php-format
 msgctxt "email"
 msgid "%1$s"
 msgstr ""
 
 #. translators: %d is the donation ID
 #: includes/admin/donations/class-charitable-donation-list-table.php:140
+#, php-format
 msgctxt "number symbol"
 msgid "#%d"
 msgstr ""
 
 #. translators: %s is the gateway label.
 #: includes/admin/donations/class-charitable-donation-list-table.php:169
+#, php-format
 msgctxt "gateway label in donations"
 msgid "via %s"
 msgstr ""
@@ -10938,12 +11042,14 @@ msgstr ""
 
 #. translators: %s is the status label
 #: includes/admin/donations/class-charitable-donation-list-table.php:436
+#, php-format
 msgctxt "set donation status to x"
 msgid "Set to %s"
 msgstr ""
 
 #. translators: %s is the number of orders.
 #: includes/admin/donations/class-charitable-donation-list-table.php:539
+#, php-format
 msgid "%s donation status changed."
 msgid_plural "%s donation statuses changed."
 msgstr[0] ""
@@ -10953,6 +11059,7 @@ msgstr[1] ""
 #. translators: %s: link
 #: includes/admin/donations/class-charitable-donation-list-table.php:561
 #: includes/admin/donations/class-charitable-donation-meta-boxes.php:454
+#, php-format
 msgid "Donation updated. <a href=\"%s\">View Donation</a>"
 msgstr ""
 
@@ -10965,6 +11072,7 @@ msgstr ""
 #. translators: %s: revision title
 #: includes/admin/donations/class-charitable-donation-list-table.php:566
 #: includes/admin/donations/class-charitable-donation-meta-boxes.php:464
+#, php-format
 msgid "Donation restored to revision from %s"
 msgstr ""
 
@@ -10972,6 +11080,7 @@ msgstr ""
 #. translators: %s: link
 #: includes/admin/donations/class-charitable-donation-list-table.php:568
 #: includes/admin/donations/class-charitable-donation-meta-boxes.php:470
+#, php-format
 msgid "Donation published. <a href=\"%s\">View Donation</a>"
 msgstr ""
 
@@ -10984,6 +11093,7 @@ msgstr ""
 #. translators: %s: link
 #: includes/admin/donations/class-charitable-donation-list-table.php:572
 #: includes/admin/donations/class-charitable-donation-meta-boxes.php:476
+#, php-format
 msgid "Donation submitted. <a target=\"_blank\" href=\"%s\">Preview Donation</a>"
 msgstr ""
 
@@ -10991,6 +11101,7 @@ msgstr ""
 #. translators: %1$s: date and time; %2$s: link
 #: includes/admin/donations/class-charitable-donation-list-table.php:577
 #: includes/admin/donations/class-charitable-donation-meta-boxes.php:481
+#, php-format
 msgid "Donation scheduled for: <strong>%1$s</strong>. <a target=\"_blank\" href=\"%2$s\">Preview Donation</a>"
 msgstr ""
 
@@ -10998,6 +11109,7 @@ msgstr ""
 #. translators: %s: link
 #: includes/admin/donations/class-charitable-donation-list-table.php:583
 #: includes/admin/donations/class-charitable-donation-meta-boxes.php:487
+#, php-format
 msgid "Donation draft updated. <a target=\"_blank\" href=\"%s\">Preview Donation</a>"
 msgstr ""
 
@@ -11011,6 +11123,7 @@ msgstr ""
 
 #. translators: %d: number of items.
 #: includes/admin/donations/class-charitable-donation-list-table.php:605
+#, php-format
 msgid "%d donation updated."
 msgid_plural "%d donations updated."
 msgstr[0] ""
@@ -11022,6 +11135,7 @@ msgstr ""
 
 #. translators: %d: number of items.
 #: includes/admin/donations/class-charitable-donation-list-table.php:608
+#, php-format
 msgid "%s donation not updated, somebody is editing it."
 msgid_plural "%s donations not updated, somebody is editing them."
 msgstr[0] ""
@@ -11029,6 +11143,7 @@ msgstr[1] ""
 
 #. translators: %s: number of items.
 #: includes/admin/donations/class-charitable-donation-list-table.php:610
+#, php-format
 msgid "%s donation permanently deleted."
 msgid_plural "%s donations permanently deleted."
 msgstr[0] ""
@@ -11036,6 +11151,7 @@ msgstr[1] ""
 
 #. translators: %s: number of items.
 #: includes/admin/donations/class-charitable-donation-list-table.php:612
+#, php-format
 msgid "%s donation moved to the Trash."
 msgid_plural "%s donations moved to the Trash."
 msgstr[0] ""
@@ -11043,6 +11159,7 @@ msgstr[1] ""
 
 #. translators: %s: number of items.
 #: includes/admin/donations/class-charitable-donation-list-table.php:614
+#, php-format
 msgid "%s donation restored from the Trash."
 msgid_plural "%s donations restored from the Trash."
 msgstr[0] ""
@@ -11066,6 +11183,7 @@ msgstr ""
 
 #. translators: 1: bolded "GiveWP", 2: number of donations.
 #: includes/admin/donations/class-charitable-donation-list-table.php:986
+#, php-format
 msgid "We detected %1$s with %2$s donations installed on your site. Use our import tool to import them into Charitable."
 msgstr ""
 
@@ -11076,6 +11194,7 @@ msgstr ""
 
 #. translators: %s: bolded "GiveWP".
 #: includes/admin/donations/class-charitable-donation-list-table.php:1004
+#, php-format
 msgid "Did you know you can import %s donations, campaigns, and donors right into Charitable?"
 msgstr ""
 
@@ -11139,6 +11258,7 @@ msgstr ""
 
 #. translators: %s: gateway name
 #: includes/admin/donations/class-charitable-donation-meta-boxes.php:373
+#, php-format
 msgid "Refund in %s automatically."
 msgstr ""
 
@@ -11198,6 +11318,7 @@ msgstr ""
 
 #. translators: %1$s: User profile URL, %2$s: User display name
 #: includes/admin/forms/class-charitable-admin-donation-form.php:577
+#, php-format
 msgid "Donation updated manually by <a href=\"%1$s\">%2$s</a>."
 msgstr ""
 
@@ -11226,6 +11347,7 @@ msgstr ""
 
 #. translators: Placeholder for the missing plugin name.
 #: includes/admin/growth-tools/class-charitable-growth-tools.php:314
+#, php-format
 msgid "%1$s We suggest %2$s."
 msgstr ""
 
@@ -11267,6 +11389,7 @@ msgid "Starting migration..."
 msgstr ""
 
 #: includes/admin/import-items/class-charitable-givewp-importer.php:97
+#, php-format
 msgid "Importing %1$s... (%2$d/%3$d)"
 msgstr ""
 
@@ -11353,6 +11476,7 @@ msgstr ""
 
 #. translators: %d is the number of donations imported.
 #: includes/admin/import-items/class-charitable-import-items.php:444
+#, php-format
 msgid "%d donations imported."
 msgstr ""
 
@@ -11379,6 +11503,7 @@ msgstr ""
 
 #. translators: %1$d: number of donations imported. %2$d: number of rows skipped.
 #: includes/admin/import-items/class-charitable-import-items.php:679
+#, php-format
 msgid "%1$d donations imported from GiveWP CSV. %2$d rows skipped."
 msgstr ""
 
@@ -11388,6 +11513,7 @@ msgstr ""
 
 #. translators: %1$d: number of donations imported. %2$d: number of rows skipped.
 #: includes/admin/import-items/class-charitable-import-items.php:813
+#, php-format
 msgid "%1$d donations imported from GiveButter CSV. %2$d rows skipped."
 msgstr ""
 
@@ -11418,6 +11544,7 @@ msgstr ""
 
 #. translators: %d: number of failed donations
 #: includes/admin/notifications/class-charitable-notification-cron.php:192
+#, php-format
 msgid "%d failed donation in the last 24 hours"
 msgid_plural "%d failed donations in the last 24 hours"
 msgstr[0] ""
@@ -11517,6 +11644,7 @@ msgstr ""
 
 #. translators: %s: campaign title
 #: includes/admin/notifications/class-charitable-notification-triggers.php:98
+#, php-format
 msgid "\"%s\" is now live"
 msgstr ""
 
@@ -11525,15 +11653,18 @@ msgid "Your campaign is published and accepting donations."
 msgstr ""
 
 #: includes/admin/notifications/class-charitable-notification-triggers.php:130
+#, php-format
 msgid "\"%s\" ended — goal met!"
 msgstr ""
 
 #: includes/admin/notifications/class-charitable-notification-triggers.php:131
+#, php-format
 msgid "\"%s\" has ended"
 msgstr ""
 
 #. translators: %s: amount raised (wrapped in stat span)
 #: includes/admin/notifications/class-charitable-notification-triggers.php:136
+#, php-format
 msgid "Total raised: %s."
 msgstr ""
 
@@ -11547,11 +11678,13 @@ msgstr ""
 
 #. translators: %d: donor count
 #: includes/admin/notifications/class-charitable-notification-triggers.php:188
+#, php-format
 msgid "You've reached %d unique donors!"
 msgstr ""
 
 #. translators: %s: donor count (wrapped in stat span)
 #: includes/admin/notifications/class-charitable-notification-triggers.php:193
+#, php-format
 msgid "%s real donors have contributed to your campaigns."
 msgstr ""
 
@@ -11565,6 +11698,7 @@ msgstr ""
 
 #. translators: %s: formatted amount (wrapped in stat span)
 #: includes/admin/notifications/class-charitable-notification-triggers.php:240
+#, php-format
 msgid "A new record: %s in a single donation."
 msgstr ""
 
@@ -11577,11 +11711,13 @@ msgstr ""
 
 #. translators: %s: campaign title
 #: includes/admin/notifications/class-charitable-notification-triggers.php:298
+#, php-format
 msgid "\"%s\" has reached its goal!"
 msgstr ""
 
 #. translators: %s: goal amount (wrapped in stat span)
 #: includes/admin/notifications/class-charitable-notification-triggers.php:303
+#, php-format
 msgid "Your campaign hit its %s target."
 msgstr ""
 
@@ -11766,6 +11902,7 @@ msgstr ""
 
 #. translators: %1$s: List of requested features
 #: includes/admin/onboarding/class-charitable-setup.php:1958
+#, php-format
 msgid "In order to install and activate some of the features you requested %1$s you need to activate your PRO license after setup is complete."
 msgstr ""
 
@@ -11950,7 +12087,7 @@ msgid "Dedicated guides and resources will be coming soon."
 msgstr ""
 
 #: includes/admin/reports/class-charitable-export-campaigns.php:225
-#: includes/admin/reports/class-charitable-export-donations.php:165
+#: includes/admin/reports/class-charitable-export-donations.php:180
 #: includes/fields/default-fields/campaign-fields.php:33
 msgid "Campaign ID"
 msgstr ""
@@ -11969,12 +12106,12 @@ msgstr ""
 msgid "Campaign Creator Email"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-export-donations.php:164
+#: includes/admin/reports/class-charitable-export-donations.php:179
 #: includes/fields/default-fields/donation-fields.php:33
 msgid "Donation ID"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-export-donations.php:167
+#: includes/admin/reports/class-charitable-export-donations.php:182
 #: includes/admin/reports/class-charitable-reports-download.php:575
 #: includes/admin/reports/class-charitable-reports-download.php:670
 #: includes/fields/default-fields/donation-fields.php:45
@@ -11982,7 +12119,7 @@ msgstr ""
 msgid "First Name"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-export-donations.php:168
+#: includes/admin/reports/class-charitable-export-donations.php:183
 #: includes/admin/reports/class-charitable-reports-download.php:576
 #: includes/admin/reports/class-charitable-reports-download.php:671
 #: includes/fields/default-fields/donation-fields.php:65
@@ -11990,83 +12127,83 @@ msgstr ""
 msgid "Last Name"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-export-donations.php:170
+#: includes/admin/reports/class-charitable-export-donations.php:185
 #: includes/fields/default-fields/donation-fields.php:117
 #: includes/fields/default-fields/donation-fields.php:141
 #: includes/forms/class-charitable-profile-form.php:220
 msgid "Address"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-export-donations.php:171
+#: includes/admin/reports/class-charitable-export-donations.php:186
 #: includes/fields/default-fields/donation-fields.php:154
 #: includes/forms/class-charitable-profile-form.php:227
 msgid "Address 2"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-export-donations.php:172
+#: includes/admin/reports/class-charitable-export-donations.php:187
 #: includes/fields/default-fields/donation-fields.php:167
 #: includes/forms/class-charitable-profile-form.php:234
 msgid "City"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-export-donations.php:173
+#: includes/admin/reports/class-charitable-export-donations.php:188
 #: includes/fields/default-fields/donation-fields.php:180
 #: includes/forms/class-charitable-profile-form.php:241
 msgid "State"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-export-donations.php:174
+#: includes/admin/reports/class-charitable-export-donations.php:189
 #: includes/fields/default-fields/donation-fields.php:193
 msgid "Postcode"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-export-donations.php:175
+#: includes/admin/reports/class-charitable-export-donations.php:190
 #: includes/fields/default-fields/donation-fields.php:206
 #: includes/forms/class-charitable-profile-form.php:255
 msgid "Country"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-export-donations.php:176
+#: includes/admin/reports/class-charitable-export-donations.php:191
 #: includes/fields/default-fields/donation-fields.php:222
 msgid "Phone Number"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-export-donations.php:177
+#: includes/admin/reports/class-charitable-export-donations.php:192
 msgid "Address Formatted"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-export-donations.php:178
+#: includes/admin/reports/class-charitable-export-donations.php:193
 #: includes/admin/reports/class-charitable-reports.php:1187
 #: includes/fields/default-fields/donation-fields.php:284
 msgid "Donation Amount"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-export-donations.php:179
+#: includes/admin/reports/class-charitable-export-donations.php:194
 #: includes/fields/default-fields/donation-fields.php:307
 msgid "Date of Donation"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-export-donations.php:180
+#: includes/admin/reports/class-charitable-export-donations.php:195
 #: includes/fields/default-fields/donation-fields.php:329
 msgid "Time of Donation"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-export-donations.php:181
+#: includes/admin/reports/class-charitable-export-donations.php:196
 #: includes/admin/tools/class-charitable-tools-misc.php:111
 #: includes/fields/default-fields/donation-fields.php:339
 #: includes/fields/default-fields/donation-fields.php:355
 msgid "Donation Status"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-export-donations.php:182
+#: includes/admin/reports/class-charitable-export-donations.php:197
 msgid "Donation Gateway"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-export-donations.php:183
+#: includes/admin/reports/class-charitable-export-donations.php:198
 msgid "Made in Test Mode"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-export-donations.php:184
+#: includes/admin/reports/class-charitable-export-donations.php:199
 #: includes/admin/views/metaboxes/donation/donation-overview.php:95
 #: includes/fields/default-fields/donation-fields.php:442
 msgid "Contact Consent"
@@ -12318,6 +12455,7 @@ msgstr ""
 
 #. translators: %d: total number of records.
 #: includes/admin/reports/class-charitable-reports.php:1677
+#, php-format
 msgid "Total: %d"
 msgstr ""
 
@@ -12402,6 +12540,7 @@ msgstr ""
 
 #. translators: %s: link to security settings
 #: includes/admin/security/class-charitable-security-settings.php:259
+#, php-format
 msgid "Charitable recommends enabling CAPTCHA to protect your donation forms against bots and spam. <a href=\"%s\">Configure security settings</a>."
 msgstr ""
 
@@ -12508,6 +12647,7 @@ msgstr ""
 
 #. translators: %1$s: score, %2$s: threshold
 #: includes/admin/security/modules/captcha/class-charitable-captcha-google-recaptcha-v3.php:507
+#, php-format
 msgid "Captcha score (%1$s) is below the required threshold (%2$s)."
 msgstr ""
 
@@ -12621,6 +12761,7 @@ msgstr ""
 
 #. translators: %1$s: URL to the documentation.
 #: includes/admin/settings/class-charitable-advanced-settings.php:113
+#, php-format
 msgid "Determines ability for admin users to add new legacy campaigns. <a href=\"%1$s\">Learn More</a>."
 msgstr ""
 
@@ -12630,6 +12771,7 @@ msgstr ""
 
 #. translators: %1$s: URL to the documentation.
 #: includes/admin/settings/class-charitable-advanced-settings.php:121
+#, php-format
 msgid "Allows us to better help you as we know which WordPress configurations, themes and plugins we should test. <a href=\"%1$s\">Learn More</a>."
 msgstr ""
 
@@ -12920,6 +13062,7 @@ msgstr ""
 
 #. translators: %s - charitable.com upgrade URL.
 #: includes/admin/settings/class-charitable-licenses-settings.php:614
+#, php-format
 msgid "To unlock more features consider <strong><a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"charitable-upgrade-modal\">upgrading to PRO</a></strong>."
 msgstr ""
 
@@ -12966,11 +13109,13 @@ msgstr ""
 
 #. translators: %s - charitable.com upgrade URL.
 #: includes/admin/settings/class-charitable-licenses-settings.php:697
+#, php-format
 msgid "Your license may be expiring soon. Please renew to continue receiving updates and support. <a target=\"_blank\" href=\"%s\">Learn more</a>."
 msgstr ""
 
 #. translators: %s - charitable.com upgrade URL.
 #: includes/admin/settings/class-charitable-licenses-settings.php:716
+#, php-format
 msgid "It appears your license may have expired. Please renew to continue receiving updates and support. <a target=\"_blank\" href=\"%s\">Learn more</a>."
 msgstr ""
 
@@ -13000,6 +13145,7 @@ msgstr ""
 
 #. translators: %s - charitable.com upgrade URL.
 #: includes/admin/settings/class-charitable-licenses-settings.php:818
+#, php-format
 msgid "You're using <strong>Charitable</strong> with one or more <a href=\"%s\">activated legacy licenses</a>. Enjoy! 🙂"
 msgstr ""
 
@@ -13022,6 +13168,7 @@ msgstr ""
 
 #. translators: %1$s: HTML strong tag. %2$s: HTML closing strong tag. %1$s: HTML break tag.
 #: includes/admin/settings/class-charitable-privacy-settings.php:99
+#, php-format
 msgid "Prevent personal data from being erased for donations made within a certain amount of time.%3$sChoose %1$sNone%2$s to allow the personal data of any donation to be erased.%3$sChoose %1$sForever%2$s to prevent any personal data from being erased from donations, regardless of how long ago they were made."
 msgstr ""
 
@@ -13118,6 +13265,7 @@ msgstr ""
 
 #. translators: %1$s: HTML code tag. %2$s: HTML closing code tag. %3$s: HTML anchor tag. %4$s: HTML closing anchor tag.
 #: includes/admin/settings/class-charitable-privacy-settings.php:168
+#, php-format
 msgid "Privacy policy information to be seen when individuals donate, register an account, or manage their profile. Use <code>[privacy_policy]</code> to link to the page assigned in <a href=\"%s\">general settings</a>."
 msgstr ""
 
@@ -13135,6 +13283,7 @@ msgstr ""
 
 #. translators: %1$s: HTML code tag. %2$s: HTML closing code tag. %3$s: HTML anchor tag. %4$s: HTML closing anchor tag.
 #: includes/admin/settings/class-charitable-privacy-settings.php:186
+#, php-format
 msgid "Terms and conditions statement to display on donation forms. Use <code>[terms]</code> to link to the page assigned in <a href=\"%s\">general settings</a>."
 msgstr ""
 
@@ -13159,6 +13308,7 @@ msgstr ""
 
 #. translators: %s: comma-separated list of gateway names
 #: includes/admin/settings/class-charitable-settings.php:397
+#, php-format
 msgid "Some active payment gateways <strong>(including %s)</strong> might have reset their connections due to an update in the test mode. Please check your active payment gateways to ensure they are still connected."
 msgstr ""
 
@@ -13178,6 +13328,7 @@ msgstr ""
 
 #. translators: %s: mode (test or live)
 #: includes/admin/settings/class-charitable-settings.php:409
+#, php-format
 msgid "Square payment gateway is enabled but not connected in %s mode. Please connect your Square account to continue processing payments."
 msgstr ""
 
@@ -13187,6 +13338,7 @@ msgstr ""
 
 #. translators: %s: Documentation URL
 #: includes/admin/settings/class-charitable-settings.php:1011
+#, php-format
 msgid "Please add your license and upgrade to Charitable Pro for more advanced security features. Please %s on how to download Charitable Pro."
 msgstr ""
 
@@ -13518,6 +13670,7 @@ msgstr ""
 
 #. translators: %1$s: HTML strong tag. %2$s: HTML closing strong tag. %3$s: HTML break tag.
 #: includes/admin/settings/class-charitable-tools-settings.php:109
+#, php-format
 msgid "Imports a campaign JSON file into this website. It will not overwrite any previous campaigns, and it will set to \"inactive\" with a new campaign ID.%3$s %1$sCampaign tools do not include donations or campaign creators%2$s."
 msgstr ""
 
@@ -13527,6 +13680,7 @@ msgstr ""
 
 #. translators: %1$s: HTML strong tag. %2$s: HTML closing strong tag. %3$s: HTML break tag.
 #: includes/admin/settings/class-charitable-tools-settings.php:128
+#, php-format
 msgid "Imports a donation JSON file into the selected campaign. It will not overwrite any previous donations or prevent duplicates.%3$s %1$sDonation tools do not include users - if a donor's email address is not found, the donation will not be assigned to a user%2$s."
 msgstr ""
 
@@ -13565,6 +13719,7 @@ msgstr ""
 
 #. translators: %1$s: opening anchor tag. %2$s: closing anchor tag.
 #: includes/admin/settings/class-charitable-tools-settings.php:213
+#, php-format
 msgid "%1$sUpgrade to Charitable Pro%2$s for full GiveWP migration capabilities including recurring donations, standalone donor imports, rollback support, and import history."
 msgstr ""
 
@@ -13606,11 +13761,13 @@ msgstr ""
 
 #. translators: %d: number of GiveWP forms found.
 #: includes/admin/settings/class-charitable-tools-settings.php:273
+#, php-format
 msgid "Campaigns (%d GiveWP forms)"
 msgstr ""
 
 #. translators: %d: number of GiveWP donations found.
 #: includes/admin/settings/class-charitable-tools-settings.php:277
+#, php-format
 msgid "Donations (%d)"
 msgstr ""
 
@@ -13695,6 +13852,7 @@ msgstr ""
 
 #. translators: %1$s: HTML strong tag. %2$s: HTML closing strong tag. %1$s: HTML break tag.
 #: includes/admin/settings/class-charitable-tools-settings.php:404
+#, php-format
 msgid "Campaign exports files can be used to create a backup of your campaigns or to import campaigns into another site with Charitable installed.%3$s %1$sCampaign exports do not include donations or campaign creators%2$s."
 msgstr ""
 
@@ -13709,40 +13867,43 @@ msgstr ""
 
 #. translators: %1$s: HTML strong tag. %2$s: HTML closing strong tag. %1$s: HTML break tag.
 #: includes/admin/settings/class-charitable-tools-settings.php:424
+#, php-format
 msgid "Donation exports files can be used to create a backup of your donations or to import donations if you are migrating campaigns to another site with Charitable installed. %3$s All donation types (paid, refunded, pending) will be exported. %1$sRecurring donations are not included%2$s."
 msgstr ""
 
-#: includes/admin/site-analysis/class-charitable-site-analysis.php:76
+#: includes/admin/site-analysis/class-charitable-site-analysis.php:91
 msgid "Site Analysis"
 msgstr ""
 
 #. translators: %s: human-readable time difference, e.g. "2 hours".
-#: includes/admin/site-analysis/class-charitable-site-analysis.php:121
+#: includes/admin/site-analysis/class-charitable-site-analysis.php:146
+#, php-format
 msgid "Last analyzed %s ago"
 msgstr ""
 
-#: includes/admin/site-analysis/class-charitable-site-analysis.php:179
+#: includes/admin/site-analysis/class-charitable-site-analysis.php:207
 msgid "Analyzing your site..."
 msgstr ""
 
-#: includes/admin/site-analysis/class-charitable-site-analysis.php:180
+#: includes/admin/site-analysis/class-charitable-site-analysis.php:208
 msgid "Sorry, the analysis could not be completed. Please try again."
 msgstr ""
 
-#: includes/admin/site-analysis/class-charitable-site-analysis.php:181
+#: includes/admin/site-analysis/class-charitable-site-analysis.php:209
 msgid "Refresh"
 msgstr ""
 
 #. translators: %s: human-readable time until refresh is available, e.g. "20 hours".
-#: includes/admin/site-analysis/class-charitable-site-analysis.php:183
+#: includes/admin/site-analysis/class-charitable-site-analysis.php:211
+#, php-format
 msgid "You can refresh again in %s"
 msgstr ""
 
-#: includes/admin/site-analysis/class-charitable-site-analysis.php:184
+#: includes/admin/site-analysis/class-charitable-site-analysis.php:212
 msgid "You can refresh again tomorrow"
 msgstr ""
 
-#: includes/admin/site-analysis/class-charitable-site-analysis.php:193
+#: includes/admin/site-analysis/class-charitable-site-analysis.php:221
 #: includes/logger/class-charitable-log.php:313
 #: includes/logger/class-charitable-log.php:361
 #: includes/logger/class-charitable-log.php:380
@@ -13751,13 +13912,15 @@ msgstr ""
 msgid "Permission denied."
 msgstr ""
 
-#: includes/admin/site-analysis/class-charitable-site-analysis.php:220
-#: includes/admin/site-analysis/class-charitable-site-analysis.php:235
-msgid "The analysis service is unavailable right now. Please try again."
+#: includes/admin/site-analysis/class-charitable-site-analysis.php:262
+#: includes/admin/site-analysis/class-charitable-site-analysis.php:276
+#: includes/admin/site-analysis/class-charitable-site-analysis.php:282
+msgid "You've reached the analysis limit for now. Please try again later."
 msgstr ""
 
-#: includes/admin/site-analysis/class-charitable-site-analysis.php:232
-msgid "You've reached the analysis limit for now. Please try again later."
+#: includes/admin/site-analysis/class-charitable-site-analysis.php:265
+#: includes/admin/site-analysis/class-charitable-site-analysis.php:285
+msgid "The analysis service is unavailable right now. Please try again."
 msgstr ""
 
 #: includes/admin/splash/class-charitable-admin-splash.php:246
@@ -13996,6 +14159,7 @@ msgstr ""
 
 #. translators: %1$d - number of minutes, %2$s - singular or plural form of 'minute'.
 #: includes/admin/templates/checklist-widget.php:57
+#, php-format
 msgid "Complete the <b>Charitable Checklist</b> and get up and running within %1$s."
 msgstr ""
 
@@ -14031,11 +14195,13 @@ msgstr ""
 
 #. translators: %1$d - number of minutes, %2$s - singular or plural form of 'minute'.
 #: includes/admin/templates/checklist-widget.php:102
+#, php-format
 msgid "%1$s of %2$s completed"
 msgstr ""
 
 #. translators: %1$s Opening strong tag, do not translate. %2$s Closing strong tag, do not translate. %3$s Opening anchor tag, do not translate. %4$s Closing anchor tag, do not translate.
 #: includes/admin/templates/checklist-widget.php:132
+#, php-format
 msgid "Please rate %1$sCharitable%2$s %3$s★★★★★%4$s on %3$sWordPress.org%4$s!"
 msgstr ""
 
@@ -14111,6 +14277,7 @@ msgstr ""
 
 #. translators: %s: inline gear icon
 #: includes/admin/templates/notifications.php:101
+#, php-format
 msgid "Product announcements, campaign milestones, license status, and action items will appear here as they happen. Use the %s gear icon above to choose which categories you want to see."
 msgstr ""
 
@@ -14132,16 +14299,19 @@ msgstr ""
 
 #. translators: %s is the version number
 #: includes/admin/templates/splash/splash-section.php:57
+#, php-format
 msgid "New Feature%s"
 msgstr ""
 
 #. translators: %s is the version number
 #: includes/admin/templates/splash/splash-section.php:66
+#, php-format
 msgid "New Addon%s"
 msgstr ""
 
 #. translators: %s is the version number
 #: includes/admin/templates/splash/splash-section.php:75
+#, php-format
 msgid "New for Pro%s"
 msgstr ""
 
@@ -14211,11 +14381,13 @@ msgstr ""
 
 #. translators: %s: donation status
 #: includes/admin/tools/class-charitable-tools-misc.php:257
+#, php-format
 msgid "No %s donations found to remove."
 msgstr ""
 
 #. translators: %1$d: count, %2$s: status
 #: includes/admin/tools/class-charitable-tools-misc.php:305
+#, php-format
 msgid "%1$d %2$s donation has been deleted."
 msgid_plural "%1$d %2$s donations have been deleted."
 msgstr[0] ""
@@ -14292,6 +14464,7 @@ msgid "To use the debug log scanner you need to enable WordPress debug logging. 
 msgstr ""
 
 #: includes/admin/tools/class-charitable-tools-system-info.php:194
+#, php-format
 msgid "For more information see our <a href=\"%s\" target=\"_blank\">guide to debugging WordPress</a>"
 msgstr ""
 
@@ -14304,6 +14477,7 @@ msgid "WordPress Debug Logging Disabled"
 msgstr ""
 
 #: includes/admin/tools/class-charitable-tools-system-info.php:212
+#, php-format
 msgid "To enable debug logging see our <a href=\"%s\" target=\"_blank\">guide to debugging WordPress</a>"
 msgstr ""
 
@@ -14362,6 +14536,7 @@ msgid "Recent donation form errors and troubleshooting information."
 msgstr ""
 
 #: includes/admin/tools/class-charitable-tools-system-info.php:272
+#, php-format
 msgid "%d error found in recent logs"
 msgid_plural "%d errors found in recent logs"
 msgstr[0] ""
@@ -14402,6 +14577,7 @@ msgid "Insufficient permissions"
 msgstr ""
 
 #: includes/admin/tools/class-charitable-tools-system-info.php:1169
+#, php-format
 msgid "Test email failed: %s"
 msgstr ""
 
@@ -14417,12 +14593,14 @@ msgstr ""
 
 #. translators: %d: number of deleted error logs
 #: includes/admin/tools/class-charitable-tools-system-info.php:1312
+#, php-format
 msgid "%d error log cleared successfully."
 msgid_plural "%d error logs cleared successfully."
 msgstr[0] ""
 msgstr[1] ""
 
 #: includes/admin/tools/class-charitable-tools-system-info.php:1327
+#, php-format
 msgid "Error clearing logs: %s"
 msgstr ""
 
@@ -14431,6 +14609,7 @@ msgid "Error logs exported successfully."
 msgstr ""
 
 #: includes/admin/tools/class-charitable-tools-system-info.php:1403
+#, php-format
 msgid "Error exporting logs: %s"
 msgstr ""
 
@@ -14476,7 +14655,7 @@ msgstr ""
 msgid "Logs"
 msgstr ""
 
-#: includes/admin/tracking/class-charitable-tracking.php:729
+#: includes/admin/tracking/class-charitable-tracking.php:1185
 msgid "Once Weekly"
 msgstr ""
 
@@ -14487,6 +14666,7 @@ msgstr ""
 
 #. translators: %s - status label.
 #: includes/admin/views/about/addons.php:64
+#, php-format
 msgid "Status: %s"
 msgstr ""
 
@@ -14516,6 +14696,7 @@ msgstr ""
 
 #. translators: %1$s - WP Charitable URL, %2$s - WP Charitable URL.
 #: includes/admin/views/about/tabs/about-us.php:37
+#, php-format
 msgid "Charitable is brought to you by the team at <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">WP Charitable</a>, dedicated to creating the best WordPress donation and fundraising tools for nonprofits, charities, and organizations worldwide."
 msgstr ""
 
@@ -14816,7 +14997,7 @@ msgstr ""
 #: includes/admin/views/reports/advanced.php:79
 #: includes/admin/views/reports/donors.php:53
 #: includes/admin/views/reports/overview.php:167
-#: includes/logger/class-charitable-log-list-table.php:275
+#: includes/logger/class-charitable-log-list-table.php:292
 msgid "Filter"
 msgstr ""
 
@@ -14847,6 +15028,7 @@ msgstr ""
 
 #. translators: Suggestion on completion of checklist on checklist page.
 #: includes/admin/views/checklist/checklist.php:95
+#, php-format
 msgid "<strong>%1$s</strong> What's Next?"
 msgstr ""
 
@@ -14856,6 +15038,7 @@ msgstr ""
 
 #. translators: Suggestion on completion of checklist on checklist page.
 #: includes/admin/views/checklist/checklist.php:110
+#, php-format
 msgid "Don't forget to visit the <a href=\"%1$s\" target=\"_blank\">%2$s</a> and <a href=\"%3$s\" target=\"_blank\">%4$s</a> to see your fundraising stats and grow your campaigns."
 msgstr ""
 
@@ -14869,6 +15052,7 @@ msgstr ""
 
 #. translators: Suggestion on completion of checklist on checklist page.
 #: includes/admin/views/checklist/checklist.php:123
+#, php-format
 msgid "%1$s <a href=\"https://www.wpcharitable.com/documentation/\" target=\"_blank\">%2$s</a> %3$s <a href=\"https://www.wpcharitable.com/support/\" target=\"_blank\">%4$s</a>."
 msgstr ""
 
@@ -14886,6 +15070,7 @@ msgstr ""
 
 #. translators: Suggestion on completion of checklist on checklist page.
 #: includes/admin/views/checklist/checklist.php:135
+#, php-format
 msgid "<a href=\"%1$s\">%2$s</a> to unlock more features, get priority support, and take your campaigns to the next level!"
 msgstr ""
 
@@ -14895,6 +15080,7 @@ msgstr ""
 
 #. translators: Suggestion on completion of checklist on checklist page.
 #: includes/admin/views/checklist/checklist.php:154
+#, php-format
 msgid "<strong>%1$s</strong> View remaining steps below to improve your fundraising efforts."
 msgstr ""
 
@@ -14905,6 +15091,7 @@ msgstr ""
 
 #. translators: Suggestion on completion of checklist on checklist page.
 #: includes/admin/views/checklist/checklist.php:161
+#, php-format
 msgid "<strong>%1$s</strong> Follow these steps to start fundraising quickly."
 msgstr ""
 
@@ -14923,11 +15110,13 @@ msgstr ""
 
 #. Translators: %s: domain.
 #: includes/admin/views/checklist/checklist.php:271
+#, php-format
 msgid "Opt in to get email notifications for security & feature updates, educational content, and occasional offers, and to share some basic WordPress environment info. This will help us make the plugin more compatible with %s to ensure you get donations and run campaigns smoothly."
 msgstr ""
 
 #. Translators: %s: domain.
 #: includes/admin/views/checklist/checklist.php:289
+#, php-format
 msgid "Being opt in you get email notifications for security & feature updates, educational content, and occasional offers. You also share some basic WordPress environment info that helps us  make the plugin more compatible with %s to ensure you get donations and run campaigns smoothly."
 msgstr ""
 
@@ -14961,6 +15150,7 @@ msgstr ""
 
 #. translators: %s: link to documentation.
 #: includes/admin/views/checklist/checklist.php:324
+#, php-format
 msgid "Read %s for full details."
 msgstr ""
 
@@ -15122,6 +15312,7 @@ msgstr ""
 
 #. translators: %s: Documentation URL
 #: includes/admin/views/donors/donors.php:100
+#, php-format
 msgid "This feature is only available in Charitable Pro. Please %s on how to download Charitable Pro."
 msgstr ""
 
@@ -15265,6 +15456,7 @@ msgstr ""
 
 #. translators: %s: erasure date
 #: includes/admin/views/metaboxes/donation/donation-overview.php:45
+#, php-format
 msgid "Personal data for this donation was erased on %s."
 msgstr ""
 
@@ -15367,11 +15559,13 @@ msgstr ""
 
 #. translators: %1$s: error message, %2$s: opening link tag, %3$s: closing link tag
 #: includes/admin/views/notices/admin-notice-square-connection-error.php:42
+#, php-format
 msgid "<strong>Charitable:</strong> Important! %1$s %2$sReconnect to Square%3$s"
 msgstr ""
 
 #. translators: %s - getting started guide link.
 #: includes/admin/views/onboarding/setup.php:46
+#, php-format
 msgid "In order to install and activate some of the features you requested (%1$s) you need to activate your PRO license after setup is complete."
 msgstr ""
 
@@ -15385,6 +15579,7 @@ msgstr ""
 
 #. translators: %s - getting started guide link.
 #: includes/admin/views/onboarding/setup.php:71
+#, php-format
 msgid "Activating license and installing addons requested (%1$s)..."
 msgstr ""
 
@@ -15434,31 +15629,37 @@ msgstr ""
 
 #. translators: %s is the plugin name
 #: includes/admin/views/privacy-compliance/privacy-compliance.php:82
+#, php-format
 msgid "Install and Activate %s"
 msgstr ""
 
 #. translators: %s is the plugin name
 #: includes/admin/views/privacy-compliance/privacy-compliance.php:86
+#, php-format
 msgid "Install the %s plugin by clicking this button"
 msgstr ""
 
 #. translators: %s is the plugin name
 #: includes/admin/views/privacy-compliance/privacy-compliance.php:112
+#, php-format
 msgid "Activate %s"
 msgstr ""
 
 #. translators: %s is the plugin name
 #: includes/admin/views/privacy-compliance/privacy-compliance.php:116
+#, php-format
 msgid "Activate %s by clicking this button:"
 msgstr ""
 
 #. translators: %s is the plugin name
 #: includes/admin/views/privacy-compliance/privacy-compliance.php:141
+#, php-format
 msgid "Setup %s"
 msgstr ""
 
 #. translators: %s is the plugin name
 #: includes/admin/views/privacy-compliance/privacy-compliance.php:145
+#, php-format
 msgid "Setup %s plugin by clicking this button:"
 msgstr ""
 
@@ -15468,11 +15669,13 @@ msgstr ""
 
 #. translators: %s is the plugin name
 #: includes/admin/views/privacy-compliance/privacy-compliance.php:164
+#, php-format
 msgid "Upgrade to %s Pro"
 msgstr ""
 
 #. translators: %s is the plugin name
 #: includes/admin/views/privacy-compliance/privacy-compliance.php:168
+#, php-format
 msgid "Unlock addition features by upgrading to %s Pro. Special offer: Get 50%% off your plan!"
 msgstr ""
 
@@ -15731,24 +15934,26 @@ msgstr ""
 
 #. translators: %s: "Read more" link to the Site Analysis info page.
 #: includes/admin/views/reports/site-analysis.php:108
+#, php-format
 msgid "No campaign content or donor data (including names, emails, or donation amounts) are ever sent or stored. %s"
 msgstr ""
 
 #: includes/admin/views/reports/site-analysis.php:109
-#: includes/admin/views/reports/site-analysis.php:136
+#: includes/admin/views/reports/site-analysis.php:141
 msgid "Learn more"
 msgstr ""
 
-#: includes/admin/views/reports/site-analysis.php:131
+#: includes/admin/views/reports/site-analysis.php:136
 msgid "Share Usage Data:"
 msgstr ""
 
 #. translators: %s: "Read More" link to the usage-tracking documentation.
-#: includes/admin/views/reports/site-analysis.php:135
-msgid "Helps improve site analysis and improve Charitable plugin for your use. %s"
+#: includes/admin/views/reports/site-analysis.php:140
+#, php-format
+msgid "Helps improve site analysis and improve Charitable plugin for your use. Leaving this on turns on usage tracking, which you can switch off at any time in Settings &rarr; Advanced. %s"
 msgstr ""
 
-#: includes/admin/views/reports/site-analysis.php:145
+#: includes/admin/views/reports/site-analysis.php:150
 msgid "Run Analysis"
 msgstr ""
 
@@ -15839,6 +16044,7 @@ msgstr ""
 
 #. translators: %s: URL to the Stripe settings page
 #: includes/admin/views/settings/gateways.php:56
+#, php-format
 msgid "<strong>Note:</strong> Stripe is enabled but it does not appear to be connected or API keys are missing. <a href=\"%s\">Confirm Stripe settings to keep using this gateway</a>."
 msgstr ""
 
@@ -15849,6 +16055,7 @@ msgstr ""
 #. translators: %s: gateway name (e.g. Stripe).
 #: includes/admin/views/settings/gateways.php:160
 #: includes/admin/views/settings/gateways.php:164
+#, php-format
 msgid "View %s documentation"
 msgstr ""
 
@@ -15866,6 +16073,7 @@ msgstr ""
 
 #. translators: %s: URL to documentation
 #: includes/admin/views/settings/gateways.php:255
+#, php-format
 msgid "Requires PHP 8.1.0 or higher. <a href=\"%s\" target=\"_blank\">See our documentation</a>."
 msgstr ""
 
@@ -15880,16 +16088,19 @@ msgstr ""
 
 #. translators: %1$s: currency; %2$s: hyperlink %3$s: payment gateway name
 #: includes/admin/views/settings/gateways.php:307
+#, php-format
 msgid "<strong>Tip</strong>: Accept donations in %1$s with <a href=\"%2$s\" target=\"_blank\">%3$s</a>."
 msgstr ""
 
 #. translators: %1$s: hyperlink; %2$s: single extension name; %3$s: comma-separated list of extension names
 #: includes/admin/views/settings/gateways.php:315
+#, php-format
 msgid "<strong>Need more options?</strong> <a href=\"%1$s\" target=\"_blank\">Click here to browse our payment gateway extensions</a>, including %3$s and %2$s."
 msgstr ""
 
 #. translators: %s - charitable.com upgrade URL.
 #: includes/admin/views/settings/licenses.php:37
+#, php-format
 msgid "You already have a non-legacy license activated on this install, which you can deactivate <a href=\"%s\">in the \"General\" tab</a>."
 msgstr ""
 
@@ -15900,6 +16111,7 @@ msgstr ""
 
 #. translators: %s - charitable.com upgrade URL.
 #: includes/admin/views/settings/licenses.php:69
+#, php-format
 msgid "If you have purchased your license key for <strong>Basic</strong>, <strong>Plus</strong>, <strong>Pro</strong>, or <strong>Agency / Elite</strong> recently, please enter your charitable license key <a href=\"%s\">in the \"General\" tab</a>."
 msgstr ""
 
@@ -15945,6 +16157,7 @@ msgstr ""
 
 #. translators: %s: tab name
 #: includes/admin/views/settings/settings.php:48
+#, php-format
 msgid "&#8592; Return to %s"
 msgstr ""
 
@@ -16047,6 +16260,7 @@ msgstr ""
 
 #. translators: %d: number of days
 #: includes/admin/views/tools/logs.php:82
+#, php-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] ""
@@ -16140,11 +16354,13 @@ msgstr ""
 
 #. translators: %s - WPCode library website URL.
 #: includes/admin/views/tools/snippets.php:82
+#, php-format
 msgid "Using WPCode, you can install <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">Charitable code snippets</a> with 1 click directly from this page or the <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">WPCode library</a>."
 msgstr ""
 
 #. translators: %s - WPCode library website URL.
 #: includes/admin/views/tools/snippets.php:100
+#, php-format
 msgid "<strong>Need help?</strong> Read more on <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">how to use WPCode</a> and exmaine <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">our documentation</a> to learn more on how to customize Charitable."
 msgstr ""
 
@@ -16166,6 +16382,7 @@ msgstr ""
 
 #. Translators: %1$s is the current step, %2$s is the total number of steps.
 #: includes/admin/views/upgrades-page/page.php:60
+#, php-format
 msgid "Step %1$d of approximately %2$d running"
 msgstr ""
 
@@ -16256,17 +16473,20 @@ msgstr ""
 
 #. translators: %s: class name
 #: includes/autoloader/class-charitable-registry.php:135
+#, php-format
 msgctxt "error message when non-existent class is called"
 msgid "Class %s does not exist."
 msgstr ""
 
 #. Translators: %s is the date passed.
 #: includes/campaigns/class-charitable-campaign-processor.php:555
+#, php-format
 msgid "Campaign processor requires date in YYYY-MM-DD format. Date passed as %s. This message was added in Charitable version 1.5.9."
 msgstr ""
 
 #. Translators: %1$s is the method, %2$s is the tag, %3$s is the key.
 #: includes/campaigns/class-charitable-campaign-processor.php:716
+#, php-format
 msgid "%1$s is deprecated as a sanitizer on the %2$s hook. To prevent sanitization, use add_filter( 'charitable_campaign_processor_disable_sanitizer_%3$s', '__return_true' ) instead."
 msgstr ""
 
@@ -16278,6 +16498,7 @@ msgstr ""
 
 #. translators: %s is the number of minutes left.
 #: includes/campaigns/class-charitable-campaign.php:466
+#, php-format
 msgid "%s Minute Left"
 msgid_plural "%s Minutes Left"
 msgstr[0] ""
@@ -16285,6 +16506,7 @@ msgstr[1] ""
 
 #. translators: %s is the number of hours left.
 #: includes/campaigns/class-charitable-campaign.php:478
+#, php-format
 msgid "%s Hour Left"
 msgid_plural "%s Hours Left"
 msgstr[0] ""
@@ -16292,6 +16514,7 @@ msgstr[1] ""
 
 #. translators: %s is the number of days left.
 #: includes/campaigns/class-charitable-campaign.php:490
+#, php-format
 msgid "%s Day Left"
 msgid_plural "%s Days Left"
 msgstr[0] ""
@@ -16299,16 +16522,19 @@ msgstr[1] ""
 
 #. translators: %s is the time since the campaign ended.
 #: includes/campaigns/class-charitable-campaign.php:545
+#, php-format
 msgid "This campaign ended %s ago"
 msgstr ""
 
 #. translators: %s is the time since the campaign ended.
 #: includes/campaigns/class-charitable-campaign.php:548
+#, php-format
 msgid "This campaign successfully reached its funding goal and ended %s ago"
 msgstr ""
 
 #. translators: %s is the time since the campaign ended.
 #: includes/campaigns/class-charitable-campaign.php:551
+#, php-format
 msgid "This campaign failed to reach its funding goal %s ago"
 msgstr ""
 
@@ -16348,6 +16574,7 @@ msgstr ""
 
 #. translators: %1$s is the amount donated, %2$s is the goal amount.
 #: includes/campaigns/class-charitable-campaign.php:952
+#, php-format
 msgctxt "amount donated of goal"
 msgid "%1$s donated of %2$s goal"
 msgstr ""
@@ -16355,12 +16582,14 @@ msgstr ""
 #. translators: %s is the amount donated.
 #: includes/campaigns/class-charitable-campaign.php:959
 #: includes/campaigns/class-charitable-campaign.php:993
+#, php-format
 msgctxt "amount donated"
 msgid "%s donated"
 msgstr ""
 
 #. translators: %s - WPCharitable.com contact page URL.
 #: includes/charitable-core-functions.php:709
+#, php-format
 msgid "Thank you for considering upgrading. If you have any questions, please <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">let us know</a>."
 msgstr ""
 
@@ -16372,16 +16601,19 @@ msgstr ""
 #. translators: %s - WPCharitable.com upgrade from Lite to paid docs page URL.
 #: includes/charitable-core-functions.php:740
 #: includes/charitable-core-functions.php:790
+#, php-format
 msgid "Check out <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">our documentation</a> for step-by-step instructions."
 msgstr ""
 
 #. translators: %s - WPCharitable.com contact page URL.
 #: includes/charitable-core-functions.php:757
+#, php-format
 msgid "If you have any questions or issues just <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">let us know</a>."
 msgstr ""
 
 #. translators: %s - license level, Charitable Pro or Charitable Elite.
 #: includes/charitable-core-functions.php:778
+#, php-format
 msgid "After purchasing a license, just <strong>enter your license key on the Charitable Settings page</strong>. This will let your site automatically upgrade to %s! (Don't worry, all your campaigns, donations and settings will be preserved.)"
 msgstr ""
 
@@ -16389,6 +16621,7 @@ msgstr ""
 #. Translators: %s is the label of the description.
 #: includes/compat/class-charitable-translatepress-compat.php:113
 #: includes/compat/class-charitable-translatepress-compat.php:115
+#, php-format
 msgid "%s"
 msgstr ""
 
@@ -16398,261 +16631,313 @@ msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:329
+#, php-format
 msgid "Argentine Peso (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:334
+#, php-format
 msgid "Australian Dollars (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:339
+#, php-format
 msgid "Bangladeshi Taka (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:344
+#, php-format
 msgid "Bolivian Bolíviano (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:349
+#, php-format
 msgid "Brazilian Real (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:354
+#, php-format
 msgid "Brunei Dollar (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:359
+#, php-format
 msgid "Bulgarian Lev (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:364
+#, php-format
 msgid "Canadian Dollar (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:369
+#, php-format
 msgid "Swiss Franc (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:374
+#, php-format
 msgid "Chilean Peso (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:379
+#, php-format
 msgid "Chinese Yuan Renminbi (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:384
+#, php-format
 msgid "Colombian Peso (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:389
+#, php-format
 msgid "Czech Koruna (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:394
+#, php-format
 msgid "Danish Krone (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:399
+#, php-format
 msgid "Egyptian Pound (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:404
+#, php-format
 msgid "Emirati Dirham (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:409
+#, php-format
 msgid "Euro (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:414
+#, php-format
 msgid "Fijian Dollar (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:419
+#, php-format
 msgid "British Pound (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:424
+#, php-format
 msgid "Ghanaian Cedi (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:429
+#, php-format
 msgid "Hong Kong Dollar (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:434
+#, php-format
 msgid "Croatian Kuna (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:439
+#, php-format
 msgid "Hungarian Forint (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:444
+#, php-format
 msgid "Indonesian Rupiah (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:449
+#, php-format
 msgid "Israeli Shekel (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:454
+#, php-format
 msgid "Indian Rupee (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:459
+#, php-format
 msgid "Icelandic Krona (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:464
+#, php-format
 msgid "Japanese Yen (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:469
+#, php-format
 msgid "Kuwaiti Dinar (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:474
+#, php-format
 msgid "Malaysian Ringgit (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:479
+#, php-format
 msgid "Mexican Peso (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:484
+#, php-format
 msgid "New Zealand Dollar (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:489
+#, php-format
 msgid "Nigerian Naira (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:494
+#, php-format
 msgid "Norwegian Krone (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:499
+#, php-format
 msgid "Papua New Guinean Kina (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:504
+#, php-format
 msgid "Philippine Peso (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:509
+#, php-format
 msgid "Polish Zloty (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:514
+#, php-format
 msgid "Romanian New Leu (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:519
+#, php-format
 msgid "Russian Ruble (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:524
+#, php-format
 msgid "Samoan Tālā (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:529
+#, php-format
 msgid "Singapore Dollar (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:534
+#, php-format
 msgid "Solomon Islands Dollar (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:539
+#, php-format
 msgid "South African Rand (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:544
+#, php-format
 msgid "South Korean Won (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:549
+#, php-format
 msgid "Swedish Krona (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:554
+#, php-format
 msgid "Taiwan New Dollar (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:559
+#, php-format
 msgid "Thai Baht (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:564
+#, php-format
 msgid "Tongan Pa&lsquo;anga (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:569
+#, php-format
 msgid "Turkish Lira (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:574
+#, php-format
 msgid "US Dollar (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:579
+#, php-format
 msgid "Vanuatu Vatu (%s)"
 msgstr ""
 
 #. translators: %s: currency symbol
 #: includes/currency/class-charitable-currency.php:584
+#, php-format
 msgid "Vietnamese Dong (%s)"
 msgstr ""
 
@@ -16734,6 +17019,7 @@ msgstr ""
 
 #. translators: %s: count
 #: includes/data/class-charitable-post-types.php:351
+#, php-format
 msgid "Pending (%s)"
 msgid_plural "Pending (%s)"
 msgstr[0] ""
@@ -16746,6 +17032,7 @@ msgstr ""
 
 #. translators: %s: count
 #: includes/data/class-charitable-post-types.php:364
+#, php-format
 msgid "Paid (%s)"
 msgid_plural "Paid (%s)"
 msgstr[0] ""
@@ -16758,6 +17045,7 @@ msgstr ""
 
 #. translators: %s: count
 #: includes/data/class-charitable-post-types.php:377
+#, php-format
 msgid "Failed (%s)"
 msgid_plural "Failed (%s)"
 msgstr[0] ""
@@ -16770,6 +17058,7 @@ msgstr ""
 
 #. translators: %s: count
 #: includes/data/class-charitable-post-types.php:390
+#, php-format
 msgid "Canceled (%s)"
 msgid_plural "Canceled (%s)"
 msgstr[0] ""
@@ -16782,6 +17071,7 @@ msgstr ""
 
 #. translators: %s: count
 #: includes/data/class-charitable-post-types.php:403
+#, php-format
 msgid "Refunded (%s)"
 msgid_plural "Refunded (%s)"
 msgstr[0] ""
@@ -16794,6 +17084,7 @@ msgstr ""
 
 #. translators: %s: count
 #: includes/data/class-charitable-post-types.php:416
+#, php-format
 msgid "Pre Approved (%s)"
 msgid_plural "Pre Approved (%s)"
 msgstr[0] ""
@@ -16931,31 +17222,37 @@ msgstr ""
 
 #. translators: 1: function name, 2: version number, 3: extra message, 4: plugin name.
 #: includes/deprecated/class-charitable-deprecated.php:91
+#, php-format
 msgid "%1$s was called with an argument that is <strong>deprecated</strong> since version %2$s of %4$s! %3$s"
 msgstr ""
 
 #. translators: 1: function name, 2: version number, 3: plugin name.
 #: includes/deprecated/class-charitable-deprecated.php:94
+#, php-format
 msgid "%1$s was called with an argument that is <strong>deprecated</strong> since version %2$s of %3$s with no alternatives available."
 msgstr ""
 
 #. translators: 1: function name, 2: version number, 3: replacement function name, 4: plugin name.
 #: includes/deprecated/class-charitable-deprecated.php:119
+#, php-format
 msgid "%1$s is <strong>deprecated</strong> since version %2$s of %4$s! Use %3$s instead."
 msgstr ""
 
 #. translators: 1: function name, 2: version number, 3: plugin name.
 #: includes/deprecated/class-charitable-deprecated.php:122
+#, php-format
 msgid "%1$s is <strong>deprecated</strong> since version %2$s of %3$s with no alternatives available."
 msgstr ""
 
 #. translators: 1: function name, 2: error message, 3: version number.
 #: includes/deprecated/class-charitable-deprecated.php:146
+#, php-format
 msgid "(This message was added in %1$s version %2$s.)"
 msgstr ""
 
 #. translators: 1: function name, 2: error message, 3: version number.
 #: includes/deprecated/class-charitable-deprecated.php:149
+#, php-format
 msgid "%1$s was called <strong>incorrectly</strong>. %2$s %3$s"
 msgstr ""
 
@@ -16974,6 +17271,7 @@ msgstr ""
 
 #. translators: %s is the email name.
 #: includes/donations/class-charitable-donation-log.php:360
+#, php-format
 msgid "%s was sent successfully."
 msgstr ""
 
@@ -16983,6 +17281,7 @@ msgstr ""
 
 #. translators: %s is the email name.
 #: includes/donations/class-charitable-donation-log.php:380
+#, php-format
 msgid "%s failed to send."
 msgstr ""
 
@@ -17052,11 +17351,13 @@ msgstr ""
 
 #. translators: %s: error message
 #: includes/donations/class-charitable-donation-processor.php:943
+#, php-format
 msgid "Payment failed with errors: %s"
 msgstr ""
 
 #. translators: %s: report type
 #: includes/donations/class-charitable-donation-report.php:243
+#, php-format
 msgid "%s is not a valid donation report type."
 msgstr ""
 
@@ -17194,6 +17495,7 @@ msgstr ""
 
 #. translators: %1$s: campaign title; %2$s: campaign creator; %3$s: campaign end date
 #: includes/emails/class-charitable-email-campaign-end.php:192
+#, php-format
 msgid "%1$s by %2$s finished on %3$s."
 msgstr ""
 
@@ -17368,18 +17670,22 @@ msgid "Test Email"
 msgstr ""
 
 #: includes/emails/class-charitable-email-test.php:88
+#, php-format
 msgid "Invalid email address: %s"
 msgstr ""
 
 #: includes/emails/class-charitable-email-test.php:103
+#, php-format
 msgid "Test email sent successfully to %s using Charitable's email system."
 msgstr ""
 
 #: includes/emails/class-charitable-email-test.php:108
+#, php-format
 msgid "Failed to send test email to %s. This indicates an issue with Charitable's email system or your server's email configuration."
 msgstr ""
 
 #: includes/emails/class-charitable-email-test.php:132
+#, php-format
 msgid "Test Email from %s - Charitable Plugin"
 msgstr ""
 
@@ -17502,11 +17808,13 @@ msgstr ""
 
 #. translators: %s: endpoint id
 #: includes/endpoints/class-charitable-endpoints.php:96
+#, php-format
 msgid "Endpoint %s has already been registered."
 msgstr ""
 
 #. translators: %s: endpoint id
 #: includes/endpoints/class-charitable-endpoints.php:198
+#, php-format
 msgid "Endpoint %s has not been registered."
 msgstr ""
 
@@ -17534,6 +17842,7 @@ msgstr ""
 
 #. translators: %s: endpoint id
 #: includes/endpoints/class-charitable-endpoints.php:673
+#, php-format
 msgid "Endpoint %s was incorrectly registered."
 msgstr ""
 
@@ -17843,6 +18152,7 @@ msgstr ""
 #. translators: %s: submitted email address
 #: includes/forms/class-charitable-donation-form.php:755
 #: includes/forms/class-charitable-registration-form.php:246
+#, php-format
 msgid "%s is not a valid email address."
 msgstr ""
 
@@ -17855,6 +18165,7 @@ msgstr ""
 #: includes/forms/class-charitable-donation-form.php:829
 #: includes/forms/class-charitable-donation-form.php:865
 #: includes/public/class-charitable-public.php:91
+#, php-format
 msgid "You must donate more than %s."
 msgstr ""
 
@@ -17862,6 +18173,7 @@ msgstr ""
 #. Translators: %s: maximum donation amount
 #: includes/forms/class-charitable-donation-form.php:847
 #: includes/public/class-charitable-public.php:100
+#, php-format
 msgid "The maximum donation amount permitted is %s."
 msgstr ""
 
@@ -17900,6 +18212,7 @@ msgstr ""
 
 #. translators: %s: mode (test or live)
 #: includes/forms/class-charitable-donation-form.php:1566
+#, php-format
 msgid "Square is enabled but not connected in %s mode."
 msgstr ""
 
@@ -17949,6 +18262,7 @@ msgstr ""
 
 #. translators: %s: username
 #: includes/forms/class-charitable-profile-form.php:152
+#, php-format
 msgid "Username: %s."
 msgstr ""
 
@@ -18028,6 +18342,7 @@ msgstr ""
 #. translators: %s: email verification link
 #: includes/forms/class-charitable-registration-form.php:276
 #: includes/shortcodes/class-charitable-my-donations-shortcode.php:82
+#, php-format
 msgid "We have sent you an email to confirm your email address. Haven't received the email? <a href=\"%s\">Click here to send it again.</a>"
 msgstr ""
 
@@ -18114,11 +18429,13 @@ msgstr ""
 
 #. translators: %s: link
 #: includes/gateways/class-charitable-gateway-paypal.php:108
+#, php-format
 msgid "<strong>Live</strong>: Go to %s."
 msgstr ""
 
 #. translators: %s: link
 #: includes/gateways/class-charitable-gateway-paypal.php:113
+#, php-format
 msgid "<strong>Sandbox</strong>: Go to %s, click on <em>Profile</em> for the Seller account and open the <em>API keys</em> tab."
 msgstr ""
 
@@ -18288,6 +18605,7 @@ msgstr ""
 
 #. translators: %s: reason code given by PayPal
 #: includes/gateways/class-charitable-gateway-paypal.php:667
+#, php-format
 msgid "Payment is pending for unknown reasons. Contact PayPal support for assistance. Reason code: %s"
 msgstr ""
 
@@ -18298,11 +18616,13 @@ msgstr ""
 #: includes/gateways/paypal-commerce/class-charitable-gateway-paypal-commerce.php:3832
 #: includes/gateways/paypal-commerce/class-charitable-gateway-paypal-commerce.php:3924
 #: includes/gateways/paypal-commerce/class-charitable-gateway-paypal-commerce.php:3960
+#, php-format
 msgid "PayPal refund failed: %s"
 msgstr ""
 
 #. translators: %s: transaction reference.
 #: includes/gateways/class-charitable-gateway-paypal.php:776
+#, php-format
 msgid "PayPal refund transaction ID: %s"
 msgstr ""
 
@@ -18343,6 +18663,7 @@ msgstr ""
 
 #. translators: %1$s - Live Mode Endpoint ID or Test Mode Endpoint ID. %2$s - Square Dashboard Webhooks Settings URL.
 #: includes/gateways/class-charitable-gateway-square.php:403
+#, php-format
 msgid "Retrieve your %1$s from your <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">Square webhook settings</a>. Select the endpoint, then click Copy button."
 msgstr ""
 
@@ -18356,11 +18677,13 @@ msgstr ""
 
 #. translators: %1$s - Live Mode Signing Secret or Test Mode Signing Secret. %2$s - Square Dashboard Webhooks Settings URL.
 #: includes/gateways/class-charitable-gateway-square.php:435
+#, php-format
 msgid "Retrieve your %1$s from your <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">Square webhook settings</a>. Select the endpoint, then click Reveal."
 msgstr ""
 
 #. translators: %s - Charitable.com Square documentation article URL.
 #: includes/gateways/class-charitable-gateway-square.php:523
+#, php-format
 msgid "Securely connect to Square with just a few clicks to begin accepting payments! <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"charitable-learn-more\">Learn More</a>"
 msgstr ""
 
@@ -18395,16 +18718,19 @@ msgstr ""
 #. translators: % 1$s: opening link tag, % 2$s: closing link tag
 #: includes/gateways/class-charitable-gateway-square.php:695
 #: includes/gateways/class-charitable-gateway-square.php:1144
+#, php-format
 msgid "3%% per transaction + Square fees. %1$sUpgrade to Pro%2$s for no added fees and priority support."
 msgstr ""
 
 #. translators: %s: Merchant name
 #: includes/gateways/class-charitable-gateway-square.php:726
+#, php-format
 msgid "Connected to Square as %s."
 msgstr ""
 
 #. translators: %d: Number of days until expiration
 #: includes/gateways/class-charitable-gateway-square.php:740
+#, php-format
 msgid "Your connection will expire in %d days."
 msgstr ""
 
@@ -18472,11 +18798,13 @@ msgstr ""
 
 #. translators: %s - charitable.com URL for Square webhooks documentation.
 #: includes/gateways/class-charitable-gateway-square.php:989
+#, php-format
 msgid "Please see <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">our documentation on Square webhooks</a> for detailed instructions on how to add this webhook to your Square dashboard."
 msgstr ""
 
 #. translators: %s - charitable.com URL for Square webhooks documentation.
 #: includes/gateways/class-charitable-gateway-square.php:1023
+#, php-format
 msgid "Ensure an endpoint with the above URL is present in the <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">Square webhook settings</a>."
 msgstr ""
 
@@ -18494,6 +18822,7 @@ msgstr ""
 
 #. translators: %s - charitable.com URL for Square webhooks documentation.
 #: includes/gateways/class-charitable-gateway-square.php:1070
+#, php-format
 msgid "To start using webhooks, please register a webhook route inside our application. You can do this by pressing the button above. Please see <a href=\"%1$s\" target=\"_blank\">our documentation on Square webhooks</a> for full details."
 msgstr ""
 
@@ -18559,11 +18888,13 @@ msgstr ""
 #. translators: %s: error message.
 #: includes/gateways/class-charitable-gateway-square.php:2316
 #: includes/gateways/class-charitable-gateway-square.php:2335
+#, php-format
 msgid "Square refund failed: %s"
 msgstr ""
 
 #. translators: %s: transaction reference.
 #: includes/gateways/class-charitable-gateway-square.php:2326
+#, php-format
 msgid "Square refund successful. Refund transaction ID: %s"
 msgstr ""
 
@@ -18578,6 +18909,7 @@ msgstr ""
 
 #. translators: %s: error message.
 #: includes/gateways/class-charitable-gateway-square.php:2416
+#, php-format
 msgid "Square cancellation failed: %s"
 msgstr ""
 
@@ -18747,16 +19079,19 @@ msgstr ""
 
 #. translators: %1$s: opening link tag, %2$s: closing link tag
 #: includes/gateways/class-charitable-gateway-stripe-am.php:398
+#, php-format
 msgid "3%% per transaction + Stripe fees. %1$sUpgrade to Pro%2$s for no added fees and priority support."
 msgstr ""
 
 #. translators: %1$s Stripe payment mode. %2$s Opening anchor tag for reconnecting to Stripe, do not translate. %3$s Opening anchor tag for disconnecting Stripe, do not translate. %4$s Closing anchor tag, do not translate.
 #: includes/gateways/class-charitable-gateway-stripe-am.php:407
+#, php-format
 msgid "%1$sDisconnect this account%2$s."
 msgstr ""
 
 #. translators: %1$s Stripe payment mode. %2$s Opening anchor tag for reconnecting to Stripe, do not translate. %3$s Opening anchor tag for disconnecting Stripe, do not translate. %4$s Closing anchor tag, do not translate.
 #: includes/gateways/class-charitable-gateway-stripe-am.php:414
+#, php-format
 msgid "Your Stripe account is connected in %1$s mode. %2$sDisconnect this account%3$s."
 msgstr ""
 
@@ -18804,11 +19139,13 @@ msgstr ""
 
 #. translators: %s: transaction reference.
 #: includes/gateways/class-charitable-gateway-stripe-am.php:1047
+#, php-format
 msgid "Stripe refund transaction ID: %s"
 msgstr ""
 
 #. translators: %s: error message.
 #: includes/gateways/class-charitable-gateway-stripe-am.php:1057
+#, php-format
 msgid "Stripe refund failed: %s"
 msgstr ""
 
@@ -18821,6 +19158,7 @@ msgid "Cancellation failed: No Stripe API key configured."
 msgstr ""
 
 #: includes/gateways/class-charitable-gateway-stripe-am.php:1186
+#, php-format
 msgid "Retrieved subscription from Stripe - Current status: %s"
 msgstr ""
 
@@ -18830,6 +19168,7 @@ msgstr ""
 
 #. translators: %s: error message
 #: includes/gateways/class-charitable-gateway-stripe-am.php:1209
+#, php-format
 msgid "Stripe cancellation failed: %s"
 msgstr ""
 
@@ -18875,16 +19214,19 @@ msgstr ""
 
 #. translators: %1$s Opening anchor tag, do not translate. %2$s Closing anchor tag, do not translate.
 #: includes/gateways/class-charitable-gateways.php:795
+#, php-format
 msgid "There was an error getting your Stripe credentials. Please %1$stry again%2$s. If you continue to have this problem, please contact support."
 msgstr ""
 
 #. translators: %1$s Opening anchor tag, do not translate. %2$s Closing anchor tag, do not translate.
 #: includes/gateways/class-charitable-gateways.php:908
+#, php-format
 msgid "There was an error getting your Square credentials. Please %1$stry again%2$s. If you continue to have this problem, please contact support."
 msgstr ""
 
 #. translators: %s is the mode of the connection.
 #: includes/gateways/class-charitable-gateways.php:931
+#, php-format
 msgid "You have reconnected and updated your access token for Square in %s mode."
 msgstr ""
 
@@ -18898,6 +19240,7 @@ msgstr ""
 
 #. translators: %s is the mode of the connection.
 #: includes/gateways/class-charitable-gateways.php:1299
+#, php-format
 msgid "Your connection to Square in %s mode has been removed."
 msgstr ""
 
@@ -18909,31 +19252,37 @@ msgstr ""
 #: includes/gateways/class-charitable-gateways.php:1587
 #: includes/gateways/class-charitable-gateways.php:1645
 #: includes/gateways/class-charitable-gateways.php:1654
+#, php-format
 msgid "There has been an issue with your request. Please try again or <a href=\"%s\">contact support</a>."
 msgstr ""
 
 #. translators: %s: Support link URL
 #: includes/gateways/class-charitable-gateways.php:1594
+#, php-format
 msgid "There has been an issue confirming your request. Please try again or <a href=\"%s\">contact support</a>."
 msgstr ""
 
 #. translators: %s: Support link URL
 #: includes/gateways/class-charitable-gateways.php:1601
+#, php-format
 msgid "Your connect to Square has been canceled for an unknown reason. Please try again or <a href=\"%s\">contact support</a>."
 msgstr ""
 
 #. translators: %s: Refresh by date
 #: includes/gateways/class-charitable-gateways.php:1613
+#, php-format
 msgid "There has been an issue refreshing your Square token. Token should be refreshed by: %1$s. Please try again or <a href=\"%2$s\">contact support</a>."
 msgstr ""
 
 #. translators: %s: Support link URL
 #: includes/gateways/class-charitable-gateways.php:1622
+#, php-format
 msgid "There has been an issue confirming your Square token. Please try again or <a href=\"%s\">contact support</a>."
 msgstr ""
 
 #. translators: %s: Support link URL
 #: includes/gateways/class-charitable-gateways.php:1638
+#, php-format
 msgid "There has been an issue communicating with Square. Please try again or <a href=\"%s\">contact support</a>."
 msgstr ""
 
@@ -19019,6 +19368,7 @@ msgstr ""
 #. translators: %s: PayPal order ID
 #: includes/gateways/paypal-commerce/charitable-paypal-commerce-hooks.php:978
 #: includes/gateways/paypal-commerce/charitable-paypal-commerce-hooks.php:1390
+#, php-format
 msgid "PayPal Commerce order %s captured."
 msgstr ""
 
@@ -19030,24 +19380,28 @@ msgstr ""
 #. translators: %1$s: PayPal order ID; %2$s: PayPal base URL; %3$s: PayPal order ID (repeated in URL path)
 #: includes/gateways/paypal-commerce/charitable-paypal-commerce-hooks.php:1038
 #: includes/gateways/paypal-commerce/charitable-paypal-commerce-hooks.php:1430
+#, php-format
 msgid "Payment completed via PayPal Commerce Platform. Order ID: %1$s <a href=\"%2$s/activities/payment/%3$s\" target=\"_blank\">[View in PayPal Dashboard]</a>"
 msgstr ""
 
 #. translators: %1$s: PayPal capture ID; %2$s: PayPal base URL; %3$s: PayPal capture ID (repeated in URL path)
 #: includes/gateways/paypal-commerce/charitable-paypal-commerce-hooks.php:1049
 #: includes/gateways/paypal-commerce/charitable-paypal-commerce-hooks.php:1441
+#, php-format
 msgid "PayPal capture ID: %1$s <a href=\"%2$s/activities/payment/%3$s\" target=\"_blank\">[View Transaction in PayPal]</a>"
 msgstr ""
 
 #. translators: %s: gateway transaction ID (PayPal capture or order ID)
 #: includes/gateways/paypal-commerce/charitable-paypal-commerce-hooks.php:1060
 #: includes/gateways/paypal-commerce/charitable-paypal-commerce-hooks.php:1452
+#, php-format
 msgid "Gateway transaction ID: %s"
 msgstr ""
 
 #. translators: %s: PayPal capture status string
 #: includes/gateways/paypal-commerce/charitable-paypal-commerce-hooks.php:1069
 #: includes/gateways/paypal-commerce/charitable-paypal-commerce-hooks.php:1461
+#, php-format
 msgid "PayPal capture status: %s"
 msgstr ""
 
@@ -19092,6 +19446,7 @@ msgstr ""
 
 #. translators: %s: error message
 #: includes/gateways/paypal-commerce/charitable-paypal-commerce-hooks.php:1732
+#, php-format
 msgid "PayPal account connected, but middleware registration failed: %s"
 msgstr ""
 
@@ -19113,6 +19468,7 @@ msgstr ""
 
 #. translators: %s: error message
 #: includes/gateways/paypal-commerce/charitable-paypal-commerce-hooks.php:1955
+#, php-format
 msgid "PayPal capture failed on return: %s"
 msgstr ""
 
@@ -19126,6 +19482,7 @@ msgstr ""
 
 #. translators: %s: webhook ID
 #: includes/gateways/paypal-commerce/charitable-paypal-commerce-hooks.php:2223
+#, php-format
 msgid "Webhook created successfully! Webhook ID: %s"
 msgstr ""
 
@@ -19179,6 +19536,7 @@ msgstr ""
 
 #. translators: 1: formatted fee amount with currency symbol (e.g. "$0.09"), 2: currency code (e.g. "USD")
 #: includes/gateways/paypal-commerce/charitable-paypal-commerce-hooks.php:2482
+#, php-format
 msgid "%1$s %2$s Deducted By PayPal"
 msgstr ""
 
@@ -19204,6 +19562,7 @@ msgstr ""
 
 #. translators: %1$s: opening anchor for help-doc link, %2$s: closing anchor.
 #: includes/gateways/paypal-commerce/class-charitable-gateway-paypal-commerce.php:145
+#, php-format
 msgid "Tells PayPal how to classify donations for fees, disputes, risk, and reporting. %1$sLearn more%2$s."
 msgstr ""
 
@@ -19325,6 +19684,7 @@ msgstr ""
 
 #. translators: %1$s: opening link tag, %2$s: closing link tag
 #: includes/gateways/paypal-commerce/class-charitable-gateway-paypal-commerce.php:282
+#, php-format
 msgid "3%% per transaction + PayPal fees. %1$sUpgrade to Pro%2$s for no added fees and priority support."
 msgstr ""
 
@@ -19334,11 +19694,13 @@ msgstr ""
 
 #. translators: %s: mode (sandbox/live)
 #: includes/gateways/paypal-commerce/class-charitable-gateway-paypal-commerce.php:335
+#, php-format
 msgid "Connected to PayPal (%s)"
 msgstr ""
 
 #. translators: %s: merchant ID
 #: includes/gateways/paypal-commerce/class-charitable-gateway-paypal-commerce.php:343
+#, php-format
 msgid "Merchant ID: %s"
 msgstr ""
 
@@ -19482,6 +19844,7 @@ msgstr ""
 
 #. translators: %s: mode (sandbox/live)
 #: includes/gateways/paypal-commerce/class-charitable-gateway-paypal-commerce.php:494
+#, php-format
 msgid "Not connected to PayPal (%s)"
 msgstr ""
 
@@ -19536,6 +19899,7 @@ msgstr ""
 #: includes/gateways/paypal-commerce/class-charitable-gateway-paypal-commerce.php:1397
 #: includes/gateways/paypal-commerce/class-charitable-gateway-paypal-commerce.php:4167
 #: includes/gateways/paypal-commerce/class-charitable-gateway-paypal-commerce.php:4185
+#, php-format
 msgid "Donation to %s"
 msgstr ""
 
@@ -19600,11 +19964,13 @@ msgstr ""
 
 #. translators: %s: PayPal mode (sandbox or live).
 #: includes/gateways/paypal-commerce/class-charitable-gateway-paypal-commerce.php:2817
+#, php-format
 msgid "(for %s mode)"
 msgstr ""
 
 #. translators: %s: PayPal mode (sandbox or live).
 #: includes/gateways/paypal-commerce/class-charitable-gateway-paypal-commerce.php:2832
+#, php-format
 msgid "Webhook configured for %s mode."
 msgstr ""
 
@@ -19651,6 +20017,7 @@ msgstr ""
 
 #. translators: %s: merchant ID
 #: includes/gateways/paypal-commerce/class-charitable-gateway-paypal-commerce.php:3488
+#, php-format
 msgid "PayPal merchant %s has revoked consent. Please reconnect your PayPal account."
 msgstr ""
 
@@ -19664,6 +20031,7 @@ msgstr ""
 
 #. translators: %s: PayPal refund ID
 #: includes/gateways/paypal-commerce/class-charitable-gateway-paypal-commerce.php:3864
+#, php-format
 msgid "Refund processed via PayPal Commerce Platform (middleware). Refund ID: %s"
 msgstr ""
 
@@ -19677,16 +20045,19 @@ msgstr ""
 
 #. translators: %s: PayPal refund ID
 #: includes/gateways/paypal-commerce/class-charitable-gateway-paypal-commerce.php:3992
+#, php-format
 msgid "Refund processed via PayPal Commerce Platform. Refund ID: %s"
 msgstr ""
 
 #. translators: %s: current tier value
 #: includes/gateways/paypal-commerce/class-charitable-paypal-cli.php:84
+#, php-format
 msgid "No-op: the current PayPal tier is \"%s\". Nothing to switch."
 msgstr ""
 
 #. translators: %d: number of active recurring donations
 #: includes/gateways/paypal-commerce/class-charitable-paypal-cli.php:99
+#, php-format
 msgid "You have %d active legacy PayPal recurring donations. PayPal will continue billing donors, but Charitable will not record those renewals as donations after this switch. Cancel them in PayPal first OR pass --confirm-recurring-impact to accept this trade-off."
 msgstr ""
 
@@ -19696,6 +20067,7 @@ msgstr ""
 
 #. translators: %s: gateway settings URL
 #: includes/gateways/paypal-commerce/class-charitable-paypal-cli.php:173
+#, php-format
 msgid "Tier switched to commerce. Connect PayPal Commerce: %s"
 msgstr ""
 
@@ -19760,19 +20132,19 @@ msgstr ""
 msgid "Source"
 msgstr ""
 
-#: includes/logger/class-charitable-log-list-table.php:255
+#: includes/logger/class-charitable-log-list-table.php:272
 msgid "All Types"
 msgstr ""
 
-#: includes/logger/class-charitable-log-list-table.php:262
+#: includes/logger/class-charitable-log-list-table.php:279
 msgid "All Levels"
 msgstr ""
 
-#: includes/logger/class-charitable-log-list-table.php:269
+#: includes/logger/class-charitable-log-list-table.php:286
 msgid "All Sources"
 msgstr ""
 
-#: includes/logger/class-charitable-log-list-table.php:286
+#: includes/logger/class-charitable-log-list-table.php:303
 msgid "No log entries found."
 msgstr ""
 
@@ -19846,6 +20218,7 @@ msgstr ""
 
 #. translators: %d: number of days
 #: includes/logger/class-charitable-log.php:443
+#, php-format
 msgid "Retention set to %d days."
 msgstr ""
 
@@ -19924,6 +20297,7 @@ msgstr ""
 
 #. translators: %s: campaign names
 #: includes/privacy/class-charitable-privacy.php:615
+#, php-format
 msgid "Anonymous &ndash; %s"
 msgstr ""
 
@@ -19933,6 +20307,7 @@ msgstr ""
 
 #. translators: %s: donation amount
 #: includes/public/charitable-template-functions.php:1152
+#, php-format
 msgid "Your Donation Amount: %s."
 msgstr ""
 
@@ -19942,6 +20317,7 @@ msgstr ""
 
 #. Translators: %s: minimum donatino amount
 #: includes/public/class-charitable-public.php:85
+#, php-format
 msgid "You must donate at least %s."
 msgstr ""
 
@@ -19968,21 +20344,25 @@ msgstr ""
 
 #. translators: %d: number of files
 #: includes/public/class-charitable-public.php:248
+#, php-format
 msgid "You can only upload %d file"
 msgstr ""
 
 #. translators: %d: number of files
 #: includes/public/class-charitable-public.php:249
+#, php-format
 msgid "You can only upload a maximum of %d files"
 msgstr ""
 
 #. translators: %1$s: file name; %2$s: max upload size
 #: includes/public/class-charitable-public.php:250
+#, php-format
 msgid "%1$s exceeds the max upload size of %2$s"
 msgstr ""
 
 #. translators: %s: file name
 #: includes/public/class-charitable-public.php:251
+#, php-format
 msgid "%s failed to upload. Please try again."
 msgstr ""
 
@@ -20038,10 +20418,12 @@ msgid "Enter monthly amount"
 msgstr ""
 
 #: includes/shortcodes/class-charitable-mini-widget.php:78
+#, php-format
 msgid "Minimum amount is %s"
 msgstr ""
 
 #: includes/shortcodes/class-charitable-mini-widget.php:79
+#, php-format
 msgid "Maximum amount is %s"
 msgstr ""
 
@@ -20059,6 +20441,7 @@ msgstr ""
 
 #. translators: %s: email verification link
 #: includes/shortcodes/class-charitable-my-donations-shortcode.php:88
+#, php-format
 msgid "<a href=\"%s\">Confirm your email address</a> to access your full donation history."
 msgstr ""
 
@@ -20081,6 +20464,7 @@ msgstr ""
 
 #. translators: %s - the Square developer dashboard URL.
 #: includes/square/admin/class-charitable-square-admin.php:174
+#, php-format
 msgid "<p>To receive events, create a webhook route by providing your Personal Access Token, which you can find after registering an app on the <a href=\"%1$s\" target=\"_blank\">Square Developer Dashboard</a>. You can also set it up manually in the Advanced section.</p><p>See <a href=\"%2$s\" target=\"_blank\">our documentation</a> for details.</p>"
 msgstr ""
 
@@ -20090,6 +20474,7 @@ msgstr ""
 
 #. translators: %s: Error message from Square API
 #: includes/square/admin/class-charitable-square-connect.php:237
+#, php-format
 msgid "Square Error: Unable to revoke access token. %s"
 msgstr ""
 
@@ -20156,8 +20541,15 @@ msgid "Yearly"
 msgstr ""
 
 #. translators: %1$s: URL to the webhooks documentation
-#: includes/square/admin/class-charitable-square-webhookshealthcheck.php:217
+#: includes/square/admin/class-charitable-square-webhookshealthcheck.php:224
+#, php-format
 msgid "Looks like you have a problem with your webhooks configuration. Please check and confirm that you've configured the WPCharitable webhooks in your Square account. This notice will disappear automatically when a new Square request comes in. See our <a href=\"%1$s\" rel=\"nofollow noopener\" target=\"_blank\">documentation</a> for more information."
+msgstr ""
+
+#. translators: %1$s: URL to the Square settings screen, %2$s: URL to the webhooks documentation
+#: includes/square/admin/class-charitable-square-webhookshealthcheck.php:278
+#, php-format
+msgid "Charitable cannot verify incoming Square webhooks because no webhook signing secret is stored for the current mode. Unverified webhooks are rejected, so Square donations and refunds will not update automatically. Add your signing secret on the <a href=\"%1$s\">Square settings screen</a>. See our <a href=\"%2$s\" rel=\"nofollow noopener\" target=\"_blank\">documentation</a> for the steps."
 msgstr ""
 
 #: includes/square/admin/class-charitable-square-webhooksmanager.php:60
@@ -20270,6 +20662,7 @@ msgstr ""
 
 #. translators: %1$s: Minimum PHP version required, %2$s: Current PHP version, %3$s: Alternative gateway URL, %4$s: Documentation URL
 #: includes/square/class-charitable-square-compatibility.php:191
+#, php-format
 msgid "Charitable: The Square payment gateway requires PHP %1$s or higher. Your site is running PHP %2$s. Please upgrade PHP to use Square or use an <a href=\"%3$s\">alternative payment gateway</a>. See <a href=\"%4$s\">our documentation</a>."
 msgstr ""
 
@@ -20283,11 +20676,13 @@ msgstr ""
 
 #. translators: %s: link to Square payment intent details
 #: includes/square/donations/class-charitable-square-donation-log.php:80
+#, php-format
 msgid "Square Webhook: Payment status updated to %1$s and card details status is %2$s. Payment ID: %3$s"
 msgstr ""
 
 #. translators: %s: link to subscription object in Square dashboard
 #: includes/square/donations/class-charitable-square-recurring-donation-log.php:65
+#, php-format
 msgid "Square subscription ID: %s"
 msgstr ""
 
@@ -20295,16 +20690,19 @@ msgstr ""
 #. translators: %s: link to invoice object in Stripe dashboard
 #: includes/square/donations/class-charitable-square-recurring-donation-log.php:85
 #: includes/stripe/donations/class-charitable-stripe-recurring-donation-log.php:97
+#, php-format
 msgid "New invoice created for the subscription: %s"
 msgstr ""
 
 #. translators: %1$s: invoice id; %2$s: payment intent with link
 #: includes/square/donations/class-charitable-square-recurring-donation-log.php:120
+#, php-format
 msgid "Payment for invoice %1$s failed. Square payment intent: %2$s"
 msgstr ""
 
 #. translators: %1$s: campaign title; %2$s: amount; %3$s: currency; %4$s: period
 #: includes/square/gateway/class-charitable-square-subscription-plan.php:255
+#, php-format
 msgctxt "campaign title — amount every period"
 msgid "%1$s - %2$s %3$s every %4$s"
 msgstr ""
@@ -20327,6 +20725,7 @@ msgstr ""
 
 #. translators: %s: error message from Square
 #: includes/square/gateway/class-charitable-square-subscription-plan.php:446
+#, php-format
 msgid "Payment request failed with error: %s."
 msgstr ""
 
@@ -20448,6 +20847,7 @@ msgstr ""
 #. translators: %d: threshold
 #: includes/square/gateway/class-charitable-square-webhook-processor.php:1322
 #: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:1118
+#, php-format
 msgid "The payment intent has been cancelled after %d failed payment attempts."
 msgstr ""
 
@@ -20462,22 +20862,26 @@ msgstr ""
 #. translators: %1$s: campaign title; %2$s: amount; %3$s: currency; %4$s: period
 #: includes/stripe/abstracts/class-charitable-stripe-gateway-processor.php:708
 #: includes/stripe/gateway/class-charitable-stripe-plan.php:240
+#, php-format
 msgctxt "campaign title — amount every period"
 msgid "%1$s - %2$s %3$s every %4$s"
 msgstr ""
 
 #. translators: %s: type of error
 #: includes/stripe/abstracts/class-charitable-stripe-gateway-processor.php:1094
+#, php-format
 msgid "Stripe error: %s"
 msgstr ""
 
 #. translators: %s: link to Stripe charge details
 #: includes/stripe/abstracts/class-charitable-stripe-gateway-processor.php:1125
+#, php-format
 msgid "Stripe charge: %s"
 msgstr ""
 
 #. translators: %s: link to Stripe application fee details
 #: includes/stripe/abstracts/class-charitable-stripe-gateway-processor.php:1150
+#, php-format
 msgid "Stripe application fee: %s"
 msgstr ""
 
@@ -20499,6 +20903,7 @@ msgstr ""
 
 #. translators: %s is a link to the Charitable plugin.
 #: includes/stripe/admin/class-charitable-extension-activation.php:91
+#, php-format
 msgid " requires Charitable! Please %s to continue!"
 msgstr ""
 
@@ -20545,6 +20950,7 @@ msgstr ""
 
 #. translators: %1$d: number of failures, %2$s: opening Stripe settings link tag, %3$s: closing link tag, %4$s: opening documentation link tag, %5$s: closing link tag.
 #: includes/stripe/admin/class-charitable-stripe-admin.php:692
+#, php-format
 msgid "%1$d webhook events failed signature verification in the last 24 hours. This often happens after reconnecting Stripe or refreshing your account. If the issue persists, verify your signing secret in your %2$sStripe settings%3$s. %4$sLearn more%5$s."
 msgstr ""
 
@@ -20554,6 +20960,7 @@ msgstr ""
 
 #. translators: %1$s: opening link tag, %2$s: closing link tag.
 #: includes/stripe/admin/class-charitable-stripe-admin.php:738
+#, php-format
 msgid "Charitable was unable to automatically configure webhook signature verification for Stripe. Please visit your %1$sStripe settings%2$s and click \"Enable Webhook Signature Verification\" to secure your webhook endpoint."
 msgstr ""
 
@@ -20588,11 +20995,13 @@ msgstr ""
 
 #. translators: %d: number of days
 #: includes/stripe/admin/class-charitable-stripe-admin.php:1043
+#, php-format
 msgid "No pending Stripe donations found in the last %d days."
 msgstr ""
 
 #. translators: 1: checked count, 2: total count
 #: includes/stripe/admin/class-charitable-stripe-admin.php:1136
+#, php-format
 msgid "Dry Run: Checking donations... (%1$d of %2$d checked)"
 msgstr ""
 
@@ -20602,6 +21011,7 @@ msgstr ""
 
 #. translators: 1: count, 2: formatted total, 3: earliest date, 4: latest date
 #: includes/stripe/admin/class-charitable-stripe-admin.php:1145
+#, php-format
 msgid "Dry Run: Found %1$d donation(s) that would be updated, totaling %2$s. Date range: %3$s – %4$s. No changes were made. Uncheck \"Dry Run\" and click again to process."
 msgstr ""
 
@@ -20611,31 +21021,37 @@ msgstr ""
 
 #. translators: %s: Stripe PaymentIntent ID.
 #: includes/stripe/admin/class-charitable-stripe-admin.php:1230
+#, php-format
 msgid "Stripe Sync: PaymentIntent %s confirmed (succeeded). Status updated to Paid."
 msgstr ""
 
 #. translators: 1: Stripe PaymentIntent ID, 2: Stripe status string.
 #: includes/stripe/admin/class-charitable-stripe-admin.php:1244
+#, php-format
 msgid "Stripe Sync: PaymentIntent %1$s status '%2$s' — payment not confirmed. Status remains Pending."
 msgstr ""
 
 #. translators: 1: Stripe PaymentIntent ID, 2: error message.
 #: includes/stripe/admin/class-charitable-stripe-admin.php:1261
+#, php-format
 msgid "Stripe Sync: Error retrieving PaymentIntent %1$s — %2$s"
 msgstr ""
 
 #. translators: 1: processed count, 2: total count
 #: includes/stripe/admin/class-charitable-stripe-admin.php:1289
+#, php-format
 msgid "Syncing... %1$d of %2$d donations processed."
 msgstr ""
 
 #. translators: 1: updated count, 2: skipped count, 3: error count
 #: includes/stripe/admin/class-charitable-stripe-admin.php:1299
+#, php-format
 msgid "%1$d donation(s) marked completed. %2$d still pending in Stripe. %3$d error(s)."
 msgstr ""
 
 #. translators: %s: number of periods.
 #: includes/stripe/compat/charitable-stripe-recurring-compat-functions.php:34
+#, php-format
 msgid "%s month"
 msgid_plural "%s months"
 msgstr[0] ""
@@ -20643,6 +21059,7 @@ msgstr[1] ""
 
 #. translators: %s: number of periods.
 #: includes/stripe/compat/charitable-stripe-recurring-compat-functions.php:36
+#, php-format
 msgid "%s quarter"
 msgid_plural "%s quarters"
 msgstr[0] ""
@@ -20650,6 +21067,7 @@ msgstr[1] ""
 
 #. translators: %s: number of periods.
 #: includes/stripe/compat/charitable-stripe-recurring-compat-functions.php:38
+#, php-format
 msgid "%s semiannual"
 msgid_plural "%s semiannuals"
 msgstr[0] ""
@@ -20657,6 +21075,7 @@ msgstr[1] ""
 
 #. translators: %s: number of periods.
 #: includes/stripe/compat/charitable-stripe-recurring-compat-functions.php:40
+#, php-format
 msgid "%s year"
 msgid_plural "%s years"
 msgstr[0] ""
@@ -20664,31 +21083,37 @@ msgstr[1] ""
 
 #. translators: %s: link to Stripe payment intent details
 #: includes/stripe/donations/class-charitable-stripe-donation-log.php:69
+#, php-format
 msgid "Stripe payment intent: %s"
 msgstr ""
 
 #. translators: %s: link to connected account page in Stripe
 #: includes/stripe/donations/class-charitable-stripe-donation-log.php:135
+#, php-format
 msgid "Payment made directly on connected account: %s"
 msgstr ""
 
 #. translators: %s: link to connected account page in Stripe
 #: includes/stripe/donations/class-charitable-stripe-donation-log.php:212
+#, php-format
 msgid "%1$s application fee collected: %2$s"
 msgstr ""
 
 #. translators: %s: link to connected account page in Stripe
 #: includes/stripe/donations/class-charitable-stripe-donation-log.php:240
+#, php-format
 msgid "Transfer to connected account: %s"
 msgstr ""
 
 #. translators: %s: link to subscription object in Stripe dashboard
 #: includes/stripe/donations/class-charitable-stripe-recurring-donation-log.php:66
+#, php-format
 msgid "Stripe subscription ID: %s"
 msgstr ""
 
 #. translators: %1$s: invoice id; %2$s: payment intent with link
 #: includes/stripe/donations/class-charitable-stripe-recurring-donation-log.php:132
+#, php-format
 msgid "Payment for invoice %1$s failed. Stripe payment intent: %2$s"
 msgstr ""
 
@@ -20699,6 +21124,7 @@ msgstr ""
 
 #. translators: %d is the campaign ID.
 #: includes/stripe/gateway/class-charitable-stripe-gateway-processor-checkout.php:129
+#, php-format
 msgid "Donation to campaign %d"
 msgstr ""
 
@@ -20746,6 +21172,7 @@ msgstr ""
 
 #. translators: %s is the error message.
 #: includes/stripe/gateway/class-charitable-stripe-webhook-api.php:217
+#, php-format
 msgid "Error creating Stripe webhook: %s"
 msgstr ""
 
@@ -20856,6 +21283,7 @@ msgstr ""
 
 #. translators: %s is the invoice status.
 #: includes/stripe/gateway/class-charitable-stripe-webhook-processor.php:811
+#, php-format
 msgid "Subscription Webhook: Not processing invoice with a status of %s."
 msgstr ""
 
@@ -20930,11 +21358,13 @@ msgstr ""
 
 #. translators: %s: upgrade link
 #: includes/upgrades/class-charitable-upgrade.php:390
+#, php-format
 msgid "Click <a href=\"%s\">here</a> to start the upgrade."
 msgstr ""
 
 #. translators: %s: upgrade link
 #: includes/upgrades/class-charitable-upgrade.php:525
+#, php-format
 msgid "Charitable needs to complete an upgrade that was started earlier. Click <a href=\"%s\">here</a> to continue the upgrade."
 msgstr ""
 
@@ -20945,17 +21375,18 @@ msgstr ""
 msgid "You do not have permission to do Charitable upgrades"
 msgstr ""
 
-#: includes/user-management/class-charitable-user-management.php:138
+#: includes/user-management/class-charitable-user-management.php:157
 msgid "<strong>ERROR</strong>: Invalid email address."
 msgstr ""
 
-#: includes/user-management/class-charitable-user-management.php:140
-#: includes/user-management/class-charitable-user-management.php:151
+#: includes/user-management/class-charitable-user-management.php:159
+#: includes/user-management/class-charitable-user-management.php:177
 msgid "Lost your password?"
 msgstr ""
 
 #. translators: %s: email address
-#: includes/user-management/class-charitable-user-management.php:147
+#: includes/user-management/class-charitable-user-management.php:166
+#, php-format
 msgid "<strong>ERROR</strong>: The password you entered for %s is incorrect."
 msgstr ""
 
@@ -20976,6 +21407,7 @@ msgstr ""
 #. translators: %1$s: all list items except last, comma-separated; %2$s: second list item.
 #: includes/utilities/charitable-utility-functions.php:225
 #: includes/utilities/charitable-utility-functions.php:235
+#, php-format
 msgctxt "x and y"
 msgid "%1$s and %2$s"
 msgstr ""
@@ -21150,6 +21582,7 @@ msgstr ""
 
 #. translators: %s: campaign title
 #: templates/campaign-loop/more-link.php:26
+#, php-format
 msgctxt "Continue reading about campaign"
 msgid "Continue reading about %s"
 msgstr ""
@@ -21177,11 +21610,13 @@ msgstr ""
 
 #. translators: %s: email address
 #: templates/donation-form/donor-fields/donor-details.php:32
+#, php-format
 msgid "Email: %s"
 msgstr ""
 
 #. translators: %s: phone number
 #: templates/donation-form/donor-fields/donor-details.php:36
+#, php-format
 msgid "Phone number: %s"
 msgstr ""
 
@@ -21325,6 +21760,7 @@ msgstr ""
 
 #. translators: %s: taxonomy label
 #: templates/widgets/campaign-terms-dropdown.php:32
+#, php-format
 msgctxt "select campaign category/tag"
 msgid "Select %s"
 msgstr ""

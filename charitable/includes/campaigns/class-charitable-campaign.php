@@ -1385,6 +1385,16 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 			foreach ( $value as $key => $suggestion ) {
 				$value[ $key ]['amount'] = charitable_sanitize_amount( (string) $suggestion['amount'] );
 
+				/*
+				 * A description is OPTIONAL. filter_suggested_donation() above keeps any entry that has
+				 * a non-empty 'amount', so array( 'amount' => 25 ) is a perfectly valid suggestion with
+				 * no 'description' key at all - which is the normal shape when a campaign offers bare
+				 * amounts. Reading it unguarded emitted an "Undefined array key" warning on every such
+				 * sanitize pass. Defaulted rather than skipped so the key is always present in the
+				 * returned array, which is what callers and the stored meta already assume.
+				 */
+				$description = isset( $suggestion['description'] ) ? $suggestion['description'] : '';
+
 				/**
 				 * Sanitize the description field.
 				 *
@@ -1395,9 +1405,9 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 				 *                          still be filtered using wp_kses_post.
 				 */
 				if ( apply_filters( 'charitable_sanitize_suggested_amount_description', true ) ) {
-					$value[ $key ]['description'] = sanitize_text_field( $suggestion['description'] );
+					$value[ $key ]['description'] = sanitize_text_field( $description );
 				} else {
-					$value[ $key ]['description'] = wp_kses_post( $suggestion['description'] );
+					$value[ $key ]['description'] = wp_kses_post( $description );
 				}
 			}
 

@@ -1599,7 +1599,7 @@ form#posts-filter .actions.charitable-export-actions {
  */
 .charitable-admin-banner-top-of-page {
   text-align: center;
-  background: #E89940;
+  background: #fc9a2a;
   color: #fff;
   font-size: 13px;
   line-height: 1.4;
@@ -1819,7 +1819,7 @@ body.post-type-campaign .jconfirm.jconfirm-type-lite-pro-ad {
 }
 .charitable-lite-pro-popup .charitable-lite-pro-popup-button {
   padding: 16px 18px;
-  background: #E89940;
+  background: #fc9a2a;
   margin: 10px auto 0 auto;
   color: #fff;
   text-align: center;
@@ -2098,8 +2098,8 @@ div#charitable-settings .charitable-btn-md {
   min-height: 39px;
 }
 div#charitable-settings .charitable-btn-orange {
-  background-color: #e27730;
-  border-color: #e27730;
+  background-color: #fc9a2a;
+  border-color: #fc9a2a;
   color: #fff;
 }
 div#charitable-settings .charitable-btn-orange:hover:not(:disabled) {

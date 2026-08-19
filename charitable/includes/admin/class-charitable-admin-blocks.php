@@ -418,6 +418,41 @@ if ( ! class_exists( 'Charitable_Admin_Blocks' ) ) :
 		}
 
 		/**
+		 * Loads the stylesheet for the block editor canvas (the editor iframe).
+		 *
+		 * Since WP 6.3 the post editor canvas is an iframe, so anything enqueued on
+		 * admin_enqueue_scripts lands in the parent admin document and cannot style the
+		 * blocks inside it. `enqueue_block_assets` is the hook core collects to build the
+		 * iframe's assets (see _wp_get_iframed_editor_assets()), so styles enqueued here
+		 * are injected into the canvas properly.
+		 *
+		 * This replaces reliance on Gutenberg's useCompatibilityStyles back-compat shim,
+		 * which used to clone charitable-admin.css into the iframe and log
+		 * "charitable-admin-2.0-css was added to the iframe incorrectly" on every load.
+		 *
+		 * @since  1.8.12.1
+		 *
+		 * @return void
+		 */
+		public function enqueue_block_editor_canvas_styles() {
+
+			// `enqueue_block_assets` also fires on the front end; these rules are editor-only.
+			if ( ! is_admin() ) {
+				return;
+			}
+
+			$min     = charitable_get_min_suffix();
+			$version = charitable()->get_version();
+
+			wp_enqueue_style(
+				'charitable-block-editor-canvas',
+				charitable()->get_path( 'assets', false ) . 'css/admin/charitable-block-editor-canvas' . $min . '.css',
+				array(),
+				$version
+			);
+		}
+
+		/**
 		 * Retrieves localized strings for the Charitable Blocks editor.
 		 *
 		 * @since 1.8.0

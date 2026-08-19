@@ -1,0 +1,42 @@
+/**
+ * Charitable styles for the block editor CANVAS (the editor iframe).
+ *
+ * Since WP 6.3 the post editor canvas is an iframe, so styles enqueued on
+ * admin_enqueue_scripts land in the parent admin document and cannot reach the blocks.
+ * Gutenberg has a back-compat shim (useCompatibilityStyles) that clones any parent
+ * stylesheet whose selectors mention `.editor-styles-wrapper` or `.wp-block` into the
+ * iframe — but it logs a console warning naming the handle every time it does.
+ *
+ * These rules therefore live in their own file, enqueued on `enqueue_block_assets`, which
+ * is the hook core collects for the iframe (see _wp_get_iframed_editor_assets()). Because
+ * the sheet is then already present in the iframe under its own id, the shim skips it and
+ * stays quiet.
+ *
+ * Keep this file free of anything that is not canvas-scoped, and do not move these
+ * selectors back into charitable-admin.css — that reintroduces the warning.
+ *
+ * @since 1.8.12.1
+ */
+
+.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-campaigns-block .charitable-logo,
+.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-donations-block .charitable-logo,
+.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-donors-block .charitable-logo,
+.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-campaign-progress-bar .charitable-logo,
+.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-donation-button .charitable-logo,
+.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-campaign-stats .charitable-logo,
+.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-my-donations .charitable-logo {
+  max-width: 255px !important;
+  margin-bottom: 10px !important;
+  padding-bottom: 10px !important;
+  border-bottom: 1px solid #e8e8eb;
+}
+.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-campaigns-block p,
+.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-donations-block p,
+.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-donors-block p,
+.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-campaign-progress-bar p,
+.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-donation-button p,
+.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-campaign-stats p,
+.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-my-donations p {
+  margin-top: 2px !important;
+  margin-bottom: 2px !important;
+}

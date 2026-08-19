@@ -150,17 +150,20 @@ if ( ! class_exists( 'Charitable_Field_Progress_Bar' ) ) :
 			}
 
 			// if the "show_goal" is set to "show_goal" then show the goal, otherise do not but hidding it by setting 'charitable-hidden' class.
+			// A newly dragged-in field has neither 'show_hide' (legacy multi-check key) nor the
+			// newer 'show_donated'/'show_goal' scalars until it is first saved, so every key is
+			// checked with isset()/! empty() before use.
 			$show_donated_css = ! empty( $field_data ) &&
 								(
-									( is_array( $field_data['show_hide'] ) && ! empty( $field_data['show_hide'] ) && in_array( 'show_donated', $field_data['show_hide'] ) ) || // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
-									( is_string( $field_data['show_donated'] ) && 'show_donated' === $field_data['show_donated'] )
+									( ! empty( $field_data['show_hide'] ) && is_array( $field_data['show_hide'] ) && in_array( 'show_donated', $field_data['show_hide'] ) ) || // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
+									( isset( $field_data['show_donated'] ) && is_string( $field_data['show_donated'] ) && 'show_donated' === $field_data['show_donated'] )
 								)
 								? '' : 'charitable-hidden';
 			$show_goal_css    = ! empty( $field_data ) &&
 
 								(
-									( is_array( $field_data['show_hide'] ) && ! empty( $field_data['show_hide'] ) && in_array( 'show_goal', $field_data['show_hide'] ) ) || // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
-									( is_string( $field_data['show_goal'] ) && 'show_goal' === $field_data['show_goal'] )
+									( ! empty( $field_data['show_hide'] ) && is_array( $field_data['show_hide'] ) && in_array( 'show_goal', $field_data['show_hide'] ) ) || // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
+									( isset( $field_data['show_goal'] ) && is_string( $field_data['show_goal'] ) && 'show_goal' === $field_data['show_goal'] )
 								)
 								? '' : 'charitable-hidden';
 

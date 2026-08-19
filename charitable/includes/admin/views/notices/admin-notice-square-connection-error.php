@@ -45,7 +45,7 @@ if ( $charitable_status_code === '401' ) {
 				)
 			),
 			esc_html( $charitable_message ),
-			'<br><a href="' . esc_url( $charitable_settings_url ) . '" class="button button-primary charitable-admin-notice-square-connection-error" style="margin-top: 10px; background-color: #E89940; border-color: #E89940;">',
+			'<br><a href="' . esc_url( $charitable_settings_url ) . '" class="button button-primary charitable-admin-notice-square-connection-error" style="margin-top: 10px; background-color: #fc9a2a; border-color: #fc9a2a;">',
 			'</a>'
 		);
 		?>

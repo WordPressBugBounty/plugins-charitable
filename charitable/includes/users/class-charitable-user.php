@@ -856,8 +856,19 @@ if ( ! class_exists( 'Charitable_User' ) ) :
 				$donor_id = $this->get_donor_id();
 			}
 
-			/* Clear out the cache */
-			wp_cache_delete( $donor_id, 'donors' );
+			/*
+			 * Clear out the cache.
+			 *
+			 * Only when there is actually an ID. get_donor_id() returns false for a donor who does not
+			 * exist yet, which is the normal path into the insert() below - and the `if ( $donor_id )`
+			 * immediately after this already accounts for that. Passing false as a cache key trips
+			 * WP 6.1+'s "Cache key must be an integer or a non-empty string" _doing_it_wrong notice on
+			 * every new-donor save. Deleting the key false was a no-op regardless, so guarding it
+			 * changes no behaviour.
+			 */
+			if ( $donor_id ) {
+				wp_cache_delete( $donor_id, 'donors' );
+			}
 
 			if ( $donor_id ) {
 				charitable_get_table( 'donors' )->update( $donor_id, $donor_data );

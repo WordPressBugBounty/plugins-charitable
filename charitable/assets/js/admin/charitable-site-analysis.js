@@ -8,6 +8,25 @@
 	// PLACEHOLDER personalization hints (until the backend personalizes detail copy per featureId).
 	var AFTER_OPTIN = { recurring: 'quantified after opt-in', 'fee-relief': 'personalized after opt-in' };
 
+	// Allow only http(s) (or scheme-less) URLs into an href. cta.url and recommendedPlan.url come from
+	// the remote recommendations feed, so a `javascript:` or `data:` URL from a compromised or spoofed
+	// endpoint would otherwise execute inside wp-admin with the logged-in admin's privileges.
+	//
+	// Deliberately NOT implemented with the URL constructor and a catch that returns '#': where URL is
+	// unavailable that silently kills every CTA on the page.
+	function safeHref( url ) {
+		if ( ! url ) { return '#'; }
+		// Strip whitespace and control characters anywhere in the string before testing the scheme:
+		// browsers ignore them when resolving, so "java\tscript:" and " javascript:" both execute.
+		var candidate = String( url ).replace( /[\s\x00-\x1f\x7f]/g, '' );
+		// A scheme is present only if a colon precedes any /, ? or #. Scheme-relative ("//host/x") and
+		// path-relative URLs carry no scheme of their own and inherit the admin origin, so they're fine.
+		if ( /^[a-z][a-z0-9+.\-]*:/i.test( candidate ) ) {
+			return /^https?:/i.test( candidate ) ? url : '#';
+		}
+		return url;
+	}
+
 	// Upgrade recs point at the plugin's tagged upgrade URL; config-fix recs open the relevant in-plugin
 	// screen (cfg.internal); everything else falls back to the rec's own (external) CTA link.
 	function ctaHref( rec, cfg ) {
@@ -98,7 +117,7 @@
 		$main.append( $d );
 		$c.append( $main );
 		if ( r.cta && r.cta.label ) {
-			var $cta = $( '<a class="button"></a>' ).attr( 'href', ctaHref( r, cfg ) ).text( r.cta.label );
+			var $cta = $( '<a class="button"></a>' ).attr( 'href', safeHref( ctaHref( r, cfg ) ) ).text( r.cta.label );
 			// Internal (in-plugin) links open in the same tab; external links open in a new tab.
 			if ( ! ctaIsInternal( r, cfg ) ) { $cta.attr( 'target', '_blank' ).attr( 'rel', 'noopener noreferrer' ); }
 			$c.append( $cta );
@@ -245,7 +264,7 @@
 				? ' Acting on these would lift your score toward ' + report.score.potential + '.'
 				: '';
 			$plan.append( $( '<div></div>' ).text( unlocks + tail ) );
-			$plan.append( $( '<a class="button button-primary" style="margin-top:8px;"></a>' ).attr( 'href', p.url ).attr( 'target', '_blank' ).attr( 'rel', 'noopener noreferrer' ).text( 'See ' + p.label ) );
+			$plan.append( $( '<a class="button button-primary" style="margin-top:8px;"></a>' ).attr( 'href', safeHref( p.url ) ).attr( 'target', '_blank' ).attr( 'rel', 'noopener noreferrer' ).text( 'See ' + p.label ) );
 			$out.append( $plan );
 		}
 

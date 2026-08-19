@@ -453,27 +453,39 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 			$where_sql[] = 'WHERE 1=1';
 			$where_sql[] = 'p.post_type = "%s"';
 			$where_sql[] = 'p.post_status = "charitable-active"';
-			$where_sql[] = 'pm1.meta_key = "donation_gateway"';
-			$where_sql[] = 'pm2.meta_key = "donation_period"';
-			$where_sql[] = 'pm3.meta_key = "_first_donation"';
-			$where_sql[] = 'pm4.meta_key = "_expiration_date"';
 
 			// remove all empty values from the array.
 			$where_sql  = array_filter( $where_sql );
 			$where_args = implode( ' AND ', $where_sql );
 
+			/*
+			 * Each meta_key test belongs in its join's ON clause, NOT in the WHERE clause. A WHERE test
+			 * against a left-joined row is an inner join, so until 1.8.12.1 any recurring donation missing
+			 * even one of these four meta keys was dropped from the result set entirely - which silently
+			 * undercounted recurring_donations_count and every amount derived from these rows. A
+			 * subscription with no _expiration_date is perfectly normal, and used to vanish here.
+			 */
 			$left_join      = array();
-			$left_join[]    = $wpdb->prefix . 'postmeta pm1 ON p.ID = pm1.post_id';
-			$left_join[]    = $wpdb->prefix . 'postmeta pm2 ON p.ID = pm2.post_id';
-			$left_join[]    = $wpdb->prefix . 'postmeta pm3 ON p.ID = pm3.post_id';
-			$left_join[]    = $wpdb->prefix . 'postmeta pm4 ON p.ID = pm4.post_id';
+			$left_join[]    = $wpdb->prefix . 'postmeta pm1 ON p.ID = pm1.post_id AND pm1.meta_key = "donation_gateway"';
+			$left_join[]    = $wpdb->prefix . 'postmeta pm2 ON p.ID = pm2.post_id AND pm2.meta_key = "donation_period"';
+			$left_join[]    = $wpdb->prefix . 'postmeta pm4 ON p.ID = pm4.post_id AND pm4.meta_key = "_expiration_date"';
 			$left_join      = array_filter( $left_join );
 			$left_join_args = 'LEFT JOIN ' . implode( ' LEFT JOIN ', $left_join );
 
-			$sql = "SELECT SUM(pm4.meta_value) AS total_recurring_amount,
-			pm1.meta_value AS payment_gateway,
+			/*
+			 * No SUM() here any more. Until 1.8.12.1 this selected `SUM(pm4.meta_value) AS
+			 * total_recurring_amount` - i.e. it summed the _expiration_date meta, a DATE, which cast to
+			 * '2026-06-15 23:59:59' -> 2026. Nothing ever read that alias (the aggregator re-sums in PHP),
+			 * and with GROUP BY p.ID it was not even an aggregate. It is gone because it was the single
+			 * most misleading line in this function: it implied the recurring amount came from a date.
+			 *
+			 * pm3 (_first_donation) is no longer selected either. It is a donation POST ID, not an amount
+			 * - the Recurring addon writes it as update_post_meta( $recurring_id, '_first_donation',
+			 * $donation_id ) - and it was previously summed as money. See
+			 * summarise_recurring_donations() for what replaced it.
+			 */
+			$sql = "SELECT pm1.meta_value AS payment_gateway,
 			pm2.meta_value AS donation_period,
-			pm3.meta_value AS first_donation,
 			pm4.meta_value AS expiration_date,
 			p.post_date AS post_date,
 			p.post_date_gmt AS post_date_gmt,
@@ -500,59 +512,61 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 		 * Extracted from get_recurring_donation_data() so it is testable without a
 		 * $wpdb stub.
 		 *
-		 * recurring_donations_count is NEW in 1.8.17.4 and is the point. Stage 5
-		 * Power leans on recurring activity, but the only recurring signal in the
-		 * payload was total_recurring_amount, a money figure. On the cloud side
-		 * subscription_analyses covers just 193 of 2,547 accounts and
-		 * RefreshSubscriptionAnalysisCommand never writes active_subscriptions at
-		 * all, so there was no reliable recurring COUNT anywhere.
+		 * recurring_donations_count is the point. Stage 5 Power leans on recurring
+		 * activity, but the only recurring signal in the payload was
+		 * total_recurring_amount. On the cloud side subscription_analyses covers just
+		 * 193 of 2,547 accounts and RefreshSubscriptionAnalysisCommand never writes
+		 * active_subscriptions at all, so there was no reliable recurring COUNT
+		 * anywhere.
 		 *
-		 * NOTE ON $donation->first_donation: in this query that is the
-		 * _first_donation POST META, which is a MONEY AMOUNT, not a date. It shares
-		 * a name with the charitable_first_donation option, which IS a date and is
-		 * reported separately as $data['first_donation']. Do not conflate them.
+		 * CHANGED IN 1.8.12.1. This function used to report five money figures, all of
+		 * which were sums of donation POST IDs, because it read the _first_donation
+		 * post meta as an amount. It is not an amount: the Recurring addon writes it
+		 * as update_post_meta( $recurring_id, '_first_donation', $donation_id ), and
+		 * its accessor is get_first_donation_id(). Measured on a real site, a
+		 * subscription whose first donation was 3.68 contributed 309, and one whose
+		 * first-donation post had been deleted still contributed its stale ID.
+		 *
+		 * Removed: total_recurring_amount, recurring_donations_7_days,
+		 * recurring_donations_30_days. There is no correct value to put in them here -
+		 * the pledge amount lives only in the serialized `campaigns` post meta,
+		 * recurring donations have no charitable_campaign_donations row, and some
+		 * active subscriptions record no amount at all.
+		 *
+		 * Changed: recurring_donations_payment_gateway and recurring_donations_period
+		 * are now COUNTS of active subscriptions rather than (bogus) amounts.
+		 *
+		 * Do not confuse _first_donation with the charitable_first_donation option,
+		 * which IS a date and is reported separately as $data['first_donation'].
 		 *
 		 * @since 1.8.12
+		 * @version 1.8.12.1
 		 *
 		 * @param array $recurring_donations Rows from the recurring query.
 		 * @return array
 		 */
 		private function summarise_recurring_donations( array $recurring_donations ) {
 
-			$total_recurring_amount              = 0;
 			$recurring_count                     = 0;
-			$recurring_donations_7_days          = 0;
-			$recurring_donations_30_days         = 0;
 			$recurring_donations_payment_gateway = array();
 			$recurring_donations_period          = array();
 
-			$cutoff_7  = strtotime( '-7 days' );
-			$cutoff_30 = strtotime( '-30 days' );
-
 			foreach ( $recurring_donations as $donation ) {
 
-				// A money amount, despite the name. See the docblock.
-				$amount = isset( $donation->first_donation ) ? $donation->first_donation : 0;
-				$when   = isset( $donation->post_date ) ? strtotime( (string) $donation->post_date ) : false;
-
-				$total_recurring_amount += $amount;
 				++$recurring_count;
 
-				if ( false !== $when && $when > $cutoff_7 ) {
-					$recurring_donations_7_days += $amount;
-				}
-
-				if ( false !== $when && $when > $cutoff_30 ) {
-					$recurring_donations_30_days += $amount;
-				}
-
+				// Counts, not amounts. This query cannot produce a reliable recurring money figure: the
+				// pledge amount lives only inside the serialized `campaigns` post meta, recurring
+				// donations have no charitable_campaign_donations row, and some active subscriptions
+				// record no amount at all. A count of active subscriptions per gateway and per period is
+				// the useful thing it CAN compute correctly, so that is what these now report.
 				$gateway = isset( $donation->payment_gateway ) ? (string) $donation->payment_gateway : '';
 
 				if ( ! isset( $recurring_donations_payment_gateway[ $gateway ] ) ) {
 					$recurring_donations_payment_gateway[ $gateway ] = 0;
 				}
 
-				$recurring_donations_payment_gateway[ $gateway ] += $amount;
+				++$recurring_donations_payment_gateway[ $gateway ];
 
 				$period = isset( $donation->donation_period ) ? (string) $donation->donation_period : '';
 
@@ -560,16 +574,13 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 					$recurring_donations_period[ $period ] = 0;
 				}
 
-				$recurring_donations_period[ $period ] += $amount;
+				++$recurring_donations_period[ $period ];
 			}
 
 			return array(
-				'total_recurring_amount'              => $total_recurring_amount,
+				// Counts of ACTIVE subscriptions, keyed by gateway / by period. Amounts before 1.8.12.1.
 				'recurring_donations_payment_gateway' => $recurring_donations_payment_gateway,
 				'recurring_donations_period'          => $recurring_donations_period,
-				'recurring_donations_7_days'          => $recurring_donations_7_days,
-				'recurring_donations_30_days'         => $recurring_donations_30_days,
-				// New in 1.8.17.4.
 				'recurring_donations_count'           => $recurring_count,
 			);
 		}

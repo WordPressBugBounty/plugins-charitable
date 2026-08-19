@@ -118,7 +118,22 @@ if ( ! class_exists( 'Charitable_Export_Donations' ) ) :
 		public function suppliment_charitable_export_data( $custom_field_data = false, $key = false, $data = array() ) {
 
 			if ( in_array( $key, $this->format_money_fields, true ) ) {
-				return html_entity_decode( trim( charitable_format_money( $custom_field_data ) ) );
+				/*
+				 * Core 'subtotal' and 'total' have no value_callback, so they arrive here as
+				 * raw database amounts (period as the decimal separator, e.g. "101.78"). Other
+				 * money fields ('amount', and addon-provided totals such as Fee Relief's
+				 * 'total_donation_with_fees') arrive already localized. On comma-decimal locales,
+				 * running a raw DB amount through charitable_format_money() without the db_format
+				 * flag makes the "." read as a thousands separator and get stripped
+				 * (101.78 -> "10 178,00"). So pass db_format = true only for the raw DB amounts.
+				 */
+				$db_format_fields = apply_filters(
+					'charitable_export_donations_db_format_money_fields',
+					array( 'subtotal', 'total' )
+				);
+				$db_format        = in_array( $key, $db_format_fields, true );
+
+				return html_entity_decode( trim( charitable_format_money( $custom_field_data, false, $db_format ) ) );
 			}
 
 			return $custom_field_data;

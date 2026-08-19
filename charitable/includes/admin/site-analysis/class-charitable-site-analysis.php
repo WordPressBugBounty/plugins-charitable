@@ -23,6 +23,21 @@ if ( ! class_exists( 'Charitable_Site_Analysis' ) ) :
 		/** Transient holding the last result keyed by payload hash. */
 		const CACHE_TRANSIENT = 'charitable_analysis_cache';
 
+		/**
+		 * Timestamp of the last successful API call, for the refresh rate limit (autoload off).
+		 *
+		 * NEW IN 1.8.12.1. This used to be read out of CACHE_TRANSIENT's own 'time' key - i.e. the rate
+		 * limit lived inside the very cache that flush_cache() deletes. Every one of the five
+		 * invalidation hooks therefore reset the 24h limit, and "Settings > Advanced > Clear cache" was
+		 * a deliberate, repeatable, one-click reset. The cache is meant to be volatile; a rate limit
+		 * must not be.
+		 *
+		 * Kept separate from the cache's 'time' on purpose: that still dates the *report* ("Last
+		 * analyzed 2 hours ago"), which correctly disappears when the report does. This dates the
+		 * last *network call*, which must not.
+		 */
+		const LAST_RUN_OPTION = 'charitable_analysis_last_run';
+
 		/** Plugin-side cache lifetime. */
 		const CACHE_TTL = 7 * DAY_IN_SECONDS;
 
@@ -82,9 +97,19 @@ if ( ! class_exists( 'Charitable_Site_Analysis' ) ) :
 			charitable_admin_view( 'reports/site-analysis' );
 		}
 
-		/** Delete the cached report so the next tab view recomputes (config changed or cache cleared). */
+		/**
+		 * Delete the cached report so the next tab view recomputes (config changed or cache cleared).
+		 *
+		 * Deliberately does NOT touch LAST_RUN_OPTION. Invalidating the report is the point here;
+		 * resetting the refresh rate limit is not, and used to be a side effect.
+		 */
 		public function flush_cache() {
 			delete_transient( self::CACHE_TRANSIENT );
+		}
+
+		/** Timestamp of the last successful API call, or 0 if it has never run. */
+		private function last_run_time() {
+			return (int) get_option( self::LAST_RUN_OPTION, 0 );
 		}
 
 		/** Enqueue the tool's assets on the Reports > Site Analysis tab. */
@@ -123,9 +148,12 @@ if ( ! class_exists( 'Charitable_Site_Analysis' ) ) :
 
 			// Manual refresh is limited to once per cooldown window; tell the JS whether it's allowed yet
 			// (and, if not, how long until it is) so it can disable the link. The server enforces this too.
-			$cache_time    = ( is_array( $cache ) && ! empty( $cache['time'] ) ) ? (int) $cache['time'] : 0;
-			$refresh_ok    = ( 0 === $cache_time ) || ( time() - $cache_time ) >= self::REFRESH_COOLDOWN;
-			$refresh_wait  = $refresh_ok ? '' : human_time_diff( time(), $cache_time + self::REFRESH_COOLDOWN );
+			// Measured from LAST_RUN_OPTION rather than the cache's own timestamp: the cache is deleted on
+			// every config change and by "Clear cache", which used to silently reset this limit and leave
+			// the UI offering a live Refresh link seconds after an analysis ran.
+			$last_run     = $this->last_run_time();
+			$refresh_ok   = ( 0 === $last_run ) || ( time() - $last_run ) >= self::REFRESH_COOLDOWN;
+			$refresh_wait = $refresh_ok ? '' : human_time_diff( time(), $last_run + self::REFRESH_COOLDOWN );
 
 			wp_localize_script(
 				'charitable-site-analysis',
@@ -199,11 +227,23 @@ if ( ! class_exists( 'Charitable_Site_Analysis' ) ) :
 			$force   = ! empty( $_POST['refresh'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$cache   = get_transient( self::CACHE_TRANSIENT );
 
-			// Rate-limit manual refresh: only honor a forced re-fetch once the cooldown has elapsed since
-			// the last analysis. Within the window, ignore the force and serve the cache (no network/quota).
-			// This is the authoritative check - the button is also disabled client-side, but that's only UX.
-			if ( $force && is_array( $cache ) && ! empty( $cache['time'] )
-				&& ( time() - (int) $cache['time'] ) < self::REFRESH_COOLDOWN ) {
+			/*
+			 * Rate-limit manual refresh: only honor a forced re-fetch once the cooldown has elapsed since
+			 * the last successful API call. Within the window, ignore the force and serve the cache
+			 * (no network, no quota). This is the authoritative check for the *forced refresh* path - the
+			 * button is also disabled client-side, but that is only UX.
+			 *
+			 * Read from LAST_RUN_OPTION, not from $cache['time']: the cooldown must outlive the cache it
+			 * limits. See LAST_RUN_OPTION.
+			 *
+			 * Note this gates the forced path only. A changed payload hash, or an absent cache, still
+			 * reaches the network on the next run - deliberately, because a config change must be
+			 * reflected in the score. The floor on that path is the server's own per-token daily quota,
+			 * which returns 429 and is surfaced as the "analysis limit" message below.
+			 */
+			$last_run = $this->last_run_time();
+
+			if ( $force && $last_run > 0 && ( time() - $last_run ) < self::REFRESH_COOLDOWN ) {
 				$force = false;
 			}
 
@@ -216,6 +256,11 @@ if ( ! class_exists( 'Charitable_Site_Analysis' ) ) :
 			$token = $this->get_token();
 			if ( '' === $token ) {
 				$token = $this->register();
+				// A rate-limited registration is not an outage; say so, so the user waits instead of
+				// retrying into the same limit. See register().
+				if ( 'quota' === $token ) {
+					$this->fail_with_cache( __( "You've reached the analysis limit for now. Please try again later.", 'charitable' ), $cache );
+				}
 				if ( '' === $token ) {
 					$this->fail_with_cache( __( 'The analysis service is unavailable right now. Please try again.', 'charitable' ), $cache );
 				}
@@ -224,7 +269,12 @@ if ( ! class_exists( 'Charitable_Site_Analysis' ) ) :
 			// 3) Call recommendations; on 401 (revoked/unknown token) re-register once and retry.
 			$report = $this->request_recommendations( $payload, $token );
 			if ( 'reauth' === $report ) {
-				$token  = $this->register();
+				$token = $this->register();
+				// Handle the rate limit here too: 'quota' is a status, not a token, and passing it
+				// through as one would produce a second 401 and report a misleading generic error.
+				if ( 'quota' === $token ) {
+					$this->fail_with_cache( __( "You've reached the analysis limit for now. Please try again later.", 'charitable' ), $cache );
+				}
 				$report = ( '' === $token ) ? 'error' : $this->request_recommendations( $payload, $token );
 			}
 
@@ -235,8 +285,12 @@ if ( ! class_exists( 'Charitable_Site_Analysis' ) ) :
 				$this->fail_with_cache( __( 'The analysis service is unavailable right now. Please try again.', 'charitable' ), $cache );
 			}
 
-			// 4) Success: cache, consent-gated usage check-in, return.
+			// 4) Success: cache, stamp the rate limit, consent-gated usage check-in, return.
 			set_transient( self::CACHE_TRANSIENT, array( 'payload_hash' => $hash, 'result' => $report, 'time' => time() ), self::CACHE_TTL );
+			// Stamped outside the transient so flush_cache() cannot reset the cooldown. Only successes
+			// count, so a failed call stays retryable - which is what fail_with_cache()'s stale-report
+			// path and the JS retry link both assume.
+			update_option( self::LAST_RUN_OPTION, time(), false ); // autoload = no
 			$this->fire_usage_tracking( $consent );
 			wp_send_json_success( $report );
 		}
@@ -300,17 +354,70 @@ if ( ! class_exists( 'Charitable_Site_Analysis' ) ) :
 			$t          = Charitable_Tracking::get_instance();
 			$donation   = method_exists( $t, 'get_donation_data' ) ? (array) $t->get_donation_data() : array();
 			$charitable = method_exists( $t, 'get_charitable_data' ) ? (array) $t->get_charitable_data() : array();
-			$recurring  = method_exists( $t, 'get_recurring_donation_data' ) ? (array) $t->get_recurring_donation_data() : array();
 			$total      = isset( $donation['total_donations'] ) ? (float) $donation['total_donations'] : 0.0;
-			$rec_total  = isset( $recurring['total_recurring_amount'] ) ? (float) $recurring['total_recurring_amount'] : 0.0;
 			return array(
 				'total_raised'    => $total,
 				'avg_gift'        => isset( $charitable['average'] ) ? (float) $charitable['average'] : 0.0,
-				'recurring_share' => $total > 0 ? min( 1, round( $rec_total / $total, 4 ) ) : 0.0,
+				'recurring_share' => $this->recurring_revenue_share(),
 				'donations_30d'   => isset( $donation['donations_30_days'] ) ? (float) $donation['donations_30_days'] : 0.0,
 				'donor_count'     => isset( $charitable['donor_count'] ) ? (int) $charitable['donor_count'] : 0,
 				'country'         => (string) charitable_get_option( 'country', '' ),
 			);
+		}
+
+		/**
+		 * Share of completed donation revenue that came from a recurring donation, 0..1.
+		 *
+		 * REPLACES A BROKEN DERIVATION. Until 1.8.12.1 this came from Charitable_Tracking's
+		 * total_recurring_amount divided by total_donations and clamped with min( 1, ... ). That was
+		 * wrong twice over: total_recurring_amount summed the _first_donation post meta, which is a
+		 * donation POST ID and not an amount (the Recurring addon writes it as
+		 * update_post_meta( $recurring_id, '_first_donation', $donation_id )), and even correctly
+		 * summed it would count active pledges rather than revenue received, so dividing it by
+		 * lifetime revenue was a category error. The clamp hid it: the numerator was large enough
+		 * that the ratio pinned to exactly 1, so almost every site reported 100% recurring. Measured
+		 * on a real site: 1.2% actual vs 100% reported. A value of exactly 1 is that bug's signature.
+		 *
+		 * Both halves below come from the same rows of the same table, so this is a true ratio and
+		 * needs no clamp. Recurring child donations are themselves completed `donation` posts, so
+		 * they are already inside the denominator. See
+		 * _claude/addons/charitable-pro/1.8.18/2026-08-18-recurring-share-and-total-recurring-amount-bugs.md
+		 *
+		 * @since 1.8.12.1
+		 *
+		 * @return float
+		 */
+		private function recurring_revenue_share() {
+			global $wpdb;
+
+			// Match on parent.post_type rather than post_parent > 0: post_parent is a generic column,
+			// and this stays correct if anything else ever parents a donation.
+			//
+			// A direct query is deliberate: this is a two-column aggregate over the whole donation
+			// table, computed once per analysis run, and there is no Charitable API that returns both
+			// halves from the same rows - which is the entire point (see the docblock). It is not
+			// cached because a stale ratio would silently misreport the score.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$row = $wpdb->get_row(
+				"SELECT SUM(cd.amount) AS total,
+					SUM( CASE WHEN parent.ID IS NOT NULL THEN cd.amount ELSE 0 END ) AS recurring
+				FROM {$wpdb->posts} p
+				INNER JOIN {$wpdb->prefix}charitable_campaign_donations cd
+					ON p.ID = cd.donation_id
+				LEFT JOIN {$wpdb->posts} parent
+					ON p.post_parent = parent.ID
+					AND parent.post_type = 'recurring_donation'
+				WHERE p.post_type = 'donation'
+					AND p.post_status = 'charitable-completed'"
+			); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+
+			$total = ( $row && $row->total ) ? (float) $row->total : 0.0;
+
+			if ( $total <= 0 ) {
+				return 0.0;
+			}
+
+			return round( (float) $row->recurring / $total, 4 );
 		}
 
 		/**
@@ -332,7 +439,24 @@ if ( ! class_exists( 'Charitable_Site_Analysis' ) ) :
 
 		/**
 		 * Register this site with NonprofitScore and persist the minted per-site token.
-		 * Returns the token on success, '' on failure (the caller surfaces a graceful error).
+		 * Returns the token on success, 'quota' on 429, or '' on failure (the caller surfaces a
+		 * graceful error).
+		 *
+		 * CHANGED IN 1.8.12.1. This used to fold every non-201 into '', so the caller reported "The
+		 * analysis service is unavailable right now" for a 429 as well as for a real outage. The
+		 * register endpoint is rate-limited **by IP** with a window observed at over 15 minutes, which
+		 * means a shared host, a multisite, or an agency running several client sites can trip it
+		 * through no fault of the site in front of the user - and the message then invites exactly the
+		 * pointless retry that keeps it tripped.
+		 *
+		 * Mirrors request_recommendations()'s existing convention of returning a status string, so both
+		 * network paths report a quota the same way. A minted token can never collide with 'quota';
+		 * they are prefixed 'nst_'.
+		 *
+		 * @since 1.8.12
+		 * @version 1.8.12.1
+		 *
+		 * @return string
 		 */
 		private function register() {
 			$response = wp_remote_post(
@@ -350,9 +474,20 @@ if ( ! class_exists( 'Charitable_Site_Analysis' ) ) :
 				)
 			);
 
-			if ( is_wp_error( $response ) || 201 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+			if ( is_wp_error( $response ) ) {
 				return '';
 			}
+
+			$code = (int) wp_remote_retrieve_response_code( $response );
+
+			if ( 429 === $code ) {
+				return 'quota';
+			}
+
+			if ( 201 !== $code ) {
+				return '';
+			}
+
 			$data  = json_decode( wp_remote_retrieve_body( $response ), true );
 			$token = ( is_array( $data ) && ! empty( $data['token'] ) ) ? (string) $data['token'] : '';
 			if ( '' !== $token ) {
@@ -548,38 +683,114 @@ if ( ! class_exists( 'Charitable_Site_Analysis' ) ) :
 		/**
 		 * Decide which usage-tracking check-in to fire (pure; unit-testable).
 		 *
-		 * @param bool $tracking_enabled Whether the Advanced "Usage Tracking" toggle is ON.
-		 * @param bool $consent          Whether the user ticked the in-tool consent checkbox.
-		 * @return string 'none' | 'financial' | 'both'
+		 * CHANGED IN 1.8.12.1. This used to return 'financial' when the user DECLINED the in-tool
+		 * toggle and usage tracking was off, and the caller then invoked
+		 * send_tracking_checkin( true, false ) - where the first argument is $override, which skips
+		 * the consent gate outright:
+		 *
+		 *     if ( ! $this->tracking_allowed() && ! $override ) {
+		 *         return false;
+		 *     }
+		 *
+		 * So declining still transmitted: a persistent sha256 site AID from
+		 * charitable_site_tracking_aid, campaign counts, campaign data, donation data and recurring
+		 * data. On Lite the licence key resolves to '', so unlike Pro the payload is not directly
+		 * identifying - but the AID is stable, so it still links a site's history, and it was a
+		 * decline being ignored either way.
+		 *
+		 * This was Lite's behaviour from its first commit (334730a553) rather than a regression -
+		 * dd0c57264f only changed the tracking-ON case from 'none' to 'both' - so the intent was
+		 * presumably "anonymous aggregates are fine". The premise does not hold: the user declined.
+		 *
+		 * Declining now sends nothing. The report itself is unaffected: this runs after the report is
+		 * built, and the score comes from the separately consent-gated NonprofitScore payload, so with
+		 * the toggle off the analysis and score still work in full.
+		 *
+		 * 'financial' is gone rather than left unreachable, so no dead branch remains below.
+		 *
+		 * The Advanced > Misc "Usage Tracking" permission is now the ONLY basis for transmitting
+		 * anything, in Lite and Pro alike. In-tool consent is not an independent basis: ticking the
+		 * toggle turns that permission ON (see enable_usage_tracking()), and the caller applies it
+		 * before this runs, so by the time we get here $tracking_enabled already reflects it. That is
+		 * what makes "nothing is submitted while usage tracking is off" true rather than aspirational,
+		 * and it means a filter-based force-disable still wins over a ticked toggle.
+		 *
+		 * @since 1.8.12
+		 * @version 1.8.12.1
+		 *
+		 * @param bool $tracking_enabled Whether usage-tracking permission is granted, read through
+		 *                               the charitable_usage_tracking filter.
+		 * @param bool $consent          Whether the user ticked the in-tool toggle. Retained because
+		 *                               this is a public, unit-tested contract; not decisive, since
+		 *                               the caller has already converted it into the permission.
+		 * @return string 'none' | 'both'
 		 */
-		public static function decide_tracking_action( $tracking_enabled, $consent ) {
-			if ( $tracking_enabled ) {
-				// Fire an immediate full check-in on submit. The sender's once-per-week
-				// throttle prevents a double-send and stamps charitable_usage_tracking_last_checkin,
-				// so the weekly cron simply resumes from here.
-				return 'both';
-			}
-			return $consent ? 'both' : 'financial';
+		public static function decide_tracking_action( $tracking_enabled, $consent ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- $consent stays in the signature because this is a public, unit-tested contract; it is no longer decisive. See above.
+			// Fire an immediate full check-in on submit. The sender's once-per-week throttle prevents a
+			// double-send and stamps charitable_usage_tracking_last_checkin, so the weekly cron simply
+			// resumes from here.
+			return $tracking_enabled ? 'both' : 'none';
 		}
 
-		/** Fire the appropriate one-time check-in, best-effort. Never flips the Advanced setting. */
+		/**
+		 * Grant usage-tracking permission persistently, because the user ticked the in-tool toggle.
+		 *
+		 * Ticking the Site Analysis toggle turns the Advanced > Misc "Usage Tracking" setting ON, in
+		 * both Lite and Pro. Lite has no other mechanism for enabling it outside the settings screen,
+		 * so routing consent through the setting is what lets one rule cover both products.
+		 *
+		 * ONE-WAY BY DESIGN. This never writes false: unticking the toggle must not turn off tracking
+		 * that is already on. In practice the toggle is not even rendered once tracking is on (see
+		 * views/reports/site-analysis.php), so there is nothing to untick - but the guarantee is
+		 * enforced here rather than left to the view.
+		 *
+		 * @since 1.8.12.1
+		 *
+		 * @return void
+		 */
+		private function enable_usage_tracking() {
+			if ( function_exists( 'charitable_update_usage_tracking_setting' ) ) {
+				charitable_update_usage_tracking_setting( true );
+				return;
+			}
+
+			// Same inline write Charitable_Upgrade uses, for contexts where that admin-only helper is
+			// not loaded. Keeps the charitable_settings mirror in sync.
+			update_option( 'charitable_usage_tracking', 1 );
+			$settings                              = (array) get_option( 'charitable_settings', array() );
+			$settings['charitable_usage_tracking'] = true;
+			update_option( 'charitable_settings', $settings );
+		}
+
+		/**
+		 * Fire the appropriate one-time check-in, best-effort.
+		 *
+		 * As of 1.8.12.1 this DOES flip the Advanced setting - but only ever on, and only when the
+		 * user ticked the toggle. See enable_usage_tracking().
+		 */
 		private function fire_usage_tracking( $consent ) {
-			// Resolve "is tracking on?" the same way core does, so a filter-based force-enable
-			// can't cause a double-send with the weekly cron.
+			// Ticking the toggle grants permission persistently, so record it before deciding anything.
+			// Reads the raw setting, not the filtered value: a filter that force-enables is somebody
+			// else's runtime opinion and should not be persisted as the user's choice.
+			if ( $consent && ! charitable_get_usage_tracking_setting() ) {
+				$this->enable_usage_tracking();
+			}
+
+			// Resolve "may we transmit?" the same way core does, so a filter-based force-disable still
+			// wins over a ticked toggle, and a force-enable can't cause a double-send with the weekly cron.
 			$tracking_enabled = (bool) apply_filters( 'charitable_usage_tracking', charitable_get_usage_tracking_setting() );
 			$action           = self::decide_tracking_action( $tracking_enabled, (bool) $consent );
 
+			// 'none' means the user declined and nothing may be transmitted. This guard existed before
+			// 1.8.12.1 but was unreachable, because decide_tracking_action() never returned 'none'.
 			if ( 'none' === $action || ! class_exists( 'Charitable_Tracking' ) ) {
 				return;
 			}
 
 			try {
-				$tracker = Charitable_Tracking::get_instance();
-				if ( 'both' === $action ) {
-					$tracker->send_checkins( true, false );          // anonymous financial + usage (admin email + license)
-				} else {
-					$tracker->send_tracking_checkin( true, false );  // anonymous financial only
-				}
+				// Consented (either by the Advanced setting or the in-tool toggle), so send both
+				// endpoints: the financial capture and the opt-in usage check-in.
+				Charitable_Tracking::get_instance()->send_checkins( true, false );
 			} catch ( \Throwable $e ) {
 				// Best-effort: a tracking failure must never affect the analysis.
 			}

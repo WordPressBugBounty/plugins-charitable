@@ -5,7 +5,7 @@
  * @author  WP Charitable LLC
  * @package Charitable/Templates/Donation Form
  * @since   1.0.0
- * @version 1.0.0
+ * @version 1.8.12.1
  */
 
 // Exit if accessed directly.
@@ -30,6 +30,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 			 * @param boolean $usernames Whether usernames are used.
 			 */
 			'label_username' => apply_filters( 'charitable_donor_usernames', false ) ? __( 'Username', 'charitable' ) : __( 'Email', 'charitable' ),
+			/*
+			 * Fingerprint this form with charitable=true so a failed login is caught by
+			 * Charitable_User_Management::maybe_redirect_at_authenticate() and returned to
+			 * the custom login page, instead of falling through to wp-login.php. The hidden
+			 * charitable=1 field is added by the global login_form_bottom filter.
+			 */
+			'charitable'     => true,
 		)
 	);
 	?>

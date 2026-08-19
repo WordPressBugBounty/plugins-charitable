@@ -103,7 +103,7 @@ body.charitable_page_charitable-addons #wpbody-content .wrap {
   margin: 0 0 0 -20px;
   padding-right: 20px;
   width: 100%;
-  border-top: 3px solid #E89940;
+  border-top: 3px solid #fc9a2a;
   border-bottom: 1px solid #ddd;
   border-left: 0;
   border-right: 0;
@@ -4905,28 +4905,16 @@ body.charitable-show-notifications .charitable-main {
   margin-bottom: 12px;
 }
 
-.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-campaigns-block .charitable-logo,
-.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-donations-block .charitable-logo,
-.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-donors-block .charitable-logo,
-.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-campaign-progress-bar .charitable-logo,
-.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-donation-button .charitable-logo,
-.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-campaign-stats .charitable-logo,
-.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-my-donations .charitable-logo {
-  max-width: 255px !important;
-  margin-bottom: 10px !important;
-  padding-bottom: 10px !important;
-  border-bottom: 1px solid #e8e8eb;
-}
-.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-campaigns-block p,
-.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-donations-block p,
-.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-donors-block p,
-.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-campaign-progress-bar p,
-.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-donation-button p,
-.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-campaign-stats p,
-.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-my-donations p {
-  margin-top: 2px !important;
-  margin-bottom: 2px !important;
-}
+/*
+ * The Charitable block-editor CANVAS rules that used to live here (the
+ * `.editor-styles-wrapper .block-editor-block-list__layout .wp-block-charitable-*`
+ * logo and paragraph rules) moved to charitable-block-editor-canvas.css in 1.8.12.1.
+ *
+ * They only reached the iframed canvas via Gutenberg's useCompatibilityStyles shim,
+ * which logged "charitable-admin-2.0-css was added to the iframe incorrectly" on every
+ * editor load. Do not add `.editor-styles-wrapper` or `.wp-block` selectors to this
+ * file — that is what makes the shim clone it and warn again.
+ */
 
 /* post new donation */
 body.post-type-donation.charitable-admin-donation-edit #post-body input[type=text],
@@ -5290,15 +5278,14 @@ body.charitable-admin-promotion-footer #wpbody {
 }
 /* Charitable Test Mode Admin Bar Badge */
 #wpadminbar .charitable-test-mode-active .charitable-test-mode-badge {
-  color: #fff;
-  background-color: #E89940 !important;
+  color: #1e1515;
+  background-color: #fc9a2a !important;
   font-weight: 600;
   padding: 0px 8px;
   border-radius: 4px;
   margin: 0 4px;
   display: inline-block;
   white-space: nowrap;
-  border: 2px solid black;
   font-size: 12px;
   line-height: 25px;
 }
@@ -5310,7 +5297,17 @@ body.charitable-admin-promotion-footer #wpbody {
 }
 
 #wpadminbar .charitable-test-mode-active:hover .charitable-test-mode-badge {
-  background-color: #d68a37 !important;
+  background-color: #fc8c0c !important;
+}
+
+/*
+ * Core draws a 4px "current item" bar inside the bottom edge of any hovered or focused
+ * admin-bar link: #wpadminbar a:hover, #wpadminbar a:focus { box-shadow: currentcolor 0 -4px 0 0 inset }.
+ * Against a filled pill that reads as a stray underline sitting below the badge, so it is
+ * suppressed here. Scoped to :not(:focus-visible) so keyboard focus keeps its indicator.
+ */
+#wpadminbar .charitable-test-mode-active > .ab-item:hover:not(:focus-visible) {
+  box-shadow: none;
 }
 
 /* Test Mode Checkbox Flash Animation */
@@ -5319,7 +5316,7 @@ body.charitable-admin-promotion-footer #wpbody {
     background-color: transparent;
   }
   50% {
-    background-color: rgba(232, 153, 64, 0.5);
+    background-color: rgba(252, 154, 42, 0.5);
     color: white;
   }
   100% {

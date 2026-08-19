@@ -116,6 +116,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 			 * Usage-data toggle. If usage tracking is already ON site-wide, there's nothing to opt into,
 			 * so we hide the toggle entirely (the JS then treats consent as true). If it's OFF, show the
 			 * toggle defaulted ON so sharing is the friendly default the user can switch off.
+			 *
+			 * As of 1.8.12.1 leaving this ticked turns the Advanced > Misc "Usage Tracking" setting ON
+			 * persistently, so the copy below says so. It is one-way: unticking never turns tracking off
+			 * (see Charitable_Site_Analysis::enable_usage_tracking()), and once tracking is on this
+			 * toggle is not rendered at all, so there is nothing to untick.
 			 */
 			$charitable_usage_on = function_exists( 'charitable_get_usage_tracking_setting' )
 				? (bool) apply_filters( 'charitable_usage_tracking', charitable_get_usage_tracking_setting() )
@@ -132,7 +137,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php
 					printf(
 						/* translators: %s: "Read More" link to the usage-tracking documentation. */
-						esc_html__( 'Helps improve site analysis and improve Charitable plugin for your use. %s', 'charitable' ),
+						esc_html__( 'Helps improve site analysis and improve Charitable plugin for your use. Leaving this on turns on usage tracking, which you can switch off at any time in Settings &rarr; Advanced. %s', 'charitable' ),
 						'<a href="https://www.wpcharitable.com/documentation/usage-tracking/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Learn more', 'charitable' ) . '</a>'
 					);
 					?>

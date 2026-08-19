@@ -281,6 +281,17 @@ if ( ! class_exists( 'Charitable_Session' ) ) :
 		public function add_donation( $campaign_id, $amount, $period = 'once' ) {
 			$donations = $this->get( 'donations' );
 
+			/*
+			 * get() returns false when the key is not in the session, which is the normal state for the
+			 * first donation of a fresh session. Assigning $donations[ $campaign_id ] to that false
+			 * relied on PHP silently converting it to an array - deprecated in PHP 8.1 and a fatal
+			 * TypeError in PHP 9, on the donation path. add_donation_key() below already guards exactly
+			 * this way; this method was simply missing it.
+			 */
+			if ( ! is_array( $donations ) ) {
+				$donations = array();
+			}
+
 			$campaign_donation                    = isset( $donations[ $campaign_id ] ) ? $donations[ $campaign_id ] : array();
 			$campaign_donation['amount']          = floatval( charitable_get_currency_helper()->cast_to_decimal_format( $amount ) );
 			$campaign_donation['donation_period'] = $period;

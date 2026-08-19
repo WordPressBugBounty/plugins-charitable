@@ -1,3 +1,14 @@
+# 1.8.12.1
+* NEW: Added a `charitable_campaign_description_limit` filter so developers can change the word limit on the campaign description shown on the campaign page.
+* IMPROVED: More consistent brand colors in admin UI.
+* FIX: Improvements to Site Analysis that effect The 24-hour limit on re-running, rate-limiting your site, and improved security.
+* FIX: Donation CSV export no longer shows inflated "Donation Total" and "Donation Subtotal" amounts on sites that use a comma as the decimal separator.
+* FIX: Campaign Hero background images now appear on the front end for every campaign template.
+* FIX: Campaigns created with a duplicate title now have the campaign ID appended, so the two can be told apart.
+* FIX: Removed PHP warnings logged the first time a campaign containing a Progress Bar block was saved.
+* FIX: The fundraising progress bar now displays correctly with themes that apply their own global progress bar styles (for example Avada).
+* FIX: The login prompt on the donation form now returns a failed login to your custom Charitable login page instead of the default WordPress login screen.
+
 # 1.8.12
 * NEW: Beacon (2 Columns) campaign template - includes Campaign Hero block and Mini Donation Widget (used internally).
 * NEW: Free Site Analysis (Reports > Site Analysis). Get a free Fundraising Score across four areas (Activation, Health, Growth, and Optimization) with specific, prioritized recommendations.

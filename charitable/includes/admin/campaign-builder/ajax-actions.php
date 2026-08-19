@@ -960,8 +960,28 @@ function charitable_new_campaign() { // phpcs:ignore Generic.Metrics.CyclomaticC
 		);
 	}
 
-	// phpcs:ignore WordPress.WP.DeprecatedFunctions.get_page_by_titleFound -- Legacy support, will be replaced with WP_Query in future version
-	$title_exists = get_page_by_title( $campaign_title, 'OBJECT', 'charitable' );
+	/*
+	 * Does a campaign with this title already exist? This has to run *before* the new
+	 * campaign is created, otherwise it would match the new campaign itself.
+	 *
+	 * Replaces get_page_by_title(), which was deprecated in WP 6.2 and was being passed
+	 * the post type 'charitable' rather than 'campaign' — so it never matched anything and
+	 * the disambiguating suffix below never ran.
+	 */
+	$charitable_existing_titles = new WP_Query(
+		[
+			'post_type'              => Charitable::CAMPAIGN_POST_TYPE,
+			'post_status'            => 'any',
+			'title'                  => $campaign_title,
+			'posts_per_page'         => 1,
+			'fields'                 => 'ids',
+			'no_found_rows'          => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+		]
+	);
+
+	$title_exists = ! empty( $charitable_existing_titles->posts );
 	$campaign_id  = charitable()->get( 'form' )->add(
 		$campaign_title,
 		[],
@@ -970,7 +990,7 @@ function charitable_new_campaign() { // phpcs:ignore Generic.Metrics.CyclomaticC
 		]
 	);
 
-	if ( $title_exists !== null ) {
+	if ( $title_exists ) {
 
 		// Skip creating a revision for this action.
 		remove_action( 'post_updated', 'wp_save_post_revision' );

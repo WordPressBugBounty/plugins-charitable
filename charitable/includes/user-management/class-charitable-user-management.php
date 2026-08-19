@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.4.0
- * @version   1.6.47
+ * @version   1.8.12.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -129,6 +129,25 @@ if ( ! class_exists( 'Charitable_User_Management' ) ) :
 				return $user_or_error;
 			}
 
+			/*
+			 * Resolve our redirect target before touching the notice session.
+			 *
+			 * If the site uses the default WordPress login (the 'login_page' setting is
+			 * 'wp', which is the default), or the configured login page has since been
+			 * deleted, then there is no page of ours to send the user to. Bail out and let
+			 * wp-login.php render its own error, which it does natively.
+			 *
+			 * Redirecting to wp_login_url() in that case would be strictly worse than
+			 * doing nothing: our messages are queued in the Charitable notice session and
+			 * nothing renders them on wp-login.php, so the user would land on a blank
+			 * login form with no indication of what went wrong.
+			 */
+			$redirect_url = charitable_get_permalink( 'login_page' );
+
+			if ( ! $redirect_url || wp_login_url() === $redirect_url ) {
+				return $user_or_error;
+			}
+
 			foreach ( $user_or_error->errors as $code => $error ) {
 
 				/* Make sure the error messages link to our forgot password page, not WordPress' */
@@ -145,7 +164,14 @@ if ( ! class_exists( 'Charitable_User_Management' ) ) :
 						$error = sprintf(
 							/* translators: %s: email address */
 							__( '<strong>ERROR</strong>: The password you entered for %s is incorrect.', 'charitable' ),
-							'<strong>' . $username . '</strong>'
+							/*
+							 * Escape the submitted username. This string is queued as a notice and
+							 * rendered as HTML, so it must not carry markup through. In practice
+							 * wp_authenticate() has already run sanitize_user() on it before the
+							 * authenticate filter fires, which strips tags -- this is belt and
+							 * braces so the escaping does not depend on that upstream behaviour.
+							 */
+							'<strong>' . esc_html( $username ) . '</strong>'
 						) .
 						' <a href="' . esc_url( charitable_get_permalink( 'forgot_password_page' ) ) . '">' .
 						__( 'Lost your password?', 'charitable' ) .
@@ -160,8 +186,6 @@ if ( ! class_exists( 'Charitable_User_Management' ) ) :
 			}
 
 			charitable_get_session()->add_notices();
-
-			$redirect_url = charitable_get_permalink( 'login_page' );
 
 			if ( strlen( $username ) ) {
 				$redirect_url = add_query_arg( 'username', $username, $redirect_url );

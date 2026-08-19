@@ -174,6 +174,21 @@ if ( ! class_exists( 'Charitable_API_Route_Campaign_CSS' ) ) :
 			// Change to the template directory so relative paths in template files work.
 			chdir( dirname( $template_file ) );
 
+			/*
+			 * Campaign Hero base CSS, emitted for every template.
+			 *
+			 * The hero block can be added to a campaign built on any template, but the
+			 * bespoke hero CSS lives in partials/beacon-hero.php scoped to the Beacon
+			 * wrappers. Without this, a hero on any other template gets an unstyled
+			 * `__banner` — which is absolutely positioned and so collapses to zero height,
+			 * making the background image invisible.
+			 *
+			 * Emitted *before* the template so a template's own rules always take
+			 * precedence, and every selector in the partial is deliberately one class less
+			 * specific than its Beacon counterpart.
+			 */
+			include charitable()->get_path( 'includes' ) . 'css-templates/frontend/partials/campaign-hero-base.php';
+
 			// Include the template file - it will output CSS.
 			include $template_file;
 

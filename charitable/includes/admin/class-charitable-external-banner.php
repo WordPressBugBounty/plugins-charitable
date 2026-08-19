@@ -240,7 +240,7 @@ if ( ! class_exists( 'Charitable_External_Banner' ) ) :
 		private function get_inline_css() {
 			return '
 				.charitable-external-banner {
-					background: #E89940;
+					background: #fc9a2a;
 					color: #fff;
 					padding: 11px 40px 11px 20px;
 					font-size: 13px;

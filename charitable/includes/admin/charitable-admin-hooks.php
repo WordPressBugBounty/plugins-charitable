@@ -168,6 +168,16 @@ add_action( 'admin_init', array( Charitable_Campaign_Embed_Wizard::get_instance(
 add_action( 'admin_enqueue_scripts', array( Charitable_Admin_Blocks::get_instance(), 'admin_enqueue_scripts' ) );
 
 /**
+ * Enqueue Charitable's styles for the block editor canvas (the editor iframe).
+ *
+ * Must be on `enqueue_block_assets` rather than `admin_enqueue_scripts` — that is the hook
+ * core collects when building the iframe's assets.
+ *
+ * @see Charitable_Admin_Blocks::enqueue_block_editor_canvas_styles()
+ */
+add_action( 'enqueue_block_assets', array( Charitable_Admin_Blocks::get_instance(), 'enqueue_block_editor_canvas_styles' ) );
+
+/**
  * Enqueue Charitable's campaign builder congrats wizard related scripts & styles.
  *
  * @see Charitable_Campaign_Congrats_Wizard::init()

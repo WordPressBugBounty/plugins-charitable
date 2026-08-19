@@ -10,6 +10,7 @@
  * @version 1.8.1.14
  * @version 1.8.3
  * @version 1.8.8.6
+ * @version 1.8.12.1 Add charitable_campaign_description_limit filter.
  */
 
 // Exit if accessed directly.
@@ -21,6 +22,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 $charitable_campaign          = isset( $view_args['campaign'] ) ? $view_args['campaign'] : false;
 $charitable_description       = isset( $view_args['description'] ) ? $view_args['description'] : false;
 $charitable_description_limit = isset( $view_args['view_args']['description_limit'] ) ? $view_args['view_args']['description_limit'] : 100;
+
+/**
+ * Filter the number of words the campaign description is trimmed to on the campaign page.
+ *
+ * @since 1.8.12.1
+ *
+ * @param int                       $charitable_description_limit Number of words to keep.
+ * @param Charitable_Campaign|false $charitable_campaign          The campaign object (may be false).
+ * @param array                     $view_args                    The template view arguments.
+ */
+$charitable_description_limit = (int) apply_filters( 'charitable_campaign_description_limit', $charitable_description_limit, $charitable_campaign, $view_args );
 
 if ( $charitable_description === false ) {
 	$charitable_description = isset( $view_args['campaign'] ) && ! empty( $view_args['campaign']->description ) ? $view_args['campaign']->description : $charitable_description;
