@@ -171,14 +171,18 @@ if ( ! class_exists( 'Charitable_Campaigns' ) ) :
 		/**
 		 * A method used to change the ordering of the campaigns query, to order by the amount donated.
 		 *
-		 * @since  1.0.0
+		 * WP_Query::get() returns the raw, unparsed query var, so the sort direction
+		 * is validated against ASC/DESC before being added to the ORDER BY clause.
+		 *
+		 * @since   1.0.0
+		 * @version 1.8.12.2
 		 *
 		 * @param  string   $orderby The current orderby value.
 		 * @param  WP_Query $wp_query The WP_Query object.
 		 * @return string
 		 */
 		public static function orderby_campaign_donation_amount( $orderby, WP_Query $wp_query ) {
-			return 'COALESCE(SUM(cd.amount), 0) ' . $wp_query->get( 'order' );
+			return 'COALESCE(SUM(cd.amount), 0) ' . charitable_validate_sort_direction( $wp_query->get( 'order' ) );
 		}
 	}
 

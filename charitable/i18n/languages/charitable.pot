@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Charitable 1.8.12.1\n"
+"Project-Id-Version: Charitable 1.8.12.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/charitable\n"
 "Last-Translator: Charitable Team\n"
 "Language-Team: Charitable Team\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-18T13:40:24+00:00\n"
+"POT-Creation-Date: 2026-08-22T12:32:48+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: charitable\n"
@@ -50,17 +50,17 @@ msgstr ""
 msgid "https://wpcharitable.com"
 msgstr ""
 
-#: charitable.php:1127
+#: charitable.php:1128
 msgid "Cloning this object is forbidden."
 msgstr ""
 
-#: charitable.php:1142
+#: charitable.php:1143
 msgid "Unserializing instances of this class is forbidden."
 msgstr ""
 
 #. Translators: This is an action link users can click to purchase a license for All in One SEO Pro.
 #. translators: Suggestion on completion of checklist on checklist page.
-#: charitable.php:1332
+#: charitable.php:1333
 #: includes/admin/charitable-core-admin-functions.php:402
 #: includes/admin/class-charitable-admin-getting-started.php:521
 #: includes/admin/dashboard/class-charitable-dashboard.php:1610
@@ -77,7 +77,7 @@ msgid "Upgrade to Pro"
 msgstr ""
 
 #. translators: %s is the version number.
-#: charitable.php:1412
+#: charitable.php:1413
 #, php-format
 msgid "<p><strong style=\"color:red;\">NOTICE:</strong> <strong>Charitable</strong> detected an out-of-date and incompatible version of <strong>Charitable Stripe</strong> addon. To avoid issues with Stripe donations, <strong>Charitable Stripe</strong> %s was deactivated. Please update <strong>Charitable Stripe</strong> to version 1.5.0 or higher.</p><p>You can get the latest version of <strong>Charitable Stripe</strong> through your <a href=\"https://www.wpcharitable.com/account/\" target=\"_blank\">Charitable account at wpcharitable.com</a>. All active licenses are accessible in the \"My Downloads\" tab.</p>"
 msgstr ""
@@ -5364,7 +5364,7 @@ msgstr ""
 #: includes/admin/campaign-builder/ajax-actions.php:31
 #: includes/admin/campaign-builder/ajax-actions.php:64
 #: includes/admin/campaign-builder/ajax-actions.php:110
-#: includes/admin/campaign-builder/fields/class-donate-amount.php:375
+#: includes/admin/campaign-builder/fields/class-donate-amount.php:394
 msgid "Something went wrong while performing this action."
 msgstr ""
 
@@ -6619,8 +6619,8 @@ msgstr ""
 #: includes/admin/campaign-builder/fields/class-campaign-overview.php:200
 #: includes/admin/campaign-builder/fields/class-campaign-summary.php:270
 #: includes/admin/campaign-builder/fields/class-campaign-text.php:207
-#: includes/admin/campaign-builder/fields/class-donate-amount.php:287
-#: includes/admin/campaign-builder/fields/class-donate-amount.php:391
+#: includes/admin/campaign-builder/fields/class-donate-amount.php:306
+#: includes/admin/campaign-builder/fields/class-donate-amount.php:410
 #: includes/admin/campaign-builder/fields/class-donate-form.php:204
 #: includes/admin/campaign-builder/fields/class-donate-form.php:261
 #: includes/admin/campaign-builder/fields/class-donor-wall.php:310
@@ -6689,8 +6689,8 @@ msgstr ""
 #: includes/admin/campaign-builder/fields/class-campaign-summary.php:335
 #: includes/admin/campaign-builder/fields/class-campaign-text.php:265
 #: includes/admin/campaign-builder/fields/class-campaign-title.php:216
-#: includes/admin/campaign-builder/fields/class-donate-amount.php:342
-#: includes/admin/campaign-builder/fields/class-donate-amount.php:403
+#: includes/admin/campaign-builder/fields/class-donate-amount.php:361
+#: includes/admin/campaign-builder/fields/class-donate-amount.php:422
 #: includes/admin/campaign-builder/fields/class-donate-button.php:289
 #: includes/admin/campaign-builder/fields/class-donate-form.php:216
 #: includes/admin/campaign-builder/fields/class-donate-form.php:273
@@ -6718,7 +6718,7 @@ msgstr ""
 #: includes/admin/campaign-builder/fields/class-campaign-summary.php:340
 #: includes/admin/campaign-builder/fields/class-campaign-text.php:270
 #: includes/admin/campaign-builder/fields/class-campaign-title.php:221
-#: includes/admin/campaign-builder/fields/class-donate-amount.php:347
+#: includes/admin/campaign-builder/fields/class-donate-amount.php:366
 #: includes/admin/campaign-builder/fields/class-donate-button.php:294
 #: includes/admin/campaign-builder/fields/class-donate-form.php:221
 #: includes/admin/campaign-builder/fields/class-donation-options.php:145
@@ -6900,8 +6900,8 @@ msgid "%s Donors"
 msgstr ""
 
 #: includes/admin/campaign-builder/fields/class-campaign-summary.php:275
-#: includes/admin/campaign-builder/fields/class-donate-amount.php:292
-#: includes/admin/campaign-builder/fields/class-donate-amount.php:396
+#: includes/admin/campaign-builder/fields/class-donate-amount.php:311
+#: includes/admin/campaign-builder/fields/class-donate-amount.php:415
 #: includes/admin/campaign-builder/fields/class-donate-form.php:209
 #: includes/admin/campaign-builder/fields/class-donate-form.php:266
 #: includes/admin/campaign-builder/fields/class-organizer.php:214
@@ -6952,23 +6952,23 @@ msgid "Custom Amount"
 msgstr ""
 
 #: includes/admin/campaign-builder/fields/class-donate-amount.php:128
-#: includes/admin/campaign-builder/fields/class-donate-amount.php:204
+#: includes/admin/campaign-builder/fields/class-donate-amount.php:223
 msgid "Custom Donation Amount"
 msgstr ""
 
-#: includes/admin/campaign-builder/fields/class-donate-amount.php:202
+#: includes/admin/campaign-builder/fields/class-donate-amount.php:221
 #: templates/donation-form/donation-amount-list.php:103
 msgid "Custom amount"
 msgstr ""
 
-#: includes/admin/campaign-builder/fields/class-donate-amount.php:301
+#: includes/admin/campaign-builder/fields/class-donate-amount.php:320
 #: includes/admin/campaign-builder/panels/settings/class-settings-donation-options.php:153
 #: includes/admin/views/about/tabs/lite-vs-pro.php:65
 #: includes/fields/default-fields/campaign-fields.php:104
 msgid "Suggested Donation Amounts"
 msgstr ""
 
-#: includes/admin/campaign-builder/fields/class-donate-amount.php:328
+#: includes/admin/campaign-builder/fields/class-donate-amount.php:347
 #: includes/admin/campaign-builder/panels/settings/class-settings-donation-options.php:184
 #: includes/fields/default-fields/campaign-fields.php:116
 msgid "Allow Custom Donations"
@@ -7442,7 +7442,7 @@ msgstr ""
 
 #: includes/admin/campaign-builder/panels/class-design.php:747
 #: includes/admin/campaign-builder/panels/settings/class-settings-general.php:311
-#: includes/admin/reports/class-charitable-reports.php:3696
+#: includes/admin/reports/class-charitable-reports.php:3722
 #: includes/admin/settings/class-charitable-settings.php:102
 msgid "Advanced"
 msgstr ""
@@ -7688,7 +7688,7 @@ msgstr ""
 #: includes/admin/reports/class-charitable-reports.php:943
 #: includes/admin/reports/class-charitable-reports.php:959
 #: includes/admin/reports/class-charitable-reports.php:975
-#: includes/admin/reports/class-charitable-reports.php:3250
+#: includes/admin/reports/class-charitable-reports.php:3274
 msgid "Name"
 msgstr ""
 
@@ -8490,10 +8490,10 @@ msgstr ""
 #: includes/admin/campaigns/class-charitable-campaign-list-table.php:106
 #: includes/admin/donations/class-charitable-donation-list-table.php:958
 #: includes/admin/reports/class-charitable-reports-download.php:428
-#: includes/admin/reports/class-charitable-reports.php:3209
-#: includes/admin/reports/class-charitable-reports.php:3214
-#: includes/admin/reports/class-charitable-reports.php:3468
-#: includes/admin/reports/class-charitable-reports.php:3469
+#: includes/admin/reports/class-charitable-reports.php:3233
+#: includes/admin/reports/class-charitable-reports.php:3238
+#: includes/admin/reports/class-charitable-reports.php:3492
+#: includes/admin/reports/class-charitable-reports.php:3493
 #: includes/admin/settings/class-charitable-tools-settings.php:263
 #: includes/admin/views/donations-page/export-form.php:51
 #: includes/admin/views/reports/overview.php:227
@@ -8532,7 +8532,7 @@ msgstr ""
 #: includes/admin/reports/class-charitable-reports.php:949
 #: includes/admin/reports/class-charitable-reports.php:965
 #: includes/admin/reports/class-charitable-reports.php:979
-#: includes/admin/reports/class-charitable-reports.php:3260
+#: includes/admin/reports/class-charitable-reports.php:3284
 msgid "Actions"
 msgstr ""
 
@@ -9752,10 +9752,10 @@ msgstr ""
 #: includes/admin/reports/class-charitable-reports.php:940
 #: includes/admin/reports/class-charitable-reports.php:956
 #: includes/admin/reports/class-charitable-reports.php:972
-#: includes/admin/reports/class-charitable-reports.php:3199
-#: includes/admin/reports/class-charitable-reports.php:3204
-#: includes/admin/reports/class-charitable-reports.php:3247
-#: includes/admin/reports/class-charitable-reports.php:3698
+#: includes/admin/reports/class-charitable-reports.php:3223
+#: includes/admin/reports/class-charitable-reports.php:3228
+#: includes/admin/reports/class-charitable-reports.php:3271
+#: includes/admin/reports/class-charitable-reports.php:3724
 #: includes/admin/settings/class-charitable-settings.php:100
 #: includes/admin/views/donors/donors.php:24
 #: includes/admin/views/reports/overview.php:88
@@ -10198,8 +10198,8 @@ msgstr ""
 #: includes/admin/reports/class-charitable-reports.php:944
 #: includes/admin/reports/class-charitable-reports.php:960
 #: includes/admin/reports/class-charitable-reports.php:1206
-#: includes/admin/reports/class-charitable-reports.php:3252
-#: includes/admin/reports/class-charitable-reports.php:3253
+#: includes/admin/reports/class-charitable-reports.php:3276
+#: includes/admin/reports/class-charitable-reports.php:3277
 msgid "Total Donations"
 msgstr ""
 
@@ -10423,12 +10423,12 @@ msgid "Looks like you started the setup wizard but didn't finish. Pick up where 
 msgstr ""
 
 #: includes/admin/dashboard/class-charitable-dashboard.php:122
-#: includes/admin/views/welcome-page/page.php:44
+#: includes/admin/views/welcome-page/page.php:45
 msgid "Resume Setup Wizard"
 msgstr ""
 
 #: includes/admin/dashboard/class-charitable-dashboard.php:217
-#: includes/admin/reports/class-charitable-reports.php:3695
+#: includes/admin/reports/class-charitable-reports.php:3721
 msgid "Overview"
 msgstr ""
 
@@ -12379,7 +12379,7 @@ msgid "No payments."
 msgstr ""
 
 #: includes/admin/reports/class-charitable-reports.php:886
-#: includes/admin/reports/class-charitable-reports.php:3441
+#: includes/admin/reports/class-charitable-reports.php:3465
 msgid "There are no donations within the date range."
 msgstr ""
 
@@ -12395,14 +12395,14 @@ msgstr ""
 
 #: includes/admin/reports/class-charitable-reports.php:948
 #: includes/admin/reports/class-charitable-reports.php:964
-#: includes/admin/reports/class-charitable-reports.php:3251
+#: includes/admin/reports/class-charitable-reports.php:3275
 msgid "Last Donation"
 msgstr ""
 
 #: includes/admin/reports/class-charitable-reports.php:1022
 #: includes/admin/reports/class-charitable-reports.php:1030
-#: includes/admin/reports/class-charitable-reports.php:3015
-#: includes/admin/reports/class-charitable-reports.php:3028
+#: includes/admin/reports/class-charitable-reports.php:3039
+#: includes/admin/reports/class-charitable-reports.php:3052
 #: includes/admin/views/reports/activity.php:187
 #: includes/admin/views/reports/activity.php:202
 #: includes/admin/views/reports/overview.php:217
@@ -12419,7 +12419,7 @@ msgstr ""
 
 #: includes/admin/reports/class-charitable-reports.php:1185
 #: includes/admin/reports/class-charitable-reports.php:1204
-#: includes/admin/reports/class-charitable-reports.php:3465
+#: includes/admin/reports/class-charitable-reports.php:3489
 msgid "Profile picture of"
 msgstr ""
 
@@ -12454,84 +12454,92 @@ msgid "No donations found."
 msgstr ""
 
 #. translators: %d: total number of records.
-#: includes/admin/reports/class-charitable-reports.php:1677
+#: includes/admin/reports/class-charitable-reports.php:1693
 #, php-format
 msgid "Total: %d"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-reports.php:1989
-#: includes/admin/reports/class-charitable-reports.php:3738
+#: includes/admin/reports/class-charitable-reports.php:2005
+#: includes/admin/reports/class-charitable-reports.php:3764
 #: includes/admin/views/reports/overview.php:267
 #: templates/print/overview.php:208
 msgid "Top Donors"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-reports.php:1990
-#: includes/admin/reports/class-charitable-reports.php:3772
+#: includes/admin/reports/class-charitable-reports.php:2006
+#: includes/admin/reports/class-charitable-reports.php:3798
 msgid "First Time Donors"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-reports.php:1991
-#: includes/admin/reports/class-charitable-reports.php:3755
+#: includes/admin/reports/class-charitable-reports.php:2007
+#: includes/admin/reports/class-charitable-reports.php:3781
 msgid "Recurring Donors"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-reports.php:3254
+#: includes/admin/reports/class-charitable-reports.php:3278
 msgid "Last Campaign"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-reports.php:3255
+#: includes/admin/reports/class-charitable-reports.php:3279
 msgid "Life Total"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-reports.php:3466
+#: includes/admin/reports/class-charitable-reports.php:3490
 msgid "Date."
 msgstr ""
 
-#: includes/admin/reports/class-charitable-reports.php:3477
-#: includes/admin/reports/class-charitable-reports.php:3481
+#: includes/admin/reports/class-charitable-reports.php:3501
+#: includes/admin/reports/class-charitable-reports.php:3505
 msgid "View User"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-reports.php:3513
-#: includes/admin/reports/class-charitable-reports.php:3621
-#: includes/admin/reports/class-charitable-reports.php:3789
+#: includes/admin/reports/class-charitable-reports.php:3537
+#: includes/admin/reports/class-charitable-reports.php:3645
+#: includes/admin/reports/class-charitable-reports.php:3815
 msgid "LYBUNT / SYBUNT"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-reports.php:3623
-#: includes/admin/reports/class-charitable-reports.php:3791
+#: includes/admin/reports/class-charitable-reports.php:3647
+#: includes/admin/reports/class-charitable-reports.php:3817
 msgid ""
 "<p>LYBUNT stands for <strong>Last Year But Unfortunately Not This Year</strong>, meaning the donor supported your organization during the last fiscal year but did not return to donate again this year. SYBUNT stands for <strong>Some Year But Unfortunately Not This Year</strong>. </p>\n"
 "\n"
 "\t\t\t\t\t\t\t<p><strong>Why This Is Important:</strong> LYBUNT and SYBUNT reports are important to nonprofits because they allow you to look for low-hanging fruit. Nonprofit organizations have an average retention rate of 43.6%. In order to meet or exceed this retention rate, it is important to nurture the donors you have.</p>"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-reports.php:3697
+#: includes/admin/reports/class-charitable-reports.php:3694
+msgid "This report took too long to load and was stopped by the server. The figures have been cleared so they are not mistaken for the range you asked for. Try a shorter date range."
+msgstr ""
+
+#: includes/admin/reports/class-charitable-reports.php:3695
+msgid "This report could not be loaded. The figures have been cleared so they are not mistaken for the range you asked for. Please try again."
+msgstr ""
+
+#: includes/admin/reports/class-charitable-reports.php:3723
 #: includes/admin/views/reports/overview.php:255
 #: templates/print/overview.php:197
 msgid "Activity"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-reports.php:3699
+#: includes/admin/reports/class-charitable-reports.php:3725
 msgid "Analytics"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-reports.php:3741
+#: includes/admin/reports/class-charitable-reports.php:3767
 msgid ""
 "<p>This report shows which donors have made the largest gifts and donations.</p>\n"
 "\t\t\t\t\t<p><strong>Why This Is Important:</strong> It will show you which donors you can turn to when you need to make an ask for major needs or projects. Given that they are donating a significant amount of money at one time, you don’t want to lump them in with campaigns asking people for smaller, one-off donations. This can help you identify donors who are increasing their giving year over year and who may be good candidates for a major gift ask.</p>\n"
 "\t\t\t\t\t<p>You can also use this report to thank top donors for their support.</p>"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-reports.php:3758
+#: includes/admin/reports/class-charitable-reports.php:3784
 msgid ""
 "<p>This report shows which donors have made repeated donations the largest gifts and donations.</p>\n"
 "\t\t\t\t\t<p><strong>Why This Is Important:</strong> It will show you which donors you can turn to when you need to make an ask for major needs or projects. Sometimes you do not want to target all donors - especially those that have given once or in small amounts - in repeated campaigns.</p>\n"
 "\t\t\t\t\t<p>You can also use this report to thank recurring donors for their support.</p>"
 msgstr ""
 
-#: includes/admin/reports/class-charitable-reports.php:3775
+#: includes/admin/reports/class-charitable-reports.php:3801
 msgid ""
 "<p>This report shows which donors have made one donation - their first.</p>\n"
 "\t\t\t\t\t<p><strong>Why This Is Important:</strong> Seeing which donors are new to your campaigns can help you determine where your traffic is coming from or how donors are finding you.</p>\n"
@@ -16386,56 +16394,56 @@ msgstr ""
 msgid "Step %1$d of approximately %2$d running"
 msgstr ""
 
-#: includes/admin/views/welcome-page/page.php:28
-#: includes/admin/views/welcome-page/page.php:42
+#: includes/admin/views/welcome-page/page.php:29
+#: includes/admin/views/welcome-page/page.php:43
 msgid "Welcome back to the Charitable Setup Wizard!"
 msgstr ""
 
-#: includes/admin/views/welcome-page/page.php:28
+#: includes/admin/views/welcome-page/page.php:29
 msgid "Welcome to the Charitable Setup Wizard!"
 msgstr ""
 
-#: includes/admin/views/welcome-page/page.php:29
+#: includes/admin/views/welcome-page/page.php:30
 msgid "You have already completed the setup wizard. If you need to make any changes, you can restart this process or adjust your Charitable settings."
 msgstr ""
 
-#: includes/admin/views/welcome-page/page.php:29
+#: includes/admin/views/welcome-page/page.php:30
 msgid "Your first fundraising begins with a creating a campaign. Ready to get started? Your first campaign is just 5 minutes away!"
 msgstr ""
 
-#: includes/admin/views/welcome-page/page.php:30
+#: includes/admin/views/welcome-page/page.php:31
 msgid "Restart Setup Wizard"
 msgstr ""
 
-#: includes/admin/views/welcome-page/page.php:30
+#: includes/admin/views/welcome-page/page.php:31
 msgid "Let's Get Started"
 msgstr ""
 
-#: includes/admin/views/welcome-page/page.php:37
+#: includes/admin/views/welcome-page/page.php:38
 msgid "Go back to the dashboard"
 msgstr ""
 
-#: includes/admin/views/welcome-page/page.php:37
+#: includes/admin/views/welcome-page/page.php:38
 msgid "Cancel this wizard and go back to the checklist"
 msgstr ""
 
-#: includes/admin/views/welcome-page/page.php:43
+#: includes/admin/views/welcome-page/page.php:44
 msgid "You have already started the setup wizard. Would you like to continue where you left off?"
 msgstr ""
 
-#: includes/admin/views/welcome-page/page.php:50
+#: includes/admin/views/welcome-page/page.php:56
 msgid "Welcome back!"
 msgstr ""
 
-#: includes/admin/views/welcome-page/page.php:51
-msgid "You seem to have been logged out of your WordPress admin during the onboarding process. In order for the onboarding to install plugins and update settings please go back the last step and submit while you are still logged into WordPress."
+#: includes/admin/views/welcome-page/page.php:57
+msgid "We were not able to bring your choices back from the setup wizard, so setup did not finish. Your login is fine and nothing is wrong with your install. You can try the wizard again, or skip it and set up Charitable yourself from the dashboard."
 msgstr ""
 
-#: includes/admin/views/welcome-page/page.php:52
-msgid "Go Back"
+#: includes/admin/views/welcome-page/page.php:58
+msgid "Try Again"
 msgstr ""
 
-#: includes/admin/views/welcome-page/page.php:69
+#: includes/admin/views/welcome-page/page.php:75
 msgid "Note: You will be transfered to an WPCharitable.com to complete the setup wizard."
 msgstr ""
 
@@ -16941,7 +16949,7 @@ msgstr ""
 msgid "Vietnamese Dong (%s)"
 msgstr ""
 
-#: includes/data/class-charitable-campaign-donations-db.php:992
+#: includes/data/class-charitable-campaign-donations-db.php:1068
 msgid "Field expected to be `campaign`, `campaign_id`, `donation`, `donation_id`, `donor` or `donor_id`."
 msgstr ""
 
@@ -20370,6 +20378,10 @@ msgstr ""
 msgid "User Dashboard"
 msgstr ""
 
+#: includes/shortcodes/class-charitable-campaign-shortcode.php:95
+msgid "This campaign embeds a shortcode that points back at itself, so it was not rendered here to prevent an infinite loop. Remove or change that shortcode field."
+msgstr ""
+
 #: includes/shortcodes/class-charitable-email-shortcode.php:126
 msgid "[charitable_email] cannot be called until a class instance has been created."
 msgstr ""
@@ -21405,8 +21417,8 @@ msgstr ""
 
 #. translators: %1$s: first list item; %2$s: second list item.
 #. translators: %1$s: all list items except last, comma-separated; %2$s: second list item.
-#: includes/utilities/charitable-utility-functions.php:225
-#: includes/utilities/charitable-utility-functions.php:235
+#: includes/utilities/charitable-utility-functions.php:256
+#: includes/utilities/charitable-utility-functions.php:266
 #, php-format
 msgctxt "x and y"
 msgid "%1$s and %2$s"

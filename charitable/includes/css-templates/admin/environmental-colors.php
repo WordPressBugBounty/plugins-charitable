@@ -59,7 +59,7 @@ $button    = isset( $_GET['b'] ) ? '#' . preg_replace("/[^A-Za-z0-9 ]/", '', $_G
 $slug    = 'environmental'; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template variable used in CSS selectors.
 $wrapper = '.charitable-preview.charitable-builder-template-' . $slug . ' #charitable-design-wrap .charitable-campaign-preview'; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template variable used in CSS selectors.
 
-require_once ('../../admin/campaign-builder/templates/functions-campaign-templates.php');
+require_once dirname( __DIR__, 2 ) . '/admin/campaign-builder/templates/functions-campaign-templates.php';
 
 ?>
 

@@ -33,7 +33,7 @@ $charitable_preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.t
 // .charitable-field        ----------> .charitable-campaign-field
 // .charitable-preview-*    ----------> .charitable-campaign-*
 
-require_once ('../../admin/campaign-builder/templates/functions-campaign-templates.php');
+require_once dirname( __DIR__, 2 ) . '/admin/campaign-builder/templates/functions-campaign-templates.php';
 
 ?>
 

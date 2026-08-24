@@ -8,6 +8,7 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.8.0
  * @version.  1.8.0
+ * @version   1.8.12.2 Add an infinite-recursion guard so a self-referencing [campaign] shortcode cannot exhaust memory.
  */
 
 // Exit if accessed directly.
@@ -30,6 +31,34 @@ if ( ! class_exists( 'Charitable_Campaign_Shortcode' ) ) :
 		private $campaign_data;
 
 		/**
+		 * Campaign IDs that are currently mid-render (the recursion stack).
+		 *
+		 * Used to stop a campaign from rendering itself forever. A campaign whose
+		 * content embeds a [campaign] shortcode pointing back at the same campaign
+		 * (directly, or via a mutual A->B->A reference) would otherwise re-enter
+		 * self::display() on every level, nesting an output buffer each time until
+		 * PHP's memory limit is exhausted and the request fatals. Keyed by campaign
+		 * ID for O(1) lookups; a set (not a bool) so mutual references are caught too.
+		 *
+		 * @since 1.8.12.2
+		 *
+		 * @var array<int,bool>
+		 */
+		private static $rendering = array();
+
+		/**
+		 * Whether the given campaign is already being rendered further up the stack.
+		 *
+		 * @since 1.8.12.2
+		 *
+		 * @param  int $campaign_id The campaign ID.
+		 * @return bool
+		 */
+		public static function is_rendering( $campaign_id ) {
+			return isset( self::$rendering[ (int) $campaign_id ] );
+		}
+
+		/**
 		 * Display the shortcode output. This is the callback method for the campaigns shortcode.
 		 *
 		 * @since   1.8.0
@@ -44,6 +73,62 @@ if ( ! class_exists( 'Charitable_Campaign_Shortcode' ) ) :
 			);
 
 			$args = shortcode_atts( $default, $atts, 'campaign' );
+
+			// Guard against infinite recursion. If this campaign is already being rendered
+			// higher up the stack, a field inside it embeds a [campaign] shortcode that points
+			// back at the same campaign (directly, or via a mutual A->B->A reference). Rendering
+			// it again here would loop until the memory limit is exhausted, fatalling the request.
+			// Bail with a harmless placeholder.
+			$recursion_guard_id = absint( $args['id'] );
+
+			/*
+			 * Defence in depth for the id-less form, which absint( '' ) would otherwise
+			 * reduce to 0 and exclude from both the check below and the flagging further
+			 * down.
+			 *
+			 * A bare [campaign] does resolve to the current post -- get_campaign() passes
+			 * the empty string through to charitable_get_campaign(), and WP's get_post()
+			 * falls back to $GLOBALS['post'] on an empty argument (verified: it returns
+			 * the surrounding campaign). It cannot recurse today only because
+			 * get_campaign_data() reads campaign_settings_v2 via get_post_meta( '' ),
+			 * which gets no such fallback and returns empty, so no fields render and no
+			 * nested shortcode ever executes -- a bare [campaign] emits an empty wrapper.
+			 *
+			 * That makes this belt and braces rather than a live fix: the only thing
+			 * preventing the loop is an asymmetry between get_post() and get_post_meta().
+			 * Give get_campaign_data() the same fallback and the vector opens, so resolve
+			 * the ID the guard would need before that can happen.
+			 */
+			if ( ! $recursion_guard_id ) {
+				$recursion_guard_id = absint( get_the_ID() );
+			}
+
+			if ( $recursion_guard_id && self::is_rendering( $recursion_guard_id ) ) {
+
+				// Invisible in the rendered page, but leaves a trace in the source for debugging.
+				$notice = '<!-- charitable: skipped self-referencing [campaign] shortcode for campaign ' . $recursion_guard_id . ' to prevent an infinite render loop. -->';
+
+				// In the builder preview / admin, surface a visible notice so the author understands
+				// why the embedded campaign did not render, instead of silently dropping it.
+				$is_preview = is_admin() || ! empty( $_GET['charitable_campaign_preview'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+				if ( $is_preview ) {
+					$notice .= '<div class="charitable-notice charitable-notice-info"><p style="margin:0;">' .
+						esc_html__( 'This campaign embeds a shortcode that points back at itself, so it was not rendered here to prevent an infinite loop. Remove or change that shortcode field.', 'charitable' ) .
+						'</p></div>';
+				}
+
+				/**
+				 * Filter the placeholder returned when a self-referencing [campaign] shortcode is skipped.
+				 *
+				 * @since 1.8.12.2
+				 *
+				 * @param string $notice      The placeholder markup.
+				 * @param int    $campaign_id The campaign ID that would have recursed.
+				 * @param array  $args        The parsed shortcode arguments.
+				 */
+				return apply_filters( 'charitable_campaign_shortcode_recursion_notice', $notice, $recursion_guard_id, $args );
+			}
 
 			// Get the campaign data from the ID that should be passed along in the shortcode.
 			$args['campaign']      = self::get_campaign( $args );
@@ -91,7 +176,21 @@ if ( ! class_exists( 'Charitable_Campaign_Shortcode' ) ) :
 
 			ob_start();
 
-			$template->render();
+			try {
+				// Flag this campaign as rendering so any nested [campaign] shortcode that points
+				// back at it short-circuits in the recursion guard above instead of looping. The
+				// matching unset in the finally below runs even if rendering throws, so a campaign
+				// is never left flagged as rendering for the rest of the request.
+				if ( $recursion_guard_id ) {
+					self::$rendering[ $recursion_guard_id ] = true;
+				}
+
+				$template->render();
+			} finally {
+				if ( $recursion_guard_id ) {
+					unset( self::$rendering[ $recursion_guard_id ] );
+				}
+			}
 
 			$html = ob_get_clean();
 

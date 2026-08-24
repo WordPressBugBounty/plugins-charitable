@@ -705,7 +705,7 @@ class Charitable_Builder_Form_Fields {
 
 		}
 
-		if ( $args['html'] ) {
+		if ( $params['html'] ) {
 
 			$html = '<div id="' . $this->id_slug . '-' . $params['id'] . '-wrap" class="charitable-panel-field charitable-panel-field-textarea ' . $params['container_classes'] . '" ' . $field_id_attr . ' data-special-type="' . $params['special'] . '">
                         <label for="' . $this->id_slug . '-' . $params['id'] . '">' . $label . ' ' . $tooltip_html . '</label>' . $description . '
@@ -713,7 +713,7 @@ class Charitable_Builder_Form_Fields {
                         <input type="hidden" value="' . htmlentities( $value ) . '" name="' . $params['name'] . '" />
                     </div>';
 
-		} elseif ( $args['code'] ) {
+		} elseif ( $params['code'] ) {
 
 			$html = '<div id="' . $this->id_slug . '-' . $params['id'] . '-wrap" class="charitable-panel-field  charitable-panel-field-textarea ' . $params['container_classes'] . '" ' . $field_id_attr . '>
                         <label for="' . $this->id_slug . '-' . $params['id'] . '">' . $label . ' ' . $tooltip_html . '</label>' . $description . '

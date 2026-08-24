@@ -822,6 +822,82 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
 		}
 
 		/**
+		 * Return a count and sum of donations for every day in a date range, keyed by day.
+		 *
+		 * Callers that need a per-day series must use this instead of calling
+		 * get_donations_summary_by_period() once per calendar day. That pattern issued one
+		 * uncached query per day, so the query count scaled with the LENGTH of the range
+		 * rather than the amount of data, and a multi-year range timed out. It also wrapped
+		 * post_date in DATE_FORMAT(), which prevented any index being used, making every
+		 * one of those queries a full scan of the join.
+		 *
+		 * Days with no donations are absent from the return value; callers should treat a
+		 * missing key as zero.
+		 *
+		 * @since  1.8.12.2
+		 *
+		 * @global WPDB $wpdb
+		 * @param  string   $start_date Start of the range, Y-m-d. Inclusive.
+		 * @param  string   $end_date   End of the range, Y-m-d. Inclusive of the whole day.
+		 * @param  string[] $statuses   List of statuses.
+		 * @return array Keyed by Y-m-d, each value an object with 'amount' and 'count'.
+		 */
+		public function get_donations_summary_by_day_range( $start_date, $end_date, $statuses = array() ) {
+			global $wpdb;
+
+			if ( empty( $start_date ) || empty( $end_date ) ) {
+				return array();
+			}
+
+			if ( empty( $statuses ) ) {
+				$statuses = charitable_get_approval_statuses();
+			}
+
+			list( $status_clause, $status_parameters ) = $this->get_donation_status_clause( $statuses );
+
+			// Every status was filtered out as invalid, so nothing could match. Without
+			// this the IN clause would be emitted empty and the query would error.
+			if ( empty( $status_parameters ) ) {
+				return array();
+			}
+
+			$parameters = array_merge(
+				array( $start_date . ' 00:00:00', $end_date . ' 23:59:59' ),
+				$status_parameters
+			);
+
+			// Sums cd.amount, matching get_donations_summary_by_period() above. The
+			// base_amount column belongs to the multi-currency schema and does not exist
+			// on this table in Lite, so it must not appear here.
+			$sql = "SELECT DATE( p.post_date ) as day,
+				COALESCE( SUM( cd.amount ), 0 ) as amount,
+				COUNT( cd.donation_id ) as count
+				FROM {$wpdb->prefix}charitable_campaign_donations cd
+				INNER JOIN $wpdb->posts p ON p.ID = cd.donation_id
+				WHERE p.post_date >= %s AND p.post_date <= %s AND {$status_clause}
+				GROUP BY DATE( p.post_date )";
+
+			$results = $wpdb->get_results( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+
+			if ( empty( $results ) ) {
+				return array();
+			}
+
+			$comma_decimal = $this->is_comma_decimal();
+			$summary       = array();
+
+			foreach ( $results as $result ) {
+				if ( $comma_decimal ) {
+					$result = $this->sanitize_amounts( $result );
+				}
+
+				$summary[ $result->day ] = $result;
+			}
+
+			return $summary;
+		}
+
+		/**
 		 * Returns the orderby clause.
 		 *
 		 * @since  1.3.4

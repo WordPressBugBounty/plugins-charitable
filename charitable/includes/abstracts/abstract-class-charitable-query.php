@@ -427,7 +427,15 @@ if ( ! class_exists( 'Charitable_Query' ) ) :
 		/**
 		 * Return the ORDER part of the query.
 		 *
-		 * @since  1.0.0
+		 * The returned value is interpolated directly into the SQL statement
+		 * assembled by Charitable_Query::run_query(). A sort direction cannot be
+		 * passed to $wpdb->prepare() as a placeholder, so it is validated against
+		 * a strict whitelist here instead. Any value other than ASC or DESC --
+		 * including anything supplied through a shortcode attribute or the
+		 * `charitable_query_order` filter -- falls back to DESC.
+		 *
+		 * @since   1.0.0
+		 * @version 1.8.12.2
 		 *
 		 * @return string
 		 */
@@ -435,12 +443,17 @@ if ( ! class_exists( 'Charitable_Query' ) ) :
 			/**
 			 * Filter the `ORDER` statement.
 			 *
+			 * Note that the filtered value is validated against ASC/DESC before it
+			 * is used in the query, so returning any other value has no effect.
+			 *
 			 * @since 1.0.0
 			 *
 			 * @param string           $sql   The `ORDER` statement. DESC by default.
 			 * @param Charitable_Query $query The `Charitable_Query` instance.
 			 */
-			return apply_filters( 'charitable_query_order', $this->get( 'order', 'DESC' ), $this );
+			$order = apply_filters( 'charitable_query_order', $this->get( 'order', 'DESC' ), $this );
+
+			return charitable_validate_sort_direction( $order );
 		}
 
 		/**

@@ -1,8 +1,20 @@
+# 1.8.12.2
+* FIX: Reports > Overview no longer times out on long date ranges. If a report does fail, the figures are cleared and an error shown.
+* FIX: The Refunds and Net columns in the Reports > Overview breakdown read zero for ranges outside the current year, and merged refunds across years.
+* FIX: The optional description beside each suggested donation amount now appears in the Donate Amount block.
+* FIX: Campaign template stylesheets now locate their shared helper reliably, so a campaign's colours no longer depend on the server's working directory.
+* FIX: Security: the sort setting on the donor list shortcode is now restricted to standard sort directions, so it cannot be used to read information from the database.
+* FIX: The setup wizard no longer says you have been logged out when its final step cannot reach your site. It now explains what happened and offers to retry or finish from the dashboard.
+* FIX: A campaign embedding a shortcode that points back at itself, or two campaigns referencing each other, no longer loops until memory runs out.
+* FIX: Removed PHP warnings and general cleanup.
+
 # 1.8.12.1
 * NEW: Added a `charitable_campaign_description_limit` filter so developers can change the word limit on the campaign description shown on the campaign page.
 * IMPROVED: More consistent brand colors in admin UI.
-* FIX: Improvements to Site Analysis that effect The 24-hour limit on re-running, rate-limiting your site, and improved security.
-* FIX: Donation CSV export no longer shows inflated "Donation Total" and "Donation Subtotal" amounts on sites that use a comma as the decimal separator.
+* FIX: The 24-hour limit on re-running Site Analysis is no longer reset by clearing Charitable's cache from Settings > Advanced, or by changing a setting, a campaign, or an add-on.
+* FIX: Site Analysis now tells you that you have reached the analysis limit when the service is rate-limiting your site, instead of reporting that the service is unavailable and inviting a retry that keeps the limit in place.
+* FIX: Security: links on Site Analysis recommendations are now restricted to standard web addresses, so a spoofed or compromised response cannot place a script link on the screen.
+* FIX: Donation CSV export no longer shows inflated "Donation Total" and "Donation Subtotal" amounts (such as 10 178,00 instead of 101,78) on sites that use a comma as the decimal separator.
 * FIX: Campaign Hero background images now appear on the front end for every campaign template.
 * FIX: Campaigns created with a duplicate title now have the campaign ID appended, so the two can be told apart.
 * FIX: Removed PHP warnings logged the first time a campaign containing a Progress Bar block was saved.

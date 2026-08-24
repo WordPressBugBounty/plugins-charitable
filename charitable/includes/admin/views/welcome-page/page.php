@@ -8,6 +8,7 @@
  * @version 1.8.0
  * @version 1.8.4 Revised for server-side onboarding.
  * @version 1.8.8.6
+ * @version 1.8.12.2 Reworded the onboarding "lostconnection" return message so it no longer tells the user they are logged out.
  */
 
 // Exit if accessed directly.
@@ -45,11 +46,16 @@ if ( $charitable_resume_onboarding && ! $charitable_onboarding_welcome ) {
 	$charitable_onboarding_url      = add_query_arg( array( 'resume' => 'true' ), charitable_get_onboarding_url() );
 	$charitable_welcome_go_back_url = admin_url( 'admin.php?page=charitable-setup-checklist&charitable_onboarding=cancel' );
 }
-// Override even more things if the user is returning from a login after the onboarding process by checking for reauth=1 in the query string.
+// The setup wizard finishes by sending your choices back from WPCharitable.com to your site.
+// If that hand-off arrives without its data (which can happen when a site redirects the
+// connection, for example between http and https or www and non-www, or when a security
+// plugin blocks it), we land here. The user reaching this screen is still logged in, so we
+// explain what happened and offer to try again or finish setup manually rather than telling
+// them they are logged out.
 if ( ! empty( $_GET['lostconnection'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$charitable_welcome_headline    = __( 'Welcome back!', 'charitable' );
-	$charitable_introduction_text   = __( 'You seem to have been logged out of your WordPress admin during the onboarding process. In order for the onboarding to install plugins and update settings please go back the last step and submit while you are still logged into WordPress.', 'charitable' );
-	$charitable_button_label        = __( 'Go Back', 'charitable' );
+	$charitable_introduction_text   = __( 'We were not able to bring your choices back from the setup wizard, so setup did not finish. Your login is fine and nothing is wrong with your install. You can try the wizard again, or skip it and set up Charitable yourself from the dashboard.', 'charitable' );
+	$charitable_button_label        = __( 'Try Again', 'charitable' );
 	$charitable_onboarding_url      = add_query_arg( array( 'resume' => 'true' ), charitable_get_onboarding_url() );
 	$charitable_welcome_go_back_url = admin_url( 'admin.php?page=charitable-setup-checklist&charitable_onboarding=cancel' );
 }

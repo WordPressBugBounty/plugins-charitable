@@ -180,7 +180,26 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 					<li class="charitable-<?php echo esc_attr( $preview_or_template_css ); ?>-donation-amount suggested-donation-amount <?php echo esc_attr( $selected_css ); ?>">
 						<label>
 							<input type="radio" name="donation_amount" value="<?php echo esc_attr( $suggested_donation['amount'] ); ?>" <?php echo esc_attr( $checked_attribute ); ?>>
-							<span class="amount"><?php echo esc_html( $currency_helper->get_monetary_amount( $suggested_donation['amount'] ) ); ?></span> <?php /* <span class="description"><?php echo esc_html( $suggested_donation['description'] ); ?></span> */ ?>
+							<span class="amount"><?php echo esc_html( $currency_helper->get_monetary_amount( $suggested_donation['amount'] ) ); ?></span>
+							<?php
+							/*
+							 * The builder's "Optional Description" beside each amount. Rows saved before
+							 * that input existed, written by the legacy metabox, or added programmatically
+							 * have no 'description' key at all, so this is guarded rather than read
+							 * directly. The span is omitted entirely when the description is blank, which
+							 * keeps the markup (and so the layout) identical for the campaigns that never
+							 * filled it in.
+							 *
+							 * wp_kses_post() rather than esc_html() to match
+							 * templates/donation-form/donation-amount-list.php, so the same description
+							 * renders the same way in this block and on the donation form.
+							 */
+							if ( ! empty( $suggested_donation['description'] ) ) :
+								?>
+								<span class="description"><?php echo wp_kses_post( $suggested_donation['description'] ); ?></span>
+								<?php
+							endif;
+							?>
 						</label>
 					</li>
 						<?php

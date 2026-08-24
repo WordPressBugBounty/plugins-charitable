@@ -28,7 +28,7 @@ $wrapper            = '.charitable-campaign-wrap.template-' . $charitable_slug;
 $hero_row_class     = 'beacon-hero-row';
 $body_row_class     = 'beacon-body-row';
 
-require_once '../../admin/campaign-builder/templates/functions-campaign-templates.php';
+require_once dirname( __DIR__, 2 ) . '/admin/campaign-builder/templates/functions-campaign-templates.php';
 
 ?>
 

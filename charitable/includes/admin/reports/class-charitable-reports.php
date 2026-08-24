@@ -1444,16 +1444,32 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 			$days              = $this->get_days_between_dates( $this->start_date, $this->end_date );
 			$refunded_statuses = array( 'charitable-refunded' );
 
+			/**
+			 * Two grouped queries for the whole range, rather than two queries per calendar
+			 * day. The old per-day loop made the cost a function of how long the organisation
+			 * had existed rather than how much data it had, so a 24-year range issued ~18,000
+			 * queries and hit max_execution_time before returning anything.
+			 *
+			 * The range is taken from $days rather than from $this->start_date /
+			 * $this->end_date, because get_days_between_dates() normalises a falsy date to
+			 * "now". Reading the bounds back off $days guarantees the query covers exactly
+			 * the days this loop is about to render, however those dates were normalised.
+			 */
+			$day_keys    = array_keys( $days );
+			$range_start = reset( $day_keys );
+			$range_end   = end( $day_keys );
+
+			$completed_by_day = $campaign_donations_table->get_donations_summary_by_day_range( $range_start, $range_end, array( 'charitable-completed', 'charitable-refunded' ) );
+			$refunded_by_day  = $campaign_donations_table->get_donations_summary_by_day_range( $range_start, $range_end, $refunded_statuses );
+
 			foreach ( $days as $day_unformatted => $day_label ) {
 
-				$donation_today_completed = $campaign_donations_table->get_donations_summary_by_period( gmdate( 'Y-m-d', strtotime( $day_unformatted ) ), array( 'charitable-completed', 'charitable-refunded' ) );
-				$donation_today_refunded  = $campaign_donations_table->get_donations_summary_by_period( gmdate( 'Y-m-d', strtotime( $day_unformatted ) ), $refunded_statuses );
+				$donation_day = gmdate( 'Y-m-d', strtotime( $day_unformatted ) );
 
-				$donation_day                                 = gmdate( 'Y-m-d', strtotime( $day_unformatted ) );
 				$donations_by_day[ $donation_day ]['label']   = gmdate( 'F d, Y', strtotime( $day_unformatted ) );
-				$donations_by_day[ $donation_day ]['amount']  = $donation_today_completed->amount;
+				$donations_by_day[ $donation_day ]['amount']  = isset( $completed_by_day[ $donation_day ] ) ? $completed_by_day[ $donation_day ]->amount : 0;
 				$donations_by_day[ $donation_day ]['donors']  = 0;
-				$donations_by_day[ $donation_day ]['refunds'] = $donation_today_refunded->amount;
+				$donations_by_day[ $donation_day ]['refunds'] = isset( $refunded_by_day[ $donation_day ] ) ? $refunded_by_day[ $donation_day ]->amount : 0;
 				$donations_by_day[ $donation_day ]['net']     = 0;
 			}
 
@@ -2832,48 +2848,56 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 			$refunds_by_day                  = array();
 			$refunded_donations_total_amount = 0;
 			$refunded_donations_total_count  = 0;
-			$processed_donation_ids         = array(); // Track unique donation IDs to avoid double-counting
 
 			$days = $this->get_days_between_dates( $this->start_date, $this->end_date );
 
-			// First, calculate totals from all refunded donations (regardless of day matching)
-			// This ensures count and amount are consistent
+			/**
+			 * Bucket the refunds by day once, up front, then read from that.
+			 *
+			 * The day loop below used to iterate the day LABEL ('M d') rather than the
+			 * 'Y-m-d' key, so strtotime() stamped every bucket with the CURRENT year. The
+			 * Refunds column and Net in the breakdown table therefore read 0 for any range
+			 * outside the current year, and for a multi-year range refunds from different
+			 * years merged into a single month-day bucket. (The totals were already
+			 * computed up front, so the Refunds card itself was correct.)
+			 *
+			 * Buckets on post_date, matching the WHERE clause above and the donation series
+			 * in get_donations_by_day(). Bucketing on post_date_gmt while filtering on
+			 * post_date could put a late-evening refund in a day outside the range on a
+			 * non-UTC site.
+			 *
+			 * The GROUP BY p.ID in the query already guarantees one row per donation, so no
+			 * per-day dedup is needed. The previous "$donation_id > 0" guard also silently
+			 * dropped a refunded donation that has no campaign_donations row from the totals;
+			 * such a refund is now counted, with a zero amount, so it stays visible.
+			 */
+			$refunds_by_date = array();
+
 			if ( ! empty( $refunded_donations ) ) {
 				foreach ( $refunded_donations as $refunded_donation ) {
-					// Only count each unique donation ID once
-					$donation_id = isset( $refunded_donation->donation_id ) ? intval( $refunded_donation->donation_id ) : 0;
-					if ( $donation_id > 0 && ! in_array( $donation_id, $processed_donation_ids, true ) ) {
-						$refunded_donations_total_amount += floatval( $refunded_donation->amount );
-						$refunded_donations_total_count++;
-						$processed_donation_ids[] = $donation_id;
+					$refund_day = gmdate( 'Y-m-d', strtotime( $refunded_donation->post_date ) );
+
+					if ( ! isset( $refunds_by_date[ $refund_day ] ) ) {
+						$refunds_by_date[ $refund_day ] = array(
+							'amount' => 0,
+							'count'  => 0,
+						);
 					}
+
+					$refunds_by_date[ $refund_day ]['amount'] += floatval( $refunded_donation->amount );
+					++$refunds_by_date[ $refund_day ]['count'];
+
+					$refunded_donations_total_amount += floatval( $refunded_donation->amount );
+					++$refunded_donations_total_count;
 				}
 			}
 
-			// Then, organize by day for the breakdown
-			foreach ( $days as $day ) {
-				$donation_day             = gmdate( 'Y-m-d', strtotime( $day ) );
-				$refunded_donation_amount = 0;
-				$refunded_donation_count  = 0;
-				$processed_day_donation_ids = array(); // Track unique donation IDs per day
-				if ( ! empty( $refunded_donations ) ) :
-					foreach ( $refunded_donations as $refunded_donation ) {
-						// if the refunded donation post date is the same day as the donation_day, add it to the refunded total.
-						$refund_date = gmdate( 'Y-m-d', strtotime( $refunded_donation->post_date_gmt ) );
-						if ( $refund_date === $donation_day ) {
-							$donation_id = isset( $refunded_donation->donation_id ) ? intval( $refunded_donation->donation_id ) : 0;
-							// Only count each unique donation ID once per day
-							if ( $donation_id > 0 && ! in_array( $donation_id, $processed_day_donation_ids, true ) ) {
-								$refunded_donation_amount += floatval( $refunded_donation->amount );
-								++$refunded_donation_count;
-								$processed_day_donation_ids[] = $donation_id;
-							}
-						}
-					}
-				endif;
-				$refunds_by_day[ $donation_day ]['label']  = gmdate( 'F d, Y', strtotime( $day ) );
-				$refunds_by_day[ $donation_day ]['amount'] = $refunded_donation_amount;
-				$refunds_by_day[ $donation_day ]['donors'] = $refunded_donation_count;
+			foreach ( $days as $day_unformatted => $day_label ) {
+				$donation_day = gmdate( 'Y-m-d', strtotime( $day_unformatted ) );
+
+				$refunds_by_day[ $donation_day ]['label']  = gmdate( 'F d, Y', strtotime( $day_unformatted ) );
+				$refunds_by_day[ $donation_day ]['amount'] = isset( $refunds_by_date[ $donation_day ] ) ? $refunds_by_date[ $donation_day ]['amount'] : 0;
+				$refunds_by_day[ $donation_day ]['donors'] = isset( $refunds_by_date[ $donation_day ] ) ? $refunds_by_date[ $donation_day ]['count'] : 0;
 			}
 
 			return array(
@@ -3667,6 +3691,8 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 				'default_start_date'            => current_time( gmdate( 'Y-m-d', strtotime( '-1 month' ) ) ),
 				'default_end_date'              => current_time( gmdate( 'Y-m-d' ) ),
 				'advanced_reports'              => $charitable_reports_advanced_report_strings,
+				'i18n_report_timeout'           => __( 'This report took too long to load and was stopped by the server. The figures have been cleared so they are not mistaken for the range you asked for. Try a shorter date range.', 'charitable' ),
+				'i18n_report_error'             => __( 'This report could not be loaded. The figures have been cleared so they are not mistaken for the range you asked for. Please try again.', 'charitable' ),
 			);
 
 			$strings = apply_filters( 'charitable_reporting_strings', $strings );

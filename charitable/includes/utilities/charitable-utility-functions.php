@@ -189,6 +189,37 @@ function charitable_validate_email( $i ) {
 }
 
 /**
+ * Ensure a sort direction is one of the two values MySQL accepts.
+ *
+ * Sort directions cannot be passed to $wpdb->prepare() as placeholders, so any
+ * value that is interpolated into the ORDER BY clause of a query has to be
+ * validated against a strict whitelist instead. Anything that is not exactly
+ * ASC or DESC (case insensitive) falls back to the given default.
+ *
+ * @since  1.8.12.2
+ *
+ * @param  mixed  $order    The sort direction received.
+ * @param  string $fallback The direction to use when $order is not valid.
+ * @return string Either 'ASC' or 'DESC'.
+ */
+function charitable_validate_sort_direction( $order, $fallback = 'DESC' ) {
+	/*
+	 * Only strings are considered. Anything else -- null, arrays, objects,
+	 * integers -- fails closed to the fallback rather than being coerced, so
+	 * there is no path on which caller-supplied bytes are returned.
+	 */
+	$order = is_string( $order ) ? strtoupper( trim( $order ) ) : '';
+
+	if ( in_array( $order, array( 'ASC', 'DESC' ), true ) ) {
+		return $order;
+	}
+
+	$fallback = is_string( $fallback ) ? strtoupper( trim( $fallback ) ) : '';
+
+	return 'ASC' === $fallback ? 'ASC' : 'DESC';
+}
+
+/**
  * Sanitize any checkbox value.
  *
  * @since  1.5.0

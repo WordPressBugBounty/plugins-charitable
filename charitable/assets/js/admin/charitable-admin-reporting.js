@@ -691,8 +691,20 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
 
             app.disableUI();
             app.reportUILoadingOn();
+            app.clearReportError();
 
             $.post(charitable_reporting.ajax_url, data, function (response) {
+
+                // A request that came back but reported failure must not leave the
+                // previous range's figures on screen under the new date range.
+                if ( ! response || ! response.success ) {
+
+                    wpchar.debug('response failure');
+
+                    app.showReportError( app.getString( 'i18n_report_error', 'This report could not be loaded. Please try again.' ) );
+
+                    return;
+                }
 
                 if (response.success) { // check and see if HTML donation_breakdown is returned and if so, update the breakdown table.
 
@@ -784,6 +796,19 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
                     app.checkCategoryDropdown();
 
                 }
+
+            }).fail(function (jqXHR, textStatus) {
+
+                /**
+                 * Without this, a request killed by the server (a 504 at
+                 * max_execution_time on a long date range) never ran a callback at
+                 * all: the UI stayed disabled and dimmed forever, and the cards kept
+                 * showing the PREVIOUS range's figures while the date field showed
+                 * the new one. An all-time total could be read as last week's.
+                 */
+                wpchar.debug('overview request failed: ' + textStatus);
+
+                app.showReportError( app.getRequestFailureMessage( jqXHR, textStatus ) );
 
             });
 
@@ -1358,6 +1383,183 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
         reportUILoadingOff: function () {
 
             $reports.find('.charitable-report-ui, .charitable-activity-list-container').removeClass('charitable-section-loading');
+
+        },
+
+		/**
+		 * Reads a localized string, falling back to English if the string was not
+		 * localized (older report screens localize their own subset).
+		 *
+		 * @since 1.8.12.2
+		 *
+		 * @param {string} key      The key in charitable_reporting.
+		 * @param {string} fallback Text to use when the key is absent.
+		 *
+		 * @return {string} The string to display.
+		 */
+        getString: function ( key, fallback ) {
+
+            if ( typeof charitable_reporting !== 'undefined' && charitable_reporting[ key ] ) {
+                return charitable_reporting[ key ];
+            }
+
+            return fallback;
+
+        },
+
+		/**
+		 * Builds the message for a request that failed at the HTTP level.
+		 *
+		 * @since 1.8.12.2
+		 *
+		 * @param {Object} jqXHR      The jQuery XHR object.
+		 * @param {string} textStatus The jQuery status string.
+		 *
+		 * @return {string} The message to display.
+		 */
+        getRequestFailureMessage: function ( jqXHR, textStatus ) {
+
+            var status = ( jqXHR && jqXHR.status ) ? jqXHR.status : 0;
+
+            // 504/502 is a gateway timeout; status 0 is a connection dropped or a
+            // request aborted, which is what a request killed at max_execution_time
+            // looks like from the browser. All three mean "took too long".
+            if ( 'timeout' === textStatus || 504 === status || 502 === status || 0 === status ) {
+                return app.getString( 'i18n_report_timeout', 'This report took too long to load and was stopped by the server. Try a shorter date range.' );
+            }
+
+            return app.getString( 'i18n_report_error', 'This report could not be loaded. Please try again.' );
+
+        },
+
+		/**
+		 * Returns the container used for report-level errors, creating it if the
+		 * current report template does not already provide one.
+		 *
+		 * @since 1.8.12.2
+		 *
+		 * @return {Object} The jQuery-wrapped error container.
+		 */
+        getReportErrorContainer: function () {
+
+            var $error = $reports.find('#charitable-report-error');
+
+            if ( $error.length === 0 ) {
+                $error = $('<div id="charitable-report-error" class="notice notice-error charitable-report-error"><p></p></div>');
+                $reports.prepend( $error );
+            }
+
+            return $error;
+
+        },
+
+		/**
+		 * Hides any error left over from a previous request.
+		 *
+		 * @since 1.8.12.2
+		 *
+		 */
+        clearReportError: function () {
+
+            $reports.find('#charitable-report-error').hide();
+
+            app.unflagStaleData();
+
+        },
+
+		/**
+		 * Marks every data panel as not reflecting the requested date range.
+		 *
+		 * Blanking the headline cards is not enough on its own. The chart, the
+		 * breakdown table, the payment methods, the activity list and the top
+		 * donors/campaigns panels all still hold the PREVIOUS range's data, while
+		 * the date field shows the range the user actually asked for - which is the
+		 * misreading the original report described.
+		 *
+		 * These are flagged rather than emptied so the earlier figures stay
+		 * available for reference; the error notice above says why they are dimmed.
+		 * The opacity is applied inline so this needs no stylesheet change.
+		 *
+		 * @since 1.8.12.2
+		 *
+		 */
+        flagStaleData: function () {
+
+            $reports.find('.charitable-report-ui')
+                .addClass('charitable-section-stale')
+                .css('opacity', '0.4');
+
+        },
+
+		/**
+		 * Clears the stale flag, ahead of a fresh request.
+		 *
+		 * @since 1.8.12.2
+		 *
+		 */
+        unflagStaleData: function () {
+
+            $reports.find('.charitable-section-stale')
+                .removeClass('charitable-section-stale')
+                .css('opacity', '');
+
+        },
+
+		/**
+		 * Shows a report-level error and clears the headline figures.
+		 *
+		 * @since 1.8.12.2
+		 *
+		 * @param {string} message The message to display.
+		 *
+		 */
+        showReportError: function ( message ) {
+
+            app.getReportErrorContainer().find('p').text( message ).end().show();
+
+            app.blankHeadlineFigures();
+            app.flagStaleData();
+
+            // Always hand the UI back, or the screen stays dimmed and disabled with
+            // no way to try a different range.
+            app.enableUI();
+            app.reportUILoadingOff();
+
+            // enableUI() clears charitable-disabled from everything, including the
+            // category dropdown that checkCategoryDropdown() owns. The success path
+            // re-asserts it for the same reason.
+            app.checkCategoryDropdown();
+
+        },
+
+		/**
+		 * Replaces the headline figures with a placeholder.
+		 *
+		 * Deliberate: a failed request used to leave the previous range's numbers in
+		 * the cards while the date field showed the range the user actually asked
+		 * for. A dash is unhelpful, but unlike a stale number it cannot be misread.
+		 *
+		 * @since 1.8.12.2
+		 *
+		 */
+        blankHeadlineFigures: function () {
+
+            var placeholder = '&mdash;';
+
+            $.each( [
+                elements.$top_donation_amount,
+                elements.$top_donation_count,
+                elements.$top_donation_average,
+                elements.$top_donation_donors_count,
+                elements.$top_charitable_refund_total_amount,
+                elements.$top_charitable_refund_count
+            ], function ( index, $el ) {
+
+                if ( $el && $el.length ) {
+                    $el.html( placeholder );
+                }
+
+            } );
 
         },
 

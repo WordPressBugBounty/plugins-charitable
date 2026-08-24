@@ -51,6 +51,15 @@ if ( ! class_exists( 'Charitable_Donors_Shortcode' ) ) :
 
 			$args = shortcode_atts( $default, $atts, 'charitable_donors' );
 
+			/**
+			 * The order attribute is interpolated into the ORDER BY clause of the
+			 * donor query, so restrict it to a valid sort direction before it is
+			 * passed any further.
+			 *
+			 * @since 1.8.12.2
+			 */
+			$args['order'] = charitable_validate_sort_direction( $args['order'] );
+
 			if ( '' !== $args['campaign_categories'] ) {
 				$campaign_categories = str_replace( ', ', ',', $args['campaign_categories'] );
 				$campaign_categories = explode( ',', $args['campaign_categories'] );

@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 header( 'Content-type: text/css; charset: UTF-8' );
 
-require_once '../../admin/campaign-builder/templates/functions-campaign-templates.php';
+require_once dirname( __DIR__, 2 ) . '/admin/campaign-builder/templates/functions-campaign-templates.php';
 
 if ( ! function_exists( 'charitable_sanitize_hex_color' ) ) {
 	/**
@@ -62,7 +62,7 @@ $mobile_width = isset( $_GET['mw'] ) ? intval( $_GET['mw'] ) : 800; // phpcs:ign
 $charitable_slug    = 'youth-sports';
 $charitable_wrapper = '.charitable-campaign-wrap.template-' . $charitable_slug;
 
-require_once '../../admin/campaign-builder/templates/functions-campaign-templates.php';
+require_once dirname( __DIR__, 2 ) . '/admin/campaign-builder/templates/functions-campaign-templates.php';
 
 ?>
 

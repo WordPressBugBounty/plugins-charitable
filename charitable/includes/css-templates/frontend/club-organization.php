@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 header( 'Content-type: text/css; charset: UTF-8' );
 
-require_once '../../admin/campaign-builder/templates/functions-campaign-templates.php';
+require_once dirname( __DIR__, 2 ) . '/admin/campaign-builder/templates/functions-campaign-templates.php';
 
 if ( ! function_exists( 'charitable_sanitize_hex_color' ) ) {
 	/**

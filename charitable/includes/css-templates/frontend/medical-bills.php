@@ -28,7 +28,7 @@ $charitable_slug            = 'medical-bills';
 $charitable_wrapper         = '.charitable-campaign-wrap.template-' . $charitable_slug;
 $charitable_preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.template-' . $charitable_slug;
 
-require_once '../../admin/campaign-builder/templates/functions-campaign-templates.php';
+require_once dirname( __DIR__, 2 ) . '/admin/campaign-builder/templates/functions-campaign-templates.php';
 
 // phpcs:disable
 ?>

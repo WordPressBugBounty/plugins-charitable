@@ -171,7 +171,15 @@ if ( ! class_exists( 'Charitable_API_Route_Campaign_CSS' ) ) :
 			// Save current working directory.
 			$original_cwd = getcwd();
 
-			// Change to the template directory so relative paths in template files work.
+			/*
+			 * Change to the template directory. The templates now resolve their shared
+			 * helper from their own directory instead of the working directory, so this is
+			 * belt and braces for any third-party template that still uses a relative
+			 * path. It must not become load-bearing again: if chdir() is disabled or
+			 * restricted by open_basedir, a template relying on it fatals and this route
+			 * returns a PHP error instead of CSS, which the browser rejects - leaving the
+			 * campaign with only the base stylesheet's default colours.
+			 */
 			chdir( dirname( $template_file ) );
 
 			/*
@@ -254,7 +262,15 @@ if ( ! class_exists( 'Charitable_API_Route_Campaign_CSS' ) ) :
 			// Save current working directory.
 			$original_cwd = getcwd();
 
-			// Change to the template directory so relative paths in template files work.
+			/*
+			 * Change to the template directory. The templates now resolve their shared
+			 * helper from their own directory instead of the working directory, so this is
+			 * belt and braces for any third-party template that still uses a relative
+			 * path. It must not become load-bearing again: if chdir() is disabled or
+			 * restricted by open_basedir, a template relying on it fatals and this route
+			 * returns a PHP error instead of CSS, which the browser rejects - leaving the
+			 * campaign with only the base stylesheet's default colours.
+			 */
 			chdir( dirname( $template_file ) );
 
 			// Include the template file - it will output CSS.
