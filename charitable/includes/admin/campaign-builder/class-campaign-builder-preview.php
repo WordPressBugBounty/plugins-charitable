@@ -209,6 +209,7 @@ if ( ! class_exists( 'Campaign_Builder_Preview' ) ) :
 		 * Customize campaign preview page content.
 		 *
 		 * @since 1.8.0
+		 * @version 1.8.12.3 Detach from the content filters while the campaign renders, to prevent an infinite the_content loop that exhausts memory.
 		 *
 		 * @return string
 		 */
@@ -294,7 +295,7 @@ if ( ! class_exists( 'Campaign_Builder_Preview' ) ) :
 
 					$content .= '</p>';
 
-					$content .= '<p>' . esc_html__( 'Ssome functionality and elements (like donation buttons, forms, social sharing, etc.) are disabled.', 'charitable' ) . '</p>';
+					$content .= '<p>' . esc_html__( 'Some functionality and elements (like donation buttons, forms, social sharing, etc.) are disabled.', 'charitable' ) . '</p>';
 
 				} else {
 
@@ -317,7 +318,7 @@ if ( ! class_exists( 'Campaign_Builder_Preview' ) ) :
 
 					$content .= '</p>';
 
-					$content .= '<p>' . esc_html__( 'Ssome functionality and elements (like donation buttons, forms, social sharing, etc.) are disabled.', 'charitable' ) . '</p>';
+					$content .= '<p>' . esc_html__( 'Some functionality and elements (like donation buttons, forms, social sharing, etc.) are disabled.', 'charitable' ) . '</p>';
 
 				}
 
@@ -377,7 +378,22 @@ if ( ! class_exists( 'Campaign_Builder_Preview' ) ) :
 			// if there is no campaign ID in the campaign_data, this MIGHT be an initial preview on a new campaign which means it should be in the URL.
 			$campaign_id = 0 === intval( $this->campaign_data['id'] ) && ! empty( $_GET['charitable_campaign_preview'] ) ? absint( $_GET['charitable_campaign_preview'] ) : absint( $this->campaign_data['id'] ); // phpcs:ignore
 
-			$content .= do_shortcode( '[campaign version="2" id=' . $campaign_id . ']' );
+			// Detach this handler from the content filters before rendering the campaign.
+			// The campaign render re-applies the_content (via the campaign's get_content), and
+			// with certain content-processing plugins active that re-application would re-enter
+			// this method and render the campaign again, looping until PHP's memory limit is
+			// exhausted (HelpScout #11576). The campaign endpoint already guards its own render
+			// the same way. The finally re-adds the filters unconditionally, so even if the
+			// render throws they are never left detached for the rest of the request.
+			remove_filter( 'the_content', [ $this, 'the_content' ], 999 );
+			remove_filter( 'get_the_excerpt', [ $this, 'the_content' ], 999 );
+
+			try {
+				$content .= do_shortcode( '[campaign version="2" id=' . $campaign_id . ']' );
+			} finally {
+				add_filter( 'the_content', [ $this, 'the_content' ], 999 );
+				add_filter( 'get_the_excerpt', [ $this, 'the_content' ], 999 );
+			}
 
 			return $content;
 		}

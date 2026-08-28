@@ -4,6 +4,62 @@
 const CharitableUtils = window.CharitableUtils || ( function( document, window, $ ) {
 
 	/**
+	 * Characters removed from user-entered headlines, labels and titles.
+	 *
+	 * This is a denylist on purpose. The previous allowlist only permitted ASCII
+	 * word characters plus the Latin Extended blocks, so every non-Latin script
+	 * (Japanese, Chinese, Korean, Cyrillic, Greek, Arabic, Hebrew, Thai,
+	 * Devanagari) was silently deleted as the user typed. An allowlist widened to
+	 * \p{L}\p{N}\p{M}\p{Zs} still drops the punctuation those languages actually
+	 * use, so bare kanji would survive while "今すぐ寄付！" quietly lost its
+	 * fullwidth "！" and "寄付する。" lost its kuten.
+	 *
+	 * Escaping is handled server side -- generate_text() strips quotes and runs
+	 * esc_html() before echoing into a value attribute, and every output path
+	 * uses esc_html() -- so this is belt and braces. It only needs to remove the
+	 * characters that could break an HTML context, plus control characters.
+	 *
+	 * Deliberately NOT stripped, despite looking like candidates:
+	 *
+	 * - Bidi marks and isolates (U+200E/U+200F, U+202A-U+202E, U+2066-U+2069) and
+	 *   zero-width joiners (U+200B-U+200D, U+FEFF). Removing these would break the
+	 *   very languages this fix exists to support: RLM/LRM are load-bearing in
+	 *   Arabic and Hebrew, and ZWNJ/ZWJ are required in Persian, Arabic and Indic
+	 *   scripts and in emoji sequences. They carry a theoretical display-spoofing
+	 *   risk, but the author already needs campaign-edit capability, so spoofing
+	 *   their own button label grants them nothing.
+	 * - HTML entity text such as "&lt;script&gt;". innerHTML decodes entities into
+	 *   text nodes rather than re-parsing them as markup, so they cannot create an
+	 *   element. Verified.
+	 *
+	 * @since 1.8.12.3
+	 *
+	 * @type {RegExp}
+	 */
+	const UNSAFE_TEXT_CHARS = /[<>`]|[\u0000-\u001F\u007F-\u009F]/g; // eslint-disable-line no-control-regex
+
+	/**
+	 * Strip the unsafe characters from a value, tolerating non-string input.
+	 *
+	 * Non-strings return '' rather than being coerced. The previous implementation
+	 * called .replace() directly and so threw a TypeError on null, undefined and
+	 * numbers alike; coercing with String() instead would put the literal text
+	 * "null" or "[object Object]" into a campaign field, which is worse than
+	 * either. Every real caller passes a jQuery .val(), which is always a string.
+	 *
+	 * @since 1.8.12.3
+	 *
+	 * @param {string} stringValue The text, usually coming from user input.
+	 *
+	 * @returns {string} The cleaned string.
+	 */
+	function stripUnsafeText( stringValue ) {
+
+		return 'string' === typeof stringValue ? stringValue.replace( UNSAFE_TEXT_CHARS, '' ) : '';
+
+	}
+
+	/**
 	 * Public functions and properties.
 	 *
 	 * @since 1.8.0
@@ -16,6 +72,7 @@ const CharitableUtils = window.CharitableUtils || ( function( document, window, 
 		 * function that prevents certain HTML/JS/etc characters from being inputted into headlines, campaign titles, etc.
 		 *
 		 * @since 1.8.0
+		 * @since 1.8.12.3 Switched to a denylist so non-Latin scripts survive.
 		 *
 		 * @param {string} stringValue The text, usually coming from user input.
 		 *
@@ -23,7 +80,7 @@ const CharitableUtils = window.CharitableUtils || ( function( document, window, 
 		 */
 		santitizeTitle: function ( stringValue ) {
 
-			return stringValue.replace(/[^\w\s\u00C0-\u024F\u1E00-\u1EFF\u2C60-\u2C7F\uA720-\uA7FF _.,!"()'\/$[\]:@#%-]/gi, '');
+			return stripUnsafeText( stringValue );
 
 		},
 
@@ -32,6 +89,7 @@ const CharitableUtils = window.CharitableUtils || ( function( document, window, 
 		 * function that prevents certain HTML/JS/etc characters from being inputted into generic text input areas/boxes.
 		 *
 		 * @since 1.8.0
+		 * @since 1.8.12.3 Switched to a denylist so non-Latin scripts survive.
 		 *
 		 * @param {string} stringValue The text, usually coming from user input.
 		 *
@@ -39,7 +97,7 @@ const CharitableUtils = window.CharitableUtils || ( function( document, window, 
 		 */
 		santitizeTextInput: function ( stringValue ) {
 
-			return stringValue.replace(/[^\w\s\u00C0-\u024F\u1E00-\u1EFF\u2C60-\u2C7F\uA720-\uA7FF _.,!"()'\/$[\]:@#%-]/gi, '');
+			return stripUnsafeText( stringValue );
 
 		},
 

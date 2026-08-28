@@ -135,9 +135,14 @@
 #charitable-design-wrap .placeholder .charitable-campaign-builder-placeholder-preview-text {
   max-height: 550px;
 }
+/* Match the front-end body size (base.css asserts 14px on the text field and the
+   campaign description). Without this the canvas inherits the wp-admin base size
+   and previews body copy larger than the published page renders it. A per-field
+   body_font_size still wins here, as it does on the front end. */
 #charitable-design-wrap .charitable-campaign-builder-placeholder-preview-text {
   opacity: 0.35;
   overflow: hidden;
+  font-size: 14px;
 }
 #charitable-design-wrap .charitable-prevent-select {
   -webkit-user-select: none; /* Safari */

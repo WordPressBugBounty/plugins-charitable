@@ -3904,7 +3904,18 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 		 */
 		textFieldEvents: function( $builder ) {
 
-			$builder.on( 'input', '.charitable-panel-field-text input[type="text"][data-ajax-label!="css_class"]:not(.charitable-campaign-builder-headline, .charitable-campaign-builder-donate-button-button-label)', function( e ) { // eslint-disable-line
+			const textFieldSelector = '.charitable-panel-field-text input[type="text"][data-ajax-label!="css_class"]:not(.charitable-campaign-builder-headline, .charitable-campaign-builder-donate-button-button-label)';
+
+			$builder.on( 'input', textFieldSelector, function( e ) { // eslint-disable-line
+
+				// Never rewrite the value mid-IME-composition. Assigning to .value
+				// while an IME is composing desyncs the composition from the DOM and
+				// each subsequent update re-inserts, so "あb" arrives as "ああbあb".
+				// Cleaning happens on compositionend instead -- see below.
+				if ( e.originalEvent && e.originalEvent.isComposing ) {
+					app.setCampaignNotSaved();
+					return;
+				}
 
 				const 	theTextBox    = $( this ),
 						textboxString = CharitableUtils.santitizeTextInput( theTextBox.val() ); // Clean the string.
@@ -3912,6 +3923,31 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 				$( this ).val( textboxString );
 
 				app.setCampaignNotSaved();
+
+			} );
+
+			// This binding is what makes the isComposing guard above safe.
+			//
+			// A composition does NOT end with an input event carrying isComposing
+			// false -- every input event it emits, including the one for the final
+			// commit, carries isComposing true. Verified in Chromium. So the guard
+			// alone would skip cleaning for the whole composition and leave the
+			// composed text unsanitised for good, which matters because a couple of
+			// preview handlers pass a field's raw .val() straight to .html().
+			// compositionend is the first moment it is safe to rewrite the value.
+			//
+			// focusout covers the case of a composition abandoned without commit
+			// (no compositionend fires), so nothing unsanitised survives the field
+			// losing focus, which is the last thing to happen before a save.
+			$builder.on( 'compositionend focusout', textFieldSelector, function() { // eslint-disable-line
+
+				const 	theTextBox    = $( this ),
+						textboxString = CharitableUtils.santitizeTextInput( theTextBox.val() );
+
+				if ( theTextBox.val() !== textboxString ) {
+					theTextBox.val( textboxString );
+					app.setCampaignNotSaved();
+				}
 
 			} );
 
@@ -3926,14 +3962,30 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 		 */
 		headlineEvents: function( $builder ) {
 
-			$builder.on( 'input', '.charitable-panel-field-text input[type="text"].charitable-campaign-builder-headline', function( e ) { // eslint-disable-line
+			const headlineSelector = '.charitable-panel-field-text input[type="text"].charitable-campaign-builder-headline';
+
+			$builder.on( 'input', headlineSelector, function( e ) { // eslint-disable-line
 
 				const 	theTextBox = $( this ),
-						field_id    = theTextBox.closest('.charitable-panel-field').data('field-id');
+						field_id    = theTextBox.closest('.charitable-panel-field').data('field-id'),
+						isComposing = !! ( e.originalEvent && e.originalEvent.isComposing );
 
-				app.updateHeadlinePreview( field_id, theTextBox.attr('name'), theTextBox.val(), theTextBox );
+				app.updateHeadlinePreview( field_id, theTextBox.attr('name'), theTextBox.val(), theTextBox, isComposing );
 
 				app.setCampaignNotSaved();
+
+			} );
+
+			// See the matching binding in textFieldEvents: a composition emits no
+			// input event with isComposing false, so without this the guarded
+			// .val() write would never run and the field would keep unsanitised
+			// composed text. focusout also covers an abandoned composition.
+			$builder.on( 'compositionend focusout', headlineSelector, function() { // eslint-disable-line
+
+				const 	theTextBox = $( this ),
+						field_id   = theTextBox.closest('.charitable-panel-field').data('field-id');
+
+				app.updateHeadlinePreview( field_id, theTextBox.attr('name'), theTextBox.val(), theTextBox, false );
 
 			} );
 
@@ -3943,12 +3995,15 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 		 * Updating the fields for headlines.
 		 *
 		 * @since 1.8.0
+		 * @since 1.8.12.3 Added isComposing so the input is not rewritten mid-IME-composition.
 		 *
 		 * @param {integer} field_id Field ID.
 		 * @param {string}  textFieldName Not currently used.
 		 * @param {string}  $label_value Value of text to update.
+		 * @param {object}  theTextBox The text input.
+		 * @param {bool}    isComposing Whether an IME composition is in progress.
 		 */
-		updateHeadlinePreview: function( field_id = 0, textFieldName = '', label_value = '', theTextBox ) { // eslint-disable-line
+		updateHeadlinePreview: function( field_id = 0, textFieldName = '', label_value = '', theTextBox, isComposing = false ) { // eslint-disable-line
 
 			const 	preview_field            = $('#charitable-field-' + field_id ),
 					headline                 = CharitableUtils.santitizeTitle( label_value  ), // Clean the string.
@@ -3956,7 +4011,11 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 					tempPlaceholderContainer = preview_field.find('.charitable-placeholder').length > 0 ? '.charitable-placeholder' : '.placeholder',
 					placeholderContainer     = preview_field.find('.charitable-field-preview-social-sharing-headline-container').length > 0 ? '.charitable-field-preview-social-sharing-headline-container' : tempPlaceholderContainer;
 
-			theTextBox.val( headline );
+			// Writing to the input while an IME is composing corrupts the composition.
+			// The value is cleaned on the input event that follows compositionend.
+			if ( ! isComposing ) {
+				theTextBox.val( headline );
+			}
 			preview_field.find( placeholderContainer ).find( 'h5.charitable-field-preview-headline' ).remove();
 			preview_field.find( placeholderContainer ).first().prepend( headline_html );
 

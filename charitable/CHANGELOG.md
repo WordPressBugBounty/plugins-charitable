@@ -1,3 +1,8 @@
+# 1.8.12.3
+* FIX: Improved support for Campaign builder text fields and non-Latin characters such as Japanese, Chinese, Korean, etc.
+* FIX: Updates involving campaign headline color in the builder and resolved builder preview memory issue, which was happening in some scenarios.
+* FIX: Improved Donate Button block's label in terms of readability in certain scenarios.
+
 # 1.8.12.2
 * FIX: Reports > Overview no longer times out on long date ranges. If a report does fail, the figures are cleared and an error shown.
 * FIX: The Refunds and Net columns in the Reports > Overview breakdown read zero for ranges outside the current year, and merged refunds across years.

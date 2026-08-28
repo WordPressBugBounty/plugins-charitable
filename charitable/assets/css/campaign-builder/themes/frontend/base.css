@@ -43,7 +43,7 @@
 }
 .charitable-campaign-wrap .charitable-campaign-container h5.charitable-field-template-headline,
 .charitable-campaign-wrap .charitable-campaign-container .charitable-field-template-headline {
-  color: #000;
+  color: var(--charitable_campaign_theme_headline, #000);
   font-size: 27px;
   line-height: 29px;
   font-weight: 500;
@@ -305,6 +305,7 @@
   line-height: 25px;
   padding-left: 0;
   padding-right: 0;
+  color: #fff;
   display: block;
   text-align: center;
   text-decoration: none;

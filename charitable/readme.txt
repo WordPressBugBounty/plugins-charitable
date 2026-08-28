@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.8.12.2
+Stable tag: 1.8.12.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -271,6 +271,11 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.12.3 =
+* FIX: Improved support for Campaign builder text fields and non-Latin characters such as Japanese, Chinese, Korean, etc.
+* FIX: Updates involving campaign headline color in the builder and resolved builder preview memory issue, which was happening in some scenarios.
+* FIX: Improved Donate Button block's label in terms of readability in certain scenarios.
 
 = Donation Form & Fundraising Campaigns v1.8.12.2 =
 * FIX: Reports > Overview no longer times out on long date ranges. If a report does fail, the figures are cleared and an error shown.

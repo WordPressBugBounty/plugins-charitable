@@ -31,6 +31,27 @@ $charitable_preview_wrapper = '.charitable-campaign-wrap.is-charitable-preview.t
 require_once dirname( __DIR__, 2 ) . '/admin/campaign-builder/templates/functions-campaign-templates.php';
 ?>
 
+<?php
+/*
+ * Headline colour. Emitted ONLY when the campaign actually configured a primary
+ * colour (the endpoint omits 'p' otherwise), so a campaign that customised nothing
+ * falls back to the historic #000 in base.css and renders byte-identical. The hex
+ * guard stops a malformed 'p' from emitting an invalid token, which would make the
+ * headline inherit the theme's colour instead of falling back.
+ *
+ * Emitted at the top of the stylesheet rather than appended at the end, because
+ * save-the-museum.php has an unclosed rule near its end that would otherwise nest
+ * this declaration inside it.
+ */
+if ( isset( $_GET['p'] ) && preg_match( '/^#[A-Fa-f0-9]{3,6}$/', $primary ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	?>
+<?php echo $charitable_wrapper; // phpcs:ignore ?> {
+	--charitable_campaign_theme_headline: <?php echo $primary; // phpcs:ignore ?>;
+}
+	<?php
+endif;
+?>
+
 :root {
 	--charitable_campaign_theme_primary: <?php echo $primary; // phpcs:ignore ?>;
 	--charitable_campaign_theme_secondary: <?php echo $secondary; // phpcs:ignore ?>;
