@@ -237,7 +237,82 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 		public function retrieve_sections_for_user( array $sections = array() ): array {
 
 			$sections = array(
-				// 1.8.12 — Beacon campaign templates (headline feature).
+				/*
+				 * 1.8.13 — AI assistants, the headline feature.
+				 *
+				 * This section is FIRST on purpose: the dark treatment comes from
+				 * `.charitable-splash-section:first-child` in the compiled
+				 * charitable-admin-splash.css (background #2c3338, white text), so the
+				 * marquee feature gets that look by position, not by a class of its own.
+				 * Reorder these and the dark block follows whatever ends up first.
+				 *
+				 * Ported from the Pro modal, where the same section leads Pro 1.8.19.
+				 * The copy is Pro's with one change: Pro reads "New in 1.8.19: switch on
+				 * write access", because Pro 1.8.18 shipped the read-only assistant first.
+				 * Lite never had that intermediate release — abilities and the write gate
+				 * both land here in 1.8.13 — so the clause is stated plainly instead of
+				 * pinned to a version Lite has no concept of.
+				 *
+				 * Video and poster are the same CDN objects Pro points at; both are live.
+				 * The 1-8-19 path is Pro's release folder, not a Lite version — the bucket
+				 * is shared, and the PayPal section below already does the same thing with
+				 * splash/1-8-15 under a Lite 1.8.11 badge.
+				 */
+				array(
+					'new'     => true,
+					'version' => '1.8.13',
+					'layout'  => 'fifty-fifty',
+					'class'   => 'no-order',
+					'title'   => __( 'Build Campaigns Just By Asking Your AI Assistant', 'charitable' ),
+					'content' => __( 'Connect an assistant like Claude or ChatGPT using the free WPVibe plugin, or any MCP client, then just say what you need. Switch on write access and it makes the change itself. Launch a fundraiser, add a question to a donation form, restyle a campaign, or log a check that came in the post.', 'charitable' ),
+					'video'   => array(
+						'url'    => 'https://wpcharitable-space.nyc3.digitaloceanspaces.com/splash/1-8-19/ai-assistants.mp4',
+						'poster' => 'https://wpcharitable-space.nyc3.digitaloceanspaces.com/splash/1-8-19/ai-assistants-poster.jpg',
+					),
+					'buttons' => array(
+						'main'      => array(
+							'text' => __( 'Get Started', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/ai-assistants-getting-started/', 'splash-modal', 'AI Assistants Main' ),
+						),
+						'secondary' => array(
+							'text' => __( 'Learn More', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/ai-assistants-learn-more/', 'splash-modal', 'AI Assistants Secondary' ),
+						),
+					),
+				),
+				/*
+				 * Charitable Events, slot 2. Ported from the Pro modal, where it carries
+				 * the 'new-addon' badge — Events ships on its own 1.0.0 cycle and is not a
+				 * Pro 1.8.19 feature. Here it is 'new-for-pro' instead, because for a Lite
+				 * reader the relevant fact is that it needs Pro, not that it is new.
+				 *
+				 * Buttons follow the Lite house style for Pro sections (main + upgrade)
+				 * rather than Pro's main + secondary. That is also what keeps the second
+				 * button alive: Pro's Learn More points at
+				 * /charitable-events-learn-more/, which is not published yet and 404s.
+				 */
+				array(
+					'new-for-pro' => true,
+					'layout'      => 'fifty-fifty',
+					'class'       => 'no-order',
+					'title'       => __( 'Charitable Events', 'charitable' ),
+					'content'     => __( 'Sell tickets to galas, dinners and virtual events without leaving Charitable. Every ticket is a donation, so the money lands in the event\'s own campaign. Set a fair market value per ticket and the deductible portion appears on the receipt. Each attendee gets a QR code, and you check them in at the door from your phone.', 'charitable' ),
+					'img'         => array(
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-19-charitable-events.png',
+						'shadow' => 'none',
+					),
+					'buttons'     => array(
+						'main'    => array(
+							'text' => __( 'Get Started', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/charitable-events-getting-started/', 'splash-modal', 'Charitable Events Main' ),
+						),
+						'upgrade' => array(
+							'text' => __( 'Upgrade to Pro', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/lite-upgrade/', 'splash-modal', 'Charitable Events Upgrade' ),
+						),
+					),
+				),
+				// 1.8.12 — Beacon campaign templates.
 				array(
 					'new'     => true,
 					'version' => '1.8.12',

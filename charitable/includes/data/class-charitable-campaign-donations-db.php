@@ -362,6 +362,138 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
 		}
 
 		/**
+		 * Return the total donated on each of several donations, grouped by
+		 * donation id, in a single query.
+		 *
+		 * The donation-side counterpart to get_donated_amounts_by_campaign().
+		 * Added because no batched per-donation accessor existed: listing a page
+		 * of donations and calling get_donation_total_amount() per row issues one
+		 * query per donation, which is the same N+1 that had to be fixed out of
+		 * the campaign list.
+		 *
+		 * No status clause: the donation ids are already selected by status by
+		 * the caller, and a per-donation total must not be filtered by the
+		 * donation's own status — the donation IS the status.
+		 *
+		 * The donor id comes back alongside the total, and that is the point of
+		 * it rather than a convenience. Charitable_Donation::get_donor_id()
+		 * resolves it through get_campaign_donations(), which issues its own
+		 * `SELECT * FROM campaign_donations WHERE donation_id IN (N)` per
+		 * donation — so a page of 20 donations paid 20 extra queries to learn
+		 * something this one grouped query already had in hand. Measured on the
+		 * development site: dropping that call took charitable/list-donations
+		 * from 76 queries to 36.
+		 *
+		 * MIN( cd.donor_id ) rather than any aggregate cleverness: every row of
+		 * a single donation carries the same donor_id, because the donor is a
+		 * property of the donation and not of the split across campaigns.
+		 *
+		 * Ported from Charitable Pro, with one change: Pro's version reads
+		 * COALESCE( cd.base_amount, cd.amount ) because Pro's multi-currency
+		 * feature adds a base_amount column to this table. Lite has no
+		 * base_amount column and no multi-currency feature, so this sums
+		 * cd.amount directly — the same substitution every other aggregate
+		 * method in this Lite file already carries (see
+		 * get_donations_summary_by_day_range() below for the same rationale).
+		 *
+		 * @since 1.8.13
+		 *
+		 * @global WPDB $wpdb
+		 * @param  int[] $donation_ids Donation IDs.
+		 * @return array Keyed by donation_id (int), each value an array with
+		 *               'amount' (float) and 'donor_id' (int). A donation with no
+		 *               campaign_donations rows is simply absent — callers should
+		 *               treat a missing key as zero.
+		 */
+		public function get_donated_amounts_by_donation( $donation_ids ) {
+			global $wpdb;
+
+			list( $donations_in, $parameters ) = $this->get_in_clause_params( $donation_ids );
+
+			if ( empty( $donations_in ) || empty( $parameters ) ) {
+				return array();
+			}
+
+			$sql = "SELECT cd.donation_id,
+						COALESCE( SUM( cd.amount ), 0 ) as total,
+						MIN( cd.donor_id ) as donor_id
+					FROM $this->table_name cd
+					WHERE cd.donation_id IN ( $donations_in )
+					GROUP BY cd.donation_id";
+
+			$results = $wpdb->get_results( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+
+			$totals = array();
+
+			foreach ( $results as $row ) {
+				$totals[ (int) $row->donation_id ] = array(
+					'amount'   => (float) $row->total,
+					'donor_id' => (int) $row->donor_id,
+				);
+			}
+
+			return $totals;
+		}
+
+		/**
+		 * Return the per-campaign rows for MANY donations in one query.
+		 *
+		 * The batched counterpart to get_campaigns_for_donation() below. A
+		 * listing that wants to show what each gift was split across needs this
+		 * shape or it pays a query per row — the same reason
+		 * get_donated_amounts_by_donation() above exists, and that method is the
+		 * model for this one.
+		 *
+		 * Ordered by id so a split donation's campaigns come back in the order
+		 * they were recorded, which is the order the donation form collected
+		 * them.
+		 *
+		 * Ported from Charitable Pro, with one change: Pro's version reads
+		 * COALESCE( cd.base_amount, cd.amount ) because Pro's multi-currency
+		 * feature adds a base_amount column to this table. Lite has no
+		 * base_amount column and no multi-currency feature, so this reads
+		 * cd.amount directly — the same substitution get_donated_amounts_by_donation()
+		 * above carries.
+		 *
+		 * @since 1.8.13
+		 *
+		 * @global wpdb $wpdb
+		 * @param  int[] $donation_ids The donation IDs.
+		 * @return array donation_id => array of { campaign_id, campaign_name, amount }
+		 */
+		public function get_campaign_rows_by_donation( $donation_ids ) {
+			global $wpdb;
+
+			list( $donations_in, $parameters ) = $this->get_in_clause_params( $donation_ids );
+
+			if ( empty( $donations_in ) || empty( $parameters ) ) {
+				return array();
+			}
+
+			$sql = "SELECT cd.donation_id,
+						cd.campaign_id,
+						cd.campaign_name,
+						cd.amount
+					FROM $this->table_name cd
+					WHERE cd.donation_id IN ( $donations_in )
+					ORDER BY cd.donation_id ASC, cd.campaign_donation_id ASC";
+
+			$results = $wpdb->get_results( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+
+			$rows = array();
+
+			foreach ( (array) $results as $row ) {
+				$rows[ (int) $row->donation_id ][] = array(
+					'campaign_id'   => (int) $row->campaign_id,
+					'campaign_name' => (string) $row->campaign_name,
+					'amount'        => (float) $row->amount,
+				);
+			}
+
+			return $rows;
+		}
+
+		/**
 		 * Return an array of campaigns donated to in a single donation.
 		 *
 		 * @since  1.2.0
@@ -413,6 +545,157 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
 				),
 				$sanitize
 			);
+		}
+
+		/**
+		 * Return the total amount donated to each of several campaigns, grouped
+		 * by campaign id, in a single query.
+		 *
+		 * Exists so a caller iterating N campaigns (e.g. the charitable/list-campaigns
+		 * ability) can resolve every row's donated amount in one query instead of
+		 * N calls to get_campaign_donated_amount() / Charitable_Campaign::get_donated_amount() —
+		 * one query per campaign multiplied by a page size is the exact N+1 shape
+		 * that made the long-range Reports Overview timeout ~18,000 queries before
+		 * it was batched the same way.
+		 *
+		 * Ported from Charitable Pro, with one change: Pro's version reads
+		 * COALESCE( cd.base_amount, cd.amount ) because Pro's multi-currency
+		 * feature adds a base_amount column to this table. Lite has no
+		 * base_amount column and no multi-currency feature, so this reads
+		 * cd.amount directly — the same column every other aggregate method in
+		 * this Lite file already uses (see get_amount_by_campaign_report()).
+		 *
+		 * Deliberately mirrors get_campaign_donated_amount( $campaigns, false, false )'s
+		 * raw, un-locale-converted output (no sanitize_database_amount() pass) so a
+		 * batched row and a get_campaign_donated_amount() call for the same campaign
+		 * return numerically identical values — callers that need the site's
+		 * comma/dot display convention should convert the same way that call site
+		 * already does.
+		 *
+		 * This is a raw aggregate accessor: it does NOT apply the
+		 * `charitable_campaign_donated_amount` filter that
+		 * Charitable_Campaign::get_donated_amount() applies on every call. A
+		 * caller that wants a figure consistent with the rest of the product —
+		 * not just a faster one — must apply that filter itself, per
+		 * campaign_id, with the same arguments get_donated_amount() uses:
+		 * `apply_filters( 'charitable_campaign_donated_amount', $amount,
+		 * $campaign, $sanitize )`. See
+		 * Charitable_Campaign_Abilities::campaign_summary() for a worked example.
+		 *
+		 * @since 1.8.13
+		 *
+		 * @global WPDB $wpdb
+		 * @param  int[]   $campaign_ids Campaign IDs.
+		 * @param  boolean $include_all  Whether to include all donations (true), or only approved (false).
+		 * @return array Keyed by campaign_id (int), each value a float total. A
+		 *               campaign with no matching donations is simply absent from
+		 *               the array — callers should treat a missing key as 0.
+		 */
+		public function get_donated_amounts_by_campaign( $campaign_ids, $include_all = false ) {
+			global $wpdb;
+
+			list( $campaigns_in, $campaigns_parameters ) = $this->get_in_clause_params( $campaign_ids );
+
+			if ( empty( $campaigns_in ) || empty( $campaigns_parameters ) ) {
+				return array();
+			}
+
+			$statuses = $include_all ? array() : charitable_get_approval_statuses();
+
+			list( $status_clause, $status_parameters ) = $this->get_donation_status_clause( $statuses );
+
+			$sql_where_clauses = array( "cd.campaign_id IN ( $campaigns_in )" );
+
+			if ( ! empty( $status_clause ) ) {
+				$sql_where_clauses[] = $status_clause;
+			}
+
+			$sql_where  = 'WHERE ' . implode( ' AND ', $sql_where_clauses );
+			$parameters = array_merge( $campaigns_parameters, $status_parameters );
+
+			$sql = "SELECT cd.campaign_id, COALESCE( SUM( cd.amount ), 0 ) as total
+					FROM $this->table_name cd
+					INNER JOIN $wpdb->posts p ON p.ID = cd.donation_id
+					$sql_where
+					GROUP BY cd.campaign_id";
+
+			$results = $wpdb->get_results( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+
+			$totals = array();
+
+			foreach ( $results as $row ) {
+				$totals[ (int) $row->campaign_id ] = (float) $row->total;
+			}
+
+			return $totals;
+		}
+
+		/**
+		 * Return the number of distinct donors for each of several campaigns,
+		 * grouped by campaign id, in a single query.
+		 *
+		 * Same rationale as get_donated_amounts_by_campaign(): count_campaign_donors()
+		 * has no caching layer at all (unlike the donated-amount path, which is at
+		 * least transient-cached), so calling it once per row in a list is the
+		 * more expensive half of that ability's N+1.
+		 *
+		 * Ported from Charitable Pro unchanged: this query never touches
+		 * base_amount, so Lite's lack of that column does not affect it.
+		 *
+		 * This is a raw aggregate accessor: it does NOT apply the
+		 * `charitable_campaign_donor_count` filter that
+		 * Charitable_Campaign::get_donor_count() applies on every call. A caller
+		 * that wants a figure consistent with the rest of the product must apply
+		 * that filter itself, per campaign_id: `apply_filters(
+		 * 'charitable_campaign_donor_count', $count, $campaign )`. See
+		 * Charitable_Campaign_Abilities::campaign_summary() for a worked example.
+		 *
+		 * @since 1.8.13
+		 *
+		 * @global WPDB $wpdb
+		 * @param  int[]   $campaign_ids Campaign IDs.
+		 * @param  boolean $include_all  Whether to include all donations (true), or only approved (false).
+		 * @return array Keyed by campaign_id (int), each value an int count. A
+		 *               campaign with no matching donors is simply absent from the
+		 *               array — callers should treat a missing key as 0.
+		 */
+		public function count_campaign_donors_by_campaign( $campaign_ids, $include_all = false ) {
+			global $wpdb;
+
+			list( $campaigns_in, $campaigns_parameters ) = $this->get_in_clause_params( $campaign_ids );
+
+			if ( empty( $campaigns_in ) || empty( $campaigns_parameters ) ) {
+				return array();
+			}
+
+			$statuses = $include_all ? array() : charitable_get_approval_statuses();
+
+			list( $status_clause, $status_parameters ) = $this->get_donation_status_clause( $statuses );
+
+			$sql_where_clauses = array( "cd.campaign_id IN ( $campaigns_in )" );
+
+			if ( ! empty( $status_clause ) ) {
+				$sql_where_clauses[] = $status_clause;
+			}
+
+			$sql_where  = 'WHERE ' . implode( ' AND ', $sql_where_clauses );
+			$parameters = array_merge( $campaigns_parameters, $status_parameters );
+
+			$sql = "SELECT cd.campaign_id, COUNT( DISTINCT cd.donor_id ) as donor_count
+					FROM $this->table_name cd
+					INNER JOIN $wpdb->posts p ON p.ID = cd.donation_id
+					$sql_where
+					GROUP BY cd.campaign_id";
+
+			$results = $wpdb->get_results( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+
+			$counts = array();
+
+			foreach ( $results as $row ) {
+				$counts[ (int) $row->campaign_id ] = (int) $row->donor_count;
+			}
+
+			return $counts;
 		}
 
 		/**
@@ -473,6 +756,54 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
                     $sql_where;";
 
 			return $wpdb->get_var( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+		}
+
+		/**
+		 * Count distinct donations (transactions) for a campaign.
+		 *
+		 * Ported from Charitable Pro unchanged: a pure COUNT query, it never
+		 * touches base_amount, so Lite's lack of that column does not affect it.
+		 * Backs Charitable_Campaign::get_donation_count(), which the
+		 * charitable/get-campaign-performance ability calls.
+		 *
+		 * @since  1.8.13
+		 *
+		 * @global wpdb $wpdb
+		 * @param  int|int[] $campaign    The campaign ID, or list of campaign IDs.
+		 * @param  boolean   $include_all Whether to include all donations (true), or only approved (false).
+		 * @return int
+		 */
+		public function count_campaign_donations( $campaign, $include_all = false ) {
+			global $wpdb;
+
+			$statuses = $include_all ? array() : charitable_get_approval_statuses();
+
+			list( $status_clause, $status_parameters )   = $this->get_donation_status_clause( $statuses );
+			list( $campaigns_in, $campaigns_parameters ) = $this->get_in_clause_params( $campaign );
+
+			$sql_where_clauses = array();
+
+			if ( ! empty( $campaigns_in ) && ! empty( $campaigns_parameters ) ) {
+				$sql_where_clauses[] = "cd.campaign_id IN ( $campaigns_in )";
+			}
+
+			if ( ! empty( $status_clause ) ) {
+				$sql_where_clauses[] = $status_clause;
+			}
+
+			if ( empty( $sql_where_clauses ) ) {
+				return 0;
+			}
+
+			$sql_where  = 'WHERE ' . implode( ' AND ', $sql_where_clauses );
+			$parameters = array_merge( $campaigns_parameters, $status_parameters );
+
+			$sql = "SELECT COUNT( DISTINCT cd.donation_id )
+                    FROM $this->table_name cd
+                    INNER JOIN $wpdb->posts p ON p.ID = cd.donation_id
+                    $sql_where;";
+
+			return (int) $wpdb->get_var( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
 		}
 
 		/**
@@ -690,6 +1021,281 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
 		}
 
 		/**
+		 * Count the distinct donations matching a report query.
+		 *
+		 * Counts DISTINCT donation_id, so a donation split across three
+		 * campaigns counts once rather than three times — unlike
+		 * count_donations_by_status(), which counts campaign_donations ROWS and
+		 * cannot be date-ranged.
+		 *
+		 * Exists because the alternative is loading every matching donation id
+		 * into PHP just to call count() on it. Filtering reuses
+		 * get_report_sql_where_clause(), so campaigns, status and the date range
+		 * behave exactly as they do for get_amount_report() — which means a
+		 * total and a count taken from the same $args are always coherent, and
+		 * average = total / count cannot disagree with itself.
+		 *
+		 * THE INNER JOIN IS DELIBERATE, and it is a behaviour decision worth
+		 * stating. A donation POST with no campaign_donations row is not
+		 * counted, because such a record carries no amount and so contributes
+		 * nothing to any money figure. Counting it would report more donations
+		 * than the money accounts for: on the development database, 18 donation
+		 * posts (abandoned importer and gateway-test records) have no rows at
+		 * all, and counting donation posts against a campaign_donations total
+		 * produced an all-time average gift of 9.49 when the real average of
+		 * the donations that carry money is 14.02 — an average no actual
+		 * donation resembles. Taking the count from the same table as the total
+		 * is what makes the reported average true.
+		 *
+		 * @since 1.8.13
+		 *
+		 * @global WPDB $wpdb
+		 * @param  array $args Query arguments: campaigns, status, start_date, end_date, donor_id.
+		 * @return int
+		 */
+		public function count_donations_report( $args = array() ) {
+			global $wpdb;
+
+			list( $sql_where, $parameters ) = $this->get_report_sql_where_clause( $args );
+
+			$sql = "SELECT COUNT( DISTINCT cd.donation_id )
+					FROM $this->table_name cd
+					INNER JOIN $wpdb->posts p
+					ON p.ID = cd.donation_id
+					$sql_where";
+
+			if ( ! empty( $parameters ) ) {
+				$sql = $wpdb->prepare( $sql, $parameters ); // phpcs:ignore
+			}
+
+			return (int) $wpdb->get_var( $sql ); // phpcs:ignore
+		}
+
+		/**
+		 * Count the distinct donors matching a report query.
+		 *
+		 * A donor_id of 0 is excluded: a row can carry it when the donation was
+		 * recorded without a resolvable donor, and counting those as one donor
+		 * would understate a site's supporter count while counting them
+		 * individually would overstate it. Excluding is the only honest option.
+		 *
+		 * @since 1.8.13
+		 *
+		 * @global WPDB $wpdb
+		 * @param  array $args Query arguments: campaigns, status, start_date, end_date.
+		 * @return int
+		 */
+		public function count_donors_report( $args = array() ) {
+			global $wpdb;
+
+			list( $sql_where, $parameters ) = $this->get_report_sql_where_clause( $args );
+
+			$sql_where = '' !== $sql_where
+				? $sql_where . ' AND cd.donor_id != 0'
+				: 'WHERE cd.donor_id != 0';
+
+			$sql = "SELECT COUNT( DISTINCT cd.donor_id )
+					FROM $this->table_name cd
+					INNER JOIN $wpdb->posts p
+					ON p.ID = cd.donation_id
+					$sql_where";
+
+			if ( ! empty( $parameters ) ) {
+				$sql = $wpdb->prepare( $sql, $parameters ); // phpcs:ignore
+			}
+
+			return (int) $wpdb->get_var( $sql ); // phpcs:ignore
+		}
+
+		/**
+		 * Count the distinct donations in a report query, grouped by status.
+		 *
+		 * ONE query for every status, rather than one query per status. Pass no
+		 * `status` argument: get_report_sql_where_clause() then constrains to
+		 * all valid donation statuses, which is exactly the set to group over.
+		 *
+		 * Ported from Charitable Pro unchanged: this query never touches
+		 * base_amount, so Lite's lack of that column does not affect it.
+		 *
+		 * @since 1.8.13
+		 *
+		 * @global WPDB $wpdb
+		 * @param  array $args Query arguments: campaigns, start_date, end_date, donor_id.
+		 * @return array Keyed by post status, each value an int count. A status with
+		 *               no donations is absent — callers should treat a missing key
+		 *               as 0.
+		 */
+		public function count_donations_by_status_report( $args = array() ) {
+			global $wpdb;
+
+			unset( $args['status'] );
+
+			list( $sql_where, $parameters ) = $this->get_report_sql_where_clause( $args );
+
+			$sql = "SELECT p.post_status, COUNT( DISTINCT cd.donation_id ) as donation_count
+					FROM $this->table_name cd
+					INNER JOIN $wpdb->posts p
+					ON p.ID = cd.donation_id
+					$sql_where
+					GROUP BY p.post_status";
+
+			if ( ! empty( $parameters ) ) {
+				$sql = $wpdb->prepare( $sql, $parameters ); // phpcs:ignore
+			}
+
+			$results = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter
+
+			$counts = array();
+
+			foreach ( (array) $results as $row ) {
+				$counts[ (string) $row->post_status ] = (int) $row->donation_count;
+			}
+
+			return $counts;
+		}
+
+		/**
+		 * Return campaigns ranked by amount raised over a date range.
+		 *
+		 * The get_amount_by_campaign_report() accessor is the closest existing one
+		 * and is correctly converted, but it selects `campaign_name` WITHOUT
+		 * campaign_id and applies no ordering or limit. A caller that needs to
+		 * link to the campaign, or that wants the top N, therefore cannot use
+		 * it: names are not unique, and they drift when a campaign is renamed
+		 * after the donation was recorded.
+		 *
+		 * Filtering reuses get_report_sql_where_clause(), so campaigns, status,
+		 * start_date, end_date and donor_id behave exactly as they do for every
+		 * other report query, including its default of all valid donation
+		 * statuses when none is given.
+		 *
+		 * Sums cd.amount rather than Pro's COALESCE( cd.base_amount, cd.amount ):
+		 * base_amount belongs to the multi-currency schema and does not exist on
+		 * this table in Lite (see get_donations_summary_by_day_range() below for
+		 * the same substitution and rationale).
+		 *
+		 * @since 1.8.13
+		 *
+		 * @global WPDB $wpdb
+		 * @param  array $args Query arguments: campaigns, status, start_date,
+		 *                     end_date, donor_id, limit.
+		 * @return object[] Rows of campaign_id, campaign_name, total, donation_count.
+		 */
+		public function get_top_campaigns_report( $args = array() ) {
+			global $wpdb;
+
+			list( $sql_where, $parameters ) = $this->get_report_sql_where_clause( $args );
+
+			$limit = isset( $args['limit'] ) ? absint( $args['limit'] ) : 10;
+			$limit = $limit > 0 ? $limit : 10;
+
+			$sql = "SELECT cd.campaign_id,
+						cd.campaign_name,
+						COALESCE( SUM( cd.amount ), 0 ) as total,
+						COUNT( DISTINCT cd.donation_id ) as donation_count
+					FROM $this->table_name cd
+					INNER JOIN $wpdb->posts p
+					ON p.ID = cd.donation_id
+					$sql_where
+					GROUP BY cd.campaign_id, cd.campaign_name
+					ORDER BY total DESC
+					LIMIT %d";
+
+			$parameters[] = $limit;
+
+			$results = $wpdb->get_results( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore
+
+			if ( $this->is_comma_decimal() ) {
+				$results = array_map( array( $this, 'sanitize_amounts' ), $results );
+			}
+
+			return $results;
+		}
+
+		/**
+		 * Return donors ranked by amount given over a date range.
+		 *
+		 * Charitable_Reports::get_top_donors_overview() is the existing
+		 * equivalent, and is not usable here: it requires the whole donation set
+		 * to have been loaded into PHP first via init_with_array() plus
+		 * get_donations(), sorts it in PHP, and calls charitable_get_donation()
+		 * once per row. This is one grouped query.
+		 *
+		 * Ranked on cd.amount rather than Pro's COALESCE( base_amount, amount ):
+		 * base_amount belongs to the multi-currency schema and does not exist on
+		 * this table in Lite (see get_donations_summary_by_day_range() below for
+		 * the same substitution and rationale).
+		 *
+		 * @since 1.8.13
+		 *
+		 * @global WPDB $wpdb
+		 * @param  array $args Query arguments: campaigns, status, start_date,
+		 *                     end_date, limit.
+		 * @return object[] Rows of donor_id, first_name, last_name, email, total,
+		 *                  donation_count.
+		 */
+		public function get_top_donors_report( $args = array() ) {
+			global $wpdb;
+
+			list( $sql_where, $parameters ) = $this->get_report_sql_where_clause( $args );
+
+			$limit = isset( $args['limit'] ) ? absint( $args['limit'] ) : 10;
+			$limit = $limit > 0 ? $limit : 10;
+
+			/*
+			 * donor_id 0 must not be grouped: a campaign_donations row can carry
+			 * it when the donation was recorded without a resolvable donor, and
+			 * grouping those would present the sum of several unrelated gifts as
+			 * one large anonymous top donor.
+			 *
+			 * The INNER JOIN on the donors table below is what actually excludes
+			 * them, because no donors row has donor_id 0 — the column is
+			 * AUTO_INCREMENT and starts at 1. This clause is therefore SECONDARY
+			 * and, on any normal install, redundant. It is kept because it states
+			 * the intent at the point the grouping happens, so a future change
+					 * from INNER to LEFT JOIN (to include gifts whose donor record
+			 * was erased, say) does not silently reintroduce the anonymous-group
+			 * bug.
+			 *
+			 * Honest note on coverage: this clause is NOT independently testable.
+			 * Removing it leaves every test green, because the join already
+			 * covers the case, and a donors row with donor_id 0 cannot be created
+			 * to exercise it — MySQL treats an inserted 0 in an AUTO_INCREMENT
+			 * column as a request for the next value unless NO_AUTO_VALUE_ON_ZERO
+			 * is set on the session. Verified by mutation rather than assumed.
+			 */
+			$sql_where = '' !== $sql_where
+				? $sql_where . ' AND cd.donor_id != 0'
+				: 'WHERE cd.donor_id != 0';
+
+			$sql = "SELECT cd.donor_id,
+						d.first_name,
+						d.last_name,
+						d.email,
+						COALESCE( SUM( cd.amount ), 0 ) as total,
+						COUNT( DISTINCT cd.donation_id ) as donation_count
+					FROM $this->table_name cd
+					INNER JOIN $wpdb->posts p
+					ON p.ID = cd.donation_id
+					INNER JOIN {$wpdb->prefix}charitable_donors d
+					ON d.donor_id = cd.donor_id
+					$sql_where
+					GROUP BY cd.donor_id, d.first_name, d.last_name, d.email
+					ORDER BY total DESC
+					LIMIT %d";
+
+			$parameters[] = $limit;
+
+			$results = $wpdb->get_results( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore
+
+			if ( $this->is_comma_decimal() ) {
+				$results = array_map( array( $this, 'sanitize_amounts' ), $results );
+			}
+
+			return $results;
+		}
+
+		/**
 		 * Return an SQL limit for the report
 		 *
 		 * @since  1.8.1.10
@@ -766,6 +1372,33 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
 				$parameters[]        = $args['post_parent'];
 			}
 
+			/*
+			 * `author` narrows to one donation author, which for a donation is
+			 * the donor's WordPress user id
+			 * (Charitable_Donation_Processor::parse_donation_data() sets
+			 * post_author from `user_id`). Added in 1.8.13 for the ownership
+			 * scoping on charitable/get-donation-summary: a report caller without
+			 * `edit_others_donations` must see only their own donations, which is
+			 * the rule wp-admin's donation list already applies
+			 * (class-charitable-donation-list-table.php:783) via WP_Query's own
+			 * `author` argument. The report accessors do not go through WP_Query,
+			 * so the equivalent has to exist here.
+			 *
+			 * isset(), not ! empty(): author 0 is a real value — guest and
+			 * manually recorded donations carry post_author 0 — so treating it as
+			 * "no filter" would be fail-OPEN, returning every donation to a
+			 * caller who asked to be scoped. No caller passes 0 today, because
+			 * the only one that sets this key is gated behind `edit_donations`
+			 * and so is always a logged-in user; isset() is what keeps that true
+			 * if a future caller is not.
+			 *
+			 * @since 1.8.13
+			 */
+			if ( isset( $args['author'] ) ) {
+				$sql_where_clauses[] = 'p.post_author = %d';
+				$parameters[]        = (int) $args['author'];
+			}
+
 			if ( ! empty( $sql_where_clauses ) ) {
 				$sql_where = 'WHERE ' . implode( ' AND ', $sql_where_clauses );
 			}
@@ -835,14 +1468,18 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
 		 * missing key as zero.
 		 *
 		 * @since  1.8.12.2
+		 * @since  1.8.13 Added $campaign_id parameter.
 		 *
 		 * @global WPDB $wpdb
-		 * @param  string   $start_date Start of the range, Y-m-d. Inclusive.
-		 * @param  string   $end_date   End of the range, Y-m-d. Inclusive of the whole day.
-		 * @param  string[] $statuses   List of statuses.
+		 * @param  string   $start_date  Start of the range, Y-m-d. Inclusive.
+		 * @param  string   $end_date    End of the range, Y-m-d. Inclusive of the whole day.
+		 * @param  string[] $statuses    List of statuses.
+		 * @param  int      $campaign_id Optional. Restrict to donations that include this
+		 *                               campaign. 0, the default, means every campaign —
+		 *                               which is what existing callers want.
 		 * @return array Keyed by Y-m-d, each value an object with 'amount' and 'count'.
 		 */
-		public function get_donations_summary_by_day_range( $start_date, $end_date, $statuses = array() ) {
+		public function get_donations_summary_by_day_range( $start_date, $end_date, $statuses = array(), $campaign_id = 0 ) {
 			global $wpdb;
 
 			if ( empty( $start_date ) || empty( $end_date ) ) {
@@ -866,6 +1503,21 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
 				$status_parameters
 			);
 
+			/*
+			 * Appended AFTER the status clause, so the extra parameter lands last
+			 * in $parameters and the placeholder order still lines up. Filtering
+			 * on cd.campaign_id rather than joining anything: a donation split
+			 * across campaigns has one row per campaign in this table, and the
+			 * per-campaign row is exactly what a per-campaign figure means.
+			 */
+			$campaign_clause = '';
+			$campaign_id     = (int) $campaign_id;
+
+			if ( $campaign_id > 0 ) {
+				$campaign_clause = ' AND cd.campaign_id = %d';
+				$parameters[]    = $campaign_id;
+			}
+
 			// Sums cd.amount, matching get_donations_summary_by_period() above. The
 			// base_amount column belongs to the multi-currency schema and does not exist
 			// on this table in Lite, so it must not appear here.
@@ -874,7 +1526,7 @@ if ( ! class_exists( 'Charitable_Campaign_Donations_DB' ) ) :
 				COUNT( cd.donation_id ) as count
 				FROM {$wpdb->prefix}charitable_campaign_donations cd
 				INNER JOIN $wpdb->posts p ON p.ID = cd.donation_id
-				WHERE p.post_date >= %s AND p.post_date <= %s AND {$status_clause}
+				WHERE p.post_date >= %s AND p.post_date <= %s AND {$status_clause}{$campaign_clause}
 				GROUP BY DATE( p.post_date )";
 
 			$results = $wpdb->get_results( $wpdb->prepare( $sql, $parameters ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter

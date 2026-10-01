@@ -3630,6 +3630,67 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 		}
 
 		/**
+		 * Get the date of the earliest donation on the site.
+		 *
+		 * Used to build the "All Time" preset in the reporting date picker, so that
+		 * lifetime figures are one click away rather than a hand-typed range.
+		 *
+		 * Every valid donation status is considered, not just completed ones, because
+		 * the reports can be filtered by status and a narrower floor would hide the
+		 * earliest refunded or cancelled donation.
+		 *
+		 * @since 1.8.12.4
+		 *
+		 * @return string Date in Y/m/d format. Falls back to one month ago when the
+		 *                site has no donations yet.
+		 */
+		public function get_earliest_donation_date() {
+
+			$cached = get_transient( 'charitable-reports-earliest-donation-date' );
+
+			if ( false !== $cached ) {
+				return $cached;
+			}
+
+			global $wpdb;
+
+			$statuses = array_keys( charitable_get_valid_donation_statuses() );
+
+			// `charitable_donation_statuses` is a public filter, and an empty list would
+			// build `IN ( )`. Nothing to measure in that case, so use the fallback.
+			if ( empty( $statuses ) ) {
+				return gmdate( 'Y/m/d', strtotime( '-1 month' ) );
+			}
+
+			$placeholders = implode( ', ', array_fill( 0, count( $statuses ), '%s' ) );
+
+			$earliest = $wpdb->get_var( // phpcs:ignore
+				$wpdb->prepare(
+					"SELECT MIN( post_date ) FROM {$wpdb->posts}
+					WHERE post_type = 'donation'
+					AND post_status IN ( {$placeholders} )", // phpcs:ignore
+					$statuses
+				)
+			);
+
+			if ( empty( $earliest ) || '0000-00-00 00:00:00' === $earliest ) {
+				/*
+				 * Deliberately not cached. A site with no donations today may be one
+				 * import away from four years of history, and a cached fallback would
+				 * leave "All Time" starting a month ago for a full day afterwards -
+				 * which is the exact wrong-figure trap this preset exists to close.
+				 */
+				return gmdate( 'Y/m/d', strtotime( '-1 month' ) );
+			}
+
+			$date = gmdate( 'Y/m/d', strtotime( $earliest ) );
+
+			set_transient( 'charitable-reports-earliest-donation-date', $date, DAY_IN_SECONDS );
+
+			return $date;
+		}
+
+		/**
 		 * Get localized strings.
 		 *
 		 * @since 1.8.1
@@ -3690,6 +3751,13 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 				),
 				'default_start_date'            => current_time( gmdate( 'Y-m-d', strtotime( '-1 month' ) ) ),
 				'default_end_date'              => current_time( gmdate( 'Y-m-d' ) ),
+				'earliest_donation_date'        => $this->get_earliest_donation_date(),
+				// The date picker uses each preset's label as its object key, so the
+				// label has to travel to JS rather than being written there. It rides
+				// this same array as `earliest_donation_date` on purpose: the
+				// reporting JS contains no wp.i18n calls, so a second localization
+				// mechanism for one string would be the inconsistent choice.
+				'all_time_label'                => __( 'All Time', 'charitable' ),
 				'advanced_reports'              => $charitable_reports_advanced_report_strings,
 				'i18n_report_timeout'           => __( 'This report took too long to load and was stopped by the server. The figures have been cleared so they are not mistaken for the range you asked for. Try a shorter date range.', 'charitable' ),
 				'i18n_report_error'             => __( 'This report could not be loaded. The figures have been cleared so they are not mistaken for the range you asked for. Please try again.', 'charitable' ),

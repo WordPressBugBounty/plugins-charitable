@@ -242,6 +242,15 @@ $array_to_return = array( // phpcs:ignore WordPress.NamingConventions.PrefixAllG
 	'Charitable_Log_Query'                           => 'logger/class-charitable-log-query.php', // v1.8.11.
 	'Charitable_Log_List_Table'                      => 'logger/class-charitable-log-list-table.php', // v1.8.11.
 	'Charitable_Log_Export'                          => 'logger/class-charitable-log-export.php', // v1.8.11.
+	'Charitable_Abilities'                           => 'abilities/class-charitable-abilities.php', // v1.8.13.
+	'Charitable_Abilities_Usage'                     => 'abilities/class-charitable-abilities-usage.php', // v1.8.13.
+	'Charitable_Abilities_System_Info'               => 'abilities/class-charitable-abilities-system-info.php', // v1.8.13.
+	'Charitable_Abilities_Registrar'                 => 'abstracts/abstract-class-charitable-abilities-registrar.php', // v1.8.13.
+	'Charitable_Diagnostic_Abilities'                => 'abilities/registrars/class-charitable-diagnostic-abilities.php', // v1.8.13.
+	'Charitable_Campaign_Abilities'                  => 'abilities/registrars/class-charitable-campaign-abilities.php', // v1.8.13.
+	'Charitable_Donation_Abilities'                  => 'abilities/registrars/class-charitable-donation-abilities.php', // v1.8.13.
+	'Charitable_Report_Abilities'                    => 'abilities/registrars/class-charitable-report-abilities.php', // v1.8.13.
+	'Charitable_Tools_AI_MCP'                        => 'admin/tools/class-charitable-tools-ai-mcp.php', // v1.8.13.
 );
 
 return $array_to_return; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- '$array_to_return' is a local variable within a function.

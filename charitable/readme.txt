@@ -2,9 +2,9 @@
 Contributors: WPCharitable, smub, dimensionmedia
 Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.9
-Tested up to: 7.1
+Tested up to: 7.1.2
 Requires PHP: 7.4
-Stable tag: 1.8.12.3
+Stable tag: 1.8.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -271,6 +271,26 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.13 =
+* NEW: (AI) Charitable now works with AI assistants. On WordPress 6.9 or later, connect Claude or ChatGPT using the free WPVibe plugin, or any MCP client, to build and restyle campaigns, log donations that arrived by post, and report on your fundraising. 24+ operations, all permission-checked. [More Information](https://www.wpcharitable.com/ai/)
+* NEW: (AI) New panel at Charitable > Tools > AI MCP. Write access starts OFF, an AI Activity list records every change and every refusal, and an assistant must confirm explicitly before trashing or unpublishing a campaign that already has donations.
+* FIX: Resolved issue involving campaign progress bars showing incorrect percentages when a goal contained separators in certain scenarios.
+* FIX: Resolved issue when a campaign with a goal but no end date showed no progress bar in the Campaigns list.
+* FIX: A campaign end date entered as a plain date, for example 2027-01-31, could be mis-read and saved incorrectly in certain scenarios in admin.
+* FIX: Reports, the donations CSV export, and the Dashboard's date-range dropdown and latest-donations list could leave today's donations out for part of each day, on sites whose timezone is ahead of UTC.
+* FIX: Security: on a page using the [charitable_donate_button] shortcode without a campaign resolved issue where a crafted link could run script in a visitor's browser when they clicked the donate button under certain conditions.
+
+= Donation Form & Fundraising Campaigns v1.8.12.4 =
+* FIX: Previewing a campaign from the Campaigns list, or more than a day after your last save in the campaign builder, could show an empty campaign. The preview now falls back to your last saved version.
+* FIX: Campaign template stylesheets now accept only valid hex characters in their colour values, so an invalid colour can no longer reach the stylesheet.
+* FIX: The Preview button in the campaign builder did nothing at all for a campaign awaiting review, scheduled, or set to private. It now saves and opens the preview as it does for any other campaign.
+* FIX: Campaigns awaiting review, scheduled, or set to private rendered as an empty campaign wherever they appeared. They now display for the campaign's author and for users who can edit campaigns, and stay hidden from everyone else.
+* FIX: Security: campaign previews now require permission to edit the campaign being previewed. Previously a preview link could be altered to display a different campaign's content, including campaigns that were not published.
+* FIX: On a campaign preview page, an excerpt of any other post shown alongside the campaign (in a posts list or query loop, for example) was replaced by a copy of the campaign. Excerpts now display normally.
+* FIX: Previewing a campaign could fail with a memory error on sites running an SEO plugin. The preview no longer rebuilds the entire campaign every time a plugin asks for the page summary, and the summary it hands back is now the campaign's own description.
+* FIX: Picture upload fields no longer accept uploads from logged-out visitors by default, and accept image files only. Sites that intentionally allow guest image uploads can re-enable them with the new `charitable_allow_anonymous_picture_uploads` filter, and the accepted image types can be adjusted with the new `charitable_picture_upload_allowed_mimes` filter.
+* IMPROVED: Picture upload fields now accept WebP images.
 
 = Donation Form & Fundraising Campaigns v1.8.12.3 =
 * FIX: Improved support for Campaign builder text fields and non-Latin characters such as Japanese, Chinese, Korean, etc.
@@ -631,20 +651,5 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 * FIX: Improved loading for the WordPress dashboard widget.
 * FIX: Adjustments to CSS on the Dashboard page.
 * FIX: Minor translation, misc CSS, UI, and PHP coding updates.
-
-= Donation Form & Fundraising Campaigns v1.8.1.15 =
-* NEW: Added exit modal popup on getting started screen when user visits Pro page.
-* NEW: Added ability via two global PHP variables to force/not force "tour" for visual campaign builder.
-* FIX: Resolved issue resolving showing license information for lifetime licenses.
-* FIX: Resolved a misalignment of the icon/field for the minimum donation amount field in the visual campaign builder.
-* FIX: Addressed security issue involving creating new users primarily via Charitable registration shortcode.
-* FIX: Resolved sanitization issue with the custom CSS field for HTML field in visual campaign builder.
-* FIX: Minor translation, CSS, and PHP coding updates.
-
-= Donation Form & Fundraising Campaigns v1.8.1.14 =
-* FIX: Resolved a PHP fatal error when saving information for legacy campaigns.
-* FIX: Resolved error on getting started screen after Stripe was connected.
-* FIX: Improved retrieval of campaign descriptions for legacy campaigns.
-* FIX: Resolved CSS issue in visual builder.
 
 **[View entire donation form and fundraising platform changelog](https://plugins.svn.wordpress.org/charitable/trunk/CHANGELOG.md)**

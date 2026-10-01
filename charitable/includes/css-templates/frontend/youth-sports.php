@@ -53,10 +53,10 @@ if ( ! function_exists( 'charitable_esc_attr_php' ) ) {
 	}
 }
 
-$primary      = isset( $_GET['p'] ) ? '#' . preg_replace( '/[^A-Za-z0-9 ]/', '', $_GET['p'] ) : '#3418d2'; // phpcs:ignore
-$secondary    = isset( $_GET['s'] ) ? '#' . preg_replace( '/[^A-Za-z0-9 ]/', '', $_GET['s'] ) : '#005eff'; // phpcs:ignore
-$tertiary     = isset( $_GET['t'] ) ? '#' . preg_replace( '/[^A-Za-z0-9 ]/', '', $_GET['t'] ) : '#00a1ff'; // phpcs:ignore
-$button       = isset( $_GET['b'] ) ? '#' . preg_replace( '/[^A-Za-z0-9 ]/', '', $_GET['b'] ) : '#ec5f25'; // phpcs:ignore
+$primary      = isset( $_GET['p'] ) ? '#' . substr( preg_replace( '/[^A-Fa-f0-9]/', '', $_GET['p'] ), 0, 6 ) : '#3418d2'; // phpcs:ignore
+$secondary    = isset( $_GET['s'] ) ? '#' . substr( preg_replace( '/[^A-Fa-f0-9]/', '', $_GET['s'] ), 0, 6 ) : '#005eff'; // phpcs:ignore
+$tertiary     = isset( $_GET['t'] ) ? '#' . substr( preg_replace( '/[^A-Fa-f0-9]/', '', $_GET['t'] ), 0, 6 ) : '#00a1ff'; // phpcs:ignore
+$button       = isset( $_GET['b'] ) ? '#' . substr( preg_replace( '/[^A-Fa-f0-9]/', '', $_GET['b'] ), 0, 6 ) : '#ec5f25'; // phpcs:ignore
 $mobile_width = isset( $_GET['mw'] ) ? intval( $_GET['mw'] ) : 800; // phpcs:ignore
 
 $charitable_slug    = 'youth-sports';

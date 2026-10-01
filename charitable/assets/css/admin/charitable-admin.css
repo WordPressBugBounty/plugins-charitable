@@ -1507,6 +1507,49 @@ body.taxonomy-campaign_tag li#toplevel_page_charitable ul li.tools a {
   font-size: 9px;
 }
 
+/*
+ * "New" pill on a Charitable Tools tab.
+ *
+ * Values copied EXACTLY from the Site Analysis badge on Reports, which is the
+ * established Charitable "New" tab badge. That one is an inline ::after rule
+ * built in Charitable_Site_Analysis::enqueue_assets() -
+ * `.nav-tab.site-analysis::after { content:"New"; ... }` - so this is the same
+ * fill, text colour, size, weight, padding and vertical offset, just applied to
+ * a real element instead of generated content.
+ *
+ * A <span> rather than content:"New" on purpose: CSS generated content cannot
+ * be translated, and the Site Analysis badge's label is therefore stuck in
+ * English on every locale. Same appearance, one fewer untranslatable string.
+ *
+ * #5AA152 is NOT canon brand green (#31714c) - it is the as-built value the
+ * Site Analysis badge already ships, matched deliberately because the point is
+ * for the two badges to be indistinguishable. Changing it is a separate
+ * decision that should move both at once.
+ *
+ * Here rather than in charitable-ai-mcp.css because that stylesheet is only
+ * enqueued on tab=ai-mcp, and the badge exists to be seen from the OTHER tabs.
+ *
+ * Edited in the .css directly, NOT in assets/scss/admin/charitable-admin.scss.
+ * The build has no sass step - bin/build.sh --css only runs
+ * minify_admin_css.sh - so the .scss tree is not compiled and is not the source
+ * of truth for this file. Editing the .scss here changed nothing.
+ */
+.nav-tab .charitable-tab-new-badge {
+  display: inline-block;
+  background-color: #5AA152;
+  padding: 3px 7px;
+  font-size: 11px;
+  line-height: 11px;
+  text-transform: uppercase;
+  color: #fff;
+  font-weight: 600;
+  margin-left: 5px;
+  margin-right: 5px;
+  margin-top: 0;
+  position: relative;
+  top: -7px;
+}
+
 /* settings */
 body.charitable_page_charitable-settings table,
 body.charitable_page_charitable-reports table,

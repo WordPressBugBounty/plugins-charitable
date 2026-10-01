@@ -132,13 +132,20 @@ CHARITABLE = window.CHARITABLE || {};
      * FileUploaded event
      */
     Uploader.prototype.FileUploaded = function( uploader, file, r ) {
-        var input, data;
+        var input, data, message;
 
         r = $.parseJSON( r.response );
 
         if ( ! r.success ) {
 
-            this.add_image_error( file, CHARITABLE_UPLOAD_VARS.upload_problem.replace('%s', file.name) );
+            // Show the server's own reason when it sends one - a refusal ("please log in")
+            // or a rejected file type is not something retrying can fix, so the generic
+            // "please try again" is only the fallback. Only data.message is trusted here:
+            // data.error carries WordPress core's raw upload errors, which name php.ini
+            // directives and server paths and must not be shown to public visitors.
+            message = r.data && typeof r.data.message === 'string' ? r.data.message : '';
+
+            this.add_image_error( file, message || CHARITABLE_UPLOAD_VARS.upload_problem.replace('%s', file.name) );
             return;
 
         }
@@ -241,6 +248,14 @@ CHARITABLE = window.CHARITABLE || {};
      */
     Uploader.prototype.add_image_error = function( file, msg ) {
         var self = this;
+
+        // FileFiltered counted this file against max_file_uploads before it was sent. A
+        // failed upload never becomes a preview, so nothing else gives the slot back, and
+        // without this the next attempt is rejected client-side with the "you have already
+        // uploaded the maximum number of files" alert and the user is stuck until reload.
+        if ( self.uploaded > 0 ) {
+            self.uploaded -= 1;
+        }
 
         self.$dropzone.fadeIn( 300 );
 

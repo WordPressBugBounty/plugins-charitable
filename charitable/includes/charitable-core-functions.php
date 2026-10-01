@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
- * @version   1.6.37
+ * @version   1.8.12.4
  */
 
 // Exit if accessed directly.
@@ -1071,6 +1071,47 @@ function charitable_square_legacy_mode() {
  */
 function charitable_is_square_addon_active() {
 	return is_plugin_active( 'charitable-square/charitable-square.php' );
+}
+
+/**
+ * Whether the current visitor may upload through a picture field.
+ *
+ * Anonymous file writes are off unless a site explicitly opts in. This lives in one place
+ * so the AJAX handler and the picture field template cannot drift apart: a form that draws
+ * a working uploader must be a form whose uploads the endpoint will actually accept.
+ *
+ * @since 1.8.12.4
+ *
+ * @param  string $field_id The picture field's key, where known.
+ * @param  int    $post_id  The parent post the field uploads against, where known.
+ * @return boolean
+ */
+function charitable_picture_uploads_enabled( $field_id = '', $post_id = 0 ) {
+	if ( is_user_logged_in() ) {
+		return true;
+	}
+
+	/*
+	 * Ambassadors has exposed charitable_ambassadors_allow_anonymous_photo_uploads since its
+	 * 3.2.0 for its own gallery uploader. Its campaign and fundraiser picture fields upload
+	 * through Charitable's endpoint, which that addon does not own and cannot gate, so seed
+	 * the default from its filter: a site that deliberately opted in to anonymous photo
+	 * uploads keeps working, and the gallery and picture fields agree in every configuration.
+	 * Note this widens that opt-in to every picture field on the site, which is the intended
+	 * reading of an explicit site-owner opt-in.
+	 */
+	$allow = (bool) apply_filters( 'charitable_ambassadors_allow_anonymous_photo_uploads', false );
+
+	/**
+	 * Whether a logged-out visitor may upload through a picture field.
+	 *
+	 * @since 1.8.12.4
+	 *
+	 * @param boolean $allow    Whether to allow the upload. Off by default.
+	 * @param string  $field_id The picture field's key, where known.
+	 * @param int     $post_id  The parent post the field uploads against, where known.
+	 */
+	return (bool) apply_filters( 'charitable_allow_anonymous_picture_uploads', $allow, $field_id, $post_id );
 }
 
 require_once dirname( __FILE__ ) . '/logger/charitable-log-functions.php';

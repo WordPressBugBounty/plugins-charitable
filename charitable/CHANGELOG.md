@@ -1,3 +1,23 @@
+# 1.8.13
+* NEW: Charitable now works with AI assistants. On WordPress 6.9 or later, connect Claude or ChatGPT using the free WPVibe plugin, or any MCP client, to build and restyle campaigns, log donations that arrived by post, and report on your fundraising. Twenty-four operations, all permission-checked. [More Information](https://www.wpcharitable.com/ai/)
+* NEW: Control it all at Charitable > Tools > AI MCP. Write access starts OFF, an AI Activity list records every change and every refusal, and an assistant must confirm explicitly before trashing or unpublishing a campaign that already has donations.
+* FIX: Campaign progress bars could show wildly wrong percentages when a goal contained separators. A goal saved as "1,000.00" was read as 1, reporting 30000% instead of 30%. On sites using a comma decimal separator, goals with cents read a hundred times too large. GiveWP imports were most affected.
+* FIX: Resolved issue when a campaign with a goal but no end date showed no progress bar in the Campaigns list.
+* FIX: A campaign end date entered as a plain date, for example 2027-01-31, could be mis-read and saved incorrectly in certain scenarios in admin.
+* FIX: Reports, the donations CSV export, and the Dashboard's date-range dropdown and latest-donations list could leave today's donations out for part of each day, on sites whose timezone is ahead of UTC.
+* FIX: Security: on a page using the [charitable_donate_button] shortcode without a campaign resolved issue where a crafted link could run script in a visitor's browser when they clicked the donate button under certain conditions.
+
+# 1.8.12.4
+* FIX: Previewing a campaign from the Campaigns list, or more than a day after your last save in the campaign builder, could show an empty campaign. The preview now falls back to your last saved version.
+* FIX: Campaign template stylesheets now accept only valid hex characters in their colour values, so an invalid colour can no longer reach the stylesheet.
+* FIX: The Preview button in the campaign builder did nothing at all for a campaign awaiting review, scheduled, or set to private. It now saves and opens the preview as it does for any other campaign.
+* FIX: Campaigns awaiting review, scheduled, or set to private rendered as an empty campaign wherever they appeared. They now display for the campaign's author and for users who can edit campaigns, and stay hidden from everyone else.
+* FIX: Security: campaign previews now require permission to edit the campaign being previewed. Previously a preview link could be altered to display a different campaign's content, including campaigns that were not published.
+* FIX: On a campaign preview page, an excerpt of any other post shown alongside the campaign (in a posts list or query loop, for example) was replaced by a copy of the campaign. Excerpts now display normally.
+* FIX: Previewing a campaign could fail with a memory error on sites running an SEO plugin. The preview no longer rebuilds the entire campaign every time a plugin asks for the page summary, and the summary it hands back is now the campaign's own description.
+* FIX: Picture upload fields no longer accept uploads from logged-out visitors by default, and accept image files only. Sites that intentionally allow guest image uploads can re-enable them with the new `charitable_allow_anonymous_picture_uploads` filter, and the accepted image types can be adjusted with the new `charitable_picture_upload_allowed_mimes` filter.
+* IMPROVED: Picture upload fields now accept WebP images.
+
 # 1.8.12.3
 * FIX: Improved support for Campaign builder text fields and non-Latin characters such as Japanese, Chinese, Korean, etc.
 * FIX: Updates involving campaign headline color in the builder and resolved builder preview memory issue, which was happening in some scenarios.

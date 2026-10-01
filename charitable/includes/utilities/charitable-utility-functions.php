@@ -291,6 +291,34 @@ function charitable_sanitize_date( $date, $return_format = 'U' ) {
 		return false;
 	}
 
+	/*
+	 * Handle Y-m-d format dates (like "2027-01-31") directly. Ported from
+	 * Charitable Pro (1.8.13): the code below this block assumes a
+	 * space-separated, English-or-localized MONTH NAME date ("January 31,
+	 * 2027") and mis-parses a bare ISO date into garbage, which is what
+	 * charitable/update-campaign and charitable/create-campaign's end_date
+	 * input send (validated as ^\d{4}-\d{2}-\d{2}$ before it reaches here).
+	 */
+	if ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $date ) ) {
+		$date_parts = explode( '-', $date );
+
+		if ( 3 === count( $date_parts ) ) {
+			$year  = (int) $date_parts[0];
+			$month = (int) $date_parts[1];
+			$day   = (int) $date_parts[2];
+
+			$time = mktime( 0, 0, 0, $month, $day, $year );
+
+			if ( 'U' === $return_format ) {
+				return $time;
+			}
+
+			return date( $return_format, $time ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
+		}
+
+		return false;
+	}
+
 	// If the month is in english, we need to ensure it's translated if the site is in another language.
 	$english_to_local_month = array(
 		'january'   => $wp_locale->get_month( 1 ),

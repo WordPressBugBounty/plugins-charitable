@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
- * @version   1.8.9.1
+ * @version   1.8.13
  */
 
 // Exit if accessed directly.
@@ -276,11 +276,52 @@ function charitable_is_main_loop() {
 }
 
 /**
+ * Re-encodes a raw query string so that every key and value is percent-encoded.
+ *
+ * The query string arrives from the request untrusted and unencoded. Rebuilding it
+ * pair by pair guarantees the result contains no character that could break out of
+ * the HTML attribute, JavaScript string or URL context it is later printed into --
+ * including HTML entities such as `&apos;` that survive esc_url() and are decoded
+ * back into a quote by the browser's HTML parser.
+ *
+ * Query strings are application/x-www-form-urlencoded, so urldecode()/urlencode()
+ * is the correct pair here: it round-trips `+` as a space the way the request did.
+ *
+ * @since  1.8.13
+ *
+ * @param  string $query_string Raw query string, without the leading '?'.
+ * @return string Re-encoded query string, or an empty string if nothing usable remains.
+ */
+function charitable_sanitize_query_string( $query_string ) {
+	$pairs = array();
+
+	foreach ( explode( '&', (string) $query_string ) as $pair ) {
+		if ( '' === $pair ) {
+			continue;
+		}
+
+		$parts = explode( '=', $pair, 2 );
+		$key   = urlencode( urldecode( $parts[0] ) );
+
+		if ( '' === $key ) {
+			continue;
+		}
+
+		$pairs[] = isset( $parts[1] ) ? $key . '=' . urlencode( urldecode( $parts[1] ) ) : $key;
+	}
+
+	return implode( '&', $pairs );
+}
+
+/**
  * Returns the current URL.
  *
  * @see    https://gist.github.com/leereamsnyder/fac3b9ccb6b99ab14f36
  *
  * @since  1.0.0
+ * @since  1.8.13 The path and query string are both percent-encoded instead of being
+ *                reflected raw, and the trailing slash is applied to the path rather
+ *                than to the end of the query string.
  *
  * @global WP $wp
  * @return string
@@ -288,13 +329,36 @@ function charitable_is_main_loop() {
 function charitable_get_current_url() {
 	global $wp;
 
-	return trailingslashit(
-		add_query_arg(
-			array_key_exists( 'QUERY_STRING', $_SERVER ) ? $_SERVER['QUERY_STRING'] : '', // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			'',
-			home_url( $wp->request )
-		)
+	$path = isset( $wp->request ) ? (string) $wp->request : '';
+
+	/*
+	 * The requested path is reflected here too, and WordPress hands it over exactly as
+	 * it arrived: any %XX escapes are already inert, but characters that arrived
+	 * literally are not. Encoding '&' closes off every HTML entity form at once
+	 * (&apos;, &#39;, &#x27;, &quot;, ...), which is what a URL escaper cannot do
+	 * because those entities are made of characters it considers legal; the quotes and
+	 * angle brackets cover the literal cases. Only these five are touched, so existing
+	 * %XX escapes and ordinary slugs pass through unchanged and the result is idempotent.
+	 */
+	$path = str_replace(
+		array( '&', "'", '"', '<', '>' ),
+		array( '%26', '%27', '%22', '%3C', '%3E' ),
+		$path
 	);
+
+	$url = trailingslashit( home_url( $path ) );
+
+	if ( empty( $_SERVER['QUERY_STRING'] ) ) {
+		return $url;
+	}
+
+	$query_string = charitable_sanitize_query_string( wp_unslash( $_SERVER['QUERY_STRING'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
+	if ( '' === $query_string ) {
+		return $url;
+	}
+
+	return $url . '?' . $query_string;
 }
 
 /**

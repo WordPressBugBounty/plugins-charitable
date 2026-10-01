@@ -176,6 +176,38 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 			$data['recommended_plugins_activated'] = get_option( 'charitable_recommended_plugins_activated', array() );
 			$data['dashboard_enhance_section_views'] = get_option( 'charitable_dashboard_enhance_views', 0 );
 
+			/*
+			 * Added BEFORE the two plugin lists, deliberately.
+			 *
+			 * The body is form-encoded and the receiver runs
+			 * max_input_vars = 1000 (measured), which PHP enforces by silently
+			 * DROPPING variables past the limit rather than erroring — so
+			 * whatever is last in this array is first to be lost. active_plugins
+			 * and inactive_plugins are the only unbounded part of this payload,
+			 * and they are also the least valuable, so the bounded fields belong
+			 * in front of them.
+			 *
+			 * @since 1.8.13
+			 */
+			$data['abilities'] = $this->get_abilities_data();
+
+			/*
+			 * Mirrors the cross-brand AM promo-attribution loop. The options are
+			 * unprefixed; we claim only installs whose source names Charitable.
+			 *
+			 * @since 1.8.13
+			 */
+			$promo = array( 'wpconsent', 'sugar-calendar', 'duplicator', 'uncannyautomator', 'activelayer', 'wpvibe' );
+
+			foreach ( $promo as $plugin ) {
+				$source = (string) get_option( $plugin . '_source', '' );
+				$date   = (int) get_option( $plugin . '_date', 0 );
+
+				if ( $date && false !== strpos( $source, 'Charitable' ) ) {
+					$data[ 'charitable_' . $plugin . '_date' ] = $date;
+				}
+			}
+
 			// Retrieve current plugin information.
 			if ( ! function_exists( 'get_plugins' ) ) {
 				include ABSPATH . '/wp-admin/includes/plugin.php';
@@ -196,6 +228,215 @@ if ( ! class_exists( 'Charitable_Tracking' ) ) {
 			$data['locale']           = get_locale();
 
 			return $data;
+		}
+
+		/**
+		 * Abilities / AI-assistant usage for the opt-in check-in.
+		 *
+		 * Fifteen fields: six integers, five booleans, two dates, one client
+		 * slug and one JSON map. Nothing else, and in particular nothing that
+		 * identifies a campaign, a donation, a donor or an administrator — the
+		 * whole payload is counts drawn from Charitable_Abilities_Usage, whose
+		 * stored keys are a closed vocabulary of registered ability slugs.
+		 *
+		 * A `scopes` map was briefly the sixteenth, reporting which of three
+		 * write permissions a site had granted. Write access went back to one
+		 * switch before 1.8.13 shipped, and `write` already carries that.
+		 *
+		 * PUBLIC on purpose, like get_charitable_data() and get_donation_data().
+		 * get_optin_data() is private, so a block built inline there cannot be
+		 * asserted by a test, and this is the payload where an untested field is
+		 * most expensive: the usage receiver reads named keys one at a time, so a
+		 * field that is misnamed or the wrong shape is not an error anywhere — it
+		 * is silently dropped on arrival and cannot be backfilled.
+		 *
+		 * ⚠️ TWO FIELDS ARE DELIBERATELY ABSENT and must not be added here.
+		 * `rest_visible` (the count of abilities a REST client can actually see)
+		 * and application-password availability are both measured by seams that
+		 * are invalid without an authenticated HTTPS request: the first needs
+		 * rest_do_request(), which returns an empty list with no user, and the
+		 * second consults is_ssl(), which is false with no request. THIS RUNS IN
+		 * CRON. Both would report "0 visible" and "not available" across the
+		 * entire fleet of healthy sites — and both already did exactly that under
+		 * WP-CLI, which is why the two System Info lines that report them refuse
+		 * to measure rather than answer. A false catastrophe in a dataset nobody
+		 * thinks to distrust is worse than a missing column.
+		 *
+		 * `observation_complete` IS NEW HERE, added in Lite 1.8.13 and not present
+		 * in Pro's version of this method. It reads
+		 * Charitable_Abilities_Usage::get_counts() rather than ::get() for exactly
+		 * that field: wp_after_execute_ability is core @since 6.9.0 but
+		 * wp_ability_invoked is @since 7.1.0, so on WordPress 6.9 and 7.0.x
+		 * `calls`/`total` read 0 while `ok` can still climb. Without this flag a
+		 * quiet WP-7.0 site and an unused site are indistinguishable on the
+		 * receiving end.
+		 *
+		 * @since 1.8.13
+		 *
+		 * @return array<string,int|string>
+		 */
+		public function get_abilities_data() {
+
+			$usage = class_exists( 'Charitable_Abilities_Usage' )
+				? Charitable_Abilities_Usage::get_counts()
+				: array(
+					'calls'                => array(),
+					'total'                => 0,
+					'ok'                   => 0,
+					'denied'               => 0,
+					'refused'              => 0,
+					'failed'               => 0,
+					'first_at'             => '',
+					'last_at'              => '',
+					'observation_complete' => 0,
+				);
+
+			/*
+			 * Integers, not booleans, for the flags. On the wire the two are
+			 * identical — http_build_query() encodes true/false as 1/0 — and the
+			 * receiver parses with filter_var( FILTER_VALIDATE_BOOLEAN ), which
+			 * takes either. Casting here is so the shape is unambiguous to a test
+			 * and to anyone reading a logged payload, where a bare `false` would
+			 * render as an empty string.
+			 */
+			return array(
+				'api'                  => (int) function_exists( 'wp_register_ability' ),
+				'registered'           => $this->count_registered_abilities(),
+				'write'                => (int) ( class_exists( 'Charitable_Abilities_Registrar' ) && Charitable_Abilities_Registrar::write_enabled() ),
+				'client'               => $this->get_mcp_client_slug(),
+				'logs'                 => (int) ( ! class_exists( 'Charitable_Log' ) || Charitable_Log::is_enabled() ),
+
+				/*
+				 * Passed the empty string as the second argument because the
+				 * filter is per-ability and there is no ability in hand here.
+				 * This reports the site's DEFAULT answer, which is the only
+				 * meaningful one fleet-wide.
+				 */
+				'read_logs'            => (int) apply_filters( 'charitable_abilities_log_reads', false, '' ),
+
+				/*
+				 * A JSON STRING, never a nested array, and this is load-bearing
+				 * twice over. A nested abilities[calls][list-campaigns]=41 shape
+				 * invites the `[]=x` payload that has twice forced a guard into
+				 * the receiver (a (string) cast on an array raises a warning that
+				 * Laravel rethrows as an ErrorException, 500ing an otherwise good
+				 * check-in). And the body is form-encoded, so a 24-slug map is 24
+				 * more PHP input variables against a max_input_vars budget this
+				 * payload already spends heavily on the full active and inactive
+				 * plugin lists. One string is one variable.
+				 *
+				 * Cast to object so an EMPTY map encodes as `{}` rather than
+				 * `[]`. wp_json_encode( array() ) emits a JSON array, so without
+				 * the cast this field is an object on a site that has used the
+				 * feature and an array on one that has not — and most sites have
+				 * not, so the array form would be the common case for a field
+				 * documented as a map. The receiver tolerates both, but a type
+				 * that changes with the data is the kind of thing that breaks a
+				 * consumer written against the common case years later.
+				 */
+				'calls'                => (string) wp_json_encode( (object) (array) $usage['calls'] ),
+
+				/*
+				 * Sent rather than recovered by summing `calls` receiver-side.
+				 * get_counts() already computes it, so this passes along a value
+				 * that exists; without it the headline usage number is only
+				 * reachable by summing a JSON blob in every query, against no
+				 * index.
+				 */
+				'total'                => (int) $usage['total'],
+				'ok'                   => (int) $usage['ok'],
+				'denied'               => (int) $usage['denied'],
+				'refused'              => (int) $usage['refused'],
+				'failed'               => (int) $usage['failed'],
+				'first_at'             => (string) $usage['first_at'],
+				'last_at'              => (string) $usage['last_at'],
+				'observation_complete' => (int) $usage['observation_complete'],
+			);
+		}
+
+		/**
+		 * How many Charitable abilities are registered.
+		 *
+		 * A weak signal deliberately kept: one smallint that reveals a build or
+		 * a partial deploy where some abilities failed to register at all.
+		 *
+		 * ⚠️ NOTE THE SIDE EFFECT, which is the reason this is one line of code
+		 * and a paragraph of comment. wp_get_abilities() reaches
+		 * WP_Abilities_Registry::get_instance(), which fires
+		 * `wp_abilities_api_init` lazily on first use — so asking for this count
+		 * inside the check-in FORCES the whole abilities surface to register:
+		 * four registrar objects and twenty-four wp_register_ability() calls
+		 * with their full input and output schemas, in a weekly cron request
+		 * that would otherwise never touch any of it.
+		 *
+		 * Accepted, because it is once a week and the alternative is worse. A
+		 * hardcoded 24 drifts the moment an ability is added or removed, and
+		 * this field exists precisely to catch a build where the real number is
+		 * not 24 — a count that cannot disagree with reality reports nothing.
+		 *
+		 * Do NOT reach for a cached value here either: a cache populated during
+		 * a normal admin request would report yesterday's build in today's
+		 * check-in, which is the same failure in slower motion.
+		 *
+		 * @since 1.8.13
+		 *
+		 * @return int
+		 */
+		private function count_registered_abilities() {
+
+			if ( ! function_exists( 'wp_get_abilities' ) ) {
+				return 0;
+			}
+
+			$count = 0;
+
+			foreach ( wp_get_abilities() as $ability ) {
+				if ( is_object( $ability ) && method_exists( $ability, 'get_name' ) && 0 === strpos( $ability->get_name(), 'charitable/' ) ) {
+					++$count;
+				}
+			}
+
+			return $count;
+		}
+
+		/**
+		 * The slug of the MCP client this site is running, or '' for none.
+		 *
+		 * Detection shares Charitable_Abilities' basename map with the System
+		 * Info screen, so the two cannot disagree about whether a client is
+		 * present. Almost every reporting site is expected to say `wpvibe`; the
+		 * value of the field is the day one does not.
+		 *
+		 * First match wins where two are somehow active. A list would be a
+		 * second JSON column to express a state that should not occur, and the
+		 * question this answers is "which client", not "how many".
+		 *
+		 * DELIBERATELY NOT FILTERED, and the asymmetry is worth stating because
+		 * it otherwise reads as an oversight: `charitable_abilities_mcp_clients`
+		 * changes what System Info displays but has no effect here. That filter
+		 * takes and returns human-readable LABELS for a pasted report, so it
+		 * cannot supply the slug this field needs, and quietly running labels
+		 * through here would write values the receiver sanitises away. A site
+		 * using that filter to declare a bespoke client therefore shows it on
+		 * screen and reports no client in telemetry, which is the right answer
+		 * of the two available: the slug vocabulary is shared with the receiver,
+		 * so it is not a site's to extend.
+		 *
+		 * @since 1.8.13
+		 *
+		 * @return string
+		 */
+		private function get_mcp_client_slug() {
+
+			if ( ! class_exists( 'Charitable_Abilities' ) ) {
+				return '';
+			}
+
+			foreach ( Charitable_Abilities::get_active_mcp_clients() as $entry ) {
+				return (string) $entry['slug'];
+			}
+
+			return '';
 		}
 
 

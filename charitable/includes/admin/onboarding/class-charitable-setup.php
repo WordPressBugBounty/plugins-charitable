@@ -85,15 +85,6 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 		);
 
 		/**
-		 * The private app_server_url property.
-		 *
-		 * @since 1.8.4
-		 *
-		 * @var string
-		 */
-		private $app_server_url = 'https://app.wpcharitable.com/';
-
-		/**
 		 * The private $stripe_redirect_url property.
 		 *
 		 * @var string
@@ -139,6 +130,11 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 			// Register the resume-banner dismiss listener unconditionally — it
 			// must fire during admin-ajax, which the guards below bail out of.
 			add_action( 'charitable_dashboard_notification_dismissed', [ $this, 'maybe_clear_onboarding_state_on_dismiss' ] );
+
+			// Records that the user actually departed for the setup wizard. Like the
+			// hook above, this MUST be registered before the wp_doing_ajax() bail
+			// below, or it would never fire on admin-ajax.php.
+			add_action( 'wp_ajax_charitable_onboarding_started', [ $this, 'ajax_mark_onboarding_started' ] );
 
 			// If user is in admin ajax or doing cron, return.
 			if ( wp_doing_ajax() || wp_doing_cron() ) {
@@ -281,6 +277,43 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 		}
 
 		/**
+		 * Record that the user has actually departed for the setup wizard.
+		 *
+		 * Fired by a beacon sent when the welcome screen's call-to-action is
+		 * clicked. That button links straight out to the centrally hosted wizard,
+		 * so there is no server-side moment at which we would otherwise notice the
+		 * departure.
+		 *
+		 * `charitable_started_onboarding` is what `resume_onboarding()` reads to
+		 * decide someone is mid-setup and pull them back to the welcome screen. It
+		 * used to be set on activation, which meant every new install was treated
+		 * as mid-setup whether or not the user ever went to the wizard. Setting it
+		 * here instead makes the option mean what its name says.
+		 *
+		 * Deliberately best-effort: if the beacon does not arrive (JavaScript
+		 * disabled, browser without sendBeacon, request dropped mid-navigation) the
+		 * user still reaches the wizard normally and simply is not offered the
+		 * resume prompt afterwards. Losing a prompt is an acceptable failure; a
+		 * broken call-to-action on the first screen of a new install is not.
+		 *
+		 * @since 1.8.12.4
+		 *
+		 * @return void
+		 */
+		public function ajax_mark_onboarding_started() {
+
+			check_ajax_referer( 'charitable_onboarding_started', 'nonce' );
+
+			if ( ! charitable_current_user_can( 'administrator' ) ) {
+				wp_send_json_error( null, 403 );
+			}
+
+			update_option( 'charitable_started_onboarding', 1 );
+
+			wp_send_json_success();
+		}
+
+		/**
 		 * Onboarding welcome screen redirect.
 		 *
 		 * This function checks if a new install or update has just occurred. If so,
@@ -327,7 +360,15 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 
 			if ( ! $upgrade || 1 === count( $upgrade ) ) {
 				// Initial install.
-				update_option( 'charitable_started_onboarding', 1 );
+				//
+				// NOTE: `charitable_started_onboarding` is deliberately NOT set here.
+				// Being redirected to the welcome screen is not the same as having
+				// started the wizard, and `resume_onboarding()` treats that option as
+				// "this user is mid-setup" and redirects them back here from other
+				// admin pages until it is cleared. Setting it on activation therefore
+				// nagged every new install, including people who never clicked
+				// through. It is now set only when the user actually leaves for the
+				// wizard - see `ajax_mark_onboarding_started()`.
 				wp_safe_redirect( admin_url( 'admin.php?page=charitable&wpchar_lite=lite&setup=welcome&f=1' ) );
 				exit;
 			}
@@ -369,6 +410,51 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 				);
 
 				wp_enqueue_style( 'charitable-admin-user-onboarding' );
+
+				if ( $this->is_welcome_page() ) :
+
+					/*
+					 * The welcome screen's call-to-action links straight out to the
+					 * centrally hosted wizard, so nothing server-side observes the
+					 * departure. Send a beacon on click so
+					 * `charitable_started_onboarding` is set only for users who
+					 * genuinely leave for the wizard, rather than for everyone who
+					 * merely activated the plugin.
+					 *
+					 * Inline rather than a new asset file: it is a few lines, the
+					 * existing onboarding script is only registered on the setup page
+					 * and pulls in the confetti library, and a new file would need a
+					 * minified twin to match the $min convention here.
+					 */
+					wp_register_script( 'charitable-onboarding-departure', '', array(), $version, true );
+					wp_enqueue_script( 'charitable-onboarding-departure' );
+
+					wp_add_inline_script(
+						'charitable-onboarding-departure',
+						'(function(){' .
+						'var d=' . wp_json_encode(
+							array(
+								'url'   => admin_url( 'admin-ajax.php' ),
+								'nonce' => wp_create_nonce( 'charitable_onboarding_started' ),
+							)
+						) . ';' .
+						'document.addEventListener("DOMContentLoaded",function(){' .
+						'var a=document.querySelector(".charitable-user-onboarding-wrap a.charitable-button-link");' .
+						'if(!a){return;}' .
+						'a.addEventListener("click",function(){' .
+						'try{' .
+						'var f=new FormData();' .
+						'f.append("action","charitable_onboarding_started");' .
+						'f.append("nonce",d.nonce);' .
+						'if(navigator.sendBeacon){navigator.sendBeacon(d.url,f);}' .
+						'else{fetch(d.url,{method:"POST",body:f,credentials:"same-origin",keepalive:true}).catch(function(){});}' .
+						'}catch(e){}' .
+						'});' . // Never preventDefault: navigation to the wizard must proceed regardless.
+						'});' .
+						'})();'
+					);
+
+				endif;
 
 				if ( $this->is_setup_page() ) :
 
@@ -1036,7 +1122,7 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 						base64_encode( get_admin_url( null, 'admin.php') ) // phpcs:ignore
 					),
 				),
-				$this->app_server_url . 'optin-charitable_tracking'
+				charitable_onboarding_app_url() . '/optin-charitable_tracking'
 			);
 
 			// Send the POST request.

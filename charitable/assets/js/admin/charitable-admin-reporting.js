@@ -142,6 +142,58 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
         },
 
         /**
+         * Builds the "All Time" preset range - the earliest donation on the site
+         * through today.
+         *
+         * The existing presets stop at "This Year", so answering "what have we
+         * raised?" meant hand-typing a multi-year range. Selecting the range still
+         * requires pressing Filter, as every other preset does.
+         *
+         * @since 1.8.12.4
+         *
+         */
+        getAllTimeRange: function () {
+
+            var earliest = false;
+
+            if ( typeof charitable_reporting !== 'undefined' && charitable_reporting.earliest_donation_date ) { // eslint-disable-line
+                earliest = moment( charitable_reporting.earliest_donation_date, 'YYYY/MM/DD' ); // eslint-disable-line
+            }
+
+            // No localized date (or an unparseable one) - fall back to a span wide
+            // enough to cover the data rather than silently showing a short range.
+            if ( ! earliest || ! earliest.isValid() ) {
+                earliest = moment().subtract( 10, 'years' ); // eslint-disable-line
+            }
+
+            return [ earliest, moment() ]; // eslint-disable-line
+        },
+
+        /**
+         * The translated label for the "All Time" preset.
+         *
+         * bootstrap-daterangepicker uses each preset's object KEY as its visible
+         * label, so this string cannot live in the JS - it has to be localized and
+         * then used as a computed key.
+         *
+         * Falls back to the English literal when the key is absent, which is a real
+         * case rather than defensive padding: `charitable_reporting` is localized by
+         * more than one class and only Charitable_Reports supplies these keys. The
+         * Dashboard would otherwise render `undefined` as the preset's label.
+         *
+         * @since 1.8.12.4
+         *
+         */
+        getAllTimeLabel: function () {
+
+            if ( typeof charitable_reporting !== 'undefined' && charitable_reporting.all_time_label ) { // eslint-disable-line
+                return charitable_reporting.all_time_label; // eslint-disable-line
+            }
+
+            return 'All Time';
+        },
+
+        /**
          * Inits the date picker ranges, for when that UI needs to be initialized.
          *
          * @since 1.8.1
@@ -171,6 +223,12 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
                         moment().subtract(1, 'month').endOf('month') // eslint-disable-line
                     ]
                   }
+
+                  // Assigned separately because the label is the key, and it is
+                  // localized. The four labels above are hardcoded English, which is
+                  // this file's existing convention - they are left alone rather
+                  // than converted as part of a port.
+                  s.ranges[ app.getAllTimeLabel() ] = app.getAllTimeRange();
 
                 }
 
@@ -206,6 +264,8 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
                         moment().subtract(1, 'month').endOf('month') // eslint-disable-line
                     ]
                   };
+
+                  s.ranges[ app.getAllTimeLabel() ] = app.getAllTimeRange();
 
                 }
 

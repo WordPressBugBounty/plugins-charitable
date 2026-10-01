@@ -1,0 +1,1036 @@
+/**
+ * Charitable Tools > AI Assistants.
+ *
+ * Colour values are Charitable brand canon, not WPForms':
+ *   #fc9a2a  brand orange        (primary button)
+ *   #fc8c0c  brand orange dark   (button hover)
+ *   #1e1515  brand ink           (dark hero ground)
+ *   #31714c  brand green         (card bullet marks)
+ *
+ * The hero uses brand INK rather than the WP-admin grey #2c3338 that WPForms
+ * uses, so the panel reads as Charitable rather than as a copy. Type is Inter
+ * via the admin stack on purpose - product UI matches WordPress admin.
+ *
+ * Ported verbatim from Charitable Pro (pinned commit 4f84275197) for the Lite
+ * 1.8.13 Tools > AI MCP screen. The two additions at the bottom of this file -
+ * .charitable-ai-card-note and .charitable-ai-card-upgrade, for the two
+ * Pro-gated capability cards Lite shows that Pro does not - reuse only the
+ * custom properties and literal values already declared above; nothing below
+ * introduces a new colour.
+ *
+ * @since 1.8.13
+ */
+
+.charitable-ai-mcp {
+	--chai-orange: #fc9a2a;
+	--chai-orange-dark: #fc8c0c;
+	--chai-ink: #1e1515;
+	--chai-green: #31714c;
+	--chai-border: #dcdcde;
+	--chai-muted: #6b615c;
+	/* A darkened brand orange for small text on white, where #fc9a2a does not
+	   carry enough contrast. NOT a canon brand value. Two uses remain - the
+	   pre-flight notice icon and the troubleshooting summary - both of them text
+	   or text-adjacent. The card icons moved to canon --chai-orange on
+	   2026-09-16, because a decorative glyph is not held to text contrast. */
+	--chai-accent-ink: #8a4d00;
+	/* A warm off-white for a secondary row, one step off surface white. Neutral,
+	   biased slightly toward the brand orange so it does not read as grey. */
+	--chai-surface-2: #f7f3ef;
+
+	max-width: 1100px;
+	margin: 0 0 20px;
+	font-size: 14px;
+	line-height: 1.6;
+	-webkit-font-smoothing: antialiased;
+}
+
+/* ---- pre-flight notice (WP < 6.9) ---- */
+
+.charitable-ai-mcp .charitable-ai-notice {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	background: #fdf4e7;
+	border: 1px solid #f0c98a;
+	border-left: 4px solid var(--chai-orange);
+	border-radius: 6px;
+	padding: 12px 16px;
+	margin: 0 0 16px;
+}
+
+.charitable-ai-mcp .charitable-ai-notice .dashicons {
+	color: var(--chai-accent-ink);
+	flex: none;
+	margin-top: 2px;
+}
+
+.charitable-ai-mcp .charitable-ai-notice p {
+	margin: 0;
+	color: #5d4a2e;
+}
+
+/* ---- dark hero ---- */
+
+.charitable-ai-mcp .charitable-ai-hero {
+	display: flex;
+	gap: 32px;
+	align-items: flex-start;
+	justify-content: space-between;
+	background: var(--chai-ink);
+	/* Top corners only: the white cards panel sits flush beneath and carries the
+	   bottom pair, so the two read as one continuous card rather than two blocks
+	   with the dark one rounding away from the panel's square top edge. */
+	border-radius: 8px 8px 0 0;
+	padding: 28px 30px 30px;
+	color: #f5f1ec;
+}
+
+.charitable-ai-mcp .charitable-ai-hero-body {
+	flex: 1 1 auto;
+	min-width: 0;
+	max-width: 680px;
+}
+
+.charitable-ai-mcp .charitable-ai-eyebrow {
+	margin: 0 0 10px;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.11em;
+	text-transform: uppercase;
+	color: #a89d96;
+}
+
+.charitable-ai-mcp .charitable-ai-title {
+	margin: 0 0 10px;
+	padding: 0;
+	font-size: 22px;
+	font-weight: 700;
+	line-height: 1.25;
+	color: #ffffff;
+}
+
+.charitable-ai-mcp .charitable-ai-desc {
+	margin: 0 0 20px;
+	color: #ddd5cd;
+}
+
+.charitable-ai-mcp .charitable-ai-desc a {
+	color: #fcbf72;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.charitable-ai-mcp .charitable-ai-desc a:hover,
+.charitable-ai-mcp .charitable-ai-desc a:focus {
+	color: var(--chai-orange);
+}
+
+.charitable-ai-mcp .charitable-ai-actions {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	flex-wrap: wrap;
+}
+
+.charitable-ai-mcp .charitable-ai-button {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	background: var(--chai-orange);
+	color: var(--chai-ink);
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1;
+	padding: 12px 20px;
+	border-radius: 5px;
+	text-decoration: none;
+	transition: background-color 0.15s ease;
+}
+
+.charitable-ai-mcp .charitable-ai-button:hover,
+.charitable-ai-mcp .charitable-ai-button:focus {
+	background: var(--chai-orange-dark);
+	color: var(--chai-ink);
+}
+
+.charitable-ai-mcp .charitable-ai-button:focus-visible {
+	outline: 2px solid #ffffff;
+	outline-offset: 2px;
+}
+
+.charitable-ai-mcp .charitable-ai-note {
+	margin: 14px 0 0;
+	font-size: 13px;
+	color: #a89d96;
+}
+
+/* ---- AI client chips ---- */
+
+.charitable-ai-mcp .charitable-ai-clients {
+	flex: 0 0 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	align-items: stretch;
+	min-width: 170px;
+}
+
+/* Light chips, not dark: the vendor SVGs render through <img> with their own
+   fills - one of which is black - so a dark chip would hide it. */
+.charitable-ai-mcp .charitable-ai-client {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	background: #ffffff;
+	border: 1px solid var(--chai-border);
+	border-radius: 6px;
+	padding: 9px 13px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--chai-ink);
+}
+
+.charitable-ai-mcp .charitable-ai-client-icon {
+	flex: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 16px;
+	height: 16px;
+}
+
+.charitable-ai-mcp .charitable-ai-client-icon img {
+	display: block;
+	width: 16px;
+	height: 16px;
+}
+
+.charitable-ai-mcp .charitable-ai-client-label {
+	white-space: nowrap;
+}
+
+.charitable-ai-mcp .charitable-ai-client-any {
+	display: block;
+	text-align: right;
+	padding: 2px 4px 0;
+	font-size: 12px;
+	color: #a89d96;
+}
+
+/* ---- white cards panel ---- */
+
+.charitable-ai-mcp .charitable-ai-panel {
+	background: #ffffff;
+	border: 1px solid var(--chai-border);
+	border-top: 0;
+	border-radius: 0 0 8px 8px;
+	padding: 22px 24px 24px;
+}
+
+/* Per David 2026-09-16: the two links moved off the title's line and onto a
+   row of their own beneath it, so this is a column rather than a
+   space-between row. */
+.charitable-ai-mcp .charitable-ai-panel-head {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 6px;
+	margin: 0 0 18px;
+}
+
+.charitable-ai-mcp .charitable-ai-panel-links {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin: 0;
+	padding: 0;
+	font-size: 13px;
+	line-height: 1.4;
+}
+
+.charitable-ai-mcp .charitable-ai-panel-links-sep {
+	color: var(--chai-border);
+}
+
+/* Left as a standard WP admin link colour on purpose: blue is the affordance
+   that says "this navigates", and both links here do. */
+.charitable-ai-mcp .charitable-ai-video-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 13px;
+	font-weight: 500;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.charitable-ai-mcp .charitable-ai-video-link .dashicons {
+	width: 17px;
+	height: 17px;
+	font-size: 17px;
+	line-height: 1;
+}
+
+.charitable-ai-mcp .charitable-ai-panel-title {
+	margin: 0;
+	padding: 0;
+	font-size: 16px;
+	font-weight: 700;
+	color: var(--chai-ink);
+}
+
+/* Per David 2026-09-16: the brand word only, picked out of an otherwise ink
+   heading. Canon orange is safe on a 16px BOLD word - the contrast caveat on
+   --chai-accent-ink is about small text. */
+.charitable-ai-mcp .charitable-ai-panel-title .charitable-ai-brand {
+	color: var(--chai-orange);
+}
+
+.charitable-ai-mcp .charitable-ai-docs-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+	font-weight: 500;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.charitable-ai-mcp .charitable-ai-docs-link:hover .charitable-ai-docs-arrow {
+	transform: translateX(2px);
+}
+
+.charitable-ai-mcp .charitable-ai-docs-arrow {
+	transition: transform 0.15s ease;
+}
+
+.charitable-ai-mcp .charitable-ai-cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 16px;
+}
+
+.charitable-ai-mcp .charitable-ai-card {
+	border: 1px solid var(--chai-border);
+	border-radius: 7px;
+	padding: 18px 18px 8px;
+	background: #ffffff;
+}
+
+.charitable-ai-mcp .charitable-ai-card-head {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 0 0 12px;
+}
+
+/* Per David 2026-09-16: no chip behind the glyph, and brand orange rather than
+   the darkened --chai-accent-ink. These dashicons are decorative (aria-hidden,
+   with the card title carrying the meaning), so canon #fc9a2a is right here even
+   though this file deliberately avoids it for small TEXT on white. Without the
+   chip the 34px box left the glyph floating away from its label, hence the
+   tighter box and larger glyph. */
+.charitable-ai-mcp .charitable-ai-card-icon {
+	flex: none;
+	width: 24px;
+	height: 24px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--chai-orange);
+	font-size: 22px;
+}
+
+.charitable-ai-mcp .charitable-ai-card-title {
+	margin: 0;
+	padding: 0;
+	font-size: 14px;
+	font-weight: 700;
+	color: var(--chai-ink);
+}
+
+.charitable-ai-mcp .charitable-ai-card-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.charitable-ai-mcp .charitable-ai-card-list li {
+	position: relative;
+	margin: 0;
+	padding: 9px 0 9px 16px;
+	border-top: 1px solid #f0eeec;
+	font-size: 13px;
+	color: #3c3c3c;
+}
+
+.charitable-ai-mcp .charitable-ai-card-list li:first-child {
+	border-top: 0;
+}
+
+.charitable-ai-mcp .charitable-ai-card-list li::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 16px;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--chai-green);
+}
+
+/* ---- panel footer ---- */
+
+.charitable-ai-mcp .charitable-ai-panel-foot {
+	margin: 18px 0 0;
+	padding: 16px 0 0;
+	border-top: 1px solid var(--chai-border);
+}
+
+.charitable-ai-mcp .charitable-ai-panel-foot p {
+	margin: 0;
+	font-size: 13px;
+	color: var(--chai-muted);
+	/* Full width: the panel is wider than a reading measure and the constrained
+	   version wrapped after two-thirds of the row, which read as a layout fault
+	   rather than as a deliberate measure. */
+	max-width: none;
+}
+
+/* ---- narrow screens ---- */
+
+@media screen and (max-width: 782px) {
+
+	.charitable-ai-mcp .charitable-ai-hero {
+		flex-direction: column;
+		gap: 22px;
+		padding: 22px 20px 24px;
+	}
+
+	.charitable-ai-mcp .charitable-ai-clients {
+		flex-direction: row;
+		flex-wrap: wrap;
+		min-width: 0;
+		width: 100%;
+	}
+
+	.charitable-ai-mcp .charitable-ai-client {
+		flex: 1 1 auto;
+		text-align: center;
+	}
+
+	.charitable-ai-mcp .charitable-ai-client-any {
+		flex: 1 1 100%;
+		text-align: left;
+	}
+
+	.charitable-ai-mcp .charitable-ai-panel {
+		padding: 18px 16px 20px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+	.charitable-ai-mcp * {
+		transition: none !important;
+	}
+}
+
+/* ---- the write-access toggles, on the dark hero ---- */
+
+
+.charitable-ai-mcp .charitable-ai-gate {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.charitable-ai-mcp .charitable-ai-gate-label {
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: #ddd5cd;
+	cursor: pointer;
+}
+
+/* Self-contained slider. The shared .charitable-toggle component lives in
+   charitable-admin-legacy.css and charitable-logger.css, neither of which is
+   enqueued on this screen, so the control rendered as a bare checkbox. Styling it
+   here beats enqueuing a legacy stylesheet and inheriting its whole cascade. */
+.charitable-ai-mcp .charitable-toggle {
+	position: relative;
+	display: inline-block;
+	width: 38px;
+	height: 21px;
+	flex: none;
+	cursor: pointer;
+}
+
+.charitable-ai-mcp .charitable-toggle input {
+	position: absolute;
+	opacity: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	cursor: pointer;
+}
+
+.charitable-ai-mcp .charitable-toggle .charitable-toggle-slider {
+	position: absolute;
+	inset: 0;
+	background: #4a403a;
+	border-radius: 21px;
+	transition: background-color 0.15s ease;
+	pointer-events: none;
+}
+
+.charitable-ai-mcp .charitable-toggle .charitable-toggle-slider::before {
+	content: "";
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	width: 15px;
+	height: 15px;
+	background: #ffffff;
+	border-radius: 50%;
+	transition: transform 0.15s ease;
+}
+
+.charitable-ai-mcp .charitable-toggle input:checked + .charitable-toggle-slider {
+	background: var(--chai-green);
+}
+
+.charitable-ai-mcp .charitable-toggle input:checked + .charitable-toggle-slider::before {
+	transform: translateX(17px);
+}
+
+.charitable-ai-mcp .charitable-toggle input:focus-visible + .charitable-toggle-slider {
+	outline: 2px solid var(--chai-orange);
+	outline-offset: 2px;
+}
+
+.charitable-ai-mcp .charitable-toggle input:disabled + .charitable-toggle-slider {
+	opacity: 0.6;
+}
+
+/* Our own ring rather than WordPress's .spinner, which is a grey background-image
+   sprite drawn for light admin surfaces and reads as a grey blob on the ink hero.
+   Occupies its space at all times so flipping the toggle does not shift the row. */
+.charitable-ai-mcp .charitable-ai-gate-spinner {
+	width: 14px;
+	height: 14px;
+	flex: none;
+	border-radius: 50%;
+	border: 2px solid rgba( 255, 255, 255, 0.25 );
+	border-top-color: var(--chai-orange);
+	/* visibility, not opacity with a transition. A 0.12s fade on a control that
+	   is on screen for about 100ms buys nothing, and it makes the element's state
+	   ambiguous to read while the transition is mid-flight. */
+	visibility: hidden;
+}
+
+.charitable-ai-mcp .charitable-ai-gate-spinner.is-active {
+	visibility: visible;
+	animation: charitable-ai-spin 0.6s linear infinite;
+}
+
+@keyframes charitable-ai-spin {
+
+	to {
+		transform: rotate( 360deg );
+	}
+}
+
+/* Reduced motion: still show that something is happening, without spinning. */
+@media ( prefers-reduced-motion: reduce ) {
+
+	.charitable-ai-mcp .charitable-ai-gate-spinner.is-active {
+		animation: none;
+		border-top-color: rgba( 255, 255, 255, 0.25 );
+		border-right-color: var(--chai-orange);
+	}
+}
+
+/* ---- read-only banner ---- */
+
+/* No box. The state it reports is normal and expected - writes start off - so a
+   bordered, tinted panel over-weighted it and read as a warning about a problem.
+   The icon carries the meaning; the spacing does the separating. The panel's own
+   22px top padding sits above this margin, so ~30px above and 26px below. */
+.charitable-ai-mcp .charitable-ai-readonly-banner {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	margin: 14px 0 30px;
+	padding: 0;
+	font-size: 13px;
+	color: #3c3c3c;
+	max-width: none;
+}
+
+.charitable-ai-mcp .charitable-ai-readonly-banner .dashicons {
+	flex: none;
+	color: var(--chai-green);
+	font-size: 17px;
+	width: 17px;
+	height: 17px;
+	margin-top: 1px;
+}
+
+/* ---- inline diagnostics ---- */
+
+.charitable-ai-mcp .charitable-ai-diag-wrap {
+	margin: 14px 0 0;
+}
+
+/* Native <details> rather than a JS toggle: it is keyboard accessible and
+   focusable for free, and the summary IS the affordance - so the duplicate link
+   that used to sit in the row above has gone. */
+.charitable-ai-mcp .charitable-ai-diag-summary {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--chai-accent-ink);
+	list-style: none;
+	width: auto;
+}
+
+.charitable-ai-mcp .charitable-ai-diag-summary::-webkit-details-marker {
+	display: none;
+}
+
+.charitable-ai-mcp .charitable-ai-diag-summary::before {
+	content: "";
+	width: 0;
+	height: 0;
+	border-left: 5px solid currentColor;
+	border-top: 4px solid transparent;
+	border-bottom: 4px solid transparent;
+	transition: transform 0.15s ease;
+}
+
+.charitable-ai-mcp .charitable-ai-diag-wrap[open] .charitable-ai-diag-summary::before {
+	transform: rotate(90deg);
+}
+
+.charitable-ai-mcp .charitable-ai-diag-summary:hover,
+.charitable-ai-mcp .charitable-ai-diag-summary:focus-visible {
+	text-decoration: underline;
+}
+
+.charitable-ai-mcp .charitable-ai-diag-wrap[open] .charitable-ai-diag-summary {
+	margin-bottom: 10px;
+}
+
+.charitable-ai-mcp .charitable-ai-diag-title {
+	margin: 18px 0 8px;
+	padding: 0;
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--chai-ink);
+}
+
+.charitable-ai-mcp .charitable-ai-diag-box {
+	border: 1px solid var(--chai-border);
+	border-radius: 7px;
+	overflow: hidden;
+}
+
+.charitable-ai-mcp .charitable-ai-diag {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	max-width: none;
+}
+
+.charitable-ai-mcp .charitable-ai-diag-row {
+	display: grid;
+	/* Fixed, not minmax(): each <li> is its own grid container, so an auto column
+	   is sized per row and the values end up on ragged left edges. */
+	grid-template-columns: 20px 230px 1fr;
+	align-items: baseline;
+	gap: 4px 10px;
+	margin: 0;
+	padding: 9px 14px;
+	border-top: 1px solid #f0eeec;
+	font-size: 13px;
+}
+
+.charitable-ai-mcp .charitable-ai-diag-row:first-child {
+	border-top: 0;
+}
+
+.charitable-ai-mcp .charitable-ai-diag-mark {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	align-self: center;
+}
+
+.charitable-ai-mcp .charitable-ai-diag-row.is-ok .charitable-ai-diag-mark {
+	color: var(--chai-green);
+}
+
+.charitable-ai-mcp .charitable-ai-diag-row.is-problem .charitable-ai-diag-mark {
+	color: #b32d2e;
+}
+
+.charitable-ai-mcp .charitable-ai-diag-label {
+	font-weight: 600;
+	color: var(--chai-ink);
+}
+
+.charitable-ai-mcp .charitable-ai-diag-value {
+	color: var(--chai-muted);
+}
+
+.charitable-ai-mcp .charitable-ai-diag-row.is-problem .charitable-ai-diag-value {
+	color: #b32d2e;
+}
+
+@media screen and (max-width: 782px) {
+
+	.charitable-ai-mcp .charitable-ai-diag-row {
+		grid-template-columns: 20px 1fr;
+	}
+
+	.charitable-ai-mcp .charitable-ai-diag-value {
+		grid-column: 2;
+	}
+}
+
+/* A closing row inside the box, not a check - so it gets the same padding as a
+   row and a separator above it, but no status mark and no grid. */
+.charitable-ai-mcp .charitable-ai-diag-more {
+	margin: 0;
+	padding: 9px 14px;
+	border-top: 1px solid var(--chai-border);
+	background: var(--chai-surface-2);
+	font-size: 13px;
+	color: var(--chai-muted);
+	max-width: none;
+}
+
+/* While an install is in flight the button must not take a second click - that
+   would install twice - and it should read as busy rather than as a live
+   control. The JS adds this class for the duration of the request. */
+.charitable-ai-mcp .charitable-ai-button.is-working {
+	opacity: 0.7;
+	pointer-events: none;
+}
+
+/* ---- "Watch video" modal ----
+ *
+ * NOT scoped under .charitable-ai-mcp: jquery-confirm appends its markup to
+ * <body>, outside this page's wrapper, so a scoped selector would never match.
+ * The class comes from `theme: 'modern,charitable-ai-video-modal'` in
+ * charitable-ai-mcp.js - jquery-confirm splits that on the comma and prefixes
+ * each part with `jconfirm-` (themePrefix in the library).
+ *
+ * The frame is a padding-top aspect box rather than fixed pixels, because the
+ * Lite welcome modal's 1280x720 iframe at boxWidth 1300 overflows any laptop
+ * viewport narrower than that.
+ */
+
+.jconfirm.jconfirm-charitable-ai-video-modal .jconfirm-content {
+	padding: 0;
+}
+
+.jconfirm.jconfirm-charitable-ai-video-modal .charitable-ai-video-frame {
+	position: relative;
+	width: 100%;
+	padding-top: 56.25%;
+	background: #000000;
+	overflow: hidden;
+	border-radius: 4px;
+}
+
+.jconfirm.jconfirm-charitable-ai-video-modal .charitable-ai-video-frame iframe {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	border: 0;
+	display: block;
+}
+
+/* ---- Lite-only: Pro-gated capability cards ----
+ *
+ * Two of get_cards()'s entries describe an area Lite does not register
+ * (donor management, donation-form editing) rather than listing bullets for
+ * it. The .charitable-pro-badge next to the card title is the SAME sitewide
+ * component already shipped in charitable-admin.css (enqueued on every
+ * wp-admin screen), so it is reused rather than restyled here.
+ *
+ * The border colour below (#f0eeec) is not new: it is the exact value
+ * .charitable-ai-card-list li already uses above for the same divider role.
+ *
+ * @since 1.8.13
+ */
+
+.charitable-ai-mcp .charitable-ai-card-note {
+	margin: 0 0 10px;
+	padding: 9px 0 0;
+	border-top: 1px solid #f0eeec;
+	font-size: 13px;
+	color: var(--chai-muted);
+}
+
+.charitable-ai-mcp .charitable-ai-card-upgrade {
+	margin: 0;
+	padding: 0 0 9px;
+	font-size: 13px;
+}
+
+.charitable-ai-mcp .charitable-ai-card-upgrade a {
+	color: var(--chai-accent-ink);
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.charitable-ai-mcp .charitable-ai-card-upgrade a:hover,
+.charitable-ai-mcp .charitable-ai-card-upgrade a:focus {
+	text-decoration: underline;
+}
+
+/* ---- AI Activity panel ----
+ *
+ * Added Lite 1.8.13, Task 12. Every colour below is one of this file's own
+ * existing custom properties, or a literal already used elsewhere in this
+ * exact file for the same semantic role - nothing new is introduced:
+ *
+ *   applied  -> var(--chai-green)       (already the ".is-ok" diagnostics colour)
+ *   refused  -> var(--chai-accent-ink)  (already used for accent text on white)
+ *   denied   -> #b32d2e                 (already the ".is-problem" diagnostics colour)
+ *
+ * Canon has no separate warning/danger token to draw on instead - confirmed
+ * against the brand token file, which notes the gap explicitly rather than
+ * leaving it silently unaddressed - so refused/denied deliberately reuse
+ * values this file already carries rather than inventing new ones.
+ *
+ * @since 1.8.13
+ */
+
+.charitable-ai-mcp .charitable-ai-activity {
+	margin: 20px 0 0;
+	padding: 18px 0 0;
+	border-top: 1px solid var(--chai-border);
+}
+
+.charitable-ai-mcp .charitable-ai-activity-head {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 8px;
+	margin: 0 0 6px;
+}
+
+.charitable-ai-mcp .charitable-ai-activity-title {
+	margin: 0;
+	padding: 0;
+	font-size: 15px;
+	font-weight: 700;
+	color: var(--chai-ink);
+}
+
+.charitable-ai-mcp .charitable-ai-activity-client {
+	margin: 0;
+	font-size: 12px;
+	color: var(--chai-muted);
+}
+
+.charitable-ai-mcp .charitable-ai-activity-note {
+	margin: 0 0 6px;
+	font-size: 13px;
+	color: var(--chai-muted);
+	max-width: none;
+}
+
+/* ---- empty state: the common case, and the one most likely to be
+   screenshotted, so it reads as calm rather than as an error or a bare
+   table. No border, no icon - just a quiet, centred note. ---- */
+.charitable-ai-mcp .charitable-ai-activity-empty {
+	padding: 26px 12px;
+	text-align: center;
+	background: var(--chai-surface-2);
+	border-radius: 7px;
+	margin: 10px 0 0;
+}
+
+.charitable-ai-mcp .charitable-ai-activity-empty-title {
+	margin: 0 0 4px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--chai-ink);
+}
+
+.charitable-ai-mcp .charitable-ai-activity-empty-sub {
+	margin: 0;
+	font-size: 12px;
+	color: var(--chai-muted);
+}
+
+.charitable-ai-mcp .charitable-ai-activity-table-wrap {
+	margin: 10px 0 0;
+	overflow-x: auto;
+	border: 1px solid var(--chai-border);
+	border-radius: 7px;
+}
+
+.charitable-ai-mcp .charitable-ai-activity-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13px;
+}
+
+.charitable-ai-mcp .charitable-ai-activity-table th,
+.charitable-ai-mcp .charitable-ai-activity-table td {
+	padding: 9px 12px;
+	text-align: left;
+	vertical-align: top;
+	white-space: nowrap;
+}
+
+/* Details is the one column allowed to wrap - it carries the free-text
+   message plus the affected object, which is often the longest cell. */
+.charitable-ai-mcp .charitable-ai-activity-table .charitable-ai-activity-col-message {
+	white-space: normal;
+	color: var(--chai-muted);
+}
+
+.charitable-ai-mcp .charitable-ai-activity-table thead th {
+	background: var(--chai-surface-2);
+	font-weight: 600;
+	color: var(--chai-ink);
+	border-bottom: 1px solid var(--chai-border);
+}
+
+.charitable-ai-mcp .charitable-ai-activity-table tbody tr {
+	border-top: 1px solid #f0eeec;
+}
+
+.charitable-ai-mcp .charitable-ai-activity-table tbody tr:first-child {
+	border-top: 0;
+}
+
+/* Same pill shape as the sitewide .charitable-pro-badge (padding, uppercase,
+   border-radius) so the two badge idioms this screen uses read as one
+   family, without reusing that class itself - a "Pro" label and an outcome
+   are not the same kind of thing. */
+.charitable-ai-mcp .charitable-ai-outcome {
+	display: inline-block;
+	padding: 3px 8px;
+	font-size: 11px;
+	font-weight: 700;
+	line-height: 1.4;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	border-radius: 3px;
+	color: #ffffff;
+	white-space: nowrap;
+}
+
+.charitable-ai-mcp .charitable-ai-outcome-applied {
+	background: var(--chai-green);
+}
+
+/* Refused: the site's OWN write gate said no. Distinct from "denied" on
+   purpose - see the docblock above this section. */
+.charitable-ai-mcp .charitable-ai-outcome-refused {
+	background: var(--chai-accent-ink);
+}
+
+/* Denied: a WordPress capability check said no. */
+.charitable-ai-mcp .charitable-ai-outcome-denied {
+	background: #b32d2e;
+}
+
+.charitable-ai-mcp .charitable-ai-activity-more {
+	margin: 12px 0 0;
+	font-size: 13px;
+}
+
+.charitable-ai-mcp .charitable-ai-activity-more a {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	text-decoration: none;
+}
+
+.charitable-ai-mcp .charitable-ai-activity-more a:hover,
+.charitable-ai-mcp .charitable-ai-activity-more a:focus {
+	text-decoration: underline;
+}
+
+@media screen and (max-width: 782px) {
+
+	.charitable-ai-mcp .charitable-ai-activity-table th,
+	.charitable-ai-mcp .charitable-ai-activity-table td {
+		white-space: normal;
+	}
+}
+
+/*
+ * Collapsible AI Activity.
+ *
+ * The panel is collapsed on page load - the `is-collapsed` class ships in the
+ * markup (views/ai-mcp-activity.php) rather than being added by JS, so the
+ * table is never painted and then hidden.
+ *
+ * "View full history at Tools > Logs" sits outside .charitable-ai-activity-content
+ * and so stays visible in the collapsed state, which is the whole point: the
+ * default state must still offer a way through to the log.
+ *
+ * Every colour here already appears earlier in this stylesheet.
+ */
+.charitable-ai-mcp .charitable-ai-activity-toggle {
+	align-self: center;
+	margin-left: auto;
+	display: inline-flex;
+	align-items: center;
+	background: none;
+	border: 0;
+	border-radius: 3px;
+	padding: 4px;
+	line-height: 1;
+	color: #3c3c3c;
+	cursor: pointer;
+}
+
+.charitable-ai-mcp .charitable-ai-activity-toggle:hover,
+.charitable-ai-mcp .charitable-ai-activity-toggle:focus {
+	color: #1e1515;
+}
+
+.charitable-ai-mcp .charitable-ai-activity-toggle:focus-visible {
+	outline: 2px solid #fc9a2a;
+	outline-offset: 1px;
+}
+
+/*
+ * The chevron direction is a CLASS SWAP, not a rotate().
+ *
+ * charitable-ai-mcp.js swaps dashicons-arrow-right-alt2 (collapsed) for
+ * dashicons-arrow-down-alt2 (expanded). A transform was tried first and
+ * abandoned: the rule matched, won on specificity and was present in the
+ * loaded stylesheet, but the computed transform stayed at identity in Chrome
+ * whenever the transition was live - it only resolved to rotate(90deg) with
+ * `transition` disabled. Swapping the icon has no such edge case, needs no
+ * transition, and is what the glyphs are for.
+ */
+.charitable-ai-mcp .charitable-ai-activity-angle {
+	line-height: 1;
+}
+
+/* The collapse itself. */
+.charitable-ai-mcp .charitable-ai-activity-collapsible.is-collapsed .charitable-ai-activity-content {
+	display: none;
+}

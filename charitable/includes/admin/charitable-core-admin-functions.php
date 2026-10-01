@@ -1617,6 +1617,32 @@ function charitable_get_site_token() {
 	return $wpchar_site_token;
 }
 
+if ( ! function_exists( 'charitable_onboarding_app_url' ) ) :
+
+	/**
+	 * Base URL of the centrally hosted onboarding wizard, without a trailing slash.
+	 *
+	 * Filterable so a development site can be pointed at a local instance of the
+	 * wizard. The wizard has no staging environment, so without this the only way
+	 * to exercise the hand-off between it and a site is against production.
+	 *
+	 *     add_filter( 'charitable_onboarding_app_url', function () {
+	 *         return 'http://127.0.0.1:8131';
+	 *     } );
+	 *
+	 * Unfiltered the return value is unchanged from the previously hardcoded
+	 * literal, so this is a no-op in production.
+	 *
+	 * @since 1.8.12.4
+	 *
+	 * @return string
+	 */
+	function charitable_onboarding_app_url() {
+		return untrailingslashit( apply_filters( 'charitable_onboarding_app_url', 'https://app.wpcharitable.com' ) );
+	}
+
+endif;
+
 if ( ! function_exists( 'charitable_get_onboarding_url' ) ) :
 
 	/**
@@ -1643,7 +1669,7 @@ if ( ! function_exists( 'charitable_get_onboarding_url' ) ) :
 				),
 				'update_to_pro_url' => 'https://app.charitable.com/upgrade-free-to-pro?api_token=REPLACE_API_TOKEN&license_key=REPLACE_LICENSE_KEY&oth=11ecbadab9561202d33b5ffb8405f9cb9b783af17b52c4b16e16bd8fbbd6cdccbd2a5445c2cb456cb11cdd555471c19e5e2ad446450df2f4e0fc70e410a814d4&endpoint=&siteurl=' . $current_site_url . '/wp-admin/',
 			),
-			'https://app.wpcharitable.com/setup-wizard-charitable_lite'
+			charitable_onboarding_app_url() . '/setup-wizard-charitable_lite'
 		);
 	}
 

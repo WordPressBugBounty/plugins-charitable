@@ -602,39 +602,49 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		 * @return array
 		 */
 		public function get_date_range_for_period( $time_period ) {
-			$end_date = gmdate( 'Y/m/d' );
+			/*
+			 * Site-local, not UTC: this range feeds Charitable_Reports::get_data(),
+			 * which filters on p.post_date (site-local time), so a bound built from
+			 * bare UTC excludes part of today's donations on any site whose
+			 * timezone is ahead of UTC. Every case below is anchored to the same
+			 * site-local "now" so the range is internally consistent.
+			 *
+			 * @since 1.8.13
+			 */
+			$now      = current_time( 'timestamp', 0 );
+			$end_date = gmdate( 'Y/m/d', $now );
 
 			switch ( $time_period ) {
 				case 'last-7-days':
-					$start_date = gmdate( 'Y/m/d', strtotime( '-7 days' ) );
+					$start_date = gmdate( 'Y/m/d', strtotime( '-7 days', $now ) );
 					$days = 7;
 					break;
 				case 'last-14-days':
-					$start_date = gmdate( 'Y/m/d', strtotime( '-14 days' ) );
+					$start_date = gmdate( 'Y/m/d', strtotime( '-14 days', $now ) );
 					$days = 14;
 					break;
 				case 'last-30-days':
-					$start_date = gmdate( 'Y/m/d', strtotime( '-30 days' ) );
+					$start_date = gmdate( 'Y/m/d', strtotime( '-30 days', $now ) );
 					$days = 30;
 					break;
 				case 'this-month':
-					$start_date = gmdate( 'Y/m/d', strtotime( 'first day of this month' ) );
-					$days = gmdate( 'j' ); // Current day of month
+					$start_date = gmdate( 'Y/m/d', strtotime( 'first day of this month', $now ) );
+					$days = gmdate( 'j', $now ); // Current day of month
 					break;
 				case 'last-3-months':
-					$start_date = gmdate( 'Y/m/d', strtotime( '-3 months' ) );
+					$start_date = gmdate( 'Y/m/d', strtotime( '-3 months', $now ) );
 					$days = 90;
 					break;
 				case 'last-6-months':
-					$start_date = gmdate( 'Y/m/d', strtotime( '-6 months' ) );
+					$start_date = gmdate( 'Y/m/d', strtotime( '-6 months', $now ) );
 					$days = 180;
 					break;
 				case 'last-year':
-					$start_date = gmdate( 'Y/m/d', strtotime( '-1 year' ) );
+					$start_date = gmdate( 'Y/m/d', strtotime( '-1 year', $now ) );
 					$days = 365;
 					break;
 				default:
-					$start_date = gmdate( 'Y/m/d', strtotime( '-7 days' ) );
+					$start_date = gmdate( 'Y/m/d', strtotime( '-7 days', $now ) );
 					$days = 7;
 					break;
 			}
@@ -1180,9 +1190,16 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 
 			// Get latest donations using Charitable_Reports
 			$charitable_reports = Charitable_Reports::get_instance();
+			/*
+			 * Site-local, not UTC: post_date is stored in site-local time, so a
+			 * bound built from bare UTC excludes part of today's donations on any
+			 * site whose timezone is ahead of UTC.
+			 *
+			 * @since 1.8.13
+			 */
 			$args = array(
-				'start_date' => gmdate( 'Y/m/d', strtotime( '-30 days' ) ),
-				'end_date'   => gmdate( 'Y/m/d' ),
+				'start_date' => gmdate( 'Y/m/d', current_time( 'timestamp', 0 ) - ( 30 * DAY_IN_SECONDS ) ),
+				'end_date'   => gmdate( 'Y/m/d', current_time( 'timestamp', 0 ) ),
 				'days'       => 30,
 			);
 			$charitable_reports->init_with_array( 'dashboard', $args );

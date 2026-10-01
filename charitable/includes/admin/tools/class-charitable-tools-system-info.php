@@ -357,6 +357,18 @@ if ( ! class_exists( 'Charitable_Tools_System_Info' ) ) :
 			$data .= $this->debug_log_scanner();
 			$data .= $this->hosting_environment_info();
 
+			/**
+			 * Append extra System Info sections.
+			 *
+			 * Applied here, before the end marker, so a section cannot land
+			 * outside the block a customer copies out of the textarea.
+			 *
+			 * @since 1.8.13
+			 *
+			 * @param string $sections Extra sections, already formatted.
+			 */
+			$data .= apply_filters( 'charitable_system_info_sections', '' );
+
 			$data .= "\n" . '### End System Info ###';
 
 			return $data;

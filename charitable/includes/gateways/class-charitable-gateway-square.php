@@ -2810,11 +2810,10 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 
 				$this->generate_admin_notice_for_square_connection_error( $message, $status_code, 'square_connection_error' );
 
-				// redirect to the settings page.
-				if ( ! wp_doing_ajax() ) {
-					wp_safe_redirect( $this->get_settings_page_url() );
-						exit;
-				}
+				// Do not force-redirect the admin from here. This method runs on
+				// every admin_init, so redirecting hijacked unrelated pages and
+				// looped whenever the dismissible notice flag was cleared. The
+				// admin notice already prompts the reconnect.
 			}
 		}
 

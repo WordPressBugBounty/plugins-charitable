@@ -6083,16 +6083,25 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 
 					// We are assuming that if they are able to click preview then the campaign is either in draft/not posiblished OR published but they made a change.
 
-					// Determine if this is an already published campaign... if so, then save the campaign data TEMPORARILY so we can preview it...
-					if ( typeof s.formStatus !== 'undefined' && s.formStatus === 'publish' ) {
-						// Passing in "true" as the second parameter to formSave() will tell it to save the campaign data temporarily.
+					// Save the campaign data temporarily, then open the preview. Passing "true" as the
+					// second parameter tells formSave() this is a preview, which makes
+					// charitable_save_campaign store the settings blob in a transient and skip the
+					// wp_update_post() that would write title, content, status and author to the live
+					// post. Note that is the ONLY thing the preview flag skips: the tag and category
+					// wp_set_post_terms() calls and the _campaign_hide_* / donate-button-text post
+					// meta writes in ajax-actions.php run either way.
+					//
+					// This is an exclusion list, not an allow list, and that is deliberate. It used to
+					// test for 'publish' and then 'draft' with two identical bodies, so a campaign in
+					// any other status fell through both and the click was swallowed after
+					// preventDefault() - no save, no new tab, no feedback at all. s.formStatus comes
+					// straight from get_post_status(), so 'pending', 'private' and 'future' are all
+					// reachable. Only 'trash' is refused: the save's status switch has no case for it,
+					// so it would store a boolean false post_status into the preview transient, and the
+					// render gate blocks trashed campaigns anyway, so the tab could only open empty.
+					if ( 'trash' !== s.formStatus ) {
 						app.formSave( false, true, openNewTabURL ); // false - no redirect, true - yes this is a preview.
-
-					} else if ( typeof s.formStatus !== 'undefined' && s.formStatus === 'draft' ) {
-						app.formSave( false, true, openNewTabURL ); // still previewing, so pass true.
 					}
-
-
 
 				}
 
@@ -6205,7 +6214,25 @@ var CharitableCampaignBuilder = window.CharitableCampaignBuilder || ( function( 
 			// After form save.
 			$builder.on( 'charitableSaved', function( e, data ) { // eslint-disable-line
 
-				$('#charitable_settings_title').attr('disabled', true);
+				/*
+				 * The campaign title is deliberately NOT disabled here.
+				 *
+				 * This used to do $('#charitable_settings_title').attr('disabled', true),
+				 * which locked the title on the first save with no way back. The only
+				 * thing that re-enabled it was allowTitleUpdate(), fired by a pencil
+				 * icon next to the field - and both of those are gone: the icon is
+				 * commented out in class-charitable-campaign-builder.php and the click
+				 * binding in bindUIEditCampaignTitle() is commented out too. So the
+				 * disable had nothing left to undo it, and renaming a campaign after
+				 * saving it required reloading the builder.
+				 *
+				 * formSave() still removes the attribute before submitting so the value
+				 * is included in the POST; that part is unrelated and stays.
+				 *
+				 * If a read-only-until-you-click-edit title ever comes back, restore
+				 * the icon and the binding FIRST, then re-add the disable - not the
+				 * other way round.
+				 */
 
 				/**
 				 * Remove `newform` parameter, if it's in URL, otherwise we can to get a "race condition".

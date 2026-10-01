@@ -175,3 +175,156 @@ add_action( 'wp_ajax_charitable_export_logs_csv', array( 'Charitable_Log', 'ajax
 add_action( 'wp_ajax_charitable_toggle_logging', array( 'Charitable_Log', 'ajax_toggle_logging' ) );
 add_action( 'wp_ajax_charitable_save_log_retention', array( 'Charitable_Log', 'ajax_save_retention' ) );
 add_action( 'admin_enqueue_scripts', array( 'Charitable_Log', 'enqueue_scripts' ) );
+
+/**
+ * Tools > AI MCP.
+ *
+ * Surfaces the Abilities API, which ships with no UI of its own, and carries the
+ * AI write-access toggle. Charitable_Tools_AI_MCP is autoloaded via the classmap.
+ *
+ * Ported from Charitable Pro (pinned commit 4f84275197) for Lite 1.8.13. The
+ * `ai-mcp` tab itself is registered directly in
+ * Charitable_Tools::get_sections(), and the "no form / no Save Changes button"
+ * behaviour Pro gets from its `charitable_tools_tabs_without_form` filter is
+ * given here by adding 'ai-mcp' to the `$charitable_tab_no_form_tag` array in
+ * includes/admin/views/tools/tools.php - the hardcoded-array convention that
+ * file already uses for 'import', 'export', 'system-info' and the rest, rather
+ * than porting a filter Lite's view template does not read.
+ *
+ * @since 1.8.13
+ */
+add_filter(
+	'charitable_tools_tab_fields_ai-mcp',
+	array( Charitable_Tools_AI_MCP::get_instance(), 'add_fields' ),
+	5
+);
+
+/**
+ * Enqueue the AI MCP panel assets, on that one tab only.
+ *
+ * @since 1.8.13
+ *
+ * @return void
+ */
+add_action(
+	'admin_enqueue_scripts',
+	function () {
+
+		if ( ! function_exists( 'charitable_is_tools_view' ) || ! charitable_is_tools_view() ) {
+			return;
+		}
+
+		$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ( 'ai-mcp' !== $tab ) {
+			return;
+		}
+
+		wp_enqueue_style( 'dashicons' );
+
+		wp_enqueue_style(
+			'charitable-ai-mcp',
+			charitable()->get_path( 'assets', false ) . 'css/admin/charitable-ai-mcp.css',
+			array(),
+			charitable()->get_version()
+		);
+
+		if ( ! current_user_can( 'manage_charitable_settings' ) ) {
+			return;
+		}
+
+		/*
+		 * jquery-confirm powers the "Watch video" modal. Guarded the same way
+		 * Charitable_Admin_Splash guards it, because the splash is enqueued on
+		 * this same screen and whichever runs first should win. Do NOT rely on
+		 * the splash having done it: the link has to work on a site where the
+		 * splash is suppressed (hide_announcements), and without the library the
+		 * handler falls through to the anchor's YouTube href.
+		 */
+		if ( ! wp_style_is( 'jquery-confirm', 'enqueued' ) ) {
+			wp_enqueue_style(
+				'jquery-confirm',
+				charitable()->get_path( 'directory', false ) . 'assets/lib/jquery.confirm/jquery-confirm.min.css',
+				null,
+				'3.3.4'
+			);
+		}
+
+		if ( ! wp_script_is( 'jquery-confirm', 'enqueued' ) ) {
+			wp_enqueue_script(
+				'jquery-confirm',
+				charitable()->get_path( 'directory', false ) . 'assets/lib/jquery.confirm/jquery-confirm.min.js',
+				array( 'jquery' ),
+				'3.3.4',
+				false
+			);
+		}
+
+		wp_enqueue_script(
+			'charitable-ai-mcp',
+			charitable()->get_path( 'assets', false ) . 'js/admin/charitable-ai-mcp.js',
+			array( 'jquery', 'jquery-confirm' ),
+			charitable()->get_version(),
+			true
+		);
+
+		wp_localize_script(
+			'charitable-ai-mcp',
+			'charitable_ai_mcp',
+			array(
+				'ajax_url'     => admin_url( 'admin-ajax.php' ),
+				'nonce'        => wp_create_nonce( 'charitable_ai_mcp_toggle' ),
+				// Charitable_Admin_Plugins_Third_Party guards both the install and
+				// the activate call with the shared 'charitable-admin' nonce, so the
+				// in-place bridge install needs that one rather than the toggle nonce.
+				'plugin_nonce' => wp_create_nonce( 'charitable-admin' ),
+				'i18n'         => array(
+					'error'        => __( 'That could not be saved. Please try again.', 'charitable' ),
+					'installing'   => __( 'Installing WPVibe…', 'charitable' ),
+					'activating'   => __( 'Activating WPVibe…', 'charitable' ),
+					'installError' => __( 'WPVibe could not be installed. Install it from the Plugins screen instead.', 'charitable' ),
+					/* The iframe's title attribute, read by screen readers in the video modal. */
+					'videoTitle'   => esc_attr__( 'Using Charitable with AI', 'charitable' ),
+					/*
+					 * The AI Activity toggle's accessible name, which is the only
+					 * thing that can say which way the control goes - its visible
+					 * label is a chevron. The collapsed wording matches the
+					 * `screen-reader-text` rendered in views/ai-mcp-activity.php,
+					 * since that is the state the panel loads in.
+					 */
+					'showActivity' => __( 'Show AI activity', 'charitable' ),
+					'hideActivity' => __( 'Hide AI activity', 'charitable' ),
+				),
+			)
+		);
+	}
+);
+
+/**
+ * AJAX: flip the AI write gate.
+ *
+ * No _nopriv counterpart, deliberately - this changes a security setting.
+ *
+ * @since 1.8.13
+ */
+add_action(
+	'wp_ajax_charitable_ai_mcp_toggle_write',
+	array( Charitable_Tools_AI_MCP::get_instance(), 'ajax_toggle_write' )
+);
+
+/**
+ * Remember when a user has opened WPVibe's own admin page.
+ *
+ * On `current_screen`, and NOT gated to the Tools tab, because WPVibe's page is
+ * a different screen entirely and the visit has to be caught wherever it
+ * happens. Flips the AI MCP tab's primary button from "Open WPVibe Setup" to
+ * "Go to WPVibe" so a user is not told to set up something they have already
+ * opened. The write is a one-time latch (see maybe_mark_bridge_visited()), so
+ * this costs a single user-meta read on other admin screens.
+ *
+ * @since 1.8.13
+ */
+add_action(
+	'current_screen',
+	array( Charitable_Tools_AI_MCP::get_instance(), 'maybe_mark_bridge_visited' )
+);

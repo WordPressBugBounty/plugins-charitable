@@ -35,6 +35,26 @@ if ( ! class_exists( 'Campaign_Builder_Preview' ) ) :
 		private static $instance;
 
 		/**
+		 * Whether a campaign preview render is already in progress anywhere up the call stack.
+		 *
+		 * Static on purpose, and this is the whole point of it. This class is instantiated in more
+		 * than one place - once from the plugin bootstrap and again from
+		 * templates/campaign/builder/content.php, which the render itself includes - and every
+		 * instance whose is_preview_page() passes registers its own the_content callback. WordPress
+		 * keys object callbacks by spl_object_hash, so the remove_filter() around the render can only
+		 * ever detach the *calling* instance's callback. The instance created during the render is a
+		 * new object identity, so it re-arms the hook the level above just disarmed, and each nesting
+		 * level adds another handler: measured at 2, 3, 4 and climbing, exhausting 256M within a
+		 * handful of renders (HelpScout #11576). A per-instance guard cannot see that; a class-level
+		 * one can.
+		 *
+		 * @since 1.8.12.4
+		 *
+		 * @var bool
+		 */
+		private static $is_rendering = false;
+
+		/**
 		 * Campaign data.
 		 *
 		 * @since 1.8.0
@@ -146,7 +166,9 @@ if ( ! class_exists( 'Campaign_Builder_Preview' ) ) :
 			add_action( 'pre_get_posts', [ $this, 'pre_get_posts' ] );
 			add_filter( 'the_title', [ $this, 'the_title' ], 100, 1 );
 			add_filter( 'the_content', [ $this, 'the_content' ], 999 );
-			add_filter( 'get_the_excerpt', [ $this, 'the_content' ], 999 );
+			// Accept the second argument get_the_excerpt passes (the WP_Post being excerpted) so the
+			// handler can tell whose excerpt it is and leave other posts alone. See the_content().
+			add_filter( 'get_the_excerpt', [ $this, 'the_content' ], 999, 2 );
 			add_filter( 'home_template_hierarchy', [ $this, 'force_page_template_hierarchy' ], 999 );
 			add_filter( 'frontpage_template_hierarchy', [ $this, 'force_page_template_hierarchy' ], 999 );
 			add_filter( 'post_thumbnail_html', '__return_empty_string' );
@@ -206,14 +228,138 @@ if ( ! class_exists( 'Campaign_Builder_Preview' ) ) :
 		}
 
 		/**
+		 * The ID of the campaign this request is previewing.
+		 *
+		 * A brand-new campaign that has never been saved has no id in its payload, in which case the
+		 * only place the ID exists is the query argument, so fall back to that.
+		 *
+		 * @since 1.8.12.4
+		 *
+		 * @return int Campaign ID, or 0 if none could be resolved.
+		 */
+		public function get_preview_campaign_id() {
+
+			$campaign_id = isset( $this->campaign_data['id'] ) ? absint( $this->campaign_data['id'] ) : 0;
+
+			if ( 0 === $campaign_id && ! empty( $_GET['charitable_campaign_preview'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$campaign_id = absint( $_GET['charitable_campaign_preview'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			}
+
+			return $campaign_id;
+		}
+
+		/**
 		 * Customize campaign preview page content.
 		 *
 		 * @since 1.8.0
 		 * @version 1.8.12.3 Detach from the content filters while the campaign renders, to prevent an infinite the_content loop that exhausts memory.
+		 * @version 1.8.12.4 Leave other posts' excerpts alone. This handler is also attached to
+		 *                   get_the_excerpt, and returned the whole rendered campaign for whatever post
+		 *                   was being excerpted, so any excerpt elsewhere on the preview page (a query
+		 *                   loop, a posts list) was replaced by a duplicate of the campaign.
+		 *
+		 * @param string       $content The incoming content or excerpt.
+		 * @param WP_Post|null $post    Only supplied by get_the_excerpt: the post being excerpted.
+		 *                              Null on the_content, which passes a single argument.
 		 *
 		 * @return string
 		 */
-		public function the_content() {
+		public function the_content( $content = '', $post = null ) {
+
+			/*
+			 * get_the_excerpt names the post it is asking about, so when it is asking about anything
+			 * other than the campaign being previewed, hand the excerpt straight back untouched.
+			 * Without this the handler ignored the question and answered with the full campaign render
+			 * every time, so a preview page containing any other post's excerpt showed the campaign
+			 * again in its place.
+			 *
+			 * Deliberately keyed on the argument rather than on in_the_loop() or get_the_ID(): both of
+			 * those read the global post, which under a block theme is only set up when core's
+			 * singular-template loop workaround fires (it is gated on is_singular(),
+			 * wp-includes/block-template.php). The passed WP_Post is reliable regardless of theme.
+			 *
+			 * the_content is left alone on purpose. It passes no post argument, and core's
+			 * core/post-content block calls get_the_content() with no ID precisely so the queried
+			 * object wins, so that path is expected to act on the ambient post.
+			 */
+			if ( $post instanceof WP_Post && absint( $post->ID ) !== $this->get_preview_campaign_id() ) {
+				return $content;
+			}
+
+			/*
+			 * A render is already running further up the stack, so this application of the filter is
+			 * a re-entry. Hand the content back untouched instead of starting a second render.
+			 *
+			 * This is what actually stops the loop. The remove_filter() further down cannot, because
+			 * it only detaches THIS instance's callback, and the instance created inside the render
+			 * (content.php, "preview page check") re-arms the hook under a fresh object identity. See
+			 * the note on self::$is_rendering.
+			 */
+			if ( self::$is_rendering ) {
+				return $content;
+			}
+
+			/*
+			 * Never render the campaign into an excerpt. This catches BOTH the direct
+			 * get_the_excerpt application and the indirect one: core's wp_trim_excerpt() re-applies
+			 * the_content from inside the get_the_excerpt filter, so an SEO or Open Graph plugin
+			 * asking for a meta description costs a full campaign render every time it asks. That is
+			 * what exhausted 256M on the reporting site, and it is why deactivating SiteSEO there
+			 * made the preview work (HelpScout #11576). doing_filter() sees the enclosing filter, so
+			 * it recognises the nested the_content application that a check on the current filter
+			 * alone would miss.
+			 *
+			 * Deliberately not bounded by a render counter instead: whichever caller asked first
+			 * would win, and an SEO plugin building meta tags in wp_head asks before the body
+			 * renders, which would leave the preview body empty.
+			 */
+			if ( doing_filter( 'get_the_excerpt' ) ) {
+
+				/*
+				 * Two different applications reach here while an excerpt is being built: the
+				 * get_the_excerpt filter itself, and the the_content filter that core's
+				 * wp_trim_excerpt() applies from inside it. Only the first is asking us for a
+				 * summary. The second is asking "what is this post's content", about whatever post
+				 * is being excerpted, which may not be the campaign at all, so answering it with the
+				 * campaign's description would put the campaign's words into an unrelated post's
+				 * excerpt. Hand that one straight back.
+				 *
+				 * Note wp_trim_excerpt() only takes that branch when the post has no excerpt of its
+				 * own (formatting.php, '' === trim( $text )), which is why a post WITH an excerpt
+				 * never exposed this.
+				 */
+				if ( 'get_the_excerpt' !== current_filter() ) {
+					return $content;
+				}
+
+				/*
+				 * Answer with the campaign's own description rather than nothing, so an SEO or Open
+				 * Graph plugin still gets a usable meta description on a preview page. This reads the
+				 * settings array is_preview_page() already loaded, so it costs no render and no query,
+				 * and charitable_find_description_in_campaign_settings() ends on a Charitable filter
+				 * rather than the_content, so it cannot re-enter this handler.
+				 *
+				 * Tags are stripped and the result trimmed because the caller wants a summary, not
+				 * markup. 55 words is about the length a meta description survives at.
+				 */
+				if ( ! function_exists( 'charitable_find_description_in_campaign_settings' ) ) {
+					return $content;
+				}
+
+				$charitable_preview_description = charitable_find_description_in_campaign_settings( $this->campaign_data, 0 );
+
+				if ( ! is_string( $charitable_preview_description ) ) {
+					return $content;
+				}
+
+				$charitable_preview_description = wp_strip_all_tags( $charitable_preview_description );
+
+				if ( '' === trim( $charitable_preview_description ) ) {
+					return $content;
+				}
+
+				return wp_trim_words( $charitable_preview_description, 55, '…' );
+			}
 
 			if ( ! isset( $this->campaign_data['id'] ) ) {
 				return '';
@@ -375,9 +521,15 @@ if ( ! class_exists( 'Campaign_Builder_Preview' ) ) :
 
 			$content .= '</div>';
 
-			// if there is no campaign ID in the campaign_data, this MIGHT be an initial preview on a new campaign which means it should be in the URL.
-			$campaign_id = 0 === intval( $this->campaign_data['id'] ) && ! empty( $_GET['charitable_campaign_preview'] ) ? absint( $_GET['charitable_campaign_preview'] ) : absint( $this->campaign_data['id'] ); // phpcs:ignore
+			// If there is no campaign ID in the campaign_data, this MIGHT be an initial preview on a
+			// new campaign, in which case the ID is only in the URL. Same resolution the excerpt guard
+			// above uses, so the two cannot disagree about which campaign is being previewed.
+			$campaign_id = $this->get_preview_campaign_id();
 
+			// Mark a render as in progress for every instance of this class, not just this one, so a
+			// re-application of the_content from inside the render short-circuits at the guard above.
+			// This is the load-bearing part; the remove_filter() below is belt and braces that only
+			// covers this instance's own callback.
 			// Detach this handler from the content filters before rendering the campaign.
 			// The campaign render re-applies the_content (via the campaign's get_content), and
 			// with certain content-processing plugins active that re-application would re-enter
@@ -389,10 +541,18 @@ if ( ! class_exists( 'Campaign_Builder_Preview' ) ) :
 			remove_filter( 'get_the_excerpt', [ $this, 'the_content' ], 999 );
 
 			try {
+				// Inside the try so the finally below always clears it. Set outside, a throw between
+				// the assignment and the try would leave every later application short-circuiting.
+				self::$is_rendering = true;
+
 				$content .= do_shortcode( '[campaign version="2" id=' . $campaign_id . ']' );
 			} finally {
+				self::$is_rendering = false;
 				add_filter( 'the_content', [ $this, 'the_content' ], 999 );
-				add_filter( 'get_the_excerpt', [ $this, 'the_content' ], 999 );
+				// The 2 matters. Re-adding without it silently downgrades this hook to one argument
+				// for the rest of the request, so the excerpt guard above would stop receiving the
+				// WP_Post and would go back to answering every excerpt with the campaign render.
+				add_filter( 'get_the_excerpt', [ $this, 'the_content' ], 999, 2 );
 			}
 
 			return $content;

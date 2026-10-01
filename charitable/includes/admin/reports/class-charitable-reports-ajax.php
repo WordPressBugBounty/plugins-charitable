@@ -363,8 +363,15 @@ if ( ! class_exists( 'Charitable_Reports_Ajax' ) ) :
 				$start_date = $charitable_dashboard->get_start_date();
 				$end_date   = $charitable_dashboard->get_end_date();
 			} else {
-				$start_date = gmdate( 'Y-m-d', strtotime( 'today' ) );
-				$end_date   = gmdate( 'Y-m-d', strtotime( 'today' ) + ( $days * 24 * 60 * 60 ) );
+				/*
+				 * Site-local, not UTC: post_date is stored in site-local time, so a
+				 * bound built from bare UTC "today" excludes part of today's
+				 * donations on any site whose timezone is ahead of UTC.
+				 *
+				 * @since 1.8.13
+				 */
+				$start_date = gmdate( 'Y-m-d', current_time( 'timestamp', 0 ) );
+				$end_date   = gmdate( 'Y-m-d', current_time( 'timestamp', 0 ) + ( $days * 24 * 60 * 60 ) );
 			}
 			$report_html['start_date'] = $start_date;
 			$report_html['end_date']   = $end_date;

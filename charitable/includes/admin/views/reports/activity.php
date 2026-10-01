@@ -56,11 +56,19 @@ if ( $charitable_donation_activities_db->table_exists() && $charitable_campaign_
 
 	if ( false === $charitable_start_date || false === $charitable_end_date || false === $charitable_campaign_id ) {
 		// If still nothing assign defaults.
+		/*
+		 * Site-local, not UTC: this feeds Charitable_Reports::get_data(), which
+		 * filters on p.post_date (site-local time), so a bound built from bare
+		 * UTC excludes part of today's activity on any site whose timezone is
+		 * ahead of UTC.
+		 *
+		 * @since 1.8.13
+		 */
 		$charitable_report_overview_defaults = apply_filters(
 			'charitable_report_activity_defaults',
 			array(
-				'start_date'    => gmdate( 'Y/m/d', strtotime( '-7 days' ) ),
-				'end_date'      => gmdate( 'Y/m/d' ),
+				'start_date'    => gmdate( 'Y/m/d', current_time( 'timestamp', 0 ) - ( 7 * DAY_IN_SECONDS ) ),
+				'end_date'      => gmdate( 'Y/m/d', current_time( 'timestamp', 0 ) ),
 				'campaign_id'   => -1,
 				'activity_type' => '',
 				'limit'         => false,

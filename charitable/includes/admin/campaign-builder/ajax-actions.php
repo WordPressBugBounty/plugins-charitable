@@ -749,9 +749,19 @@ function charitable_template_layout_to_campaign_layout( $campaign_settings_v2, $
 
 	$campaign_settings_v2['layout']['rows'] = array();
 
+	// Ensure fields array exists to prevent undefined key errors.
+	if ( ! isset( $campaign_settings_v2['fields'] ) ) {
+		$campaign_settings_v2['fields'] = array();
+	}
+
 	$row_id     = 0;
 	$column_id  = 0;
 	$section_id = 0;
+
+	// Ensure template_data layout is an array before iterating.
+	if ( ! is_array( $template_data ) || ! isset( $template_data['layout'] ) || ! is_array( $template_data['layout'] ) ) {
+		$template_data['layout'] = array();
+	}
 
 	foreach ( $template_data['layout'] as $row_id => $row ) :
 
@@ -807,6 +817,76 @@ function charitable_template_layout_to_campaign_layout( $campaign_settings_v2, $
 		++$row_id;
 
 	endforeach;
+
+	/*
+	 * Copy template field data to campaign settings to preserve complex data
+	 * structures. This is especially important for fields with nested data
+	 * like list fields.
+	 *
+	 * Ported from Charitable Pro (1.8.13): without this second pass,
+	 * $campaign_settings_v2['fields'] is left empty, so a freshly created
+	 * visual campaign has row/column/section skeletons that reference field
+	 * ids with no field DATA (headline, content, etc.) behind them at all —
+	 * content.php has nothing to render for any of them.
+	 */
+	if ( ! empty( $template_data['layout'] ) && is_array( $template_data['layout'] ) ) {
+		if ( charitable_is_debug() ) {
+			error_log( 'Charitable: Copying template field data to campaign settings' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		}
+
+		$field_id = 0;
+
+		foreach ( $template_data['layout'] as $row ) {
+			if ( ! empty( $row['columns'] ) && is_array( $row['columns'] ) ) {
+				foreach ( $row['columns'] as $column ) {
+					if ( ! empty( $column ) && is_array( $column ) ) {
+						foreach ( $column as $section ) {
+							if ( ! empty( $section['type'] ) ) {
+								if ( 'fields' === $section['type'] && ! empty( $section['fields'] ) ) {
+									// Process regular fields.
+									foreach ( $section['fields'] as $field_data ) {
+										if ( is_array( $field_data ) && ! empty( $field_data['type'] ) ) {
+											// Copy the field data to preserve complex structures.
+											$campaign_settings_v2['fields'][ $field_id ] = $field_data;
+
+											if ( 'list' === $field_data['type'] && ! empty( $field_data['list_items'] ) && charitable_is_debug() ) {
+												error_log( 'Charitable: Copied list field ' . $field_id . ' from template with list_items: ' . print_r( $field_data['list_items'], true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log, WordPress.PHP.DevelopmentFunctions.error_log_print_r
+											}
+										}
+
+										++$field_id;
+									}
+								} elseif ( 'tabs' === $section['type'] && ! empty( $section['tabs'] ) ) {
+									// Process tab fields.
+									foreach ( $section['tabs'] as $tab ) {
+										if ( ! empty( $tab['fields'] ) && is_array( $tab['fields'] ) ) {
+											foreach ( $tab['fields'] as $field_data ) {
+												if ( is_array( $field_data ) && ! empty( $field_data['type'] ) ) {
+													// Copy the field data to preserve complex structures.
+													$campaign_settings_v2['fields'][ $field_id ] = $field_data;
+
+													if ( 'list' === $field_data['type'] && ! empty( $field_data['list_items'] ) && charitable_is_debug() ) {
+														error_log( 'Charitable: Copied list field ' . $field_id . ' from template with list_items: ' . print_r( $field_data['list_items'], true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log, WordPress.PHP.DevelopmentFunctions.error_log_print_r
+													}
+												}
+
+												++$field_id;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if ( charitable_is_debug() ) {
+			$fields_count = isset( $campaign_settings_v2['fields'] ) && is_array( $campaign_settings_v2['fields'] ) ? count( $campaign_settings_v2['fields'] ) : 0;
+			error_log( 'Charitable: Template field data copying complete. Total fields: ' . $fields_count ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		}
+	}
 
 	return $campaign_settings_v2;
 }

@@ -50,8 +50,15 @@ if ( false === $charitable_start_date || false === $charitable_end_date || false
 
 if ( false === $charitable_start_date || false === $charitable_end_date || false === $charitable_filter ) {
 	// If still nothing assign defaults.
-	$charitable_start_date  = gmdate( 'Y/m/d', strtotime( '-7 days' ) );
-	$charitable_end_date    = gmdate( 'Y/m/d' );
+	/*
+	 * Site-local, not UTC: post_date is stored in site-local time, so a bound
+	 * built from bare UTC excludes part of today's donations on any site whose
+	 * timezone is ahead of UTC.
+	 *
+	 * @since 1.8.13
+	 */
+	$charitable_start_date  = gmdate( 'Y/m/d', current_time( 'timestamp', 0 ) - ( 7 * DAY_IN_SECONDS ) );
+	$charitable_end_date    = gmdate( 'Y/m/d', current_time( 'timestamp', 0 ) );
 	$charitable_filter      = 7;
 	$charitable_campaign_id = -1; // cannot be zero because that would be false.
 	$charitable_category_id = 0;

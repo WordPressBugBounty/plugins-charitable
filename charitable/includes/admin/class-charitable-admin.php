@@ -114,99 +114,38 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 							break;
 
 						case 'return':
-							// if the user is returning from a redirect from a login or back link detect that and redirect them to the welcome/continue page.
-							// Only good way so far would be to detect POST data.
-							if ( empty( $_POST ) && is_admin() ) { // phpcs:ignore
+							// The wizard finishes by POSTing the user's choices from the
+							// hosted app straight into this admin, cross-site and
+							// top-level. Browsers drop that body when a SameSite=Lax auth
+							// cookie forces a trip through wp-login.php, or when a
+							// canonical / http-to-https / security-plugin redirect turns
+							// the POST into a GET. The user is logged in the whole time;
+							// the cookie simply did not ride along.
+
+							// Applying onboarding choices writes plugin options and
+							// third-party activation flags, so it is an administrator
+							// action. This previously ran for any user who could reach
+							// wp-admin.
+							if ( ! charitable_current_user_can( 'administrator' ) ) {
+								wp_safe_redirect( admin_url( 'admin.php?page=charitable-dashboard' ) );
+								exit;
+							}
+
+							$charitable_return_data = wp_unslash( $_POST ); // phpcs:ignore
+
+							if ( empty( $charitable_return_data ) && is_admin() ) {
+								// Body dropped in transit. Recover the choices with a
+								// server-to-server read: no browser, no cookies, no
+								// redirects, so nothing that drops the POST applies.
+								$charitable_return_data = $this->pull_onboarding_return_data();
+							}
+
+							if ( empty( $charitable_return_data ) ) {
 								wp_safe_redirect( admin_url( 'admin.php?page=charitable&wpchar_lite=lite&setup=welcome&resume=true&lostconnection=1' ) );
 								exit;
 							}
 
-							$plugins     = isset( $_POST['plugins'] )     ? base64_decode( sanitize_text_field( wp_unslash( $_POST['plugins'] ) ) ) : ''; // phpcs:ignore
-							$features    = isset( $_POST['features'] )    ? base64_decode( sanitize_text_field( wp_unslash( $_POST['features'] ) ) ) : ''; // phpcs:ignore
-							$meta        = isset( $_POST['meta'] )        ? base64_decode( sanitize_text_field( wp_unslash( $_POST['meta'] ) ) ) : ''; // phpcs:ignore
-							$pm	   	     = isset( $_POST['pm'] )          ? base64_decode( sanitize_text_field( wp_unslash( $_POST['pm'] ) ) ) : ''; // phpcs:ignore
-							$license_key = isset( $_POST['license_key'] ) ? base64_decode( sanitize_text_field( wp_unslash( $_POST['license_key'] ) ) ) : ''; // phpcs:ignore
-
-							// process meta.
-							if ( ! empty( $meta ) ) {
-								$meta = str_replace( '\"', '"', $meta );
-								if ( ! empty( $meta ) ) {
-									$meta = json_decode( $meta, true );
-								}
-							}
-							// process payment methods.
-							if ( ! empty( $plugins ) ) {
-								$plugins = json_decode( $plugins );
-								$plugins = str_replace( array( '"', '[', ']' ), '', $plugins );
-								if ( ! empty( $plugins ) ) {
-									$plugins = explode( ',', $plugins );
-								}
-							}
-
-							// process plugins.
-							if ( ! empty( $pm ) ) {
-								$pm = json_decode( $pm );
-								if ( $pm ) {
-									$pm = str_replace( array( '"', '[', ']' ), '', $pm );
-									if ( ! empty( $plugins ) ) {
-										$pm = explode( ',', $pm );
-									}
-								}
-							}
-
-							// process features.
-							if ( ! empty( $features ) ) {
-								$features = json_decode( $features );
-								$features = str_replace( array( '"', '[', ']' ), '', $features );
-								if ( ! empty( $features ) ) {
-									$features = explode( ',', $features );
-								}
-							}
-
-							// clean license (remove quotes).
-							$license_key = str_replace( '"', '', $license_key );
-
-							// process campaign.
-							$campaign_template    = isset( $_POST['template'] ) && ! empty( $_POST['template'] ) ? sanitize_text_field( wp_unslash( $_POST['template'] ) ) : ''; // phpcs:ignore
-							$campaign_title       = isset( $_POST['campaign_title'] ) && ! empty( $_POST['campaign_title'] ) ? sanitize_text_field( wp_unslash( $_POST['campaign_title'] ) ) : ''; // phpcs:ignore
-							$campaign_description = isset( $_POST['campaign_description'] ) && ! empty( $_POST['campaign_description'] ) ? sanitize_text_field( wp_unslash( $_POST['campaign_description'] ) ) : ''; // phpcs:ignore
-							$campaign_goal        = isset( $_POST['campaign_goal'] ) && ! empty( $_POST['campaign_goal'] ) ? sanitize_text_field( wp_unslash( $_POST['campaign_goal'] ) ) : ''; // phpcs:ignore
-							$campaign_end_date    = isset( $_POST['campaign_end_date'] ) && ! empty( $_POST['campaign_end_date'] ) ? sanitize_text_field( wp_unslash( $_POST['campaign_end_date'] ) ) : ''; // phpcs:ignore
-							$campaign             = array(
-								'template'    => $campaign_template,
-								'title'       => $campaign_title,
-								'description' => $campaign_description,
-								'goal'        => $campaign_goal,
-								'end_date'    => $campaign_end_date,
-							);
-
-							// store server side setups.
-							$serverside = new Charitable_Setup();
-
-							$serverside->store_meta( $meta );
-							$serverside->store_plugins( $plugins );
-							$serverside->store_features( $features );
-							$serverside->store_payment_methods( $pm );
-							$serverside->store_campaign( $campaign );
-							if ( $license_key ) {
-								$serverside->store_license_key( $license_key );
-							}
-
-							// If this is a select few addons that we need to disable their auto-activation, do so.
-							if ( ! empty( $plugins ) ) {
-								foreach ( $plugins as $plugin ) {
-									if ( $plugin === 'all-in-one-seo-pack' ) {
-										update_option( 'aioseo_activation_redirect', true );
-									} elseif ( $plugin === 'wp-mail-smtp' ) {
-										update_option( 'wp_mail_smtp_activation_prevent_redirect', true );
-									}
-								}
-							}
-
-							// add a transient to indicate that the server side onboarding has moved to the plugin.
-							set_transient( 'charitable_ss_onboarding', 1, 0 );
-
-							delete_option( 'charitable_started_onboarding' );
+							$this->process_onboarding_return_data( $charitable_return_data );
 
 							wp_safe_redirect( admin_url( 'admin.php?page=charitable-setup&setup=1' ) );
 							exit;
@@ -239,6 +178,183 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 
 				}
 			}
+		}
+
+		/**
+		 * Apply a set of onboarding choices handed back by the setup wizard.
+		 *
+		 * Extracted verbatim from the `setup=return` branch so the same logic
+		 * serves both routes into it: the cross-site POST the wizard sends, and
+		 * the server-to-server pull used when that POST body is dropped. Keeping
+		 * one implementation is the point - a second decoder would drift.
+		 *
+		 * Expects the same keys and encodings as the POST: `meta`, `pm`,
+		 * `features`, `plugins` and `license_key` base64-encoded, and `template`
+		 * plus the `campaign_*` fields plain. Every field is optional.
+		 *
+		 * @since 1.8.12.4
+		 *
+		 * @param  array $data Onboarding fields, already unslashed.
+		 * @return void
+		 */
+		private function process_onboarding_return_data( $data ) {
+
+			if ( ! is_array( $data ) ) {
+				return;
+			}
+
+			$charitable_field = function ( $key ) use ( $data ) {
+				return isset( $data[ $key ] ) && ! is_array( $data[ $key ] )
+					? sanitize_text_field( $data[ $key ] )
+					: '';
+			};
+
+			$plugins     = '' !== $charitable_field( 'plugins' ) ? base64_decode( $charitable_field( 'plugins' ) ) : '';
+			$features    = '' !== $charitable_field( 'features' ) ? base64_decode( $charitable_field( 'features' ) ) : '';
+			$meta        = '' !== $charitable_field( 'meta' ) ? base64_decode( $charitable_field( 'meta' ) ) : '';
+			$pm          = '' !== $charitable_field( 'pm' ) ? base64_decode( $charitable_field( 'pm' ) ) : '';
+			$license_key = '' !== $charitable_field( 'license_key' ) ? base64_decode( $charitable_field( 'license_key' ) ) : '';
+
+			// process meta.
+			if ( ! empty( $meta ) ) {
+				$meta = str_replace( '\\"', '"', $meta );
+				if ( ! empty( $meta ) ) {
+					$meta = json_decode( $meta, true );
+				}
+			}
+			// process plugins.
+			if ( ! empty( $plugins ) ) {
+				$plugins = json_decode( $plugins );
+				$plugins = str_replace( array( '"', '[', ']' ), '', $plugins );
+				if ( ! empty( $plugins ) ) {
+					$plugins = explode( ',', $plugins );
+				}
+			}
+
+			// process payment methods.
+			// NOTE: the inner guard tests $plugins, not $pm. That is how this has
+			// always behaved, so it is preserved here rather than quietly changed
+			// during a refactor whose whole value is being behaviour-identical.
+			// Worth fixing on its own, separately.
+			if ( ! empty( $pm ) ) {
+				$pm = json_decode( $pm );
+				if ( $pm ) {
+					$pm = str_replace( array( '"', '[', ']' ), '', $pm );
+					if ( ! empty( $plugins ) ) {
+						$pm = explode( ',', $pm );
+					}
+				}
+			}
+
+			// process features.
+			if ( ! empty( $features ) ) {
+				$features = json_decode( $features );
+				$features = str_replace( array( '"', '[', ']' ), '', $features );
+				if ( ! empty( $features ) ) {
+					$features = explode( ',', $features );
+				}
+			}
+
+			// clean license (remove quotes).
+			$license_key = str_replace( '"', '', $license_key );
+
+			// process campaign.
+			$campaign = array(
+				'template'    => $charitable_field( 'template' ),
+				'title'       => $charitable_field( 'campaign_title' ),
+				'description' => $charitable_field( 'campaign_description' ),
+				'goal'        => $charitable_field( 'campaign_goal' ),
+				'end_date'    => $charitable_field( 'campaign_end_date' ),
+			);
+
+			// store server side setups.
+			$serverside = new Charitable_Setup();
+
+			$serverside->store_meta( $meta );
+			$serverside->store_plugins( $plugins );
+			$serverside->store_features( $features );
+			$serverside->store_payment_methods( $pm );
+			$serverside->store_campaign( $campaign );
+			// Guarded, so a payload without a licence key never overwrites one
+			// already stored. The pull payload deliberately never carries one.
+			if ( $license_key ) {
+				$serverside->store_license_key( $license_key );
+			}
+
+			// If this is a select few addons that we need to disable their auto-activation, do so.
+			if ( ! empty( $plugins ) && is_array( $plugins ) ) {
+				foreach ( $plugins as $plugin ) {
+					if ( $plugin === 'all-in-one-seo-pack' ) {
+						update_option( 'aioseo_activation_redirect', true );
+					} elseif ( $plugin === 'wp-mail-smtp' ) {
+						update_option( 'wp_mail_smtp_activation_prevent_redirect', true );
+					}
+				}
+			}
+
+			// add a transient to indicate that the server side onboarding has moved to the plugin.
+			set_transient( 'charitable_ss_onboarding', 1, 0 );
+
+			delete_option( 'charitable_started_onboarding' );
+		}
+
+		/**
+		 * Read the onboarding choices back from the wizard, server to server.
+		 *
+		 * Used only when the wizard's cross-site POST arrived with no body. A
+		 * plain server-side GET has no browser, no cookies and no redirects, so
+		 * none of the mechanisms that drop that POST can affect it.
+		 *
+		 * Returns an empty array on any doubt at all - disabled, missing
+		 * helpers, transport error, non-200, unparseable body, or a payload that
+		 * does not say `status: ok`. The caller then falls back to exactly the
+		 * behaviour that shipped before this existed.
+		 *
+		 * @since 1.8.12.4
+		 *
+		 * @return array Onboarding fields, or an empty array.
+		 */
+		private function pull_onboarding_return_data() {
+
+			// Field kill switch: both of these turn the fallback off without
+			// needing a release, reverting to the previous behaviour exactly.
+			if ( ! apply_filters( 'charitable_onboarding_pull_enabled', true ) ) {
+				return array();
+			}
+
+			if ( defined( 'CHARITABLE_ONBOARDING_DISABLE_PULL' ) && CHARITABLE_ONBOARDING_DISABLE_PULL ) {
+				return array();
+			}
+
+			if ( ! function_exists( 'charitable_onboarding_app_url' ) || ! function_exists( 'charitable_get_site_token' ) ) {
+				return array();
+			}
+
+			$site_token = charitable_get_site_token();
+
+			if ( empty( $site_token ) ) {
+				return array();
+			}
+
+			$response = wp_remote_get(
+				charitable_onboarding_app_url() . '/setup-wizard-charitable_lite/pull/' . rawurlencode( $site_token ),
+				array(
+					'timeout'   => 10,
+					'sslverify' => true,
+				)
+			);
+
+			if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+				return array();
+			}
+
+			$body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+			if ( ! is_array( $body ) || empty( $body['status'] ) || 'ok' !== $body['status'] ) {
+				return array();
+			}
+
+			return $body;
 		}
 
 		/**

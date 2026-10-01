@@ -148,11 +148,29 @@ if ( ! class_exists( 'Charitable_Campaign_List_Table' ) ) :
 
 				case 'donated':
 					$display = charitable_format_money( $campaign->get_donated_amount() );
-					$percent = absint( $campaign->get_percent_donated() );
-					if ( $percent > 100 ) {
-						$percent = 100;
-					}
-					if ( ! $campaign->is_endless() ) {
+
+					/*
+					 * Gated on having a GOAL, not on having an end date.
+					 *
+					 * This used to test `! $campaign->is_endless()`, which is a
+					 * question about the end date and says nothing about whether
+					 * there is a target to measure against. It got both cases
+					 * wrong: a campaign with a goal and no end date showed no bar
+					 * at all - reported in 1.8.13 testing as the goal not showing
+					 * in the campaigns list - while a campaign with an end date
+					 * and no goal drew a bar that could only ever sit at 0%,
+					 * since get_percent_donated() has no denominator.
+					 *
+					 * has_goal() is the same accessor the Charitable dashboard's
+					 * own goal column and Charitable_Campaign::get_goal() use, so
+					 * the two screens now agree about which campaigns have a
+					 * target.
+					 */
+					if ( $campaign->has_goal() ) {
+						$percent = absint( $campaign->get_percent_donated() );
+						if ( $percent > 100 ) {
+							$percent = 100;
+						}
 						$display .= '<div class="meter">
 										<span style="width: ' . $percent . '%"></span>
 									</div>';

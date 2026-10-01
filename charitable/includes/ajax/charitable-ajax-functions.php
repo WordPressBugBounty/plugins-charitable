@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2023, WP Charitable LLC
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.2.3
- * @version   1.6.28
+ * @version   1.8.12.4
  */
 
 // Exit if accessed directly.
@@ -64,17 +64,146 @@ if ( ! function_exists( 'charitable_plupload_image_upload' ) ) :
 	 * @return void
 	 */
 	function charitable_plupload_image_upload() {
-		$post_id  = (int) filter_input( INPUT_POST, 'post_id', FILTER_SANITIZE_NUMBER_INT );
+		// absint(), not FILTER_SANITIZE_NUMBER_INT: that filter strips non-digits rather than
+		// rejecting them, so "1e5" resolves to post 15 and "a1b2" to post 12.
+		$post_id  = absint( filter_input( INPUT_POST, 'post_id' ) );
 		$field_id = (string) filter_input( INPUT_POST, 'field_id' );
 
 		check_ajax_referer( 'charitable-upload-images-' . $field_id );
 
+		/*
+		 * Default-refuse anonymous callers.
+		 *
+		 * This handler is registered on wp_ajax_nopriv_, so it is reachable by logged-out
+		 * visitors. The nonce is not an access control for them: wp_create_nonce() resolves
+		 * against user 0 with an empty session token, so the token printed into any public
+		 * picture field is identical for every anonymous visitor and valid for ~24h. One GET
+		 * of a public form yields a token anyone can reuse to write files into the media
+		 * library. charitable_picture_uploads_enabled() holds the opt-in, and the picture
+		 * field template asks it the same question so the form cannot draw a working
+		 * uploader for a visitor this endpoint will refuse.
+		 *
+		 * Errors are returned with a 200 on purpose. plupload's HTML5 runtime treats any
+		 * status >= 400 as an HTTP error and fires Error instead of FileUploaded, and the
+		 * Error binding in charitable-plupload-fields.js only logs to the console - so a
+		 * status code here would hang the "Uploading..." row with nothing shown to the
+		 * visitor. A 200 lands on the ! r.success branch, which renders the message.
+		 */
+		if ( ! charitable_picture_uploads_enabled( $field_id, $post_id ) ) {
+			wp_send_json_error( array( 'message' => __( 'Please log in or create an account to upload an image.', 'charitable' ) ) );
+		}
+
+		/*
+		 * A request can pass the nonce and still carry no usable file - either nothing at all,
+		 * or an array shape (async-upload[]) that makes core compare an array against an int
+		 * and then use it as an array offset. Require the one thing every step below needs:
+		 * a single non-empty tmp_name string.
+		 */
+		if ( ! isset( $_FILES['async-upload']['tmp_name'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			|| ! is_string( $_FILES['async-upload']['tmp_name'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			|| '' === $_FILES['async-upload']['tmp_name'] ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			wp_send_json_error( array( 'message' => __( 'No file was uploaded.', 'charitable' ) ) );
+		}
+
 		$file = $_FILES['async-upload']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$file_attr = wp_handle_upload( $file, array( 'test_form' => false ) );
+
+		/*
+		 * This is a picture field, so restrict the server-side allowlist to images. Without a
+		 * mimes array, wp_handle_upload() falls back to the full get_allowed_mime_types() set
+		 * (PDF, ZIP, MP4, MP3, ...) for any caller; the client-side plupload extension filter
+		 * is otherwise the only thing keeping non-images out, and a direct request bypasses it.
+		 *
+		 * Seeded from the same list the non-AJAX form path already uses in
+		 * Charitable_Form::get_file_overrides(), plus webp, so the same picture field does not
+		 * accept one set of types through the uploader and a different set on form submit.
+		 */
+		$charitable_default_mimes = array(
+			'jpg|jpeg|jpe' => 'image/jpeg',
+			'gif'          => 'image/gif',
+			'png'          => 'image/png',
+			'bmp'          => 'image/bmp',
+			'tif|tiff'     => 'image/tiff',
+			'ico'          => 'image/x-icon',
+			'webp'         => 'image/webp',
+		);
+
+		$mimes = apply_filters( 'charitable_picture_upload_allowed_mimes', $charitable_default_mimes, $field_id );
+
+		/*
+		 * Never hand core an empty or non-array list. wp_check_filetype() reads an empty
+		 * $mimes as "no restriction" and falls back to get_allowed_mime_types(), so
+		 * normalising a bad filter return to array() would quietly widen this endpoint back
+		 * to every type the site allows - the exact opposite of what it looks like it does.
+		 */
+		if ( ! is_array( $mimes ) || empty( $mimes ) ) {
+			$mimes = $charitable_default_mimes;
+		}
+
+		$file_attr = wp_handle_upload(
+			$file,
+			array(
+				'test_form' => false,
+				'mimes'     => $mimes,
+			)
+		);
 
 		if ( isset( $file_attr['error'] ) ) {
-			wp_send_json_error( $file_attr );
+			/*
+			 * Core's upload errors quote server configuration back to the caller: the PHP
+			 * size limit setting by name, or the uploads directory and whether its parent is
+			 * writable. This endpoint answers logged-out visitors on public forms, so report
+			 * our own wording instead.
+			 */
+			wp_send_json_error( array( 'message' => __( 'Sorry, that file could not be uploaded. Please choose an image and try again.', 'charitable' ) ) );
 		}
+
+		/*
+		 * Re-assert against what actually landed on disk.
+		 *
+		 * The list above is not the last word on type. wp_handle_upload() resolves the type
+		 * through wp_check_filetype_and_ext(), and any theme or plugin can rewrite that
+		 * function's result through the filter of the same name - the usual way SVG support
+		 * gets bolted onto a site, and it ignores the mimes array completely. It also falls
+		 * back to the browser-supplied Content-Type for a caller holding unfiltered_upload.
+		 * So resolve the type from the final on-disk filename with wp_check_filetype(), which
+		 * is extension matching with no filter anywhere in its path, and require an image.
+		 *
+		 * SVG is refused here even on a site that permits it elsewhere: it is script-bearing
+		 * markup served from this origin, which through a picture field is stored XSS.
+		 */
+		$charitable_final      = wp_check_filetype( $file_attr['file'] );
+		$charitable_final_type = ! empty( $charitable_final['type'] ) ? (string) $charitable_final['type'] : '';
+
+		if ( 0 !== strpos( $charitable_final_type, 'image/' ) || preg_match( '/svg|xml/i', $charitable_final_type ) ) {
+			/*
+			 * Assert the cleanup rather than assuming it. wp_delete_file() runs the path
+			 * through its own filter, which backup and media-offload plugins do intercept and
+			 * can blank - and a file left behind here is the very thing being refused, sitting
+			 * at a public URL.
+			 */
+			if ( ! wp_delete_file( $file_attr['file'] ) && file_exists( $file_attr['file'] ) ) {
+				// wp_delete_file() is the first attempt above; this is the backstop for when
+				// its filter blanked the path, so the alternative-function sniff does not apply.
+				@unlink( $file_attr['file'] ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink,WordPress.PHP.NoSilencedErrors.Discouraged
+
+				if ( file_exists( $file_attr['file'] ) ) {
+					charitable_log(
+						'Picture upload refused but the file could not be removed',
+						$file_attr['file'],
+						array( 'level' => 'error' )
+					);
+				}
+			}
+
+			wp_send_json_error( array( 'message' => __( 'Sorry, you are not allowed to upload this file type.', 'charitable' ) ) );
+		}
+
+		/*
+		 * Do not trust the caller-supplied post_id as the attachment parent. Honour it only
+		 * when the current user can actually edit that post; otherwise parent to 0. For an
+		 * anonymous opt-in upload there is no such user, so this always resolves to 0.
+		 */
+		$parent_id = ( $post_id && current_user_can( 'edit_post', $post_id ) ) ? $post_id : 0;
 
 		$attachment = array(
 			'guid'              => $file_attr['url'],
@@ -87,7 +216,7 @@ if ( ! function_exists( 'charitable_plupload_image_upload' ) ) :
 		/**
 		 * Insert the file as an attachment.
 		 */
-		$attachment_id = wp_insert_attachment( $attachment, $file_attr['file'], $post_id );
+		$attachment_id = wp_insert_attachment( $attachment, $file_attr['file'], $parent_id );
 
 		if ( is_wp_error( $attachment_id ) ) {
 			wp_send_json_error();

@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since   1.0.0
  * @version 1.6.13
  * @version 1.8.8.6
+ * @version 1.8.12.4
  */
 
 if ( ! isset( $view_args['form'] ) || ! isset( $view_args['field'] ) ) {
@@ -47,6 +48,18 @@ foreach ( $charitable_pictures as $charitable_i => $charitable_picture ) {
 	}
 }
 
+/*
+ * Ask the same question the AJAX endpoint asks. Without this the field draws a fully
+ * working drag-and-drop zone for a logged-out visitor whose uploads charitable_plupload_
+ * image_upload() will always refuse - the visitor picks a file and gets an error with no
+ * way to succeed. Say so up front instead. Mirrors the disabled state Ambassadors renders
+ * for its own gallery field.
+ */
+$charitable_uploads_enabled = charitable_picture_uploads_enabled(
+	$charitable_field['key'],
+	isset( $charitable_field['parent_id'] ) ? absint( $charitable_field['parent_id'] ) : 0
+);
+
 $charitable_has_max_uploads = count( $charitable_pictures ) >= $charitable_max_uploads;
 $charitable_params          = array(
 	'runtimes'            => 'html5,silverlight,flash,html4',
@@ -63,7 +76,7 @@ $charitable_params          = array(
 	'filters'             => array(
 		array(
 			'title'      => _x( 'Allowed Image Files', 'image upload', 'charitable' ),
-			'extensions' => 'jpg,jpeg,gif,png',
+			'extensions' => 'jpg,jpeg,gif,png,webp',
 		),
 	),
 	'multipart_params'    => array(
@@ -76,7 +89,10 @@ $charitable_params          = array(
 	),
 );
 
-wp_enqueue_script( 'charitable-plup-fields' );
+if ( $charitable_uploads_enabled ) {
+	wp_enqueue_script( 'charitable-plup-fields' );
+}
+
 wp_enqueue_style( 'charitable-plup-styles' );
 
 ?>
@@ -92,34 +108,62 @@ wp_enqueue_style( 'charitable-plup-styles' );
 	<?php if ( isset( $charitable_field['help'] ) ) : ?>
 		<p class="charitable-field-help"><?php echo $charitable_field['help']; // phpcs:ignore  ?></p>
 	<?php endif ?>
-	<div id="<?php echo esc_attr( $charitable_field['key'] ); ?>-dragdrop"
-		class="charitable-drag-drop"
-		data-max-size="<?php echo esc_attr( $charitable_max_file_size ); ?>"
-		data-images="<?php echo esc_attr( $charitable_field['key'] ); ?>-dragdrop-images"
-		data-params="<?php echo esc_attr( wp_json_encode( $charitable_params ) ); ?>">
-		<div id="<?php echo esc_attr( $charitable_field['key'] ); ?>-dragdrop-dropzone" class="charitable-drag-drop-dropzone" <?php echo $charitable_has_max_uploads ? 'style="display:none;"' : ''; ?>>
-			<p class="charitable-drag-drop-info"><?php echo esc_html( 1 === $charitable_max_uploads ? _x( 'Drop image here', 'image upload', 'charitable' ) : _x( 'Drop images here', 'image upload plural', 'charitable' ) ); ?></p>
-			<p><?php echo esc_html_x( 'or', 'image upload', 'charitable' ); ?></p>
-			<p class="charitable-drag-drop-buttons">
-				<button id="<?php echo esc_attr( $charitable_field['key'] ); ?>-browse-button" class="button" type="button"><?php echo esc_html_x( 'Select Files', 'image upload', 'charitable' ); ?></button>
-			</p>
+	<?php if ( ! $charitable_uploads_enabled ) : ?>
+		<?php
+		/*
+		 * No .charitable-drag-drop class here on purpose: that class is what
+		 * charitable-plupload-fields.js constructs an Uploader from. Not printing the params
+		 * also keeps the user-0 nonce off public pages, so there is no token to scrape.
+		 */
+		?>
+		<div class="charitable-drag-drop-disabled">
+			<p class="charitable-drag-drop-info"><?php esc_html_e( 'Image uploads are available to logged-in users. Please log in or create an account to add an image.', 'charitable' ); ?></p>
+			<?php if ( ! empty( $charitable_pictures ) ) : ?>
+				<ul class="charitable-drag-drop-images charitable-drag-drop-images-<?php echo esc_attr( $charitable_max_uploads ); ?>">
+					<?php
+					foreach ( $charitable_pictures as $charitable_image ) :
+						charitable_template(
+							'form-fields/picture-preview.php',
+							array(
+								'image' => $charitable_image,
+								'field' => $charitable_field,
+							)
+						);
+					endforeach;
+					?>
+				</ul>
+			<?php endif ?>
 		</div>
-		<div class="charitable-drag-drop-image-loader" style="display: none;">
-			<p class="loader-title"><?php esc_html_e( 'Uploading...', 'charitable' ); ?></p>
-			<ul class="images"></ul>
+	<?php else : ?>
+		<div id="<?php echo esc_attr( $charitable_field['key'] ); ?>-dragdrop"
+			class="charitable-drag-drop"
+			data-max-size="<?php echo esc_attr( $charitable_max_file_size ); ?>"
+			data-images="<?php echo esc_attr( $charitable_field['key'] ); ?>-dragdrop-images"
+			data-params="<?php echo esc_attr( wp_json_encode( $charitable_params ) ); ?>">
+			<div id="<?php echo esc_attr( $charitable_field['key'] ); ?>-dragdrop-dropzone" class="charitable-drag-drop-dropzone" <?php echo $charitable_has_max_uploads ? 'style="display:none;"' : ''; ?>>
+				<p class="charitable-drag-drop-info"><?php echo esc_html( 1 === $charitable_max_uploads ? _x( 'Drop image here', 'image upload', 'charitable' ) : _x( 'Drop images here', 'image upload plural', 'charitable' ) ); ?></p>
+				<p><?php echo esc_html_x( 'or', 'image upload', 'charitable' ); ?></p>
+				<p class="charitable-drag-drop-buttons">
+					<button id="<?php echo esc_attr( $charitable_field['key'] ); ?>-browse-button" class="button" type="button"><?php echo esc_html_x( 'Select Files', 'image upload', 'charitable' ); ?></button>
+				</p>
+			</div>
+			<div class="charitable-drag-drop-image-loader" style="display: none;">
+				<p class="loader-title"><?php esc_html_e( 'Uploading...', 'charitable' ); ?></p>
+				<ul class="images"></ul>
+			</div>
+			<ul id="<?php echo esc_attr( $charitable_field['key'] ); ?>-dragdrop-images" class="charitable-drag-drop-images charitable-drag-drop-images-<?php echo esc_attr( $charitable_max_uploads ); ?>">
+				<?php
+				foreach ( $charitable_pictures as $charitable_image ) :
+					charitable_template(
+						'form-fields/picture-preview.php',
+						array(
+							'image' => $charitable_image,
+							'field' => $charitable_field,
+						)
+					);
+				endforeach;
+				?>
+			</ul>
 		</div>
-		<ul id="<?php echo esc_attr( $charitable_field['key'] ); ?>-dragdrop-images" class="charitable-drag-drop-images charitable-drag-drop-images-<?php echo esc_attr( $charitable_max_uploads ); ?>">
-			<?php
-			foreach ( $charitable_pictures as $charitable_image ) :
-				charitable_template(
-					'form-fields/picture-preview.php',
-					array(
-						'image' => $charitable_image,
-						'field' => $charitable_field,
-					)
-				);
-			endforeach;
-			?>
-		</ul>
-	</div>
+	<?php endif ?>
 </div>

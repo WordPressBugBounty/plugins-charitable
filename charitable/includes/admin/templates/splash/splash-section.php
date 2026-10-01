@@ -3,12 +3,12 @@
  * What's New modal section.
  *
  * @since   1.8.8
- * @version 1.8.10.6
+ * @version 1.8.13
  *
  * @var string $title Section title.
  * @var string $content Section content.
  * @var array $img Section image.
- * @var array $video Section video (Vimeo or mp4).
+ * @var array $video Section video (Vimeo, or mp4 with an optional poster).
  * @var array $items More-features layout items.
  * @var string $new Is new feature.
  * @var array $buttons Section buttons.
@@ -119,7 +119,7 @@ $classes_output = charitable_sanitize_classes( $classes, true );
 					data-vimeo-id="<?php echo esc_attr( $vimeo_id ); ?>"
 					data-video-title="<?php echo esc_attr( $section['title'] ); ?>"></div>
 			<?php elseif ( ! empty( $section['video']['url'] ) ) : ?>
-				<video muted playsinline controls preload="metadata">
+				<video muted playsinline controls preload="metadata"<?php echo ! empty( $section['video']['poster'] ) ? ' poster="' . esc_url( $section['video']['poster'] ) . '"' : ''; ?>>
 					<source src="<?php echo esc_url( $section['video']['url'] ); ?>" type="video/mp4">
 				</video>
 			<?php endif; ?>

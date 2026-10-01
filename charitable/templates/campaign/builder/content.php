@@ -20,11 +20,68 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $charitable_campaign = $view_args['campaign']; // Charitable_Campaign Instance of `Charitable_Campaign`.
 
-if ( ! empty( $_GET['charitable_campaign_preview'] ) ) { //phpcs:ignore
+/*
+ * Whether to honour the ?charitable_campaign_preview argument.
+ *
+ * That argument is unauthenticated and names an arbitrary post ID, so it is only trusted
+ * for a user who can edit that specific campaign. Without this check, appending
+ * ?charitable_campaign_preview=<other campaign id> to ANY campaign URL replaced the
+ * rendered campaign's whole builder payload with that other campaign's, which gave two
+ * real problems:
+ *
+ *  - An unpublished campaign's headline, story and images leaked to any Contributor. The
+ *    render gate further down tests edit_posts, a site-wide primitive every Contributor
+ *    holds, not a per-campaign capability.
+ *  - A published campaign's content rendered under a different campaign's URL for
+ *    anonymous visitors, including its donation ask. That link is hand-outable and any
+ *    full-page cache that ignores unknown query args will store it against the wrong URL.
+ *
+ * Both were reachable before 1.8.12.4 for the 24 hours a preview transient lives after
+ * each builder save; the saved-revision fallback added below would otherwise have made
+ * them permanent.
+ *
+ * edit_post (singular) is the meta capability. The campaign post type is registered with
+ * capability_type 'campaign' and map_meta_cap true, so WordPress maps it onto
+ * edit_campaign / edit_others_campaigns for the specific post. This mirrors the check
+ * Campaign_Builder_Preview::is_preview_page() already makes.
+ *
+ * When the check fails the argument is ignored completely and the normal view_args path
+ * renders the campaign the caller actually asked for.
+ */
+$charitable_preview_id  = empty( $_GET['charitable_campaign_preview'] ) ? 0 : absint( $_GET['charitable_campaign_preview'] ); //phpcs:ignore
+$charitable_can_preview = $charitable_preview_id
+	&& Charitable::CAMPAIGN_POST_TYPE === get_post_type( $charitable_preview_id )
+	&& charitable_current_user_can( 'edit_post', $charitable_preview_id );
+
+if ( $charitable_can_preview ) {
 	// get the transient that is storing the temp settings information, as this is what we will use to display the preview.
-	$charitable_campaign_data = get_transient( 'charitable_campaign_preview_' . intval( $_GET['charitable_campaign_preview'] ) ); //phpcs:ignore
+	$charitable_campaign_data = get_transient( 'charitable_campaign_preview_' . $charitable_preview_id );
+
+	/*
+	 * The transient carries the builder's *unsaved* changes and is written only by the
+	 * builder's save AJAX. Every other route to a preview arrives without it:
+	 *
+	 *  - the Preview action on a draft in the Campaigns list table,
+	 *  - WordPress's own preview_post_link for a campaign,
+	 *  - any preview more than DAY_IN_SECONDS after the last builder save,
+	 *  - an object cache that has evicted the entry (HelpScout #11576).
+	 *
+	 * With no fallback the whole render proceeded on false, which produced an empty
+	 * campaign body and logged a warning for every read of ['id']. Fall back to the
+	 * saved revision, which is what the preview notice already tells the user it is
+	 * showing.
+	 */
+	if ( empty( $charitable_campaign_data ) ) {
+		$charitable_campaign_data = get_post_meta( $charitable_preview_id, 'campaign_settings_v2', true );
+	}
 } else {
 	$charitable_campaign_data = empty( $view_args['campaign_data'] ) && ! empty( $view_args['id'] ) ? get_post_meta( intval( $view_args['id'] ), 'campaign_settings_v2', true ) : $view_args['campaign_data'];
+}
+
+// A brand-new campaign has neither transient nor saved meta, so either branch can still
+// yield a non-array. Normalise before anything indexes it.
+if ( ! is_array( $charitable_campaign_data ) ) {
+	$charitable_campaign_data = array();
 }
 
 $charitable_template_data   = isset( $view_args['template'] ) && is_array( $view_args['template'] ) ? $view_args['template'] : array();
@@ -69,27 +126,61 @@ $charitable_enabled_tabs = isset( $charitable_campaign_data['layout']['advanced'
 
 /* The Setup */
 
-/* Campaign Related */
+/*
+ * $charitable_campaign, $charitable_campaign_data, $charitable_template_data,
+ * $charitable_template_id and $charitable_template_layout are all resolved at the top of
+ * this file and are still current here. Nothing between there and this point reassigns
+ * $view_args or $_GET, or writes the preview transient or the campaign's post meta. The
+ * is_admin() branch only reads them and echoes stylesheet links, assigning nothing but four
+ * locals of its own; Campaign_Builder_Preview's constructor does query the database via
+ * is_preview_page() before registering its hooks, but it touches none of this scope.
+ * Verified at runtime across the draft-preview, published-preview and front-end paths.
+ *
+ * This block previously recomputed four of the five from scratch - everything except
+ * $charitable_template_data, which was and still is assigned exactly once above. That
+ * duplicate is where the second copy of the preview-transient read lived, and why the
+ * transient fix originally had to be written twice.
+ */
 
-$charitable_campaign = $view_args['campaign']; // Charitable_Campaign Instance of `Charitable_Campaign`.
+/*
+ * Resolve the campaign's post ID independently of the campaign data payload. The three post
+ * lookups below need nothing but the ID, and sourcing it from inside the payload is what
+ * made them warn whenever the payload was missing.
+ *
+ * $view_args['id'] comes first because it is the campaign the caller actually asked for.
+ * The payload's own 'id' is the least trustworthy source: it is written once at save time
+ * and copied verbatim thereafter, so a WXR import, a staging-to-production migration or a
+ * duplicate-post plugin can leave it pointing at an unrelated post, and the status of THAT
+ * post would then decide whether this campaign renders.
+ *
+ * $charitable_preview_id is used only when $charitable_can_preview passed, so the
+ * unauthenticated query argument cannot steer this either.
+ *
+ * Stays 0 only when there is no global post either, since get_the_ID() would otherwise have
+ * supplied it. The status gate below has an explicit branch for that case rather than
+ * relying on get_post_status( 0 ), which returns false with no post to fall back to.
+ */
+$charitable_campaign_post_id = ! empty( $view_args['id'] ) ? intval( $view_args['id'] ) : 0;
 
-if ( ! empty( $_GET['charitable_campaign_preview'] ) ) { //phpcs:ignore
-	// get the transient that is storing the temp settings information, as this is what we will use to display the preview.
-	$charitable_campaign_data = get_transient( 'charitable_campaign_preview_' . intval( $_GET['charitable_campaign_preview'] ) ); //phpcs:ignore
-} else {
-	$charitable_campaign_data = empty( $view_args['campaign_data'] ) && ! empty( $view_args['id'] ) ? get_post_meta( intval( $view_args['id'] ), 'campaign_settings_v2', true ) : $view_args['campaign_data'];
+if ( 0 === $charitable_campaign_post_id && ! empty( $charitable_campaign_data['id'] ) ) {
+	$charitable_campaign_post_id = intval( $charitable_campaign_data['id'] );
+}
+
+if ( 0 === $charitable_campaign_post_id && $charitable_can_preview ) {
+	$charitable_campaign_post_id = $charitable_preview_id;
+}
+
+if ( 0 === $charitable_campaign_post_id ) {
+	$charitable_campaign_post_id = intval( get_the_ID() );
 }
 
 /* Template Related */
-
-$charitable_template_id     = isset( $charitable_campaign_data['template_id'] ) && ! empty( $charitable_campaign_data['template_id'] ) ? sanitize_key( $charitable_campaign_data['template_id'] ) : charitable_campaign_builder_default_template();
-$charitable_template_layout = isset( $charitable_template_data['layout'] ) ? $charitable_template_data['layout'] : array();
 
 $charitable_template_parent_id = ( isset( $charitable_template_data['meta']['parent_theme'] ) && ! empty( $charitable_template_data['meta']['parent_theme'] ) ) ? esc_attr( $charitable_template_data['meta']['parent_theme'] ) : false;
 $charitable_template_wrap_css  = false !== $charitable_template_parent_id ? 'template-' . $charitable_template_parent_id : '';
 $charitable_template_wrap_css .= false !== $charitable_template_id ? ' template-' . $charitable_template_id : '';
 $charitable_template_wrap_css .= ! empty( $view_args['campaign_data']['settings']['general']['form_css_class'] ) ? ' ' . esc_attr( $view_args['campaign_data']['settings']['general']['form_css_class'] ) : false;
-$charitable_template_wrap_css .= 'draft' === get_post_status( $charitable_campaign_data['id'] ) ? ' is-charitable-preview' : false; // this to give a css class only when the campaign is previewed.
+$charitable_template_wrap_css .= 'draft' === get_post_status( $charitable_campaign_post_id ) ? ' is-charitable-preview' : false; // this to give a css class only when the campaign is previewed.
 
 /* Layout Related */
 
@@ -106,32 +197,106 @@ $charitable_css_classes                    = apply_filters( 'charitable_builder_
 $charitable_css_classes_output             = implode( ' ', $charitable_css_classes );
 
 // Get the post status - if this is a draft, we will display a notice to the admin or author, and not show this to the public.
-$charitable_post_status = get_post_status( $charitable_campaign_data['id'] );
-$charitable_post_author = get_post_field( 'post_author', $charitable_campaign_data['id'] );
+$charitable_post_status = get_post_status( $charitable_campaign_post_id );
+$charitable_post_author = get_post_field( 'post_author', $charitable_campaign_post_id );
 
-// Only display the message if the viewer if the view isn't viewing a preview from the campaign builder (maybe they are viewing this via shortcode on the frontend, etc.).
-if ( empty( $_GET['charitable_campaign_preview'] ) && ( false === $charitable_post_status || 'draft' === $charitable_post_status ) ) : //phpcs:ignore
+/*
+ * Statuses that are not publicly published. These render only for the campaign's author or
+ * a user who can edit that campaign, and carry the "not published yet" notice on the front
+ * end.
+ *
+ * 'pending' and 'future' were missing before 1.8.12.4, so a campaign in either status
+ * rendered nothing at all - the builder's preview page showed its notice bar above an empty
+ * body. That became reachable once the Preview button stopped swallowing those statuses.
+ * 'private' is deliberately not in this list: it is published but restricted, so it is
+ * handled below with the read_post capability instead.
+ */
+$charitable_unpublished_statuses = array( 'draft', 'pending', 'future' );
+
+/*
+ * Whether the current user is the campaign's author.
+ *
+ * get_post_field() returns post_author as a *string*, while get_current_user_id() returns an
+ * int, so the previous `$charitable_post_author === get_current_user_id()` could never match
+ * and every check below fell through to the capability test alone. Comparing as integers is
+ * plainly the intent (see the comments on each branch), and restores author access.
+ *
+ * The get_current_user_id() > 0 guard is load-bearing: a campaign whose post_author is 0 or
+ * NULL would otherwise compare equal to a logged-out visitor's user ID of 0 and expose an
+ * unpublished campaign publicly.
+ */
+$charitable_is_campaign_author = get_current_user_id() > 0 && (int) $charitable_post_author === get_current_user_id();
+
+/*
+ * Only display the message if the viewer isn't viewing a preview from the campaign builder
+ * (maybe they are viewing this via shortcode on the frontend, etc.).
+ *
+ * Keyed off $charitable_can_preview rather than the raw query argument: a request carrying
+ * ?charitable_campaign_preview for a campaign the user cannot edit is an ordinary page view,
+ * not a preview, so it should still get the notice.
+ */
+if ( ! $charitable_can_preview && ( false === $charitable_post_status || in_array( $charitable_post_status, $charitable_unpublished_statuses, true ) ) ) :
 
 	// if the user is the author of the post OR if they have permissions to view drafts, show the notice.
-	if ( $charitable_post_author === get_current_user_id() || current_user_can( 'edit_posts' ) ) {
+	if ( $charitable_is_campaign_author || current_user_can( 'edit_posts' ) ) {
 		?>
 		<div class="charitable-notice charitable-notice-info">
-			<p style="margin: 0;"><?php esc_html_e( 'This campaign is currently in draft mode. Only you can see it, and some functionality (like donation forms, donation buttons, etc.) might be disabled.', 'charitable' ); ?></p>
+			<?php
+			/*
+			 * Status-neutral wording. This branch now covers pending and future as well as
+			 * draft, so the previous "currently in draft mode" was inaccurate for a campaign
+			 * awaiting review or scheduled. The draft-specific strings it replaces are no
+			 * longer referenced.
+			 */
+			?>
+			<p style="margin: 0;"><?php esc_html_e( 'This campaign has not been published yet. Only you can see it, and some functionality (like donation forms, donation buttons, etc.) might be disabled.', 'charitable' ); ?></p>
 		</div>
 		<?php
 	} else {
 		// show a generic message to the public.
 		?>
 		<div class="charitable-notice charitable-notice-info">
-			<p style="margin: 0;"><?php esc_html_e( 'This campaign is currently in draft mode.', 'charitable' ); ?></p>
+			<p style="margin: 0;"><?php esc_html_e( 'This campaign has not been published yet.', 'charitable' ); ?></p>
 		</div>
 		<?php
 	}
 
 endif;
 
-// if the campaign/post is published OR if the user is the author of the post OR if they have permissions to edit posts, show the (slightly disabled) campaign.
-if ( 'publish' === $charitable_post_status || ( ( false === $charitable_post_status || 'draft' === $charitable_post_status ) && ( $charitable_post_author === get_current_user_id() || current_user_can( 'edit_posts' ) ) ) ) :
+/*
+ * Whether to render the campaign at all, and to whom.
+ *
+ * - 'publish' is public.
+ * - The unpublished states render for the author, or for a user who can edit THAT campaign.
+ * - 'private' is published but access-restricted, so it asks whether the user can read that
+ *   specific post rather than whether they can edit campaigns generally.
+ * - No resolvable post means there is nothing to disclose, so this keeps the pre-1.8.12.4
+ *   site-wide edit_posts test rather than inventing a per-post check with no post.
+ * - Everything else - trash, auto-draft, inherit, and any status a third party registers -
+ *   renders nothing, as before.
+ *
+ * These use the singular edit_post / read_post META capabilities against
+ * $charitable_campaign_post_id, not the plural edit_posts / read_private_posts primitives.
+ * The campaign post type registers capability_type 'campaign' with map_meta_cap true, so
+ * WordPress maps them onto edit_campaign / edit_others_campaigns / read_private_campaigns
+ * for that one post. The plural forms were wrong twice over: edit_posts is held by every
+ * Contributor for every campaign on the site, and read_private_posts is a *posts* primitive
+ * that says nothing about campaigns, so a core Editor would have passed it while WordPress's
+ * own read_post check on the campaign would have denied them.
+ */
+if ( 'publish' === $charitable_post_status ) {
+	$charitable_can_view_campaign = true;
+} elseif ( false === $charitable_post_status || 0 === $charitable_campaign_post_id ) {
+	$charitable_can_view_campaign = $charitable_is_campaign_author || charitable_current_user_can( 'edit_posts' );
+} elseif ( 'private' === $charitable_post_status ) {
+	$charitable_can_view_campaign = $charitable_is_campaign_author || charitable_current_user_can( 'read_post', $charitable_campaign_post_id );
+} elseif ( in_array( $charitable_post_status, $charitable_unpublished_statuses, true ) ) {
+	$charitable_can_view_campaign = $charitable_is_campaign_author || charitable_current_user_can( 'edit_post', $charitable_campaign_post_id );
+} else {
+	$charitable_can_view_campaign = false;
+}
+
+if ( $charitable_can_view_campaign ) :
 
 	/**
 	 * Add something before the campaign builder content.

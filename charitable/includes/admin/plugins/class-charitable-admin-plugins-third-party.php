@@ -405,6 +405,42 @@ if ( ! class_exists( 'Charitable_Admin_Plugins_Third_Party' ) ) :
 				delete_transient( 'pushengage_activation_redirect' );
 			}
 
+			/*
+			 * Record that Charitable drove this WPVibe install, for cross-brand
+			 * attribution. The option pair is UNPREFIXED on purpose: whichever
+			 * Awesome Motive plugin installs the promoted plugin writes its own
+			 * name into `<plugin>_source`, and each brand's own check-in claims
+			 * only the installs whose source names IT. The key is `wpvibe_source`,
+			 * the plugin's published `vibe-ai` slug notwithstanding, because that
+			 * is the key every brand agrees to read - WPForms uses the identical
+			 * pair for the same plugin. Guarded so a value another AM plugin
+			 * already wrote is never overwritten: the option records who FIRST
+			 * drove the install. This method is reached only through Charitable's
+			 * own AJAX installer, so the attribution is never claimed for an
+			 * activation the user made from the Plugins screen directly.
+			 *
+			 * Written as a fixed 'Charitable Lite', not a charitable_is_pro()
+			 * ternary: this file ships in the Lite plugin, so the driver is
+			 * always Charitable Lite. Pro's own copy of this method (Charitable
+			 * Pro is a separate, standalone plugin - it never runs alongside
+			 * Lite) writes 'Charitable Pro'. Both strings contain 'Charitable',
+			 * which is all a receiving check-in matches on.
+			 *
+			 * Autoload explicitly OFF (fix round 2, ITEM 2): Pro's own copy of
+			 * this method omits the third argument, which defaults an option
+			 * to autoloaded. Both of these are read only from this one admin
+			 * screen and from a weekly check-in - never on the front end, never
+			 * on most admin requests - so there is no reason to load either of
+			 * them into memory on every request the way autoloaded options are.
+			 * Deliberately NOT matching Pro here.
+			 *
+			 * @since 1.8.13
+			 */
+			if ( strstr( $basename, 'vibe-ai' ) && ! get_option( 'wpvibe_source' ) ) {
+				update_option( 'wpvibe_source', 'Charitable Lite', false );
+				update_option( 'wpvibe_date', time(), false );
+			}
+
 			if ( is_wp_error( $success ) ) {
 				wp_send_json_error(
 					array(

@@ -18,10 +18,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 header( 'Content-type: text/css; charset: UTF-8' );
 
-$primary      = isset( $_GET['p'] ) ? '#' . preg_replace( '/[^A-Za-z0-9 ]/', '', $_GET['p'] ) : '#2B2B2B'; // phpcs:ignore
-$secondary    = isset( $_GET['s'] ) ? '#' . preg_replace( '/[^A-Za-z0-9 ]/', '', $_GET['s'] ) : '#F5F5F5'; // phpcs:ignore
-$tertiary     = isset( $_GET['t'] ) ? '#' . preg_replace( '/[^A-Za-z0-9 ]/', '', $_GET['t'] ) : '#FFFFFF'; // phpcs:ignore
-$button       = isset( $_GET['b'] ) ? '#' . preg_replace( '/[^A-Za-z0-9 ]/', '', $_GET['b'] ) : '#2B2B2B'; // phpcs:ignore
+$primary      = isset( $_GET['p'] ) ? '#' . substr( preg_replace( '/[^A-Fa-f0-9]/', '', $_GET['p'] ), 0, 6 ) : '#2B2B2B'; // phpcs:ignore
+$secondary    = isset( $_GET['s'] ) ? '#' . substr( preg_replace( '/[^A-Fa-f0-9]/', '', $_GET['s'] ), 0, 6 ) : '#F5F5F5'; // phpcs:ignore
+$tertiary     = isset( $_GET['t'] ) ? '#' . substr( preg_replace( '/[^A-Fa-f0-9]/', '', $_GET['t'] ), 0, 6 ) : '#FFFFFF'; // phpcs:ignore
+$button       = isset( $_GET['b'] ) ? '#' . substr( preg_replace( '/[^A-Fa-f0-9]/', '', $_GET['b'] ), 0, 6 ) : '#2B2B2B'; // phpcs:ignore
 $mobile_width = isset( $_GET['mw'] ) ? intval( $_GET['mw'] ) : 800; // phpcs:ignore
 
 $charitable_slug            = 'save-the-museum';

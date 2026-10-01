@@ -186,12 +186,48 @@ if ( ! class_exists( 'Charitable_Tools' ) ) :
 					'customize'   => __( 'Customize', 'charitable' ),
 					'export'      => __( 'Export', 'charitable' ),
 					'import'      => __( 'Import', 'charitable' ),
+					'ai-mcp'      => __( 'AI MCP', 'charitable' ),
 					'system-info' => __( 'System Info', 'charitable' ),
 					'snippets'    => __( 'Code Snippets', 'charitable' ),
 					'logs'        => __( 'Logs', 'charitable' ),
 					'misc'        => __( 'Misc', 'charitable' ),
 				)
 			);
+		}
+
+		/**
+		 * The "New" badge markup for a Tools tab, or '' when it has none.
+		 *
+		 * A method rather than HTML inside the get_sections() label, because the
+		 * two navs that render those labels escape them differently -
+		 * views/tools/tools.php echoes the label raw, the taxonomy-page nav in
+		 * this class runs it through esc_html() - so markup smuggled into the
+		 * label would render in one place and print as literal tags in the
+		 * other. Keeping labels plain text and the badge separate means both
+		 * navs can escape correctly.
+		 *
+		 * It also means ONE place decides which tab is new. Both navs call this,
+		 * the same way both now loop get_sections(); a second hand-written copy
+		 * is exactly how the AI MCP tab went missing from the taxonomy screens
+		 * in the first place.
+		 *
+		 * Removing the badge is a manual edit next cycle, matching how
+		 * `.charitable-menu-new-indicator` is used on the Donors menu item -
+		 * there is no dismissal state and it is not tied to a version check, so
+		 * it stays until somebody takes it out.
+		 *
+		 * @since 1.8.13
+		 *
+		 * @param  string $tab_key The tab key from get_sections().
+		 * @return string Badge HTML, already escaped, or '' for every other tab.
+		 */
+		public function get_section_badge( $tab_key ) {
+
+			if ( 'ai-mcp' !== $tab_key ) {
+				return '';
+			}
+
+			return ' <span class="charitable-tab-new-badge">' . esc_html__( 'New', 'charitable' ) . '</span>';
 		}
 
 		/**
@@ -531,23 +567,46 @@ if ( ! class_exists( 'Charitable_Tools' ) ) :
 
 			ob_start();
 
-			$categories_css = isset( $_GET['taxonomy'] ) && 'campaign_category' == $_GET['taxonomy'] ? 'nav-tab-active' : ''; // phpcs:ignore
-			$tags_css       = isset( $_GET['taxonomy'] ) && 'campaign_tag' == $_GET['taxonomy'] ? 'nav-tab-active' : ''; // phpcs:ignore
+			$taxonomy_now = isset( $_GET['taxonomy'] ) ? $_GET['taxonomy'] : ''; // phpcs:ignore
+
+			/*
+			 * Driven from get_sections() rather than a hand-written list.
+			 *
+			 * This nav is a SECOND copy of the one in views/tools/tools.php,
+			 * needed because the Categories and Tags tabs redirect out to
+			 * edit-tags.php (see taxonomy_redirects()), where that view never
+			 * runs. It used to hardcode nine anchors, and so it silently went
+			 * stale every time a tab was added: `ai-mcp` landed in
+			 * get_sections() in 1.8.13 and never appeared here, which is
+			 * exactly how the AI MCP tab went missing on the two taxonomy
+			 * screens while showing correctly everywhere else. Looping the same
+			 * source both navs share is what stops the next tab drifting too.
+			 *
+			 * Only the two taxonomy tabs need a non-standard href, since they
+			 * are the ones that live outside page=charitable-tools.
+			 */
+			$taxonomy_tabs = array(
+				'categories' => 'campaign_category',
+				'tags'       => 'campaign_tag',
+			);
 
 			?>
 
 			<div id="charitable-tools-nav">
 				<h1><?php echo esc_html__( 'Charitable Tools', 'charitable' ); ?></h1>
 				<h2 class="nav-tab-wrapper">
-						<a href="<?php echo esc_url( admin_url( 'edit-tags.php?taxonomy=campaign_category&post_type=campaign' ) ); ?>" class="nav-tab <?php echo esc_attr( $categories_css ); ?>"><?php echo esc_html__( 'Categories', 'charitable' ); ?></a>
-						<a href="<?php echo esc_url( admin_url( 'edit-tags.php?taxonomy=campaign_tag&post_type=campaign' ) ); ?>" class="nav-tab <?php echo esc_attr( $tags_css ); ?>"><?php echo esc_html__( 'Tags', 'charitable' ); ?></a>
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=customize' ) ); ?>" class="nav-tab "><?php echo esc_html__( 'Customize', 'charitable' ); ?></a>
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=export' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'Export', 'charitable' ); ?></a>
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=import' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'Import', 'charitable' ); ?></a>
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=system-info' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'System Info', 'charitable' ); ?></a>
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=snippets' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'Code Snippets', 'charitable' ); ?></a>
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=logs' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'Logs', 'charitable' ); ?></a>
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=charitable-tools&tab=misc' ) ); ?>" class="nav-tab"><?php echo esc_html__( 'Misc', 'charitable' ); ?></a>
+					<?php foreach ( charitable_get_admin_tools()->get_sections() as $tab_key => $tab_label ) : ?>
+						<?php
+						if ( isset( $taxonomy_tabs[ $tab_key ] ) ) {
+							$tab_url    = admin_url( 'edit-tags.php?taxonomy=' . $taxonomy_tabs[ $tab_key ] . '&post_type=campaign' );
+							$tab_active = $taxonomy_tabs[ $tab_key ] === $taxonomy_now ? 'nav-tab-active' : '';
+						} else {
+							$tab_url    = admin_url( 'admin.php?page=charitable-tools&tab=' . $tab_key );
+							$tab_active = '';
+						}
+						?>
+						<a href="<?php echo esc_url( $tab_url ); ?>" class="nav-tab <?php echo esc_attr( $tab_active ); ?>"><?php echo esc_html( $tab_label ); ?><?php echo $this->get_section_badge( $tab_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in get_section_badge(). ?></a>
+					<?php endforeach; ?>
 				</h2>
 			</div>
 

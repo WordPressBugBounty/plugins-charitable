@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $charitable_active_tab      = isset( $_GET['tab'] ) ? esc_html( $_GET['tab'] ) : 'export';  // phpcs:ignore
 $charitable_active_sub_tab  = isset( $_GET['sub_tab'] ) ? esc_html( $_GET['sub_tab'] ) : ''; // phpcs:ignore
 $charitable_group           = isset( $_GET['group'] ) ? esc_html( $_GET['group'] ) : $charitable_active_tab; // phpcs:ignore
-$charitable_tab_no_form_tag = array( 'import', 'export', 'system-info', 'snippets', 'customize', 'logs' );
+$charitable_tab_no_form_tag = array( 'import', 'export', 'system-info', 'snippets', 'customize', 'logs', 'ai-mcp' );
 $charitable_tab_no_fields   = array( 'system-info', 'snippets', 'customize', 'logs' );
 $charitable_tab_no_table    = array( 'logs' );
 $charitable_sections        = charitable_get_admin_tools()->get_sections();
@@ -44,7 +44,7 @@ ob_start();
 	<?php do_action( 'charitable_maybe_show_notification' ); ?>
 	<h2 class="nav-tab-wrapper">
 		<?php foreach ( $charitable_sections as $charitable_tab => $charitable_name ) : // phpcs:ignore ?>
-			<a href="<?php echo esc_url( add_query_arg( array( 'tab' => $charitable_tab ), admin_url( 'admin.php?page=charitable-tools' ) ) ); ?>" class="nav-tab <?php echo $charitable_active_tab == $charitable_tab ? 'nav-tab-active' : ''; ?>"><?php echo $charitable_name; // phpcs:ignore ?></a>
+			<a href="<?php echo esc_url( add_query_arg( array( 'tab' => $charitable_tab ), admin_url( 'admin.php?page=charitable-tools' ) ) ); ?>" class="nav-tab <?php echo $charitable_active_tab == $charitable_tab ? 'nav-tab-active' : ''; ?>"><?php echo $charitable_name; // phpcs:ignore ?><?php echo charitable_get_admin_tools()->get_section_badge( $charitable_tab ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in get_section_badge(). ?></a>
 		<?php endforeach ?>
 	</h2>
 	<?php if ( ! empty( $charitable_sub_sections ) ) : ?>

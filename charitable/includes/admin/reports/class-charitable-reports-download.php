@@ -181,8 +181,15 @@ if ( ! class_exists( 'Charitable_Reports_Download' ) ) :
 		 */
 		public function generate_overview_content( $action = '' ) {
 
-			$start_date = gmdate( 'Y/m/d', strtotime( '-7 days' ) );
-			$end_date   = gmdate( 'Y/m/d' );
+			/*
+			 * Site-local, not UTC: post_date is stored in site-local time, so a
+			 * bound built from bare UTC excludes part of today's donations on any
+			 * site whose timezone is ahead of UTC.
+			 *
+			 * @since 1.8.13
+			 */
+			$start_date = gmdate( 'Y/m/d', current_time( 'timestamp', 0 ) - ( 7 * DAY_IN_SECONDS ) );
+			$end_date   = gmdate( 'Y/m/d', current_time( 'timestamp', 0 ) );
 			$status     = false;
 
 			$start_date         = empty( $_POST['start_date'] ) ? $start_date : esc_html( $_POST['start_date'] ); // phpcs:ignore

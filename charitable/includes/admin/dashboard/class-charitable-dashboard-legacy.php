@@ -142,11 +142,18 @@ if ( ! class_exists( 'Charitable_Dashboard_Legacy' ) ) :
 		 */
 		private function init( $args = array() ) {
 
+			/*
+			 * Site-local, not UTC: post_date is stored in site-local time, so a
+			 * bound built from bare UTC excludes part of today's donations on any
+			 * site whose timezone is ahead of UTC.
+			 *
+			 * @since 1.8.13
+			 */
 			$defaults = apply_filters(
 				'charitable_dashboard_data_arg_defaults',
 				array(
-					'start_date' => gmdate( 'Y/m/d', strtotime( '-7 days' ) ),
-					'end_date'   => gmdate( 'Y/m/d' ),
+					'start_date' => gmdate( 'Y/m/d', current_time( 'timestamp', 0 ) - ( 7 * DAY_IN_SECONDS ) ),
+					'end_date'   => gmdate( 'Y/m/d', current_time( 'timestamp', 0 ) ),
 					'days'       => 7,
 				)
 			);
@@ -354,7 +361,13 @@ if ( ! class_exists( 'Charitable_Dashboard_Legacy' ) ) :
 			}
 
 			if ( empty( $this->date_axis ) ) {
-				return $this->get_days_between_dates( gmdate( 'Y/m/d', strtotime( '-7 days' ) ), gmdate( 'Y/m/d' ) );
+				/*
+				 * Site-local, not UTC: matches the convention used everywhere else
+				 * this class builds a date bound.
+				 *
+				 * @since 1.8.13
+				 */
+				return $this->get_days_between_dates( gmdate( 'Y/m/d', current_time( 'timestamp', 0 ) - ( 7 * DAY_IN_SECONDS ) ), gmdate( 'Y/m/d', current_time( 'timestamp', 0 ) ) );
 			}
 
 			return (array) $this->date_axis;
@@ -405,6 +418,15 @@ if ( ! class_exists( 'Charitable_Dashboard_Legacy' ) ) :
 			if ( false === $days ) {
 				$args = $this->get_cached_dashboard_data_args();
 				if ( empty( $args ) || false === $args ) {
+					/*
+					 * NOTE (1.8.13): $days is still `false` here - it isn't set to 7
+					 * until the line below - so `'-' . $days . ' days'` resolves to
+					 * '- days' and strtotime() returns an epoch-adjacent date. This
+					 * is a separate, pre-existing defect (not the UTC-vs-site-local
+					 * bug fixed elsewhere in this file this release) and is left
+					 * untouched here; fixing it needs its own review since the
+					 * $days ordering is the actual problem, not the timezone.
+					 */
 					$start_date = gmdate( 'Y/m/d', strtotime( '-' . $days . ' days' ) );
 					$end_date   = gmdate( 'Y/m/d' );
 					$days       = 7;
@@ -437,8 +459,16 @@ if ( ! class_exists( 'Charitable_Dashboard_Legacy' ) ) :
 			if ( false === $html || false === $this->donation_axis || false === $this->date_axis || ! $this->maybe_cache_dashboard( $use_cache ) ) {
 
 				if ( $days ) {
-					$start_date = gmdate( 'Y/m/d', strtotime( '-' . $days . ' days' ) );
-					$end_date   = gmdate( 'Y/m/d' );
+					/*
+					 * Site-local, not UTC: this feeds Charitable_Reports::get_data(),
+					 * which filters on p.post_date (site-local time), so a bound
+					 * built from bare UTC excludes part of today's donations on any
+					 * site whose timezone is ahead of UTC.
+					 *
+					 * @since 1.8.13
+					 */
+					$start_date = gmdate( 'Y/m/d', strtotime( '-' . $days . ' days', current_time( 'timestamp', 0 ) ) );
+					$end_date   = gmdate( 'Y/m/d', current_time( 'timestamp', 0 ) );
 				} else {
 					$start_date = ( false === $start_date ) ? $this->start_date : $start_date;
 					$end_date   = ( false === $end_date ) ? $this->end_date : $end_date;

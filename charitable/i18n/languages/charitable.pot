@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Charitable 1.8.12.2\n"
+"Project-Id-Version: Charitable 1.8.12.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/charitable\n"
 "Last-Translator: Charitable Team\n"
 "Language-Team: Charitable Team\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-22T12:32:48+00:00\n"
+"POT-Creation-Date: 2026-09-02T16:19:26+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: charitable\n"
@@ -4959,6 +4959,7 @@ msgid "There were problems with your form submission. The following required fie
 msgstr ""
 
 #: includes/abstracts/abstract-class-charitable-form.php:509
+#: includes/ajax/charitable-ajax-functions.php:105
 msgid "No file was uploaded."
 msgstr ""
 
@@ -5072,14 +5073,14 @@ msgstr ""
 
 #: includes/admin/addons-directory/class-charitable-addons-directory.php:131
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:701
-#: includes/admin/class-charitable-admin.php:361
+#: includes/admin/class-charitable-admin.php:477
 #: includes/admin/onboarding/class-charitable-checklist.php:827
 msgid "OK"
 msgstr ""
 
 #: includes/admin/addons-directory/class-charitable-addons-directory.php:132
 #: includes/admin/campaign-builder/class-charitable-campaign-builder.php:700
-#: includes/admin/class-charitable-admin.php:362
+#: includes/admin/class-charitable-admin.php:478
 #: includes/admin/views/metaboxes/campaign-benefactors/form.php:54
 #: includes/admin/views/metaboxes/donation/donation-form-meta.php:36
 msgid "Cancel"
@@ -5195,7 +5196,7 @@ msgstr ""
 #: includes/admin/campaign-builder/panels/payment/class-payment-stripe.php:111
 #: includes/admin/campaign-builder/panels/payment/class-payment-windcave.php:154
 #: includes/admin/class-charitable-admin-pages.php:243
-#: includes/admin/class-charitable-admin.php:1223
+#: includes/admin/class-charitable-admin.php:1339
 #: includes/admin/templates/campaign-builder-onboarding.php:65
 msgid "Settings"
 msgstr ""
@@ -5452,7 +5453,7 @@ msgid "View Campaign Page"
 msgstr ""
 
 #: includes/admin/campaign-builder/campaign-congrats-wizard/popup.php:38
-#: includes/admin/onboarding/class-charitable-setup.php:1930
+#: includes/admin/onboarding/class-charitable-setup.php:2016
 msgid "Congratulations!"
 msgstr ""
 
@@ -5648,14 +5649,14 @@ msgid "This is a large donation."
 msgstr ""
 
 #. translators: %s - campaign title.
-#: includes/admin/campaign-builder/class-campaign-builder-preview.php:200
-#: includes/admin/campaign-builder/class-campaign-builder-preview.php:415
+#: includes/admin/campaign-builder/class-campaign-builder-preview.php:222
+#: includes/admin/campaign-builder/class-campaign-builder-preview.php:591
 #, php-format
 msgid "%s Preview"
 msgstr ""
 
-#: includes/admin/campaign-builder/class-campaign-builder-preview.php:201
-#: includes/admin/campaign-builder/class-campaign-builder-preview.php:416
+#: includes/admin/campaign-builder/class-campaign-builder-preview.php:223
+#: includes/admin/campaign-builder/class-campaign-builder-preview.php:592
 #: includes/admin/campaign-builder/fields/class-campaign-title.php:83
 #: includes/admin/campaign-builder/templates/class-templates.php:1421
 #: includes/admin/notifications/class-charitable-notification-test-helper.php:147
@@ -5677,48 +5678,45 @@ msgstr ""
 msgid "Campaign"
 msgstr ""
 
-#: includes/admin/campaign-builder/class-campaign-builder-preview.php:239
+#: includes/admin/campaign-builder/class-campaign-builder-preview.php:386
 #: includes/admin/views/checklist/checklist.php:464
 #: includes/data/class-charitable-post-types.php:255
 msgid "Edit Campaign"
 msgstr ""
 
-#: includes/admin/campaign-builder/class-campaign-builder-preview.php:254
+#: includes/admin/campaign-builder/class-campaign-builder-preview.php:401
 msgid "View Donations"
 msgstr ""
 
-#: includes/admin/campaign-builder/class-campaign-builder-preview.php:262
+#: includes/admin/campaign-builder/class-campaign-builder-preview.php:409
 #: includes/admin/dashboard/class-charitable-dashboard.php:4162
 msgid "Documentation"
 msgstr ""
 
-#: includes/admin/campaign-builder/class-campaign-builder-preview.php:268
+#: includes/admin/campaign-builder/class-campaign-builder-preview.php:415
 msgid "Close this window"
 msgstr ""
 
 #. translators: %s - Charitable doc link.
-#: includes/admin/campaign-builder/class-campaign-builder-preview.php:283
+#: includes/admin/campaign-builder/class-campaign-builder-preview.php:430
 #, php-format
 msgid "You are viewing a preview of a <a href=\"%s\" target=\"_blank\">published campaign</a>. If this does not match your campaign page in the campaign builder, save your changes and then refresh this page. Your current theme can also effect the look of this page."
 msgstr ""
 
-#: includes/admin/campaign-builder/class-campaign-builder-preview.php:297
-#: includes/admin/campaign-builder/class-campaign-builder-preview.php:320
-msgid "Ssome functionality and elements (like donation buttons, forms, social sharing, etc.) are disabled."
+#: includes/admin/campaign-builder/class-campaign-builder-preview.php:444
+#: includes/admin/campaign-builder/class-campaign-builder-preview.php:467
+#: includes/admin/campaign-builder/class-campaign-builder-preview.php:502
+msgid "Some functionality and elements (like donation buttons, forms, social sharing, etc.) are disabled."
 msgstr ""
 
 #. translators: %s - Charitable doc link.
-#: includes/admin/campaign-builder/class-campaign-builder-preview.php:306
-#: includes/admin/campaign-builder/class-campaign-builder-preview.php:341
+#: includes/admin/campaign-builder/class-campaign-builder-preview.php:453
+#: includes/admin/campaign-builder/class-campaign-builder-preview.php:488
 msgid "This is a preview of the latest saved revision of your campaign page. If this does not match your campaign page in the campaign builder, save your changes and then refresh this page. Your current theme can also effect the look of this page."
 msgstr ""
 
-#: includes/admin/campaign-builder/class-campaign-builder-preview.php:330
+#: includes/admin/campaign-builder/class-campaign-builder-preview.php:477
 msgid "View Live Campaign"
-msgstr ""
-
-#: includes/admin/campaign-builder/class-campaign-builder-preview.php:355
-msgid "Some functionality and elements (like donation buttons, forms, social sharing, etc.) are disabled."
 msgstr ""
 
 #: includes/admin/campaign-builder/class-campaign-embed-wizard.php:446
@@ -7724,7 +7722,7 @@ msgstr ""
 #: templates/form-fields/editor.php:55
 #: templates/form-fields/multi-checkbox.php:40
 #: templates/form-fields/number.php:35
-#: templates/form-fields/picture.php:88
+#: templates/form-fields/picture.php:104
 #: templates/form-fields/radio.php:43
 #: templates/form-fields/select.php:41
 #: templates/form-fields/textarea.php:39
@@ -8193,7 +8191,7 @@ msgid "Ambassadors &amp; Peer to Peer Fundraising"
 msgstr ""
 
 #: includes/admin/campaign-builder/panels/settings/class-settings-addons.php:63
-#: includes/admin/charitable-core-admin-functions.php:1824
+#: includes/admin/charitable-core-admin-functions.php:1850
 #: includes/admin/class-charitable-admin-getting-started.php:363
 #: includes/admin/class-charitable-admin-getting-started.php:436
 #: includes/admin/dashboard/class-charitable-dashboard-legacy.php:1094
@@ -8701,7 +8699,7 @@ msgid "Create A Modern Campaign"
 msgstr ""
 
 #: includes/admin/campaigns/class-charitable-campaign-list-table.php:793
-#: includes/admin/charitable-core-admin-functions.php:1803
+#: includes/admin/charitable-core-admin-functions.php:1829
 #: includes/admin/dashboard/class-charitable-dashboard.php:1894
 #: includes/admin/dashboard/class-charitable-dashboard.php:4169
 #: includes/admin/donations/class-charitable-donation-list-table.php:1166
@@ -9123,21 +9121,21 @@ msgstr ""
 msgid "Notification not found."
 msgstr ""
 
-#: includes/admin/charitable-core-admin-functions.php:1759
+#: includes/admin/charitable-core-admin-functions.php:1785
 msgid "Charitable Test Mode Active"
 msgstr ""
 
-#: includes/admin/charitable-core-admin-functions.php:1793
+#: includes/admin/charitable-core-admin-functions.php:1819
 #: includes/admin/dashboard/class-charitable-dashboard.php:1884
 msgid "Upgrade to Pro to Unlock Powerful Donation Features"
 msgstr ""
 
-#: includes/admin/charitable-core-admin-functions.php:1804
+#: includes/admin/charitable-core-admin-functions.php:1830
 #: includes/admin/dashboard/class-charitable-dashboard.php:1895
 msgid "Learn more about all features →"
 msgstr ""
 
-#: includes/admin/charitable-core-admin-functions.php:1825
+#: includes/admin/charitable-core-admin-functions.php:1851
 #: includes/admin/class-charitable-admin-getting-started.php:347
 #: includes/admin/class-charitable-admin-getting-started.php:447
 #: includes/admin/dashboard/class-charitable-dashboard.php:1909
@@ -9146,12 +9144,12 @@ msgstr ""
 msgid "Peer-to-Peer Fundraising"
 msgstr ""
 
-#: includes/admin/charitable-core-admin-functions.php:1826
+#: includes/admin/charitable-core-admin-functions.php:1852
 #: includes/admin/dashboard/class-charitable-dashboard.php:1910
 msgid "Donor Database"
 msgstr ""
 
-#: includes/admin/charitable-core-admin-functions.php:1827
+#: includes/admin/charitable-core-admin-functions.php:1853
 #: includes/admin/dashboard/class-charitable-dashboard.php:1911
 #: includes/admin/settings/class-charitable-settings.php:1048
 #: includes/admin/settings/class-charitable-settings.php:1049
@@ -9160,32 +9158,32 @@ msgstr ""
 msgid "Donor Dashboard"
 msgstr ""
 
-#: includes/admin/charitable-core-admin-functions.php:1828
+#: includes/admin/charitable-core-admin-functions.php:1854
 #: includes/admin/dashboard/class-charitable-dashboard.php:1912
 msgid "PDF & Annual Receipts"
 msgstr ""
 
-#: includes/admin/charitable-core-admin-functions.php:1853
+#: includes/admin/charitable-core-admin-functions.php:1879
 #: includes/admin/dashboard/class-charitable-dashboard.php:1934
 msgid "Anonymous Giving"
 msgstr ""
 
-#: includes/admin/charitable-core-admin-functions.php:1854
+#: includes/admin/charitable-core-admin-functions.php:1880
 #: includes/admin/dashboard/class-charitable-dashboard.php:1935
 msgid "Fee Coverage Option"
 msgstr ""
 
-#: includes/admin/charitable-core-admin-functions.php:1855
+#: includes/admin/charitable-core-admin-functions.php:1881
 #: includes/admin/dashboard/class-charitable-dashboard.php:1936
 msgid "Email Marketing Integration"
 msgstr ""
 
-#: includes/admin/charitable-core-admin-functions.php:1856
+#: includes/admin/charitable-core-admin-functions.php:1882
 #: includes/admin/dashboard/class-charitable-dashboard.php:1937
 msgid "Built-In Analytics & Reports"
 msgstr ""
 
-#: includes/admin/charitable-core-admin-functions.php:1857
+#: includes/admin/charitable-core-admin-functions.php:1883
 #: includes/admin/dashboard/class-charitable-dashboard.php:1938
 msgid "Flexible Payment Methods"
 msgstr ""
@@ -9846,19 +9844,19 @@ msgstr ""
 msgid "Dismiss"
 msgstr ""
 
-#: includes/admin/class-charitable-admin.php:322
+#: includes/admin/class-charitable-admin.php:438
 msgid "Action could not be executed."
 msgstr ""
 
-#: includes/admin/class-charitable-admin.php:326
+#: includes/admin/class-charitable-admin.php:442
 msgid "Action could not be executed. Nonce check failed."
 msgstr ""
 
-#: includes/admin/class-charitable-admin.php:330
+#: includes/admin/class-charitable-admin.php:446
 msgid "Action from an unknown action type executed."
 msgstr ""
 
-#: includes/admin/class-charitable-admin.php:352
+#: includes/admin/class-charitable-admin.php:468
 #: includes/admin/reports/class-charitable-reports-download.php:492
 #: includes/admin/views/metaboxes/campaign-donation-options/suggested-amounts.php:36
 #: includes/admin/views/metaboxes/campaign-donation-options/suggested-amounts.php:37
@@ -9868,79 +9866,79 @@ msgstr ""
 msgid "Amount"
 msgstr ""
 
-#: includes/admin/class-charitable-admin.php:353
+#: includes/admin/class-charitable-admin.php:469
 #: includes/admin/views/metaboxes/campaign-donation-options/suggested-amounts.php:41
 msgid "Optional Description"
 msgstr ""
 
-#: includes/admin/class-charitable-admin.php:356
+#: includes/admin/class-charitable-admin.php:472
 msgid "Heads Up!"
 msgstr ""
 
-#: includes/admin/class-charitable-admin.php:357
+#: includes/admin/class-charitable-admin.php:473
 msgid "Square (Legacy) is currently active. Activating the Square (Core) payment method will deactivate the Square (Legacy) payment and you will need to reconnect your Square account.<br><br>Click <strong><span style=\"color: #ff6b35;\">Ok</span></strong> to deactivate Square (Legacy) and activate Square (Core) payment. Click <strong><span style=\"color: #000000;\">Cancel</span></strong> to keep Square (Legacy) payment active.</strong><br><br><a href=\"https://wpcharitable.com/documentation/square-legacy\" target=\"_blank\">Read our documentation</a>"
 msgstr ""
 
-#: includes/admin/class-charitable-admin.php:358
+#: includes/admin/class-charitable-admin.php:474
 msgid "Square (Core) is currently active. Activating the Square (Legacy) payment method will deactivate the Square (Core) payment and you will need to reconnect your Square account.<br><br>Click <strong><span style=\"color: #ff6b35;\">Ok</span></strong> to deactivate Square (Core) and activate Square (Legacy) payment. Click <strong><span style=\"color: #000000;\">Cancel</span></strong> to keep Square (Core) payment active.<br><br><a href=\"https://wpcharitable.com/documentation/square-legacy\" target=\"_blank\">Read our documentation</a>"
 msgstr ""
 
-#: includes/admin/class-charitable-admin.php:359
+#: includes/admin/class-charitable-admin.php:475
 msgid "Oops!"
 msgstr ""
 
-#: includes/admin/class-charitable-admin.php:360
+#: includes/admin/class-charitable-admin.php:476
 msgid "There was an error switching the payment gateways. Please try again."
 msgstr ""
 
 #. Translators: %s: link.
-#: includes/admin/class-charitable-admin.php:861
+#: includes/admin/class-charitable-admin.php:977
 #, php-format
 msgid "You appear to be using a code snippet plugin. Please <a href='%s' target='_blank'>review best practices</a> when using snippets to avoid problems when upgrading or deactivating Charitable."
 msgstr ""
 
 #. translators: %s: link
-#: includes/admin/class-charitable-admin.php:895
+#: includes/admin/class-charitable-admin.php:1011
 #, php-format
 msgid "Charitable 1.5 is packed with new features and improvements. <a href='%s' target='_blank'>Find out what's new</a>."
 msgstr ""
 
 #. translators: %s: link
-#: includes/admin/class-charitable-admin.php:900
+#: includes/admin/class-charitable-admin.php:1016
 #, php-format
 msgid "Charitable 1.6 introduces important new user privacy features and other improvements. <a href=\"%s\" target=\"_blank\">Find out what's new</a>."
 msgstr ""
 
 #. Translators: 1 - Opening HTML bold tag, 2 - Closing HTML bold tag, 3 - Opening HTML link tag, 4 - Closing HTML link tag.
-#: includes/admin/class-charitable-admin.php:932
+#: includes/admin/class-charitable-admin.php:1048
 #, php-format
 msgid "Your site is running an %1$soutdated version%2$s of PHP that is no longer supported and may cause issues with %3$s. Please contact your web hosting provider to update your PHP version or switch to a %4$srecommended WordPress hosting company%5$s."
 msgstr ""
 
 #. Translators: 1 - Opening HTML bold tag, 2 - Closing HTML bold tag, 3 - The PHP version, 4 - The current year, 5 - The short plugin name ("Charitable"), 6 - Opening HTML link tag, 7 - Closing HTML link tag.
-#: includes/admin/class-charitable-admin.php:955
+#: includes/admin/class-charitable-admin.php:1071
 #, php-format
 msgid "%1$sNote:%2$s Support for PHP %3$s will be discontinued in %4$s. After this, if no further action is taken, %5$s functionality will be disabled. %6$sRead more for additional information.%7$s"
 msgstr ""
 
-#: includes/admin/class-charitable-admin.php:1248
+#: includes/admin/class-charitable-admin.php:1364
 #: includes/admin/settings/class-charitable-settings.php:223
 msgid "Extensions"
 msgstr ""
 
-#: includes/admin/class-charitable-admin.php:1426
+#: includes/admin/class-charitable-admin.php:1542
 msgid "ID: "
 msgstr ""
 
-#: includes/admin/class-charitable-admin.php:1436
+#: includes/admin/class-charitable-admin.php:1552
 msgid "Legacy Edit"
 msgstr ""
 
-#: includes/admin/class-charitable-admin.php:1439
+#: includes/admin/class-charitable-admin.php:1555
 msgid "Edit With Builder"
 msgstr ""
 
-#: includes/admin/class-charitable-admin.php:1445
+#: includes/admin/class-charitable-admin.php:1561
 #: includes/admin/donations/class-charitable-donation-list-table.php:281
 #: includes/admin/views/metaboxes/campaign-benefactors/summary.php:34
 #: includes/data/class-charitable-post-types.php:254
@@ -9948,11 +9946,11 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: includes/admin/class-charitable-admin.php:1633
+#: includes/admin/class-charitable-admin.php:1749
 msgid "Plugin installed successfully"
 msgstr ""
 
-#: includes/admin/class-charitable-admin.php:1676
+#: includes/admin/class-charitable-admin.php:1792
 msgid "Plugin activated successfully"
 msgstr ""
 
@@ -11825,92 +11823,92 @@ msgstr ""
 msgid "Finish the Checklist."
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:505
-#: includes/admin/onboarding/class-charitable-setup.php:506
+#: includes/admin/onboarding/class-charitable-setup.php:591
+#: includes/admin/onboarding/class-charitable-setup.php:592
 msgid "Setup Charitable"
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1920
+#: includes/admin/onboarding/class-charitable-setup.php:2006
 msgid "Starting..."
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1921
+#: includes/admin/onboarding/class-charitable-setup.php:2007
 msgid "Setting Up General Settings..."
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1922
+#: includes/admin/onboarding/class-charitable-setup.php:2008
 msgid "Updating Plugins..."
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1923
+#: includes/admin/onboarding/class-charitable-setup.php:2009
 msgid "Installing Plugins..."
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1924
+#: includes/admin/onboarding/class-charitable-setup.php:2010
 msgid "Activating Plugins..."
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1925
-#: includes/admin/onboarding/class-charitable-setup.php:1926
+#: includes/admin/onboarding/class-charitable-setup.php:2011
+#: includes/admin/onboarding/class-charitable-setup.php:2012
 msgid "Setting Up Features..."
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1927
+#: includes/admin/onboarding/class-charitable-setup.php:2013
 msgid "Setting Up Your First Campaign..."
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1928
+#: includes/admin/onboarding/class-charitable-setup.php:2014
 msgid "Setting Up Payment Methods..."
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1929
+#: includes/admin/onboarding/class-charitable-setup.php:2015
 msgid "Almost done!"
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1934
+#: includes/admin/onboarding/class-charitable-setup.php:2020
 msgid "Updating country, currency, and related settings for you."
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1935
+#: includes/admin/onboarding/class-charitable-setup.php:2021
 msgid "Checking plugins..."
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1938
-#: includes/admin/onboarding/class-charitable-setup.php:1939
+#: includes/admin/onboarding/class-charitable-setup.php:2024
+#: includes/admin/onboarding/class-charitable-setup.php:2025
 msgid "Checking license and site information..."
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1940
+#: includes/admin/onboarding/class-charitable-setup.php:2026
 msgid "Creating draft..."
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1941
+#: includes/admin/onboarding/class-charitable-setup.php:2027
 msgid "Checking payment methods..."
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1942
+#: includes/admin/onboarding/class-charitable-setup.php:2028
 msgid "Finishing things..."
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1943
+#: includes/admin/onboarding/class-charitable-setup.php:2029
 msgid "Stripe offers a seamless and secure payment experience for both you and your donors."
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1944
+#: includes/admin/onboarding/class-charitable-setup.php:2030
 msgid "Your Charitable install has been setup and is ready for you."
 msgstr ""
 
 #. translators: %1$s: List of requested features
-#: includes/admin/onboarding/class-charitable-setup.php:1958
+#: includes/admin/onboarding/class-charitable-setup.php:2044
 #, php-format
 msgid "In order to install and activate some of the features you requested %1$s you need to activate your PRO license after setup is complete."
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1959
+#: includes/admin/onboarding/class-charitable-setup.php:2045
 msgid "Activating license and installing addons..."
 msgstr ""
 
-#: includes/admin/onboarding/class-charitable-setup.php:1964
+#: includes/admin/onboarding/class-charitable-setup.php:2050
 msgid "Skip setting up Stripe"
 msgstr ""
 
@@ -16447,7 +16445,19 @@ msgstr ""
 msgid "Note: You will be transfered to an WPCharitable.com to complete the setup wizard."
 msgstr ""
 
+#: includes/ajax/charitable-ajax-functions.php:93
+msgid "Please log in or create an account to upload an image."
+msgstr ""
+
 #: includes/ajax/charitable-ajax-functions.php:157
+msgid "Sorry, that file could not be uploaded. Please choose an image and try again."
+msgstr ""
+
+#: includes/ajax/charitable-ajax-functions.php:197
+msgid "Sorry, you are not allowed to upload this file type."
+msgstr ""
+
+#: includes/ajax/charitable-ajax-functions.php:285
 msgid "Missing templates in request."
 msgstr ""
 
@@ -20378,7 +20388,7 @@ msgstr ""
 msgid "User Dashboard"
 msgstr ""
 
-#: includes/shortcodes/class-charitable-campaign-shortcode.php:95
+#: includes/shortcodes/class-charitable-campaign-shortcode.php:117
 msgid "This campaign embeds a shortcode that points back at itself, so it was not rendered here to prevent an infinite loop. Remove or change that shortcode field."
 msgstr ""
 
@@ -21603,12 +21613,12 @@ msgstr ""
 msgid "Read More"
 msgstr ""
 
-#: templates/campaign/builder/content.php:119
-msgid "This campaign is currently in draft mode. Only you can see it, and some functionality (like donation forms, donation buttons, etc.) might be disabled."
+#: templates/campaign/builder/content.php:252
+msgid "This campaign has not been published yet. Only you can see it, and some functionality (like donation forms, donation buttons, etc.) might be disabled."
 msgstr ""
 
-#: templates/campaign/builder/content.php:126
-msgid "This campaign is currently in draft mode."
+#: templates/campaign/builder/content.php:259
+msgid "This campaign has not been published yet."
 msgstr ""
 
 #: templates/comments/disabled-comments.php:21
@@ -21695,32 +21705,36 @@ msgstr ""
 msgid "Remove"
 msgstr ""
 
-#: templates/form-fields/picture.php:65
+#: templates/form-fields/picture.php:78
 msgctxt "image upload"
 msgid "Allowed Image Files"
 msgstr ""
 
-#: templates/form-fields/picture.php:101
+#: templates/form-fields/picture.php:120
+msgid "Image uploads are available to logged-in users. Please log in or create an account to add an image."
+msgstr ""
+
+#: templates/form-fields/picture.php:144
 msgctxt "image upload"
 msgid "Drop image here"
 msgstr ""
 
-#: templates/form-fields/picture.php:101
+#: templates/form-fields/picture.php:144
 msgctxt "image upload plural"
 msgid "Drop images here"
 msgstr ""
 
-#: templates/form-fields/picture.php:102
+#: templates/form-fields/picture.php:145
 msgctxt "image upload"
 msgid "or"
 msgstr ""
 
-#: templates/form-fields/picture.php:104
+#: templates/form-fields/picture.php:147
 msgctxt "image upload"
 msgid "Select Files"
 msgstr ""
 
-#: templates/form-fields/picture.php:108
+#: templates/form-fields/picture.php:151
 msgid "Uploading..."
 msgstr ""
 

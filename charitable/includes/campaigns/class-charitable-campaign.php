@@ -1029,8 +1029,40 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 		/**
 		 * Returns the percentage donated as a number.
 		 *
+		 * Ported from Charitable Pro, 1.8.13, THEN deliberately changed —
+		 * Lite deviates from Pro here on purpose. Pro's own version (and my
+		 * first port of it) unconditionally strips the thousands separator
+		 * and swaps the decimal separator, which is correct for a
+		 * DISPLAY-locale-formatted goal like "1,000.00" but wrong for the
+		 * CANONICAL dot-decimal form sanitize_campaign_goal() actually
+		 * stores: that method runs every saved goal through
+		 * Charitable_Currency::sanitize_monetary_amount(), which returns
+		 * floatval() — always dot-decimal, regardless of site locale. On a
+		 * comma-decimal / dot-thousands site (Settings > General; both
+		 * separators are user-settable), the unconditional strip reads an
+		 * already-canonical "1000.5" as "10005" — a campaign that raised 300
+		 * of a 1000.5 goal reported 3% instead of 30%.
+		 *
+		 * is_numeric() distinguishes the two shapes: a canonical dot-decimal
+		 * value passes it and is used via a plain floatval(), untouched; a
+		 * display-formatted value ("1,000.00", "1.000,50") does not, and
+		 * still gets the separator treatment below. This is what makes both
+		 * the locale-formatted-input case (list-campaigns/get-campaign's own
+		 * "1,000.00" trap) and the canonical-storage case correct at once.
+		 *
+		 * Callers reach well beyond the abilities surface: the front-end
+		 * progress bar (templates/campaign/progress-bar.php, both the bar
+		 * width and the aria-valuenow a screen reader announces), the
+		 * dashboard and reports classes, and get_percent_donated() below all
+		 * go through this method. Pro carries the same bug on the same
+		 * front-end path; Charitable_Campaign_Abilities::percent_raised()
+		 * being correct would not have been enough to fix what a donor's
+		 * screen reader announces. The verbatim-fidelity rule for this port
+		 * covers the abilities registrars; it does not require shipping a
+		 * known locale regression on a shared front-end template.
+		 *
 		 * @since   1.0.0
-		 * @version 1.8.7.1
+		 * @version 1.8.13
 		 *
 		 * @return int
 		 */
@@ -1039,11 +1071,27 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 				return false;
 			}
 
-			$donated = (float) $this->get_donated_amount( true );
-			$goal    = (float) $this->get_goal();
+			$donated = floatval( $this->get_donated_amount( true ) );
+
+			$goal_meta           = $this->get_meta( '_campaign_goal' );
+			$currency            = Charitable_Currency::get_instance();
+			$decimal_separator   = $currency->get_decimal_separator();
+			$thousands_separator = $currency->get_thousands_separator();
+
+			/*
+			 * Already-canonical dot-decimal values (the shape every saved
+			 * goal is actually stored in) pass through untouched; anything
+			 * else is a display-formatted string and gets the thousands
+			 * strip + decimal-separator swap.
+			 */
+			$goal = is_numeric( $goal_meta )
+				? floatval( $goal_meta )
+				: floatval( str_replace( $decimal_separator, '.', str_replace( $thousands_separator, '', $goal_meta ) ) );
+
 			if ( $goal <= 0 ) {
 				return 0;
 			}
+
 			return ( $donated / $goal ) * 100;
 		}
 
@@ -1066,6 +1114,34 @@ if ( ! class_exists( 'Charitable_Campaign' ) ) :
 			return apply_filters(
 				'charitable_campaign_donor_count',
 				(int) charitable_get_table( 'campaign_donations' )->count_campaign_donors( $this->ID ),
+				$this
+			);
+		}
+
+		/**
+		 * Return the number of donations (transactions) for the campaign.
+		 *
+		 * Ported from Charitable Pro unchanged. Backs the
+		 * charitable/get-campaign-performance ability's donation_count field —
+		 * a campaign with two donations from the same donor has a donor_count
+		 * of 1 but a get_donation_count() of 2.
+		 *
+		 * @since 1.8.13
+		 *
+		 * @return int
+		 */
+		public function get_donation_count() {
+			/**
+			 * Filter the number of donations (transactions) for the campaign.
+			 *
+			 * @since 1.8.13
+			 *
+			 * @param int                 $count Number of donations.
+			 * @param Charitable_Campaign $this  This campaign object.
+			 */
+			return apply_filters(
+				'charitable_campaign_donation_count',
+				(int) charitable_get_table( 'campaign_donations' )->count_campaign_donations( $this->ID ),
 				$this
 			);
 		}
