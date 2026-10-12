@@ -2,9 +2,9 @@
 Contributors: WPCharitable, smub, dimensionmedia
 Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.9
-Tested up to: 7.1.2
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.8.13
+Stable tag: 1.8.13.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -272,10 +272,21 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 
 == Changelog ==
 
+= Donation Form & Fundraising Campaigns v1.8.13.1 =
+* IMPROVED: Accessibility improvements across the donation form, covering field labelling, autocomplete hints, grouped donation amounts and visible keyboard focus indicators.
+* FIX: Privacy improvements, reducing any unneeded external requests, and adding more control over the Share Usage Data setting.
+* FIX: Hardening across the campaign builder, including permission and security-token checks on several internal requests.
+* FIX: Minor improvements to Addons screen and setup wizard welcome screen.
+* FIX: Improvements for zero-decimal currencies, mostly on reports and dashboard pages.
+* FIX: Donation form errors are now announced to screen readers and take keyboard focus.
+* FIX: Donation form improvements related to Google reCAPTCHA and errors related to Stripe when confirming card details.
+* FIX: Donate button on a campaign page now carries the donation amount already highlighted.
+* FIX: Campaign templates now show a consistent campaign description in the builder preview and on the published page.
+
 = Donation Form & Fundraising Campaigns v1.8.13 =
-* NEW: (AI) Charitable now works with AI assistants. On WordPress 6.9 or later, connect Claude or ChatGPT using the free WPVibe plugin, or any MCP client, to build and restyle campaigns, log donations that arrived by post, and report on your fundraising. 24+ operations, all permission-checked. [More Information](https://www.wpcharitable.com/ai/)
-* NEW: (AI) New panel at Charitable > Tools > AI MCP. Write access starts OFF, an AI Activity list records every change and every refusal, and an assistant must confirm explicitly before trashing or unpublishing a campaign that already has donations.
-* FIX: Resolved issue involving campaign progress bars showing incorrect percentages when a goal contained separators in certain scenarios.
+* NEW: Charitable now works with AI assistants. On WordPress 6.9 or later, connect Claude or ChatGPT using the free WPVibe plugin, or any MCP client, to build and restyle campaigns, log donations that arrived by post, and report on your fundraising. Twenty-four operations, all permission-checked. [More Information](https://www.wpcharitable.com/ai/)
+* NEW: Control it all at Charitable > Tools > AI MCP. Write access starts OFF, an AI Activity list records every change and every refusal, and an assistant must confirm explicitly before trashing or unpublishing a campaign that already has donations.
+* FIX: Campaign progress bars could show wildly wrong percentages when a goal contained separators. A goal saved as "1,000.00" was read as 1, reporting 30000% instead of 30%. On sites using a comma decimal separator, goals with cents read a hundred times too large. GiveWP imports were most affected.
 * FIX: Resolved issue when a campaign with a goal but no end date showed no progress bar in the Campaigns list.
 * FIX: A campaign end date entered as a plain date, for example 2027-01-31, could be mis-read and saved incorrectly in certain scenarios in admin.
 * FIX: Reports, the donations CSV export, and the Dashboard's date-range dropdown and latest-donations list could leave today's donations out for part of each day, on sites whose timezone is ahead of UTC.
@@ -347,309 +358,5 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 * NEW: Help icons next to each payment gateway in admin settings, linking to documentation.
 * IMPROVED: Test Mode toggle now has descriptive help text explaining sandbox routing.
 * IMPROVED: Stripe donation flow now self-heals when a previously stored PaymentIntent becomes unreachable (e.g. after a gateway reconnect).
-
-= Donation Form & Fundraising Campaigns v1.8.10.5 =
-* NEW: Redesigned the "What's New" splash screen with a new hero section, video, and upgrade buttons.
-* NEW: Added a Form navigation icon in the campaign builder with an upgrade prompt for the Charitable Pro visual form builder.
-* IMPROVED: System Info now includes a Hosting Environment section.
-* FIX: Hardened input handling in the donations admin search to improve query safety.
-* FIX: Resolved a custom donation amount parsing issue with the decimal separator on non-US currency sites in certain scenarios.
-
-= Donation Form & Fundraising Campaigns v1.8.10.4 =
-* FIX: Fixed an issue where multiple Stripe webhook endpoints could accumulate over time, causing donation webhook events to fail signature verification in certain scenarios.
-
-= Donation Form & Fundraising Campaigns v1.8.10.3 =
-* IMPROVED: Sync Pending Stripe Donations now uses AJAX processing with new dry run and email options.
-* FIX: Improved Stripe webhook reliability, signing secret handling, and notice wording in certain scenarios.
-* FIX: Fixed refund checkbox not appearing when changing donation status to Refunded in certain scenarios.
-
-= Donation Form & Fundraising Campaigns v1.8.10.2 =
-* NEW: Added Sync Pending Stripe Donations tool to gateway settings (beta).
-* FIX: Fixed minor CSS issues on dashboard.
-* FIX: Fixed some PHP warnings.
-* FIX: Fixed a fatal error involving Stripe webhook migration on sites without an active Stripe connection in certain scenarios.
-
-= Donation Form & Fundraising Campaigns v1.8.10.1 =
-* FIX: Improved Stripe webhook verification and resolved several issues with signing secret setup and auto-migration.
-* FIX: Improved license detection on WordPress multisite subsites.
-* FIX: Resolved PHP 8.3 compatibility issue in Stripe gateway.
-* FIX: Fixed Cloudflare Turnstile action string exceeding character limit on password retrieval form.
-* FIX: Fixed padding and alignment in dashboard tab content area for addon status messages.
-
-= Donation Form & Fundraising Campaigns v1.8.10 =
-* NEW: Expanded Import tools with sub-tabs for Charitable, GiveWP, and GiveButter imports including CSV donations import and GiveWP Migration Tool (Beta).
-* NEW: Redesigned blank slate pages for campaigns and donations.
-* IMPROVED: Strengthened Stripe webhook processing with additional verification.
-* FIX: Restored campaign grid column widths for the [campaigns] shortcode.
-* FIX: Improved email reliability when processing certain recipient formats.
-* FIX: Improved error diagnostics in System Info.
-
-= Donation Form & Fundraising Campaigns v1.8.9.7 =
-* NEW: Charitable will add social meta to campaign pages for improved sharing on some social networks (SEO plugins can override this).
-* FIX: Fixed broken social share URLs for Twitter/X, Pinterest, and improved share link defaults.
-* FIX: Corrected sanitization issue that resulted in incorrect display of code in "time left" display for campaigns in certain scenarios.
-
-= Donation Form & Fundraising Campaigns v1.8.9.6 =
-* IMPROVED: Enhanced license validation process with improved performance when downloading Charitable Pro automatically.
-* FIX: Improved email reliability in certain scenarios, especially with certain aggressive WordPress themes.
-* FIX: Updated translation strings and minor updates to PHP and CSS regarding best practices.
-
-= Donation Form & Fundraising Campaigns v1.8.9.5 =
-* FIX: Added additional checks to resolved issue with Stripe webhook that was causing a fatal error a certain scenario.
-* FIX: Allow more international characters into campaign title fields in campaign visual builder.
-* IMPROVED: Email shortcode processing with recursion prevention for better reliability.
-* IMPROVED: Added additional enhanced email error logging and diagnostics.
-
-= Donation Form & Fundraising Campaigns v1.8.9.4 =
-* FIX: Resolved seemingly missing social media icons in some campaign builder template previews in certain scenarios.
-* UPDATE: Improved campaign builder templates for cache busting.
-
-= Donation Form & Fundraising Campaigns v1.8.9.3 =
-* FIX: Resolved onboarding redirect issue in some scenarios.
-
-= Donation Form & Fundraising Campaigns v1.8.9.2 =
-* NEW: Email and donation form debugging tools in "System Info" in Charitable Tools.
-* UPDATE: Campaign template CSS now loads via REST API endpoint to resolve 500 errors on servers that block direct PHP file access.
-* FIX: Adjustments for PHP 8.4 and PHP 8.5 for better compatibility.
-* FIX: Adjustment in how email emails are registered and loaded for better potential compatibility in certain server configurations.
-* FIX: Minor translation and coding updates.
-
-= Donation Form & Fundraising Campaigns v1.8.9.1 =
-* FIX: Resolved issue where blank state screens were not displaying on campaigns and donations list pages when no items exist.
-* FIX: Fixed help button in campaign builder not navigating to documentation URL.
-
-= Donation Form & Fundraising Campaigns v1.8.9 =
-* NEW: Captcha security settings in security tab. Supports Google reCAPTCHA (Invisible V2), Google reCAPTCHA v3 (Invisible), hCaptcha, Cloudflare Turnstile.
-
-= Donation Form & Fundraising Campaigns v1.8.8.6 =
-* NEW: Added include_children to the stat shortcode.
-* FIX: Resolved issue relating to onboarding screen overriding a number of other WordPress admin screens.
-* FIX: Updated code related to translations and PHP standards.
-* UPDATE: Campaign frontend CSS system revised.
-
-= Donation Form & Fundraising Campaigns v1.8.8.5 =
-* FIX: Resolved bug regarding manual donation edit and time resetting to midnight.
-* FIX: Insured proper sanitization of user input in database queries in some scenarios.
-* FIX: Updated code related to translations and PHP standards.
-
-= Donation Form & Fundraising Campaigns v1.8.8.4 =
-* FIX: Fixed compatibility issue in admin action processing that could cause errors when managing recurring donations.
-* FIX: Improved caching of dashboard blog posts.
-* FIX: Updated code related to translations and PHP standards.
-* UPDATE: Updated text on dashboard widgets.
-
-= Donation Form & Fundraising Campaigns v1.8.8.3 =
-* FIX: Resolved application fee calculation issue for zero-decimal currencies in Stripe payments in certain scenarios.
-* FIX: Updated code related to improve security and PHP standards compliance.
-
-= Donation Form & Fundraising Campaigns v1.8.8.2 =
-* FIX: Resolve PHP error causing issues with dashboard fully loading in some scenarios.
-* FIX: Improved front-end detection of tabs in visual campaigns.
-
-= Donation Form & Fundraising Campaigns v1.8.8.1 =
-* FIX: Fixed some CSS issues in certain areas in the admin when a license was not activated.
-* UPDATE: Minor dashboard visual updates when a license is activated.
-
-= Donation Form & Fundraising Campaigns v1.8.8 =
-* NEW: New dashboard design with top campaigns, latest donations, top donors, and comments. New "30 Day" period added.
-* NEW: Added 'charitable_donor_query_skip_donation_filters' for donor query to make including donors without donations more flexible.
-* NEW: Added 'charitable_admin_donation_form_donor_list' to control donor retreval in the admin.
-* NEW: Test Mode Alert now shows in admin pages, links to Charitable's payment methods settings screen.
-* NEW: Updated plugin screen design.
-* NEW: About Us menu that includes "Getting Started" page for the Charitable Checklist, Lite vs Pro page, and more.
-
-= Donation Form & Fundraising Campaigns v1.8.7.4 =
-* FIX: Resolve a fatal error in PHP 8.0 in campaign visual builder in certain scenarios.
-
-= Donation Form & Fundraising Campaigns v1.8.7.3 =
-* FIX: Updated code related to translations and PHP standards.
-* FIX: Bug in license detection to display certain text in certain scenarios.
-* FIX: JavaScript errors related to campaign visual builder when Charitable is in debug mode.
-
-= Donation Form & Fundraising Campaigns v1.8.7.2 =
-* FIX: CSS tweaks to notifications displays and admin settings.
-* UPDATE: Notification alert dot in header shows number of notifications.
-
-= Donation Form & Fundraising Campaigns v1.8.7.1 =
-* FIX: Minor CSS issues in CTA areas.
-* FIX: Resolved an issue with Elementor embedded campaigns with the modal donation form setting selected.
-
-= Donation Form & Fundraising Campaigns v1.8.7 =
-* NEW: Square added as a default payment gateway. [More Information](https://www.wpcharitable.com/get-started/square/)
-* NEW: ErrorHandler class that will suppress _load_textdomain_just_in_time messages.
-* FIX: Updated code related to translations and PHP standards.
-
-= Donation Form & Fundraising Campaigns v1.8.6.2 =
-* NEW: Add ‘allow_unfiltered’ setting for CHARITABLE_ADMIN javascript variables for use in campaign builder.
-* FIX: Improved realiablity of some license checks.
-* FIX: Updated code related to improve security and PHP standards.
-
-= Donation Form & Fundraising Campaigns v1.8.6.1 =
-* FIX: Resolve security issue with public checkbox template.
-* FIX: Resolve fatal error involving Elementor constants.
-* FIX: Resolve issue involving some non-english translations and the campaign builder payment page.
-* FIX: Resolved a CSS rendering issue with Youth Sports campaign template.
-
-= Donation Form & Fundraising Campaigns v1.8.6 =
-* NEW: Admins can directly reply to donors via donation notification emails.
-* NEW: Four new Elementor widgets: Campaign, Donor Form, Donor Button, Campaign List.
-* NEW: Ability to round donations in the campaign builder's progress bar.
-* FIX: Resolved issue when tabs in visual campaigns not appearing in certain scenarios.
-* FIX: Resolved issue with loading of frontend scripts in certain scenarios.
-* FIX: Resolved Facebook sharing w/ sharing button on campaigns.
-* FIX: Updated code related to translations, CSS, UI, and PHP standards.
-
-= Donation Form & Fundraising Campaigns v1.8.5.3 =
-* NEW: Added dialog box upon entering license that activates Pro if already installed.
-* FIX: Improve sanitization of donor widget and video alt text in campaign builder.
-* FIX: Tweak first/last/email field CSS on a "minimal" format form.
-
-= Donation Form & Fundraising Campaigns v1.8.5.2 =
-* FIX: Improved sanitation in decimal count in admin general settings.
-* FIX: Improved support for certain currency settings when auto formatting certain fields in the campaign builder.
-* FIX: Addressed some PHP notices that involved translations.
-
-= Donation Form & Fundraising Campaigns v1.8.5.1 =
-* FIX: Resolved fatal error in some scenarios upon activation/deactivation of license and installing Pro with third-party plugins.
-* FIX: Resolved a JS error in settings due to incorrect sanitization.
-* UPDATED: CTA related updates, including Marketing and Security tabs.
-
-= Donation Form & Fundraising Campaigns v1.8.5.0 =
-* NEW: Compatibility with new Charitable Pro plugin (including automatic upgrading when entering a license).
-* NEW: "charitable_export_data" and "charitable_export_columns" filters for control in Charitable exporting in the admin.
-* UPDATED: CSS tweaks to admin and donation form UI.
-* FIX: Updated code related to translations, CSS, UI, and PHP standards.
-
-= Donation Form & Fundraising Campaigns v1.8.4.8 =
-* FIX: Resolved security issue involving the logout template.
-
-= Donation Form & Fundraising Campaigns v1.8.4.7 =
-* UPDATED: Terms and consent options are also now under "Privacy" settings and any Charitable settings in WordPress customizer are depreciated and will soon be removed.
-* FIX: Made headers and spacing more consistent in settings area, along with tweaks in character output.
-
-= Donation Form & Fundraising Campaigns v1.8.4.6 =
-* FIX: Resolved an issue involving escaped text on addons page.
-* FIX: Tweaks to UI on certain element defaults in campaign builder.
-
-= Donation Form & Fundraising Campaigns v1.8.4.5 =
-* NEW: A minimum number of characters is now required for a password for user registeration. Customize via the 'charitable_minimum_password_length' filter.
-* FIX: Resolved issues related to the campaign visual builder and several UI elements.
-* FIX: Improved methods of exporting and importing donations via Tools.
-* FIX: Updated code related to opt-in data collection, translations, CSS, UI, typos, and PHP standards.
-
-= Donation Form & Fundraising Campaigns v1.8.4.4 =
-* FIX: Adjusted escaping of setting labels resolving an issue rendering HTML beta tags.
-* FIX: CSS adjustments to display banners on some admin screens.
-* FIX: Resolved a bug with dashboard notifications.
-
-= Donation Form & Fundraising Campaigns v1.8.4.3 =
-* NEW: (Visual Campaign Builder) New options for Social Links and Social Sharing fields include YouTube (links only), Threads, and Bluesky.
-* FIX: (Visual Campaign Builder) Visual tweaks to campaigns on "narrow content" themes.
-* FIX: Adding additional check to resolve several JavaScript errors in some scenarios in the campaign builder.
-* FIX: Resolved issue involving default fields appearing in visual builder for campaign summary.
-* FIX: Resolved an issue regarding rendering HTML in emails in some scenarios.
-* FIX: Updated code related to opt-in data collection, translations, CSS, UI, and PHP standards.
-
-= Donation Form & Fundraising Campaigns v1.8.4.2 =
-* NEW: (Visual Campaign Builder) Changing button color in "advanced" will automatically adjust donation button text for contrast.
-* FIX: (Visual Campaign Builder) Updated documentation links.
-* FIX: (Visual Campaign Builder) Adjustments and tweaks to campaigns in visual builder (admin and frontend).
-* FIX: Resolved issue involving sanitization of non-english dates in some scenarios resulting in incorrect "days until" calculations.
-* FIX: Updated code related to opt-in data collection, translations, CSS, UI, and PHP standards.
-
-= Donation Form & Fundraising Campaigns v1.8.4.1 =
-* FIX: Resolved an issue involving the "Use This Template" button in visual campaign when choosing campaigns in some scenarios.
-* FIX: Resolved an internal server issue when attempting to fetch CSS when campaign builder was viewing the Club template.
-* FIX: Minor adjustments and tweaks to campaign templates including word breaking and word wrapping in the visual builder.
-* FIX: Updated code related to typos, translations and PHP standards.
-
-= Donation Form & Fundraising Campaigns v1.8.4 =
-* NEW: Onboarding wizard on first install that guides you through setting up basic settings, gateways, plugins, and your first campaign!
-* NEW: You can now opt-in into data collection to improve Charitable. See "advanced settings" screen for details.
-* UPDATED: Revised output of the "Your Donations" title that was causing issues for those adding HTML via the 'charitable_donation_amount_legend' filter.
-* FIX: Updated code related to translations, CSS, UI, and PHP standards.
-
-= Donation Form & Fundraising Campaigns v1.8.3.7 =
-* NEW: Stripe Gateway allows single or multiple credit card field layout (beta). [More Information](https://www.wpcharitable.com/documentation/credit-card-multiple-fields/)
-* FIX: Ensured some additional settings are added to the database upon a new install.
-
-= Donation Form & Fundraising Campaigns v1.8.3.6 =
-* NEW: Form templates (beta) - standard/default and "minimal" - selectable in donation form settings in the "general" settings tab. [More Information](https://www.wpcharitable.com/documentation/donation-form-templates/)
-* NEW: Added 'charitable_donation_amount_legend' filter to allow easier customization of "Your Donations" on donation form.
-* NEW: Added beta global 'CHARITABLE_DISABLE_SHOW_CURRENT_DONATION_AMOUNT' to change behavior of showing a donation already "in session" on donation form.
-* UPDATED: Turning off 'disable legacy mode' will now make more "add new" link for campaigns default to making new legacy campaigns.
-* UPDATED: Donation buttons in visual campaign for campaigns that no longer accept donations will show a 'no longer accepting donations message' while button is disabled.
-* FIX: Changed santitization of a url in Charitable upgrades which should allow upgrade to complete and prevent notice from appearing.
-* FIX: Improved notifications and dashboard display in the admin for ltr displays.
-* FIX: Resolved issue when donation module in campaign wasn't matching donation amount in modal triggered by donation button on same page.
-* FIX: CSS adjustments to campaign templates: wrapper element, donation buttons, and tweaks to donation suggested amounts.
-* FIX: Updated code related to translations and PHP standards.
-
-= Donation Form & Fundraising Campaigns v1.8.3.5 =
-* NEW: Added a 'charitable_gateway_fields_after_selector' action hook to insert content between gateway selectors and gateway fields on donation forms.
-* UPDATED: Provided a 'campaign_categories' attribute to stat and donor shortcodes to help filter by Charitable campaign categories.
-* FIX: Resolves PHP notices that appeared after WordPress 6.7.0 was released.
-* FIX: Improved front-end buttons and CSS of several campaign templates.
-* FIX: Remove notifications HTML when printing from a browser in the WordPress admin.
-* FIX: Updated code related to translations and PHP standards.
-
-= Donation Form & Fundraising Campaigns v1.8.3.4 =
-* NEW: Added a new setting on privacy screen to allow the consent field to be required before submitting a donation.
-* NEW: Added a 'charitable_redirection_after_gateway_processing' filter which helps override the URL that the donor should be redirected to after a donation in certain scenarios.
-* FIX: Resolved an issue involving formatting a donation amount in non-English languages on the Charitable dashboard.
-* UPDATED: Compatibility with WordPress 6.7.1.
-
-= Donation Form & Fundraising Campaigns v1.8.3.3 =
-* FIX: Resolved an issue when a button appeared unresponsive when verifying/disconnecting a license on the general settings tab.
-* FIX: Updated translation strings and improved string output for email password reset email body.
-* FIX: Resolved incorrect form field name on the privacy page for contact consent.
-
-= Donation Form & Fundraising Campaigns v1.8.3.2 =
-* UPDATED: To improve performance and security, user list for assigning campaign ownership in campaign settings checks for users with proper permissions.
-* UPDATED: New filter 'charitable_campaign_builder_settings_general_users' to customize the updated user list.
-* FIX: campaign_link() function returns $link rather than false.
-* FIX: Visiting the settings page will attempt to double check licenses for any expiring or expired subscriptions.
-* FIX: Notification tweaks including upgrading from older versions and showing UI even if feed is empty.
-* FIX: Donation amount from custom donation field in a campaign page should now be carried to the donation page even with currency symbols included.
-* FIX: Updated code related to translations, CSS, UI, and PHP standards.
-
-= Donation Form & Fundraising Campaigns v1.8.3.1 =
-* UPDATED: "Disable Legacy Campaign Mode" is set to on for new installs of the plugin. [More Information](https://www.wpcharitable.com/documentation/legacy-campaigns/)
-* UPDATED: Plugin notification slide out UI can be closed by also clicking outside of the notification area.
-* FIX: Addressed security issue on the donations list screen.
-* FIX: Updated code related to translations, CSS, UI, and PHP standards.
-
-= Donation Form & Fundraising Campaigns v1.8.3 =
-* NEW: WordPress editor block: "Campaigns". Displays multiple Charitable campaigns in a grid.
-* NEW: WordPress editor block: "Donations". Display a simple donation widget for a campaign.
-* NEW: WordPress editor block: "Donors". Display a list of donors to one or all of your campaigns.
-* NEW: WordPress editor block: "Campaign Stats". Allows various statistics to be dynamically calculated and displayed on a page.
-* NEW: WordPress editor block: "Donation Button". Displays a donation button for a particular campaign.
-* NEW: WordPress editor block: "Campaign Progress Bar". Displays a live progress bar for a particular campaign.
-* NEW: WordPress editor block: "My Donations". Displayss a list of donations for the current logged in user.
-* NEW: Added a new notifications engine to keep you informed of all important updates, license information, and news. New inbox icon and notifications menu items will alert when new notifications are available.
-* NEW: Updated charitable.pot.
-* UPDATED: Additional minification of JS and CSS to increase performance.
-* FIX: Resolved an issue regarding campaign descriptions not displaying properly with the campaign shortcode in some scenarios.
-* FIX: Fixed alt-text of a LinkedIn share icon in visual campaign builder.
-* FIX: Code tweaks related to translations, CSS, UI, and PHP warnings.
-
-= Donation Form & Fundraising Campaigns v1.8.2 =
-* NEW: "Charitable Checklist" so new users can check vital settings, connect gateways, and get to building their first campaign.
-* NEW: Warning messages for admin users - in gateway settings page and viewing donation forms (as admins) - if Stripe is enabled, but no keys are detected.
-* NEW: Dashboard notifications for important messages and notices.
-* NEW: Added 'charitable_email_fields_donation_field_value' filter which can help with output of custom field values in emails.
-* NEW: Campaigns shortcode now has a new "description_limit" parameter that limits words displayed from campaign description.
-* NEW: Added a donation button shortcode. [More Information](https://www.wpcharitable.com/documentation/donation-button-shortcode/)
-* NEW: Added both a filter and an option (in beta) in the general setting tab to disable showing a login form or registeration reminder on donation forms. [More Information](https://www.wpcharitable.com/documentation/hiding-the-login-register-form-on-donation-forms/)
-* UPDATED: Improved tour guide for visual campaign builder with more interactivity and showing more elements.
-* UPDATED: Campaigns shortcode now displays a photo and campaign description from campaigns built with the visual builder.
-* UPDATED: Moved "Categories", "Tags", and "Customize" menus from main menu. Now found in the Charitable -> "Tools" page.
-* FIX: Adjusted appearance of the donation button in Youth Sports campaign theme when modal button setting was on.
-* FIX: Resolved an issue with the donation summary field for the visual campaign builder involving showing/hiding items.
-* FIX: Resolved several instances where donation amounts were not being formatted currently in non-English languages in the reporting screens.
-* FIX: Improved loading for the WordPress dashboard widget.
-* FIX: Adjustments to CSS on the Dashboard page.
-* FIX: Minor translation, misc CSS, UI, and PHP coding updates.
 
 **[View entire donation form and fundraising platform changelog](https://plugins.svn.wordpress.org/charitable/trunk/CHANGELOG.md)**

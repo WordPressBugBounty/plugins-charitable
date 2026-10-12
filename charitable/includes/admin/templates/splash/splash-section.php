@@ -109,17 +109,38 @@ $classes_output = charitable_sanitize_classes( $classes, true );
 	</div>
 
 	<?php if ( ! empty( $section['video'] ) ) : ?>
-		<div class="charitable-splash-section-image charitable-splash-video-wrap">
-			<?php if ( ! empty( $section['video']['vimeo_id'] ) ) : ?>
+		<?php
+		/*
+		 * A Vimeo embed is a third-party iframe, which loads Vimeo's player script into
+		 * wp-admin. It is now deferred behind a click so opening this modal makes no
+		 * third-party request at all, and preload="none" below keeps the mp4 host
+		 * untouched until the visitor actually plays something.
+		 */
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Local template variable.
+		$is_deferred_embed = ! empty( $section['video']['vimeo_id'] );
+		?>
+		<div class="charitable-splash-section-image charitable-splash-video-wrap<?php echo $is_deferred_embed ? ' charitable-splash-video-wrap--deferred' : ''; ?>">
+			<?php if ( $is_deferred_embed ) : ?>
 				<?php
 				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Local template variable.
 				$vimeo_id = preg_replace( '/[^0-9]/', '', (string) $section['video']['vimeo_id'] );
 				?>
-				<div class="charitable-splash-video-embed"
+				<button type="button"
+					class="charitable-splash-video-embed charitable-splash-video-embed--deferred"
 					data-vimeo-id="<?php echo esc_attr( $vimeo_id ); ?>"
-					data-video-title="<?php echo esc_attr( $section['title'] ); ?>"></div>
+					data-video-title="<?php echo esc_attr( $section['title'] ); ?>">
+					<span class="screen-reader-text">
+						<?php
+						printf(
+							/* translators: %s: name of the feature the video demonstrates. */
+							esc_html__( 'Play video: %s', 'charitable' ),
+							esc_html( $section['title'] )
+						);
+						?>
+					</span>
+				</button>
 			<?php elseif ( ! empty( $section['video']['url'] ) ) : ?>
-				<video muted playsinline controls preload="metadata"<?php echo ! empty( $section['video']['poster'] ) ? ' poster="' . esc_url( $section['video']['poster'] ) . '"' : ''; ?>>
+				<video muted playsinline controls preload="none"<?php echo ! empty( $section['video']['poster'] ) ? ' poster="' . esc_url( $section['video']['poster'] ) . '"' : ''; ?>>
 					<source src="<?php echo esc_url( $section['video']['url'] ); ?>" type="video/mp4">
 				</video>
 			<?php endif; ?>

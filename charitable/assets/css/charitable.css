@@ -1526,3 +1526,84 @@ h3.charitable-header {
   padding: 0;
   border: none;
 }
+
+/*
+ * WCAG 2.4.7 Focus Visible -- one keyboard focus ring for every control Charitable renders
+ * (1.8.13.1). Ported from Charitable Pro 1.8.19.2 / 1.8.20.
+ *
+ * Lite shipped NO :focus rules in this stylesheet at all, so the donation form had whatever
+ * indicator the theme happened to give it -- and the common themes actively remove it. Astra
+ * ships
+ *     .button:focus, button:focus, input[type="submit"]:focus { outline: 0 }
+ * and our donate controls match it (`a.donate-button` carries the `button` class), which also
+ * beats Astra's own `a:focus { outline: thin dotted }`. Measured on Pro with real Tab keypresses,
+ * 6 of the 9 tab stops in the modal donation form had no visible indicator at all, and the submit
+ * was actively regressive: focusing it REMOVED its drop shadow. Lite renders the same controls
+ * through the same templates, so it has the same gap.
+ *
+ * Declared once for the whole surface rather than chased per control, so a control added later
+ * inherits it instead of starting out unfixed.
+ *
+ * SPECIFICITY. This is (0,4,0), not the (0,3,1) the Pro comment claims: `:is()` takes the
+ * specificity of its MOST SPECIFIC argument, which here is `[tabindex]:not([tabindex="-1"])` at
+ * two attribute selectors, not one class. Either way it clears Astra's (0,2,0) on specificity
+ * rather than relying on stylesheet order, which a stylesheet enqueued in wp_head cannot count on
+ * winning. No `!important`, so a theme can still have the last word, and the colour is exposed as
+ * a custom property, which is the cheap override for a dark form background.
+ *
+ * `outline` and deliberately NOT `box-shadow`: forced-colors mode (Windows High Contrast) strips
+ * box-shadow entirely, so a shadow-only ring is invisible to exactly the users most likely to be
+ * relying on it.
+ *
+ * :focus-visible, so a mouse click does not draw the ring -- only keyboard focus does.
+ *
+ * KNOWN GAP, deliberately not closed here, and MEASURED rather than reasoned about. The
+ * `charitable-template-minimal` rules earlier in this file set `outline: none` at (0,5,2) on BOTH
+ * of their text inputs -- the one inside `.donation-amounts.donation-suggested-amount` and the one
+ * inside `.charitable-custom-donation-field-alone` -- which out-specifies this rule, so those two
+ * controls stay unringed on that one template. Confirmed in a headless Chromium probe loading this
+ * compiled stylesheet, driven with a real Tab keypress, against a plain `<input>` in the same form
+ * as the positive control: the control ringed `solid 2px`, both minimal inputs reported
+ * `outline-style: none` at `0px`. Closing it means overriding a suppression the template's designer
+ * put there on purpose, which is a design decision rather than a port, and Pro carries the same gap.
+ *
+ * SELECTOR DIFFERENCES FROM PRO, both verified against this tree:
+ * - Pro's `#charitable-universal-modal` is omitted: the universal modal is Pro-only and the id
+ *   appears nowhere in Lite.
+ * - `input.charitable-button` is ADDED: Lite's donate-button shortcode renders
+ *   `<input type="button" class="charitable-button">` (its 'css' arg defaults to
+ *   `charitable-button`), so that is Lite's equivalent of the control Pro covers via
+ *   `.charitable-donate-button`. The Pro class is kept as well, since the shortcode's 'css'
+ *   argument is caller-overridable.
+ */
+.charitable-donation-form :is(a[href], button, input:not([type=hidden]), select, textarea, [tabindex]:not([tabindex="-1"])):focus-visible,
+.charitable-donation-amount-form :is(a[href], button, input:not([type=hidden]), select, textarea, [tabindex]:not([tabindex="-1"])):focus-visible,
+.charitable-modal :is(a[href], button, input:not([type=hidden]), select, textarea, [tabindex]:not([tabindex="-1"])):focus-visible,
+a.donate-button:focus-visible,
+input.charitable-button:focus-visible,
+.charitable-donate-button:focus-visible {
+  /*
+   * Longhands, not the `outline` shorthand. A shorthand containing var() becomes a
+   * pending-substitution value: it is resolved at computed-value time, it is invisible to
+   * getPropertyValue("outline") (which returns an empty string, making the rule look absent
+   * when inspecting the cascade), and in Pro's testing it applied on the checkboxes, radio and
+   * submit but silently failed on the custom-amount input, leaving outline-style at its initial
+   * `none` while the sibling outline-offset still took. Declaring the four longhands removes
+   * that whole class of problem and keeps the custom-property override.
+   */
+  outline-width: 2px;
+  outline-style: solid;
+  outline-color: var(--charitable-focus-ring, #1e1515);
+  outline-offset: 2px;
+}
+
+/*
+ * In forced-colors mode the UA forces its own palette, so the ring is redefined to the system
+ * Highlight colour rather than our ink. Done by reassigning the custom property, so the selector
+ * list above is not duplicated.
+ */
+@media (forced-colors: active) {
+  :root {
+    --charitable-focus-ring: Highlight;
+  }
+}

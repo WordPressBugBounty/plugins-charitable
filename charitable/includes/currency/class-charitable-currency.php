@@ -81,7 +81,8 @@ if ( ! class_exists( 'Charitable_Currency' ) ) :
 		 */
 		public function get_monetary_amount( $amount, $decimal_count = false, $db_format = false, $symbol_position = '', $currency = '' ) {
 			if ( false === $decimal_count ) {
-				$decimal_count = charitable_get_option( 'decimal_count', 2 );
+				// Use the currency-aware default so zero-decimal currencies (JPY, KRW, ...) are not forced to 2 decimals when the decimal_count option has never been saved.
+				$decimal_count = $this->get_decimals();
 			}
 
 			$amount = $this->sanitize_monetary_amount( strval( $amount ), $db_format );
@@ -163,7 +164,8 @@ if ( ! class_exists( 'Charitable_Currency' ) ) :
 		 */
 		public function get_sanitized_and_localized_amount( $amount, $decimal_count = false, $db_format = false ) {
 			if ( false === $decimal_count ) {
-				$decimal_count = charitable_get_option( 'decimal_count', 2 );
+				// Use the currency-aware default so zero-decimal currencies (JPY, KRW, ...) are not forced to 2 decimals when the decimal_count option has never been saved.
+				$decimal_count = $this->get_decimals();
 			}
 
 			$amount = $this->sanitize_monetary_amount( strval( $amount ), $db_format );

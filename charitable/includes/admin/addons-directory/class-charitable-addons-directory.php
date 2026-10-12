@@ -1411,6 +1411,12 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 					}
 				}
 
+				// No licence: serve the static catalogue instead of an API that can only answer
+				// for a licensed site. This is what gives the Addons screen a catalogue on Lite.
+				if ( empty( $licenses ) ) {
+					return Charitable_Addons_Catalogue::get_instance()->get();
+				}
+
 				$response = wp_remote_post(
 					self::UPDATE_URL . '/edd-api/versions-v3/',
 					array(
@@ -1454,6 +1460,14 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 			$versions = get_site_option( 'wpc_plugin_versions' );
 
 			if ( false === $versions || ! isset( $versions['expires'] ) || time() > $versions['expires'] || ! isset( $versions['data'] ) ) {
+				// No licence: serve the static catalogue rather than asking an API that can only
+				// answer for a licensed site. This is what gives this screen a catalogue on Lite.
+				// Ahead of the recently-failed guard below, because this path makes no request,
+				// so an earlier network failure has no bearing on it.
+				if ( ! $this->has_any_license() ) {
+					return Charitable_Addons_Catalogue::get_instance()->get();
+				}
+
 				/*
 				* Check and see if this request recently failed.
 				* Most likely because the site is down or didn't return a 200 response.
@@ -1544,6 +1558,22 @@ if ( ! class_exists( 'Charitable_Addons_Directory' ) ) :
 		 *
 		 * @since 1.8.1.3
 		 */
+		/**
+		 * Whether any licence key is stored.
+		 *
+		 * @since 1.8.13.1
+		 *
+		 * @return bool
+		 */
+		private function has_any_license() {
+			foreach ( $this->get_licenses() as $license ) {
+				if ( ! empty( $license['license'] ) ) {
+					return true;
+				}
+			}
+			return false;
+		}
+
 		private function log_failed_request() {
 			update_option( $this->failed_request_cache_key, strtotime( '+1 hour' ) );
 		}

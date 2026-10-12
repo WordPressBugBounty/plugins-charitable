@@ -46,6 +46,10 @@ const CharitableAdminSplash = window.CharitableAdminSplash || ( function( docume
 				.on( 'click', '.charitable-splash-modal-open', function( e ) {
 					e.preventDefault();
 					app.openModal();
+				} )
+				.on( 'click', '.charitable-splash-video-embed[data-vimeo-id]', function( e ) {
+					e.preventDefault();
+					app.injectVideoEmbed( $( this ) );
 				} );
 		},
 
@@ -93,7 +97,6 @@ const CharitableAdminSplash = window.CharitableAdminSplash || ( function( docume
 				onOpen() {
 					$( '.jconfirm' ).css( 'bottom', 0 );
 					$( '.charitable-dash-widget-welcome-block' ).remove();
-					app.injectVideoEmbeds();
 				},
 				onDestroy() {
 					$( 'body' )
@@ -104,39 +107,47 @@ const CharitableAdminSplash = window.CharitableAdminSplash || ( function( docume
 		},
 
 		/**
-		 * Inject video iframes into placeholder divs.
+		 * Build the Vimeo iframe for one placeholder, on demand.
 		 *
-		 * The PHP template renders empty divs with data-vimeo-id; we build the
-		 * iframe client-side because admin output filters can strip server-rendered
-		 * iframes from the response.
+		 * Called on click, not when the modal opens. A Vimeo iframe loads Vimeo's
+		 * player script into wp-admin, so nothing should reach a third party until
+		 * the visitor asks to watch.
+		 *
+		 * The iframe is still built client-side rather than rendered by PHP, because
+		 * admin output filters can strip server-rendered iframes from the response.
 		 *
 		 * @since 1.8.10.6
+		 * @since 1.8.13.1 Deferred behind a click.
+		 *
+		 * @param {jQuery} $el The placeholder element.
 		 */
-		injectVideoEmbeds() {
-			$( '.charitable-splash-video-embed[data-vimeo-id]' ).each( function() {
-				const $el = $( this );
+		injectVideoEmbed( $el ) {
+			if ( $el.children( 'iframe' ).length ) {
+				return;
+			}
 
-				if ( $el.children( 'iframe' ).length ) {
-					return;
-				}
+			const id = String( $el.attr( 'data-vimeo-id' ) || '' ).replace( /[^0-9]/g, '' );
 
-				const id = String( $el.attr( 'data-vimeo-id' ) || '' ).replace( /[^0-9]/g, '' );
+			if ( ! id ) {
+				return;
+			}
 
-				if ( ! id ) {
-					return;
-				}
+			const title = $el.attr( 'data-video-title' ) || '';
+			const iframe = document.createElement( 'iframe' );
 
-				const title = $el.attr( 'data-video-title' ) || '';
-				const iframe = document.createElement( 'iframe' );
+			// autoplay=1 because this only runs from a click, so playing is the intent.
+			iframe.src = 'https://player.vimeo.com/video/' + id + '?autoplay=1&muted=1&controls=1&dnt=1';
+			iframe.setAttribute( 'frameborder', '0' );
+			iframe.setAttribute( 'allow', 'autoplay; fullscreen; picture-in-picture' );
+			iframe.setAttribute( 'allowfullscreen', '' );
+			iframe.setAttribute( 'title', title );
 
-				iframe.src = 'https://player.vimeo.com/video/' + id + '?autoplay=0&muted=1&controls=1&dnt=1';
-				iframe.setAttribute( 'frameborder', '0' );
-				iframe.setAttribute( 'allow', 'fullscreen; picture-in-picture' );
-				iframe.setAttribute( 'allowfullscreen', '' );
-				iframe.setAttribute( 'title', title );
+			$el
+				.removeClass( 'charitable-splash-video-embed--deferred' )
+				.closest( '.charitable-splash-video-wrap' )
+				.removeClass( 'charitable-splash-video-wrap--deferred' );
 
-				$el.append( iframe );
-			} );
+			$el.append( iframe );
 		},
 	};
 

@@ -670,7 +670,14 @@ CHARITABLE = window.CHARITABLE || {};
             this.form.find( '.charitable-form-errors' ).remove();
         }
 
-        output += '<div class="charitable-form-errors charitable-notice"><ul class="errors"><li>';
+        /*
+         * role="alert" + tabindex="-1" + the summary marker mirror
+         * templates/form-fields/errors.php. The role is what announces these errors,
+         * because this node is inserted into a form that is already on screen. See
+         * CHARITABLE.focus_error_summary for why focus is moved as well.
+         * WCAG 4.1.3 / 3.3.1, 1.8.13.1.
+         */
+        output += '<div class="charitable-form-errors charitable-notice" role="alert" tabindex="-1" data-charitable-error-summary="1"><ul class="errors"><li>';
         output += e.join( '</li><li>' );
         output += '</li></ul></div>';
 
@@ -679,6 +686,8 @@ CHARITABLE = window.CHARITABLE || {};
         } else {
             this.form.prepend( output );
         }
+
+        CHARITABLE.focus_error_summary( this.form.find( '.charitable-form-errors' ) );
 
     }
 
@@ -1077,6 +1086,55 @@ CHARITABLE.VersionCompare = function( version, compare ) {
      */
     CHARITABLE.forms_initialized = false;
 
+    /**
+     * Move focus to a form's error summary so it is announced and reachable.
+     *
+     * Needed because role="alert" only covers half the problem. A live region
+     * announces content that changes AFTER the region exists, so it works for the
+     * summary charitable.js injects on a client-side validation failure, but a
+     * summary rendered by PHP on a failed submit is already present when the page
+     * loads and is therefore silent. Moving focus announces that case, and in both
+     * cases it lands a keyboard user on the error rather than at the top of the page.
+     *
+     * Focus is deferred a tick because the node has usually just been inserted; taking
+     * focus before layout settles is unreliable in Safari and Firefox.
+     *
+     * Declared inside this jQuery-bound closure rather than at file scope because
+     * WordPress loads jQuery in noConflict mode, so `$` is not a global.
+     *
+     * WCAG 4.1.3 / 3.3.1.
+     *
+     * @since 1.8.13.1
+     *
+     * @param object $errors jQuery collection of error-summary nodes.
+     */
+    CHARITABLE.focus_error_summary = function( $errors ) {
+        if ( ! $errors || ! $errors.length ) {
+            return;
+        }
+
+        var $summary = $errors.first();
+
+        // Templates carry tabindex="-1", but a theme override may predate it.
+        if ( 'undefined' === typeof $summary.attr( 'tabindex' ) ) {
+            $summary.attr( 'tabindex', '-1' );
+        }
+
+        window.setTimeout( function() {
+            var node = $summary.get( 0 );
+
+            if ( ! node ) {
+                return;
+            }
+
+            try {
+                node.focus();
+            } catch ( e ) {
+                $summary.trigger( 'focus' );
+            }
+        }, 0 );
+    };
+
     $( document ).ready( function() {
 
         $( 'html' ).addClass( 'js' );
@@ -1090,6 +1148,23 @@ CHARITABLE.VersionCompare = function( version, compare ) {
         CHARITABLE.Toggle();
 
         CHARITABLE.ResetSuggestedDonations();
+
+        /*
+         * A failed server-side submit re-renders the page with the error summary
+         * already in the DOM, where role="alert" cannot announce it. Move focus so
+         * assistive tech reads it and a keyboard user starts at the error.
+         *
+         * Gated on data-charitable-error-summary, NOT on the class. The class
+         * .charitable-form-errors is shared by page-level notices that merely borrow
+         * the error styling -- notably the admin-only "Test mode is active" notice,
+         * which sits on an ordinary GET of every donation form. Matching the class
+         * alone would steal focus on page load for any admin running test mode. The
+         * attribute is emitted only for a genuine error summary, and in the generic
+         * notices template only on a POST. See templates/form-fields/notices.php.
+         *
+         * WCAG 4.1.3 / 3.3.1, 1.8.13.1.
+         */
+        CHARITABLE.focus_error_summary( $( '.charitable-form-errors[data-charitable-error-summary]:visible' ) );
     });
 
 })( jQuery );

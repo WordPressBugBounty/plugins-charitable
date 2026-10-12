@@ -125,7 +125,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 							<label>
 								<input type="radio" name="donation_amount" value="custom"><span class="description">' . esc_html__( 'Custom Amount', 'charitable' ) . '</span>
 							</label>
-							<input type="text" ' . esc_attr( $input_disabled_attr ) . ' class="custom-donation-input" name="custom_donation_amount" placeholder="' . esc_html__( 'Custom Donation Amount', 'charitable' ) . '" value="">
+							<input type="text" ' . esc_attr( $input_disabled_attr ) . ' class="custom-donation-input" name="custom_donation_amount" placeholder="' . esc_attr__( 'Custom Donation Amount', 'charitable' ) . '" aria-label="' . esc_attr__( 'Custom Donation Amount', 'charitable' ) . '" value="">
                         </span>
                     </li>
             </ul>
@@ -220,7 +220,18 @@ if ( ! class_exists( 'Charitable_Field_Donate_Amount' ) ) :
 					<label>
 					<input type="radio" name="donation_amount" value="custom"><span class="description"><?php echo esc_html__( 'Custom amount', 'charitable' ); ?></span>
 					</label>
-					<input type="text" <?php echo esc_attr( $input_disabled_attr ); ?> class="custom-donation-input" name="custom_donation_amount" placeholder="<?php echo esc_html__( 'Custom Donation Amount', 'charitable' ); ?>" value="<?php echo esc_attr( $value ); ?>">
+					<?php
+					/*
+					 * aria-label alongside the placeholder (WCAG 3.3.2 / 4.1.2) -- 1.8.13.1.
+					 *
+					 * The wrapping <label> above names the radio, not this text input, so with only
+					 * a placeholder this control had no accessible name -- and a placeholder is not
+					 * one: it disappears as soon as the donor types. In 'template' mode this input
+					 * is live on the front end, so it is a donor-facing control, not just builder
+					 * chrome. Same string as the placeholder so the two cannot drift.
+					 */
+					?>
+					<input type="text" <?php echo esc_attr( $input_disabled_attr ); ?> class="custom-donation-input" name="custom_donation_amount" placeholder="<?php echo esc_attr__( 'Custom Donation Amount', 'charitable' ); ?>" aria-label="<?php echo esc_attr__( 'Custom Donation Amount', 'charitable' ); ?>" value="<?php echo esc_attr( $value ); ?>">
 					</span>
 				</li>
 

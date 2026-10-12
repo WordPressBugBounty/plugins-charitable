@@ -139,6 +139,49 @@ if ( ! class_exists( 'Charitable_Field_Donate_Button' ) ) :
 			// We want the button to contain a donation amount, but we go with what is in the SESSION first, then the DEFAULT amount.
 			$donation_amount = $campaign->get_donation_amount_in_session();
 
+			/*
+			 * Nothing in the session means a first-time visitor, who still sees one of the
+			 * suggested amounts rendered as pre-selected by the Donate Amount field. Without
+			 * falling back to it here, accepting that default and clicking straight through
+			 * posted an empty amount. The default index is read from the same place
+			 * class-donate-amount.php reads it so the button and the checked radio cannot
+			 * disagree. Skipped when the campaign has no Donate Amount field, since a
+			 * button-only layout should leave the donation form to ask for the amount.
+			 */
+			if ( ! $donation_amount
+				&& is_array( $campaign_data )
+				&& ! empty( $campaign_data['layout'] )
+				&& $this->layout_has_field_type( $campaign_data['layout'], 'donate-amount' ) ) {
+
+				$suggested_donations = $campaign->get_suggested_donations();
+
+				if ( ! empty( $suggested_donations ) ) {
+					$default_index = ! empty( $campaign_data['settings']['donation-options']['suggested_donations_default'] )
+						? intval( $campaign_data['settings']['donation-options']['suggested_donations_default'] )
+						: 0;
+
+					/*
+					 * is_scalar() because a row imported or edited by hand can carry an array
+					 * where an amount belongs, which would otherwise reach esc_attr() and emit
+					 * an "Array to string conversion" warning on the campaign page.
+					 */
+					if ( isset( $suggested_donations[ $default_index ]['amount'] )
+						&& is_scalar( $suggested_donations[ $default_index ]['amount'] ) ) {
+						$donation_amount = $suggested_donations[ $default_index ]['amount'];
+					}
+				}
+			}
+
+			/*
+			 * An empty session comes back from get_donation_amount_in_session() as integer 0.
+			 * Keep the field empty in that case rather than printing a literal zero: the
+			 * processor reads the two the same way, but an empty value is what this field has
+			 * always emitted, so button-only campaigns keep byte-identical markup.
+			 */
+			if ( ! $donation_amount ) {
+				$donation_amount = '';
+			}
+
 			ob_start();
 
 			?>
@@ -191,7 +234,7 @@ if ( ! class_exists( 'Charitable_Field_Donate_Button' ) ) :
 					<?php wp_nonce_field( 'charitable-donate', 'charitable-donate-now' ); ?>
 					<input type="hidden" name="charitable_action" value="start_donation" />
 					<input type="hidden" name="campaign_id" value="<?php echo esc_html( $campaign->ID ); ?>" />
-					<input type="hidden" name="charitable_donation_amount" value="<?php $donation_amount; ?>" />
+					<input type="hidden" name="charitable_donation_amount" value="<?php echo esc_attr( $donation_amount ); ?>" />
 					<input type="hidden" name="charitable_builder" value="true" />
 					<button type="submit" name="charitable_submit" class="<?php echo esc_attr( charitable_get_button_class( 'donate' ) ); ?>"><?php echo esc_html( wp_strip_all_tags( $button_label ) ); ?></button>
 				</form>
@@ -209,6 +252,54 @@ if ( ! class_exists( 'Charitable_Field_Donate_Button' ) ) :
 			$html = $this->field_display_wrapper( $html, $field_data );
 
 			echo apply_filters( 'charitable_campaign_builder_' . $this->type . '_field_display', $html, $campaign_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+
+		/**
+		 * Whether a field type appears anywhere in a campaign's builder layout.
+		 *
+		 * Used to decide whether the donate button should inherit the pre-selected suggested
+		 * amount: a campaign that lays out no amounts has nothing for the button to inherit,
+		 * and should keep sending the donor to the donation form to choose.
+		 *
+		 * The layout nests rows inside columns inside sections, and tabs alongside them, with
+		 * each recording its field types in a 'fields' list. This walks the structure rather
+		 * than assuming a depth. The entries in $campaign_data['fields'] hold only a field's
+		 * own settings and never its type, which is why the layout is what gets consulted.
+		 *
+		 * Only 'fields' lists are matched against. Reading every string in the layout would
+		 * also read presentational values, and a row's css_class is free text that can itself
+		 * be set to a field slug, which would report a field the campaign does not lay out.
+		 *
+		 * @since 1.8.13.1
+		 *
+		 * @param  mixed  $layout Layout node to search.
+		 * @param  string $type   Field type slug to look for.
+		 * @param  int    $depth  Current recursion depth, to bound malformed data.
+		 * @return boolean
+		 */
+		protected function layout_has_field_type( $layout, $type, $depth = 0 ) {
+
+			if ( ! is_array( $layout ) || $depth > 32 ) {
+				return false;
+			}
+
+			foreach ( $layout as $key => $node ) {
+
+				if ( ! is_array( $node ) ) {
+					continue;
+				}
+
+				/* Section-level 'fields' lists hold field IDs, so the comparison is strict. */
+				if ( 'fields' === $key && in_array( $type, $node, true ) ) {
+					return true;
+				}
+
+				if ( $this->layout_has_field_type( $node, $type, $depth + 1 ) ) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		/**

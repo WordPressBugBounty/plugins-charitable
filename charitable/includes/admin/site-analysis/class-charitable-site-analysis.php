@@ -788,9 +788,18 @@ if ( ! class_exists( 'Charitable_Site_Analysis' ) ) :
 			}
 
 			try {
-				// Consented (either by the Advanced setting or the in-tool toggle), so send both
-				// endpoints: the financial capture and the opt-in usage check-in.
-				Charitable_Tracking::get_instance()->send_checkins( true, false );
+				/*
+				 * Consented (either by the Advanced setting or the in-tool toggle), so send both
+				 * endpoints: the financial capture and the opt-in usage check-in.
+				 *
+				 * $override is false. It used to be true, which skipped the senders' own gates
+				 * entirely - and those gates are where CHARITABLE_DISABLE_TRACKING,
+				 * CHARITABLE_DISABLE_OPTIN_USAGE and the staging-environment exclusion live. So a
+				 * site that opted out in wp-config, or a staging clone, still transmitted from this
+				 * one path. The consent check above is unaffected, because it tests the same option
+				 * and filter the senders do; passing false simply lets them apply the rest.
+				 */
+				Charitable_Tracking::get_instance()->send_checkins( false, false );
 			} catch ( \Throwable $e ) {
 				// Best-effort: a tracking failure must never affect the analysis.
 			}

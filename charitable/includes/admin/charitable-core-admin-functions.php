@@ -1350,6 +1350,10 @@ function charitable_get_addons_data_from_server( $licenses = false, $update_url 
 
 	if ( false === $versions ) {
 
+		if ( get_transient( '_charitable_plugin_versions_failed' ) ) {
+			return false;
+		}
+
 		if ( false === $licenses ) {
 
 			$licenses = array();
@@ -1359,6 +1363,15 @@ function charitable_get_addons_data_from_server( $licenses = false, $update_url 
 					$licenses[] = $license['license'];
 				}
 			}
+		}
+
+		/*
+		 * No licence means the response cannot be acted on: `install` is a licence-keyed download URL
+		 * and `license` is plan-tier data used only to pick an upgrade prompt. Serve the static
+		 * catalogue instead, which costs no licence key and no home_url() on the wire.
+		 */
+		if ( empty( $licenses ) ) {
+			return Charitable_Addons_Catalogue::get_instance()->get();
 		}
 
 		$response = wp_remote_post(
@@ -1376,14 +1389,18 @@ function charitable_get_addons_data_from_server( $licenses = false, $update_url 
 		$response_body = wp_remote_retrieve_body( $response );
 		$response_code = wp_remote_retrieve_response_code( $response );
 
-		// Bail out early if there are any errors.
+		// Bail out early if there are any errors. Cached briefly, because the campaign builder calls
+		// this once per payment and marketing panel and a failure sets no transient to short-circuit
+		// them: at a 15 second timeout an outage meant ~30 serial requests on one page load.
 		if ( (int) $response_code !== 200 || is_wp_error( $response_body ) ) {
+			set_transient( '_charitable_plugin_versions_failed', 1, 15 * MINUTE_IN_SECONDS );
 			return false;
 		}
 
 		$versions = json_decode( $response_body, true );
 
 		set_transient( '_charitable_plugin_versions', $versions, DAY_IN_SECONDS );
+		delete_transient( '_charitable_plugin_versions_failed' );
 
 	} // end if
 

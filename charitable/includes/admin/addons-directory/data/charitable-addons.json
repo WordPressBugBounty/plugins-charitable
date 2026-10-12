@@ -1,0 +1,1001 @@
+{
+ "charitable-ambassadors": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-ambassadors/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2022/03/Ambassadors-Banner.png",
+  "install": "",
+  "last_updated": "2026-10-08 06:58:54",
+  "license": [
+   "agency",
+   "pro"
+  ],
+  "name": "Charitable Ambassadors",
+  "new_version": "3.4.7",
+  "package": "",
+  "path": "charitable-ambassadors/charitable-ambassadors.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.6.51",
+   "php": "7.0"
+  },
+  "sections": {
+   "description": "<p>Charitable Ambassadors transforms your website into a peer-to-peer fundraising or crowdfunding platform.</p>\n"
+  },
+  "slug": "charitable-ambassadors",
+  "url": "https://www.wpcharitable.com/extensions/charitable-ambassadors/?changelog=1"
+ },
+ "charitable-annual-receipts": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-annual-receipts/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2022/03/Annual-Receipts-Banner.png",
+  "install": "",
+  "last_updated": "2026-07-29 22:49:02",
+  "license": [
+   "plus"
+  ],
+  "name": "Charitable Annual Receipts",
+  "new_version": "2.0.1",
+  "package": "",
+  "path": "charitable-annual-receipts/charitable-annual-receipts.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.6.57",
+   "php": "7.2"
+  },
+  "sections": {
+   "description": "<p>Help your donors with their record keeping by providing downloadable annual receipts.</p>\n"
+  },
+  "slug": "charitable-annual-receipts",
+  "url": "https://www.wpcharitable.com/extensions/charitable-annual-receipts/?changelog=1"
+ },
+ "charitable-anonymous-donations": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-anonymous-donations/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2015/09/anonymous-donations-banner.png",
+  "install": "",
+  "last_updated": "2024-11-04 09:45:45",
+  "license": [
+   "basic",
+   "plus"
+  ],
+  "name": "Charitable Anonymous Donations",
+  "new_version": "1.3.1.3",
+  "package": "",
+  "path": "charitable-anonymous-donations/charitable-anonymous-donations.php",
+  "plan_id": 3,
+  "requirements": [],
+  "sections": {
+   "description": "<p>Let your donors support you without having their name listed publicly.</p>\n"
+  },
+  "slug": "charitable-anonymous-donations",
+  "url": "https://www.wpcharitable.com/extensions/charitable-anonymous-donations/?changelog=1"
+ },
+ "charitable-authorize-net": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-authorize-net/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2015/12/authorize-banner.png",
+  "install": "",
+  "last_updated": "2026-09-01 15:30:56",
+  "license": [
+   "basic"
+  ],
+  "name": "Charitable Authorize.Net",
+  "new_version": "1.4.3",
+  "package": "",
+  "path": "charitable-authorize-net/charitable-authorize-net.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.6.30",
+   "php": "5.6"
+  },
+  "sections": {
+   "description": "<p>Accept credit cards and ACH / eCheck donations on your website with Authorize.Net.</p>\n"
+  },
+  "slug": "charitable-authorize-net",
+  "url": "https://www.wpcharitable.com/extensions/charitable-authorize-net/?changelog=1"
+ },
+ "charitable-automation-connect": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-automation-connect/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2021/10/Automation-Connect-Banner-1.png",
+  "install": "",
+  "last_updated": "2026-10-07 08:25:40",
+  "license": [
+   "pro"
+  ],
+  "name": "Charitable Automation Connect",
+  "new_version": "2.4.0",
+  "package": "",
+  "path": "charitable-automation-connect/charitable-automation-connect.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.6.53",
+   "php": "7.2"
+  },
+  "sections": {
+   "description": "<p>Connect Charitable to your favourite apps by creating automatic workflows with automation platforms like Zapier, Zoho Flow, Integromat or Automate.io.</p>\n"
+  },
+  "slug": "charitable-automation-connect",
+  "url": "https://www.wpcharitable.com/extensions/charitable-automation-connect/?changelog=1"
+ },
+ "charitable-braintree": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-braintree/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/2020/08/braintree-product-banner.png",
+  "install": "",
+  "last_updated": "2026-04-24 12:19:52",
+  "license": [
+   "basic"
+  ],
+  "name": "Charitable Braintree",
+  "new_version": "1.3.0",
+  "package": "",
+  "path": "charitable-braintree/charitable-braintree.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.6.43",
+   "php": "7.2"
+  },
+  "sections": {
+   "description": "<p>Accept donations with Braintree, with support for card payments, PayPal, Apple Pay, Google Pay and Venmo.</p>\n"
+  },
+  "slug": "charitable-braintree",
+  "url": "https://www.wpcharitable.com/extensions/charitable-braintree/?changelog=1"
+ },
+ "charitable-campaign-updates": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-campaign-updates/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/2026/05/campaign_updates_thumbnail.png",
+  "install": "",
+  "last_updated": "2026-05-04 12:00:41",
+  "license": [
+   "agency",
+   "pro"
+  ],
+  "name": "Charitable Campaign Updates",
+  "new_version": "1.0.7",
+  "package": "",
+  "path": "charitable-campaign-updates/charitable-campaign-updates.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.8.13",
+   "php": "7.4"
+  },
+  "sections": {
+   "description": "<p>Publish progress updates for your campaigns, display them on campaign pages, and email donors who have opted in.</p>\n"
+  },
+  "slug": "charitable-campaign-updates",
+  "url": "https://www.wpcharitable.com/extensions/charitable-campaign-updates/?changelog=1"
+ },
+ "charitable-conversion-tracking": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-conversion-tracking/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2026/04/conversion_tracking_addon_thumbnail.png",
+  "install": "",
+  "last_updated": "2026-09-01 15:51:34",
+  "license": [
+   "agency",
+   "pro"
+  ],
+  "name": "Charitable Conversion Tracking",
+  "new_version": "1.1.1",
+  "package": "",
+  "path": "charitable-conversion-tracking/charitable-conversion-tracking.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.8.13",
+   "php": "7.4"
+  },
+  "sections": {
+   "description": "<p>Conversion Tracking fires the events your ad platforms expect, with the data they need, directly from your Charitable donation flow. No extra pixel plugin required.</p>\n"
+  },
+  "slug": "charitable-conversion-tracking",
+  "url": "https://www.wpcharitable.com/extensions/charitable-conversion-tracking/?changelog=1"
+ },
+ "charitable-custom-receipts": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-custom-receipts/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2026/07/campaign_custom_receipts_addon_thumbnail.png",
+  "install": "",
+  "last_updated": "2026-08-03 16:54:09",
+  "license": [
+   "agency",
+   "plus"
+  ],
+  "name": "Charitable Custom Receipts",
+  "new_version": "1.0.0",
+  "package": "",
+  "path": "charitable-custom-receipts/charitable-custom-receipts.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.8.15",
+   "php": "7.4"
+  },
+  "sections": {
+   "description": "<p>Create beautiful receipt and thank you pages customized based on campaign and the donor information.</p>\n"
+  },
+  "slug": "charitable-custom-receipts",
+  "url": "https://www.wpcharitable.com/extensions/charitable-custom-receipts/?changelog=1"
+ },
+ "charitable-donation-recovery": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-donation-recovery/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2026/04/donation_recovery_addon_thumbnail.png",
+  "install": "",
+  "last_updated": "2026-08-24 20:24:52",
+  "license": [
+   "agency",
+   "pro"
+  ],
+  "name": "Charitable Donation Recovery",
+  "new_version": "1.0.2",
+  "package": "",
+  "path": "charitable-donation-recovery/charitable-donation-recovery.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.8.13",
+   "php": "7.4"
+  },
+  "sections": {
+   "description": "<p>Automatically capture donor intent on your fundraising forms and send a personalized reminder email when a donation is left incomplete</p>\n"
+  },
+  "slug": "charitable-donation-recovery",
+  "url": "https://www.wpcharitable.com/extensions/charitable-donation-recovery/?changelog=1"
+ },
+ "charitable-donor-comments": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-donor-comments/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2017/12/donor-comments-banner.jpg",
+  "install": "",
+  "last_updated": "2024-07-07 08:58:59",
+  "license": [
+   "basic",
+   "plus"
+  ],
+  "name": "Charitable Donor Comments",
+  "new_version": "1.3.0",
+  "package": "",
+  "path": "charitable-donor-comments/charitable-donor-comments.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.7.0"
+  },
+  "sections": {
+   "description": "<p>Give your donors the ability to share a message when they donate.</p>\n"
+  },
+  "slug": "charitable-donor-comments",
+  "url": "https://www.wpcharitable.com/extensions/charitable-donor-comments/?changelog=1"
+ },
+ "charitable-donortrust": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-donortrust/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2025/07/donortrust-.png",
+  "install": "",
+  "last_updated": "2026-05-19 20:38:13",
+  "license": [
+   "agency",
+   "plus"
+  ],
+  "name": "Charitable DonorTrust",
+  "new_version": "1.0.7",
+  "package": "",
+  "path": "charitable-donortrust/charitable-donortrust.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.8.0",
+   "php": "7.4"
+  },
+  "sections": {
+   "description": "<p>Showcase real-time, verified donations to your website visitors and encourage more people to donate to your cause.</p>\n"
+  },
+  "slug": "charitable-donortrust",
+  "url": "https://www.wpcharitable.com/extensions/charitable-donortrust/?changelog=1"
+ },
+ "charitable-easy-digital-downloads-connect": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-easy-digital-downloads-connect/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2015/09/edd-banner.png",
+  "install": "",
+  "last_updated": "2026-02-03 21:30:27",
+  "license": [
+   "plus"
+  ],
+  "name": "Charitable Easy Digital Downloads Connect",
+  "new_version": "1.3.1",
+  "package": "",
+  "path": "charitable-easy-digital-downloads-connect/charitable-easy-digital-downloads-connect.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.2",
+   "php": "7.2"
+  },
+  "sections": {
+   "description": "<p>Accept donations for your Charitable campaigns using Easy Digital Downloads. </p>\n"
+  },
+  "slug": "charitable-easy-digital-downloads-connect",
+  "url": "https://www.wpcharitable.com/extensions/charitable-easy-digital-downloads-connect/?changelog=1"
+ },
+ "charitable-events": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-events/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2026/09/charitable-events-cover.png",
+  "install": "",
+  "last_updated": "2026-09-24 16:38:09",
+  "license": [
+   "agency",
+   "pro"
+  ],
+  "name": "Charitable Events",
+  "new_version": "1.0.0",
+  "package": "",
+  "path": "charitable-events/charitable-events.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.8.18",
+   "php": "7.4"
+  },
+  "sections": {
+   "description": "<p>Running a non-profit event? Sell tickets, track attendees, and check people in at the door, all inside Charitable.</p>\n"
+  },
+  "slug": "charitable-events",
+  "url": "https://www.wpcharitable.com/extensions/charitable-events/?changelog=1"
+ },
+ "charitable-fee-relief": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-fee-relief/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2019/01/fee-relief-banner.png",
+  "install": "",
+  "last_updated": "2026-09-22 13:32:24",
+  "license": [
+   "plus"
+  ],
+  "name": "Charitable Fee Relief",
+  "new_version": "1.3.0",
+  "package": "",
+  "path": "charitable-fee-relief/charitable-fee-relief.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.6.8",
+   "php": "5.3"
+  },
+  "sections": {
+   "description": "<p>Bump up your donations by giving your donors the option to cover the processing fees on their donations.</p>\n"
+  },
+  "slug": "charitable-fee-relief",
+  "url": "https://www.wpcharitable.com/extensions/charitable-fee-relief/?changelog=1"
+ },
+ "charitable-geolocation": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-geolocation/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2016/10/geolocation-banner.png",
+  "install": "",
+  "last_updated": "2024-09-17 13:38:37",
+  "license": [
+   "basic",
+   "plus"
+  ],
+  "name": "Charitable Geolocation",
+  "new_version": "1.2.0",
+  "package": "",
+  "path": "charitable-geolocation/charitable-geolocation.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.7.0"
+  },
+  "sections": {
+   "description": "<p>Set a location for your campaigns, and display them on a Google Map</p>\n"
+  },
+  "slug": "charitable-geolocation",
+  "url": "https://www.wpcharitable.com/extensions/charitable-geolocation/?changelog=1"
+ },
+ "charitable-gift-aid": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-gift-aid/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2016/10/gift-aid-banner.png",
+  "install": "",
+  "last_updated": "2026-03-31 13:54:31",
+  "license": [
+   "plus"
+  ],
+  "name": "Charitable Gift Aid",
+  "new_version": "1.2.4",
+  "package": "",
+  "path": "charitable-gift-aid/charitable-gift-aid.php",
+  "plan_id": 3,
+  "requirements": [],
+  "sections": {
+   "description": "<p>Boost your donations by 25% with Gift Aid, a tax incentive for UK charities.</p>\n"
+  },
+  "slug": "charitable-gift-aid",
+  "url": "https://www.wpcharitable.com/extensions/charitable-gift-aid/?changelog=1"
+ },
+ "charitable-gocardless": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-gocardless/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2022/02/Go-Cardless.png",
+  "install": "",
+  "last_updated": "2024-07-07 09:00:56",
+  "license": [
+   "basic",
+   "plus",
+   "pro"
+  ],
+  "name": "Charitable GoCardless",
+  "new_version": "1.0.1",
+  "package": "",
+  "path": "charitable-gocardless/charitable-gocardless.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.6.55",
+   "php": "7.2"
+  },
+  "sections": {
+   "description": "<p>Save on transaction costs with GoCardless.</p>\n"
+  },
+  "slug": "charitable-gocardless",
+  "url": "https://www.wpcharitable.com/extensions/charitable-gocardless/?changelog=1"
+ },
+ "charitable-google-analytics": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-google-analytics/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2025/06/ga.png",
+  "install": "",
+  "last_updated": "2026-09-24 19:25:37",
+  "license": [
+   "plus"
+  ],
+  "name": "Charitable Google Analytics",
+  "new_version": "1.2.0",
+  "package": "",
+  "path": "charitable-google-analytics/charitable-google-analytics.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.8.0",
+   "php": "7.4"
+  },
+  "sections": {
+   "description": "<p>Connect your campaigns to Google Analytics enabling you to track donation performance and gain valuable insights into your fundraising efforts.</p>\n"
+  },
+  "slug": "charitable-google-analytics",
+  "url": "https://www.wpcharitable.com/extensions/charitable-google-analytics/?changelog=1"
+ },
+ "charitable-mollie": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-mollie/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2021/01/mollie-banner.jpg",
+  "install": "",
+  "last_updated": "2026-06-29 18:55:31",
+  "license": [
+   "basic"
+  ],
+  "name": "Charitable Mollie",
+  "new_version": "1.1.0",
+  "package": "",
+  "path": "charitable-mollie/charitable-mollie.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.6.43",
+   "php": "7.2"
+  },
+  "sections": {
+   "description": "<p>Accept donations with Mollie and support leading European payment methods like Apple Pay, credit card, iDEAL, SEPA, Sofort and Bancontact.</p>\n"
+  },
+  "slug": "charitable-mollie",
+  "url": "https://www.wpcharitable.com/extensions/charitable-mollie/?changelog=1"
+ },
+ "charitable-multi-currency": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-multi-currency/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2026/06/multi_currency_addon_thumbnail.png",
+  "install": "",
+  "last_updated": "2026-08-20 11:25:18",
+  "license": [
+   "agency",
+   "pro"
+  ],
+  "name": "Charitable Multi Currency",
+  "new_version": "1.0.2",
+  "package": "",
+  "path": "charitable-multi-currency/charitable-multi-currency.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.8.16",
+   "php": "7.4"
+  },
+  "sections": {
+   "description": "<p>Let every donor give in their own currency by accepting donations in dozens of currencies and showing donors prices in the currency they understand.</p>\n"
+  },
+  "slug": "charitable-multi-currency",
+  "url": "https://www.wpcharitable.com/extensions/charitable-multi-currency/?changelog=1"
+ },
+ "charitable-newsletter-connect": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-newsletter-connect/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2019/06/Newsletter-Connect-Banner.jpg",
+  "install": "",
+  "last_updated": "2026-08-22 19:05:26",
+  "license": [
+   "plus"
+  ],
+  "name": "Charitable Newsletter Connect",
+  "new_version": "2.4.1",
+  "package": "",
+  "path": "charitable-newsletter-connect/charitable-newsletter-connect.php",
+  "plan_id": 3,
+  "requirements": {
+   "php": "5.3"
+  },
+  "sections": {
+   "description": "<p>Turn one-time donors into ongoing supporters. Supports MailChimp, Campaign Monitor, MailerLite, ActiveCampaign, MailPoet and Mailster.</p>\n"
+  },
+  "slug": "charitable-newsletter-connect",
+  "url": "https://www.wpcharitable.com/extensions/charitable-newsletter-connect/?changelog=1"
+ },
+ "charitable-payfast": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-payfast/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2017/10/payfast-banner.jpg",
+  "install": "",
+  "last_updated": "2024-07-07 09:03:58",
+  "license": [
+   "basic"
+  ],
+  "name": "Charitable PayFast",
+  "new_version": "1.3.4",
+  "package": "",
+  "path": "charitable-payfast/charitable-payfast.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.3",
+   "php": "5.4"
+  },
+  "sections": {
+   "description": "<p>Accept donations with PayFast, a leading South African payment processor.</p>\n"
+  },
+  "slug": "charitable-payfast",
+  "url": "https://www.wpcharitable.com/extensions/charitable-payfast/?changelog=1"
+ },
+ "charitable-payrexx": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-payrexx/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2021/03/payrexx-banner.jpg",
+  "install": "",
+  "last_updated": "2025-07-09 05:40:21",
+  "license": [
+   "basic"
+  ],
+  "name": "Charitable Payrexx",
+  "new_version": "1.0.3",
+  "package": "",
+  "path": "charitable-payrexx/charitable-payrexx.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.6.51",
+   "php": "7.2"
+  },
+  "sections": {
+   "description": "<p>Accept donations in over 200 payment methods globally.</p>\n"
+  },
+  "slug": "charitable-payrexx",
+  "url": "https://www.wpcharitable.com/extensions/charitable-payrexx/?changelog=1"
+ },
+ "charitable-paystack": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-paystack/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2021/02/paystack-banner.jpg",
+  "install": "",
+  "last_updated": "2024-07-07 09:05:40",
+  "license": [
+   "basic"
+  ],
+  "name": "Charitable Paystack",
+  "new_version": "1.0.1",
+  "package": "",
+  "path": "charitable-paystack/charitable-paystack.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.6.45",
+   "php": "7.2"
+  },
+  "sections": {
+   "description": "<p>Accept donations with Paystack, the leading African payment gateway.</p>\n"
+  },
+  "slug": "charitable-paystack",
+  "url": "https://www.wpcharitable.com/extensions/charitable-paystack/?changelog=1"
+ },
+ "charitable-payu-money": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-payu-money/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2015/10/payu-banner.png",
+  "install": "",
+  "last_updated": "2024-07-07 09:13:05",
+  "license": [
+   "basic"
+  ],
+  "name": "Charitable PayUMoney",
+  "new_version": "1.1.3",
+  "package": "",
+  "path": "charitable-payu-money/charitable-payu-money.php",
+  "plan_id": 3,
+  "requirements": [],
+  "sections": {
+   "description": "<p>PayUMoney is the perfect choice for Indian non-profits that want to accept donations from local supporters.</p>\n"
+  },
+  "slug": "charitable-payu-money",
+  "url": "https://www.wpcharitable.com/extensions/charitable-payu-money/?changelog=1"
+ },
+ "charitable-pdf-receipts": {
+  "download_link": "",
+  "featured": [
+   "recommended"
+  ],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-pdf-receipts/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2022/04/PDF-Receipts.png",
+  "install": "",
+  "last_updated": "2026-02-19 10:39:35",
+  "license": [
+   "basic"
+  ],
+  "name": "Charitable PDF Receipts",
+  "new_version": "1.1.1",
+  "package": "",
+  "path": "charitable-pdf-receipts/charitable-pdf-receipts.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.6.59",
+   "php": "7.2"
+  },
+  "sections": {
+   "description": "<p>Make life easy for your donors by providing them with a PDF receipt for their donation.</p>\n"
+  },
+  "slug": "charitable-pdf-receipts",
+  "url": "https://www.wpcharitable.com/extensions/charitable-pdf-receipts/?changelog=1"
+ },
+ "charitable-pro-plugin": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-pro-plugin/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2025/04/charitable-pro.png",
+  "install": "",
+  "last_updated": "2026-10-06 20:28:41",
+  "license": [
+   "basic",
+   "plus",
+   "pro"
+  ],
+  "name": "Charitable Pro",
+  "new_version": "1.8.19.1",
+  "package": "",
+  "path": "charitable-pro-plugin/charitable-pro-plugin.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.8.0",
+   "php": "7.4"
+  },
+  "sections": {},
+  "slug": "charitable-pro-plugin",
+  "url": "https://www.wpcharitable.com/extensions/charitable-pro-plugin/?changelog=1"
+ },
+ "charitable-razorpay": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-razorpay/",
+  "icon": "",
+  "install": "",
+  "last_updated": "2026-06-17 14:32:03",
+  "license": [
+   "agency",
+   "pro"
+  ],
+  "name": "Charitable Razorpay",
+  "new_version": "1.0.0",
+  "package": "",
+  "path": "charitable-razorpay/charitable-razorpay.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.8.0",
+   "php": "7.4"
+  },
+  "sections": {
+   "description": "<p>Charitable Razorpay lets you accept donations from supporters in India through UPI, cards, netbanking, and wallets.</p>\n"
+  },
+  "slug": "charitable-razorpay",
+  "url": "https://www.wpcharitable.com/extensions/charitable-razorpay/?changelog=1"
+ },
+ "charitable-recurring-donations": {
+  "download_link": "",
+  "featured": [
+   "recommended"
+  ],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-recurring-donations/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2016/10/recurring-donations-banner-1.png",
+  "install": "",
+  "last_updated": "2026-09-28 07:44:27",
+  "license": [
+   "plus"
+  ],
+  "name": "Charitable Recurring Donations",
+  "new_version": "2.3.5",
+  "package": "",
+  "path": "charitable-recurring-donations/charitable-recurring-donations.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.6.51",
+   "php": "5.3"
+  },
+  "sections": {
+   "description": "<p>Grow your organization's revenue with recurring donations.</p>\n"
+  },
+  "slug": "charitable-recurring-donations",
+  "url": "https://www.wpcharitable.com/extensions/charitable-recurring-donations/?changelog=1"
+ },
+ "charitable-rewards": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-rewards/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2026/10/charitable_rewards_addon_thumbnail_2.png",
+  "install": "",
+  "last_updated": "2026-10-07 08:28:55",
+  "license": [
+   "agency",
+   "pro"
+  ],
+  "name": "Charitable Rewards",
+  "new_version": "1.0.0",
+  "package": "",
+  "path": "charitable-rewards/charitable-rewards.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.8.19",
+   "php": "7.4"
+  },
+  "sections": {
+   "description": "<p>Thank donors with something more than a receipt. Build a library of perks once, attach them to any campaign at the giving levels you choose, and donors unlock them right on the donation form. Protected digital delivery, shipping addresses collected for you, tax-ready receipts, and more.</p>\n"
+  },
+  "slug": "charitable-rewards",
+  "url": "https://www.wpcharitable.com/extensions/charitable-rewards/?changelog=1"
+ },
+ "charitable-simple-updates": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-simple-updates/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2015/09/simple-updates-banner.png",
+  "install": "",
+  "last_updated": "2024-09-24 11:01:49",
+  "license": [
+   "basic",
+   "plus"
+  ],
+  "name": "Charitable Simple Updates",
+  "new_version": "1.3.1",
+  "package": "",
+  "path": "charitable-simple-updates/charitable-simple-updates.php",
+  "plan_id": 3,
+  "requirements": [],
+  "sections": {
+   "description": "<p>Share updates about your campaigns and display them in a widget, with a shortcode or a PHP function.</p>\n"
+  },
+  "slug": "charitable-simple-updates",
+  "url": "https://www.wpcharitable.com/extensions/charitable-simple-updates/?changelog=1"
+ },
+ "charitable-spam-blocker": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-spam-blocker/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2022/12/spam-blocker.png",
+  "install": "",
+  "last_updated": "2026-06-18 10:06:54",
+  "license": [
+   "basic",
+   "plus",
+   "pro"
+  ],
+  "name": "Charitable Spam Blocker",
+  "new_version": "2.0.1 beta",
+  "package": "",
+  "path": "charitable-spam-blocker/charitable-spam-blocker.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.7.0.6",
+   "php": "5.3"
+  },
+  "sections": {
+   "description": "<p>Add a Captcha to your donation form to prevent spam.</p>\n"
+  },
+  "slug": "charitable-spam-blocker",
+  "url": "https://www.wpcharitable.com/extensions/charitable-spam-blocker/?changelog=1"
+ },
+ "charitable-square": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-square/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2023/02/square.png",
+  "install": "",
+  "last_updated": "2025-07-02 22:54:01",
+  "license": [
+   "basic"
+  ],
+  "name": "Charitable Square",
+  "new_version": "1.0.8 beta",
+  "package": "",
+  "path": "charitable-square/charitable-square.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.7.0.8",
+   "php": "5.3"
+  },
+  "sections": {
+   "description": "<p>Securely accept credit card donations with Square.</p>\n"
+  },
+  "slug": "charitable-square",
+  "url": "https://www.wpcharitable.com/extensions/charitable-square/?changelog=1"
+ },
+ "charitable-stripe": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-stripe/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2015/09/stripe-banner.png",
+  "install": "",
+  "last_updated": "2024-07-09 10:07:52",
+  "license": [
+   "basic"
+  ],
+  "name": "Charitable Stripe",
+  "new_version": "1.5.0",
+  "package": "",
+  "path": "charitable-stripe/charitable-stripe.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.7.0",
+   "php": "5.6"
+  },
+  "sections": {
+   "description": "<p>Accept credit card donations on your website with Stripe.</p>\n"
+  },
+  "slug": "charitable-stripe",
+  "url": "https://www.wpcharitable.com/extensions/charitable-stripe/?changelog=1"
+ },
+ "charitable-stripe-connect": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-stripe-connect/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2016/05/Stripe-Connect.jpg",
+  "install": "",
+  "last_updated": "2026-04-20 06:53:38",
+  "license": [
+   "pro"
+  ],
+  "name": "Charitable Stripe Connect",
+  "new_version": "1.1.4",
+  "package": "",
+  "path": "charitable-stripe-connect/charitable-stripe-connect.php",
+  "plan_id": 3,
+  "requirements": [],
+  "sections": {
+   "description": "<p>Automatically send donations to your campaign creators with Charitable & Stripe Connect.</p>\n"
+  },
+  "slug": "charitable-stripe-connect",
+  "url": "https://www.wpcharitable.com/extensions/charitable-stripe-connect/?changelog=1"
+ },
+ "charitable-tributes": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-tributes/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2026/06/tributes_addon_thumbnail.png",
+  "install": "",
+  "last_updated": "2026-07-13 19:16:16",
+  "license": [
+   "agency",
+   "plus"
+  ],
+  "name": "Charitable Tributes",
+  "new_version": "1.0.0",
+  "package": "",
+  "path": "charitable-tributes/charitable-tributes.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.8.0",
+   "php": "7.4"
+  },
+  "sections": {
+   "description": "<p>Accept \"in memory of,\" \"in honor of,\" and \"on behalf of\" donations, turn every gift into a lasting honoree record, and notify the family automatically. Tribute giving, built right into Charitable.</p>\n"
+  },
+  "slug": "charitable-tributes",
+  "url": "https://www.wpcharitable.com/extensions/charitable-tributes/?changelog=1"
+ },
+ "charitable-user-avatar": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-user-avatar/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2015/09/user-avatar-banner.png",
+  "install": "",
+  "last_updated": "2024-07-07 09:06:59",
+  "license": [
+   "plus"
+  ],
+  "name": "Charitable User Avatar",
+  "new_version": "1.0.7",
+  "package": "",
+  "path": "charitable-user-avatar/charitable-user-avatar.php",
+  "plan_id": 3,
+  "requirements": [],
+  "sections": {
+   "description": "<p>Add a community feel to your website by giving your donors the ability to upload their profile photo.</p>\n"
+  },
+  "slug": "charitable-user-avatar",
+  "url": "https://www.wpcharitable.com/extensions/charitable-user-avatar/?changelog=1"
+ },
+ "charitable-videos": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-videos/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2015/09/campaign-video-banner.png",
+  "install": "",
+  "last_updated": "2025-02-25 04:57:39",
+  "license": [
+   "basic"
+  ],
+  "name": "Charitable Videos",
+  "new_version": "1.1.3",
+  "package": "",
+  "path": "charitable-videos/charitable-videos.php",
+  "plan_id": 3,
+  "requirements": [],
+  "sections": {
+   "description": "<p>Give your fundraising campaign a boost by adding video.</p>\n"
+  },
+  "slug": "charitable-videos",
+  "url": "https://www.wpcharitable.com/extensions/charitable-videos/?changelog=1"
+ },
+ "charitable-windcave": {
+  "download_link": "",
+  "featured": [],
+  "homepage": "https://www.wpcharitable.com/extensions/charitable-windcave/",
+  "icon": "https://www.wpcharitable.com/wp-content/uploads/edd/2020/04/windcave-banner.jpg",
+  "install": "",
+  "last_updated": "2026-08-22 21:42:59",
+  "license": [
+   "basic"
+  ],
+  "name": "Charitable Windcave",
+  "new_version": "2.0.1",
+  "package": "",
+  "path": "charitable-windcave/charitable-windcave.php",
+  "plan_id": 3,
+  "requirements": {
+   "charitable": "1.6.38",
+   "php": "5.6"
+  },
+  "sections": {
+   "description": "<p>Accept donations securely with Windcave (formerly Payment Express).</p>\n"
+  },
+  "slug": "charitable-windcave",
+  "url": "https://www.wpcharitable.com/extensions/charitable-windcave/?changelog=1"
+ }
+}

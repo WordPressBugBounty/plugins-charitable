@@ -909,6 +909,14 @@ class CharitableLicenses {
 				}
 			}
 
+			// No licence: nothing here can be updated, because every package URL this returns is
+			// licence-keyed. Returning false rather than asking keeps the site URL off the wire on
+			// the routine update check, which runs in cron. Not the static catalogue: that carries
+			// new_version with no package, which would offer an update that cannot be installed.
+			if ( empty( $licenses ) ) {
+				return false;
+			}
+
 			$response = wp_remote_post(
 				self::UPDATE_URL . '/edd-api/versions-v2/',
 				array(

@@ -1110,18 +1110,27 @@ if ( ! class_exists( 'Charitable_Setup' ) ) :
 
 			// setup variables.
 			$opt_in_tracking = empty( $_POST['tracking_action'] ) || $_POST['tracking_action'] === 'opt-out' ? '0' : '1';
-			$email           = update_option( 'charitable_email_signup', false ) ? get_option( 'charitable_email_signup' ) : get_option( 'admin_email' );
+
+			// Was update_option() where get_option() was meant, which wiped the stored address.
+			$email = get_option( 'charitable_email_signup' ) ? get_option( 'charitable_email_signup' ) : get_option( 'admin_email' );
+
+			$tracking_args = array(
+				'opt_in_track' => $opt_in_tracking,
+				'site_token'   => charitable_get_site_token(),
+				'return'       => rawurlencode(
+					base64_encode( get_admin_url( null, 'admin.php') ) // phpcs:ignore
+				),
+			);
+
+			// Never send the address on a decline. The app resolves the record by site_token and only
+			// falls back to `email` when that misses, so omitting it still records the opt-out.
+			if ( '1' === $opt_in_tracking && is_email( $email ) ) {
+				$tracking_args['email'] = $email;
+			}
 
 			// assemble a url to the setup wizard using WordPress function.
 			$tracking_update_url = add_query_arg(
-				array(
-					'email'        => is_email( $email ) ? $email : false,
-					'opt_in_track' => $opt_in_tracking,
-					'site_token'   => charitable_get_site_token(),
-					'return'       => rawurlencode(
-						base64_encode( get_admin_url( null, 'admin.php') ) // phpcs:ignore
-					),
-				),
+				$tracking_args,
 				charitable_onboarding_app_url() . '/optin-charitable_tracking'
 			);
 

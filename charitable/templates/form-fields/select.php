@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since   1.0.0
  * @version 1.0.0
  * @version 1.8.8.6
+ * @version 1.8.13.1
  */
 
 if ( ! isset( $view_args['form'] ) || ! isset( $view_args['field'] ) ) {
@@ -30,6 +31,17 @@ if ( is_array( $charitable_value ) ) {
 	$charitable_value = current( $charitable_value );
 }
 
+/*
+ * Autocomplete token for known personal fields, e.g. Country (WCAG 1.3.5). 1.8.13.1
+ *
+ * function_exists guarded for the same reason as form-fields/default.php: this template is
+ * theme-overridable, so a copy carried into a theme and run against an older Charitable would
+ * otherwise fatal. Unguarded, the select renders without the token as it did before.
+ */
+if ( function_exists( 'charitable_maybe_add_field_autocomplete' ) ) {
+	$charitable_field = charitable_maybe_add_field_autocomplete( $charitable_field );
+}
+
 if ( count( $charitable_options ) ) :
 
 	?>
@@ -42,7 +54,24 @@ if ( count( $charitable_options ) ) :
 			<?php endif ?>
 		</label>
 	<?php endif ?>
-	<select name="<?php echo esc_attr( $charitable_field['key'] ); ?>" id="charitable_field_<?php echo esc_attr( $charitable_field['key'] ); ?>_element">
+	<?php
+	/*
+	 * Emit explicit attributes, as form-fields/default.php already does for text inputs
+	 * (1.8.13.1). Without this a select could not carry an `autocomplete` token, which is
+	 * what the Country field needs for WCAG 1.3.5 Identify Input Purpose.
+	 *
+	 * Deliberately passes ONLY the attrs array, rather than the whole field as default.php
+	 * does. Handed the full field, charitable_get_arbitrary_attributes() also applies its
+	 * back-compat pass, which would start emitting `required` on every required select --
+	 * a real change in browser validation behaviour, and not something an accessibility
+	 * fix should bring in as a side effect. Same call shape as
+	 * class-charitable-public-form-view.php.
+	 */
+	$charitable_select_attrs = charitable_get_arbitrary_attributes(
+		array( 'attrs' => isset( $charitable_field['attrs'] ) ? (array) $charitable_field['attrs'] : array() )
+	);
+	?>
+	<select name="<?php echo esc_attr( $charitable_field['key'] ); ?>" id="charitable_field_<?php echo esc_attr( $charitable_field['key'] ); ?>_element"<?php echo $charitable_select_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- values escaped in the helper. ?>>
 		<?php
 		foreach ( $charitable_options as $charitable_val => $charitable_label ) :
 

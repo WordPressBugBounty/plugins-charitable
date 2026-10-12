@@ -1,3 +1,15 @@
+# 1.8.13.1
+* IMPROVED: Accessibility improvements across the donation form, covering field labelling, autocomplete hints, grouped donation amounts and visible keyboard focus indicators.
+* FIX: Privacy improvements, reducing any unneeded external requests, and adding more control over the Share Usage Data setting.
+* FIX: Hardening across the campaign builder, including permission and security-token checks on several internal requests.
+* FIX: Minor improvements to Addons screen and setup wizard welcome screen.
+* FIX: Improvements for zero-decimal currencies, mostly on reports and dashboard pages.
+* FIX: Donation form errors are now announced to screen readers and take keyboard focus.
+* FIX: Donation form improvements related to Google reCAPTCHA and errors related to Stripe when confirming card details.
+* FIX: Donate button on a campaign page now carries the donation amount already highlighted.
+* FIX: Campaign templates now show a consistent campaign description in the builder preview and on the published page.
+
+
 # 1.8.13
 * NEW: Charitable now works with AI assistants. On WordPress 6.9 or later, connect Claude or ChatGPT using the free WPVibe plugin, or any MCP client, to build and restyle campaigns, log donations that arrived by post, and report on your fundraising. Twenty-four operations, all permission-checked. [More Information](https://www.wpcharitable.com/ai/)
 * NEW: Control it all at Charitable > Tools > AI MCP. Write access starts OFF, an AI Activity list records every change and every refusal, and an assistant must confirm explicitly before trashing or unpublishing a campaign that already has donations.

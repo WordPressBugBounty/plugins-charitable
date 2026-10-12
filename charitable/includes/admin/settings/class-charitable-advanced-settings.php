@@ -223,6 +223,7 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 
 			// Delete transients (related to plugin versions).
 			delete_transient( '_charitable_plugin_versions' ); // v1.8.6.2.
+			delete_transient( '_charitable_plugin_versions_failed' ); // v1.8.13.1.
 
 			// Delete all transients whose names start with "charitable-report".
 			charitable_delete_transients_from_keys( charitable_search_database_for_transients_by_prefix( 'charitable-report', '-' ) );
@@ -390,6 +391,7 @@ if ( ! class_exists( 'Charitable_Advanced_Settings' ) ) :
 
 			// Delete transients (related to plugin versions).
 			delete_transient( '_charitable_plugin_versions' );
+			delete_transient( '_charitable_plugin_versions_failed' );
 
 			foreach ( $licenses as $product_key => $license ) {
 				$license = trim( $license );

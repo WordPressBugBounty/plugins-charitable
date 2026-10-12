@@ -190,6 +190,7 @@ $array_to_return = array( // phpcs:ignore WordPress.NamingConventions.PrefixAllG
 	'Charitable_EventDriven'                         => 'admin/notifications/class-charitable-eventdriven.php',
 	'Charitable_Export_Items'                        => 'admin/export-items/class-charitable-export-items.php',
 	'Charitable_Addons_Directory'                    => 'admin/addons-directory/class-charitable-addons-directory.php',
+	'Charitable_Addons_Catalogue'                    => 'admin/addons-directory/class-charitable-addons-catalogue.php',
 	'Charitable_Import_Items'                        => 'admin/import-items/class-charitable-import-items.php',
 	'Charitable_GiveWP_Importer'                     => 'admin/import-items/class-charitable-givewp-importer.php',
 	'Charitable_Campaign_Embed_Wizard'               => 'admin/campaign-builder/class-campaign-embed-wizard.php', // v1.8.0.

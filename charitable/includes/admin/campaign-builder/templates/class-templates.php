@@ -99,15 +99,32 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 		/**
 		 * Main Instance.
 		 *
-		 * @since 1.8.0
+		 * The accessor used to build the WRONG CLASS (1.8.13.1). It assigned
+		 * `new Charitable_Campaign_Builder()` -- a different class entirely -- so any caller
+		 * using this accessor and expecting template methods got a fatal undefined-method
+		 * error. Latent rather than live, because every real call site instantiates
+		 * `Charitable_Campaign_Builder_Templates` directly and bypasses this accessor.
 		 *
-		 * @return Charitable_Builder
+		 * The guard was also incoherent: `! isset( self::$instance ) && ! ( self::$instance
+		 * instanceof … )` evaluated the second clause against a property it had just
+		 * established was unset, so the `instanceof` half could never contribute anything.
+		 * A single `instanceof` test covers both cases, since an unset property is not an
+		 * instance of anything.
+		 *
+		 * The `admin_init` hook stays valid: this class has its own `init()` method.
+		 *
+		 * Pro fixed the same thing in `f19a22167d`.
+		 *
+		 * @since 1.8.0
+		 * @since 1.8.13.1 Returns this class rather than Charitable_Campaign_Builder.
+		 *
+		 * @return Charitable_Campaign_Builder_Templates
 		 */
 		public static function get_instance() {
 
-			if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Charitable_Campaign_Builder_Templates ) ) {
+			if ( ! self::$instance instanceof Charitable_Campaign_Builder_Templates ) {
 
-				self::$instance = new Charitable_Campaign_Builder();
+				self::$instance = new self();
 
 				add_action( 'admin_init', array( self::$instance, 'init' ), 10 );
 			}
@@ -814,7 +831,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 			}
 
 			if ( ! is_array( $charitable_addons ) || empty( $charitable_addons ) ) {
-				return;
+				return false;
 			}
 
 			foreach ( $charitable_addons as $charitable_addon ) {
@@ -1191,6 +1208,74 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 		}
 
 		/**
+		 * Seed a brand-new campaign's description from the template that supplies it.
+		 *
+		 * A campaign that has never been saved has no description of its own, and
+		 * Charitable_Field_Campaign_Description::render() prefers
+		 * settings.general.description, falling back to the description FIELD's own
+		 * `content`. Where a template supplies both and they differ, whichever paths
+		 * apply this seeding and whichever do not render DIFFERENT TEXT for the same
+		 * field.
+		 *
+		 * That is exactly what happened before 1.8.13.1: the settings panel applied it
+		 * (inline, here in get_template_field_options()) while the preview paint in
+		 * Charitable_Builder_Panel_Design::preview() did not, so the preview showed the
+		 * field's `content` on page load and switched to the description the moment the
+		 * panel opened. Extracted into one method so the two callers cannot drift apart
+		 * again -- the template data was realigned in the same release, but a future
+		 * template that diverges must not resurrect the bug.
+		 *
+		 * SCOPE: new campaigns only. The guard is `! isset()`, and every path that
+		 * creates campaign_settings_v2 writes this key -- the builder save, onboarding,
+		 * the legacy bridge (as `false`) and the AI abilities (as `''`). `isset()` is
+		 * true for both `false` and `''`, so a campaign that has ever been saved is
+		 * never touched. This also only ever rewrites the array it is handed; nothing
+		 * is persisted here.
+		 *
+		 * @since 1.8.13.1
+		 *
+		 * @param  array  $campaign_data The campaign data.
+		 * @param  string $template_id   Template slug, or false when unknown.
+		 * @return array  The campaign data, with the template description applied where applicable.
+		 */
+		public function maybe_apply_template_description( $campaign_data = false, $template_id = false ) {
+
+			if ( false === $template_id || ! is_array( $campaign_data ) ) {
+				return $campaign_data;
+			}
+
+			if ( isset( $campaign_data['settings']['general']['description'] ) ) {
+				return $campaign_data;
+			}
+
+			/*
+			 * Prefer the copy already in memory, but do not depend on it. $templates_data is
+			 * populated by the constructor, which returns early when ! is_admin() -- so under
+			 * WP-CLI, or anywhere else the class is built outside an admin request, the
+			 * property is an empty array and reading it alone would make this a silent no-op.
+			 * get_template_data() loads independently of that.
+			 */
+			$description = isset( $this->templates_data['templates'][ $template_id ]['settings']['general']['description'] )
+				? $this->templates_data['templates'][ $template_id ]['settings']['general']['description']
+				: null;
+
+			if ( null === $description || '' === $description ) {
+				$template_data = $this->get_template_data( $template_id );
+				$description   = isset( $template_data['settings']['general']['description'] )
+					? $template_data['settings']['general']['description']
+					: null;
+			}
+
+			if ( empty( $description ) ) {
+				return $campaign_data;
+			}
+
+			$campaign_data['settings']['general']['description'] = $description;
+
+			return $campaign_data;
+		}
+
+		/**
 		 * Output the 'fields' or 'blocks' for the template.
 		 *
 		 * @since 1.8.0
@@ -1209,12 +1294,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 			$layout   = (array) $theme['layout'];
 
 			// If there is no description for this campaign, then this (assumingly) must be a new campaign and we should check and see if there's a description that comes with the template.
-			if ( false !== $template_id && ! isset( $campaign_data['settings']['general']['description'] ) ) {
-
-				if ( ! empty( $this->templates_data['templates'][ $template_id ]['settings']['general']['description'] ) ) {
-					$campaign_data['settings']['general']['description'] = $this->templates_data['templates'][ $template_id ]['settings']['general']['description'];
-				}
-			}
+			$campaign_data = $this->maybe_apply_template_description( $campaign_data, $template_id );
 
 			foreach ( $layout as $row ) {
 				foreach ( $row['columns'] as $column ) {
@@ -2589,7 +2669,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						),
 						'settings' => array(
 							'general' => array(
-								'description' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqui.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqui.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod</p>',
+								'description' => '<p>We are announcing a campaign to make the dream of a once-in-a-lifetime field trip come true for our graduating 5th graders: an unforgettable adventure in California! Your support will enable us to purchase necessary supplies, ensure safe travel, and provide accommodations for both parents and teachers accompanying the students. With your contribution, we can create lasting memories and valuable learning experiences, fostering a sense of camaraderie and curiosity that will stay with these young minds for a lifetime.</p>',
 							),
 						),
 					),
@@ -2722,7 +2802,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						),
 						'settings' => array(
 							'general' => array(
-								'description' => '<p>Help us protect Maple Grove Park from commercial development and ensure it remains a free, beautiful public park for generations to come.</p>',
+								'description' => '<p>For generations, Maple Grove Park has been the beating heart of our community. It is where our children take their first steps, where local musicians find their muse under the shade of ancient trees, and where neighbors gather to escape the hustle of daily life. This park is not just a patch of green space on a map; it is a living sanctuary of shared memories, vibrant wildlife, and irreplaceable local history.</p><p>But right now, this beloved community treasure is facing a quiet but devastating crisis. <strong>Commercial development plans</strong> threaten to bulldoze our history and replace our vibrant canopy with concrete. If we stay silent, the ecosystem that supports local wildlife will be destroyed, and the public space that belongs to every single one of us will be lost forever. We cannot afford to stand by and watch Maple Grove vanish.</p><p>That is why we are launching the <strong>Save Maple Grove Park</strong> initiative. Our mission is simple but powerful: to legally protect this land, restore its natural habitats, and ensure it remains a free, beautiful public park for generations to come. We are working alongside local environmental experts, city planners, and passionate residents to present an airtight preservation alternative to the city council. But an expert plan means nothing without the roaring voice of the community behind it.</p>',
 							),
 						),
 					),
@@ -2845,7 +2925,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 						),
 						'settings' => array(
 							'general' => array(
-								'description' => '<p>Help us protect Maple Grove Park from commercial development and ensure it remains a free, beautiful public park for generations to come.</p>',
+								'description' => '<p>For generations, Maple Grove Park has been the beating heart of our community. It is where our children take their first steps, where local musicians find their muse under the shade of ancient trees, and where neighbors gather to escape the hustle of daily life. This park is not just a patch of green space on a map; it is a living sanctuary of shared memories, vibrant wildlife, and irreplaceable local history.</p><p>But right now, this beloved community treasure is facing a quiet but devastating crisis. <strong>Commercial development plans</strong> threaten to bulldoze our history and replace our vibrant canopy with concrete. If we stay silent, the ecosystem that supports local wildlife will be destroyed, and the public space that belongs to every single one of us will be lost forever. We cannot afford to stand by and watch Maple Grove vanish.</p><p>That is why we are launching the <strong>Save Maple Grove Park</strong> initiative. Our mission is simple but powerful: to legally protect this land, restore its natural habitats, and ensure it remains a free, beautiful public park for generations to come. We are working alongside local environmental experts, city planners, and passionate residents to present an airtight preservation alternative to the city council. But an expert plan means nothing without the roaring voice of the community behind it.</p>',
 							),
 						),
 					),
@@ -3372,7 +3452,7 @@ if ( ! class_exists( 'Charitable_Campaign_Builder_Templates' ) ) :
 														array(
 															'type' => 'campaign-description',
 															'headline' => 'About This Campaign',
-															'content' => '<p>We are announcing a new campaign aimed at providing crucial support to the victims of a recent devastating natural disaster. Together, we are rallying behind our fellow community members, raising funds through this non-profit initiative to help them rebuild homes, restore essential services, and reclaim their lives. Join us in making a difference, as every contribution brings us one step closer to bringing hope and stability back to those in need..</p>',
+															'content' => '<p>We are announcing a new campaign aimed at providing crucial support to the victims of a recent devastating natural disaster. Together, we are rallying behind our fellow community members, raising funds through this non-profit initiative to help them rebuild homes, restore essential services, and reclaim their lives. Join us in making a difference, as every contribution brings us one step closer to bringing hope and stability back to those in need.</p>',
 															'align' => 'left',
 														),
 														array(

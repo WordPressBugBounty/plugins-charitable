@@ -220,11 +220,19 @@
 						data
 					).then( function( result ) {
 						if ( result.error ) {
+							/*
+							 * prevent_scroll_to_top is declared in the Donation_Form
+							 * constructor, so hasOwnProperty() is always true here and the
+							 * error used to be dropped on every failure: the donor saw
+							 * nothing at all while the donation went no further. Set the
+							 * flag alongside the error rather than instead of it, matching
+							 * how the card-errors branch above handles the same pair.
+							 */
 							if ( helper.hasOwnProperty( 'prevent_scroll_to_top' ) ) {
 								helper.prevent_scroll_to_top = true;
-							} else {
-								helper.add_error( result.error.message );
 							}
+
+							helper.add_error( result.error.message );
 						} else {
 							helper.get_input( 'stripe_payment_method' ).val( result.paymentMethod.id );
 						}

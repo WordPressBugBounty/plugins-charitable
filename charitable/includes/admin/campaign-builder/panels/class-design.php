@@ -945,6 +945,28 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Design' ) ) :
 			$rows  = (array) isset( $this->campaign_data['layout'] ) && ! empty( $this->campaign_data['layout']['rows'] ) ? $this->campaign_data['layout']['rows'] : array();
 			$theme = ! empty( $rows ) && ! empty( $this->campaign_data['template_id'] ) ? $builder_template->get_template_data( $this->campaign_data['template_id'] ) : false;
 
+			/*
+			 * Apply the template's own description for a brand-new campaign, exactly as the
+			 * settings panel does (1.8.13.1).
+			 *
+			 * Without this, the two disagreed: the panel seeded the description box from the
+			 * template while this paint did not, so for any template shipping a description
+			 * that differs from its description FIELD's `content`,
+			 * Charitable_Field_Campaign_Description::render() took the `content` fallback here
+			 * and the description branch there. The preview showed one text on page load and
+			 * switched to the other the moment the field was clicked.
+			 *
+			 * New campaigns only, and render-only -- see
+			 * Charitable_Campaign_Builder_Templates::maybe_apply_template_description() for why
+			 * a campaign that has ever been saved is never touched.
+			 */
+			if ( ! empty( $this->campaign_data['template_id'] ) ) {
+				$this->campaign_data = $builder_template->maybe_apply_template_description(
+					$this->campaign_data,
+					$this->campaign_data['template_id']
+				);
+			}
+
 			$element_counter = 0;
 			$column_counter  = 0;
 			$section_counter = 0;

@@ -10,6 +10,7 @@
  * @version 1.6.49
  * @version 1.8.6 - Added filter to allow customizing the suggested donation amount text.
  * @version 1.8.8.6
+ * @version 1.8.13.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -38,6 +39,22 @@ if ( 0 === $charitable_amount ) {
 if ( empty( $charitable_suggested ) && ! $charitable_custom ) {
 	return;
 }
+
+/*
+ * Accessible name for the custom-amount input (WCAG 3.3.2 / 4.1.2) -- 1.8.13.1.
+ *
+ * This input had only a placeholder. A placeholder is not an accessible name: it disappears the
+ * moment the donor types, and screen readers are inconsistent about exposing it at all, so the
+ * field was the one visible control in this form with no programmatic name.
+ *
+ * The same string is reused for both the placeholder and aria-label so they can never drift, and
+ * so a site filtering the placeholder gets the matching name for free. Hoisted out of the markup
+ * because there are two render paths below (alongside suggested amounts, and custom-only).
+ */
+$charitable_custom_amount_label = apply_filters(
+	'charitable_donation_amount_form_custom_amount_placeholder',
+	__( 'Enter donation amount', 'charitable' )
+);
 
 if ( count( $charitable_suggested ) ) :
 
@@ -106,7 +123,8 @@ if ( count( $charitable_suggested ) ) :
 						type="text"
 						class="custom-donation-input"
 						name="custom_donation_amount"
-						placeholder="<?php esc_attr_e( 'Enter donation amount', 'charitable' ); ?>"
+						placeholder="<?php echo esc_attr( $charitable_custom_amount_label ); ?>"
+						aria-label="<?php echo esc_attr( $charitable_custom_amount_label ); ?>"
 						value="<?php echo $charitable_has_custom_donation_amount ? charitable_get_currency_helper()->get_sanitized_and_localized_amount( $charitable_amount, false, true ) : ''; // phpcs:ignore ?>"
 					/>
 				</span>
@@ -120,7 +138,8 @@ if ( count( $charitable_suggested ) ) :
 			type="text"
 			class="custom-donation-input"
 			name="custom_donation_amount"
-			placeholder="<?php esc_attr_e( 'Enter donation amount', 'charitable' ); ?>"
+			placeholder="<?php echo esc_attr( $charitable_custom_amount_label ); ?>"
+			aria-label="<?php echo esc_attr( $charitable_custom_amount_label ); ?>"
 			value="<?php echo $charitable_amount ? esc_attr( charitable_get_currency_helper()->get_sanitized_and_localized_amount( $charitable_amount, false, true ) ) : ''; ?>"
 		/>
 	</div><!-- #custom-donation-amount-field -->

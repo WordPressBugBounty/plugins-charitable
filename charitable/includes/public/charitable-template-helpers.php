@@ -10,6 +10,7 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
  * @version   1.8.13
+ * @version   1.8.13.1 Added the field autocomplete token helpers.
  */
 
 // Exit if accessed directly.
@@ -256,6 +257,89 @@ function charitable_get_arbitrary_attributes( $field ) {
 	}
 
 	return apply_filters( 'charitable_arbitrary_field_attributes', $output );
+}
+
+/**
+ * Return the HTML autocomplete token for a known donation-form field key.
+ *
+ * WCAG 1.3.5 Identify Input Purpose asks that fields collecting information about the user carry
+ * the matching autocomplete token, which also gives every donor working browser autofill.
+ *
+ * WHY THIS IS A MAP RATHER THAN JUST FIELD CONFIG. The canonical fields declare their own token in
+ * includes/fields/default-fields/donation-fields.php, and that declaration takes precedence. But
+ * not every render path reads those donation_form args -- the campaign builder's fields hand-build
+ * their own markup -- so a token declared only in the registry would reach the legacy form and
+ * silently miss other engines. The field templates consult this map to fill the gap, which also
+ * means an addon rendering a field named `email` gets the token without doing anything.
+ *
+ * Keyed on the field key, not the label, so it is translation-independent.
+ *
+ * @since 1.8.13.1
+ *
+ * @param  string $key The field key.
+ * @return string The autocomplete token, or an empty string if the key is not a known personal field.
+ */
+function charitable_get_field_autocomplete_token( $key ) {
+	$tokens = array(
+		'first_name'   => 'given-name',
+		'last_name'    => 'family-name',
+		'email'        => 'email',
+		'address'      => 'address-line1',
+		'address_2'    => 'address-line2',
+		'city'         => 'address-level2',
+		'state'        => 'address-level1',
+		'postcode'     => 'postal-code',
+		'country'      => 'country',
+		'phone'        => 'tel',
+		'company'      => 'organization',
+		'organisation' => 'organization',
+	);
+
+	/**
+	 * Filter the field key to autocomplete token map.
+	 *
+	 * @since 1.8.13.1
+	 *
+	 * @param array $tokens Map of field key => autocomplete token.
+	 */
+	$tokens = apply_filters( 'charitable_field_autocomplete_tokens', $tokens );
+
+	return isset( $tokens[ $key ] ) ? $tokens[ $key ] : '';
+}
+
+/**
+ * Add the autocomplete token to a field's attrs, if it has a known key and none was declared.
+ *
+ * Used by the field templates. Never overwrites an explicit value, so a field (or an addon, or the
+ * Stripe gateway's cc-name) that sets its own token keeps it.
+ *
+ * @since 1.8.13.1
+ *
+ * @param  array $field The field definition.
+ * @return array The field, with attrs['autocomplete'] filled in where applicable.
+ */
+function charitable_maybe_add_field_autocomplete( $field ) {
+	if ( ! is_array( $field ) || ! isset( $field['key'] ) ) {
+		return $field;
+	}
+
+	if ( isset( $field['attrs'] ) && is_array( $field['attrs'] ) && isset( $field['attrs']['autocomplete'] ) ) {
+		return $field;
+	}
+
+	$token = charitable_get_field_autocomplete_token( $field['key'] );
+
+	if ( '' === $token ) {
+		return $field;
+	}
+
+	if ( ! isset( $field['attrs'] ) || ! is_array( $field['attrs'] ) ) {
+		$field['attrs'] = array();
+	}
+
+	$field['attrs']['autocomplete'] = $token;
+
+	return $field;
 }
 
 /**

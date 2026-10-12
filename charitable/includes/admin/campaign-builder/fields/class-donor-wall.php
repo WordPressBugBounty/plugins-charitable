@@ -144,12 +144,27 @@ if ( ! class_exists( 'Charitable_Field_Donation_Wall' ) ) :
 
 				$shortcode_args = '';
 
+				/*
+				 * Both branches must neutralise the value, because this string is handed to
+				 * do_shortcode() below (1.8.13.1).
+				 *
+				 * An integer-typed default was previously interpolated raw and UNQUOTED, so a
+				 * value like `1] [some_other_shortcode] [x` closed the charitable_donors tag and
+				 * had do_shortcode() execute whatever came next. intval() makes that impossible
+				 * for the numeric keys, and esc_attr() closes the quoted branch.
+				 *
+				 * Note the branch tests the DEFAULT's type while interpolating the value from
+				 * $params, which is seeded from request data and has been through the
+				 * charitable_campaign_builder_donation_wall_args filter -- so the type of what is
+				 * actually interpolated is not guaranteed by the branch it took, and neither
+				 * branch can be trusted.
+				 */
 				foreach ( $defaults as $name => $value ) {
 
 					if ( is_integer( $value ) ) {
-						$shortcode_args .= $name . '=' . $params[ $name ] . ' ';
+						$shortcode_args .= $name . '=' . intval( $params[ $name ] ) . ' ';
 					} else {
-						$shortcode_args .= $name . '="' . $params[ $name ] . '" ';
+						$shortcode_args .= $name . '="' . esc_attr( $params[ $name ] ) . '" ';
 					}
 				}
 
@@ -246,12 +261,22 @@ if ( ! class_exists( 'Charitable_Field_Donation_Wall' ) ) :
 
 						$shortcode_args = '';
 
+						/*
+						 * Same neutralisation as the loop in render() above (1.8.13.1). This is
+						 * the FRONT-END display path rather than the builder preview, fed from
+						 * saved campaign data rather than $_POST, so the injection here is stored
+						 * rather than reflected: whoever could save the campaign chooses the
+						 * value, and it executes for every public visitor to the campaign page.
+						 *
+						 * Worth noting that Pro fixed only its render() copy in a8f1d3d00a and
+						 * left its equivalent of this loop raw, so Pro still needs this half.
+						 */
 						foreach ( $defaults as $name => $value ) {
 
 							if ( is_integer( $value ) ) {
-								$shortcode_args .= $name . '=' . $params[ $name ] . ' ';
+								$shortcode_args .= $name . '=' . intval( $params[ $name ] ) . ' ';
 							} else {
-								$shortcode_args .= $name . '="' . $params[ $name ] . '" ';
+								$shortcode_args .= $name . '="' . esc_attr( $params[ $name ] ) . '" ';
 							}
 						}
 

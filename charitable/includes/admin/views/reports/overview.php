@@ -86,7 +86,7 @@ $charitable_total_count_donations  = count( $charitable_donations );
 $charitable_total_amount_donations = $charitable_reports->get_donations_total();
 $charitable_donation_breakdown     = $charitable_reports->get_donations_by_day();
 $charitable_payment_breakdown      = $charitable_reports->get_donations_by_payment();
-$charitable_donation_average       = ( $charitable_total_amount_donations > 0 && $charitable_total_amount_donations > 0 ) ? ( charitable_format_money( $charitable_total_amount_donations / $charitable_total_count_donations, 2, true ) ) : charitable_format_money( 0 );
+$charitable_donation_average       = ( $charitable_total_amount_donations > 0 && $charitable_total_amount_donations > 0 ) ? ( charitable_format_money( $charitable_total_amount_donations / $charitable_total_count_donations, false, true ) ) : charitable_format_money( 0 );
 $charitable_donation_total         = charitable_format_money( $charitable_total_amount_donations );
 
 // donors.

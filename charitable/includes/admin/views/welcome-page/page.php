@@ -27,7 +27,7 @@ $charitable_onboarding_completed = get_option( 'charitable_ss_complete', false )
 $charitable_onboarding_welcome   = ! empty( $_GET['f'] ) ? intval( $_GET['f'] ) : false; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 $charitable_welcome_headline  = $charitable_onboarding_completed ? __( 'Welcome back to the Charitable Setup Wizard!', 'charitable' ) : __( 'Welcome to the Charitable Setup Wizard!', 'charitable' );
-$charitable_introduction_text = $charitable_onboarding_completed ? __( 'You have already completed the setup wizard. If you need to make any changes, you can restart this process or adjust your Charitable settings.', 'charitable' ) : __( 'Your first fundraising begins with a creating a campaign. Ready to get started? Your first campaign is just 5 minutes away!', 'charitable' );
+$charitable_introduction_text = $charitable_onboarding_completed ? __( 'You have already completed the setup wizard. If you need to make any changes, you can restart this process or adjust your Charitable settings.', 'charitable' ) : __( 'Your first fundraising begins with creating a campaign. Ready to get started? Your first campaign is just 5 minutes away!', 'charitable' );
 $charitable_button_label      = $charitable_onboarding_completed ? __( 'Restart Setup Wizard', 'charitable' ) : __( 'Let\'s Get Started', 'charitable' );
 
 
@@ -72,6 +72,6 @@ if ( ! empty( $_GET['lostconnection'] ) ) { // phpcs:ignore WordPress.Security.N
 	</div>
 	<div class="charitable-go-back"><a href="<?php echo esc_url( $charitable_welcome_go_back_url ); ?>">← <?php echo esc_html( $charitable_welcome_go_back_text ); ?></a></div>
 	<div class="charitable-onbarding-notice">
-		<p><?php echo esc_html__( 'Note: You will be transfered to an WPCharitable.com to complete the setup wizard.', 'charitable' ); ?></p>
+		<p><?php echo esc_html__( 'Note: You will be transferred to a WPCharitable.com site to complete the setup wizard.', 'charitable' ); ?></p>
 	</div>
 </div>

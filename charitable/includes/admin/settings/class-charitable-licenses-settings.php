@@ -456,6 +456,7 @@ if ( ! class_exists( 'Charitable_Licenses_Settings' ) ) :
 
 			// Delete transients (related to plugin versions).
 			delete_transient( '_charitable_plugin_versions' );
+			delete_transient( '_charitable_plugin_versions_failed' );
 
 			// Remember that legacy licenses are passed into values differently in this hook. $values[licenses_legacy].
 			foreach ( $licenses as $product_key => $license ) {

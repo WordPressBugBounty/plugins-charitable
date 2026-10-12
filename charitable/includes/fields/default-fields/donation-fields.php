@@ -8,6 +8,7 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.5.0
  * @version   1.6.55
+ * @version   1.8.13.1 Added autocomplete tokens to the personal donation form fields.
  */
 
 // Exit if accessed directly.
@@ -49,6 +50,7 @@ return apply_filters(
 				'label'    => __( 'First name', 'charitable' ),
 				'priority' => 4,
 				'required' => true,
+				'attrs'    => array( 'autocomplete' => 'given-name' ),
 			),
 			'admin_form'     => array(
 				'required' => false,
@@ -69,6 +71,7 @@ return apply_filters(
 				'label'    => __( 'Last name', 'charitable' ),
 				'priority' => 6,
 				'required' => true,
+				'attrs'    => array( 'autocomplete' => 'family-name' ),
 			),
 			'admin_form'     => array(
 				'required' => false,
@@ -103,6 +106,7 @@ return apply_filters(
 				'label'    => __( 'Email', 'charitable' ),
 				'priority' => 8,
 				'required' => true,
+				'attrs'    => array( 'autocomplete' => 'email' ),
 			),
 			'admin_form'     => array(
 				'required' => false,
@@ -144,6 +148,7 @@ return apply_filters(
 			'donation_form'  => array(
 				'priority' => 10,
 				'required' => false,
+				'attrs'    => array( 'autocomplete' => 'address-line1' ),
 			),
 			'admin_form'     => true,
 			'email_tag'      => false,
@@ -157,6 +162,7 @@ return apply_filters(
 			'donation_form'  => array(
 				'priority' => 12,
 				'required' => false,
+				'attrs'    => array( 'autocomplete' => 'address-line2' ),
 			),
 			'admin_form'     => true,
 			'email_tag'      => false,
@@ -170,6 +176,7 @@ return apply_filters(
 			'donation_form'  => array(
 				'priority' => 14,
 				'required' => false,
+				'attrs'    => array( 'autocomplete' => 'address-level2' ),
 			),
 			'admin_form'     => true,
 			'email_tag'      => false,
@@ -183,6 +190,7 @@ return apply_filters(
 			'donation_form'  => array(
 				'priority' => 16,
 				'required' => false,
+				'attrs'    => array( 'autocomplete' => 'address-level1' ),
 			),
 			'admin_form'     => true,
 			'email_tag'      => false,
@@ -196,6 +204,7 @@ return apply_filters(
 			'donation_form'  => array(
 				'priority' => 18,
 				'required' => false,
+				'attrs'    => array( 'autocomplete' => 'postal-code' ),
 			),
 			'admin_form'     => true,
 			'email_tag'      => false,
@@ -212,6 +221,7 @@ return apply_filters(
 				'type'     => 'select',
 				'options'  => charitable_get_location_helper()->get_countries(),
 				'default'  => charitable_get_option( 'country' ),
+				'attrs'    => array( 'autocomplete' => 'country' ),
 			),
 			'admin_form'     => true,
 			'email_tag'      => false,
@@ -225,6 +235,7 @@ return apply_filters(
 			'donation_form'  => array(
 				'priority' => 22,
 				'required' => false,
+				'attrs'    => array( 'autocomplete' => 'tel' ),
 			),
 			'admin_form'     => true,
 			'email_tag'      => array(

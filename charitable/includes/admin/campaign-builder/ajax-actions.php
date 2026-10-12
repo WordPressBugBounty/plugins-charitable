@@ -11,7 +11,45 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package   Charitable
  * @since     1.8.0
  * @version   1.8.9.1
+ * @version   1.8.13.1 Authorization fixes; see charitable_builder_require_editable_campaign().
  */
+
+/**
+ * Require that the current user may edit a specific campaign, not just campaigns in general.
+ *
+ * The builder's AJAX handlers verified a nonce and the BLANKET `edit_campaigns` capability, then
+ * acted on a post id taken straight from the request, with no `current_user_can( 'edit_post', $id )`
+ * and no post-type check. That is horizontal privilege escalation between campaign authors, and it
+ * also let campaign meta be written onto unrelated post types.
+ *
+ * A post id of 0 is legitimate and returns 0 rather than failing: a campaign being built for the
+ * first time has not been saved yet, so there is no post to authorize against.
+ *
+ * Sends a JSON error and exits when the id names a post the caller may not edit, so callers can
+ * simply invoke it and carry on.
+ *
+ * Ported from Pro's `a8f1d3d00a` (1.8.18), which generalised the pattern from the one handler that
+ * already did it correctly.
+ *
+ * @since 1.8.13.1
+ *
+ * @param  mixed $campaign_id Post id from the request.
+ * @return int   The validated campaign id, or 0 for an unsaved campaign.
+ */
+function charitable_builder_require_editable_campaign( $campaign_id ) {
+
+	$campaign_id = absint( $campaign_id );
+
+	if ( ! $campaign_id ) {
+		return 0;
+	}
+
+	if ( 'campaign' !== get_post_type( $campaign_id ) || ! current_user_can( 'edit_post', $campaign_id ) ) {
+		wp_send_json_error( esc_html__( 'You are not allowed to edit this campaign.', 'charitable' ) );
+	}
+
+	return $campaign_id;
+}
 
 /**
  * Get and return template data via ajax.
@@ -113,6 +151,21 @@ function charitable_save_campaign() {
 	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON data, decoded and sanitized in loop
 	// $campaign_post = json_decode( wp_unslash( $_POST['data'] ), ARRAY_A );
 	$campaign_post = array_column( json_decode( wp_unslash( $_POST['data'] ), ARRAY_A ), null, 'name' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON data, decoded and sanitized in loop
+
+	/*
+	 * Check the caller may edit THIS campaign, not just campaigns in general (1.8.13.1).
+	 *
+	 * This runs as early as the id is known, and before any of the data below is consumed, so a
+	 * caller who is not authorised cannot reach the write path at all. Further down, this handler
+	 * reaches update_post_meta(), wp_update_post() and wp_set_post_terms() on the same id.
+	 *
+	 * Note the id lives in the decoded `data` payload as $campaign_post['id']['value'], NOT in
+	 * $_POST['id'] the way Pro's copy of this handler receives it -- which is why Pro's one-line
+	 * call could not be copied verbatim.
+	 */
+	charitable_builder_require_editable_campaign(
+		isset( $campaign_post['id']['value'] ) ? $campaign_post['id']['value'] : 0
+	);
 	$is_preview    = isset( $_POST['preview'] ) && 'true' === $_POST['preview'] ? true : false;
 	$data          = [
 		'fields' => [],
@@ -1010,227 +1063,24 @@ function charitable_convert_campaign_string_to_array_new( $input, $value, $end_k
 	return( $output );
 }
 
-/**
- * Create a new form.
+/*
+ * Three orphaned AJAX handlers were REMOVED here in 1.8.13.1:
+ * charitable_new_campaign(), charitable_update_campaign_template() and
+ * charitable_builder_increase_next_field_id(), with their wp_ajax_ registrations.
  *
- * @since 1.8.0
- */
-function charitable_new_campaign() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-
-	check_ajax_referer( 'charitable-builder', 'nonce' );
-
-	if ( empty( $_POST['title'] ) ) {
-		wp_send_json_error(
-			[
-				'error_type' => 'missing_campaign_title',
-				'message'    => esc_html__( 'No form name provided.', 'charitable' ),
-			]
-		);
-	}
-
-	$campaign_title    = sanitize_text_field( wp_unslash( $_POST['title'] ) );
-	$campaign_template = empty( $_POST['template'] ) ? 'blank' : sanitize_text_field( wp_unslash( $_POST['template'] ) );
-
-	if ( ! charitable()->get( 'builder_templates' )->is_valid_template( $campaign_template ) ) {
-		wp_send_json_error(
-			[
-				'error_type' => 'invalid_template',
-				'message'    => esc_html__( 'The template you selected is currently not available, but you can try again later. If you continue to have trouble, please reach out to support.', 'charitable' ),
-			]
-		);
-	}
-
-	/*
-	 * Does a campaign with this title already exist? This has to run *before* the new
-	 * campaign is created, otherwise it would match the new campaign itself.
-	 *
-	 * Replaces get_page_by_title(), which was deprecated in WP 6.2 and was being passed
-	 * the post type 'charitable' rather than 'campaign' — so it never matched anything and
-	 * the disambiguating suffix below never ran.
-	 */
-	$charitable_existing_titles = new WP_Query(
-		[
-			'post_type'              => Charitable::CAMPAIGN_POST_TYPE,
-			'post_status'            => 'any',
-			'title'                  => $campaign_title,
-			'posts_per_page'         => 1,
-			'fields'                 => 'ids',
-			'no_found_rows'          => true,
-			'update_post_meta_cache' => false,
-			'update_post_term_cache' => false,
-		]
-	);
-
-	$title_exists = ! empty( $charitable_existing_titles->posts );
-	$campaign_id  = charitable()->get( 'form' )->add(
-		$campaign_title,
-		[],
-		[
-			'template' => $campaign_template,
-		]
-	);
-
-	if ( $title_exists ) {
-
-		// Skip creating a revision for this action.
-		remove_action( 'post_updated', 'wp_save_post_revision' );
-
-		wp_update_post(
-			[
-				'ID'         => $campaign_id,
-				'post_title' => $campaign_title . ' (ID #' . $campaign_id . ')',
-			]
-		);
-
-		// Restore the initial revisions state.
-		add_action( 'post_updated', 'wp_save_post_revision', 10, 1 );
-	}
-
-	if ( ! $campaign_id ) {
-		wp_send_json_error(
-			[
-				'error_type' => 'cant_create_campaign',
-				'message'    => esc_html__( 'Error creating form.', 'charitable' ),
-			]
-		);
-	}
-
-	if ( charitable_current_user_can( 'edit_campaign_single', $campaign_id ) ) {
-		wp_send_json_success(
-			[
-				'id'       => $campaign_id,
-				'redirect' => add_query_arg(
-					[
-						'view'        => 'fields',
-						'campaign_id' => $campaign_id,
-						'newform'     => '1',
-					],
-					admin_url( 'admin.php?page=charitable-builder' )
-				),
-			]
-		);
-	}
-
-	if ( charitable_current_user_can( 'view_campaigns' ) ) {
-		wp_send_json_success( [ 'redirect' => admin_url( 'admin.php?page=charitable-overview' ) ] );
-	}
-
-	wp_send_json_success( [ 'redirect' => admin_url() ] );
-}
-
-add_action( 'wp_ajax_charitable_new_campaign', 'charitable_new_campaign' );
-
-/**
- * Update form template.
+ * All three called charitable()->get( 'builder_templates' ) or charitable()->get( 'form' ).
+ * The Charitable class has no get() method -- only get_registered_object() -- and no
+ * __call(), and 'builder_templates' was never registered anywhere, so every one of the six
+ * calls was a fatal `Call to undefined method Charitable::get()` if the handler was ever
+ * reached. Nothing referenced them: no JS in the plugin fires any of the three actions, and
+ * the builder creates and saves through charitable_save_campaign, which validates templates
+ * via `new Charitable_Campaign_Builder_Templates()` -- the pattern the other call sites in
+ * this file already use. So they were dead paths rather than a live break, but reachable by
+ * a hand-crafted authenticated POST carrying a valid charitable-builder nonce, which turned
+ * them into a trivially-triggered 500 for that request.
  *
- * @since 1.0.0
+ * Pro removed the same three in 8b71ac4e7c and 6a3e53298c.
  */
-function charitable_update_campaign_template() {
-
-	// Run a security check.
-	check_ajax_referer( 'charitable-builder', 'nonce' );
-
-	// Check for form name.
-	if ( empty( $_POST['campaign_id'] ) ) {
-		wp_send_json_error(
-			[
-				'error_type' => 'invalid_campaign_id',
-				'message'    => esc_html__( 'No form ID provided.', 'charitable' ),
-			]
-		);
-	}
-
-	$campaign_id       = absint( $_POST['campaign_id'] );
-	$campaign_template = empty( $_POST['template'] ) ? 'blank' : sanitize_text_field( wp_unslash( $_POST['template'] ) );
-
-	if ( ! charitable()->get( 'builder_templates' )->is_valid_template( $campaign_template ) ) {
-		wp_send_json_error(
-			[
-				'error_type' => 'invalid_template',
-				'message'    => esc_html__( 'The template you selected is currently not available, but you can try again later. If you continue to have trouble, please reach out to support.', 'charitable' ),
-			]
-		);
-	}
-
-	$data = charitable()->get( 'form' )->get(
-		$campaign_id,
-		[
-			'content_only' => true,
-		]
-	);
-
-	if ( ! empty( $_POST['title'] ) ) {
-		$data['settings']['campaign_title'] = sanitize_text_field( wp_unslash( $_POST['title'] ) );
-	}
-
-	$updated = (bool) charitable()->get( 'form' )->update(
-		$campaign_id,
-		$data,
-		[
-			'template' => $campaign_template,
-		]
-	);
-
-	if ( $updated ) {
-		wp_send_json_success(
-			[
-				'id'       => $campaign_id,
-				'redirect' => add_query_arg(
-					[
-						'view'        => 'fields',
-						'campaign_id' => $campaign_id,
-					],
-					admin_url( 'admin.php?page=charitable-builder' )
-				),
-			]
-		);
-	}
-
-	wp_send_json_error(
-		[
-			'error_type' => 'cant_update',
-			'message'    => esc_html__( 'Error updating form template.', 'charitable' ),
-		]
-	);
-}
-
-add_action( 'wp_ajax_charitable_update_campaign_template', 'charitable_update_campaign_template' );
-
-/**
- * Campaign Builder update next field ID.
- *
- * @since 1.8.0
- */
-function charitable_builder_increase_next_field_id() {
-
-	// Run a security check.
-	check_ajax_referer( 'charitable-builder', 'nonce' );
-
-	// Check for permissions.
-	if ( ! charitable_current_user_can( 'edit_campaigns' ) ) {
-		wp_send_json_error();
-	}
-
-	// Check for required items.
-	if ( empty( $_POST['campaign_id'] ) ) {
-		wp_send_json_error();
-	}
-
-	$args = [];
-
-	// In the case of duplicating the Layout field that contains a bunch of fields,
-	// we need to set the next `field_id` to the desired value which is passed via POST argument.
-	if ( ! empty( $_POST['field_id'] ) ) {
-		$args['field_id'] = absint( $_POST['field_id'] );
-	}
-
-	charitable()->get( 'form' )->next_field_id( absint( $_POST['campaign_id'] ), $args );
-
-	wp_send_json_success();
-}
-
-add_action( 'wp_ajax_charitable_builder_increase_next_field_id', 'charitable_builder_increase_next_field_id' );
-
 /**
  * Campaign Builder Dynamic Choices option toggle.
  *
@@ -1299,16 +1149,56 @@ add_action( 'wp_ajax_charitable_tab_content_preview', 'charitable_builder_tab_co
  * @since 1.8.0
  */
 function charitable_builder_field_content_preview() {
+
+	/*
+	 * This handler had NO nonce and NO capability check, while being registered as wp_ajax_ --
+	 * so any logged-in user, including a Subscriber, could reach it (1.8.13.1).
+	 *
+	 * It renders an arbitrary builder field from raw $_POST and echoes the result, and several
+	 * field previews reach do_shortcode(), so it was an authenticated shortcode-execution and
+	 * arbitrary-post-meta-read primitive.
+	 *
+	 * The nonce was ALREADY being sent by every JS caller (charitable_builder.nonce, from
+	 * wp_create_nonce( 'charitable-builder' )) and simply never checked, so validating it
+	 * breaks nothing -- the same was verified live in Pro.
+	 */
+	check_ajax_referer( 'charitable-builder', 'nonce' );
+
+	if ( ! charitable_current_user_can( 'edit_campaigns' ) ) {
+		wp_send_json_error();
+	}
+
 	// phpcs:disable WordPress.Security.NonceVerification.Missing
 	if ( ! empty( $_POST['field_type'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized below
 
 		$type = 'Charitable_Field_' . str_replace( ' ', '_', ( ucwords( str_replace( '-', ' ', sanitize_key( wp_unslash( $_POST['field_type'] ) ) ) ) ) );
 
-		if ( class_exists( $type ) ) :
+		/*
+		 * class_exists() alone let any class whose name happens to match the Charitable_Field_*
+		 * pattern be instantiated and have field_preview() called on it. Requiring a
+		 * Charitable_Builder_Field subclass keeps this to classes that actually implement the
+		 * preview contract.
+		 */
+		if ( class_exists( $type ) && is_subclass_of( $type, 'Charitable_Builder_Field' ) ) :
 
-			$class         = new $type();
-			$field_id      = isset( $_POST['field_id'] ) ? intval( wp_unslash( $_POST['field_id'] ) ) : 0; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			$campaign_data = isset( $_POST['campaign_id'] ) ? get_post_meta( intval( wp_unslash( $_POST['campaign_id'] ) ), 'campaign_settings_v2', true ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$class    = new $type();
+			$field_id = isset( $_POST['field_id'] ) ? intval( wp_unslash( $_POST['field_id'] ) ) : 0; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
+			/*
+			 * campaign_settings_v2 was read from whatever post id arrived, with no check that
+			 * the caller may read that post -- disclosing the builder configuration of any
+			 * private or draft campaign, or of any other post type carrying that meta key.
+			 *
+			 * 0 is legitimate: a campaign being built for the first time has not been saved
+			 * yet, and previews still need to render.
+			 */
+			$campaign_id = isset( $_POST['campaign_id'] ) ? absint( wp_unslash( $_POST['campaign_id'] ) ) : 0; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
+			if ( $campaign_id && ! current_user_can( 'edit_post', $campaign_id ) ) {
+				wp_send_json_error();
+			}
+
+			$campaign_data = $campaign_id ? get_post_meta( $campaign_id, 'campaign_settings_v2', true ) : array();
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Array data, sanitized in field_preview method
 			$field_data    = $_POST;
 
@@ -1383,8 +1273,35 @@ function charitable_builder_ajax_update_campaign_creator() {
 	// Run a security check.
 	check_ajax_referer( 'charitable-builder', 'nonce' );
 
+	/*
+	 * Answers the `// todo: check creds?` that used to sit further down this function
+	 * (1.8.13.1). The nonce alone proved the request came from our own admin UI, not that the
+	 * caller may act on campaigns or read other users' details -- this returned display name,
+	 * avatar, author archive and a user-edit link for ANY user id, which is user enumeration.
+	 *
+	 * Changing a campaign's creator is an edit_campaigns operation, and where a saved campaign
+	 * is named the caller must be able to edit that specific campaign.
+	 */
+	if ( ! charitable_current_user_can( 'edit_campaigns' ) ) {
+		wp_send_json_error(
+			[
+				'error_type' => 'cant_update',
+				'message'    => esc_html__( 'Permission denied.', 'charitable' ),
+			]
+		);
+	}
+
 	$campaign_id    = ! empty( $_POST['campaign_id'] ) ? absint( $_POST['campaign_id'] ) : false;
 	$new_creator_id = ! empty( $_POST['creator_id'] ) ? absint( $_POST['creator_id'] ) : false;
+
+	if ( $campaign_id && ! current_user_can( 'edit_post', $campaign_id ) ) {
+		wp_send_json_error(
+			[
+				'error_type' => 'cant_update',
+				'message'    => esc_html__( 'Permission denied.', 'charitable' ),
+			]
+		);
+	}
 
 	if ( false === $new_creator_id ) {
 		wp_send_json_error(
@@ -1405,8 +1322,6 @@ function charitable_builder_ajax_update_campaign_creator() {
 			]
 		);
 	}
-
-	// todo: check creds?
 
 	if ( $user ) {
 
@@ -1453,6 +1368,20 @@ function charitable_builder_ajax_update_campaign_status_link() {
 
 	$campaign_id = absint( $_POST['campaign_id'] );
 
+	/*
+	 * The nonce proved the request came from our admin UI; it did not prove the caller may read
+	 * this campaign (1.8.13.1). Without this, status and permalink were returned for any
+	 * campaign id, including drafts and privately-published ones.
+	 */
+	if ( ! current_user_can( 'edit_post', $campaign_id ) ) {
+		wp_send_json_error(
+			[
+				'error_type' => 'cant_update',
+				'message'    => esc_html__( 'Permission denied.', 'charitable' ),
+			]
+		);
+	}
+
 	// get status.
 	$campaign = $campaign_id ? charitable_get_campaign( $campaign_id ) : false;
 	$status   = $campaign ? $campaign->get_status() : false;
@@ -1460,8 +1389,12 @@ function charitable_builder_ajax_update_campaign_status_link() {
 		$status = $campaign->has_achieved_goal() ? 'successful' : 'unsuccessful';
 	}
 
-	// campaign status.
-	$html = '<span class="charitable-view-campaign-external-link"><a href="' . get_permalink( $campaign_id ) . '" target="_blank" title="' . esc_html__( 'View Campaign Page', 'charitable' ) . '"><!--<i class="fa fa-eye"></i>--></a></span>';
+	/*
+	 * campaign status. esc_url() on the permalink: this is interpolated straight into an href
+	 * and the value passes through the page_link/post_link filters, so it is not guaranteed
+	 * safe markup (1.8.13.1).
+	 */
+	$html = '<span class="charitable-view-campaign-external-link"><a href="' . esc_url( get_permalink( $campaign_id ) ) . '" target="_blank" title="' . esc_html__( 'View Campaign Page', 'charitable' ) . '"><!--<i class="fa fa-eye"></i>--></a></span>';
 
 	wp_send_json_success(
 		[
@@ -1478,6 +1411,18 @@ add_action( 'wp_ajax_charitable_update_campaign_status_link', 'charitable_builde
  * @since 1.8.0
  */
 function charitable_campaign_builder_send_feedback_ajax() {
+
+	/*
+	 * Had no nonce and no capability check, so any logged-in user could drive unlimited
+	 * outbound requests to wpcharitable.com from the site (1.8.13.1). The JS caller already
+	 * sends charitable_builder.nonce, so checking it costs nothing.
+	 */
+	check_ajax_referer( 'charitable-builder', 'nonce' );
+
+	if ( ! charitable_current_user_can( 'edit_campaigns' ) ) {
+		wp_send_json_error();
+	}
+
 	// phpcs:disable WordPress.Security.NonceVerification.Missing
 	/* Data to send in our API request */
 	$feedback_params = array(
@@ -1493,9 +1438,13 @@ function charitable_campaign_builder_send_feedback_ajax() {
 	$response = wp_remote_post(
 		'https://wpcharitable.com',
 		array(
-			'timeout'   => 15,
-			'sslverify' => false,
-			'body'      => $feedback_params,
+			/*
+			 * sslverify was false, which silently accepted any certificate for this request
+			 * (1.8.13.1). There is no reason to skip verification for our own HTTPS endpoint,
+			 * and doing so makes the request interceptable.
+			 */
+			'timeout' => 15,
+			'body'    => $feedback_params,
 		)
 	);
 

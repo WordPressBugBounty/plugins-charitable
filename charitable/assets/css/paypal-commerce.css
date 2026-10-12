@@ -803,3 +803,23 @@ iframe[name^="__detect_close"] {
 	background-color: #f5b83d;
 }
 
+/*
+ * forced-colors (Windows High Contrast) safety for the card-name focus style above (1.8.13.1).
+ *
+ * forced-colors mode strips box-shadow outright and repaints border and background from the
+ * forced palette, so a focus indicator built from those is invisible there -- and the rule above
+ * also sets `outline: none`, leaving nothing at all. `outline` is the one property that survives,
+ * so it is restored here, in the system Highlight colour.
+ *
+ * Scoped to this media query only: the default appearance is untouched. The selector mirrors the
+ * one above exactly, so it carries equal specificity and wins on order.
+ */
+@media (forced-colors: active) {
+	.charitable-paypal-card-name-input:focus {
+		outline-width: 2px;
+		outline-style: solid;
+		outline-color: Highlight;
+		outline-offset: 2px;
+	}
+}
+

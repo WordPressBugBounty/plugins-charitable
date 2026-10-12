@@ -488,7 +488,7 @@ if ( ! class_exists( 'Charitable_Dashboard_Legacy' ) ) :
 				$donations              = $charitable_reports->get_donations();
 				$total_count_donations  = count( $donations );
 				$total_amount_donations = $charitable_reports->get_donations_total();
-				$donation_average       = ( $total_amount_donations > 0 && $total_amount_donations > 0 ) ? ( charitable_format_money( $total_amount_donations / $total_count_donations, 2, true ) ) : charitable_format_money( 0 );
+				$donation_average       = ( $total_amount_donations > 0 && $total_amount_donations > 0 ) ? ( charitable_format_money( $total_amount_donations / $total_count_donations, false, true ) ) : charitable_format_money( 0 );
 				$donation_total         = charitable_format_money( $total_amount_donations );
 
 				// donors.

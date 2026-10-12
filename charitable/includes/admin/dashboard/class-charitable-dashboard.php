@@ -548,7 +548,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 		$donations = $charitable_reports->get_donations();
 		$total_count_donations = count( $donations );
 		$total_amount_donations = $charitable_reports->get_donations_total();
-		$donation_average = ( $total_amount_donations > 0 && $total_count_donations > 0 ) ? ( charitable_format_money( $total_amount_donations / $total_count_donations, 2, true ) ) : charitable_format_money( 0 );
+		$donation_average = ( $total_amount_donations > 0 && $total_count_donations > 0 ) ? ( charitable_format_money( $total_amount_donations / $total_count_donations, false, true ) ) : charitable_format_money( 0 );
 		$donation_total = charitable_format_money( $total_amount_donations );
 
 		// Get donors count
@@ -1454,7 +1454,7 @@ if ( ! class_exists( 'Charitable_Dashboard' ) ) :
 			}
 
 			// Format total amount
-			$display_amount = ! empty( $donor_data->total_donation_amount ) ? charitable_format_money( $donor_data->total_donation_amount, 2, true ) : charitable_format_money( $donor_data->amount, 2, true );
+			$display_amount = ! empty( $donor_data->total_donation_amount ) ? charitable_format_money( $donor_data->total_donation_amount, false, true ) : charitable_format_money( $donor_data->amount, false, true );
 
 			$donors[] = array(
 				'name' => $donor_name,

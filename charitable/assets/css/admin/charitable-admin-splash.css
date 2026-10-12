@@ -609,6 +609,24 @@ body.charitable-splash-modal div.jconfirm .jconfirm-box-container .jconfirm-box 
   opacity: 0;
 }
 
+/* Deferred Vimeo embed: a button, not an iframe, until it is clicked. The play badge
+   must stay put on hover, because there is nothing behind it yet. */
+#charitable-splash-modal main .charitable-splash-section .charitable-splash-video-wrap--deferred:hover::after {
+  opacity: 1;
+}
+#charitable-splash-modal main .charitable-splash-section .charitable-splash-video-embed--deferred {
+  display: block;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  appearance: none;
+  background: #000;
+}
+#charitable-splash-modal main .charitable-splash-section .charitable-splash-video-embed--deferred:focus-visible {
+  outline: 2px solid #e27730;
+  outline-offset: 2px;
+}
+
 #charitable-splash-modal main .charitable-splash-section-more-features {
   display: block;
   padding: 30px 40px 40px;
