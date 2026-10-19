@@ -2,9 +2,9 @@
 Contributors: WPCharitable, smub, dimensionmedia
 Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.9
-Tested up to: 7.1
+Tested up to: 7.1.3
 Requires PHP: 7.4
-Stable tag: 1.8.13.1
+Stable tag: 1.8.13.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -272,6 +272,9 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 
 == Changelog ==
 
+= Donation Form & Fundraising Campaigns v1.8.13.2 =
+* FIX: Updating Ninja Forms to 3.15.6 no longer causes a critical error on sites running Charitable.
+
 = Donation Form & Fundraising Campaigns v1.8.13.1 =
 * IMPROVED: Accessibility improvements across the donation form, covering field labelling, autocomplete hints, grouped donation amounts and visible keyboard focus indicators.
 * FIX: Privacy improvements, reducing any unneeded external requests, and adding more control over the Share Usage Data setting.
@@ -351,12 +354,5 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 
 = Donation Form & Fundraising Campaigns v1.8.11.1 =
 * IMPROVED: Polished PayPal Settings screen, adding notice and improving readability.
-
-= Donation Form & Fundraising Campaigns v1.8.11 =
-* NEW: PayPal Commerce gateway - accept one-time donations via PayPal wallet (Venmo, Pay Later) and inline credit/debit card (Advanced Card Processing).
-* NEW: Site-level PayPal tier lock allows new installs and Commerce-tier sites see PayPal Commerce; existing PayPal Standard sites keep using the legacy gateway.
-* NEW: Help icons next to each payment gateway in admin settings, linking to documentation.
-* IMPROVED: Test Mode toggle now has descriptive help text explaining sandbox routing.
-* IMPROVED: Stripe donation flow now self-heals when a previously stored PaymentIntent becomes unreachable (e.g. after a gateway reconnect).
 
 **[View entire donation form and fundraising platform changelog](https://plugins.svn.wordpress.org/charitable/trunk/CHANGELOG.md)**

@@ -1,3 +1,6 @@
+# 1.8.13.2
+* FIX: Updating Ninja Forms to 3.15.6 no longer causes a critical error on sites running Charitable.
+
 # 1.8.13.1
 * IMPROVED: Accessibility improvements across the donation form, covering field labelling, autocomplete hints, grouped donation amounts and visible keyboard focus indicators.
 * FIX: Privacy improvements, reducing any unneeded external requests, and adding more control over the Share Usage Data setting.
