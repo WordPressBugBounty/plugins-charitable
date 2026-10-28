@@ -274,6 +274,34 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
         },
 
         /**
+         * Which way a date picker should open, decided by where its input sits.
+         *
+         * bootstrap-daterangepicker anchors a two-month calendar to one edge of the input and
+         * sets inline left/right, which CSS cannot override. 'left' was right while every report
+         * toolbar kept its date input on the FAR RIGHT. The v3 Overview toolbar moves it into the
+         * left-hand filter group, where opening leftwards runs the calendar off the screen behind
+         * the admin menu - the first two weeks of the range become unreachable.
+         *
+         * Decided per input rather than per page, because the other tabs' toolbars are untouched
+         * and still have their input on the right, where 'left' is still correct.
+         *
+         * @since 1.8.14
+         *
+         * @param {jQuery} $input The date input.
+         * @return {string} 'left' or 'right'.
+         */
+        datePickerOpens: function ( $input ) {
+
+            if ( ! $input || ! $input.length ) {
+                return 'left';
+            }
+
+            return $input.closest( '.charitable-reports-v3-toolbar' ).find( '.alignleft.actions' ).find( $input ).length
+                ? 'right'
+                : 'left';
+        },
+
+        /**
          * Inits the date picker for most standard datepicker UIs.
          *
          * @since 1.8.1
@@ -286,7 +314,7 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
                 var $the_datepicker = $reports.find( datepickerObject );
 
                 $the_datepicker.daterangepicker({
-                    opens: 'left',
+                    opens: app.datePickerOpens( $the_datepicker ),
                     locale: {
                         format: 'Y/M/DD'
                     },
@@ -318,7 +346,7 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
             } else if ( datepickerClass === 'ranged' ) {
 
                 $reports.find('input.charitable-datepicker-' + datepickerClass).daterangepicker({
-                    opens: 'left',
+                    opens: app.datePickerOpens( $reports.find('input.charitable-datepicker-' + datepickerClass) ),
                     locale: {
                         format: 'Y/M/DD'
                     },
@@ -342,7 +370,7 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
                 });
 
                 $reports.find('input#charitable-reports-topnav-datepicker-comparefrom-lybunt.charitable-datepicker-' + datepickerClass).daterangepicker({
-                    opens: 'left',
+                    opens: app.datePickerOpens( $reports.find('input#charitable-reports-topnav-datepicker-comparefrom-lybunt.charitable-datepicker-' + datepickerClass) ),
                     locale: {
                         format: 'Y/M/DD'
                     },
@@ -371,7 +399,7 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
                 });
 
                 $reports.find('input#charitable-reports-topnav-datepicker-compareto-lybunt.charitable-datepicker-' + datepickerClass).daterangepicker({
-                    opens: 'left',
+                    opens: app.datePickerOpens( $reports.find('input#charitable-reports-topnav-datepicker-compareto-lybunt.charitable-datepicker-' + datepickerClass) ),
                     locale: {
                         format: 'Y/M/DD'
                     },
@@ -406,7 +434,7 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
                 var $the_datepicker = $reports.find( 'input.' + datepickerClass ); // eslint-disable-line
 
                 $the_datepicker.daterangepicker({
-                    opens: 'left',
+                    opens: app.datePickerOpens( $the_datepicker ),
                     locale: {
                         format: 'Y/M/DD'
                     },
@@ -749,6 +777,25 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
                 filter:               $('#report-date-range-filter').val()
             };
 
+            /*
+            Remember this filter for the next visit.
+
+            Written from the REQUEST, not the response: the response carries no dates, so reading
+            them back off it produces an empty pair. includes/admin/views/reports/overview.php
+            reads this cookie only when the URL names no dates, so a link with explicit dates
+            still wins.
+
+            30 days, scoped to /wp-admin/, SameSite=Lax. A browser refusing cookies simply means
+            the range is not remembered.
+
+            @since 1.8.14
+            */
+            try {
+                document.cookie = 'charitable_reports_range=' + encodeURIComponent(
+                    [ data.start_date || '', data.end_date || '', data.campaign_id || '', data.campaign_category_id || '' ].join( '|' )
+                ) + '; max-age=' + ( 30 * 24 * 60 * 60 ) + '; path=/wp-admin/; samesite=lax';
+            } catch ( e ) {}
+
             app.disableUI();
             app.reportUILoadingOn();
             app.clearReportError();
@@ -821,6 +868,58 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
                         elements.$top_charitable_refund_count.html(response.data.refund_count);
                     } else {
                         elements.$top_charitable_refund_count.html('0');
+                    }
+
+                    // The breakdown's granularity note and its quiet-rows note both describe the
+                    // RANGE, so both are re-rendered by the server and written whole. Left alone,
+                    // they would keep describing the range the page first loaded with.
+                    if ( typeof response.data.v3_granularity !== 'undefined' ) {
+                        $( '.charitable-reports-v3-granularity' ).text( response.data.v3_granularity );
+                    }
+
+                    if ( typeof response.data.v3_quiet_note !== 'undefined' ) {
+                        var $section = $( '[data-section-name="donations_breakdown"]' );
+
+                        $section.find( '.charitable-reports-v3-empty-days' ).remove();
+                        $section.removeClass( 'charitable-reports-v3-show-empty' );
+
+                        if ( response.data.v3_quiet_note ) {
+                            $section.find( '.charitable-reports-v3-breakdown-scroll' ).after( response.data.v3_quiet_note );
+                        }
+                    }
+
+                    // "No donations in this date range." over the chart, rather than axes and a
+                    // flat line on zero - which reads as a broken chart.
+                    $( '[data-section-name="donations_breakdown"]' ).toggleClass(
+                        'charitable-reports-v3-breakdown-empty',
+                        ! parseInt( response.data.donation_count, 10 )
+                    );
+
+                    // v3 headline tiles: captions and trend arrows. The figures above are updated
+                    // field by field, but the caption under each tile and its trend arrow are
+                    // server-rendered markup, so they come back ready-made and are written whole.
+                    // Without this the figures refresh and the captions keep describing the range
+                    // the page was first loaded with.
+                    if ( response.data.v3_tiles ) {
+                        $.each( ['donations', 'average', 'donors', 'refunds'], function ( i, key ) {
+                            var $tile = $( '[data-charitable-tile="' + key + '"]' );
+
+                            if ( ! $tile.length ) {
+                                return;
+                            }
+
+                            var caption = response.data.v3_tiles.captions ? response.data.v3_tiles.captions[ key ] : '';
+                            var trend   = response.data.v3_tiles.trends ? response.data.v3_tiles.trends[ key ] : '';
+
+                            $tile.find( '.charitable-reports-v3-tile-caption' ).text( caption || '' );
+                            $tile.find( '.charitable-reports-v3-tile-trend' ).html( trend || '' );
+                        } );
+                    }
+
+                    // Donation Sources: the whole card body is replaced, not a <ul> inside it,
+                    // because its two empty states have no list to fill.
+                    if ( response.data.html.donation_sources_list ) {
+                        $( '#charitable-donation-sources' ).html( response.data.html.donation_sources_list );
                     }
 
                     if ( response.data.html.payment_methods_list ) {
@@ -1406,7 +1505,23 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
 		 */
         disableUI: function () {
 
-            $reports.find('a, button, input, select').attr('disabled', 'disabled').addClass('charitable-disabled');
+            /*
+            The masked half of a locked card is excluded from BOTH this and enableUI().
+
+            Those controls are inert by construction - no handler, no name, and the checkbox ships
+            with `disabled` hard-coded in the markup. enableUI() calls removeAttr('disabled') on
+            everything it matched, so without this exclusion a filter change would strip that
+            attribute and leave a keyboard-focusable switch inside an upsell. It would still do
+            nothing, but a control that can be toggled is a promise, and this one cannot keep it.
+
+            Excluding the overlay too keeps the upsell's own links clickable while a filter is in
+            flight, which is the one thing on a locked card that should always work.
+
+            @since 1.8.14
+            */
+            $reports.find('a, button, input, select')
+                .not('.charitable-reports-v3-locked-masked *, .charitable-reports-v3-locked-overlay *')
+                .attr('disabled', 'disabled').addClass('charitable-disabled');
 
         },
 
@@ -1418,7 +1533,10 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
 		 */
         enableUI: function () {
 
-            $reports.find('a, button, input, select').removeAttr('disabled').removeClass('charitable-disabled');
+            // See disableUI() for why the locked cards' controls are left alone.
+            $reports.find('a, button, input, select')
+                .not('.charitable-reports-v3-locked-masked *, .charitable-reports-v3-locked-overlay *')
+                .removeAttr('disabled').removeClass('charitable-disabled');
 
         },
 
@@ -1432,6 +1550,9 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
 
             $reports.find('.charitable-report-ui, .charitable-activity-list-container').addClass('charitable-section-loading');
 
+            // Say what is happening. The dimming alone reads as the page having broken.
+            $( '.charitable-reports-v3-loading' ).prop( 'hidden', false );
+
         },
 
 		/**
@@ -1443,6 +1564,8 @@ var CharitableAdminReporting = window.CharitableAdminReporting || (function (doc
         reportUILoadingOff: function () {
 
             $reports.find('.charitable-report-ui, .charitable-activity-list-container').removeClass('charitable-section-loading');
+
+            $( '.charitable-reports-v3-loading' ).prop( 'hidden', true );
 
         },
 

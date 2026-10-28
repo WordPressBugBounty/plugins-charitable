@@ -393,6 +393,7 @@ if ( ! class_exists( 'Charitable_Admin' ) ) :
 			// require_once $admin_dir . 'security/charitable-security-hooks.php';
 			require_once $admin_dir . 'activities/charitable-admin-activity-hooks.php';
 			require_once $admin_dir . 'reports/charitable-core-reports-functions.php';
+			require_once $admin_dir . 'reports/charitable-reports-v3.php';
 			require_once $admin_dir . 'reports/charitable-admin-reports-hooks.php';
 			require_once $admin_dir . 'plugins/class-charitable-admin-plugins-third-party.php';
 			require_once $admin_dir . 'tools/charitable-tools-admin-hooks.php';

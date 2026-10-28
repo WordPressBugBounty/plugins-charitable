@@ -603,7 +603,17 @@ if ( ! class_exists( 'Charitable_Dashboard_Legacy' ) ) :
 						<?php if ( ! empty( $top_campaigns->posts ) ) : ?>
 							<div class="the-list">
 								<ul id="charitable-top-campaigns-list">
-									<?php echo $charitable_reports->generate_top_campaigns( $top_campaigns ); // phpcs:ignore ?>
+									<?php
+									/*
+									layout => classic because this card supplies a <ul>. The
+									Reports Overview's reworked markup emits table rows, and the
+									gate that selects it is true for the whole admin request - so
+									without this the Dashboard would render <tr> into a list.
+
+									@since 1.8.14
+									*/
+									echo $charitable_reports->generate_top_campaigns( $top_campaigns, true, array( 'layout' => 'classic' ) ); // phpcs:ignore
+									?>
 								</ul>
 							</div>
 						<?php else : ?>

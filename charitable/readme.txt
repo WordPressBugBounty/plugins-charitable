@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.9
 Tested up to: 7.1.3
 Requires PHP: 7.4
-Stable tag: 1.8.13.2
+Stable tag: 1.8.14
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -272,6 +272,15 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 
 == Changelog ==
 
+= Donation Form & Fundraising Campaigns v1.8.14 =
+* NEW: Redesigned reporting dashboard. Headline figures now include the change from the previous period, the donations chart sits inside its breakdown card, long date ranges group by week or month, and new cards report donation sources, recurring revenue and donation recovery.
+* IMPROVED: Top Donors now shows each donor's initials, how many donations they have made and when they first gave.
+* IMPROVED: Top Campaigns is now a table, with each campaign's progress against its goal paced against the time it has left.
+* IMPROVED: Payment Methods now shows what each method took and its share of the total.
+* FIX: Donor figures are now more accurate overall. A donation with no donor attached could be counted as an extra donor, and Top Donors could list a deleted donor as "Unknown" or report half of a donor's actual total.
+* FIX: The Reports page is now more reliable.
+* FIX: Several PayPal issues that could leave a paid donation possibly stuck in Pending in certain scenarios have been resolved.
+
 = Donation Form & Fundraising Campaigns v1.8.13.2 =
 * FIX: Updating Ninja Forms to 3.15.6 no longer causes a critical error on sites running Charitable.
 
@@ -354,5 +363,12 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 
 = Donation Form & Fundraising Campaigns v1.8.11.1 =
 * IMPROVED: Polished PayPal Settings screen, adding notice and improving readability.
+
+= Donation Form & Fundraising Campaigns v1.8.11 =
+* NEW: PayPal Commerce gateway - accept one-time donations via PayPal wallet (Venmo, Pay Later) and inline credit/debit card (Advanced Card Processing).
+* NEW: Site-level PayPal tier lock allows new installs and Commerce-tier sites see PayPal Commerce; existing PayPal Standard sites keep using the legacy gateway.
+* NEW: Help icons next to each payment gateway in admin settings, linking to documentation.
+* IMPROVED: Test Mode toggle now has descriptive help text explaining sandbox routing.
+* IMPROVED: Stripe donation flow now self-heals when a previously stored PaymentIntent becomes unreachable (e.g. after a gateway reconnect).
 
 **[View entire donation form and fundraising platform changelog](https://plugins.svn.wordpress.org/charitable/trunk/CHANGELOG.md)**

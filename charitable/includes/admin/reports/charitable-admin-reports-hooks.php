@@ -92,3 +92,13 @@ add_action( 'admin_init', array( Charitable_Reports_Download::get_instance(), 'd
  * @see Charitable_Reports_Download::generate_pdf()
  */
 add_action( 'admin_init', array( Charitable_Reports_Download::get_instance(), 'generate_pdf' ) );
+
+/**
+ * Export the page-level overview summary: the headline figures, the comparison and the payment
+ * split. Distinct from the breakdown export above, which is the per-day table.
+ *
+ * @since 1.8.14
+ *
+ * @see Charitable_Reports_Download::download_overview_summary()
+ */
+add_action( 'admin_init', array( Charitable_Reports_Download::get_instance(), 'download_overview_summary' ) );

@@ -30,6 +30,40 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 		const ID = 'paypal';
 
 		/**
+		 * PayPal answered the verification postback and confirmed the IPN.
+		 *
+		 * @since 1.8.14
+		 */
+		const IPN_VERIFICATION_VERIFIED = 'verified';
+
+		/**
+		 * PayPal answered the verification postback and rejected the IPN.
+		 *
+		 * @since 1.8.14
+		 */
+		const IPN_VERIFICATION_INVALID = 'invalid';
+
+		/**
+		 * The verification postback was never answered, so nothing is known
+		 * about this IPN. Distinct from an INVALID answer: PayPal has not told
+		 * us the IPN is bad, we simply failed to ask.
+		 *
+		 * @since 1.8.14
+		 */
+		const IPN_VERIFICATION_UNKNOWN = 'unknown';
+
+		/**
+		 * Outcome of the most recent IPN verification postback.
+		 *
+		 * One of the self::IPN_VERIFICATION_* constants.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @var   string
+		 */
+		protected $ipn_verification_result = self::IPN_VERIFICATION_UNKNOWN;
+
+		/**
 		 * Instantiate the gateway class, defining its key values.
 		 *
 		 * @since  1.0.0
@@ -348,6 +382,21 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 			}
 
 			if ( ! $gateway->paypal_ipn_verification( $data ) ) {
+				$result = $gateway->get_ipn_verification_result();
+
+				/**
+				 * Answer anything other than 200 and PayPal resends the IPN, for up
+				 * to four days. That is what we want when the verification postback
+				 * went unanswered, because the donation may well be genuine and paid
+				 * for, and this is its only remaining chance to complete. An INVALID
+				 * answer keeps the 200 it has always had.
+				 */
+				status_header( Charitable_Gateway_Paypal::get_ipn_rejection_http_code( $result ) );
+
+				if ( Charitable_Gateway_Paypal::IPN_VERIFICATION_UNKNOWN === $result ) {
+					die( esc_html( __( 'IPN Verification Unavailable', 'charitable' ) ) );
+				}
+
 				die( esc_html( __( 'IPN Verification Failure', 'charitable' ) ) );
 			}
 
@@ -397,6 +446,29 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 		public static function process_web_accept( $data, $donation_id ) {
 			$gateway  = new Charitable_Gateway_Paypal();
 			$donation = charitable_get_donation( $donation_id );
+
+			/**
+			 * charitable_get_donation() returns false for a donation that no longer
+			 * exists, which used to fatal on the next line. Answer 404 rather than
+			 * 500 so the retry is driven by a deliberate response.
+			 *
+			 * @since 1.8.14
+			 */
+			if ( ! $donation ) {
+				charitable_log(
+					'PayPal IPN: Donation Not Found',
+					sprintf( 'No donation exists for ID %d referenced by an incoming PayPal IPN.', $donation_id ),
+					array(
+						'type'        => array( 'payment', 'gateway' ),
+						'level'       => 'error',
+						'source'      => 'paypal',
+						'donation_id' => $donation_id,
+					)
+				);
+
+				status_header( 404 );
+				die( esc_html( __( 'Donation Not Found', 'charitable' ) ) );
+			}
 
 			if ( 'paypal' != $donation->get_gateway() ) {
 				die( esc_html( __( 'Incorrect Gateway', 'charitable' ) ) );
@@ -585,8 +657,19 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 		 */
 		public function paypal_ipn_verification( $data ) {
 			if ( $this->get_value( 'disable_ipn_verification' ) ) {
+				$this->ipn_verification_result = self::IPN_VERIFICATION_VERIFIED;
 				return true;
 			}
+
+			$paypal_url = $this->get_ipn_verification_url( $data );
+
+			/*
+			 * The Host header must match the host being posted to. It was previously pinned to
+			 * www.paypal.com, which was already inconsistent with the live ipnpb host and would
+			 * point a sandbox postback at the live endpoint, where a sandbox transaction is
+			 * unknown and the answer is always INVALID.
+			 */
+			$paypal_host = wp_parse_url( $paypal_url, PHP_URL_HOST );
 
 			$remote_post_vars = array(
 				'method'      => 'POST',
@@ -595,7 +678,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 				'httpversion' => '1.1',
 				'blocking'    => true,
 				'headers'     => array(
-					'host'         => 'www.paypal.com',
+					'host'         => $paypal_host ? $paypal_host : 'ipnpb.paypal.com',
 					'connection'   => 'close',
 					'content-type' => 'application/x-www-form-urlencoded',
 					'post'         => '/cgi-bin/webscr HTTP/1.1',
@@ -606,7 +689,28 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 			);
 
 			/* Get response */
-			$api_response = wp_remote_post( $this->get_redirect_url( true, true ), $remote_post_vars );
+			$api_response = wp_remote_post( $paypal_url, $remote_post_vars );
+
+			$this->ipn_verification_result = $this->classify_api_response( $api_response );
+
+			/* We never got an answer, so log that distinctly from an INVALID one. */
+			if ( self::IPN_VERIFICATION_UNKNOWN === $this->ipn_verification_result ) {
+				charitable_log(
+					'PayPal IPN: Verification postback unanswered',
+					is_wp_error( $api_response )
+						? $api_response->get_error_message()
+						: sprintf(
+							'PayPal returned HTTP %d with body: %s',
+							wp_remote_retrieve_response_code( $api_response ),
+							substr( (string) wp_remote_retrieve_body( $api_response ), 0, 500 )
+						),
+					array(
+						'type'   => array( 'payment', 'gateway' ),
+						'level'  => 'error',
+						'source' => 'paypal',
+					)
+				);
+			}
 
 			/**
 			 * Filter whether the PayPal IPN was verified.
@@ -617,6 +721,110 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 			 * @param array|WP_Error $api_response Array in case of successful request. WP_Error otherwise.
 			 */
 			return apply_filters( 'charitable_paypal_ipn_verification', $this->is_valid_api_response( $api_response ), $api_response );
+		}
+
+		/**
+		 * Return the URL an IPN message must be validated against.
+		 *
+		 * PayPal requires the postback to go to the same environment that sent the
+		 * notification, and stamps `test_ipn=1` on every sandbox message. Choosing the
+		 * host from the site's Test Mode setting instead strands every outstanding
+		 * sandbox message the moment Test Mode is switched off, because live PayPal has
+		 * no record of a sandbox transaction and answers INVALID forever.
+		 *
+		 * @since  1.8.14
+		 *
+		 * @param  mixed[] $data The IPN payload.
+		 * @return string
+		 */
+		public function get_ipn_verification_url( $data = array() ) {
+			$is_test_ipn = is_array( $data ) && ! empty( $data['test_ipn'] );
+
+			$paypal_uri = $is_test_ipn
+				? 'https://ipnpb.sandbox.paypal.com/cgi-bin/webscr'
+				: 'https://ipnpb.paypal.com/cgi-bin/webscr';
+
+			/**
+			 * Filter the URL an IPN message is validated against.
+			 *
+			 * @since 1.8.14
+			 *
+			 * @param string  $paypal_uri  The URL.
+			 * @param boolean $is_test_ipn Whether the IPN came from the PayPal sandbox.
+			 * @param mixed[] $data        The IPN payload.
+			 */
+			$paypal_uri = apply_filters( 'charitable_paypal_ipn_verification_uri', $paypal_uri, $is_test_ipn, $data );
+
+			/* Still honour the long-standing generic filter so existing overrides keep working. */
+			return apply_filters( 'charitable_paypal_uri', $paypal_uri, true, true );
+		}
+
+		/**
+		 * Returns the outcome of the most recent IPN verification postback.
+		 *
+		 * @since  1.8.14
+		 *
+		 * @return string One of the self::IPN_VERIFICATION_* constants.
+		 */
+		public function get_ipn_verification_result() {
+			return $this->ipn_verification_result;
+		}
+
+		/**
+		 * Returns the HTTP status to answer a rejected IPN with.
+		 *
+		 * PayPal resends an IPN only when the listener does not answer 200, so the
+		 * status is what decides whether a donation gets a second chance. A postback
+		 * we never got an answer to must not be answered 200, or the donation is
+		 * lost for good. An INVALID answer must be answered 200, or forged IPNs are
+		 * retried for days.
+		 *
+		 * @since  1.8.14
+		 *
+		 * @param  string $result One of the self::IPN_VERIFICATION_* constants.
+		 * @return int
+		 */
+		public static function get_ipn_rejection_http_code( $result ) {
+			return self::IPN_VERIFICATION_UNKNOWN === $result ? 503 : 200;
+		}
+
+		/**
+		 * Classifies the response to the IPN verification postback.
+		 *
+		 * Distinguishes "PayPal says this IPN is not genuine" from "we never found
+		 * out". Note that wp_remote_post() only returns a WP_Error for transport
+		 * level failures: if PayPal's endpoint answers with an HTTP error status,
+		 * the return value is an ordinary array, so an is_wp_error() check alone
+		 * does not catch every case where we learned nothing.
+		 *
+		 * @since  1.8.14
+		 *
+		 * @param  array|WP_Error $api_response Array in case of successful request. WP_Error otherwise.
+		 * @return string One of the self::IPN_VERIFICATION_* constants.
+		 */
+		protected function classify_api_response( $api_response ) {
+			if ( is_wp_error( $api_response ) ) {
+				return self::IPN_VERIFICATION_UNKNOWN;
+			}
+
+			$code = (int) wp_remote_retrieve_response_code( $api_response );
+
+			if ( $code < 200 || $code > 299 ) {
+				return self::IPN_VERIFICATION_UNKNOWN;
+			}
+
+			$body = trim( (string) wp_remote_retrieve_body( $api_response ) );
+
+			if ( 'VERIFIED' === $body ) {
+				return self::IPN_VERIFICATION_VERIFIED;
+			}
+
+			if ( 'INVALID' === $body ) {
+				return self::IPN_VERIFICATION_INVALID;
+			}
+
+			/* A 2xx carrying neither answer is not an answer either. */
+			return self::IPN_VERIFICATION_UNKNOWN;
 		}
 
 		/**
@@ -903,12 +1111,14 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 		 * Returns whether the API response we received is valid.
 		 *
 		 * @since  1.5.4
+		 * @since  1.8.14 Derived from classify_api_response() so that the boolean
+		 *                and the recorded outcome can never disagree.
 		 *
 		 * @param  array|WP_Error $api_response Array in case of successful request. WP_Error otherwise.
 		 * @return boolean
 		 */
 		private function is_valid_api_response( $api_response ) {
-			return ! is_wp_error( $api_response ) && 'VERIFIED' == $api_response['body'];
+			return self::IPN_VERIFICATION_VERIFIED === $this->classify_api_response( $api_response );
 		}
 
 		/**

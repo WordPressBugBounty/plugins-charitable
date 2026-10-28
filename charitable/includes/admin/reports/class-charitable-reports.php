@@ -26,11 +26,51 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 	class Charitable_Reports {
 
 		/**
+		 * The longest range a previous-period comparison will be attempted for, in days.
+		 *
+		 * A comparison means building a SECOND overview report, and this page has a long-range
+		 * timeout history. Doubling that work is exactly the shape of the original fault, so past
+		 * this many days no comparison is attempted and the trend arrows simply do not render.
+		 * A missing arrow costs a nicety; a timeout costs the page.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @var   int
+		 */
+		const COMPARISON_MAX_DAYS = 92;
+
+		/**
 		 * The single instance of this class.
 		 *
 		 * @var  Charitable_Reports|null
 		 */
 		private static $instance = null;
+
+		/**
+		 * How many breakdown rows were marked as having no activity at all.
+		 *
+		 * Set by generate_donations_breakdown_rows() as it renders, and read straight back by
+		 * get_breakdown_quiet_note_html() - so the "N weeks with no donations are hidden" count
+		 * cannot disagree with the number of rows that were actually marked.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @var   int
+		 */
+		public $breakdown_empty_days = 0;
+
+		/**
+		 * The previous period a comparison was actually measured against, formatted for display.
+		 *
+		 * Written by get_previous_period_comparison(), which is the only place that knows the
+		 * window, and read by get_headline_tiles() for the "vs. Jul 25 - Aug 23" captions. A
+		 * percentage with no period named is the thing that genuinely misleads.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @var   string
+		 */
+		public $comparison_range_label = '';
 
 		/**
 		 * The date filter values.
@@ -324,7 +364,40 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 		 *
 		 * @return string
 		 */
-		public function generate_top_campaigns( $top_campaigns = false, $include_icons = true ) {
+		public function generate_top_campaigns( $top_campaigns = false, $include_icons = true, $args = array() ) {
+
+			/*
+			WHY THE LAYOUT IS A PARAMETER AND NOT A GATE CHECK.
+
+			This method has four callers and only two of them want the reworked markup: the Reports
+			Overview view and the AJAX filter that refreshes it. The other two - the legacy
+			Dashboard card and the printed/exported report - supply a <ul> and must keep getting
+			<li> elements. Reading charitable_reports_v3_enabled() directly here would emit table
+			rows into both of those, because the gate is true for the whole admin request.
+
+			Deciding it from the request context instead was tried and rejected: get_current_screen()
+			is the Reports screen during the print POST too (it is set before admin_init, and the
+			form posts back to this page), so a screen test would break the print report, while an
+			is-AJAX test would have to enumerate action names to tell the reports filter from any
+			other AJAX call.
+
+			So the two callers that must stay classic say so, and 'auto' means "ask the gate".
+
+			@since 1.8.14
+			*/
+			$args = wp_parse_args(
+				(array) $args,
+				array(
+					'layout' => 'auto',
+				)
+			);
+
+			$charitable_v3_campaigns = 'v3' === $args['layout']
+				|| (
+					'auto' === $args['layout']
+					&& function_exists( 'charitable_reports_v3_enabled' )
+					&& charitable_reports_v3_enabled()
+				);
 
 			if ( empty( $top_campaigns ) || empty( $top_campaigns->posts ) ) {
 				return;
@@ -335,7 +408,18 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 			foreach ( $top_campaigns->posts as $campaign ) :
 
 				$_campaign       = $campaign->ID ? charitable_get_campaign( $campaign->ID ) : false;
-				$status          = $_campaign ? $_campaign->get_status() : false;
+
+				/*
+				A missing campaign is skipped rather than rendered. charitable_get_campaign()
+				returns false when the post has gone, and every accessor below was being called on
+				the result unguarded - so one deleted campaign still listed in the report cache
+				took the whole page down with a fatal on get_donated_amount().
+				*/
+				if ( ! $_campaign ) {
+					continue;
+				}
+
+				$status          = $_campaign->get_status();
 				switch ( $status ) {
 					case 'active':
 						$status_string = esc_html__( 'Active', 'charitable' );
@@ -363,7 +447,175 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 					$percent_donated = 100;
 				}
 
+				/*
+				Goal pacing. v3 only.
+
+				The card already ranked campaigns by what they raised, which says what has worked.
+				Pacing says where to act: progress against goal measured against progress through
+				time, so 39% with days left reads as "Behind" rather than as a number.
+
+				It assumes giving accrues evenly, which it does not - campaigns spike at the
+				deadline. That assumption is what every pacing measure makes, and it is why the
+				label says "Behind" rather than a prediction. A campaign with no deadline gets NO
+				pacing claim at all rather than a flattering one: is_endless() means there is
+				nothing to be behind against.
+
+				get_percent_donated_raw() is read again here rather than using $percent_donated
+				above, which has already been clamped to 100 - the clamp is right for a bar's width
+				and wrong for a figure, where 108% is the interesting part.
+
+				All four reset per iteration, not just the first. foreach does not scope its body,
+				so a campaign with no goal following one that has a goal would otherwise render the
+				PREVIOUS campaign's percentage and days-left as its own - the values would simply
+				still be set from the last pass.
+
+				The four colours match assets/css/admin/charitable-admin-reports-v3.css, which is
+				where the rest of this card's palette lives; canon brand green is #31714c, which is
+				not what a four-step good/warn/bad ladder wants.
+
+				@since 1.8.14
+				*/
+				$charitable_pace        = false;
+				$charitable_pace_pct    = null;
+				$charitable_pace_left   = '';
+				$charitable_pace_colour = '#5aa152';
+
+				if ( $charitable_v3_campaigns && $_campaign->has_goal() ) {
+
+					$charitable_raw_pct = (float) $_campaign->get_percent_donated_raw();
+
+					if ( $charitable_raw_pct >= 100 ) {
+						$charitable_pace        = array(
+							'tone'  => 'good',
+							'label' => __( 'Goal met', 'charitable' ),
+						);
+						$charitable_pace_colour = '#276c35';
+					} elseif ( ! $_campaign->is_endless() ) {
+
+						$charitable_left  = (int) $_campaign->get_seconds_left();
+						$charitable_end   = (int) $_campaign->get_end_time();
+						$charitable_start = strtotime( $campaign->post_date_gmt . ' GMT' );
+						$charitable_span  = $charitable_end - $charitable_start;
+
+						if ( $charitable_left <= 0 ) {
+							$charitable_pace        = array(
+								'tone'  => 'bad',
+								'label' => __( 'Ended short of goal', 'charitable' ),
+							);
+							$charitable_pace_colour = '#d63638';
+						} elseif ( $charitable_span > 0 ) {
+							// Share of the campaign's life already spent, as a percentage.
+							$charitable_spent = ( 1 - ( $charitable_left / $charitable_span ) ) * 100;
+
+							// Below a week in, pacing is noise: one gift swings it wildly.
+							if ( $charitable_spent >= 15 ) {
+								$charitable_ratio = $charitable_raw_pct / max( 1, $charitable_spent );
+
+								if ( $charitable_ratio >= 1 ) {
+									$charitable_pace        = array(
+										'tone'  => 'good',
+										'label' => __( 'On track', 'charitable' ),
+									);
+									$charitable_pace_colour = '#5aa152';
+								} elseif ( $charitable_ratio >= 0.5 ) {
+									/*
+									Half pace is the boundary. At 0.6 the middle band was so narrow
+									that 39% raised with 70% of the time gone came out "At risk" at
+									a ratio of 0.557. Half the required pace is also the easier
+									line to defend out loud: below it, finishing needs the rest of
+									the campaign to outperform everything so far by more than
+									double.
+									*/
+									$charitable_pace        = array(
+										'tone'  => 'warn',
+										'label' => __( 'Behind', 'charitable' ),
+									);
+									$charitable_pace_colour = '#dba617';
+								} else {
+									$charitable_pace        = array(
+										'tone'  => 'bad',
+										'label' => __( 'At risk', 'charitable' ),
+									);
+									$charitable_pace_colour = '#d63638';
+								}
+							}
+						}
+					}
+
+					$charitable_pace_pct  = (int) round( $charitable_raw_pct );
+					$charitable_pace_left = ( ! $_campaign->is_endless() && (int) $_campaign->get_seconds_left() > 0 )
+						? human_time_diff( time(), (int) $_campaign->get_end_time() )
+						: '';
+				}
+
 				?>
+				<?php if ( $charitable_v3_campaigns ) : ?>
+					<?php
+					/*
+					v3 renders each campaign as a TABLE ROW: campaign, raised, goal, pacing, ends.
+
+					The shipping list put four labelled facts in a paragraph per campaign - "Total
+					Donations: $179.55  Total Donors: 2  End Date: July 25, 2026" - which cannot be
+					compared down a column, and that comparison is the entire job of a "top
+					campaigns" card. Same data, arranged so the eye can rank it.
+
+					A campaign with no goal shows an em dash in both the goal and pacing cells
+					rather than a zero bar. No target means no progress, and a 0% bar would read as
+					failure instead of as "not measured that way".
+					*/
+					?>
+					<tr>
+						<td class="charitable-reports-v3-campaign-name">
+							<?php
+							/*
+							A campaign can reach this list with an empty title - a draft somebody
+							started and never named. In the old paragraph layout that produced a
+							blank line; in a table it produces a row that looks like a rendering
+							fault. The post ID is what identifies it in the admin, so that is what
+							the link says.
+							*/
+							$charitable_campaign_title = '' !== trim( (string) $campaign->post_title )
+								? $campaign->post_title
+								/* translators: %d: the campaign's post ID. */
+								: sprintf( __( 'Untitled campaign #%d', 'charitable' ), (int) $campaign->ID );
+							?>
+							<a href="<?php echo esc_url( charitable_get_admin_campaign_edit_url( $campaign->ID ) ); ?>" target="_blank"><?php echo esc_html( $charitable_campaign_title ); ?></a>
+						</td>
+						<td class="num"><?php echo charitable_format_money( $donated_amount ); // phpcs:ignore ?></td>
+						<td class="num">
+							<?php
+							echo $donation_goal
+								? charitable_format_money( $donation_goal ) // phpcs:ignore
+								: '<span class="charitable-reports-v3-campaign-none">&mdash;</span>';
+							?>
+						</td>
+						<td class="charitable-reports-v3-campaign-pacing">
+							<?php if ( $donation_goal && null !== $charitable_pace_pct ) : ?>
+								<span class="charitable-reports-v3-campaign-track">
+									<i style="width: <?php echo esc_attr( max( 0, min( 100, (int) $charitable_pace_pct ) ) ); ?>%;<?php echo $charitable_pace ? ' background:' . esc_attr( $charitable_pace_colour ) . ';' : ''; ?>"></i>
+								</span>
+								<span class="charitable-reports-v3-campaign-pct"><?php echo esc_html( number_format_i18n( $charitable_pace_pct ) . '%' ); ?></span>
+							<?php else : ?>
+								<span class="charitable-reports-v3-campaign-none">&mdash;</span>
+							<?php endif; ?>
+						</td>
+						<td class="num charitable-reports-v3-campaign-ends">
+							<?php if ( false !== $charitable_pace ) : ?>
+								<span class="charitable-reports-v3-pace-pill charitable-reports-v3-pace-pill--<?php echo esc_attr( $charitable_pace['tone'] ); ?>"><?php echo esc_html( $charitable_pace['label'] ); ?></span>
+							<?php elseif ( '' !== $charitable_pace_left ) : ?>
+								<?php
+								printf(
+									/* translators: %s: a human-readable duration, e.g. "4 days". */
+									esc_html__( '%s left', 'charitable' ),
+									esc_html( $charitable_pace_left )
+								);
+								?>
+							<?php else : ?>
+								<span class="charitable-reports-v3-campaign-none"><?php echo esc_html( $status_string ); ?></span>
+							<?php endif; ?>
+						</td>
+					</tr>
+				<?php else : ?>
 				<li class="campaign-completed">
 					<div class="main">
 						<div class="info">
@@ -401,6 +653,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 						?>
 						<br class="clear" /><?php endif; ?>
 				</li>
+				<?php endif; ?>
 				<?php endforeach; ?>
 			<?php
 
@@ -425,7 +678,7 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 				?>
 
 				<div class="no-items the-list">
-					<p><strong><?php echo esc_html__( 'There are no donors within the date range.', 'charitable' ); ?></strong></p>
+					<p><strong><?php echo esc_html__( 'There are no donors in this date range.', 'charitable' ); ?></strong></p>
 				</div>
 
 			<?php } else { ?>
@@ -437,35 +690,118 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 
 				$unique_donors = array();
 
+				/*
+				One query for every donor on the card, before the loop. Inside it this would be one
+				query per row.
+				*/
+				$donor_first_dates = array();
+
+				foreach ( (array) $donors as $top_donor_ids ) {
+					if ( ! empty( $top_donor_ids->donor_id ) ) {
+						$donor_first_dates[] = $top_donor_ids->donor_id;
+					}
+				}
+
+				$donor_first_dates = $this->get_donor_first_donation_dates( $donor_first_dates );
+
 				foreach ( $donors as $top_donor ) :
 
 					if ( in_array( $top_donor->donor_id, $unique_donors, true ) ) {
 						continue;
 					}
 
-					// if this is a donation related to a recurring donation, then this parent will have a type of 'recurring'.
-					$donation_parent = ! empty( $top_donor->donation_parent_id ) ? charitable_get_donation( $top_donor->donation_parent_id )->get( 'donation_type' ) : false;
+					/*
+					If this is a donation related to a recurring donation, then this parent will
+					have a type of 'recurring'.
 
-					$donor_name   = ! empty( $top_donor->donor_name ) ? esc_html( $top_donor->donor_name ) : 'Unknown';
-					$donor_avatar = ! empty( $top_donor->donor_avatar_url ) ? esc_url( $top_donor->donor_avatar_url ) : false;
-					if ( false === $donor_avatar && function_exists( 'get_avatar_url' ) && ! empty( $top_donor->donor_email ) ) {
-						$donor_avatar = get_avatar_url(
-							$top_donor->donor_email,
-							array(
-								'size' => 50,
-							)
-						);
+					Guard against the parent donation having been deleted: charitable_get_donation()
+					returns false for an invalid or orphaned parent ID, and chaining ->get() on
+					false fatals the whole report page. The previous form did exactly that.
+
+					@since 1.8.14
+					*/
+					$donation_parent = false;
+					if ( ! empty( $top_donor->donation_parent_id ) ) {
+						$parent_donation = charitable_get_donation( $top_donor->donation_parent_id );
+						if ( $parent_donation ) {
+							$donation_parent = $parent_donation->get( 'donation_type' );
+						}
 					}
-					$badge_css   = strtolower( $donation_parent ) === 'recurring' ? 'recurring' : 'one-time';
-					$badge_label = strtolower( $donation_parent ) === 'recurring' ? esc_html__( 'Recurring', 'charitable' ) : esc_html__( 'One-Time', 'charitable' );
+
+					$donor_name = ! empty( $top_donor->donor_name ) ? esc_html( $top_donor->donor_name ) : 'Unknown';
+
+					/*
+					INITIALS, NOT A PHOTO - and this is the fix for a broken image, not only a
+					restyle.
+
+					The old markup emitted <img src="<?php echo esc_url( $donor_avatar ); ?>">
+					unconditionally. $donor_avatar was false whenever a donor had neither an avatar
+					URL nor an email, so the src rendered EMPTY and the browser drew its
+					broken-image icon - visible on any donor recorded without an email, e.g. an
+					offline or manual donation.
+
+					A monogram cannot break. It also carries more than the alternative did:
+					gravatar answers an unknown address with a generic silhouette, so the common
+					case for a donation plugin was a row of identical grey blobs.
+
+					mb_* where available so a name in a non-Latin script yields its own first
+					character rather than half a multi-byte sequence.
+
+					@since 1.8.14
+					*/
+					$donor_initials = '';
+
+					foreach ( preg_split( '/\s+/u', trim( wp_strip_all_tags( (string) $donor_name ) ), -1, PREG_SPLIT_NO_EMPTY ) as $donor_name_part ) {
+						$donor_initials .= function_exists( 'mb_substr' ) ? mb_substr( $donor_name_part, 0, 1 ) : substr( $donor_name_part, 0, 1 );
+
+						if ( 2 <= ( function_exists( 'mb_strlen' ) ? mb_strlen( $donor_initials ) : strlen( $donor_initials ) ) ) {
+							break;
+						}
+					}
+
+					$donor_initials = function_exists( 'mb_strtoupper' ) ? mb_strtoupper( $donor_initials ) : strtoupper( $donor_initials );
+
+					// A name that yielded nothing at all still needs something in the circle.
+					if ( '' === $donor_initials ) {
+						$donor_initials = '?';
+					}
 
 					$display_amount = ! empty( $top_donor->total_donation_amount ) ? charitable_format_money( $top_donor->total_donation_amount, false, true ) : charitable_format_money( esc_html( $top_donor->amount ), false, true );
 					$display_count  = ! empty( $top_donor->total_donation_count ) ? intval( $top_donor->total_donation_count ) : 1;
 
-					// based on display count, override the badge css/label.
-					if ( $display_count > 1 ) {
-						$badge_css   = 'multiple';
-						$badge_label = esc_html__( 'Multiple', 'charitable' );
+					/*
+					The line under the name: how many donations, and what kind of donor.
+
+					"donation" throughout, never "gift" - the term is not used anywhere on this
+					page. A recurring donor is described as monthly; a first-time donor as new; and
+					everyone else by when they started, which is the fact that turns a name into a
+					relationship. The date comes from the single query above.
+					*/
+					$donor_first = isset( $donor_first_dates[ (int) $top_donor->donor_id ] )
+						? $donor_first_dates[ (int) $top_donor->donor_id ]
+						: false;
+
+					/* translators: %s: number of donations this donor has made. */
+					$donor_meta = sprintf( _n( '%s donation', '%s donations', $display_count, 'charitable' ), number_format_i18n( $display_count ) );
+
+					/*
+					The qualifier is a BADGE, not more sentence. "Monthly donor" and "New donor"
+					are classifications - the two facts on this row somebody scans for - and a pill
+					is how this page already marks a classification. "first gave Jan 2025" is a
+					date rather than a class, so it stays in the line as text.
+					*/
+					$donor_badge     = '';
+					$donor_badge_css = '';
+
+					if ( 'recurring' === strtolower( (string) $donation_parent ) ) {
+						$donor_badge     = __( 'Monthly donor', 'charitable' );
+						$donor_badge_css = 'monthly';
+					} elseif ( $display_count <= 1 ) {
+						$donor_badge     = __( 'New donor', 'charitable' );
+						$donor_badge_css = 'new';
+					} elseif ( false !== $donor_first ) {
+						/* translators: %s: month and year of the donor's first donation, e.g. "Jan 2025". */
+						$donor_meta .= ' · ' . sprintf( __( 'first gave %s', 'charitable' ), gmdate( 'M Y', $donor_first ) );
 					}
 
 					// ensure we don't display the same donor twice.
@@ -475,20 +811,17 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 				<li>
 					<?php if ( $include_icons ) : ?>
 					<div class="avatar">
-						<img src="<?php echo esc_url( $donor_avatar ); ?>" alt="<?php echo esc_html( $donor_name ); ?>">
+						<span class="charitable-reports-v3-donor-mono" aria-hidden="true"><?php echo esc_html( $donor_initials ); ?></span>
 					</div>
 					<?php endif; ?>
 					<div class="info">
 						<p class="name">
 						<?php echo esc_html( $donor_name ); ?>
 						</p>
-					<?php if ( ! empty( $top_donor->donor_email ) ) : ?>
-						<p class="email"><?php echo esc_html( $top_donor->donor_email ); ?></p>
-						<?php endif; ?>
+					<p class="email charitable-reports-v3-donor-meta"><?php echo esc_html( $donor_meta ); ?><?php if ( '' !== $donor_badge ) : ?> <span class="charitable-reports-v3-donor-badge charitable-reports-v3-donor-badge--<?php echo esc_attr( $donor_badge_css ); ?>"><?php echo esc_html( $donor_badge ); ?></span><?php endif; ?></p>
 					</div>
 					<div class="donor-donation-info">
 						<p><span class="amount"><?php echo $display_amount; // phpcs:ignore ?></span></p>
-						<p><span class="badge <?php echo esc_attr( $badge_css ); ?>"><?php echo esc_html( $badge_label ); ?></span></p>
 					</div>
 					<?php
 					if ( ! $include_icons ) :
@@ -657,8 +990,18 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 
 									/* Determine Label */
 
-									// If the user isn't using pro and is on a page that isn't the report overview, give them a generic label.
-									if ( ! charitable_is_pro() && ( ! isset( $_GET['tab'] ) || ( isset( $_GET['tab'] ) && 'overview' !== $_GET['tab'] ) ) ) { // phpcs:ignore
+									/*
+									If the user isn't using pro and is on a page that isn't the report overview, give
+									them a generic label.
+
+									The overview is the NO-TAB case as well as tab=overview - reports.php defaults
+									$active_tab to 'overview' when tab is absent, and nothing ever links to
+									&tab=overview. Testing ! isset( $_GET['tab'] ) therefore treated the overview
+									itself as "not the overview", so on Lite every row there was labelled
+									"Charitable Donor" - a newly created campaign included, which is how it was
+									reported. Only a tab that is present and is not 'overview' is a non-overview page.
+									*/
+									if ( ! charitable_is_pro() && isset( $_GET['tab'] ) && 'overview' !== $_GET['tab'] ) { // phpcs:ignore
 										$action_label = esc_html__( 'Charitable Donor', 'charitable' );
 									} else {
 										// If this is a campaign, show the campaign name vs just any number ID.
@@ -810,9 +1153,104 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 		 *
 		 * @return string
 		 */
-		public function generate_payment_methods_list( $payment_breakdown = array(), $include_icons = true ) {
+		public function generate_payment_methods_list( $payment_breakdown = array(), $include_icons = true, $args = array() ) {
 
 			ob_start();
+
+			// See generate_top_campaigns() for why the layout is a parameter and not a gate check.
+			$args = wp_parse_args(
+				(array) $args,
+				array(
+					'layout' => 'auto',
+				)
+			);
+
+			/*
+			v3 renders these as money rows with a bar rather than a donut legend: the name, what it
+			took, its share, and a bar underneath. In a 330px rail a donut plus a legend spends most
+			of the card on a shape that carries four numbers, and the numbers are the point.
+
+			The share is computed from the AMOUNT here, not from the donation count the classic
+			markup below uses. That is deliberate and it is why this is a separate branch: a row
+			reading "$144.00 &middot; 33%" where the money is money and the percentage is a count is
+			worse than either figure alone, because every reader takes the percentage to refer to
+			the sum beside it. The classic view keeps its count-based share untouched.
+
+			@since 1.8.14
+			*/
+			$charitable_pm_v3 = 'v3' === $args['layout']
+				|| (
+					'auto' === $args['layout']
+					&& function_exists( 'charitable_reports_v3_enabled' )
+					&& charitable_reports_v3_enabled()
+				);
+
+			if ( $charitable_pm_v3 && ! empty( $payment_breakdown['donations'] ) ) {
+
+				$charitable_pm_total = 0.0;
+				$charitable_pm_rows  = $payment_breakdown['donations'];
+
+				foreach ( $charitable_pm_rows as $charitable_pm_data ) {
+					$charitable_pm_total += isset( $charitable_pm_data['amount'] ) ? (float) $charitable_pm_data['amount'] : 0.0;
+				}
+
+				/*
+				Sorted by amount, largest first. The card's bar colours descend by POSITION, which
+				only means anything if position is rank - and the breakdown arrives in whatever
+				order the gateways were encountered, which can put a gateway's 5.6% above another's
+				54.2% and give the smallest gateway the strongest colour.
+
+				Biggest-first is also the more useful read: the first row answers "where is the
+				money coming from" without scanning.
+				*/
+				uasort(
+					$charitable_pm_rows,
+					function ( $a, $b ) {
+						$a_amount = isset( $a['amount'] ) ? (float) $a['amount'] : 0.0;
+						$b_amount = isset( $b['amount'] ) ? (float) $b['amount'] : 0.0;
+
+						if ( $a_amount === $b_amount ) {
+							return 0;
+						}
+
+						return ( $b_amount < $a_amount ) ? -1 : 1;
+					}
+				);
+
+				foreach ( $charitable_pm_rows as $charitable_pm_method => $charitable_pm_data ) {
+
+					$charitable_pm_amount = isset( $charitable_pm_data['amount'] ) ? (float) $charitable_pm_data['amount'] : 0.0;
+
+					// A gateway that took nothing is noise in a four-row card.
+					if ( $charitable_pm_amount <= 0 ) {
+						continue;
+					}
+
+					$charitable_pm_share = $charitable_pm_total > 0
+						? round( ( $charitable_pm_amount / $charitable_pm_total ) * 100, 1 )
+						: 0;
+					?>
+					<li class="<?php echo esc_attr( $charitable_pm_method ); ?> charitable-reports-v3-pm-row">
+						<span class="charitable-reports-v3-pm-name"><?php echo esc_html( $charitable_pm_data['label'] ); ?></span>
+						<span class="charitable-reports-v3-pm-amount">
+							<?php
+							echo esc_html(
+								sprintf(
+									/* translators: 1: formatted money amount, 2: share of the total as a percentage. */
+									_x( '%1$s &middot; %2$s%%', 'payment method amount and share', 'charitable' ),
+									charitable_format_money( $charitable_pm_amount ),
+									number_format_i18n( $charitable_pm_share, 1 )
+								)
+							);
+							?>
+						</span>
+						<span class="charitable-reports-v3-pm-bar"><i style="width: <?php echo esc_attr( min( 100, $charitable_pm_share ) ); ?>%;"></i></span>
+					</li>
+					<?php
+				}
+
+				return ob_get_clean();
+			}
 
 			if ( empty( $payment_breakdown ) ) {
 				?>
@@ -822,11 +1260,15 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 					<span></span>
 				</div>
 				<div class="info">
-					<span><?php echo esc_html__( 'No payments.', 'charitable' ); ?></span>
+					<span><?php echo esc_html__( 'No payments in this date range.', 'charitable' ); ?></span>
 				</div>
-				<div class="total">
-					<span>-</span>
-				</div>
+				<?php
+				/*
+				No total column on this row. It held a bare "-", which is a dash standing in for a
+				figure that does not exist rather than for one that is zero or unknown - so it read
+				as a missing value in a row whose whole point is that there is nothing to miss.
+				*/
+				?>
 			</li>
 
 				<?php
@@ -883,10 +1325,12 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 			if ( empty( $donation_data ) ) {
 				?>
 
-				<td colspan="5"><strong><?php echo esc_html__( 'There are no donations within the date range.', 'charitable' ); ?></strong></td>
+				<td colspan="5"><strong><?php echo esc_html__( 'There are no donations in this date range.', 'charitable' ); ?></strong></td>
 
 				<?php
 			} else {
+
+				$this->breakdown_empty_days = 0;
 
 				foreach ( $donation_data as $day => $data ) :
 
@@ -903,9 +1347,29 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 					$refund_count  = intval( $refunds_data['refunds_by_day'][ $day ]['donors'] );
 					$refund_amount = $refunds_data['refunds_by_day'][ $day ]['amount'];
 
+					/*
+					A day with no donations, no donors and no refund is the DEFAULT state, not a
+					finding - and on a month-long range it is most of the table. A 30-day filter
+					with one gift rendered 29 rows of $0.00 and pushed everything below the card
+					off the screen.
+
+					Marked rather than skipped, so the rows are still in the DOM and the "show
+					every day" toggle needs no second request. The CSV export is untouched and
+					still contains every day.
+
+					@since 1.8.14
+					*/
+					$charitable_row_empty = 0 === intval( $data['donors'] )
+						&& 0.0 === (float) $data['amount']
+						&& 0.0 === (float) $refund_amount;
+
+					if ( $charitable_row_empty ) {
+						++$this->breakdown_empty_days;
+					}
+
 					?>
 
-					<tr id="type-donations-donor-<?php echo intval( $row_id ); ?>" class="row-type-donation-breakdown">
+					<tr id="type-donations-donor-<?php echo intval( $row_id ); ?>" class="row-type-donation-breakdown<?php echo $charitable_row_empty ? ' charitable-reports-v3-row-empty' : ''; ?>">
 						<td class="donated column-date" data-colname="Date"><?php echo esc_html( $data['label'] ); ?></td>
 						<td class="donated column-donations" data-colname="Donations"><?php echo charitable_format_money( esc_html( $data['amount'] ) ); // phpcs:ignore ?></td>
 						<td class="donated column-donors" data-colname="Number of Donors"><?php echo esc_html( $data['donors'] ); ?></td>
@@ -1334,7 +1798,16 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 					$donations_by_payment[ $payment ]['label']  = esc_html( $label );
 					$donations_by_payment[ $payment ]['amount'] = $donation->total_amount;
 					$donations_by_payment[ $payment ]['donors'] = 1;
-					$donations_by_payment[ $payment ]['title']  = $donation->title;
+
+					/*
+					Not every donation row carries a title - the query only selects it for some
+					gateways - and reading it unguarded logged an "Undefined property:
+					stdClass::$title" warning per affected gateway on EVERY report build. Observed
+					on this page while testing 1.8.14, once per load.
+
+					@since 1.8.14
+					*/
+					$donations_by_payment[ $payment ]['title']  = isset( $donation->title ) ? $donation->title : '';
 				}
 			}
 
@@ -1391,8 +1864,19 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 			$donation_total = 0;
 
 			foreach ( $this->donations as $donation ) {
-				// Add the donor ID to the array.
-				$donor_ids[] = $donation->donor_id;
+				/*
+				A NULL donor_id must be SKIPPED, not collected. The donations query LEFT JOINs
+				charitable_campaign_donations, so a donation post with no row there comes back with
+				every joined column NULL. Pushed unconditionally, that NULL survived
+				array_unique() as its own value and counted as an extra donor, so the tile read 7
+				where six people had given. It only shows up where a donation lost its
+				campaign_donations row, which is why it has stood.
+
+				@since 1.8.14
+				*/
+				if ( ! empty( $donation->donor_id ) ) {
+					$donor_ids[] = $donation->donor_id;
+				}
 				// Add the donation amount to the total.
 				$donation_total += $donation->total_amount;
 			}
@@ -2048,7 +2532,41 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 				}
 			);
 
-			foreach ( $donations_by_donors as $index => $donation ) {
+			/*
+			ORPHANED ROWS ARE DROPPED, not skipped.
+
+			Both guards below used to `continue`, which skipped the donor lookup but left the row
+			in $donations_by_donors - so it still reached generate_top_donors(), where
+			`! empty( $top_donor->donor_name ) ? ... : 'Unknown'` printed it as "Unknown". That
+			produced two visible faults from one cause.
+
+			FAULT 1 - a donation whose donor row no longer exists in wp_charitable_donors, a
+			deleted or erased donor leaving campaign_donations behind, appeared on a Top DONORS
+			card as "Unknown": no name, no email, no donor to click through to.
+
+			FAULT 2 - because the `continue` fired BEFORE the $unique_donors aggregation below, the
+			row never received total_donation_amount / total_donation_count either, so
+			generate_top_donors()'s fallback showed a SINGLE donation's amount and a hardcoded
+			count of 1. A donor with two $25 donations read "$25.00 / 1 donation" instead of
+			$50.00 / 2 - understating the figure by half.
+
+			Dropping the row is the right resolution rather than aggregating it under a "Deleted
+			donor" label: this card exists so somebody can recognise and contact their best
+			supporters, which a deleted donor serves neither of - and where the donor was erased on
+			request, re-surfacing their total partially re-identifies them. It is also what the
+			donor_id guard already intended; it just failed to do it.
+
+			NO FINANCIAL FIGURE MOVES. The tiles and the breakdown read $this->donations directly
+			(see get_donations_total()), and $donations_by_donors is a value copy of it, so the
+			money stays in every total - it simply stops being attributed to a donor who cannot be
+			named. If every row is orphaned the card falls through to generate_top_donors()'s own
+			"no donors in this date range" state.
+
+			@since 1.8.14
+			*/
+			$resolved_donors = array();
+
+			foreach ( $donations_by_donors as $donation ) {
 
 				if ( empty( $donation->donor_id ) || 0 === $donation->donor_id ) {
 					continue;
@@ -2066,12 +2584,27 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 				$donor_name  = ( ! empty( $donor->first_name ) || ! empty( $donor->last_name ) ? $donor->first_name . ' ' . $donor->last_name : 'Unknown' );
 				$donor_email = ( ! empty( $donor->email ) ) ? $donor->email : '';
 
-				$donations_by_donors[ $index ]->donor_name  = trim( $donor_name );
-				$donations_by_donors[ $index ]->donor_email = $donor_email;
+				$donation->donor_name  = trim( $donor_name );
+				$donation->donor_email = $donor_email;
 
-				$donations_by_donors[ $index ]->donor_avatar_url   = isset( $donation->user_id ) && $donation->user_id !== 0 ? get_avatar_url( $donation->user_id, 32 ) : 0;
-				$donations_by_donors[ $index ]->donation_type      = charitable_get_donation( $donation->donation_id )->get( 'donation_type' );
-				$donations_by_donors[ $index ]->donation_parent_id = $donation->donation_parent_id;
+				$donation->donor_avatar_url = isset( $donation->user_id ) && $donation->user_id !== 0 ? get_avatar_url( $donation->user_id, 32 ) : 0;
+
+				/*
+				Guard: charitable_get_donation() returns false if the donation post has been
+				deleted but a row still exists in the reports cache. Chaining ->get() on false
+				fatals the page.
+				*/
+				$donation_object         = charitable_get_donation( $donation->donation_id );
+				$donation->donation_type = $donation_object ? $donation_object->get( 'donation_type' ) : '';
+
+				/*
+				A `donation_parent_id` assignment stood here and has been dropped as dead code. It
+				read `$donations_by_donors[ $index ]->donation_parent_id = $donation->donation_parent_id`,
+				and since $donation IS $donations_by_donors[ $index ] - array elements holding
+				objects are handles to the same instance - it assigned the property to itself.
+				*/
+
+				$resolved_donors[] = $donation;
 
 				if ( ! isset( $unique_donors[ $donation->donor_id ] ) ) {
 					$unique_donors[ $donation->donor_id ]['amount'] = $donation->total_amount;
@@ -2081,6 +2614,9 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 					$unique_donors[ $donation->donor_id ]['count']   = $unique_donors[ $donation->donor_id ]['count'] + 1;
 				}
 			}
+
+			// Only the rows that resolved to a real donor go on from here.
+			$donations_by_donors = $resolved_donors;
 
 			// go back and add the total donation amount to the $donations_by_donors array.
 			foreach ( $donations_by_donors as $index => $donation ) {
@@ -2765,8 +3301,50 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 		public function get_days_between_dates( $start_date, $end_date, $array_key_format = 'Y-m-d' ) { // phpcs:ignore
 			$days = array();
 
-			$current_date = new DateTime( $start_date );
-			$end_date     = new DateTime( $end_date );
+			/*
+			Both constructions are guarded, and the try MUST wrap both: unguarded, guarding only
+			the first leaves half the bug.
+
+			On PHP 8.3+ `new DateTime( 'not a date' )` throws DateMalformedStringException where
+			older PHP returned false, so an unguarded call turns a bad date into an uncaught fatal.
+			That is reachable: class-charitable-reports-ajax.php takes $_POST['start_date'] and
+			$_POST['end_date'] through sanitize_text_field() only, which strips tags and normalises
+			whitespace and does NOT validate a date.
+
+			Catching \Exception rather than the 8.3 class name keeps this working on the older PHP
+			versions that threw a plain Exception here.
+
+			An empty range is returned deliberately, NOT today's date. Every caller renders
+			whatever days come back, so falling back to "now" would show a confident one-day report
+			for a range nobody asked for. A money report showing nothing is recoverable; one
+			showing the wrong period silently is not.
+
+			A FALSY date must keep normalising to "now" and must not land here: `new DateTime( '' )`
+			and `new DateTime( false )` both mean now and throw nothing, so they pass through
+			untouched. That behaviour is load-bearing - charitable_reports_donation_breakdown()
+			reads its query bounds back off this return precisely because of it.
+
+			@since 1.8.14
+			*/
+			/*
+			NULL IS COERCED TO '' FIRST, and that is not cosmetic.
+
+			`new DateTime( null )` and `new DateTime( '' )` both mean "now" and both throw
+			nothing, so the falsy-means-now behaviour described above is identical either way.
+			But on PHP 8.1+ passing null to a non-nullable string parameter is DEPRECATED, so the
+			null form logs two deprecation notices per call - and null is a legitimate input
+			here, not an error path. Coercing keeps the semantics exactly and stops the log
+			noise. Found by fuzzing this method with ( null, null ).
+			*/
+			$start_date = null === $start_date ? '' : $start_date;
+			$end_date   = null === $end_date ? '' : $end_date;
+
+			try {
+				$current_date = new DateTime( $start_date );
+				$end_date     = new DateTime( $end_date );
+			} catch ( Exception $e ) {
+				return $days;
+			}
 
 			while ( $current_date <= $end_date ) {
 				if ( $array_key_format ) :
@@ -4301,8 +4879,33 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 			// Add Javascript vars at the footer of the WordPress admin, at the dashboard and the overview tab of reporting.
 			if ( ! is_null( $screen ) && ( $screen->id === 'charitable_page_charitable-reports' && ( empty( $_GET['tab'] ) || ( ! empty( $_GET['tab'] ) && charitable_reports_allow_tab_load_scripts( strtolower( $_GET['tab'] ) ) ) ) ) ) { // phpcs:ignore
 
-				// Specific styles for the "overview" tab.
-				add_action( 'admin_footer', [ $this, 'report_vars' ], 100 );
+				/*
+				ONE instance prints the chart data, and only one.
+
+				report_vars() emits "var charitable_reporting = {...}" carrying date_axis and
+				donation_axis. Any second instance that reaches this method registers the hook
+				again, and the later script tag simply overwrites the first - so the chart ends up
+				drawing whatever range that second instance was built for.
+
+				That is not hypothetical, and it became reachable in 1.8.14:
+				get_previous_period_comparison() builds a second Charitable_Reports for the
+				PREVIOUS period. On a Jul 1 - Sep 30 report the page would carry two tags - the
+				first with the correct bucketed weekly axis ("Sep 24, Sep 17, Sep 10...") and the
+				second with 92 DAILY labels running "Mar 31, Apr 01, Apr 02..." - the comparison
+				window, at the wrong granularity, winning because it came last. It presents as
+				"the x-axis has too many labels".
+
+				First registration wins, which is the primary instance: it hooks during admin
+				setup, long before the view asks for a comparison.
+				*/
+				static $charitable_report_vars_hooked = false;
+
+				if ( ! $charitable_report_vars_hooked ) {
+					$charitable_report_vars_hooked = true;
+
+					// Specific styles for the "overview" tab.
+					add_action( 'admin_footer', [ $this, 'report_vars' ], 100 );
+				}
 			}
 		}
 
@@ -4317,6 +4920,1407 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 			add_action( 'charitable_report_before_donor_table', [ $this, 'reports_cta' ] );
 			add_action( 'charitable_report_before_activity_table', [ $this, 'reports_cta' ] );
 			add_action( 'charitable_report_before_advanced_table', [ $this, 'reports_cta' ] );
+		}
+
+		/**
+		 * Whether an addon's plugin file is on disk.
+		 *
+		 * A file check, not an "is active" check, because the two states want different copy:
+		 * installed-but-inactive on a site that bought a bundle is a click away, and telling
+		 * somebody to buy what they already own is the worst version of an upsell.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @param  string $slug The addon's plugin folder and file name, e.g. 'charitable-recurring'.
+		 * @return bool
+		 */
+		public function addon_is_installed( $slug ) {
+
+			$slug = sanitize_key( (string) $slug );
+
+			if ( '' === $slug ) {
+				return false;
+			}
+
+			return file_exists( WP_PLUGIN_DIR . '/' . $slug . '/' . $slug . '.php' );
+		}
+
+		/**
+		 * Bucket the per-day breakdown to a granularity the range can actually show.
+		 *
+		 * WHY THIS EXISTS. The table rendered one row per day and the chart one point per day, so
+		 * a 30-day range was 30 rows and 30 x-labels and a year was 365 of each. The two surfaces
+		 * had been crowding independently - the chart by squeezing labels, the table by growing
+		 * past 1,800px - and each had its own workaround. Bucketing once and deriving both means
+		 * they always agree on granularity, which is the thing a reader assumes without checking.
+		 *
+		 * The thresholds: past 180 days, calendar months; past 30, seven-day chunks; below that,
+		 * days left alone. Deliberately the same numbers the Dashboard's chart bucketing uses,
+		 * because the two screens show the same figures and two different ideas of "too many
+		 * points" would be visible the moment somebody compared them.
+		 *
+		 * Months group by RUNS of the same calendar month rather than a fixed chunk, because
+		 * months are 28-31 days and a fixed chunk drifts further out of phase every bucket.
+		 *
+		 * Returns refunds in the same 'refunds_by_day' shape it was given, keyed by bucket, so
+		 * generate_donations_breakdown_rows() consumes the result with no changes at all.
+		 *
+		 * The daily case still goes through here rather than skipping it. Below 31 days the
+		 * buckets are one day each, so the output is the input - but the code path is the same
+		 * one, and a branch that only runs on long ranges is a branch nobody tests.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @param  array $donation_data Per-day rows: label, amount, donors.
+		 * @param  array $refunds_data  Per-day refunds under 'refunds_by_day'.
+		 * @param  int   $days          Length of the range in days.
+		 * @return array {
+		 *     @type string $granularity   'day', 'week' or 'month'.
+		 *     @type array  $rows          Bucketed rows, same shape as $donation_data.
+		 *     @type array  $refunds       Bucketed refunds, same shape as $refunds_data.
+		 *     @type array  $donation_axis Chart values, one per bucket.
+		 *     @type array  $date_axis     Chart labels, one per bucket.
+		 * }
+		 */
+		public function bucket_donation_rows( $donation_data, $refunds_data, $days ) {
+
+			$donation_data  = (array) $donation_data;
+			$refunds_by_day = isset( $refunds_data['refunds_by_day'] ) ? (array) $refunds_data['refunds_by_day'] : array();
+			$days           = (int) $days;
+
+			if ( $days > 180 ) {
+				$granularity = 'month';
+			} elseif ( $days > 30 ) {
+				$granularity = 'week';
+			} else {
+				$granularity = 'day';
+			}
+
+			$rows    = array();
+			$refunds = array();
+			$values  = array();
+			$labels  = array();
+
+			$spans    = array();
+			$position = 0;
+
+			foreach ( $donation_data as $day => $data ) {
+
+				$timestamp = strtotime( $day );
+				$refund    = isset( $refunds_by_day[ $day ] ) ? (array) $refunds_by_day[ $day ] : array();
+
+				if ( 'month' === $granularity ) {
+					// A run of consecutive days sharing a year-month IS one calendar month.
+					$bucket     = false !== $timestamp ? gmdate( 'Y-m', $timestamp ) : (string) $day;
+					$row_label  = false !== $timestamp ? gmdate( 'F Y', $timestamp ) : (string) $day;
+					$axis_label = false !== $timestamp ? gmdate( 'M', $timestamp ) : (string) $day;
+				} elseif ( 'week' === $granularity ) {
+					/*
+					Seven-day chunks.
+
+					Labelled with the week's SPAN, not one of its days, and that is a correction
+					worth spelling out: get_donations_by_day() returns newest-first, so the first
+					day a bucket sees is its LATEST. Labelling from it produced "Sep 30" on a
+					bucket covering Sep 24-30, which reads as the week starting the 30th. A single
+					date cannot say which week it means, so the span is filled in below once both
+					ends are known.
+					*/
+					$bucket     = 'w' . (int) floor( $position / 7 );
+					$row_label  = '';
+					$axis_label = '';
+				} else {
+					$bucket     = $day;
+					$row_label  = isset( $data['label'] ) ? $data['label'] : (string) $day;
+					$axis_label = false !== $timestamp ? gmdate( 'M d', $timestamp ) : (string) $day;
+				}
+
+				if ( ! isset( $rows[ $bucket ] ) ) {
+					$rows[ $bucket ]    = array(
+						'label'  => $row_label,
+						'amount' => 0.0,
+						'donors' => 0,
+					);
+					$spans[ $bucket ]   = array(
+						'min' => $timestamp,
+						'max' => $timestamp,
+					);
+					$refunds[ $bucket ] = array(
+						'amount' => 0.0,
+						'donors' => 0,
+					);
+					$values[]           = 0.0;
+					$labels[]           = $axis_label;
+				}
+
+				if ( false !== $timestamp ) {
+					if ( false === $spans[ $bucket ]['min'] || $timestamp < $spans[ $bucket ]['min'] ) {
+						$spans[ $bucket ]['min'] = $timestamp;
+					}
+					if ( false === $spans[ $bucket ]['max'] || $timestamp > $spans[ $bucket ]['max'] ) {
+						$spans[ $bucket ]['max'] = $timestamp;
+					}
+				}
+
+				$rows[ $bucket ]['amount']    += isset( $data['amount'] ) ? (float) $data['amount'] : 0.0;
+				$rows[ $bucket ]['donors']    += isset( $data['donors'] ) ? (int) $data['donors'] : 0;
+				$refunds[ $bucket ]['amount'] += isset( $refund['amount'] ) ? (float) $refund['amount'] : 0.0;
+				$refunds[ $bucket ]['donors'] += isset( $refund['donors'] ) ? (int) $refund['donors'] : 0;
+
+				/*
+				NET, not the gross amount. The card plots a line above a table whose last column is
+				Net, and this accumulated $data['amount'] - so a day with 20.00 taken and 15.00
+				refunded drew a peak at 20.00 above a row reading +5.00, and the chart and its own
+				table disagreed about the same day. The refund was already being tracked one line
+				up and simply never reached the series.
+
+				get_donations_by_day() has already done this subtraction through get_net(), and both
+				callers of this method feed it from there (the view at views/reports/overview.php and
+				Charitable_Reports_Ajax::get_overview_data()), neither passing $format_money - so
+				'net' is present and is a float, not a formatted string. Reusing it keeps one net
+				rule rather than a second one here. Note get_net() floors at 0, which agrees with
+				the chart's own y-axis: charitable-admin-reporting.js pins min to 0, so a negative
+				series could not be drawn anyway.
+
+				The subtraction is kept as a fallback for any future caller that assembles the
+				breakdown without going through get_donations_by_day().
+				*/
+				$values[ count( $values ) - 1 ] += isset( $data['net'] )
+					? (float) $data['net']
+					: max(
+						0.0,
+						( isset( $data['amount'] ) ? (float) $data['amount'] : 0.0 )
+						- ( isset( $refund['amount'] ) ? (float) $refund['amount'] : 0.0 )
+					);
+
+				++$position;
+			}
+
+			/*
+			Month axis labels carry the year only where the year CHANGES.
+
+			A bare "M" repeats across a multi-year report - three separate "Sep" labels on a
+			Jan 2024 - Sep 2026 range with nothing to tell them apart - while putting the year on
+			every label widens all of them to solve an ambiguity that only exists at the
+			boundaries. So the year appears exactly where it starts to matter and nowhere else.
+
+			Done as a pass over the finished axis rather than inside the loop because the decision
+			needs the PREVIOUS bucket, and $labels is index-parallel to array_keys( $rows ) - both
+			are appended together, once per new bucket, in axis order. Note that order is
+			newest-first, so "where the year changes" is read the way the axis is read.
+			*/
+			if ( 'month' === $granularity ) {
+				$axis_prev_year = '';
+				$axis_index     = 0;
+
+				foreach ( array_keys( $rows ) as $axis_bucket ) {
+					$axis_bucket_ts = strtotime( $axis_bucket . '-01' );
+
+					if ( false !== $axis_bucket_ts && isset( $labels[ $axis_index ] ) ) {
+						$axis_bucket_year = gmdate( 'Y', $axis_bucket_ts );
+
+						$labels[ $axis_index ] = $axis_bucket_year !== $axis_prev_year
+							? gmdate( 'M Y', $axis_bucket_ts )
+							: gmdate( 'M', $axis_bucket_ts );
+
+						$axis_prev_year = $axis_bucket_year;
+					}
+
+					++$axis_index;
+				}
+			}
+
+			/*
+			Week labels, now that each bucket's two ends are known. "Sep 24 - 30" where the span
+			stays inside one month, "Sep 28 - Oct 4" where it crosses one - the year is carried by
+			the table's label and left off the chart's, which has no room for it.
+			*/
+			if ( 'week' === $granularity ) {
+				$index = 0;
+
+				foreach ( $rows as $bucket => $row ) {
+					$min = $spans[ $bucket ]['min'];
+					$max = $spans[ $bucket ]['max'];
+
+					if ( false === $min || false === $max ) {
+						++$index;
+						continue;
+					}
+
+					$same_month = gmdate( 'Y-m', $min ) === gmdate( 'Y-m', $max );
+
+					$rows[ $bucket ]['label'] = $same_month
+						? gmdate( 'M j', $min ) . ' - ' . gmdate( 'j, Y', $max )
+						: gmdate( 'M j', $min ) . ' - ' . gmdate( 'M j, Y', $max );
+
+					if ( isset( $labels[ $index ] ) ) {
+						$labels[ $index ] = gmdate( 'M j', $min );
+					}
+
+					++$index;
+				}
+			}
+
+			foreach ( $values as $index => $value ) {
+				$values[ $index ] = round( $value, 2 );
+			}
+
+			foreach ( $rows as $bucket => $row ) {
+				$rows[ $bucket ]['amount'] = round( $row['amount'], 2 );
+			}
+
+			/*
+			THE CHART READS OLDEST TO NEWEST. The table does not.
+
+			get_donations_by_day() returns newest-first, and every array above is built by walking
+			it in that order, so the x-axis came out descending - "Oct 22, Oct 21, Oct 20 ..." left
+			to right, with the line running backwards through time.
+
+			Only the two chart axes are flipped. $rows stays newest-first because that is right for
+			a table, where the most recent day belongs at the top, and because the whole point of
+			this card is a chart and a table of the SAME data presented each the way its own form
+			wants to be read.
+
+			Reversed here, at the end, rather than by walking the source backwards: the month-year
+			and week-span label passes above both depend on $labels staying index-parallel to
+			array_keys( $rows ) while they run, and the month pass additionally reads the PREVIOUS
+			bucket to decide where the year changes. Flipping earlier would have broken both.
+			array_values() keeps $values a JSON list rather than an object once reindexed.
+			*/
+			$values = array_values( array_reverse( $values ) );
+			$labels = array_values( array_reverse( $labels ) );
+
+			// A week bucket labelled for a week must not pretend the range ends mid-week: the last
+			// bucket is short whenever the range is not a multiple of seven, which is normal and
+			// needs no special case beyond summing what is there.
+			return array(
+				'granularity'   => $granularity,
+				'rows'          => $rows,
+				'refunds'       => array( 'refunds_by_day' => $refunds ),
+				'donation_axis' => $values,
+				'date_axis'     => $labels,
+			);
+		}
+
+		/**
+		 * Bucket a breakdown and publish the chart axes, for the view AND the AJAX handler.
+		 *
+		 * WHY THIS IS A METHOD. Bucketing in the view alone would mean filtering the page skipped
+		 * it entirely: Charitable_Reports_Ajax::get_overview_data() would send the raw daily rows
+		 * and the raw daily axis, so a 92-day filter would produce 92 x-axis labels and daily
+		 * table rows while the same range typed into the URL produced 14 weekly ones - the same
+		 * report disagreeing with itself depending on how you asked for it. One method, two
+		 * callers.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @param  array  $breakdown  Rows from get_donations_by_day().
+		 * @param  array  $refunds    Refund data to bucket alongside them.
+		 * @param  string $start_date Range start.
+		 * @param  string $end_date   Range end.
+		 * @return array { rows: array, refunds: array, granularity: string }
+		 */
+		public function bucket_for_range( $breakdown, $refunds, $start_date, $end_date ) {
+
+			$start = strtotime( (string) $start_date );
+			$end   = strtotime( (string) $end_date );
+
+			$days = ( $start && $end )
+				? (int) floor( ( $end - $start ) / DAY_IN_SECONDS ) + 1
+				: count( (array) $breakdown );
+
+			$bucketed = $this->bucket_donation_rows( $breakdown, $refunds, $days );
+
+			/*
+			The axes go onto the object because report_vars() reads them from there on
+			admin_footer, and the AJAX handler reads them straight back out of these same two
+			properties - so both paths publish the bucketed axis rather than the raw one.
+			*/
+			$this->donation_axis = $bucketed['donation_axis'];
+			$this->date_axis     = $bucketed['date_axis'];
+
+			return array(
+				'rows'        => $bucketed['rows'],
+				'refunds'     => array_merge( (array) $refunds, $bucketed['refunds'] ),
+				'granularity' => $bucketed['granularity'],
+			);
+		}
+
+		/**
+		 * The "by week" / "by month" note beside the Donations Breakdown heading.
+		 *
+		 * Say what a row is when it is not a day. A table of "September 2026" rows under a heading
+		 * that says nothing about months makes a reader check the dates to work out what they are
+		 * looking at. Empty at day granularity, where the heading is already accurate.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @param  string $granularity 'day', 'week' or 'month'.
+		 * @return string
+		 */
+		public function get_breakdown_granularity_label( $granularity ) {
+
+			if ( 'month' === $granularity ) {
+				return __( 'by month', 'charitable' );
+			}
+
+			if ( 'week' === $granularity ) {
+				return __( 'by week', 'charitable' );
+			}
+
+			return '';
+		}
+
+		/**
+		 * The "N weeks with no donations are hidden" note, and its toggle.
+		 *
+		 * A method rather than view markup because the AJAX filter has to replace it. Switching
+		 * from a 92-day range to Last 7 Days reloads the table, and a note built in the view would
+		 * be left reading "11 weeks with no donations are hidden" over seven days of rows - it
+		 * would describe the range the page loaded with, not the one on screen.
+		 *
+		 * Returns an empty string when nothing is hidden, so the guard lives here and the AJAX
+		 * handler can send the same markup.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @param  string $granularity 'day', 'week' or 'month'.
+		 * @param  int    $empty_count How many buckets are being hidden.
+		 * @return string HTML, or '' when nothing is hidden.
+		 */
+		public function get_breakdown_quiet_note_html( $granularity, $empty_count ) {
+
+			$empty_count = (int) $empty_count;
+
+			// Nothing hidden means nothing to explain.
+			if ( $empty_count < 1 ) {
+				return '';
+			}
+
+			/*
+			The unit follows the GRANULARITY, because a row is not always a day. On a year-long
+			range the rows are months, and "7 days with no donations are hidden" under a table of
+			months is simply wrong - it counts hidden rows and calls them days.
+
+			Three separate _n() sentences rather than one with an interpolated unit, so a
+			translator sees each whole sentence and can agree the number with its noun.
+			*/
+			if ( 'month' === $granularity ) {
+				/* translators: %s: number of months with no donations, already formatted. */
+				$sentence = _n( '%s month with no donations is hidden.', '%s months with no donations are hidden.', $empty_count, 'charitable' );
+				$show     = __( 'Show Every Month', 'charitable' );
+				$hide     = __( 'Hide Quiet Months', 'charitable' );
+			} elseif ( 'week' === $granularity ) {
+				/* translators: %s: number of weeks with no donations, already formatted. */
+				$sentence = _n( '%s week with no donations is hidden.', '%s weeks with no donations are hidden.', $empty_count, 'charitable' );
+				$show     = __( 'Show Every Week', 'charitable' );
+				$hide     = __( 'Hide Quiet Weeks', 'charitable' );
+			} else {
+				/* translators: %s: number of days with no donations, already formatted. */
+				$sentence = _n( '%s day with no donations is hidden.', '%s days with no donations are hidden.', $empty_count, 'charitable' );
+				$show     = __( 'Show Every Day', 'charitable' );
+				$hide     = __( 'Hide Quiet Days', 'charitable' );
+			}
+
+			return sprintf(
+				'<p class="charitable-reports-v3-empty-days"><span>%1$s</span> <button type="button" class="charitable-reports-v3-empty-days-toggle" aria-expanded="false" data-show="%2$s" data-hide="%3$s">%2$s</button></p>',
+				esc_html( sprintf( $sentence, number_format_i18n( $empty_count ) ) ),
+				esc_attr( $show ),
+				esc_attr( $hide )
+			);
+		}
+
+		/**
+		 * A signed percentage change between two figures, or '' where there is no honest one.
+		 *
+		 * Returns '' rather than a number when either side is zero or below: a rise from nothing
+		 * is not a percentage, and "+100%" against a zero baseline reads as a measurement when it
+		 * is an artefact of dividing by nothing.
+		 *
+		 * Clamped at +/-99.9% so one unusually quiet previous period cannot print "+41,200%" and
+		 * make the tile unreadable.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @param  float $previous The earlier figure.
+		 * @param  float $current  The figure on screen.
+		 * @return string e.g. "+18.4%", or ''.
+		 */
+		private function percentage_change( $previous, $current ) {
+
+			$previous = (float) $previous;
+			$current  = (float) $current;
+
+			if ( $previous <= 0 || $current <= 0 ) {
+				return '';
+			}
+
+			$percentage = round( ( ( $current - $previous ) / $previous ) * 100, 1 );
+
+			if ( $percentage > 99.9 ) {
+				return '+99.9%';
+			}
+
+			if ( $percentage < -99.9 ) {
+				return '-99.9%';
+			}
+
+			if ( 0.0 === $percentage ) {
+				return '';
+			}
+
+			return ( $percentage > 0 ? '+' : '' ) . $percentage . '%';
+		}
+
+		/**
+		 * The four headline figures for the period immediately before this one, as percentage
+		 * changes ready for charitable_get_stat_change_html().
+		 *
+		 * The previous period is the same LENGTH as the one on screen, ending the day before it
+		 * starts - so a 30-day view compares against the 30 days before it, and a single day
+		 * against the day before. Comparing against a fixed window instead would make the
+		 * percentages meaningless as soon as somebody changed the range.
+		 *
+		 * WHY THE GUARD. A comparison means building a SECOND overview report, and this page has a
+		 * long-range timeout history. Past self::COMPARISON_MAX_DAYS no comparison is attempted
+		 * and the arrows simply do not render.
+		 *
+		 * A second instance rather than re-initialising the shared one: this class has a public
+		 * constructor alongside get_instance(), and re-initialising the singleton mid-render would
+		 * change the range under every figure the view has already taken off it.
+		 *
+		 * Results ride the existing per-range report cache, so only the first load of a given
+		 * range pays for it.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @param  array $args The current report args, carrying start_date and end_date.
+		 * @return array Keys donations, average, donors, refunds. Values are signed percentage
+		 *               strings like "+18.4%", or '' where no comparison is possible.
+		 */
+		public function get_previous_period_comparison( $args = array() ) {
+
+			$empty = array(
+				'donations' => '',
+				'average'   => '',
+				'donors'    => '',
+				'refunds'   => '',
+			);
+
+			if ( empty( $args['start_date'] ) || empty( $args['end_date'] ) ) {
+				return $empty;
+			}
+
+			$start = strtotime( $args['start_date'] );
+			$end   = strtotime( $args['end_date'] );
+
+			if ( false === $start || false === $end || $end < $start ) {
+				return $empty;
+			}
+
+			// Inclusive, so a start equal to the end is one day.
+			$days = (int) floor( ( $end - $start ) / DAY_IN_SECONDS ) + 1;
+
+			if ( $days > self::COMPARISON_MAX_DAYS ) {
+				return $empty;
+			}
+
+			$previous_args               = $args;
+			$previous_args['start_date'] = gmdate( 'Y/m/d', $start - ( $days * DAY_IN_SECONDS ) );
+			$previous_args['end_date']   = gmdate( 'Y/m/d', $start - DAY_IN_SECONDS );
+
+			/*
+			Formatted here because this is the only place that knows the previous window. Built
+			from the same two strings the query uses, so the caption cannot describe a different
+			range from the one the percentages came from.
+
+			The year is dropped when both ends share the current year, which is the common case and
+			where it is only noise: "Jul 25 - Aug 23" rather than "Jul 25, 2026 - Aug 23, 2026".
+			*/
+			$previous_start_ts = strtotime( $previous_args['start_date'] );
+			$previous_end_ts   = strtotime( $previous_args['end_date'] );
+
+			if ( false !== $previous_start_ts && false !== $previous_end_ts ) {
+				$same_year = gmdate( 'Y', $previous_start_ts ) === gmdate( 'Y', $previous_end_ts )
+					&& gmdate( 'Y', $previous_end_ts ) === gmdate( 'Y', (int) current_time( 'timestamp', true ) );
+
+				$this->comparison_range_label = $same_year
+					? gmdate( 'M j', $previous_start_ts ) . ' - ' . gmdate( 'M j', $previous_end_ts )
+					: gmdate( 'M j, Y', $previous_start_ts ) . ' - ' . gmdate( 'M j, Y', $previous_end_ts );
+			}
+
+			$previous = new Charitable_Reports();
+			$previous->init_with_array( 'overview', $previous_args );
+
+			$previous_donations = $previous->get_donations();
+			$previous_count     = is_array( $previous_donations ) ? count( $previous_donations ) : 0;
+			$previous_total     = (float) $previous->get_donations_total();
+			$previous_donors    = (int) $previous->get_donors_count();
+			$previous_refunds   = $previous->get_refunds();
+			$previous_refunded  = isset( $previous_refunds['total_amount'] ) ? (float) $previous_refunds['total_amount'] : 0.0;
+			$previous_average   = $previous_count > 0 ? $previous_total / $previous_count : 0.0;
+
+			$current_donations = $this->get_donations();
+			$current_count     = is_array( $current_donations ) ? count( $current_donations ) : 0;
+			$current_total     = (float) $this->get_donations_total();
+			$current_donors    = (int) $this->get_donors_count();
+			$current_refunds   = $this->get_refunds();
+			$current_refunded  = isset( $current_refunds['total_amount'] ) ? (float) $current_refunds['total_amount'] : 0.0;
+			$current_average   = $current_count > 0 ? $current_total / $current_count : 0.0;
+
+			return array(
+				'donations' => $this->percentage_change( $previous_total, $current_total ),
+				'average'   => $this->percentage_change( $previous_average, $current_average ),
+				'donors'    => $this->percentage_change( $previous_donors, $current_donors ),
+				'refunds'   => $this->percentage_change( $previous_refunded, $current_refunded ),
+			);
+		}
+
+		/**
+		 * The earliest donation date for each of a set of donors, across all time.
+		 *
+		 * One query, not one per donor.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @param  array $donor_ids Donor IDs to look up.
+		 * @return array Donor ID => unix timestamp of their first donation.
+		 */
+		public function get_donor_first_donation_dates( $donor_ids ) {
+
+			$donor_ids = array_values( array_unique( array_filter( array_map( 'intval', (array) $donor_ids ) ) ) );
+
+			if ( empty( $donor_ids ) ) {
+				return array();
+			}
+
+			global $wpdb;
+
+			$placeholders = implode( ',', array_fill( 0, count( $donor_ids ), '%d' ) );
+
+			/*
+			The suppression is about what the sniff cannot see, not about skipping safety. The
+			interpolated parts are {$wpdb->prefix}, {$wpdb->posts} and a placeholder run generated
+			from a count - every VALUE still goes through a placeholder, bound by prepare() from
+			the array passed as its second argument.
+			*/
+			// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+			$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->prepare(
+					"SELECT cd.donor_id, MIN( p.post_date ) AS first_donation
+					 FROM {$wpdb->prefix}charitable_campaign_donations cd
+					 INNER JOIN {$wpdb->posts} p ON p.ID = cd.donation_id
+					 WHERE cd.donor_id IN ( {$placeholders} )
+					 GROUP BY cd.donor_id",
+					$donor_ids
+				)
+			);
+			// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+
+			$dates = array();
+
+			foreach ( (array) $rows as $row ) {
+				$first = strtotime( (string) $row->first_donation );
+
+				if ( false !== $first ) {
+					$dates[ (int) $row->donor_id ] = $first;
+				}
+			}
+
+			return $dates;
+		}
+
+		/**
+		 * How many of this range's donors were giving for the FIRST time.
+		 *
+		 * The split the headline tile needs: growth from new donors and growth from existing ones
+		 * giving more are two different problems, and a single donor count cannot tell them apart.
+		 *
+		 * One extra query, not one per donor. The range's donor ids are already in memory from
+		 * $this->donations, so this asks only for the earliest donation date per donor across ALL
+		 * time and compares it with the range's start.
+		 *
+		 * "First ever" counts donations of ANY status, and that is a correction rather than a
+		 * choice. Filtering to completed looks more principled - a failed attempt is not giving -
+		 * but it breaks the invariant that matters more: get_donors_count() does not filter by
+		 * status, so a donor whose only donations are pending would return no row here and land in
+		 * NEITHER bucket, and the caption would not add up to the figure directly above it.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @param  string $start_date Range start, any strtotime-parsable form.
+		 * @return array { @type int $new. @type int $returning. } Both zero when it cannot be told.
+		 */
+		public function get_new_vs_returning_donors( $start_date ) {
+
+			$empty = array(
+				'new'       => 0,
+				'returning' => 0,
+			);
+
+			if ( empty( $this->donations ) ) {
+				return $empty;
+			}
+
+			$start = strtotime( (string) $start_date );
+
+			if ( false === $start ) {
+				return $empty;
+			}
+
+			$donor_ids = array();
+
+			foreach ( $this->donations as $donation ) {
+				if ( ! empty( $donation->donor_id ) ) {
+					$donor_ids[ (int) $donation->donor_id ] = true;
+				}
+			}
+
+			$donor_ids = array_keys( $donor_ids );
+
+			if ( empty( $donor_ids ) ) {
+				return $empty;
+			}
+
+			$new = 0;
+
+			foreach ( $this->get_donor_first_donation_dates( $donor_ids ) as $first ) {
+				// Compared at day resolution, because the range itself is a date and a donation
+				// made earlier on the start date is still inside it.
+				if ( gmdate( 'Y-m-d', $first ) >= gmdate( 'Y-m-d', $start ) ) {
+					++$new;
+				}
+			}
+
+			/*
+			Returning is the REMAINDER, not its own count. Counting both independently is how they
+			stop adding up to the donor figure they sit under - a row that fails to parse, or a
+			donor the join misses, silently vanishes from the caption instead of from one side of
+			it. Derived, the two halves always account for every donor on the tile.
+			*/
+			$total = count( $donor_ids );
+
+			return array(
+				'new'       => min( $new, $total ),
+				'returning' => max( 0, $total - $new ),
+			);
+		}
+
+		/**
+		 * The four headline tiles' captions and trend markup, from one place.
+		 *
+		 * WHY THIS IS A METHOD. Built inline in the view, these strings could not be produced by
+		 * the AJAX filter: filtering updates the page through
+		 * Charitable_Reports_Ajax::get_overview_data(), and anything the view computes for itself
+		 * is simply left behind - a tile would read "$86.00" over "0 donations - vs. Sep 8 -
+		 * Sep 15", the figure refreshed and the caption still describing the range the page first
+		 * loaded with. Built here, the view and the AJAX handler render the same strings from the
+		 * same code and cannot drift.
+		 *
+		 * Returns the comparison percentages too, so the view does not call
+		 * get_previous_period_comparison() separately - one call per request, not two.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @param  array $args The overview args (start_date, end_date, campaign_id, category_id).
+		 * @return array { captions: array, trends: array, changes: array }
+		 */
+		public function get_headline_tiles( $args = array() ) {
+
+			$changes = array(
+				'donations' => '',
+				'average'   => '',
+				'donors'    => '',
+				'refunds'   => '',
+			);
+
+			$changes = (array) $this->get_previous_period_comparison( $args ) + $changes;
+
+			$donation_count = count( (array) $this->donations );
+			$gross          = (float) $this->get_donations_total();
+			$refunds        = (array) $this->get_refunds();
+			$refund_count   = isset( $refunds['total_count'] ) ? (int) $refunds['total_count'] : 0;
+			$refund_amount  = isset( $refunds['total_amount'] ) ? (float) $refunds['total_amount'] : 0.0;
+
+			/*
+			The comparison window, named. A percentage with no period is the thing that actually
+			misleads - 18.4% against what? - and this label is set by the method that ran the
+			comparison, so it cannot name a range the number did not come from.
+			*/
+			$vs = '' !== $this->comparison_range_label
+				/* translators: %s: the previous period, e.g. "Jul 25 - Aug 23". */
+				? sprintf( __( 'vs. %s', 'charitable' ), $this->comparison_range_label )
+				: '';
+
+			/* translators: %s: number of donations in the range. */
+			$count_text = sprintf( _n( '%s donation', '%s donations', $donation_count, 'charitable' ), number_format_i18n( $donation_count ) );
+
+			$captions = array(
+				'donations' => '' !== $vs ? $count_text . ' · ' . $vs : $count_text,
+				'average'   => $vs,
+				'donors'    => $vs,
+				'refunds'   => '',
+			);
+
+			/*
+			Donors get the new/returning split rather than the comparison window: the tile already
+			carries a percentage change, so repeating the range spends the line on something the
+			reader can see anyway. get_new_vs_returning_donors() derives "returning" as the
+			remainder, so the two halves always add up to the figure above them.
+			*/
+			if ( ! empty( $args['start_date'] ) ) {
+				$total_donors = (int) $this->get_donors_count();
+
+				if ( $total_donors > 0 ) {
+					$split = (array) $this->get_new_vs_returning_donors( $args['start_date'] );
+
+					$captions['donors'] = sprintf(
+						/* translators: 1: number of first-time donors, 2: number of donors who had given before. */
+						_x( '%1$s new · %2$s returning', 'donor tile caption', 'charitable' ),
+						number_format_i18n( isset( $split['new'] ) ? (int) $split['new'] : 0 ),
+						number_format_i18n( isset( $split['returning'] ) ? (int) $split['returning'] : 0 )
+					);
+				}
+			}
+
+			/*
+			Refunds carry a count and a share of gross, which says more about three refunds than
+			repeating the window would. Guarded against a zero gross, where the share is undefined
+			rather than zero.
+			*/
+			if ( $refund_count > 0 ) {
+				/* translators: %s: number of refunds. */
+				$refund_text = sprintf( _n( '%s refund', '%s refunds', $refund_count, 'charitable' ), number_format_i18n( $refund_count ) );
+				$share       = $gross > 0 ? ( $refund_amount / $gross ) * 100 : 0;
+
+				$captions['refunds'] = $share > 0
+					? sprintf(
+						/* translators: 1: number of refunds, 2: their share of gross as a percentage. */
+						_x( '%1$s · %2$s%% of gross', 'refund tile caption', 'charitable' ),
+						$refund_text,
+						number_format_i18n( $share, 1 )
+					)
+					: $refund_text;
+			}
+
+			$trends = array();
+
+			foreach ( array( 'donations', 'average', 'donors', 'refunds' ) as $key ) {
+				$trends[ $key ] = function_exists( 'charitable_get_stat_change_html' )
+					? charitable_get_stat_change_html( isset( $changes[ $key ] ) ? $changes[ $key ] : '' )
+					: '';
+			}
+
+			return array(
+				'captions' => $captions,
+				'trends'   => $trends,
+				'changes'  => $changes,
+			);
+		}
+
+		/**
+		 * Where this range's donations came from, by UTM source and medium.
+		 *
+		 * The one analytics figure this page can show without a Google connection. The Google
+		 * Analytics addon captures the donor's UTM parameters at donation insert and stores them
+		 * as ordinary post meta, so "where did this money come from" is answerable locally.
+		 *
+		 * NOT gated on the addon being active, and that matters more in Lite than in Pro: the meta
+		 * is post meta and outlives both deactivation and a downgrade, so a site that ran Pro with
+		 * tracking for a season and then fell back to Lite still has a season of attribution worth
+		 * reading. generate_donation_sources_list() distinguishes "nothing captured because
+		 * tracking was never set up" from "tracking ran but this period has no attributed
+		 * donations", because those need different actions from the reader.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @param  array $args Report args carrying start_date and end_date.
+		 * @return array { rows: array, total: float, attributed: int, unattributed: int }
+		 */
+		public function get_donation_attribution( $args = array() ) {
+			global $wpdb;
+
+			$start = isset( $args['start_date'] ) ? $args['start_date'] : '';
+			$end   = isset( $args['end_date'] ) ? $args['end_date'] : '';
+
+			$empty = array(
+				'rows'         => array(),
+				'total'        => 0.0,
+				'attributed'   => 0,
+				'unattributed' => 0,
+			);
+
+			if ( '' === $start || '' === $end ) {
+				return $empty;
+			}
+
+			// The report page hands dates around as Y/m/d; SQL wants Y-m-d.
+			$start = str_replace( '/', '-', (string) $start );
+			$end   = str_replace( '/', '-', (string) $end );
+
+			$statuses = charitable_get_approval_statuses();
+
+			if ( empty( $statuses ) ) {
+				return $empty;
+			}
+
+			$status_placeholders = implode( ', ', array_fill( 0, count( $statuses ), '%s' ) );
+
+			/*
+			One grouped query rather than a meta lookup per donation. LEFT JOIN, not INNER, so the
+			untracked donations come back as NULL and can be counted as unattributed in the same
+			pass instead of needing a second query to find what was missed.
+
+			Amount comes from campaign_donations, which is the table the rest of this class totals
+			from, so this card cannot disagree with the tiles above it.
+			*/
+
+			/*
+			Both suppressions are about what the sniffs cannot see, not about skipping safety.
+			InterpolatedNotPrepared fires on {$wpdb->posts} and the generated placeholder run,
+			which are composed from trusted internals - every VALUE still goes through a
+			placeholder. ReplacementsWrongNumber cannot count arguments through array_merge(), so
+			it reads one replacement where the array supplies all of them; $wpdb->prepare()
+			accepts an array as its second argument and binds each element.
+			*/
+			// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+			$sql = $wpdb->prepare(
+				"SELECT COALESCE( src.meta_value, '' ) AS source,
+				        COALESCE( med.meta_value, '' ) AS medium,
+				        COUNT( DISTINCT p.ID ) AS donations,
+				        COALESCE( SUM( cd.amount ), 0 ) AS amount
+				   FROM {$wpdb->posts} p
+				   INNER JOIN {$wpdb->prefix}charitable_campaign_donations cd ON cd.donation_id = p.ID
+				   LEFT JOIN {$wpdb->postmeta} src ON src.post_id = p.ID AND src.meta_key = '_charitable_ga_utm_source'
+				   LEFT JOIN {$wpdb->postmeta} med ON med.post_id = p.ID AND med.meta_key = '_charitable_ga_utm_medium'
+				  WHERE p.post_type = 'donation'
+				    AND p.post_status IN ( {$status_placeholders} )
+				    AND p.post_date BETWEEN %s AND %s
+				  GROUP BY source, medium
+				  ORDER BY amount DESC",
+				array_merge( $statuses, array( $start . ' 00:00:00', $end . ' 23:59:59' ) )
+			);
+			// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+
+			$results = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+
+			if ( empty( $results ) ) {
+				return $empty;
+			}
+
+			$rows         = array();
+			$total        = 0.0;
+			$attributed   = 0;
+			$unattributed = 0;
+
+			foreach ( $results as $row ) {
+				$source = trim( (string) $row->source );
+				$amount = (float) $row->amount;
+				$count  = (int) $row->donations;
+
+				if ( '' === $source ) {
+					$unattributed += $count;
+					continue;
+				}
+
+				$medium = trim( (string) $row->medium );
+
+				$rows[] = array(
+					'source' => $source,
+					'medium' => $medium,
+					'label'  => '' !== $medium ? $source . ' / ' . $medium : $source,
+					'count'  => $count,
+					'amount' => $amount,
+				);
+
+				$total      += $amount;
+				$attributed += $count;
+			}
+
+			return array(
+				'rows'         => $rows,
+				'total'        => $total,
+				'attributed'   => $attributed,
+				'unattributed' => $unattributed,
+			);
+		}
+
+		/**
+		 * The Donation Sources card body.
+		 *
+		 * Rendered through one method the view AND the AJAX handler call, so filtering the page
+		 * cannot produce different markup from loading it - which matters here because the card's
+		 * two empty states have no list to fill, so the whole body is replaced rather than a <ul>
+		 * inside it.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @param  array $attribution  Output of get_donation_attribution().
+		 * @param  bool  $ga_installed Whether the Google Analytics addon is on disk.
+		 * @return string
+		 */
+		public function generate_donation_sources_list( $attribution = array(), $ga_installed = false ) {
+			$rows         = isset( $attribution['rows'] ) ? (array) $attribution['rows'] : array();
+			$total        = isset( $attribution['total'] ) ? (float) $attribution['total'] : 0.0;
+			$attributed   = isset( $attribution['attributed'] ) ? (int) $attribution['attributed'] : 0;
+			$unattributed = isset( $attribution['unattributed'] ) ? (int) $attribution['unattributed'] : 0;
+
+			ob_start();
+
+			if ( empty( $rows ) ) {
+				?>
+				<p class="charitable-reports-v3-sources-note">
+					<?php
+					if ( $ga_installed ) {
+						echo esc_html__( 'No donations in this period have a recorded source. Attribution is captured from a donor\'s landing URL, so it begins once tracking is live.', 'charitable' );
+					} else {
+						echo esc_html__( 'Connect Google Analytics to see which channels bring in donations. Sources are recorded on each donation, so no Google account is needed to read this card.', 'charitable' );
+					}
+					?>
+				</p>
+				<?php
+				return ob_get_clean();
+			}
+
+			// Five is what fits the rail without a scrollbar; the tail is summarised below.
+			$shown = array_slice( $rows, 0, 5 );
+			$rest  = count( $rows ) - count( $shown );
+			?>
+			<div class="the-graph">
+				<div class="the-legend">
+					<ul>
+						<?php
+						foreach ( $shown as $source ) :
+							$share = $total > 0 ? round( ( $source['amount'] / $total ) * 100, 1 ) : 0;
+							?>
+							<li class="charitable-reports-v3-pm-row">
+								<span class="charitable-reports-v3-pm-name"><?php echo esc_html( $source['label'] ); ?></span>
+								<span class="charitable-reports-v3-pm-amount">
+									<?php
+									echo esc_html(
+										sprintf(
+											/* translators: 1: formatted money amount. 2: share of the attributed total as a percentage. */
+											_x( '%1$s &middot; %2$s%%', 'donation source amount and share', 'charitable' ),
+											charitable_format_money( $source['amount'] ),
+											number_format_i18n( $share, 1 )
+										)
+									);
+									?>
+								</span>
+								<span class="charitable-reports-v3-pm-bar"><i style="width: <?php echo esc_attr( min( 100, $share ) ); ?>%;"></i></span>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				</div><!-- /.the-legend -->
+			</div>
+			<?php
+			/*
+			The coverage line is not decoration. A source list showing only what it could attribute
+			reads as the whole picture, and on any site that added tracking part-way through it is
+			not - so the count that could not be attributed is stated rather than quietly dropped.
+			*/
+			?>
+			<p class="charitable-reports-v3-sources-note">
+				<?php
+				if ( $unattributed > 0 ) {
+					printf(
+						/* translators: 1: number of donations with a known source. 2: number without one. */
+						esc_html__( '%1$s attributed, %2$s without a source.', 'charitable' ),
+						esc_html( number_format_i18n( $attributed ) ),
+						esc_html( number_format_i18n( $unattributed ) )
+					);
+				} else {
+					printf(
+						/* translators: %s: number of donations with a known source. */
+						esc_html__( 'All %s donations attributed.', 'charitable' ),
+						esc_html( number_format_i18n( $attributed ) )
+					);
+				}
+
+				if ( $rest > 0 ) {
+					echo ' ';
+					printf(
+						/* translators: %s: number of further sources not shown. */
+						esc_html__( '%s more source(s) not shown.', 'charitable' ),
+						esc_html( number_format_i18n( $rest ) )
+					);
+				}
+				?>
+			</p>
+			<?php
+
+			return ob_get_clean();
+		}
+
+		/**
+		 * Recurring giving as it stands, or null when the addon is not present.
+		 *
+		 * WHY LITE HAS THIS AT ALL. The Recurring Donations addon's only activation gate is
+		 * Charitable core at 1.6.51+ - it carries no Pro check and no licence check - so it runs
+		 * on Lite, and a Lite site with it active has real recurring revenue to report. Showing
+		 * that site a blurred "upgrade" card would be telling somebody to buy what they already
+		 * own. The companion locked card is for the sites that genuinely do not have it.
+		 *
+		 * NO READ OF get_mrr_data(), and that is the substantive decision here. The addon's
+		 * Charitable_Report_Advanced_Recurring::get_mrr_data() reaches each plan's amount through
+		 * a chain of LEFT JOINs and, when any hop misses, contributes 0.0 while still counting the
+		 * plan as active - silently. So the card shows no MRR at all and leads with "Due Next 30
+		 * Days", which is derived here, exactly, from public accessors.
+		 *
+		 * NO MINIMUM ADDON VERSION, and that is a choice rather than an oversight. The gate is a
+		 * capability check on the class this actually uses, because a version number cannot say
+		 * whether a method exists on a customer's install, and every accessor reached from here
+		 * has been public since Recurring 1.1 - verified present in 1.5.8 as well as 2.3.6. The
+		 * one thing a version floor would buy: below 2.3.3 the per-plan loop in
+		 * get_recurring_due_soon() triggers "Creation of dynamic property" deprecations on
+		 * PHP 8.2+, bounded by that method's five-minute transient. A card withheld is worse than
+		 * some log noise on an install that is already behind.
+		 *
+		 * NO DATE RANGE, also deliberate. Every figure here describes the present or the near
+		 * future, so there is no range to honour; each tile label names its own window instead.
+		 *
+		 * Returns null - not zeroes - when the addon is absent, so the view renders the locked
+		 * card rather than an empty live one.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @return array|null
+		 */
+		public function get_recurring_revenue() {
+
+			if ( ! class_exists( 'Charitable_Recurring_Donation' ) ) {
+				return null;
+			}
+
+			$counts = $this->get_recurring_plan_counts();
+
+			/*
+			No active plans and nothing lapsed is a site that has the addon installed and has never
+			used it. The card would be three zeroes, which says less than no card at all.
+
+			The lapsed count is part of that test deliberately. A site whose plans have every one
+			gone on hold reports active = 0, and that is the state where this card is worth the
+			most - it is the only place on the page that would say so.
+			*/
+			if ( $counts['active'] <= 0 && $counts['attention'] <= 0 ) {
+				return null;
+			}
+
+			$due = $this->get_recurring_due_soon();
+
+			return array(
+				'active'    => $counts['active'],
+				'periods'   => $due['periods'],
+				'due'       => $due,
+				'attention' => array(
+					'total'   => $counts['attention'],
+					'onhold'  => $counts['onhold'],
+					'expired' => $counts['expired'],
+				),
+			);
+		}
+
+		/**
+		 * Active, on-hold and expired recurring plan counts.
+		 *
+		 * wp_count_posts() rather than a query per status: it is one cached call for all of them,
+		 * and it counts the same post statuses the addon registers.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @return array { active: int, onhold: int, expired: int, attention: int }
+		 */
+		private function get_recurring_plan_counts() {
+
+			$counts  = (array) wp_count_posts( 'recurring_donation' );
+			$active  = isset( $counts['charitable-active'] ) ? (int) $counts['charitable-active'] : 0;
+			$onhold  = isset( $counts['charitable-onhold'] ) ? (int) $counts['charitable-onhold'] : 0;
+			$expired = isset( $counts['charitable-expired'] ) ? (int) $counts['charitable-expired'] : 0;
+
+			return array(
+				'active'    => $active,
+				'onhold'    => $onhold,
+				'expired'   => $expired,
+				'attention' => $onhold + $expired,
+			);
+		}
+
+		/**
+		 * The charges the active plans have scheduled in the next 30 days.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @return array { amount: float, count: int, plans: array, periods: string }
+		 */
+		private function get_recurring_due_soon() {
+
+			$cached = get_transient( 'charitable_reports_recurring_due_v3' );
+
+			if ( is_array( $cached ) ) {
+				return $cached;
+			}
+
+			$due = array(
+				'amount'  => 0.0,
+				'count'   => 0,
+				'plans'   => array(),
+				'periods' => '',
+			);
+
+			if ( ! class_exists( 'Charitable_Recurring_Donation' ) ) {
+				return $due;
+			}
+
+			$ids = get_posts(
+				array(
+					'post_type'        => 'recurring_donation',
+					'post_status'      => array( 'charitable-active' ),
+					'posts_per_page'   => 500,
+					'fields'           => 'ids',
+					'no_found_rows'    => true,
+					'suppress_filters' => false,
+				)
+			);
+
+			$now     = time();
+			$horizon = $now + ( 30 * DAY_IN_SECONDS );
+			$rows    = array();
+			$periods = array();
+
+			foreach ( (array) $ids as $id ) {
+				$plan = new Charitable_Recurring_Donation( $id );
+
+				/*
+				Tallied HERE, above the date filters, because it describes every active plan and
+				not only the ones charging inside the horizon. Below the `continue`s it would
+				silently become "the period mix of the plans due this month", which is a different
+				claim printed under a label reading "Active Plans".
+				*/
+				if ( method_exists( $plan, 'get_donation_period' ) ) {
+					$period = (string) $plan->get_donation_period();
+
+					if ( '' !== $period ) {
+						$periods[ $period ] = isset( $periods[ $period ] ) ? $periods[ $period ] + 1 : 1;
+					}
+				}
+
+				if ( ! method_exists( $plan, 'get_renewal_date' ) ) {
+					continue;
+				}
+
+				$date = (string) $plan->get_renewal_date( 'Y-m-d' );
+
+				if ( '' === $date ) {
+					continue;
+				}
+
+				$when = strtotime( $date );
+
+				// A renewal date in the PAST is not a charge coming up. Stale plans on a site
+				// whose cron has not run would otherwise be counted as though due tomorrow.
+				if ( false === $when || $when < $now || $when > $horizon ) {
+					continue;
+				}
+
+				$amount = method_exists( $plan, 'get_recurring_donation_amount' )
+					? (float) $plan->get_recurring_donation_amount()
+					: 0.0;
+
+				$due['amount'] += $amount;
+				++$due['count'];
+
+				$rows[] = array(
+					'timestamp' => $when,
+					'date'      => date_i18n( 'F j, Y', $when ),
+					'donor'     => $this->get_recurring_donor_name( $plan ),
+					'campaign'  => $this->get_recurring_campaign_name( $plan ),
+					'amount'    => $amount,
+				);
+			}
+
+			// Soonest first. The table answers "what happens next", so the order carries as much
+			// as the rows do, and get_posts() returned them by post date.
+			usort(
+				$rows,
+				function ( $a, $b ) {
+					return $a['timestamp'] - $b['timestamp'];
+				}
+			);
+
+			/*
+			Six rows, so the card stays about the height of the ones beside it on a site with
+			hundreds of plans. Truncating cannot misstate anything: the tile above the table
+			carries the full count and the full amount, and both come from the loop above rather
+			than from what survived this slice.
+			*/
+			$due['plans'] = array_slice( $rows, 0, 6 );
+
+			// Formatted here rather than in the view: "all monthly" versus a two-period list is
+			// branching logic, and a template is the wrong place to keep it.
+			$due['periods'] = $this->format_recurring_period_mix( $periods );
+
+			set_transient( 'charitable_reports_recurring_due_v3', $due, 5 * MINUTE_IN_SECONDS );
+
+			return $due;
+		}
+
+		/**
+		 * A recurring plan's donor name, or a stated fallback.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @param  object $plan The recurring donation.
+		 * @return string
+		 */
+		private function get_recurring_donor_name( $plan ) {
+
+			$name = '';
+
+			if ( ! method_exists( $plan, 'get_donor' ) ) {
+				return __( 'Unknown donor', 'charitable' );
+			}
+
+			$donor = $plan->get_donor();
+
+			if ( ! is_object( $donor ) ) {
+				return __( 'Unknown donor', 'charitable' );
+			}
+
+			if ( method_exists( $donor, 'get_name' ) ) {
+				$name = trim( html_entity_decode( (string) $donor->get_name(), ENT_QUOTES, 'UTF-8' ) );
+			}
+
+			if ( '' === $name && method_exists( $donor, 'get_donor_meta' ) ) {
+				// get_donor_meta() returns null for a key it cannot resolve and an array when
+				// called with no key at all, so neither result can be cast to a string blind.
+				$first = $donor->get_donor_meta( 'first_name' );
+				$last  = $donor->get_donor_meta( 'last_name' );
+				$first = is_scalar( $first ) ? (string) $first : '';
+				$last  = is_scalar( $last ) ? (string) $last : '';
+				$name  = trim( $first . ' ' . $last );
+			}
+
+			// A plan always has a date and an amount, so a missing name must not blank the row -
+			// the rest of it is still the most useful thing on the card.
+			return '' !== $name ? $name : __( 'Unknown donor', 'charitable' );
+		}
+
+		/**
+		 * The campaign(s) a recurring plan gives to, or an em dash.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @param  object $plan The recurring donation.
+		 * @return string
+		 */
+		private function get_recurring_campaign_name( $plan ) {
+
+			if ( ! method_exists( $plan, 'get_campaigns_donated_to' ) ) {
+				return '—';
+			}
+
+			$campaigns = trim( (string) $plan->get_campaigns_donated_to() );
+
+			return '' !== $campaigns ? $campaigns : '—';
+		}
+
+		/**
+		 * "All monthly", or the two commonest periods, for the Active Plans caption.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @param  array $periods Period slug => count of active plans on it.
+		 * @return string
+		 */
+		private function format_recurring_period_mix( $periods ) {
+
+			$labels = array(
+				'day'        => __( 'daily', 'charitable' ),
+				'week'       => __( 'weekly', 'charitable' ),
+				'month'      => __( 'monthly', 'charitable' ),
+				'quarter'    => __( 'quarterly', 'charitable' ),
+				'semiannual' => __( 'twice yearly', 'charitable' ),
+				'year'       => __( 'yearly', 'charitable' ),
+			);
+
+			$named = array_intersect_key( (array) $periods, $labels );
+
+			if ( empty( $named ) ) {
+				return '';
+			}
+
+			// Commonest first, so a mixed site leads with the period that describes most of it.
+			arsort( $named );
+
+			if ( 1 === count( $named ) ) {
+				$only = key( $named );
+
+				return sprintf(
+					/* translators: %s: a billing period, e.g. "monthly". */
+					__( 'All %s', 'charitable' ),
+					$labels[ $only ]
+				);
+			}
+
+			/*
+			Two at most. A site with four periods in play would otherwise wrap this caption onto
+			three lines inside a tile a quarter of the card wide, and the tail of that list is the
+			part nobody needs - the footer leads to the full list.
+			*/
+			$parts = array();
+
+			foreach ( array_slice( $named, 0, 2, true ) as $slug => $count ) {
+				$parts[] = sprintf(
+					/* translators: 1: number of plans. 2: a billing period, e.g. "monthly". */
+					__( '%1$s %2$s', 'charitable' ),
+					number_format_i18n( $count ),
+					$labels[ $slug ]
+				);
+			}
+
+			return implode( __( ', ', 'charitable' ), $parts );
+		}
+
+		/**
+		 * Abandoned and recovered donation figures, or null when the addon is not present.
+		 *
+		 * Like the recurring card above, this exists in Lite because the Donation Recovery addon
+		 * CAN run here: its gate is charitable_is_pro(), which is licence-derived rather than
+		 * edition-derived, so a Lite install carrying a valid licence satisfies it. All the
+		 * figures come from the addon's own public analytics class.
+		 *
+		 * Every method is capability-checked before it is called, so a future addon release that
+		 * drops one of them degrades to the locked card instead of fatally.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @param  array $args Report args carrying start_date and end_date.
+		 * @return array|null
+		 */
+		public function get_abandoned_donations( $args = array() ) {
+
+			if ( ! class_exists( 'Charitable_Donation_Recovery_Analytics' ) ) {
+				return null;
+			}
+
+			$analytics = new Charitable_Donation_Recovery_Analytics();
+
+			foreach ( array( 'get_total_abandoned', 'get_total_recovered', 'get_recovery_rate' ) as $method ) {
+				if ( ! method_exists( $analytics, $method ) ) {
+					return null;
+				}
+			}
+
+			$start = ! empty( $args['start_date'] ) ? gmdate( 'Y-m-d 00:00:00', strtotime( $args['start_date'] ) ) : gmdate( 'Y-m-01 00:00:00' );
+			$end   = ! empty( $args['end_date'] ) ? gmdate( 'Y-m-d 23:59:59', strtotime( $args['end_date'] ) ) : gmdate( 'Y-m-t 23:59:59' );
+
+			return array(
+				'abandoned' => (int) $analytics->get_total_abandoned( $start, $end ),
+				'recovered' => (int) $analytics->get_total_recovered( $start, $end ),
+				'rate'      => (float) $analytics->get_recovery_rate( $start, $end ),
+				'revenue'   => method_exists( $analytics, 'get_recovered_revenue' )
+					? (float) $analytics->get_recovered_revenue( $start, $end )
+					: 0.0,
+			);
 		}
 
 		/**

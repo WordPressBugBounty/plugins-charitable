@@ -93,8 +93,21 @@ if ( ! class_exists( 'Charitable_Reports_Download' ) ) :
 					$this->generate_overview_content( $action );
 					break;
 
+				/*
+				RETURN, not break. This handler runs on admin_init ahead of the other export
+				handlers and shares their nonce, so every charitable_report_* POST reaches it -
+				but $report_type is only the text after the LAST underscore, which means it
+				recognises just two of them. Breaking here fell through to the exit below and
+				killed the request with an empty response before the handler that owns the
+				action ever ran.
+
+				charitable_report_download_overview_summary (Export CSV) resolves to "summary"
+				and was the one that broke, because it is the only export registered after this
+				one; the earlier handlers had already exited by the time it ran. Returning leaves
+				the request alive for whoever does own the action.
+				*/
 				default:
-					break;
+					return;
 			}
 
 			exit;
@@ -260,8 +273,18 @@ if ( ! class_exists( 'Charitable_Reports_Download' ) ) :
 					'donation_breakdown_html'       => $charitable_reports->generate_donations_breakdown_rows( $donation_breakdown, $refunds_data ),
 					'activity_list'                 => $charitable_reports->generate_activity_list( $report_activity, $include_icons ),
 					'top_donors'                    => $charitable_reports->generate_top_donors( $top_donors, $include_icons ),
-					'top_campaigns'                 => $charitable_reports->generate_top_campaigns( $top_campaigns, $include_icons ),
-					'payment_methods_list'          => $charitable_reports->generate_payment_methods_list( $payment_breakdown, $include_icons ),
+					/*
+					layout => classic for both. The printed report's stylesheet is built around
+					the list markup, and the gate that selects the Reports Overview's reworked
+					table/bar markup is true for this request too - get_current_screen() is still
+					the Reports screen, because this form posts back to that page. So the two
+					callers that must stay classic say so explicitly rather than relying on
+					request context.
+
+					@since 1.8.14
+					*/
+					'top_campaigns'                 => $charitable_reports->generate_top_campaigns( $top_campaigns, $include_icons, array( 'layout' => 'classic' ) ),
+					'payment_methods_list'          => $charitable_reports->generate_payment_methods_list( $payment_breakdown, $include_icons, array( 'layout' => 'classic' ) ),
 					'headline_chart_options'        => array(
 						'donation_axis' => (array) $charitable_reports->donation_axis,
 						'date_axis'     => (array) $charitable_reports->date_axis,
@@ -733,6 +756,175 @@ if ( ! class_exists( 'Charitable_Reports_Download' ) ) :
 			}
 
 			return $advanced_data;
+		}
+
+		/**
+		 * Export the page-level overview summary as a CSV.
+		 *
+		 * Distinct from download_donations_breakdown(), which is the per-day table. This is the
+		 * headline figures, the comparison and the payment split - the summary somebody actually
+		 * wants off this screen, and the reason the Export CSV button waited until there was a
+		 * handler behind it: offering the breakdown card's own per-day export at page level would
+		 * have misdescribed its scope.
+		 *
+		 * @since 1.8.14
+		 *
+		 * @return void
+		 */
+		public function download_overview_summary() {
+
+			if ( ! isset( $_POST['charitable_export_report_nonce'], $_POST['charitable_report_action'] ) ) {
+				return;
+			}
+
+			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['charitable_export_report_nonce'] ) ), 'charitable_export_report' ) ) {
+				return;
+			}
+
+			if ( ! current_user_can( 'manage_options' ) ) {
+				return;
+			}
+
+			if ( 'charitable_report_download_overview_summary' !== $_POST['charitable_report_action'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				return;
+			}
+
+			$args = wp_parse_args(
+				array(
+					'start_date'  => isset( $_POST['start_date'] ) ? sanitize_text_field( wp_unslash( $_POST['start_date'] ) ) : false, // phpcs:ignore WordPress.Security.NonceVerification.Missing
+					'end_date'    => isset( $_POST['end_date'] ) ? sanitize_text_field( wp_unslash( $_POST['end_date'] ) ) : false, // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+					/*
+					INTVAL, not absint. "All Campaigns" posts -1, and absint would turn that into
+					1 - so the export would silently filter to whichever campaign happens to have
+					ID 1 and report every headline figure as zero while the screen above it showed
+					the real ones. -1 is the sentinel the screen and the print path both use, so it
+					has to survive the read.
+					*/
+					'campaign_id' => isset( $_POST['campaign_id'] ) ? intval( $_POST['campaign_id'] ) : false, // phpcs:ignore WordPress.Security.NonceVerification.Missing
+					'category_id' => isset( $_POST['category_id'] ) ? absint( $_POST['category_id'] ) : false, // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				),
+				array(
+					'start_date'  => false,
+					'end_date'    => false,
+					'campaign_id' => false,
+					'category_id' => false,
+					'status'      => false,
+				)
+			);
+
+			$this->columns = array(
+				'metric' => __( 'Metric', 'charitable' ),
+				'value'  => __( 'Value', 'charitable' ),
+			);
+
+			$reports = Charitable_Reports::get_instance();
+			$reports->init_with_array( 'overview', $args );
+
+			$donations = $reports->get_donations();
+			$count     = is_array( $donations ) ? count( $donations ) : 0;
+			$total     = (float) $reports->get_donations_total();
+			$refunds   = $reports->get_refunds();
+			$average   = $count > 0 ? $total / $count : 0.0;
+
+			/*
+			The money formatter returns the currency symbol HTML-encoded, which is what the screen
+			wants and what a spreadsheet does not: the cells would read "&#36;86.00". Same decode
+			download_activities() already does to its amount column.
+
+			Every caller passes a raw float, so db_format = true: $total from
+			get_donations_total(), $average derived from it, the refunds SUM and the per-gateway
+			(float) amounts. The period in "101.78" is a decimal point and must not be stripped as
+			a thousands separator on comma-decimal sites.
+			*/
+			$charitable_money = function ( $amount ) {
+				return html_entity_decode( trim( charitable_format_money( $amount, false, true ) ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+			};
+
+			$rows = array(
+				array(
+					'metric' => __( 'Date range', 'charitable' ),
+					'value'  => $args['start_date'] . ' - ' . $args['end_date'],
+				),
+				array(
+					'metric' => __( 'Net donations', 'charitable' ),
+					'value'  => $charitable_money( $total ),
+				),
+				array(
+					'metric' => __( 'Donations', 'charitable' ),
+					'value'  => $count,
+				),
+				array(
+					'metric' => __( 'Average donation', 'charitable' ),
+					'value'  => $charitable_money( $average ),
+				),
+				array(
+					'metric' => __( 'Donors', 'charitable' ),
+					'value'  => (int) $reports->get_donors_count(),
+				),
+				array(
+					'metric' => __( 'Refunds', 'charitable' ),
+					'value'  => $charitable_money( isset( $refunds['total_amount'] ) ? $refunds['total_amount'] : 0 ),
+				),
+				array(
+					'metric' => __( 'Refund count', 'charitable' ),
+					'value'  => isset( $refunds['total_count'] ) ? (int) $refunds['total_count'] : 0,
+				),
+			);
+
+			/*
+			The comparison, when there is one. Named with the period it is against, for the same
+			reason the tiles carry a caption: a percentage in a spreadsheet cell with no stated
+			baseline is a number somebody will quote at a board meeting without knowing what it
+			means.
+			*/
+			if ( method_exists( $reports, 'get_previous_period_comparison' ) ) {
+				$trends = $reports->get_previous_period_comparison( $args );
+
+				if ( '' !== $reports->comparison_range_label ) {
+					$rows[] = array(
+						'metric' => __( 'Compared with', 'charitable' ),
+						'value'  => $reports->comparison_range_label,
+					);
+
+					foreach ( array(
+						'donations' => __( 'Net donations change', 'charitable' ),
+						'average'   => __( 'Average donation change', 'charitable' ),
+						'donors'    => __( 'Donors change', 'charitable' ),
+						'refunds'   => __( 'Refunds change', 'charitable' ),
+					) as $key => $label ) {
+						if ( ! empty( $trends[ $key ] ) ) {
+							$rows[] = array(
+								'metric' => $label,
+								'value'  => $trends[ $key ],
+							);
+						}
+					}
+				}
+			}
+
+			// The payment split, one gateway per line, so it sorts and sums in a spreadsheet.
+			$payments = $reports->get_donations_by_payment();
+
+			if ( ! empty( $payments['donations'] ) ) {
+				foreach ( $payments['donations'] as $data ) {
+					$amount = isset( $data['amount'] ) ? (float) $data['amount'] : 0.0;
+
+					if ( $amount <= 0 ) {
+						continue;
+					}
+
+					$rows[] = array(
+						/* translators: %s: a payment gateway's name. */
+						'metric' => sprintf( __( 'Received via %s', 'charitable' ), isset( $data['label'] ) ? $data['label'] : '' ),
+						'value'  => $charitable_money( $amount ),
+					);
+				}
+			}
+
+			$this->export( $rows, 'overview-summary' );
+
+			exit;
 		}
 
 		/**

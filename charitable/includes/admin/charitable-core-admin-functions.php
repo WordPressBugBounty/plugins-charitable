@@ -1912,3 +1912,54 @@ function charitable_render_global_upgrade_features_right() {
 
 	return $output;
 }
+/**
+ * The trend arrow and figure for a percentage change.
+ *
+ * One arrow rather than several that drift. charitable-admin-dashboard.js necessarily keeps its
+ * own copy, because it builds this markup client-side from the AJAX payload - the two are kept
+ * deliberately identical, including the two path strings and the two fills.
+ *
+ * The class is the part that matters: charitable-admin-dashboard.css has carried
+ * -positive / -negative / -zero since 1.8.8 while nothing in Lite emitted them, so the base
+ * class's hardcoded green would have applied to falls as well as rises. Anything calling this
+ * gets the figure coloured to agree with its arrow.
+ *
+ * The two fills are the ones the shipping stylesheet pairs these classes with, and are left as
+ * they are rather than converted - canon brand green is #31714c, which is not what a
+ * rise/fall semantic pair wants.
+ *
+ * @since 1.8.14
+ *
+ * @param  string $change Signed percentage as produced by the reports comparison, e.g. "+18.4%"
+ *                        or "-98.8%". The string already carries its own '%'. Empty or "0%"
+ *                        renders nothing.
+ * @return string HTML, or '' when there is nothing to show.
+ */
+function charitable_get_stat_change_html( $change ) {
+
+	$change = (string) $change;
+
+	if ( '' === $change || '0%' === $change ) {
+		return '';
+	}
+
+	$is_negative = 0 === strpos( $change, '-' );
+	$modifier    = $is_negative ? 'negative' : 'positive';
+	$fill        = $is_negative ? '#DC2626' : '#31944D';
+
+	// A stepped arrow rising, and its mirror falling.
+	$path = $is_negative
+		? 'M1.82849 3.47493L1.07562 4.196L5.05505 8.03311L7.20609 5.97292L10.0024 8.62542H8.60426V9.65552H11.8308V6.56523H10.7553V7.90435L7.20609 4.50503L5.05505 6.56523L1.82849 3.47493Z'
+		: 'M1.82849 9.52507L1.07562 8.804L5.05505 4.96689L7.20609 7.02708L10.0024 4.37458H8.60426V3.34448H11.8308V6.43477H10.7553V5.09565L7.20609 8.49497L5.05505 6.43477L1.82849 9.52507Z';
+
+	return sprintf(
+		'<span class="charitable-dashboard-v2-stat-change charitable-dashboard-v2-stat-change-%1$s">'
+			. '<svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+			. '<path d="%2$s" fill="%3$s"/>'
+			. '</svg>%4$s</span>',
+		esc_attr( $modifier ),
+		esc_attr( $path ),
+		esc_attr( $fill ),
+		esc_html( $change )
+	);
+}

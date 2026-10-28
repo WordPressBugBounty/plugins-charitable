@@ -72,8 +72,17 @@ if ( ! class_exists( 'Charitable_Admin_Pointers' ) ) :
 				return;
 			}
 
-			// Don't show this immediately for new users.
-			$slug = 'donor-pointers';
+			/*
+			Don't show this immediately for new users.
+
+			A NEW SLUG, not the old 'donor-pointers'. The transient below suppresses the pointer
+			once it has been seen, so reusing the donor slug would mean every site that already
+			dismissed the donor-management pointer never sees this one - which is the opposite of
+			the point, since the message is different. A new slug gives it a fresh impression.
+
+			@since 1.8.14
+			*/
+			$slug = 'reports-pointers';
 
 			// determine when to display this message. for now, there should be some sensible boundaries before showing the notification: a minimum of 14 days of use, created one donation form and received at least one donation.
 			$activated_datetime = ( false !== get_option( 'wpcharitable_activated_datetime' ) ) ? get_option( 'wpcharitable_activated_datetime' ) : false;
@@ -87,8 +96,8 @@ if ( ! class_exists( 'Charitable_Admin_Pointers' ) ) :
 			$count_campaigns = wp_count_posts( 'campaign' );
 			$total_campaigns = isset( $count_campaigns->publish ) ? $count_campaigns->publish : 0;
 
-			// If days is at least 1 and the user isn't already on the 'charitable-donors' page, show the pointer.
-			if ( $days >= apply_filters( 'charitable_days_since_activated', 1 ) && isset( $_GET['page'] ) && $_GET['page'] !== 'charitable-donors' ) { // phpcs:ignore
+			// If days is at least 1 and the user isn't already on the 'charitable-reports' page, show the pointer.
+			if ( $days >= apply_filters( 'charitable_days_since_activated', 1 ) && isset( $_GET['page'] ) && $_GET['page'] !== 'charitable-reports' ) { // phpcs:ignore
 				// check transient.
 				$help_pointers = get_transient( 'charitable_' . $slug . '_onboarding' );
 
@@ -119,27 +128,52 @@ if ( ! class_exists( 'Charitable_Admin_Pointers' ) ) :
 				return;
 			}
 
-			// These pointers will chain - they will not be shown at once.
+			/*
+			POINTS AT REPORTS, not Donors, as of 1.8.14.
+
+			The key is 'reports' rather than the old 'tools'. That key is what gets written into
+			the charitable-pointer-slug-dismissed user meta, so renaming it means a user who
+			dismissed the donor pointer is not silently opted out of this one. ('tools' was a
+			misnomer for a pointer aimed at the Donors menu item in any case.)
+
+			NO UPGRADE LINK, which is a change of intent rather than an omission. The old pointer
+			sold Pro donor management. This one announces an improvement that is free and already
+			installed, and "we improved your reports, now buy Pro" reads as a bait in one
+			tooltip. The Reports page it opens carries its own upsell cards, so the selling
+			happens at the destination where the reader can see what they would get.
+
+			The target class is the one WordPress actually renders for this submenu item -
+			li.reports, verified in the DOM rather than inferred from the donors entry.
+
+			@since 1.8.14
+			*/
 			$this->pointers = array(
 				'pointers' => array(
-					'tools'     => array(
-						'target'       => '#toplevel_page_charitable ul li.donors',
+					'reports'   => array(
+						'target'       => '#toplevel_page_charitable ul li.reports',
 						'next'         => false,
 						'next_trigger' => array(),
 						'options'      => array(
-							'content'      => '<h3>' . esc_html__( 'New Donor Management', 'charitable' ) . '</h3>' .
-											'<p>' . sprintf(
-												/* translators: %s: URL to upgrade to Pro */
-												esc_html__( 'Maintain detailed donor profiles, monitor donation histories, and streamline your communication with supporters. Consider upgrading to %s.', 'charitable' ),
-												'<a href="' . charitable_utm_link( 'https://wpcharitable.com/pricing/', 'donor-pointers', 'upgrade-to-pro' ) . '">Charitable Pro</a>'
-											) . '</p>',
+							/*
+							"include the change from", NOT "compare against".
+
+							Both describe the same thing - a signed percentage and an arrow on each
+							headline tile, measured against the preceding period of equal length - but
+							"compare" is the NAME of a Pro feature this release deliberately does not
+							ship: the Compare dialog that puts two arbitrary ranges side by side. A Lite
+							reader seeing "compare" in a tooltip about their own reports will reasonably
+							go looking for that control and not find it. The claim was accurate and the
+							wording was still wrong.
+							*/
+							'content'      => '<h3>' . esc_html__( 'Improved Reporting', 'charitable' ) . '</h3>' .
+											'<p>' . esc_html__( 'The Reports page has been redesigned. Headline figures now include the change from the previous period, long date ranges group by week or month, and new cards show where your donations are coming from.', 'charitable' ) . '</p>',
 							'position'     => array(
 								'edge'  => 'left',
 								'align' => 'left',
 							),
 							'visit_button' => array(
-								'url'   => admin_url( 'admin.php?page=charitable-donors' ),
-								'label' => esc_html__( 'Go Here', 'charitable' ),
+								'url'   => admin_url( 'admin.php?page=charitable-reports' ),
+								'label' => esc_html__( 'View Reports', 'charitable' ),
 							),
 						),
 					),
@@ -205,7 +239,7 @@ if ( ! class_exists( 'Charitable_Admin_Pointers' ) ) :
 							console.warn( 'Charitable: WordPress pointer function not available' );
 							return;
 						}
-						
+
 						var pointer = wpchar_pointers.pointers[ id ];
 						var options = $.extend( pointer.options, {
 							pointerClass: 'wp-pointer charitable-pointer',

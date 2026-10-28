@@ -112,6 +112,31 @@ if ( ! class_exists( 'Charitable_Reports_Ajax' ) ) :
 
 			$payment_breakdown = $charitable_reports->get_donations_by_payment();
 
+			/*
+			BUCKET HERE TOO, not only in the view.
+
+			Bucketing in views/reports/overview.php alone would mean filtering the page skipped it
+			entirely: this handler would send the raw daily rows and the raw daily axis, so a
+			92-day filter would produce 92 x-axis labels and daily table rows while the same range
+			typed into the URL produced 14 weekly ones - the same report disagreeing with itself
+			depending on how you asked for it.
+
+			AFTER init_axis_with_donations() above, which sets the unbucketed axes; bucket_for_range()
+			overwrites $charitable_reports->donation_axis and ->date_axis with the bucketed series,
+			and those two properties are read into the response below.
+
+			@since 1.8.14
+			*/
+			$charitable_reports_granularity = 'day';
+
+			if ( function_exists( 'charitable_reports_v3_enabled' ) && charitable_reports_v3_enabled() ) {
+				$charitable_bucketed = $charitable_reports->bucket_for_range( $donation_breakdown, $refunds_data, $start_date, $end_date );
+
+				$charitable_reports_granularity = $charitable_bucketed['granularity'];
+				$donation_breakdown             = $charitable_bucketed['rows'];
+				$refunds_data                   = $charitable_bucketed['refunds'];
+			}
+
 			$top_donors = $charitable_reports->get_top_donors_overview();
 
 			// campaigns.
@@ -138,6 +163,31 @@ if ( ! class_exists( 'Charitable_Reports_Ajax' ) ) :
 			$report_html['html']['activities']                           = $charitable_reports->generate_activity_list( $report_activity );
 			$report_html['html']['top_donors_list']                      = $charitable_reports->generate_top_donors( $top_donors );
 			$report_html['html']['top_campaigns_list']                   = $charitable_reports->generate_top_campaigns( $top_campaigns );
+
+			/*
+			The pieces of the reworked Overview the filter has to replace.
+
+			Each of these is server-rendered markup or a sentence that describes the RANGE, so left
+			alone they keep describing the range the page first loaded with. That is the whole class
+			of bug this block exists to prevent - a tile reading "$86.00" over "0 donations ·
+			vs. Sep 8 - Sep 15", the figure refreshed and the caption stale.
+
+			The quiet note is computed AFTER generate_donations_breakdown_rows() above, because it
+			reads the $breakdown_empty_days that method sets as it renders - so the count cannot
+			disagree with the number of rows actually marked.
+
+			@since 1.8.14
+			*/
+			if ( function_exists( 'charitable_reports_v3_enabled' ) && charitable_reports_v3_enabled() ) {
+				$report_html['v3_granularity'] = $charitable_reports->get_breakdown_granularity_label( $charitable_reports_granularity );
+				$report_html['v3_quiet_note']  = $charitable_reports->get_breakdown_quiet_note_html( $charitable_reports_granularity, $charitable_reports->breakdown_empty_days );
+				$report_html['v3_tiles']       = $charitable_reports->get_headline_tiles( $args );
+
+				$report_html['html']['donation_sources_list'] = $charitable_reports->generate_donation_sources_list(
+					$charitable_reports->get_donation_attribution( $args ),
+					$charitable_reports->addon_is_installed( 'charitable-google-analytics' )
+				);
+			}
 
 			// Cache via transients the 'charitable_report_overview_args' for 1 hour.
 			$charitable_report_overview_args = array(

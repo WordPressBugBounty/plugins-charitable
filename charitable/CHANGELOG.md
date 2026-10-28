@@ -1,3 +1,12 @@
+# 1.8.14
+* NEW: Redesigned reporting dashboard. Headline figures now include the change from the previous period, the donations chart sits inside its breakdown card, long date ranges group by week or month, and new cards report donation sources, recurring revenue and donation recovery.
+* IMPROVED: Top Donors now shows each donor's initials, how many donations they have made and when they first gave.
+* IMPROVED: Top Campaigns is now a table, with each campaign's progress against its goal paced against the time it has left.
+* IMPROVED: Payment Methods now shows what each method took and its share of the total.
+* FIX: Donor figures are now more accurate overall. A donation with no donor attached could be counted as an extra donor, and Top Donors could list a deleted donor as "Unknown" or report half of a donor's actual total.
+* FIX: The Reports page is now more reliable.
+* FIX: Several PayPal issues that could leave a paid donation possibly stuck in Pending in certain scenarios have been resolved.
+
 # 1.8.13.2
 * FIX: Updating Ninja Forms to 3.15.6 no longer causes a critical error on sites running Charitable.
 
@@ -11,7 +20,6 @@
 * FIX: Donation form improvements related to Google reCAPTCHA and errors related to Stripe when confirming card details.
 * FIX: Donate button on a campaign page now carries the donation amount already highlighted.
 * FIX: Campaign templates now show a consistent campaign description in the builder preview and on the published page.
-
 
 # 1.8.13
 * NEW: Charitable now works with AI assistants. On WordPress 6.9 or later, connect Claude or ChatGPT using the free WPVibe plugin, or any MCP client, to build and restyle campaigns, log donations that arrived by post, and report on your fundraising. Twenty-four operations, all permission-checked. [More Information](https://www.wpcharitable.com/ai/)
@@ -852,7 +860,6 @@
 * FIX: In certain cases where Recurring Donations was active on a campaign, adding a custom donation amount would result in a notice about needing to donate more than $0. [#716](https://github.com/Charitable/Charitable/issues/716)
 * FIX: In some cases, if you try to access the donation receipt for a donation you don't have access to (or you need to log in for), the login form would appear twice. [#715](https://github.com/Charitable/Charitable/issues/715)
 * FIX: Improved how fields registered through the Fields APIs are sorted, allowing you to modify the position of a field by setting its `show_before` or `show_after` value. [#707](https://github.com/Charitable/Charitable/issues/707)
-
 
 # 1.6.26
 * FIX: Resolves a bug with Recurring Donations that resulted in a pre-set custom recurring donation amount not being registered as the active choice properly. [#713](https://github.com/Charitable/Charitable/issues/713)

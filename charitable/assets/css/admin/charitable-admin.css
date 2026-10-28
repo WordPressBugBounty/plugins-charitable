@@ -3041,7 +3041,7 @@ body.charitable_page_charitable-reports .charitable-report-card .the-list {
   margin-left: 10px;
   margin-right: 10px;
   max-height: 550px;
-  overflow: scroll;
+  overflow: auto;
   /* width: 100%; */
 }
 body.charitable_page_charitable-reports .charitable-report-card .the-list.charitable-no-scroll {
@@ -3154,7 +3154,7 @@ body.charitable_page_charitable-reports .charitable-the-list-container {
   margin-left: 10px;
   margin-right: 10px;
   max-height: 550px;
-  overflow: scroll;
+  overflow: auto;
 }
 body.charitable_page_charitable-reports .charitable-the-list-container.charitable-no-scroll {
   overflow: visible;
