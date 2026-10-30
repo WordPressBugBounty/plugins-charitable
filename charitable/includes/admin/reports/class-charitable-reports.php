@@ -922,8 +922,16 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 					'donations-made'      => __( 'Donations Made (All)', 'charitable' ),
 					'donations-made-paid' => __( 'Donations Made (Paid)', 'charitable' ),
 					'refunds'             => __( 'Refunds', 'charitable' ),
+					/*
+					 * 'user-comments' was offered here but nothing ever implemented it: there is
+					 * no comment activity table, no insert, and no case for it in
+					 * Charitable_Admin_Activities::get_activity(). Selecting it left $db_types
+					 * empty, which get_activity_db_data() reads as "no type filter", so the
+					 * report answered with every activity on the site instead.
+					 *
+					 * @since 1.8.14.1
+					 */
 					'campaigns-created'   => __( 'Campaigns Created', 'charitable' ),
-					'user-comments'       => __( 'User Comments', 'charitable' ),
 				)
 			);
 
@@ -1011,7 +1019,9 @@ if ( ! class_exists( 'Charitable_Reports' ) ) :
 									echo $action_label; // phpcs:ignore
 
 									?>
-									<span class="badge <?php echo esc_attr( $activity->status ); ?>"><?php echo esc_html( $activity->status_label ); ?></span>
+									<?php if ( ! empty( $activity->status_label ) ) : ?>
+										<span class="badge <?php echo esc_attr( $activity->status ); ?>"><?php echo esc_html( $activity->status_label ); ?></span>
+									<?php endif; ?>
 								</p>
 								<?php
 

@@ -285,13 +285,33 @@ if ( ! class_exists( 'Charitable_Site_Analysis' ) ) :
 				$this->fail_with_cache( __( 'The analysis service is unavailable right now. Please try again.', 'charitable' ), $cache );
 			}
 
-			// 4) Success: cache, stamp the rate limit, consent-gated usage check-in, return.
+			// 4) Success: consent-gated usage check-in, then cache, stamp the rate limit, return.
+			/*
+			THE CHECK-IN GOES FIRST, and that order is load-bearing rather than stylistic.
+
+			fire_usage_tracking() can write charitable_settings: it calls enable_usage_tracking()
+			when the consent box is ticked and usage tracking is currently off. That write fires
+			update_option_charitable_settings, which this class hooks to flush_cache() (see the
+			constructor), and flush_cache() deletes CACHE_TRANSIENT.
+
+			So with the check-in last, the report was cached and then deleted by a later line in the
+			same request - on the FIRST analysis of any default site, where tracking is off and the
+			consent box is ticked. It looked like it worked, because wp_send_json_success() still
+			returned the report and the browser rendered it; but the transient was gone, so
+			reloading the tab showed the pre-run screen and the next Run called the remote API
+			again. Only the first run was ever affected: after it, tracking is on, the guard in
+			fire_usage_tracking() is false, nothing writes charitable_settings, and nothing
+			flushes. That is why this survived to ship - it reads as a one-off glitch.
+
+			Running the check-in first means the flush happens while there is nothing to flush.
+			@since 1.8.14.1
+			*/
+			$this->fire_usage_tracking( $consent );
 			set_transient( self::CACHE_TRANSIENT, array( 'payload_hash' => $hash, 'result' => $report, 'time' => time() ), self::CACHE_TTL );
 			// Stamped outside the transient so flush_cache() cannot reset the cooldown. Only successes
 			// count, so a failed call stays retryable - which is what fail_with_cache()'s stale-report
 			// path and the JS retry link both assume.
 			update_option( self::LAST_RUN_OPTION, time(), false ); // autoload = no
-			$this->fire_usage_tracking( $consent );
 			wp_send_json_success( $report );
 		}
 

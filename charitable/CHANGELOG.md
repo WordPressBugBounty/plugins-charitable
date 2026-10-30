@@ -1,3 +1,10 @@
+# 1.8.14.1
+* FIX: Filtering the Reports dashboard no longer replaces the Activity timeline with sample data.
+* FIX: Activity timeline in reports - resolved "Unknown" entries issue.
+* FIX: A donation that has since been paid no longer carries a "Pending" label on the entry recording when it was made.
+* FIX: The activity type filters now narrow the report as intended, including when more than one type is in play.
+* FIX: The first Site Analysis report is now saved.
+
 # 1.8.14
 * NEW: Redesigned reporting dashboard. Headline figures now include the change from the previous period, the donations chart sits inside its breakdown card, long date ranges group by week or month, and new cards report donation sources, recurring revenue and donation recovery.
 * IMPROVED: Top Donors now shows each donor's initials, how many donations they have made and when they first gave.

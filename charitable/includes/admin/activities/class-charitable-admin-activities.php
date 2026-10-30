@@ -105,12 +105,44 @@ if ( ! class_exists( 'Charitable_Admin_Activities' ) ) :
 		 * @return bool
 		 */
 		public function maybe_use_activity_data_sample() {
-			// If lite version, give sample data to populate restricted area.
-			if ( ! charitable_is_pro() && ( ! isset( $_GET['page'] ) || ( 'charitable-reports' === $_GET['page'] && isset( $_GET['tab'] ) && 'activity' === $_GET['tab'] ) ) ) { // phpcs:ignore
-				return true;
+
+			return $this->is_activity_data_sample_context( charitable_is_pro(), $_GET ); // phpcs:ignore
+		}
+
+		/**
+		 * Decide whether sample activity data should stand in for real activity data.
+		 *
+		 * Kept free of superglobals and charitable_is_pro() so the decision itself can be tested.
+		 *
+		 * @since 1.8.14.1
+		 *
+		 * @param bool  $is_pro Whether this install is running Pro.
+		 * @param array $get    The request's query arguments, normally $_GET.
+		 *
+		 * @return bool
+		 */
+		public function is_activity_data_sample_context( $is_pro, $get = array() ) {
+
+			// Pro shows real activity everywhere.
+			if ( $is_pro ) {
+				return false;
 			}
 
-			return false;
+			/*
+			 * Only the Lite activity report itself gets sample data, and only to populate
+			 * the restricted/blurred area.
+			 *
+			 * This previously also returned true whenever 'page' was absent from the query
+			 * string. That is true of every admin-ajax.php request and every front-end
+			 * request, so on Lite real activity was replaced by sample rows well outside
+			 * the report - including the activity report's own filter request, which posts
+			 * to admin-ajax.php and therefore carries no 'page'.
+			 *
+			 * @since 1.8.14.1
+			 */
+			return isset( $get['page'], $get['tab'] )
+				&& 'charitable-reports' === $get['page']
+				&& 'activity' === $get['tab'];
 		}
 
 		/**
@@ -211,46 +243,51 @@ if ( ! class_exists( 'Charitable_Admin_Activities' ) ) :
 
 					switch ( sanitize_title( $activity_filter_type ) ) {
 						case 'donations-made':
-							$db_types               = $db_types + array( 'donation' );
-							$db_actions['donation'] = $db_actions['donation']
-														+ array(
-															'primary_action'   => 'charitable-completed',
-															'secondary_action' => false,
-														)
-														+ array(
-															'primary_action'   => 'charitable-pending',
-															'secondary_action' => false,
-														)
-														+ array(
-															'primary_action'   => 'charitable-failed',
-															'secondary_action' => false,
-														)
-														+ array(
-															'primary_action'   => 'charitable-refunded',
-															'secondary_action' => false,
-														);
+							$db_types                 = array_merge( $db_types, array( 'donation' ) );
+							$db_actions['donation'][] = array(
+								'primary_action'   => 'charitable-completed',
+								'secondary_action' => false,
+							);
+							$db_actions['donation'][] = array(
+								'primary_action'   => 'charitable-pending',
+								'secondary_action' => false,
+							);
+							$db_actions['donation'][] = array(
+								'primary_action'   => 'charitable-failed',
+								'secondary_action' => false,
+							);
+							$db_actions['donation'][] = array(
+								'primary_action'   => 'charitable-refunded',
+								'secondary_action' => false,
+							);
 							break;
 
 						case 'donations-made-paid':
-							$db_types               = $db_types + array( 'donation' );
-							$db_actions['donation'] = $db_actions['donation']
-														+ array(
-															'primary_action'   => 'charitable-completed',
-															'secondary_action' => 'add_donation',
-														);
+							$db_types                 = array_merge( $db_types, array( 'donation' ) );
+							$db_actions['donation'][] = array(
+								/*
+								 * Paid, however the donation was made. This previously also pinned
+								 * secondary_action to 'add_donation', which is only the manual
+								 * admin-entered case - but it never took effect, because the action
+								 * filters were discarded before reaching the query.
+								 *
+								 * @since 1.8.14.1
+								 */
+								'primary_action'   => 'charitable-completed',
+								'secondary_action' => false,
+							);
 							break;
 
 						case 'refunds':
-							$db_types               = $db_types + array( 'donation' );
-							$db_actions['donation'] = $db_actions['donation']
-														+ array(
-															'primary_action'   => 'charitable-refunded',
-															'secondary_action' => false,
-														);
+							$db_types                 = array_merge( $db_types, array( 'donation' ) );
+							$db_actions['donation'][] = array(
+								'primary_action'   => 'charitable-refunded',
+								'secondary_action' => false,
+							);
 							break;
 
 						case 'campaigns-created':
-							$db_types                 = $db_types + array( 'campaign' );
+							$db_types                 = array_merge( $db_types, array( 'campaign' ) );
 							$db_actions['campaign'][] = array(
 								'primary_action'   => 'update',
 								'secondary_action' => 'publish',
@@ -262,6 +299,22 @@ if ( ! class_exists( 'Charitable_Admin_Activities' ) ) :
 					}
 
 				endforeach;
+
+				// Two filters can ask for the same table; query it once.
+				$db_types = array_values( array_unique( $db_types ) );
+
+				/*
+				 * An empty $db_types means "no type filter" to get_activity_db_data(), so a
+				 * filter value none of the cases above recognise would otherwise widen the
+				 * report to every activity on the site rather than narrowing it. A filter
+				 * that matched nothing has to answer with nothing.
+				 *
+				 * @since 1.8.14.1
+				 */
+				if ( empty( $db_types ) && array_filter( $activity_filter_types ) ) {
+					$this->activities = array();
+					return $this->activities;
+				}
 
 			endif;
 
@@ -352,10 +405,11 @@ if ( ! class_exists( 'Charitable_Admin_Activities' ) ) :
 		 * @since 1.8.1
 		 *
 		 * @param array $args The arguments for the sql.
+		 * @param array $db_actions The actions used to assemble the sql.
 		 *
 		 * @return string
 		 */
-		public function get_activity_donation_sql( $args = array() ) {
+		public function get_activity_donation_sql( $args = array(), $db_actions = array() ) {
 
 			global $wpdb;
 
@@ -380,6 +434,24 @@ if ( ! class_exists( 'Charitable_Admin_Activities' ) ) :
 			$where_sql   = array( '1=1' ); // init the where.
 			$where_sql[] = ( $args['campaign_id'] > 0 ) ? $table_shortcuts['donation'] . '.campaign_id = ' . $args['campaign_id'] : false;
 			$where_sql[] = "{$table_shortcuts['donation']}.primary_action != ''";
+
+			/*
+			 * Only real donation activity belongs in the report.
+			 *
+			 * log_form_error() writes diagnostic rows into this same table with
+			 * type = 'form_error' (an email or validation failure, for instance). Those have a
+			 * non-empty primary_action, so they satisfied every condition above and were
+			 * reported as activity - and because 'form_error' is neither 'donation' nor
+			 * 'campaign', get_status_label(), get_action_label() and get_icon() all fell to
+			 * their defaults, so each one rendered as "Unknown", with no icon and no amount.
+			 * Form errors are read back separately by get_recent_form_errors().
+			 *
+			 * Matching the type explicitly also keeps any future diagnostic type out.
+			 *
+			 * @since 1.8.14.1
+			 */
+			$where_sql[] = "{$table_shortcuts['donation']}.type = 'donation'";
+
 			if ( ! empty( $args['activity_filter_types'] ) ) :
 				foreach ( $args['activity_filter_types'] as $activity_filter_type ) :
 					if ( 'refunds' === $activity_filter_type ) {
@@ -390,6 +462,40 @@ if ( ! class_exists( 'Charitable_Admin_Activities' ) ) :
 					}
 				endforeach;
 			endif;
+
+			/*
+			 * Apply the action pairs the caller asked for.
+			 *
+			 * get_activity_db_data() has always passed $db_actions['donation'] here, but this
+			 * method only accepted $args, so every donation action filter was silently
+			 * discarded and the query returned every donation activity in range.
+			 *
+			 * The pairs are alternatives, so they OR together - AND'ing them, as the campaign
+			 * builder does, can never match more than one pair at a time.
+			 *
+			 * @since 1.8.14.1
+			 */
+			if ( ! empty( $db_actions ) ) {
+				$action_clauses = array();
+
+				foreach ( $db_actions as $actions ) {
+					if ( empty( $actions['primary_action'] ) ) {
+						continue;
+					}
+
+					$clause = "{$table_shortcuts['donation']}.primary_action = '" . esc_sql( $actions['primary_action'] ) . "'";
+
+					if ( ! empty( $actions['secondary_action'] ) ) {
+						$clause .= " AND {$table_shortcuts['donation']}.secondary_action = '" . esc_sql( $actions['secondary_action'] ) . "'";
+					}
+
+					$action_clauses[] = '( ' . $clause . ' )';
+				}
+
+				if ( ! empty( $action_clauses ) ) {
+					$where_sql[] = '( ' . implode( ' OR ', $action_clauses ) . ' )';
+				}
+			}
 
 			// remove all empty values from the array.
 			$where_sql  = array_filter( $where_sql );
@@ -729,6 +835,22 @@ if ( ! class_exists( 'Charitable_Admin_Activities' ) ) :
 
 			switch ( $activity_type ) {
 				case 'donation':
+					/*
+					 * A donation-created event records the status the donation held at the moment
+					 * it was logged, not its status now. Badging that row "Pending" leaves a
+					 * donation that has since been paid reading as pending forever, which is how
+					 * it was reported. The row already says "Donation #x Made", so the creation
+					 * event carries no badge and the status badges belong to the status-change
+					 * events that actually represent one.
+					 *
+					 * @since 1.8.14.1
+					 */
+					if ( 'pending' === $primary_action_slug
+						&& in_array( $secondary_action, array( 'make_donation', 'add_donation' ), true ) ) {
+						$status_label = false;
+						break;
+					}
+
 					switch ( $primary_action_slug ) {
 						case 'completed':
 							$status_label = 'Paid';
