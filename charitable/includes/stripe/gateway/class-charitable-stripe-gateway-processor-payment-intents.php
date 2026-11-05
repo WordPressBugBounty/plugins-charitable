@@ -37,8 +37,17 @@ if ( ! class_exists( 'Charitable_Stripe_Gateway_Processor_Payment_Intents' ) ) :
 				return false;
 			}
 
-			/* Collect our payment method & create/get customer. */
-			$payment_method = array_key_exists( 'stripe_payment_method', $_POST ) ? $_POST['stripe_payment_method'] : null; // phpcs:ignore
+			/*
+			 * Collect our payment method & create/get customer.
+			 *
+			 * The submitted value is unslashed and sanitized here rather than used raw.
+			 * Charitable_Gateway_Stripe_AM::validate_donation() only checks that a
+			 * sanitized copy is non-empty, so this is the first point at which the value
+			 * actually used downstream is cleaned.
+			 *
+			 * @since 1.8.15 Unslashed and sanitized.
+			 */
+			$payment_method = array_key_exists( 'stripe_payment_method', $_POST ) ? sanitize_text_field( wp_unslash( $_POST['stripe_payment_method'] ) ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$customer_id    = $this->get_stripe_customer( $payment_method );
 
 			if ( ! $customer_id ) {

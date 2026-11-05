@@ -73,18 +73,28 @@ function charitable_reports_v3_enabled() {
 }
 
 /**
- * Whether the current screen is the Reports page.
+ * Whether the current screen is one the reworked v3 styling applies to.
  *
- * NARROWER THAN PRO'S EQUIVALENT, deliberately.
+ * WIDENED IN 1.8.15 TO INCLUDE THE DASHBOARD, which is what the 1.8.14 version of this docblock
+ * said would happen: "If the Dashboard is ever reworked to match, this is the one function that
+ * widens."
  *
- * charitable-admin-reports-v3.css scopes 290 of its 308 rules to `body.charitable-dash-v3`, and
- * a number of those hang off `.charitable-cards .charitable-card` and `.charitable-report-card` -
- * class names Lite's DASHBOARD also uses. Pro can afford to put the body class on every
- * Charitable screen because its Dashboard was reworked to match in the same release. Lite's
- * Dashboard is untouched, so the same breadth would silently restyle it.
+ * Why it was narrow, and why that reason has now gone. charitable-admin-reports-v3.css scopes
+ * almost every rule to `body.charitable-dash-v3`, and some of those hang off
+ * `.charitable-cards .charitable-card` and `.charitable-report-card` - class names Lite's dashboard
+ * also uses. In 1.8.14 the dashboard was untouched, so adding the body class there would have
+ * silently restyled a screen whose markup was not built for it. As of 1.8.15 the dashboard IS the
+ * reworked one and ships charitable-admin-dashboard-v3.css alongside, so the two stylesheets are
+ * now the matched pair Pro has rather than one of them leaking onto a v2 layout.
  *
- * So the gate is the Reports screen and nothing else. If the Dashboard is ever reworked to
- * match, this is the one function that widens.
+ * STILL NARROWER THAN PRO'S, which returns true for every Charitable screen because its header
+ * items (Videos, What's New) render everywhere. Lite has no such header additions, so widening past
+ * the two screens that actually carry v3 markup would load 285KB of CSS onto Settings, Tools and
+ * the post list tables to style nothing.
+ *
+ * The function name still says "reports" and is left that way on purpose:
+ * charitable_reports_v3_enabled() is a public filter shipped in 1.8.14, and renaming this family
+ * would break any snippet using it for the sake of tidiness.
  *
  * @since 1.8.14
  *
@@ -102,8 +112,20 @@ function charitable_reports_v3_is_reports_screen() {
 		return false;
 	}
 
-	return 'charitable_page_charitable-reports' === $screen->base
-		|| 'charitable_page_charitable-reports' === $screen->id;
+	/*
+	Both base and id are tested for each screen, as the 1.8.14 version did. They are usually equal
+	for a submenu page, but not reliably so once another plugin filters the menu, and a false
+	negative here means an unstyled screen rather than a visible error.
+
+	@since 1.8.15 the dashboard is included.
+	*/
+	$charitable_v3_screens = array(
+		'charitable_page_charitable-reports',
+		'charitable_page_charitable-dashboard',
+	);
+
+	return in_array( $screen->base, $charitable_v3_screens, true )
+		|| in_array( $screen->id, $charitable_v3_screens, true );
 }
 
 /**
@@ -367,6 +389,32 @@ function charitable_reports_v3_enqueue() {
 	wp_enqueue_style(
 		'charitable-admin-reports-v3',
 		charitable()->get_path( 'assets', false ) . 'css/admin/charitable-admin-reports-v3' . $min . '.css',
+		array(),
+		charitable_get_style_version()
+	);
+
+	/*
+	The dashboard's own v3 stylesheet, added in 1.8.15 alongside the dashboard port.
+
+	A SECOND FILE rather than more rules in the reports one, matching how Pro splits them: the two
+	screens are reworked on different schedules, and somebody looking for a Reports rule should not
+	have to scroll past 399 dashboard rules to find out it is not there. Reverting either screen is
+	deleting one file and one enqueue.
+
+	Loaded on both screens rather than only the dashboard, deliberately. 394 of its 399 rules are
+	scoped to body.charitable-dash-v3 and the remainder are card primitives the two screens share,
+	so splitting the enqueue per screen would save little and would mean a rule moving between the
+	files could silently stop applying. Pro loads both together for the same reason.
+
+	REGENERATE THE .min WHEN EDITING THE SOURCE. A stale .min is invisible under SCRIPT_DEBUG or
+	CHARITABLE_DEBUG and only shows up on a production site, and never run build.sh --css to do it -
+	csso is missing locally and the fallback leaves comments behind in the output.
+
+	@since 1.8.15
+	*/
+	wp_enqueue_style(
+		'charitable-admin-dashboard-v3',
+		charitable()->get_path( 'assets', false ) . 'css/admin/charitable-admin-dashboard-v3' . $min . '.css',
 		array(),
 		charitable_get_style_version()
 	);

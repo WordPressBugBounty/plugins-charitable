@@ -1,0 +1,4241 @@
+/**
+ * Charitable dashboard v3 — design preview overrides.
+ *
+ * TEMPORARY, and deliberately a separate file. The shipping dashboard styles live in
+ * charitable-admin-dashboard.css, which has no SCSS source and is also enqueued by the donors,
+ * donations and campaigns list tables — editing it would mean hand-maintaining its .min.css
+ * sibling and putting three unrelated screens at risk. Everything here hangs off the
+ * body.charitable-dash-v3 class added by charitable-dashboard-v3.php, which both gates it
+ * and gives every rule enough specificity to beat its shipping counterpart without !important.
+ *
+ * Colours: no new values are introduced. Type colours are the existing tile values
+ * (rgba(25,29,45,.6) / .8), borders are the existing rgba(25,29,45,.15), and the Site Analysis
+ * score and dimension bars take the Site Analysis tab's own band palette via inline styles,
+ * exactly as the rail card they descend from did. Brand orange on the Site Analysis CTA is canon
+ * #fc9a2a / #fc8c0c, matching the value that card already used. Product UI type is Inter, per the
+ * brand's intentional divergence from Satoshi inside wp-admin.
+ *
+ * Once signed off, these rules fold into charitable-admin-dashboard.css and this file goes away.
+ *
+ * @since 1.8.19
+ */
+
+/* ──────────────────────────────────────────────────────────────────────────
+   1. Full width
+   Mirrors what WPForms actually does, measured on its own dashboard:
+     .wpforms-admin-content            full width, padding: 0 20px, max-width: none
+     .wpforms-dashboard-columns        flex, gap: 20px,             max-width: none
+     .wpforms-dashboard-column-main    flex: 1 1 auto   (grows, uncapped)
+     .wpforms-dashboard-column-sidebar flex: 0 0 400px  (fixed)
+   So: no cap anywhere, only the main column grows. The three 1172px caps in the shipping
+   stylesheet (header content, layout, notification) are neutralised below rather than edited.
+   The rail stays at Charitable's 452px rather than adopting WPForms' 400px, because the
+   existing rail cards are built to that width.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/*
+No horizontal padding, so the heading row and the two columns sit flush against the same band as
+the notice banner. The band itself is #charitable-dashboard-v2.wrap, which already carries
+padding: 0 10px, and the notice's own container adds none — so the notice card's outer edge lands
+on the band edge, and anything that adds its own 20px ends up visibly narrower than the notice
+sitting right above it. Aligning to the notice is the whole point here, so the gutter belongs to
+the band and nothing inside it should re-inset.
+
+Do not "restore" padding here to give the cards breathing room; that reintroduces exactly the
+19px-per-side mismatch this replaced. Widen .wrap instead if more gutter is ever wanted, so every
+child moves together.
+*/
+body.charitable-dash-v3 .charitable-dashboard-v2-header .charitable-dashboard-v2-header-content,
+body.charitable-dash-v3 .charitable-dashboard-v2-layout,
+body.charitable-dash-v3 .charitable-dashboard-notification.charitable-notification-type-notice {
+	max-width: none;
+	margin-left: 0;
+	margin-right: 0;
+	padding-left: 0;
+	padding-right: 0;
+	box-sizing: border-box;
+}
+
+/*
+The fourth cap, and the one that isn't in charitable-admin-dashboard.css at all: the notice's
+parent container is capped by
+
+    body.charitable_page_charitable-dashboard .charitable-container { max-width: 1172px; margin: 0 auto; }
+
+in charitable-admin.css. Overriding max-width on the notice itself does nothing while its parent
+is still 1172px wide, which is exactly how this presented — the child reported max-width:none and
+a width of 1172 anyway.
+
+Scoped to .charitable-dashboard-notifications rather than to .charitable-container, because that
+class appears 39 times in the tree and most of those are the LEGACY dashboard's report cards,
+which share this body class. Widening the container class wholesale would resize them.
+*/
+body.charitable-dash-v3 .charitable-container.charitable-dashboard-notifications {
+	max-width: none;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+body.charitable-dash-v3 .charitable-dashboard-v2-layout .charitable-dashboard-v2-left-column {
+	flex: 1 1 auto;
+	/*
+	Required, not cosmetic: the left column contains the campaigns/donations/donors tables, and
+	a flex item defaults to min-width:auto, which refuses to shrink below its content's intrinsic
+	width. Without this the column blows past its share and pushes the rail off-screen at
+	narrower viewports.
+	*/
+	min-width: 0;
+}
+
+body.charitable-dash-v3 .charitable-dashboard-v2-layout .charitable-dashboard-v2-right-column {
+	flex: 0 0 452px;
+	min-width: 0;
+}
+
+/* The shipping single-column breakpoint still applies; restate it so it wins over the rules
+   above, which would otherwise keep the rail fixed after the layout has gone vertical. */
+@media ( max-width: 1200px ) {
+	body.charitable-dash-v3 .charitable-dashboard-v2-layout .charitable-dashboard-v2-left-column,
+	body.charitable-dash-v3 .charitable-dashboard-v2-layout .charitable-dashboard-v2-right-column {
+		flex: 1 1 100%;
+	}
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   2. Site Analysis as a fifth tab
+   The score started life as a fifth stats tile. That was the wrong home: the stats row is
+   period-scoped ("Last 7 Days") and this score is a point-in-time reading of the site's
+   configuration, so the two never agreed. As a tab it gets room for the band, the potential
+   score and the four dimension bars, and the stats row goes back to four tiles untouched.
+
+   Band and bar colours arrive as inline styles carrying the Site Analysis tab's own palette
+   (bandColor()/dimColor() in assets/js/admin/charitable-site-analysis.js), NOT brand canon:
+   canon has no warning or pending token, so there is no canonical way to render "good but not
+   great" or "needs work" here. Nothing in this block hardcodes a colour for that reason.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-sa-tab {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 32px 44px;
+	padding: 26px 25px;
+}
+
+/* ── Score ring ── */
+
+body.charitable-dash-v3 .charitable-sa-tab-score {
+	display: flex;
+	align-items: center;
+	gap: 18px;
+	flex: none;
+}
+
+body.charitable-dash-v3 .charitable-sa-tab-ring {
+	position: relative;
+	width: 84px;
+	height: 84px;
+	border-radius: 50%;
+	flex: none;
+}
+
+/* Punches the middle out of the conic-gradient so it reads as a ring, not a pie. */
+body.charitable-dash-v3 .charitable-sa-tab-ring::after {
+	content: "";
+	position: absolute;
+	top: 9px;
+	right: 9px;
+	bottom: 9px;
+	left: 9px;
+	background: #fff;
+	border-radius: 50%;
+}
+
+body.charitable-dash-v3 .charitable-sa-tab-ring b {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 25px;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	color: #191d2d;
+}
+
+body.charitable-dash-v3 .charitable-sa-tab-score-meta {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+body.charitable-dash-v3 .charitable-sa-tab-band {
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.2;
+}
+
+body.charitable-dash-v3 .charitable-sa-tab-potential {
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 1.4;
+	color: rgba( 25, 29, 45, 0.6 );
+}
+
+/* Says out loud that the numbers are illustrative until a real analysis has run. */
+body.charitable-dash-v3 .charitable-sa-tab-example {
+	align-self: flex-start;
+	margin-top: 2px;
+	padding: 2px 7px;
+	border-radius: 3px;
+	background: rgba( 25, 29, 45, 0.07 );
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.4px;
+	text-transform: uppercase;
+	color: rgba( 25, 29, 45, 0.55 );
+}
+
+/* ── Dimension bars ── */
+
+body.charitable-dash-v3 .charitable-sa-tab-dims {
+	display: grid;
+	grid-template-columns: repeat( 2, minmax( 150px, 1fr ) );
+	gap: 15px 32px;
+	flex: 1 1 320px;
+	min-width: 0;
+}
+
+body.charitable-dash-v3 .charitable-sa-tab-dim-head {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 10px;
+	margin-bottom: 6px;
+}
+
+body.charitable-dash-v3 .charitable-sa-tab-dim-label {
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 12px;
+	font-weight: 500;
+	color: rgba( 25, 29, 45, 0.7 );
+}
+
+body.charitable-dash-v3 .charitable-sa-tab-dim-value {
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 12px;
+	font-weight: 600;
+	color: rgba( 25, 29, 45, 0.55 );
+}
+
+body.charitable-dash-v3 .charitable-sa-tab-dim-track {
+	height: 6px;
+	border-radius: 3px;
+	background: #e9e9ea;
+	overflow: hidden;
+}
+
+body.charitable-dash-v3 .charitable-sa-tab-dim-fill {
+	display: block;
+	height: 100%;
+	border-radius: 3px;
+	/* Colour is an inline style - see the block comment above. */
+}
+
+/* ── Footer ── */
+
+body.charitable-dash-v3 .charitable-sa-tab-foot {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px 14px;
+	flex: none;
+}
+
+/* Brand orange, matching the value the rail card already used for this same CTA. */
+body.charitable-dash-v3 .charitable-sa-tab-cta.button-primary {
+	background-color: #fc9a2a;
+	border-color: #fc9a2a;
+	color: #fff;
+	text-shadow: none;
+	box-shadow: none;
+}
+
+body.charitable-dash-v3 .charitable-sa-tab-cta.button-primary:hover,
+body.charitable-dash-v3 .charitable-sa-tab-cta.button-primary:focus {
+	background-color: #fc8c0c;
+	border-color: #fc8c0c;
+	color: #fff;
+}
+
+body.charitable-dash-v3 .charitable-sa-tab-foot-note {
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 1.45;
+	color: rgba( 25, 29, 45, 0.55 );
+	max-width: 260px;
+}
+
+@media ( max-width: 1400px ) {
+	body.charitable-dash-v3 .charitable-sa-tab-foot {
+		flex: 1 1 100%;
+	}
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   3. What's New — one featured item, the rest as compact rows
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-whats-new-v3 {
+	padding: 0;
+}
+
+/*
+Vertical padding only. This card's .charitable-dashboard-v2-section-content already computes to
+25px horizontal padding - the same 25px the section header uses for its <h3> - so adding 20px here
+double-padded the thumbnail and copy to 46px from the card edge while the "What's New" title sat
+at 26px. Anything inside this card that should line up under the title needs NO horizontal padding
+of its own.
+*/
+/*
+No top padding. .charitable-dashboard-v2-section-content already contributes 20px above this
+block, so a top padding here doubled it to a 40px gap between the header rule and the thumbnail —
+the vertical twin of the horizontal double-padding fixed above, and from the same cause. Bottom
+padding stays: it is the only separation between the featured item and the compact list below.
+*/
+body.charitable-dash-v3 .charitable-whats-new-v3-featured {
+	padding: 0 0 20px;
+}
+
+/* Only the icon and the badges/title share this row. The description below is a sibling, so it
+   returns to the card's left inset rather than staying indented under the title. */
+body.charitable-dash-v3 .charitable-whats-new-v3-head {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 10px;
+}
+
+body.charitable-dash-v3 .charitable-whats-new-v3-head-text {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+/*
+Icon replaces the old 2:1 thumbnail. Sized to the height of the meta row plus the title, so it
+squares off against that block rather than floating beside it. The tinted rounded square follows
+the pattern the Site Analysis card already established for its own icon.
+*/
+/*
+No background plate. With the tinted square gone the glyph has nothing to sit inside, so it is
+drawn larger - at 48px it fills the same footprint the plate used to occupy, which keeps the
+title block in the same place and stops the icon reading as an undersized orphan.
+*/
+body.charitable-dash-v3 .charitable-whats-new-v3-icon {
+	flex: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	/* Sized to span the title plus the badge row beneath it, so the logo's top and bottom land on
+	   the text block's edges rather than floating against one line. */
+	width: 46px;
+	height: 46px;
+	background: none;
+	color: rgba( 25, 29, 45, 0.5 );
+}
+
+body.charitable-dash-v3 .charitable-whats-new-v3-icon svg {
+	width: 38px;
+	height: 38px;
+}
+
+/*
+A real product mark is a solid tile rather than a line glyph, so it gets a radius - without one a
+hard-edged square reads as an unstyled image drop. 8px matches the radius the plugin uses on other
+small tiles. The glyph fallback needs no radius because it has no ground.
+*/
+body.charitable-dash-v3 .charitable-whats-new-v3-icon img {
+	width: 46px;
+	height: 46px;
+	display: block;
+	border-radius: 9px;
+}
+
+/* The badge meaning now rides on the glyph colour alone, since there is no plate to tint:
+   canon brand green for an addon, canon brand orange for Pro. */
+body.charitable-dash-v3 .charitable-whats-new-v3-icon--addon {
+	color: #31714c;
+}
+
+body.charitable-dash-v3 .charitable-whats-new-v3-icon--pro {
+	color: #fc9a2a;
+}
+
+/* The badge row now sits BELOW the headline, so its spacing flips from margin-bottom to top. */
+body.charitable-dash-v3 .charitable-whats-new-v3-meta {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-top: 6px;
+	margin-bottom: 0;
+}
+
+body.charitable-dash-v3 .charitable-whats-new-v3-title {
+	margin: 0;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 1.3;
+	letter-spacing: -0.01em;
+}
+
+body.charitable-dash-v3 .charitable-whats-new-v3-title a {
+	color: rgba( 25, 29, 45, 0.9 );
+	text-decoration: none;
+	box-shadow: none;
+}
+
+body.charitable-dash-v3 .charitable-whats-new-v3-title a:hover,
+body.charitable-dash-v3 .charitable-whats-new-v3-title a:focus {
+	color: #1e1515;
+	text-decoration: underline;
+}
+
+body.charitable-dash-v3 .charitable-whats-new-v3-desc {
+	margin: 0 0 12px;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13px;
+	font-weight: 400;
+	line-height: 1.55;
+	color: rgba( 25, 29, 45, 0.65 );
+}
+
+/* ── The demoted items ── */
+
+/*
+Pulled out to the card edges with a negative margin that cancels section-content's 25px, then the
+row links put it back as padding. Net effect: the row text lines up under the title at the same
+26px as the thumbnail, while the divider rules and the row hover band run the full width of the
+card instead of stopping short of it.
+*/
+body.charitable-dash-v3 .charitable-whats-new-v3-list {
+	margin: 0 -25px;
+	padding: 0;
+	list-style: none;
+	border-top: 1px solid rgba( 25, 29, 45, 0.15 );
+}
+
+body.charitable-dash-v3 .charitable-whats-new-v3-row + .charitable-whats-new-v3-row {
+	border-top: 1px solid rgba( 25, 29, 45, 0.08 );
+}
+
+body.charitable-dash-v3 .charitable-whats-new-v3-row-link {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 14px;
+	/* 25px restores what .charitable-whats-new-v3-list took off, landing the text under the title. */
+	padding: 13px 25px;
+	text-decoration: none;
+	box-shadow: none;
+	transition: background-color 0.12s ease;
+}
+
+body.charitable-dash-v3 .charitable-whats-new-v3-row-link:hover,
+body.charitable-dash-v3 .charitable-whats-new-v3-row-link:focus {
+	background-color: rgba( 25, 29, 45, 0.03 );
+}
+
+body.charitable-dash-v3 .charitable-whats-new-v3-row-title {
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.4;
+	color: rgba( 25, 29, 45, 0.8 );
+}
+
+body.charitable-dash-v3 .charitable-whats-new-v3-row-link:hover .charitable-whats-new-v3-row-title {
+	text-decoration: underline;
+}
+
+body.charitable-dash-v3 .charitable-whats-new-v3-row-date {
+	flex: none;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 11px;
+	font-weight: 400;
+	line-height: 1.4;
+	color: rgba( 25, 29, 45, 0.45 );
+	white-space: nowrap;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   3b. Version pill under the page title
+   Moved out of the What's New card. The heading row is a flex row with the title on the left and
+   the Add Campaign button on the right, so the left cell has to stop centring and stack.
+   The pill keeps its shipping .charitable-dashboard-v2-latest-updates-uptodate / -behind classes
+   and therefore its existing colours; only the position changes. Left padding is stripped because
+   inside the card those rules carry the card's own inset, which would push it off the title here.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/*
+The pill now sits at the top of the right rail, above Enhance Your Campaigns. It is intentionally
+NOT given card chrome - no border, no white panel - so the rail does not acquire an extra bordered
+box for a single sentence. It reads as a status line introducing the rail, which is what it is.
+
+The inner reset is needed because the shipping .charitable-dashboard-v2-latest-updates-uptodate /
+-behind rules were written for a position inside the What's New card and carry that card's own
+inset and background with them.
+*/
+body.charitable-dash-v3 .charitable-dash-v3-version-line {
+	display: flex;
+	align-items: center;
+	margin: 0;
+	padding: 0 2px;
+}
+
+body.charitable-dash-v3 .charitable-dash-v3-version-line .charitable-dashboard-v2-latest-updates-uptodate,
+body.charitable-dash-v3 .charitable-dash-v3-version-line .charitable-dashboard-v2-latest-updates-behind {
+	margin: 0;
+	padding: 0;
+	background: none;
+	border: 0;
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   4. New header icons
+   Matched to the existing header icons rather than to WPForms': the li is a fixed 30x30 box and
+   the notifications svg is #8c8e96 with a 0.5 hover opacity, both of which these inherit.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-header-videos,
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-header-whats-new {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 30px;
+	color: #8c8e96;
+}
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-header-videos svg,
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-header-whats-new svg {
+	width: 25px;
+	height: 25px;
+	display: block;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   5. Preview switcher - REMOVED
+   The Classic/New and Licensed/No license bar that used to render under the Charitable header
+   is gone; the guided tours introduce the new dashboard instead. Its styles were inline in
+   charitable-dashboard-v3.php and went with it, so there was never anything here.
+   The preview itself still works, driven by URL: charitable_dash_v3=1|0 for the layout and
+   charitable_dash_lite=1|0 for the licence simulation.
+   Number kept so the later section references still line up.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* ──────────────────────────────────────────────────────────────────────────
+   5b. Other dashboards
+   The line under the page heading pointing at addons that carry a dashboard of their own.
+   Separators come from a + a::before rather than from markup, so the last item never needs
+   a special case and PHP does not have to count.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-dashboard-v3-subnav {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 0 8px;
+	/* 4px, not 0: the h1 has no bottom margin of its own here, and the two lines touching
+	   read as one wrapped heading rather than a heading with a note under it. */
+	margin: 4px 0 0;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+body.charitable-dash-v3 .charitable-dashboard-v3-subnav-label {
+	color: #646970;
+}
+
+body.charitable-dash-v3 .charitable-dashboard-v3-subnav a {
+	color: #056aab;
+	text-decoration: none;
+	box-shadow: none;
+}
+
+/* Underline on hover only, matching the card footer links. */
+body.charitable-dash-v3 .charitable-dashboard-v3-subnav a:hover,
+body.charitable-dash-v3 .charitable-dashboard-v3-subnav a:focus {
+	text-decoration: underline;
+}
+
+body.charitable-dash-v3 .charitable-dashboard-v3-subnav a + a::before {
+	content: "\00b7";
+	display: inline-block;
+	margin-right: 8px;
+	color: #a7aaad;
+	/* The separator belongs to the row, not to the link it precedes - without this it picks up
+	   the underline on hover and looks like part of the link text. */
+	text-decoration: none;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   6. Raise More With Charitable
+   Charitable's own addons, ranked against the install. Three across in the wide left column,
+   which is what the full-width change above made room for - at the old 700px this would have
+   been two. Reuses .charitable-dashboard-v2-enhance-grid-button on each button so the existing
+   install/activate AJAX and its button styling both apply unchanged.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-raise-more-grid {
+	display: grid;
+	grid-template-columns: repeat( 3, 1fr );
+}
+
+/* Interior rules only, so the grid's outer edges stay flush with the card. */
+body.charitable-dash-v3 .charitable-raise-more-item {
+	display: flex;
+	flex-direction: column;
+	gap: 9px;
+	padding: 22px 25px;
+	border-right: 1px solid rgba( 24, 36, 69, 0.1 );
+	border-bottom: 1px solid rgba( 24, 36, 69, 0.1 );
+	min-width: 0;
+}
+
+body.charitable-dash-v3 .charitable-raise-more-item:nth-child( 3n ) {
+	border-right: 0;
+}
+
+body.charitable-dash-v3 .charitable-raise-more-item:nth-last-child( -n + 3 ):nth-child( 3n + 1 ),
+body.charitable-dash-v3 .charitable-raise-more-item:nth-last-child( -n + 3 ):nth-child( 3n + 1 ) ~ .charitable-raise-more-item {
+	border-bottom: 0;
+}
+
+body.charitable-dash-v3 .charitable-raise-more-head {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+body.charitable-dash-v3 .charitable-raise-more-icon {
+	flex: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+}
+
+body.charitable-dash-v3 .charitable-raise-more-icon img,
+body.charitable-dash-v3 .charitable-raise-more-icon svg {
+	max-width: 24px;
+	max-height: 24px;
+}
+
+body.charitable-dash-v3 .charitable-raise-more-title {
+	margin: 0;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.3;
+	color: rgba( 25, 29, 45, 0.9 );
+}
+
+body.charitable-dash-v3 .charitable-raise-more-desc {
+	margin: 0;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13px;
+	font-weight: 400;
+	line-height: 1.5;
+	color: rgba( 25, 29, 45, 0.65 );
+}
+
+/* margin-top:auto pins the button row to the bottom so buttons line up across a row
+   even when the pitches run to different numbers of lines. */
+body.charitable-dash-v3 .charitable-raise-more-foot {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px 10px;
+	margin-top: auto;
+	padding-top: 4px;
+}
+
+/*
+"Included in your plan" - the whole point of the four-state treatment. Brand green rather than
+orange: orange is the upgrade/CTA colour throughout this dashboard, and this label is the
+opposite message, namely that nothing needs buying. Canon brand green #31714c, on a tint of
+itself.
+*/
+body.charitable-dash-v3 .charitable-raise-more-included {
+	padding: 3px 8px;
+	border-radius: 3px;
+	background: rgba( 49, 113, 76, 0.1 );
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.3;
+	color: #31714c;
+	white-space: nowrap;
+}
+
+body.charitable-dash-v3 .charitable-raise-more-footer {
+	display: flex;
+	align-items: center;
+	padding: 18px 25px;
+}
+
+/* Two across in the middle band, one when the layout has already gone single-column. */
+@media ( max-width: 1500px ) {
+	body.charitable-dash-v3 .charitable-raise-more-grid {
+		grid-template-columns: repeat( 2, 1fr );
+	}
+
+	body.charitable-dash-v3 .charitable-raise-more-item:nth-child( 3n ) {
+		border-right: 1px solid rgba( 24, 36, 69, 0.1 );
+	}
+
+	body.charitable-dash-v3 .charitable-raise-more-item:nth-child( 2n ) {
+		border-right: 0;
+	}
+}
+
+@media ( max-width: 782px ) {
+	body.charitable-dash-v3 .charitable-raise-more-grid {
+		grid-template-columns: 1fr;
+	}
+
+	body.charitable-dash-v3 .charitable-raise-more-item {
+		border-right: 0;
+	}
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   7. Left-column left-edge alignment
+   Every card in the left column had its own idea of a left inset, so nothing lined up down the
+   page. Measured text-start positions, relative to the column edge:
+
+     31  "Top Campaigns", the table headers, the period dropdown row   <- the reference
+     17  "Total Donations" (stat tile padding is 20px 16px)
+     18  the chart's first y-axis label (ApexCharts' own offset)
+     46  "Raise More With Charitable"
+     71  the Raise More grid items
+
+   31 wins because it is already the majority and it is the one the eye tracks - the tab label and
+   every table header sit on it. It comes from the 30px the tab nav and table cells already use,
+   so this is the file's existing inset value rather than a new one.
+
+   The Raise More card was the outlier for a findable reason: charitable-admin-dashboard.css has
+
+     .charitable-dashboard-v2-section:not(.charitable-dashboard-v2-right-column .charitable-dashboard-v2-section) { padding: 20px }
+
+   which pads every LEFT-column section. The stats and tabs cards each override it back to 0; a
+   new left-column card inherits it and lands 20px in from its siblings. Any future card added to
+   this column needs the same padding: 0 reset.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/*
+First tile only. Giving all four 30px would push the inner tiles off-centre between their
+dividers; on the first tile the extra space sits against the card edge, so it reads as card
+padding rather than a mis-centred cell.
+*/
+body.charitable-dash-v3 .charitable-dashboard-v2-stats-row .charitable-dashboard-v2-stat-item:first-child {
+	padding-left: 30px;
+}
+
+/*
+Raise the floor on the headline figures.
+
+charitable-admin-dashboard.css sets font-size: clamp( 12px, 1.15vw, 20px ) on
+.charitable-dashboard-v2-stat-amount. 1.15vw only reaches the 20px cap at a 1739px viewport, so
+the figure shrinks with the window while its label stays at a fixed 12px, and the two converge:
+measured 16.6px at 1440px, 14.7px at 1280px, 12.9px at 1120px. On a laptop the headline number
+ends up under 3px larger than its own caption and the hierarchy is gone. Reports has the same
+figures at a flat 28px, so the two screens also diverge the narrower the window gets.
+
+18px floor rather than a flat size: the vw term still lets it grow to 20px on a wide screen,
+which is the behaviour that was wanted, but it can no longer collapse into the label.
+
+Scoped here in the v3 stylesheet rather than fixed at source on purpose. The original rule lives
+in charitable-admin-dashboard.css, which (a) is shared with the classic dashboard and the
+donation and campaign list tables, and (b) is enqueued through $min - so the minified copy is
+what production serves and editing only the source would change nothing. This file has no
+minified twin and is enqueued directly.
+*/
+body.charitable-dash-v3 .charitable-dashboard-v2-stats-row .charitable-dashboard-v2-stat-amount {
+	font-size: clamp( 18px, 1.15vw, 20px );
+}
+
+/* Cancel the left-column section padding, as the sibling cards do. */
+body.charitable-dash-v3 #charitable-dashboard-v2-raise-more {
+	padding: 0;
+}
+
+body.charitable-dash-v3 #charitable-dashboard-v2-raise-more .charitable-dashboard-v2-section-header {
+	padding-left: 30px;
+	padding-right: 30px;
+}
+
+/* Zero, so the grid's dividing rules reach the card edges the way the campaigns table's row
+   borders already do. The 30px inset moves onto the items themselves, below. */
+body.charitable-dash-v3 #charitable-dashboard-v2-raise-more .charitable-dashboard-v2-section-content {
+	padding: 0;
+}
+
+body.charitable-dash-v3 .charitable-raise-more-item {
+	padding: 22px 30px;
+}
+
+body.charitable-dash-v3 .charitable-raise-more-footer {
+	padding: 18px 30px;
+}
+
+/*
+The chart is the one element whose inset is not ours to set directly: ApexCharts computes its own
+y-axis label offset inside the SVG. Padding the container shifts the whole plot, labels and date
+axis together, which is what we want here - the trade is that the plot area loses those pixels on
+the left, so the series starts marginally further in. Value derived by measurement (label at 18,
+target 31), not guessed.
+*/
+body.charitable-dash-v3 .charitable-dashboard-v2-header-bar-chart {
+	padding-left: 13px;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   8. Raise More buttons — identical to the Enhance card's
+   Copied declaration for declaration out of charitable-admin-dashboard.css rather than
+   approximated, because "the same as Activate" has to survive someone restyling that button
+   later. The source rules are at lines 555 (base) and 574 (activate) of that file, scoped to
+
+     .charitable-dashboard-v2-section .charitable-dashboard-v2-enhance-grid
+     .charitable-dashboard-v2-enhance-grid-item .charitable-dashboard-v2-enhance-grid-content
+     .charitable-dashboard-v2-enhance-grid-button[.charitable-dashboard-v2-activate-button]
+
+   That ancestor chain is why the base class alone was not enough here: this card has no
+   .charitable-dashboard-v2-enhance-grid wrapper, so neither the grey nor the orange reached it
+   and the buttons fell back to browser defaults.
+
+   Colours are the ones already in that file — #fc9a2a / #fc8c0c for the orange, and the
+   rgba(14,33,33,...) greys — matched rather than converted to canon, per the rule about editing
+   an existing file. Since 1.8.19 this is canon brand-orange rather than an off-canon value; the token
+   file's asBuilt drift list, so drift-check.py cannot currently see it.
+
+   Role split: orange is the action we want taken (Activate — free, already paid for), grey is the
+   one that costs money (Upgrade). That is the opposite of the usual "make the upsell loudest"
+   instinct and is deliberate.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-raise-more-button {
+	background: white;
+	border: 1px solid rgba( 14, 33, 33, 0.14 );
+	border-radius: 4px;
+	padding: 8px 16px;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-weight: 500;
+	font-style: normal;
+	font-size: 13px;
+	line-height: 100%;
+	letter-spacing: 0px;
+	color: rgba( 14, 33, 33, 0.8 );
+	cursor: pointer;
+	transition: all 0.2s ease;
+	box-shadow: none;
+	text-shadow: none;
+}
+
+body.charitable-dash-v3 .charitable-raise-more-button:hover {
+	background: rgba( 14, 33, 33, 0.05 );
+	border-color: rgba( 14, 33, 33, 0.2 );
+}
+
+body.charitable-dash-v3 .charitable-raise-more-button.charitable-dashboard-v2-activate-button {
+	background: #fc9a2a;
+	border-color: #fc9a2a;
+	color: white;
+}
+
+body.charitable-dash-v3 .charitable-raise-more-button.charitable-dashboard-v2-activate-button:hover {
+	background: #fc8c0c;
+	border-color: #fc8c0c;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   9. Tab nav — real hover, active and focus states
+   What was there: hover moved the text from rgba(25,29,45,.5) to .7, which is close to
+   imperceptible, and TWO separate rules set `outline: none` on :focus — so keyboard users had no
+   indication of where they were at all. Active state was a 1px hairline underline.
+
+   The underline is declared at 2px TRANSPARENT in the base state and only recoloured by hover and
+   active. That is the point: growing a border on hover would reflow the text by 2px on every
+   pointer entry, and reserving the space up front avoids it.
+
+   Colours: CANON brand-green #31714c, converted 2026-11-03 from #33842a. The old value was the
+   tab green inherited from charitable-admin-dashboard.css and was matched rather than converted
+   when this file was written, on the reasoning that it is a green-family value missing from the
+   brand token file's asBuilt list. QA flagged the result and the convergence was taken
+   deliberately: canon also measures better here, 5.84:1 against white versus #33842a's 4.69:1.
+   The active plate and hover wash below are tints of this SAME value - rgba( 49, 113, 76, ... ) -
+   so the tab is one green, not green text on a differently-green plate.
+
+   NOT converted, deliberately: the Site Analysis band palette and the health-pill trio further
+   down this file. Those are red/amber/green scales where the green carries a meaning, and
+   repainting one leg brand green would break the scale and desynchronise the badge from
+   charitable-site-analysis.js. The hover tint and text are rgba(25,29,45,...) at the
+   0.03 and 0.8 steps, both of which are declared opacity steps for product-ui text in the token
+   file, so hierarchy comes from opacity rather than from new greys. The focus ring is canon
+   accent-blue #087ce1, whose documented role is exactly this: links and secondary actions.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-dashboard-v2-section-header .charitable-dashboard-v2-tab-nav .charitable-dashboard-v2-tab-nav-item {
+	border-bottom: 2px solid transparent;
+	transition: color 0.15s ease, background-color 0.15s ease, border-bottom-color 0.15s ease;
+}
+
+body.charitable-dash-v3 .charitable-dashboard-v2-section-header .charitable-dashboard-v2-tab-nav .charitable-dashboard-v2-tab-nav-item:hover {
+	color: rgba( 25, 29, 45, 0.8 );
+	background-color: rgba( 25, 29, 45, 0.03 );
+	border-bottom-color: rgba( 25, 29, 45, 0.15 );
+}
+
+body.charitable-dash-v3 .charitable-dashboard-v2-section-header .charitable-dashboard-v2-tab-nav .charitable-dashboard-v2-tab-nav-item.charitable-dashboard-v2-tab-nav-active {
+	color: #31714c;
+	border-bottom-color: #31714c;
+	background-color: transparent;
+}
+
+/* The active tab keeps its own underline on hover rather than reverting to the grey one. */
+body.charitable-dash-v3 .charitable-dashboard-v2-section-header .charitable-dashboard-v2-tab-nav .charitable-dashboard-v2-tab-nav-item.charitable-dashboard-v2-tab-nav-active:hover {
+	color: #31714c;
+	border-bottom-color: #31714c;
+	background-color: rgba( 25, 29, 45, 0.03 );
+}
+
+/*
+Restores a keyboard focus indicator. :focus-visible rather than :focus so it appears for keyboard
+navigation but not on mouse clicks — which is presumably what the original `outline: none` was
+trying to achieve, before :focus-visible was available to do it properly. Negative offset keeps
+the ring inside the tab strip instead of overlapping the card edge.
+*/
+body.charitable-dash-v3 .charitable-dashboard-v2-section-header .charitable-dashboard-v2-tab-nav .charitable-dashboard-v2-tab-nav-item:focus-visible {
+	outline: 2px solid #087ce1;
+	outline-offset: -3px;
+	color: rgba( 25, 29, 45, 0.8 );
+}
+
+body.charitable-dash-v3 .charitable-dashboard-v2-section-header .charitable-dashboard-v2-tab-nav .charitable-dashboard-v2-tab-nav-item.charitable-dashboard-v2-tab-nav-active:focus-visible {
+	color: #31714c;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   10. Top Campaigns column widths
+   Measured distribution was 24.2 / 14.1 / 14.1 / 23.7 / 23.8 — Status and Progress each taking
+   more room than Goal and Raised combined, for a pill and a small circle, while the title column
+   that holds the only long text got a quarter. Cause: table-layout:auto with fixed px widths on
+   the first three columns, so every pixel of extra width landed on the last two.
+
+   Fixed layout with percentages instead: the title keeps the largest share because it is the only
+   column with variable-length content, and the four data columns are equal. Percentages plus
+   table-layout:fixed also mean the proportions hold at every viewport rather than only at this
+   one, which is the "and likely overall" part.
+
+   SCOPED to .charitable-dashboard-v2-campaigns-table deliberately. The sibling tabs reuse
+   .charitable-dashboard-v2-table with different column counts — Latest Donations and Comments
+   have 2, Top Donors builds its own markup — so nth-child widths applied to the shared class
+   would corrupt all of them.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-dashboard-v2-campaigns-table .charitable-dashboard-v2-table {
+	table-layout: fixed;
+	width: 100%;
+}
+
+/*
+Widths go on the THEAD CELLS ONLY, and the body cells are explicitly released to auto.
+
+That distinction is the whole fix, and it cost a debug cycle. With table-layout:fixed the column
+widths are taken from the first row, so declaring a width on the td as well does not reinforce the
+column - it competes with it. Combined with the shipping rule
+
+    .charitable-dashboard-v2-table th:nth-child(1), .charitable-dashboard-v2-table td:nth-child(1) { width: 205px }
+
+which also targets the td, the first body cell resolved to 144px while its own header cell was
+319px: the header row summed to the table width and the body row summed to 844 of 1019. Campaign
+names then wrapped onto two and three lines, which looked like a width problem and was actually a
+td-versus-column problem. Setting the td back to auto makes each body cell simply adopt its
+column, and the names fit on one line again.
+*/
+body.charitable-dash-v3 .charitable-dashboard-v2-campaigns-table .charitable-dashboard-v2-table th:nth-child( 1 ) {
+	width: 32%;
+}
+
+body.charitable-dash-v3 .charitable-dashboard-v2-campaigns-table .charitable-dashboard-v2-table th:nth-child( 2 ),
+body.charitable-dash-v3 .charitable-dashboard-v2-campaigns-table .charitable-dashboard-v2-table th:nth-child( 3 ),
+body.charitable-dash-v3 .charitable-dashboard-v2-campaigns-table .charitable-dashboard-v2-table th:nth-child( 4 ),
+body.charitable-dash-v3 .charitable-dashboard-v2-campaigns-table .charitable-dashboard-v2-table th:nth-child( 5 ) {
+	width: 17%;
+}
+
+/* Releases the shipping 205px / 120px td widths so the body cells track their columns. */
+body.charitable-dash-v3 .charitable-dashboard-v2-campaigns-table .charitable-dashboard-v2-table td {
+	width: auto;
+}
+
+/* Safety net for a genuinely long campaign name; inert while the text fits. */
+body.charitable-dash-v3 .charitable-dashboard-v2-campaigns-table .charitable-dashboard-v2-table td:nth-child( 1 ) {
+	overflow-wrap: break-word;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   11. Top Donors — two per row
+   The shipping table gave each donor a 1019px row to hold a 40px avatar, a name, an amount and a
+   badge. Two per row halves the height and moves the amount next to the name rather than a
+   screen-width from it.
+
+   Interior rules only, matching the Raise More grid: the outer edges stay flush with the card so
+   the dividers read as part of the card rather than as a floating box. Collapses to one column at
+   782px, the same breakpoint that grid uses.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-donors-grid-v3 {
+	display: grid;
+	grid-template-columns: repeat( 2, 1fr );
+}
+
+body.charitable-dash-v3 .charitable-donor-card-v3 {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 18px 30px;
+	border-right: 1px solid rgba( 24, 36, 69, 0.1 );
+	border-bottom: 1px solid rgba( 24, 36, 69, 0.1 );
+	min-width: 0;
+}
+
+/* Right column loses its right border; the last row loses its bottom border. The :nth-last-child
+   pair covers both an even and an odd final row, so a lone trailing card does not keep a rule
+   under it. */
+body.charitable-dash-v3 .charitable-donor-card-v3:nth-child( 2n ) {
+	border-right: 0;
+}
+
+body.charitable-dash-v3 .charitable-donor-card-v3:nth-last-child( -n + 2 ):nth-child( 2n + 1 ),
+body.charitable-dash-v3 .charitable-donor-card-v3:nth-last-child( -n + 2 ):nth-child( 2n + 1 ) ~ .charitable-donor-card-v3 {
+	border-bottom: 0;
+}
+
+body.charitable-dash-v3 .charitable-donor-card-v3 .donor-avatar {
+	flex: none;
+	width: 40px;
+	height: 40px;
+}
+
+body.charitable-dash-v3 .charitable-donor-card-v3 .donor-avatar img {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	display: block;
+}
+
+/* min-width:0 lets a long email ellipsize instead of forcing the card wider than its column. */
+body.charitable-dash-v3 .charitable-donor-card-v3 .donor-details {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+body.charitable-dash-v3 .charitable-donor-card-v3 .donor-email,
+body.charitable-dash-v3 .charitable-donor-card-v3 .donor-name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+body.charitable-dash-v3 .charitable-donor-card-v3-meta {
+	flex: none;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 5px;
+	text-align: right;
+}
+
+@media ( max-width: 782px ) {
+	body.charitable-dash-v3 .charitable-donors-grid-v3 {
+		grid-template-columns: 1fr;
+	}
+
+	body.charitable-dash-v3 .charitable-donor-card-v3 {
+		border-right: 0;
+	}
+
+	/* With one column, only the genuine last card should lose its bottom rule. */
+	body.charitable-dash-v3 .charitable-donor-card-v3:nth-last-child( -n + 2 ):nth-child( 2n + 1 ) {
+		border-bottom: 1px solid rgba( 24, 36, 69, 0.1 );
+	}
+
+	body.charitable-dash-v3 .charitable-donor-card-v3:last-child {
+		border-bottom: 0;
+	}
+}
+
+/* Neutral initial-in-a-circle, shown when a donor has no resolvable gravatar. Uses the product-UI
+   text colour at low opacity rather than a new grey, so it reads as absent-data furniture and not
+   as a badge. */
+body.charitable-dash-v3 .charitable-donor-avatar-fallback {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	background: rgba( 25, 29, 45, 0.07 );
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1;
+	color: rgba( 25, 29, 45, 0.5 );
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   12. Tab badges and narrow-screen overflow
+   Seven tabs no longer fit at every width, and the strip cannot wrap: its container is
+   .charitable-dashboard-v2-section-header at a fixed height:70px, so wrapping would push the
+   second row out of the card. So the strip SCROLLS horizontally instead, with a fade on the right
+   edge to advertise that there is more. All tabs stay reachable, the header keeps its height, and
+   nothing is hidden behind a "more" menu.
+
+   Badge colours are both existing precedents rather than new values:
+     new   #31714c - canon brand green, and the colour the Site Analysis card's own NEW badge
+                     already uses, so the feature is flagged the same way in both places.
+     count #df2a4a - the red already used by .number.alert in charitable-admin.css for the admin
+                     header's notification bubble: the same UI pattern, a red circle with a count.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-dashboard-v2-section-header .charitable-dashboard-v2-tab-nav {
+	display: flex;
+	align-items: stretch;
+	height: 100%;
+	min-width: 0;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scrollbar-width: thin;
+	/* Keeps a tab from being left half-scrolled when the strip is flicked. */
+	scroll-snap-type: x proximity;
+	/* Room for the fade so the last tab's text is never sitting under it. */
+	padding-right: 2px;
+}
+
+body.charitable-dash-v3 .charitable-dashboard-v2-section-header .charitable-dashboard-v2-tab-nav .charitable-dashboard-v2-tab-nav-item {
+	flex: none;
+	gap: 8px;
+	scroll-snap-align: start;
+	/* The labels are short; letting them wrap mid-strip would look accidental. */
+	white-space: nowrap;
+}
+
+/* The scrollbar itself is hidden on WebKit — the fade is the affordance, and a visible bar inside
+   a 70px header crowds the tabs. Firefox keeps its thin bar via scrollbar-width above. */
+body.charitable-dash-v3 .charitable-dashboard-v2-section-header .charitable-dashboard-v2-tab-nav::-webkit-scrollbar {
+	height: 0;
+}
+
+/*
+Right-edge fade. On the header rather than the nav so it does not scroll away with the content,
+and pointer-events:none so it never eats a click on the tab underneath it.
+*/
+body.charitable-dash-v3 .charitable-dashboard-top-campaigns .charitable-dashboard-v2-section-header {
+	position: relative;
+}
+
+body.charitable-dash-v3 .charitable-dashboard-top-campaigns .charitable-dashboard-v2-section-header::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	width: 34px;
+	pointer-events: none;
+	background: linear-gradient( to right, rgba( 255, 255, 255, 0 ), #fff 70% );
+}
+
+/* ── Badges ── */
+
+body.charitable-dash-v3 .charitable-tab-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	line-height: 1;
+	color: #fff;
+	flex: none;
+}
+
+/* Pill, matching the Site Analysis card's own NEW badge. */
+body.charitable-dash-v3 .charitable-tab-badge--new {
+	background: #31714c;
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.4px;
+	text-transform: uppercase;
+	padding: 3px 7px;
+	border-radius: 20px;
+}
+
+/* Circle, matching the admin header's notification count bubble. min-width keeps a two-digit
+   count from squashing into an oval. */
+body.charitable-dash-v3 .charitable-tab-badge--count {
+	background: #df2a4a;
+	font-size: 10px;
+	font-weight: 700;
+	min-width: 17px;
+	height: 17px;
+	padding: 0 4px;
+	border-radius: 999px;
+}
+
+/* ── Donation Recovery / Security panels ── */
+
+body.charitable-dash-v3 .charitable-tab-panel {
+	padding: 26px 30px;
+	max-width: 680px;
+}
+
+body.charitable-dash-v3 .charitable-tab-panel-title {
+	margin: 0 0 8px;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.3;
+	color: rgba( 25, 29, 45, 0.9 );
+}
+
+body.charitable-dash-v3 .charitable-tab-panel-lead {
+	margin: 0 0 16px;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13px;
+	line-height: 1.55;
+	color: rgba( 25, 29, 45, 0.65 );
+}
+
+body.charitable-dash-v3 .charitable-security-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+body.charitable-dash-v3 .charitable-security-row {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	padding: 18px 30px;
+	border-bottom: 1px solid rgba( 24, 36, 69, 0.1 );
+}
+
+body.charitable-dash-v3 .charitable-security-row:last-child {
+	border-bottom: 0;
+}
+
+/* Pass and fail reuse the Site Analysis band palette rather than canon, for the same documented
+   reason: canon has no warning token, so there is no canonical way to render "needs attention". */
+body.charitable-dash-v3 .charitable-security-icon {
+	flex: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	margin-top: 1px;
+	color: #31714c;
+}
+
+body.charitable-dash-v3 .charitable-security-row--todo .charitable-security-icon {
+	color: #dba617;
+}
+
+body.charitable-dash-v3 .charitable-security-text {
+	flex: 1 1 auto;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+
+body.charitable-dash-v3 .charitable-security-label {
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13.5px;
+	font-weight: 600;
+	color: rgba( 25, 29, 45, 0.85 );
+}
+
+body.charitable-dash-v3 .charitable-security-detail {
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 12.5px;
+	line-height: 1.5;
+	color: rgba( 25, 29, 45, 0.6 );
+}
+
+body.charitable-dash-v3 .charitable-security-cta {
+	flex: none;
+	text-decoration: none;
+	align-self: center;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   13. Tabs, stretched to fill the strip
+   Donation Recovery and Security are no longer registered. Site Analysis IS - it is added by
+   get_dashboard_tabs() whenever charitable_reports_v3_enabled() is true, which defaults ON for
+   fresh installs and upgrades alike - so the shipping strip carries FIVE tabs, not four, and
+   charitable_dashboard_tabs lets an addon register more.
+
+   This section said "four" and sized the tabs with flex: 1 1 0, which makes every cell exactly
+   1/n of the strip no matter what is in it. At five cells that is ~20% each, and "Site Analysis"
+   plus its 8px gap plus the New badge does not fit in 20% - so the widest label decided whether
+   ANYTHING broke, and it overflowed its cell into the card's right edge. The badge is at its
+   widest ("New" rather than a score) on sites that have never run an analysis, i.e. every new
+   install.
+
+   flex: 1 0 auto instead: each tab starts at its content width and grows to share what is left
+   over, so the strip still fills the card when there is room, and no cell is ever narrower than
+   the label inside it. That holds at four tabs, at five, and at whatever a filter adds.
+   overflow-x is restored as the safety net for a strip genuinely too narrow for its labels -
+   scrolling beats clipping. @since 1.8.15
+
+   Labels are CENTRED in their cells. Note what this does to the 31px left-column alignment: the
+   tab label was the original reference for it, and centring moves that label off 31. Everything
+   else stays put - the table headers immediately below, the period row, "Total Donations", the
+   chart's axis label, the Raise More title and its grid all still sit on 31 - so the column's
+   internal alignment is intact and only the nav row opts out of it. That is the right split:
+   the tab strip is navigation, the rest is content, and they do not need to share a rule.
+
+   The right-edge fade stays off. It belonged to a strip that always scrolled; with content-sized
+   tabs the strip only scrolls in the rare too-narrow case, and a permanently-painted fade would
+   sit over the last tab's label the rest of the time. The scrollbar below is the affordance
+   instead - a scrollbar is only painted when there is something to scroll, so it is self-gating
+   in a way the fade is not.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-dashboard-v2-section-header .charitable-dashboard-v2-tab-nav {
+	width: 100%;
+	overflow-x: auto;
+	padding-right: 0;
+}
+
+body.charitable-dash-v3 .charitable-dashboard-v2-section-header .charitable-dashboard-v2-tab-nav .charitable-dashboard-v2-tab-nav-item {
+	/* Grow to share the leftover width, never shrink below the label. See section note above:
+	   flex-basis: 0 made every cell 1/n of the strip, which is what put "Site Analysis" and its
+	   badge through the card's right edge once the strip went from four tabs to five. */
+	flex: 1 0 auto;
+	justify-content: center;
+	/* Symmetric now that the label is centred; the asymmetric 0 30px was there to put the first
+	   label on the column's 31px line, which centring gives up by design. */
+	padding: 0 16px;
+	text-align: center;
+}
+
+/* Only drawn when the strip actually overflows, so it costs nothing at four or five tabs and
+   gives a 7-tab site something to grab. Overrides the height: 0 set further up, which was there
+   for a strip that scrolled by default. */
+body.charitable-dash-v3 .charitable-dashboard-v2-section-header .charitable-dashboard-v2-tab-nav::-webkit-scrollbar {
+	height: 3px;
+}
+
+body.charitable-dash-v3 .charitable-dashboard-v2-section-header .charitable-dashboard-v2-tab-nav::-webkit-scrollbar-thumb {
+	background-color: rgba( 25, 29, 45, 0.2 );
+	border-radius: 3px;
+}
+
+/* The fade belonged to the scrolling strip; with four flexible tabs there is nothing to fade. */
+body.charitable-dash-v3 .charitable-dashboard-top-campaigns .charitable-dashboard-v2-section-header::after {
+	content: none;
+}
+
+/* The last tab owns the card's right edge, so its divider would draw a line down the card. */
+body.charitable-dash-v3 .charitable-dashboard-v2-section-header .charitable-dashboard-v2-tab-nav .charitable-dashboard-v2-tab-nav-item:last-child {
+	border-right: 0;
+}
+
+/* Narrow: the 30px side padding is the first thing to give, before the labels start clipping. */
+@media ( max-width: 1100px ) {
+	body.charitable-dash-v3 .charitable-dashboard-v2-section-header .charitable-dashboard-v2-tab-nav .charitable-dashboard-v2-tab-nav-item {
+		padding: 0 16px;
+		font-size: 13px;
+	}
+}
+
+/* Learn More sat 3px in from the description above it — the shipping rule gives it a small left
+   offset that only showed once it stopped being indented under the title. */
+body.charitable-dash-v3 .charitable-whats-new-v3 > .charitable-dashboard-v2-blog-post-learn-more {
+	display: inline-block;
+	margin-left: 0;
+	padding-left: 0;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   14. Empty-state overlay on the chart
+   A blurred placeholder chart with a prompt card floating on it, so the card has context behind
+   it rather than sitting in a blank rectangle. The art is decorative and aria-hidden; the blur is
+   what stops anyone reading values off it.
+
+   The real chart container is collapsed rather than hidden with display:none — ApexCharts measures
+   its container on init and a display:none parent makes it initialise at zero width and then
+   render wrong if it is ever revealed. Height 0 with overflow hidden keeps it measurable.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* 360px, up from 260px. The card is centred with top: 50% and a translate, so it stays centred
+   both ways on its own - the extra 100px goes entirely to the blurred chart around it, which is
+   the point: more visible chart makes the card read as sitting ON something. */
+body.charitable-dash-v3 .charitable-chart-empty {
+	position: relative;
+	height: 360px;
+	overflow: hidden;
+}
+
+body.charitable-dash-v3 .charitable-chart-empty-art {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	/* Enough blur to make the line unreadable as data, little enough to still read as a chart. */
+	filter: blur( 2.5px );
+	opacity: 0.9;
+}
+
+body.charitable-dash-v3 .charitable-chart-is-empty {
+	height: 0;
+	overflow: hidden;
+}
+
+/* ── The prompt card ── */
+
+body.charitable-dash-v3 .charitable-chart-empty-card {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate( -50%, -50% );
+	/* Wide enough to land the description on two lines rather than three. */
+	width: min( 580px, calc( 100% - 60px ) );
+	box-sizing: border-box;
+	padding: 24px 28px;
+	text-align: center;
+	background: #fff;
+	/* Darker edge than the 0.1 card border used elsewhere, and a two-part shadow: a tight close
+	   one to define the edge plus a wide soft one for lift. The card floats over a busy blurred
+	   graph rather than sitting on a plain panel, so the standard card treatment disappeared
+	   into it. */
+	border: 1px solid rgba( 24, 36, 69, 0.2 );
+	border-radius: 6px;
+	box-shadow: 0 2px 6px rgba( 25, 29, 45, 0.1 ), 0 12px 32px rgba( 25, 29, 45, 0.16 );
+}
+
+/*
+The long ancestor chains on these two are deliberate. The shipping rules are
+
+    .charitable-dashboard-v2-section:not(.charitable-dashboard-v2-right-column .charitable-dashboard-v2-section) p  { margin: 0 }
+    .charitable-dashboard-v2-section h3 { margin: 0 0 15px }
+
+and a :not() argument contributes its own specificity, so the first scores (0,3,1) - which beat the
+(0,2,1) these rules used to have, flattening both margins to 0 and closing the gaps around the
+description to nothing. Adding the section and card ancestors takes this to (0,4,1), which wins
+outright without reaching for !important.
+*/
+body.charitable-dash-v3 .charitable-dashboard-v2-section .charitable-chart-empty-card .charitable-chart-empty-title {
+	margin: 0 0 14px;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 1.25;
+	color: #191d2d;
+}
+
+body.charitable-dash-v3 .charitable-dashboard-v2-section .charitable-chart-empty-card .charitable-chart-empty-body {
+	margin: 0 0 22px;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13px;
+	font-weight: 400;
+	line-height: 1.55;
+	color: rgba( 25, 29, 45, 0.65 );
+}
+
+/* Second sentence onto its own line. display:block inside the same <p> rather than a second
+   paragraph, so the 22px margin below the description stays a single gap - two paragraphs would
+   have stacked their own margins and reopened the spacing that was tuned here earlier. */
+body.charitable-dash-v3 .charitable-chart-empty-body-line {
+	display: block;
+}
+
+body.charitable-dash-v3 .charitable-chart-empty-actions {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+/* Same button geometry as the Enhance/Raise More buttons, so the dashboard has one button shape.
+   Primary is #fc9a2a, the Activate orange already in charitable-admin-dashboard.css; secondary is
+   the same value as an outline, which is how WPForms distinguishes its pair. */
+body.charitable-dash-v3 .charitable-chart-empty-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 9px 18px;
+	border-radius: 4px;
+	border: 1px solid transparent;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 100%;
+	text-decoration: none;
+	box-shadow: none;
+	transition: all 0.2s ease;
+}
+
+body.charitable-dash-v3 .charitable-chart-empty-button--primary {
+	background: #fc9a2a;
+	border-color: #fc9a2a;
+	color: #fff;
+}
+
+body.charitable-dash-v3 .charitable-chart-empty-button--primary:hover,
+body.charitable-dash-v3 .charitable-chart-empty-button--primary:focus {
+	background: #fc8c0c;
+	border-color: #fc8c0c;
+	color: #fff;
+}
+
+body.charitable-dash-v3 .charitable-chart-empty-button--secondary {
+	background: #fff;
+	border-color: #fc9a2a;
+	color: #b4721f;
+}
+
+body.charitable-dash-v3 .charitable-chart-empty-button--secondary:hover,
+body.charitable-dash-v3 .charitable-chart-empty-button--secondary:focus {
+	background: rgba( 252, 154, 42, 0.1 );
+	border-color: #fc8c0c;
+	color: #99601a;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   15. Active tab plate — GREEN, not grey
+   The grey plate this replaced was rgb( 25 29 45 / 11% ), and the table header immediately below
+   the strip is rgba( 25, 29, 45, 0.02 ). Two desaturated greys on a white card: the selected tab
+   read as DISABLED rather than chosen, and hover at 0.03 sat between them doing nothing visible.
+
+   Green at 9% of canon #31714c fixes it by changing the axis. The separation is now colour rather than
+   value, so it cannot collide with any grey on the page no matter how the table header, the card
+   or the wp-admin ground shift around it — and it matches the green text and underline the active
+   tab already carries, so the tab reads as one object instead of a grey box with green writing.
+
+   Hover stays grey-free for the same reason: a 4% green wash, deep enough to preview the active
+   state it leads to. Active+hover goes to 13% so hovering the selected tab is not a no-op.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-dashboard-v2-section-header .charitable-dashboard-v2-tab-nav .charitable-dashboard-v2-tab-nav-item:hover {
+	color: rgba( 25, 29, 45, 0.8 );
+	background-color: rgba( 49, 113, 76, 0.04 );
+	border-bottom-color: rgba( 49, 113, 76, 0.25 );
+}
+
+/*
+Top and left outline, drawn with an inset box-shadow rather than real borders.
+
+border-top / border-left would add 1px to the box and shove the label a pixel down and right,
+which is visible when the neighbouring tabs do not move. An inset shadow paints the same 1px lines
+inside the existing box, so the outline costs no layout at all.
+
+The lines are the plate's own green at 0.3 - dark enough to read as an edge against both the white
+card and the tinted plate, without becoming a second underline competing with the real one.
+*/
+body.charitable-dash-v3 .charitable-dashboard-v2-section-header .charitable-dashboard-v2-tab-nav .charitable-dashboard-v2-tab-nav-item.charitable-dashboard-v2-tab-nav-active {
+	background-color: rgba( 49, 113, 76, 0.09 );
+	box-shadow: inset 1px 1px 0 0 rgba( 49, 113, 76, 0.3 );
+}
+
+body.charitable-dash-v3 .charitable-dashboard-v2-section-header .charitable-dashboard-v2-tab-nav .charitable-dashboard-v2-tab-nav-item.charitable-dashboard-v2-tab-nav-active:hover {
+	background-color: rgba( 49, 113, 76, 0.13 );
+	box-shadow: inset 1px 1px 0 0 rgba( 49, 113, 76, 0.38 );
+}
+
+/*
+Line icons carry a single colour, so the tint lives here rather than in each glyph.
+
+#fc9a2a is canon brand orange, whose documented role is "primary brand accent, CTA buttons, icon
+fills" - so an icon fill is literally what it is for. It replaces rgba( 25, 29, 45, 0.55 ), the
+product-UI text colour, which was chosen on the grounds that a coloured icon would compete with
+the Activate and Upgrade buttons below it. That call is now overridden deliberately: the icons
+are brand orange.
+
+Worth knowing: the buttons in this same card are #fc9a2a, the shipping Activate orange from
+charitable-admin-dashboard.css, matched there on purpose so they are identical to the Enhance
+card's. So the card now carries two oranges - canon on the icons, the shipping button orange on
+the buttons. If they should be identical instead, this one value is the only edit.
+*/
+body.charitable-dash-v3 .charitable-raise-more-icon {
+	color: #fc9a2a;
+}
+
+body.charitable-dash-v3 .charitable-raise-more-icon svg {
+	width: 20px;
+	height: 20px;
+	display: block;
+}
+
+/*
+Closes the white band under the placeholder chart. Three things contributed 41px of it: the
+collapsed real chart container still carried its top margin, and the stats section kept its own
+20px bottom padding. In the empty state the art is meant to run to the card's bottom edge, the way
+the real chart's own baseline does, so both are removed — but only via the
+.charitable-stats-has-empty-chart class, so the normal chart keeps its spacing untouched.
+
+Flagged from PHP rather than with :has() so there is no browser-support question in wp-admin.
+*/
+/*
+!important here is not laziness - it is the only thing that works. charitable-admin-dashboard.css
+carries
+
+    .charitable-dashboard-v2-stats-row-section { padding: 0 0 20px !important; padding-bottom: 20px !important; }
+
+so no amount of specificity on this side can win; an !important declaration is only beaten by
+another one. Two earlier attempts at this rule failed for that reason, and the white band stayed on
+screen both times while the selector looked like it should have applied. If this stops working,
+check whether that shipping !important moved before adjusting anything here.
+*/
+body.charitable-dash-v3 .charitable-dashboard-v2-section.charitable-stats-has-empty-chart {
+	padding-bottom: 0 !important;
+}
+
+body.charitable-dash-v3 .charitable-stats-has-empty-chart .charitable-chart-is-empty {
+	margin: 0;
+}
+
+/*
+Glyph sizing. Measured heights before this: notifications 30x35 (its svg is 30x34.5 with a -4px
+offset), Help 25x25, and the two new icons 25x25 — so they matched Help but read as short beside
+the inbox, which is the tallest thing in the row. 28px splits the difference and makes the four
+scan as one set. Both are stroked, so both take the same 28px.
+*/
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-header-videos svg,
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-header-whats-new svg {
+	width: 28px;
+	height: 28px;
+}
+
+
+
+
+/* ──────────────────────────────────────────────────────────────────────────
+   16. Rail health card
+   Version on one line, then protection ON/OFF per item. Replaced three separate status tiles once
+   the Site Score moved to the Site Analysis tab badge: two remaining tiles did not justify a row,
+   and version and security are both "is this install in good shape" questions that read better as
+   one answer.
+
+   ON/OFF rather than a score, because each protection is genuinely binary and an aggregate would
+   hide which one is off. The count in the header ("2 of 3 on") gives the glanceable summary
+   without costing the detail.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-health-card {
+	background: #fff;
+	border: 1px solid rgba( 24, 36, 69, 0.1 );
+	border-radius: 4px;
+	box-shadow: 0 3px 3px rgba( 0, 0, 0, 0.05 );
+	overflow: hidden;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ── Version line ── */
+
+body.charitable-dash-v3 .charitable-health-version {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 13px 18px;
+	border-bottom: 1px solid rgba( 24, 36, 69, 0.1 );
+}
+
+/*
+Tinted version row.
+
+rgba( 49, 113, 76, 0.07 ) is canon brand-green #31714c - the same value the "Up to date" check
+beside it now uses - at 7%. Low enough that the black text on it still reads at full contrast,
+strong enough to separate the row from the status rows beneath without needing a heavier border.
+
+Was a 7% tint of #5AA152, the plugin-wide admin green, until 2026-11-03. The check and the row it
+tints were converged together so the row does not sit under a differently-green tick.
+
+The amber variant uses #dba617 from the same band palette, so a site with an update pending gets
+a row that reads as "attention" rather than one that quietly claims to be fine.
+*/
+body.charitable-dash-v3 .charitable-health-version--current {
+	background: rgba( 49, 113, 76, 0.07 );
+}
+
+body.charitable-dash-v3 .charitable-health-version--behind {
+	background: rgba( 219, 166, 23, 0.09 );
+}
+
+body.charitable-dash-v3 .charitable-health-version-name {
+	font-size: 13px;
+	font-weight: 400;
+	color: rgba( 25, 29, 45, 0.6 );
+}
+
+body.charitable-dash-v3 .charitable-health-version-name strong {
+	font-weight: 600;
+	color: rgba( 25, 29, 45, 0.9 );
+}
+
+body.charitable-dash-v3 .charitable-health-version-status {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 12px;
+	font-weight: 500;
+	color: #31714c;
+	white-space: nowrap;
+}
+
+/* An update available is the one actionable thing on this line, so it gets link treatment. */
+body.charitable-dash-v3 .charitable-health-version-action {
+	font-size: 12px;
+	font-weight: 600;
+	color: #056aab;
+	text-decoration: underline;
+	box-shadow: none;
+	white-space: nowrap;
+}
+
+/* ── Protection header ── */
+
+body.charitable-dash-v3 .charitable-health-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 12px 18px 8px;
+}
+
+body.charitable-dash-v3 .charitable-health-head-title {
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.5px;
+	text-transform: uppercase;
+	color: rgba( 25, 29, 45, 0.45 );
+}
+
+body.charitable-dash-v3 .charitable-health-head-count {
+	font-size: 11.5px;
+	font-weight: 500;
+	color: rgba( 25, 29, 45, 0.5 );
+}
+
+/* ── Protection rows ── */
+
+body.charitable-dash-v3 .charitable-health-checks {
+	margin: 0;
+	padding: 0 18px 4px;
+	list-style: none;
+}
+
+body.charitable-dash-v3 .charitable-health-check {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 7px 0;
+}
+
+body.charitable-dash-v3 .charitable-health-check-label {
+	flex: 1 1 auto;
+	min-width: 0;
+	font-size: 13px;
+	font-weight: 500;
+	color: rgba( 25, 29, 45, 0.8 );
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+body.charitable-dash-v3 .charitable-health-check-fix {
+	flex: none;
+	font-size: 11.5px;
+	font-weight: 600;
+	color: #056aab;
+	text-decoration: underline;
+	box-shadow: none;
+}
+
+/* The state word is the column the eye scans, so it is fixed-width and right-aligned. */
+body.charitable-dash-v3 .charitable-health-check-state {
+	flex: none;
+	min-width: 26px;
+	text-align: right;
+	font-size: 12px;
+	font-weight: 600;
+	color: #31714c;
+}
+
+body.charitable-dash-v3 .charitable-health-check--off .charitable-health-check-state {
+	color: #dba617;
+}
+
+body.charitable-dash-v3 .charitable-health-check--off .charitable-health-check-label {
+	color: rgba( 25, 29, 45, 0.6 );
+}
+
+/* ── Blocked attempts ── */
+
+body.charitable-dash-v3 .charitable-health-foot {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 11px 18px;
+	border-top: 1px solid rgba( 24, 36, 69, 0.1 );
+	background: rgba( 25, 29, 45, 0.02 );
+}
+
+body.charitable-dash-v3 .charitable-health-foot-label {
+	font-size: 12px;
+	font-weight: 500;
+	color: rgba( 25, 29, 45, 0.6 );
+}
+
+body.charitable-dash-v3 .charitable-health-foot-value {
+	font-size: 12px;
+	font-weight: 600;
+	color: rgba( 25, 29, 45, 0.75 );
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   17. "Import From GiveWP" under the empty-state buttons
+   Plain centred grey text, third in the hierarchy behind the two buttons - no button chrome and no
+   arrow, so it reads as an aside rather than as a third equal action.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-chart-empty-import {
+	display: block;
+	margin-top: 14px;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 1.4;
+	text-align: center;
+	color: rgba( 25, 29, 45, 0.5 );
+	text-decoration: none;
+	box-shadow: none;
+}
+
+body.charitable-dash-v3 .charitable-chart-empty-import:hover,
+body.charitable-dash-v3 .charitable-chart-empty-import:focus {
+	color: rgba( 25, 29, 45, 0.75 );
+	text-decoration: underline;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   18. Recommendations (treatment C)
+   Icon, title, reason, action - the reason line is the point: "Email is not secure" tells you
+   nothing, "receipts often land in spam" tells you what breaks. Three visible, the rest behind a
+   "Show N more", each row dismissible.
+
+   Only the FIRST row gets a filled button. Three stacked filled buttons in a 452px rail are three
+   competing calls to action; one primary plus quiet outlines keeps the priority order readable.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-rec-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/* Single-line rows since the reason lines were removed, so everything centres on one baseline
+   instead of hanging from the top. */
+body.charitable-dash-v3 .charitable-rec {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 11px;
+	/* Tightened from 11px: with the reason lines gone each row is a single line of text, so the
+	   old padding left them floating in their own dividers. */
+	padding: 7px 18px;
+	border-top: 1px solid rgba( 24, 36, 69, 0.08 );
+}
+
+body.charitable-dash-v3 .charitable-rec:first-child {
+	border-top: 0;
+}
+
+/*
+Required, and a trap worth naming: the browser's own [hidden] { display: none } is a plain element
+rule, so the display:flex above BEATS it and a row carrying the hidden attribute renders anyway.
+Caught here as all four recommendations showing while the "Show 1 more" button sat underneath them.
+Any flex or grid row that also relies on [hidden] needs this restated.
+*/
+body.charitable-dash-v3 .charitable-rec[hidden] {
+	display: none;
+}
+
+body.charitable-dash-v3 .charitable-rec-icon {
+	flex: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+	color: rgba( 25, 29, 45, 0.55 );
+}
+
+/* Real product marks keep their own colour; the stroked glyphs inherit the muted grey above. */
+body.charitable-dash-v3 .charitable-rec-icon img {
+	width: 18px;
+	height: 18px;
+	display: block;
+	object-fit: contain;
+}
+
+/* The title is the only text left, so it takes the flex slot the body wrapper used to hold.
+   No nowrap: a long title should wrap to two lines rather than be truncated, since with the
+   description gone the title is now the entire explanation. */
+body.charitable-dash-v3 .charitable-rec-title {
+	flex: 1 1 auto;
+	min-width: 0;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.35;
+	color: rgba( 25, 29, 45, 0.85 );
+}
+
+/* ── Actions ── */
+
+body.charitable-dash-v3 .charitable-rec-cta {
+	flex: none;
+	align-self: center;
+	padding: 5px 11px;
+	border: 1px solid rgba( 14, 33, 33, 0.14 );
+	border-radius: 4px;
+	background: #fff;
+	font-size: 11.5px;
+	font-weight: 500;
+	line-height: 1.3;
+	color: rgba( 14, 33, 33, 0.8 );
+	text-decoration: none;
+	white-space: nowrap;
+	box-shadow: none;
+	transition: all 0.2s ease;
+}
+
+body.charitable-dash-v3 .charitable-rec-cta:hover,
+body.charitable-dash-v3 .charitable-rec-cta:focus {
+	background: rgba( 14, 33, 33, 0.05 );
+	border-color: rgba( 14, 33, 33, 0.2 );
+}
+
+/* #fc9a2a / #fc8c0c - the Activate orange already in charitable-admin-dashboard.css. */
+body.charitable-dash-v3 .charitable-rec-cta--primary {
+	background: #fc9a2a;
+	border-color: #fc9a2a;
+	color: #fff;
+}
+
+body.charitable-dash-v3 .charitable-rec-cta--primary:hover,
+body.charitable-dash-v3 .charitable-rec-cta--primary:focus {
+	background: #fc8c0c;
+	border-color: #fc8c0c;
+	color: #fff;
+}
+
+/* ── Show more ── */
+
+body.charitable-dash-v3 .charitable-rec-more {
+	display: block;
+	width: 100%;
+	padding: 11px 18px;
+	border: 0;
+	border-top: 1px solid rgba( 24, 36, 69, 0.1 );
+	background: rgba( 25, 29, 45, 0.02 );
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 12px;
+	font-weight: 600;
+	color: #056aab;
+	text-align: center;
+	cursor: pointer;
+}
+
+body.charitable-dash-v3 .charitable-rec-more:hover {
+	background: rgba( 25, 29, 45, 0.045 );
+}
+
+/* ── All clear ── */
+
+body.charitable-dash-v3 .charitable-rec-clear {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 16px 18px;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 12.5px;
+	font-weight: 500;
+	color: rgba( 25, 29, 45, 0.6 );
+}
+
+body.charitable-dash-v3 .charitable-rec-clear svg {
+	flex: none;
+	color: #31714c;
+}
+
+/*
+Score badge: a solid circle, not the pill the other badge types use. The background colour arrives
+as an inline style from site_analysis_scale_color() so it tracks the 70/40 thresholds; only the
+shape lives here. Fixed width and height with a min-width guard so 7, 72 and 100 all stay round
+rather than stretching into an oval.
+*/
+/*
+Score circle.
+
+align-items: center centres the LINE BOX, not the glyphs, and with line-height: 1 the line box is
+shorter than the font's own ascent + descent - so the digits landed 0.75px above the circle's
+centre. Measured, not guessed: the badge box centred on y=931.69 while a Range over its text
+centred on y=930.94.
+
+The padding is the compensation, and it is on the TOP with box-sizing: border-box, so it shrinks
+the content box from above and pushes the centred digits down by half its value. 1.5px to move
+0.75px. Re-measure if the font stack or font-size here changes, because both move this number.
+*/
+body.charitable-dash-v3 .charitable-tab-badge--score {
+	box-sizing: border-box;
+	width: 22px;
+	height: 22px;
+	min-width: 22px;
+	padding: 1.5px 0 0;
+	border-radius: 50%;
+	font-size: 10.5px;
+	font-weight: 700;
+	letter-spacing: -0.2px;
+}
+
+
+body.charitable-dash-v3 .charitable-rec-restore {
+	padding: 0;
+	border: 0;
+	background: none;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 12px;
+	font-weight: 600;
+	color: #056aab;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+/*
+The nested collapsible borrows .charitable-dashboard-v2-section-content so the shipping toggle
+handler can animate it, which also drags in that class's own padding. Zeroed here: the rows carry
+their own 18px inset, and the inherited bottom padding left a gap above the "Show more" button.
+*/
+body.charitable-dash-v3 .charitable-rec-collapsible .charitable-dashboard-v2-section-content {
+	padding: 0;
+}
+
+/* The chevron sits in the Recommended header, which is not a .charitable-dashboard-v2-section-header,
+   so it needs its own alignment rather than inheriting that rule's. */
+body.charitable-dash-v3 .charitable-health-head .charitable-dashboard-v2-toggle {
+	display: flex;
+	align-items: center;
+	color: rgba( 25, 29, 45, 0.4 );
+	text-decoration: none;
+	box-shadow: none;
+}
+
+body.charitable-dash-v3 .charitable-health-head .charitable-dashboard-v2-toggle:hover {
+	color: rgba( 25, 29, 45, 0.7 );
+}
+
+/*
+The collapse rule has to be restated for this wrapper. The shipping one is
+
+    .charitable-dashboard-v2-section.charitable-dashboard-v2-collapsible.charitable-dashboard-v2-collapsed .charitable-dashboard-v2-section-content
+
+so it requires .charitable-dashboard-v2-section on the SAME element as the collapsible class. This
+wrapper deliberately does not carry it — that class brings the card chrome (white ground, border,
+shadow, 20px padding) and would draw a second card box inside the health card. The JS toggled the
+class correctly and nothing moved, because only this rule was missing.
+
+!important mirrors the shipping declarations, which use it themselves.
+*/
+body.charitable-dash-v3 .charitable-rec-collapsible.charitable-dashboard-v2-collapsed .charitable-dashboard-v2-section-content {
+	max-height: 0 !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+	opacity: 0;
+	overflow: hidden;
+}
+
+body.charitable-dash-v3 .charitable-rec-collapsible .charitable-dashboard-v2-section-content {
+	/* The animated property, matching the shipping transition. */
+	max-height: 1200px;
+	transition: max-height 0.3s ease, opacity 0.3s ease;
+	overflow: hidden;
+}
+
+body.charitable-dash-v3 .charitable-rec-collapsible.charitable-dashboard-v2-collapsed .charitable-dashboard-v2-toggle .charitable-dashboard-v2-angle-down {
+	transform: rotate( -90deg );
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   19. Integrations
+   Matched to WPForms' integrations block: a grid of bordered cards, each carrying a tier badge in
+   the top-right corner, a centred logo, the name, and an action link - then a footer band with the
+   note on the left and the button on the right.
+
+   Cards rather than the interior-rule grid this section carried first, because the badge needs a
+   corner to sit in: absolutely positioned against a cell with no border of its own it reads as
+   floating in the gap between two names.
+
+   Logos are held at 40px and NOT recoloured: these are third-party marks and normalising them to
+   one grey would misrepresent them. Webhooks is the exception - no brand exists at all - and takes
+   a stroked glyph at 32px in the same muted grey as the recommendation icons.
+   ────────────────────────────────────────────────────────────────────────── */
+/*
+The left-column padding reset section 7 warns about. charitable-admin-dashboard.css pads every
+LEFT-column section 20px, and this card inherited it - which is what put the grid, the footer band
+and the card title all 20px further in than Raise More's. Same three-rule reset the Raise More
+card uses: zero the section, then carry the 30px inset on the header, the grid and the footer so
+the footer's grey band reaches the card edges the way WPForms' does.
+*/
+body.charitable-dash-v3 #charitable-dashboard-v2-integrations {
+	padding: 0;
+}
+
+body.charitable-dash-v3 #charitable-dashboard-v2-integrations .charitable-dashboard-v2-section-header {
+	padding-left: 30px;
+	padding-right: 30px;
+}
+
+body.charitable-dash-v3 #charitable-dashboard-v2-integrations .charitable-dashboard-v2-section-content {
+	padding: 0;
+}
+
+
+body.charitable-dash-v3 .charitable-integrations-grid {
+	display: grid;
+	grid-template-columns: repeat( 4, 1fr );
+	gap: 12px;
+	margin: 0;
+	/* 30px left/right, matching the Raise More items, so the card edges line up column to column. */
+	padding: 22px 30px;
+	list-style: none;
+}
+
+/* align-items defaults to stretch, so every card in a row matches the tallest - which is what
+   keeps the action links on one baseline when a name wraps to two lines in translation. */
+body.charitable-dash-v3 .charitable-integration {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-width: 0;
+	padding: 22px 14px 18px;
+	border: 1px solid rgba( 24, 36, 69, 0.1 );
+	border-radius: 4px;
+	background: #fff;
+	text-align: center;
+}
+
+/* Tier badge. A grey plate rather than a per-tier colour ladder while every card reads PRO: eight
+   identical coloured badges would look like a status the site is in, not a tier the integration
+   needs. --pro is a modifier so a real tier lookup can add --free / --plus / --elite later without
+   touching the base rule. */
+body.charitable-dash-v3 .charitable-integration-tier {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	padding: 3px 6px;
+	border-radius: 3px;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 10px;
+	font-weight: 600;
+	line-height: 1;
+	letter-spacing: 0.4px;
+	text-transform: uppercase;
+}
+
+/*
+One badge treatment per plan, all of them grey plates. WPForms colours nothing here either - the
+badge answers "which plan" and the action underneath answers "what do I do", so tinting the badge
+would put two competing signals in one card. --free is the only one that leans, because a free
+integration is genuinely different news from a paid one.
+*/
+body.charitable-dash-v3 .charitable-integration-tier--lite,
+body.charitable-dash-v3 .charitable-integration-tier--basic,
+body.charitable-dash-v3 .charitable-integration-tier--plus,
+body.charitable-dash-v3 .charitable-integration-tier--pro,
+body.charitable-dash-v3 .charitable-integration-tier--elite {
+	background: rgba( 25, 29, 45, 0.07 );
+	color: rgba( 25, 29, 45, 0.55 );
+}
+
+body.charitable-dash-v3 .charitable-integration-tier--lite {
+	background: rgba( 90, 161, 82, 0.16 );
+	color: #276c35;
+}
+
+body.charitable-dash-v3 .charitable-integration-logo {
+	flex: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+}
+
+body.charitable-dash-v3 .charitable-integration-logo img {
+	width: 40px;
+	height: 40px;
+	display: block;
+	object-fit: contain;
+}
+
+body.charitable-dash-v3 .charitable-integration-name {
+	margin-top: 14px;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13.5px;
+	font-weight: 600;
+	line-height: 1.3;
+	color: rgba( 25, 29, 45, 0.9 );
+}
+
+/* #087ce1 - the product-ui accent-blue token, which is canon for links and secondary actions in
+   admin. WPForms uses its own blue here; this is the same treatment in our value rather than a
+   copy of theirs. Underlined by default, matching the screenshot, so the hover drops the underline
+   rather than needing a second colour. */
+body.charitable-dash-v3 .charitable-integration-action {
+	margin-top: 7px;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13px;
+	font-weight: 400;
+	line-height: 1.3;
+	color: #087ce1;
+	text-decoration: underline;
+	box-shadow: none;
+}
+
+/* DEAD as of 1.8.19 - both rules below are now unreachable and are kept only until someone
+   decides whether the "already running" state ever comes back. get_integrations_items() drops an
+   active item entirely rather than rendering it, so nothing emits .charitable-integration-state
+   or the --installed modifier any more. Delete with the preview file, or restore the state branch
+   in render_integrations_section() if the decision reverses. */
+
+/* "Installed" sits where the action sits, so the row of cards stays on one baseline - but it is
+   text, not a control, so it takes the muted grey and no underline. */
+body.charitable-dash-v3 .charitable-integration-state {
+	margin-top: 7px;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.3;
+	color: rgba( 25, 29, 45, 0.45 );
+}
+
+/* An already-installed card is not the one to look at, so it recedes a little. */
+body.charitable-dash-v3 .charitable-integration--installed .charitable-integration-logo {
+	opacity: 0.55;
+}
+
+body.charitable-dash-v3 .charitable-integration-action:hover,
+body.charitable-dash-v3 .charitable-integration-action:focus {
+	color: #087ce1;
+	text-decoration: none;
+	box-shadow: none;
+}
+
+/* ── Actions are small BUTTONS, not links ──────────────────────────────────
+   These started as blue underlined links. They read as prose in a card whose whole job is
+   offering an action, and the two kinds of action were indistinguishable: "Activate" installs
+   something on your site, "Upgrade" takes your money, and both looked like the same link.
+
+   Role split, the same one §8 applies to the Raise More buttons and for the same reason:
+
+     ORANGE  install / activate  - free, or already paid for. The action we want taken.
+     GREY    upgrade, installed  - costs money, or is already done.
+
+   That is deliberately the opposite of the usual "make the upsell loudest" instinct.
+
+   Colours are this file's existing pair, not new values: #fc9a2a / #fc8c0c is the Activate
+   orange §8 and the §19 footer button already use, and the greys are the rgba(14,33,33,…)
+   secondary-button set from §8. Converted TO canon #fc9a2a in 1.8.19 rather than matched to
+   the file's old off-canon orange - these were new files, so the canon rule applied. The token
+   file's asBuilt list, so drift-check.py cannot see it.
+
+   Both elements share .charitable-integration-action, so the BASE is the grey button (which the
+   upgrade anchor takes) and --button overrides to orange. The button also carries
+   .charitable-dashboard-v2-enhance-grid-button, which is a BEHAVIOUR hook binding it to the
+   shared handler - its paint is scoped through an ancestor this card does not have, which is why
+   §8 had to re-declare the Raise More buttons too.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-integration-action,
+body.charitable-dash-v3 .charitable-integration-action--button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	margin-top: 9px;
+	padding: 6px 14px;
+	border: 1px solid rgba( 14, 33, 33, 0.14 );
+	border-radius: 3px;
+	background: #fff;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 1;
+	letter-spacing: 0;
+	color: rgba( 14, 33, 33, 0.8 );
+	text-decoration: none;
+	cursor: pointer;
+	box-shadow: none;
+	text-shadow: none;
+	min-height: 0;
+	height: auto;
+	transition: all 0.2s ease;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+body.charitable-dash-v3 .charitable-integration-action:hover,
+body.charitable-dash-v3 .charitable-integration-action:focus {
+	background: rgba( 14, 33, 33, 0.05 );
+	border-color: rgba( 14, 33, 33, 0.2 );
+	color: rgba( 14, 33, 33, 0.9 );
+	text-decoration: none;
+}
+
+/* INSTALL: orange. Something has to be fetched before it can run. */
+body.charitable-dash-v3 .charitable-integration-action--button {
+	border-color: #fc9a2a;
+	background: #fc9a2a;
+	color: #fff;
+}
+
+body.charitable-dash-v3 .charitable-integration-action--button:hover,
+body.charitable-dash-v3 .charitable-integration-action--button:focus {
+	border-color: #fc8c0c;
+	background: #fc8c0c;
+	color: #fff;
+}
+
+/* ACTIVATE: Charitable green. A three-step ladder rather than two, which is what the states
+   actually are - green you already own it and it just needs switching on, orange it has to be
+   fetched first, grey it costs money or is already done. Targeted on data-action rather than the
+   label, since the label is translated.
+
+   #31714c is CANON brand-green, whose documented role is "CTA panels, dark brand surfaces".
+   White on it is 5.84:1, comfortably past AA. As of 2026-11-03 this is no longer the only canon
+   green in the file: the dashboard's accent greens were converged on it, so #5AA152 and #33842a
+   survive here only inside comments. #276c35 remains, as the green leg of the health-pill scale.
+
+   The hover is DERIVED, and canon is silent here: brand-green has no dark companion the way
+   brand-orange has brand-orange-dark. brand-green-dark #0d2116 is a video-composition background
+   and would read as near-black on a 26px button, so it is deliberately not used. #2a6041 is
+   #31714c darkened ~15% at the same hue. Confirm against Figma before reusing it elsewhere. */
+body.charitable-dash-v3 .charitable-integration-action--button[data-action="activate"],
+body.charitable-dash-v3 .charitable-integration-action--button[data-action="activate_addon"] {
+	border-color: #31714c;
+	background: #31714c;
+	color: #fff;
+}
+
+body.charitable-dash-v3 .charitable-integration-action--button[data-action="activate"]:hover,
+body.charitable-dash-v3 .charitable-integration-action--button[data-action="activate"]:focus,
+body.charitable-dash-v3 .charitable-integration-action--button[data-action="activate_addon"]:hover,
+body.charitable-dash-v3 .charitable-integration-action--button[data-action="activate_addon"]:focus {
+	border-color: #2a6041;
+	background: #2a6041;
+	color: #fff;
+}
+
+/* Canon accent-blue #087ce1, the same focus ring §9 and the upgrade CTA use. */
+body.charitable-dash-v3 .charitable-integration-action:focus-visible,
+body.charitable-dash-v3 .charitable-integration-action--button:focus-visible {
+	outline: 2px solid #087ce1;
+	outline-offset: 2px;
+}
+
+/* ── In-flight spinner ──
+   The shared handler sets the text to "Installing..." / "Activating..." and disables the button
+   for the duration of the request, then on success swaps in a new label and ADDS
+   .charitable-dashboard-v2-installed-button (see handleAddonActivate in
+   charitable-admin-dashboard.js). So :disabled alone cannot tell in-flight from finished - both
+   are disabled. The :not() on that class is what separates them, and it means no JS change was
+   needed to get a spinner. */
+body.charitable-dash-v3 .charitable-integration-action--button:disabled:not( .charitable-dashboard-v2-installed-button )::before {
+	content: "";
+	flex: none;
+	width: 11px;
+	height: 11px;
+	border: 2px solid currentColor;
+	border-top-color: transparent;
+	border-radius: 50%;
+	animation: charitable-integration-spin 0.6s linear infinite;
+}
+
+body.charitable-dash-v3 .charitable-integration-action--button:disabled {
+	cursor: default;
+	opacity: 0.85;
+}
+
+@keyframes charitable-integration-spin {
+	to { transform: rotate( 360deg ); }
+}
+
+/* Honour the OS setting, as §23 already does for the accordion. A static ring still reads as
+   "busy" next to "Installing...", so the state survives the animation being off. */
+@media ( prefers-reduced-motion: reduce ) {
+	body.charitable-dash-v3 .charitable-integration-action--button:disabled::before {
+		animation: none;
+	}
+}
+
+/* ── The finished "Installed" state ──
+   The THIRD !important block in this file, and like the other two (the stats-row padding and the
+   collapsed-section max-height) it is buying its way past a shipping !important rather than
+   starting a fight. render_enhance_campaign_section() prints an inline <style> containing
+
+       .charitable-dashboard-v2-installed-button { background-color: #6c757d !important; … }
+
+   unscoped, so the moment the JS adds that class on success the button turns Bootstrap-grey
+   #6c757d - a foreign value, and a different grey from the upgrade button sitting beside it.
+   !important beats non-important regardless of specificity, so there is no selector that wins
+   without one. Scoped to this card only. Same underlying problem as the upgrade-button paint
+   documented in render_upgrade_body(). */
+body.charitable-dash-v3 .charitable-integration .charitable-dashboard-v2-installed-button {
+	border-color: rgba( 14, 33, 33, 0.14 ) !important;
+	background: #fff !important;
+	color: rgba( 14, 33, 33, 0.45 ) !important;
+	cursor: default !important;
+	opacity: 1 !important;
+}
+
+/* ── Footer ── */
+
+/* rgba( 25, 29, 45, 0.03 ) is the lightest documented opacity step of the product-ui text token,
+   which is the same band WPForms' grey footer sits in. The card's own overflow: hidden clips it to
+   the 4px radius, so no per-corner radius is needed here. */
+body.charitable-dash-v3 .charitable-integrations-footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 12px 20px;
+	padding: 18px 30px;
+	border-top: 1px solid rgba( 24, 36, 69, 0.1 );
+	background: rgba( 25, 29, 45, 0.03 );
+}
+
+body.charitable-dash-v3 .charitable-integrations-note {
+	flex: 1 1 260px;
+	margin: 0;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13px;
+	font-weight: 400;
+	line-height: 1.5;
+	color: rgba( 25, 29, 45, 0.6 );
+}
+
+/* #fc9a2a / #fc8c0c - the Activate orange already in charitable-admin-dashboard.css. */
+body.charitable-dash-v3 .charitable-integrations-button {
+	flex: none;
+	display: inline-flex;
+	align-items: center;
+	padding: 8px 16px;
+	border: 1px solid #fc9a2a;
+	border-radius: 4px;
+	background: #fc9a2a;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1;
+	color: #fff;
+	text-decoration: none;
+	box-shadow: none;
+	transition: all 0.2s ease;
+}
+
+body.charitable-dash-v3 .charitable-integrations-button:hover,
+body.charitable-dash-v3 .charitable-integrations-button:focus {
+	background: #fc8c0c;
+	border-color: #fc8c0c;
+	color: #fff;
+}
+
+/* Four cards need roughly 200px each to hold "Uncanny Automator" on one line; below that the left
+   column drops to two, which is also where the Raise More grid and Top Donors already step down. */
+@media ( max-width: 1500px ) {
+	body.charitable-dash-v3 .charitable-integrations-grid {
+		grid-template-columns: repeat( 2, 1fr );
+	}
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   20. Site Status rows (health card)
+   Treatment D of the four mocked up: a dense two-column key/value list between the version line
+   and Recommended. Two lines tall, no buttons, and every state carries a WORD as well as a
+   colour, so the meaning survives for a reader who cannot separate the green dot from the amber.
+
+   Deliberately quieter than the Recommended rows below it - smaller type, no icons, no actions -
+   because the two areas answer different questions and the card should not read as one long list
+   of eight similar rows.
+
+   Tones are the Site Analysis band palette already in this file (#5AA152 / #dba617 / #d63638), so
+   an On here is the same green as the score ring in the tab.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* The SITE STATUS eyebrow was here. Removed - with the version row tinted above it, the rows
+   below are visibly a separate block already, and the label was spending 20px to say so twice.
+   The grid picks up the top padding it was providing. */
+
+/*
+Two columns. It went to one briefly, when the notes were longer: at 207px per cell the old
+"Get WP Mail SMTP (4M+ Active Installs · ★ 4.8)" broke mid-parenthetical. The shorter notes fit,
+and the two that still wrap ("We recommend WP Mail SMTP or a similar plugin.", "Captcha Not
+Installed. View Settings") now break at word boundaries in ordinary prose, which reads fine where
+snapping a bracket in half did not.
+*/
+body.charitable-dash-v3 .charitable-health-status {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	/*
+	The Enhance Your Campaigns idiom, copied deliberately: a 1px gap over a tinted grid ground, so
+	the GAP is the divider. One declaration draws both the vertical rule between columns and the
+	horizontal one between rows, it needs no nth-child arithmetic, and it stays correct if the
+	column count ever changes - which the previous per-cell border approach did not.
+	The colour is the same rgba( 24, 36, 69, 0.1 ) that card uses.
+	*/
+	gap: 1px;
+	padding: 0;
+	background: rgba( 24, 36, 69, 0.1 );
+}
+
+/* The divider is on the odd cell rather than between rows: the pairing that matters is left
+   column against right column, and a horizontal rule would have implied two separate groups. */
+body.charitable-dash-v3 .charitable-health-stat {
+	min-width: 0;
+	/* 20px 25px is the Enhance cell padding, to the pixel. */
+	padding: 20px 25px;
+	/* Opaque, so the grid ground behind it only shows in the 1px gaps. */
+	background: #fff;
+	align-self: stretch;
+}
+
+/* The label/value pair is now the inner row, because each cell carries a note line beneath it. */
+body.charitable-dash-v3 .charitable-health-stat-top {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	min-width: 0;
+}
+
+/* The nth-child divider rules lived here. The 1px gap replaced them. */
+
+/* The label is now icon + name, so it becomes the flex row and the name carries the truncation. */
+body.charitable-dash-v3 .charitable-health-stat-label {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-width: 0;
+}
+
+body.charitable-dash-v3 .charitable-health-stat-icon {
+	flex: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 15px;
+	height: 15px;
+}
+
+body.charitable-dash-v3 .charitable-health-stat-icon svg,
+body.charitable-dash-v3 img.charitable-health-stat-icon {
+	width: 15px;
+	height: 15px;
+	display: block;
+}
+
+body.charitable-dash-v3 .charitable-health-stat-name {
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13px;
+	/*
+	600, up from 400. These are the titles of the four things the card reports on, and at 400 they
+	sat at the same weight as the fact line underneath - so nothing in the cell read as its heading.
+	The pill beside it carries colour and the fact carries detail; the name needed weight.
+	*/
+	font-weight: 600;
+	line-height: 1.3;
+	color: rgba( 25, 29, 45, 0.9 );
+	/*
+	Wraps rather than truncating. At 13px inside the wider 25px cell padding, "Secure Email Needed"
+	no longer fits beside its pill and was rendering as "Secure Email N..." - and a row label that
+	hides its own last word is worse than one that takes two lines. The grid stretches both cells
+	in a row to the taller of the pair, so a wrap costs alignment nothing.
+	*/
+	overflow-wrap: break-word;
+}
+
+/*
+State pills rather than a dot plus a word.
+
+The colours are the Site Analysis band palette this file already uses - #5AA152 good, #dba617
+attention, #d63638 broken - each as a tinted plate under text at full
+strength, so the text stays the darkest thing in the pill while the pill still reads as a shape
+from across the card - which a 7px dot never did. The exact alphas are on the variants below;
+they were deepened past these original 12% values.
+
+The gateway count is a pill too, and GREEN once at least one gateway is live: a live gateway is
+the single thing on this card that has to be true for the site to take money, so it earns the same
+green as the rest. Zero live is the red case, which the tone already resolves.
+*/
+/*
+Typography lifted from the What's New badges (.charitable-dashboard-v2-blog-post-badge-*) so the
+two pill sets in the right rail read as one system: 10px/600 uppercase on 0.4px tracking, 3px 7px
+padding, which lands both at 16px tall. Measured off the rendered badges rather than copied from
+their rule, because those live in charitable-admin.css and inherit from it.
+
+line-height is the flat 10px those badges use, not a ratio - a ratio at 10px rounds to 12.5px and
+the pill comes out a pixel taller than the ones beside it.
+
+Solid with white text, like those badges, rather than the tinted plates these started as. The
+catch is that the Site Analysis band hues do not all hold white: #5AA152 measures 3.16:1 and
+#dba617 only 2.22:1, both failing AA at 10px. So good and attention move DOWN their own hue
+until white clears 4.5:1 while broken stays at full strength, which it can. Values and
+measurements are on each variant below.
+*/
+body.charitable-dash-v3 .charitable-health-stat-value {
+	display: inline-flex;
+	align-items: center;
+	flex: none;
+	padding: 3px 7px;
+	border-radius: 20px;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.4px;
+	line-height: 10px;
+	text-transform: uppercase;
+	white-space: nowrap;
+	color: #fff;
+	background: #50575e;
+}
+
+/*
+Each variant is its own hue taken as far as white allows, so the three still read as one scale.
+White on each, measured: good 6.40:1, attention 4.88:1, broken 4.73:1 - all clear AA at 10px bold.
+
+good is #276c35, which is not a darkened #5AA152 but the EXACT green of the What's New NEW badge.
+Two pill sets a card apart now share a colour as well as their type, and it happens to be the
+value the band green had to travel to anyway to hold white.
+*/
+body.charitable-dash-v3 .charitable-health-stat-value--good {
+	background: #276c35;
+}
+
+/*
+The band amber #dba617 at 0.65 strength - the lightest step down that hue that clears AA (4.88:1;
+0.70 lands at 4.32 and fails). Any darker and it stops reading as amber and starts reading brown,
+which would collapse the gap to the broken red beside it.
+*/
+body.charitable-dash-v3 .charitable-health-stat-value--warn {
+	background: #8e6c0f;
+}
+
+/*
+The Off pill, and the only one that stays at FULL band strength: #d63638 carries white at 4.73:1
+unaided. So the state that most needs to be noticed is also the most saturated of the three,
+which is the right way round.
+*/
+body.charitable-dash-v3 .charitable-health-stat-value--bad {
+	background: #d63638;
+}
+
+/* A live gateway count is good news, so it takes the green pill rather than the neutral one. */
+body.charitable-dash-v3 .charitable-health-stat-value--neutral {
+	background: #276c35;
+}
+
+/*
+The note line under each label/value pair.
+
+Smaller and lighter than everything above it so the pair still reads first - the note is the
+supporting detail, not a second headline. It is allowed to wrap, unlike the label, because some
+of these notes are sentences and truncating "Blocked 4 Attacks In The Last 7 Days" to an ellipsis
+would lose the number that is the whole point of the line.
+
+#056aab is the link colour .charitable-health-version-action already uses on the row above, so
+the card has one link treatment rather than two.
+*/
+body.charitable-dash-v3 .charitable-health-stat-note {
+	margin-top: 2px;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 1.45;
+	color: rgba( 25, 29, 45, 0.45 );
+	white-space: normal;
+}
+
+/* The fact and the link are separate lines, so the fact is a block and the link follows beneath
+   it. Not a <br>: this way a cell with no fact puts its link on line one with no empty gap. */
+/*
+Two lines, hard. The Donation Guard cell now lists three protections and their states, which runs
+to three lines on a narrow rail - and every cell in this grid stretching to match it would undo
+the balance the two-line facts were written for.
+
+Clamping rather than truncating with an ellipsis on one line, because the first two items stay
+fully readable either way and the button beside it reaches the screen all three live on, so
+nothing is only available here.
+*/
+body.charitable-dash-v3 .charitable-health-stat-fact {
+	/*
+	5px of air above and below. The fact sat hard against the label above it and the button below,
+	so the three read as one block rather than as a heading, its detail, and an action. Margins
+	rather than padding, because the clamp uses -webkit-box and padding on that box would be
+	included in the two-line height it measures.
+	*/
+	margin: 5px 0;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	display: block;
+}
+
+/* The inline-block + 3px rule lived here; the button rule above sets its own spacing. */
+
+/*
+Grey buttons, not links.
+
+Matched to .charitable-raise-more-button - which is itself matched to the "Install & Activate"
+button in Enhance Your Campaigns - so every quiet secondary action on this dashboard is the same
+control: white ground, rgba( 14, 33, 33, 0.14 ) border, 4px radius, and the same hover. Four
+coloured links in a four-cell grid competed with the pills for attention; a grey button reads as
+available without asking to be pressed.
+
+Smaller than the Raise More original at 12px/6px 12px rather than 13px/8px 16px: these sit inside
+a 225px grid cell under two lines of description, where the full-size control dominated the cell
+it was supposed to sit at the bottom of.
+*/
+body.charitable-dash-v3 .charitable-health-stat-note a {
+	display: inline-flex;
+	align-items: center;
+	margin-top: 8px;
+	padding: 6px 12px;
+	border: 1px solid rgba( 14, 33, 33, 0.14 );
+	border-radius: 4px;
+	background: #fff;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 1;
+	color: rgba( 14, 33, 33, 0.8 );
+	text-decoration: none;
+	box-shadow: none;
+	transition: all 0.2s ease;
+}
+
+body.charitable-dash-v3 .charitable-health-stat-note a:hover,
+body.charitable-dash-v3 .charitable-health-stat-note a:focus {
+	background: rgba( 14, 33, 33, 0.05 );
+	border-color: rgba( 14, 33, 33, 0.2 );
+	color: rgba( 14, 33, 33, 0.9 );
+	text-decoration: none;
+	box-shadow: none;
+}
+
+/* The .charitable-health-stat-dot rule lived here. The pill carries the colour now, so the dot
+   was removed from the markup and its rule with it. */
+
+/* One column once the rail is narrow: two label/value pairs side by side need about 200px each
+   before the labels start truncating, and the rail goes below 400px well before the dashboard
+   hits its own breakpoints. */
+@media ( max-width: 1100px ) {
+	body.charitable-dash-v3 .charitable-health-status {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   21. Latest Donations as a two-column grid
+   Same shape and the same interior-rule treatment as the Top Donors grid above, for the same
+   reason: these rows are short, and a full-width table left most of 1000px empty while parking
+   the status badge a screen-width from the donation it describes.
+
+   One structural difference from Top Donors - the status badge sits on the FIRST line, beside the
+   id and name, rather than in a right-hand meta column. The amount, method and time then run
+   along a second line as one dot-separated string. Keeping the badge next to the name means the
+   two things you scan for, who gave and whether it cleared, are on the same line.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-donations-grid-v3 {
+	display: grid;
+	grid-template-columns: repeat( 2, 1fr );
+}
+
+body.charitable-dash-v3 .charitable-donation-card-v3 {
+	display: flex;
+	align-items: center;
+	padding: 16px 30px;
+	border-right: 1px solid rgba( 24, 36, 69, 0.1 );
+	border-bottom: 1px solid rgba( 24, 36, 69, 0.1 );
+	min-width: 0;
+}
+
+body.charitable-dash-v3 .charitable-donation-card-v3:nth-child( 2n ) {
+	border-right: 0;
+}
+
+/* Last row loses its bottom rule. The :nth-last-child pair covers an odd final row too, so a lone
+   trailing card does not keep a rule under it. */
+body.charitable-dash-v3 .charitable-donation-card-v3:nth-last-child( -n + 2 ):nth-child( 2n + 1 ),
+body.charitable-dash-v3 .charitable-donation-card-v3:nth-last-child( -n + 2 ):nth-child( 2n + 1 ) ~ .charitable-donation-card-v3 {
+	border-bottom: 0;
+}
+
+body.charitable-dash-v3 .charitable-donation-card-v3-main {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+body.charitable-dash-v3 .charitable-donation-card-v3-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	min-width: 0;
+}
+
+/* min-width:0 plus the ellipsis lets a long donor name shorten rather than shoving the badge out
+   of the card. */
+body.charitable-dash-v3 .charitable-donation-card-v3-link {
+	display: flex;
+	align-items: baseline;
+	gap: 7px;
+	min-width: 0;
+	overflow: hidden;
+	text-decoration: none;
+	box-shadow: none;
+}
+
+body.charitable-dash-v3 .charitable-donation-card-v3-link .donation-id {
+	flex: none;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 11.5px;
+	font-weight: 500;
+	color: rgba( 25, 29, 45, 0.45 );
+}
+
+body.charitable-dash-v3 .charitable-donation-card-v3-link .donor-name {
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13.5px;
+	font-weight: 600;
+	line-height: 1.3;
+	color: rgba( 25, 29, 45, 0.9 );
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+body.charitable-dash-v3 .charitable-donation-card-v3-link:hover .donor-name {
+	color: #056aab;
+}
+
+body.charitable-dash-v3 .charitable-donation-card-v3-head .status-badge {
+	flex: none;
+}
+
+/* The second line is one dot-separated string, so it reads as a single caption rather than three
+   competing fields. */
+body.charitable-dash-v3 .charitable-donation-card-v3-meta {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-top: 3px;
+	min-width: 0;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 12px;
+	line-height: 1.4;
+	color: rgba( 25, 29, 45, 0.5 );
+}
+
+body.charitable-dash-v3 .charitable-donation-card-v3-amount {
+	font-weight: 600;
+	color: rgba( 25, 29, 45, 0.85 );
+}
+
+body.charitable-dash-v3 .charitable-donation-card-v3-sep {
+	color: rgba( 25, 29, 45, 0.3 );
+}
+
+body.charitable-dash-v3 .charitable-donation-card-v3-time {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+@media ( max-width: 782px ) {
+	body.charitable-dash-v3 .charitable-donations-grid-v3 {
+		grid-template-columns: 1fr;
+	}
+
+	body.charitable-dash-v3 .charitable-donation-card-v3 {
+		border-right: 0;
+	}
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   22. "No donations in this range" overlay
+   The fourth empty state, and the only one that sits ON a real chart rather than replacing it.
+   An established site with a quiet fortnight drew a flat line across six $0.00 gridlines with no
+   explanation, which reads as a broken chart.
+
+   So this one keeps the real axes visible underneath and floats the same card over them. The
+   chart container becomes the positioning context; a translucent white veil sits between the
+   chart and the card so the gridlines read as background rather than competing with the copy.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-dashboard-v2-header-bar-chart.charitable-chart-has-overlay {
+	position: relative;
+}
+
+/* Height 0 would be wrong here - unlike the replacing states, this overlay must span the chart it
+   covers, so it is absolutely positioned to its parent's full box. */
+body.charitable-dash-v3 .charitable-chart-empty--period {
+	position: absolute;
+	inset: 0;
+	height: auto;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	/* The veil. 0.72 leaves the gridlines legible as texture while dropping their contrast far
+	   enough that the card is unmistakably the thing to read. */
+	background: rgba( 255, 255, 255, 0.72 );
+}
+
+/* The card is already centred by the flex parent, so the absolute centring the other states use
+   has to be unwound - left at 50% with a translate it would sit half a card too far right. */
+body.charitable-dash-v3 .charitable-chart-empty--period .charitable-chart-empty-card {
+	position: static;
+	top: auto;
+	left: auto;
+	transform: none;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   23. What's New accordion
+   Replaces the featured-item-plus-link-list shape. Every item now carries the same treatment and
+   exactly one is open, so the card stays the height it already was while all four become readable
+   instead of one.
+
+   The look is deliberately unchanged from the old featured item: same icon plate, same pill row,
+   same description type, same Learn More. Only which item gets it, and when, has changed.
+
+   Both the date and the pill row are always in the DOM; these rules show whichever the state
+   calls for. Doing it in CSS rather than moving a node in JS keeps one layout decision in one
+   place - and it means the closed rows need no JS to render correctly on first paint.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-wn-accordion {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+body.charitable-dash-v3 .charitable-wn-item + .charitable-wn-item {
+	border-top: 1px solid rgba( 24, 36, 69, 0.1 );
+}
+
+/* A real button, so the browser's own styling has to be unwound before it can look like a row. */
+/* gap: 0, with the 12px living on the icon as margin-right instead. The icon animates from zero
+   width when a row opens, and a flex gap cannot animate - left on the container it would hold a
+   12px indent open under every CLOSED title, which is exactly the alignment those rows should not
+   have. On the icon it collapses with it. */
+body.charitable-dash-v3 .charitable-wn-head {
+	display: flex;
+	align-items: flex-start;
+	gap: 0;
+	/*
+	calc( 100% + 50px ), to pay for the two -25px margins.
+
+	Two wrong answers first, both measured: width: 100% resolved against the PARENT, so the
+	margins shifted the button left without widening it (1426 to 1826 in a card ending at 1877),
+	and width: auto made it shrink-to-fit instead of filling - a button is an intrinsically sized
+	control, and display: flex does not change that (1426 to 1726). An explicit calc is the only
+	one of the three that actually spans the card.
+	*/
+	width: calc( 100% + 50px );
+	margin: 0;
+	/*
+	No horizontal padding of its own. .charitable-dashboard-v2-section-content already carries the
+	card's inset, so 18px here stacked on top of it and pushed the icon and the titles 18px further
+	in than the "What's New" heading above them - measured at 1469 against the heading's 1451.
+	*/
+	/*
+	Negative margin out to the card edge, with matching padding back in, so the HOVER GROUND runs
+	edge to edge while the text still sits on the 25px inset the "What's New" heading uses. A tint
+	that stopped at the content box read as a floating box inside the row rather than the row
+	itself lighting up.
+
+	25px is .charitable-dashboard-v2-section-content's own padding, so this exactly cancels it.
+	The card carries overflow: hidden, so the bleed is clipped at its border rather than escaping.
+	*/
+	margin: 0 -25px;
+	padding: 16px 25px;
+	border: 0;
+	border-radius: 0;
+	background: none;
+	box-shadow: none;
+	text-align: left;
+	cursor: pointer;
+	-webkit-appearance: none;
+	appearance: none;
+	transition: background-color 0.15s ease;
+}
+
+/*
+Hover on a closed row. 7% rather than the 4% this started at: at 4% a green that pale reads as
+plain grey against white, which is the same complaint the active tab plate had. 7% is still quiet
+but unmistakably the same green as the tab.
+
+The title darkening to full ink is the second half of the signal - it says the row is a control,
+not just that the pointer is somewhere. No border or ring: at this padding an outline
+boxed the row in and fought the dividers above and below it. The tint alone, running the full
+width of the card, says "this row" more clearly than a rectangle drawn around part of it.
+*/
+body.charitable-dash-v3 .charitable-wn-item:not( .is-open ) .charitable-wn-head:hover {
+	background-color: rgba( 49, 113, 76, 0.07 );
+}
+
+body.charitable-dash-v3 .charitable-wn-item:not( .is-open ) .charitable-wn-head:hover .charitable-wn-title {
+	color: #191d2d;
+}
+
+body.charitable-dash-v3 .charitable-wn-item:not( .is-open ) .charitable-wn-head:hover .charitable-wn-date {
+	color: rgba( 25, 29, 45, 0.6 );
+}
+
+/* Keyboard focus only - a mouse click on a row should not leave a ring behind. */
+body.charitable-dash-v3 .charitable-wn-head:focus {
+	outline: none;
+	box-shadow: none;
+}
+
+body.charitable-dash-v3 .charitable-wn-head:focus-visible {
+	outline: 2px solid #087ce1;
+	outline-offset: -3px;
+}
+
+body.charitable-dash-v3 .charitable-wn-icon {
+	flex: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 38px;
+	height: 38px;
+	margin-right: 12px;
+	border-radius: 6px;
+	overflow: hidden;
+	transition: width 0.26s ease, height 0.26s ease, margin-right 0.26s ease, opacity 0.18s ease;
+}
+
+/*
+The glyph needs its own rule, not just the img.
+
+The icon plate is a flex container, so an inline SVG inside it is a flex item - and with no basis
+and the default flex-shrink it collapsed to zero width while keeping its height. It rendered as
+0x30 and looked like the icon had vanished. Its width/height attributes do not save it; the flex
+algorithm overrides them.
+*/
+body.charitable-dash-v3 .charitable-wn-icon svg {
+	flex: none;
+	width: 30px;
+	height: 30px;
+	display: block;
+}
+
+/*
+The 404 fallback glyph, revealed by the image's onerror - see render_latest_updates_items_v3().
+
+It is wrapped in a span, so the SPAN is now the plate's flex item rather than the svg, and it hits
+exactly the zero-width collapse the rule above was written for. Hence flex: none again one level out.
+
+:not([hidden]) is load-bearing and not decoration. Declaring display on the span unconditionally
+would out-specify the [hidden] attribute's own display: none and paint the fallback on every item
+that has a perfectly good icon - the whole point being that it stays invisible until the image
+actually fails.
+*/
+body.charitable-dash-v3 .charitable-wn-icon > span[data-charitable-icon-fallback]:not([hidden]) {
+	flex: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+body.charitable-dash-v3 .charitable-wn-icon img {
+	width: 38px;
+	height: 38px;
+	display: block;
+	object-fit: contain;
+}
+
+body.charitable-dash-v3 .charitable-wn-headtext {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+body.charitable-dash-v3 .charitable-wn-title {
+	display: block;
+	transition: color 0.15s ease, font-size 0.26s ease;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13.5px;
+	font-weight: 600;
+	line-height: 1.35;
+	color: rgba( 25, 29, 45, 0.9 );
+}
+
+body.charitable-dash-v3 .charitable-wn-meta {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+	max-height: 40px;
+	margin-top: 6px;
+	opacity: 1;
+	overflow: hidden;
+	transition: max-height 0.26s ease, margin-top 0.26s ease, opacity 0.2s ease;
+}
+
+body.charitable-dash-v3 .charitable-wn-date {
+	flex: none;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 11.5px;
+	font-weight: 400;
+	line-height: 1.35;
+	color: rgba( 25, 29, 45, 0.45 );
+	white-space: nowrap;
+}
+
+/* max-height rather than height: auto, which cannot be transitioned. Same idiom the shipping
+   .charitable-dashboard-v2-collapsible uses, so the two animations feel like one system. 400px
+   clears the longest description in the feed with room to spare; a description that somehow
+   exceeded it would clip rather than break the animation. */
+body.charitable-dash-v3 .charitable-wn-panel {
+	max-height: 400px;
+	padding: 0 0 16px;
+	opacity: 1;
+	overflow: hidden;
+	transition: max-height 0.28s ease, opacity 0.22s ease 0.04s, padding-bottom 0.28s ease;
+}
+
+body.charitable-dash-v3 .charitable-wn-desc {
+	margin: 0 0 10px;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 12.5px;
+	font-weight: 400;
+	line-height: 1.55;
+	color: rgba( 25, 29, 45, 0.65 );
+}
+
+/* ── State ── */
+
+/* Closed: no icon, no pills, no panel - just the title and the date on the right. The title
+   drops to 13px so a closed row reads as secondary to the open one without changing weight. */
+/*
+Closed: collapsed to zero, NOT display: none. display cannot be transitioned, so removing the
+elements outright is what made opening and closing snap. Everything here animates to and from
+zero on the same curve instead.
+
+The icon keeps height: 38px while its width goes to zero - animating both made the plate shrink
+diagonally, which read as the icon falling into a corner rather than sliding away.
+*/
+/*
+The icon and the pills now show in EVERY state, open or closed. Only the description and Learn
+More are behind the click.
+
+They were collapsing to zero with the panel, which meant three of the four rows carried no mark
+and no NEW/ADDON badge until you opened them - the two things that make a row worth opening in the
+first place. Hiding what advertises the content is the wrong half to hide.
+
+What remains state-dependent is the padding: a closed row is tighter, so four of them still read
+as a list rather than four equal blocks.
+*/
+
+body.charitable-dash-v3 .charitable-wn-item:not( .is-open ) .charitable-wn-panel {
+	max-height: 0;
+	padding-bottom: 0;
+	opacity: 0;
+}
+
+body.charitable-dash-v3 .charitable-wn-item:not( .is-open ) .charitable-wn-head {
+	align-items: center;
+	padding-top: 13px;
+	padding-bottom: 13px;
+}
+
+body.charitable-dash-v3 .charitable-wn-item:not( .is-open ) .charitable-wn-title {
+	font-size: 13px;
+}
+
+/* The date stays on the right in BOTH states - see the note in render_latest_updates_items_v3().
+   align-self keeps it level with the title rather than with the icon, which is 38px tall and would
+   otherwise drag the date down to its centre. */
+body.charitable-dash-v3 .charitable-wn-item.is-open .charitable-wn-date {
+	align-self: flex-start;
+	margin-top: 2px;
+}
+
+
+/* The header padding shifts between states too, so it rides the same curve as everything else. */
+body.charitable-dash-v3 .charitable-wn-head {
+	transition: background-color 0.15s ease, box-shadow 0.15s ease, padding 0.26s ease;
+}
+
+body.charitable-dash-v3 .charitable-wn-date {
+	transition: color 0.15s ease;
+}
+
+body.charitable-dash-v3 .charitable-wn-panel .charitable-dashboard-v2-blog-post-learn-more {
+	transition: color 0.15s ease;
+}
+
+/*
+Honour the OS setting. Everything above is decoration - the accordion works identically with the
+transitions off, and somebody who has asked for less motion should not have to watch four things
+ease every time they open a row.
+*/
+@media ( prefers-reduced-motion: reduce ) {
+	body.charitable-dash-v3 .charitable-wn-head,
+	body.charitable-dash-v3 .charitable-wn-icon,
+	body.charitable-dash-v3 .charitable-wn-meta,
+	body.charitable-dash-v3 .charitable-wn-panel,
+	body.charitable-dash-v3 .charitable-wn-title,
+	body.charitable-dash-v3 .charitable-wn-date {
+		transition: none;
+	}
+}
+
+
+/* ──────────────────────────────────────────────────────────────────────────
+   24. Top Donors pill: align its TEXT, not its box
+   align-items: flex-end lined the pill BOX up with the amount above it, which left the pill
+   text 12px short of the amount - measured, not guessed: amount right edge 767.5, pill box
+   767.5, pill text 755.5. The eye reads the words, not the plate they sit on, so the column
+   looked misaligned even though the boxes agreed.
+
+   A negative right margin equal to the pill padding pushes the plate out by exactly that 12px
+   and brings the text into line. The overhang stays inside the card - the donor card carries
+   30px of right padding, so 12px of it is spent rather than escaping.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-donor-card-v3-meta .status-badge {
+	margin-right: -12px;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   25. Site Status fact line, coloured by state
+   Canon brand values, not the band palette the pills use: #fc9a2a brand orange and #31714c brand
+   green, both straight from the token file. The pills stay on the Site Analysis band palette
+   because they report a status; these lines are product copy pointing at a product, which is what
+   the brand accents are for.
+
+   Tone comes from the note, not the row - Donation Guard reads On while its captcha is missing,
+   so the row is green and this line is orange. See get_site_status_rows().
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-health-stat-fact--warn {
+	color: #fc9a2a;
+}
+
+body.charitable-dash-v3 .charitable-health-stat-fact--good {
+	color: #31714c;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   26. Upgrade-return modal
+   NAMED -return, never -modal: charitable-admin-2.0.js binds a delegated click handler to
+   .charitable-upgrade-modal which opens Charitable's own "only available in Pro" alert, so a
+   wrapper carrying that class fired the legacy dialog on every click anywhere in this one -
+   background included. That handler is a real feature; this is the side that moves.
+   Matched to WPForms' "Thanks for your interest" dialog, measured from its computed styles rather
+   than eyeballed: 4px solid top rule, 6px radius, 0 3px 6px rgba(0,0,0,.15) shadow, 34px of
+   padding above the icon, 550px max width.
+
+   ORANGE, not the blue this was first matched in. Two values, both already in the plugin:
+
+     #fc9a2a  canon brand orange, on the 4px top rule, the icon plate, the body links and
+              the button. Its derived hover #fc8c0c is the button's hover.
+
+   This was two oranges until 1.8.19: canon on the decorative rule, and the darker as-built
+   #e27730 on anything carrying text, because #e27730 clears 3.04:1 against white. The file moved
+   wholesale to canon, so it is one value now.
+
+   CONTRAST, stated plainly: white on #fc9a2a measures 2.14:1. That is below AA for small text
+   and below the 3:1 large-text bar too - #e27730's 3.04:1 at least cleared the latter. Ink
+   #1e1515 on canon orange is 8.35:1 if these surfaces need to become compliant. That is the cost of
+   the colour, not an oversight - the button and the links are all duplicated by plain sentences
+   around them, and nothing here is reachable only through an orange word.
+
+   Scoped to .charitable-upgrade-return throughout, so the splash modal and the getting-started
+   modal keep their own treatment.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/*
+The class goes on the WRAPPER, not the box.
+
+jquery-confirm's onOpenBefore runs with this.$el pointing at .jconfirm - the full-screen wrapper -
+not at .jconfirm-box inside it. Written as .jconfirm-box.charitable-upgrade-return first, these
+rules matched nothing at all and the dialog came up in the library stock blue. Checked the rendered
+classes rather than assuming: "jconfirm jconfirm-modern charitable-upgrade-return jconfirm-open" on
+the wrapper, "jconfirm-box jconfirm-type-blue ..." on the box.
+*/
+body div.jconfirm.charitable-upgrade-return .jconfirm-box-container .jconfirm-box {
+	/*
+	jquery-confirm sets transition-property: all on this box for its open animation, so padding,
+	border-width and radius ANIMATE from the library values to these over 0.4s - the dialog opened
+	visibly reshaping itself. Restricting the transition to the two properties the animation
+	actually needs keeps the entrance and drops the wobble.
+
+	This also cost a diagnosis: getComputedStyle read the library values back for a good while
+	after open, which read as "my rules are losing the cascade" when they were mid-transition. The
+	cascade was right the whole time - only a forced reflow showed it.
+	*/
+	transition-property: opacity, transform;
+	/*
+	animation: none - and this is the declaration that actually makes the top rule orange.
+
+	jconfirm-type-blue does not only set a border colour, it also starts an INFINITE keyframe
+	animation on border-color (@keyframes type-blue, pulsing #3498db to #5faee3 every 2s via
+	jconfirm-type-animated). A running animation beats normal declarations in the cascade, so the
+	rule stayed blue however specific the override got - and getComputedStyle sampled the keyframe
+	rather than my rule, which is why it reported orange while the screen showed blue.
+
+	WPForms carries the same declaration in their version of this dialog, which is the tell: they
+	hit it too.
+	*/
+	animation: none;
+	max-width: 550px;
+	background: #fff;
+	border-radius: 6px;
+	border-top: 4px solid #fc9a2a;
+	box-shadow: 0 3px 6px rgba( 0, 0, 0, 0.15 );
+	padding: 34px 30px 24px;
+	text-align: center;
+}
+
+/* jquery-confirm's type-blue ships a 7px #3498db rule; the border above replaces it, and this
+   stops the library's own declaration winning on specificity. */
+body div.jconfirm.charitable-upgrade-return .jconfirm-box-container .jconfirm-box.jconfirm-type-blue {
+	border-top-color: #fc9a2a;
+	border-top-width: 4px;
+}
+
+body div.jconfirm.charitable-upgrade-return .charitable-upgrade-return-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 46px;
+	height: 46px;
+	margin: 0 auto 20px;
+	border-radius: 50%;
+	background: #fc9a2a;
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 27px;
+	font-weight: 700;
+	font-style: italic;
+	line-height: 1;
+	color: #fff;
+}
+
+/* The heading now lives in the content, under the icon - see the note in the PHP. */
+body div.jconfirm.charitable-upgrade-return .charitable-upgrade-return-title {
+	margin: 0 0 16px;
+	padding: 0;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 20px;
+	font-weight: 700;
+	line-height: 1.35;
+	color: #191d2d;
+	text-align: center;
+}
+
+/* The library hides its icon slot when no icon is passed, but it still reserves the row. */
+body div.jconfirm.charitable-upgrade-return .jconfirm-title-c .jconfirm-icon-c {
+	display: none;
+}
+
+body div.jconfirm.charitable-upgrade-return .jconfirm-content {
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 14.5px;
+	line-height: 1.6;
+	color: rgba( 25, 29, 45, 0.8 );
+	text-align: center;
+}
+
+body div.jconfirm.charitable-upgrade-return .jconfirm-content p {
+	margin: 0 0 14px;
+	font-size: inherit;
+	line-height: inherit;
+}
+
+body div.jconfirm.charitable-upgrade-return .jconfirm-content p:last-child {
+	margin-bottom: 0;
+}
+
+body div.jconfirm.charitable-upgrade-return .jconfirm-content a {
+	color: #fc9a2a;
+	text-decoration: underline;
+	box-shadow: none;
+}
+
+body div.jconfirm.charitable-upgrade-return .jconfirm-buttons {
+	padding-top: 10px;
+	text-align: center;
+	float: none;
+}
+
+body div.jconfirm.charitable-upgrade-return .jconfirm-buttons button.btn-confirm {
+	min-width: 84px;
+	margin: 0;
+	padding: 11px 28px;
+	border: 0;
+	border-radius: 4px;
+	background-color: #fc9a2a;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1;
+	color: #fff;
+	text-transform: none;
+	box-shadow: none;
+}
+
+body div.jconfirm.charitable-upgrade-return .jconfirm-buttons button.btn-confirm:hover,
+body div.jconfirm.charitable-upgrade-return .jconfirm-buttons button.btn-confirm:focus {
+	background-color: #fc8c0c;
+	color: #fff;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   27. Upgrade card — unlicensed sites only
+   render_upgrade_section() self-hides on Pro, so nothing here is reachable on a licensed
+   install. Check it with ?charitable_dash_lite=1.
+
+   What was wrong: this was the ONLY card in the left column with no
+   .charitable-dashboard-v2-section-header, so it had no card name, no chevron, and no 70px
+   header band. Its title floated centred at 20px where every sibling has a left-aligned 17px
+   card name, and because it also kept the plain 20px left-column padding from
+   charitable-admin-dashboard.css its contents sat 10px shy of the 30px inset Raise More (§6)
+   and Integrations (§19) use - so its feature list and its button were visibly out of line
+   with the two cards directly above it. The markup now carries the same chrome; this section
+   only has to align the insets and retune the body.
+
+   The composition stays centred. A 10-item check list under a single large CTA is what an
+   upsell panel should look like, and turning it into a 4-across tile grid to match its
+   neighbours would have made the page's one commercial ask read like another addon shelf.
+   So: card chrome on the outside, centred panel on the inside.
+
+   The CTA pair is #fc9a2a / #fc8c0c, which is what §26's upgrade-return confirm button in this
+   same file already uses - one upgrade orange across the upgrade surfaces. Both are catalogued:
+   #fc9a2a IS canon brand-orange and #fc8c0c its canon dark peer. Until 1.8.19 this pair was
+   the as-built #e27730 / #c96528, matched to the rest of the admin; the v3 stylesheets were new
+   files in an unreleased version, so the canon rule for new work applied and they were
+   converted.
+
+   It is also the legible choice, which matters more on this button than anywhere else on the
+   screen. White on #fc9a2a is 2.14:1 and clears nothing - see the ORANGE block above; the #E38632 the
+   button is painted today - by an unscoped !important in render_enhance_campaign_section()'s
+   inline <style>, not by any stylesheet - is 2.72:1 and fails. See render_upgrade_body() for
+   why v3 carries its own .charitable-dashboard-v2-upgrade-cta class instead of fighting that
+   rule.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* The same three-rule left-column padding reset §6 and §19 use: zero the section, then carry
+   the 30px inset on the header and on each band inside, so the actions band's grey reaches the
+   card edges the way the Integrations footer's does. */
+body.charitable-dash-v3 #charitable-dashboard-v2-upgrade {
+	padding: 0;
+}
+
+body.charitable-dash-v3 #charitable-dashboard-v2-upgrade .charitable-dashboard-v2-section-header {
+	padding-left: 30px;
+	padding-right: 30px;
+}
+
+body.charitable-dash-v3 #charitable-dashboard-v2-upgrade .charitable-dashboard-v2-section-content {
+	padding: 0;
+}
+
+/* max-width: none cancels the 530px cap the shipping rule applies. The cap existed to stop a
+   two-column list stretching across a full-width card; here the card has a header to sit under
+   and the column gap does that job, so the list can breathe without drifting apart. */
+body.charitable-dash-v3 #charitable-dashboard-v2-upgrade .charitable-dashboard-v2-upgrade-features {
+	max-width: none;
+	margin: 0;
+	padding: 26px 30px 24px;
+	gap: 13px 60px;
+	justify-content: center;
+}
+
+body.charitable-dash-v3 #charitable-dashboard-v2-upgrade .charitable-dashboard-v2-upgrade-column {
+	display: grid;
+	gap: 13px;
+}
+
+/* 13.5px/500 at the 0.8 opacity step - the same size the Integrations card gives an
+   integration NAME, one weight down because these are labels in a list rather than headings.
+   Hierarchy from an opacity step rather than a new grey, per the product-ui token rule. */
+body.charitable-dash-v3 #charitable-dashboard-v2-upgrade .charitable-dashboard-v2-upgrade-feature-text {
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13.5px;
+	font-weight: 500;
+	line-height: 1.35;
+	color: rgba( 25, 29, 45, 0.8 );
+}
+
+/* align-items on the row is flex-start in the shipping rule so a wrapped label keeps its tick
+   on the first line; nudge the tick onto that line's optical centre rather than its top. */
+body.charitable-dash-v3 #charitable-dashboard-v2-upgrade .charitable-dashboard-v2-upgrade-checkmark {
+	flex: none;
+	margin-top: 1px;
+}
+
+/* The actions become a footer band: top border plus the 0.03 opacity step, identical to the
+   Integrations footer (§19), so the card closes the same way its neighbours do. The one
+   difference is that this band centres its contents instead of justifying them apart, because
+   the button is the card's whole purpose rather than a "view all" afterthought. */
+body.charitable-dash-v3 #charitable-dashboard-v2-upgrade .charitable-dashboard-v2-upgrade-actions {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 14px;
+	margin: 0;
+	padding: 24px 30px 26px;
+	border-top: 1px solid rgba( 24, 36, 69, 0.1 );
+	background: rgba( 25, 29, 45, 0.03 );
+}
+
+/* Still deliberately the largest control on the dashboard - 18px/40px against the 13px/16px
+   every other button here uses. Trimmed from 19px and 22px/42px only because the card now has
+   a header competing for attention above it. */
+body.charitable-dash-v3 .charitable-dashboard-v2-upgrade-cta {
+	display: inline-flex;
+	align-items: center;
+	padding: 18px 40px;
+	border: 1px solid #fc9a2a;
+	border-radius: 4px;
+	background: #fc9a2a;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 1;
+	letter-spacing: 0;
+	color: #fff;
+	text-decoration: none;
+	cursor: pointer;
+	box-shadow: none;
+	text-shadow: none;
+	transition: all 0.2s ease;
+}
+
+body.charitable-dash-v3 .charitable-dashboard-v2-upgrade-cta:hover,
+body.charitable-dash-v3 .charitable-dashboard-v2-upgrade-cta:focus {
+	background: #fc8c0c;
+	border-color: #fc8c0c;
+	color: #fff;
+	text-decoration: none;
+}
+
+/* Canon accent-blue #087ce1, the same focus ring §9 gives the tab strip. WordPress admin
+   removes the default outline on anchors, so without this the biggest target on the screen is
+   invisible to a keyboard. */
+body.charitable-dash-v3 .charitable-dashboard-v2-upgrade-cta:focus-visible {
+	outline: 2px solid #087ce1;
+	outline-offset: 2px;
+}
+
+body.charitable-dash-v3 #charitable-dashboard-v2-upgrade .charitable-dashboard-v2-learn-more-link {
+	font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.4;
+	color: rgba( 25, 29, 45, 0.55 );
+	text-decoration: underline;
+	box-shadow: none;
+}
+
+body.charitable-dash-v3 #charitable-dashboard-v2-upgrade .charitable-dashboard-v2-learn-more-link:hover,
+body.charitable-dash-v3 #charitable-dashboard-v2-upgrade .charitable-dashboard-v2-learn-more-link:focus {
+	color: rgba( 25, 29, 45, 0.8 );
+	text-decoration: none;
+}
+
+/* Two columns need roughly 240px each to hold "Email Marketing Integration" on one line. Below
+   that they stack, which is also where the Raise More grid and Top Donors already step down. */
+@media ( max-width: 782px ) {
+	body.charitable-dash-v3 #charitable-dashboard-v2-upgrade .charitable-dashboard-v2-upgrade-features {
+		flex-direction: column;
+		gap: 13px;
+	}
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   28. Top Donors crown: keep it visible, do not let the name eat it
+   Section 11 gives .donor-name `white-space: nowrap; overflow: hidden; text-overflow:
+   ellipsis` so a long name ellipsizes inside its half-width column instead of widening the
+   card. The crown badge added after the name link is a child of that same box, so on any
+   name long enough to ellipsize the badge is exactly what gets clipped away - the donors who
+   most need the marker (the ones with long full names) would be the ones silently missing it.
+
+   So the name row becomes a flex row: the link is the only thing allowed to shrink and
+   ellipsize, and the badge is flex:none, pinned after it and never clipped. min-width:0 on
+   the link is what actually permits it to shrink below its content width inside a flex row;
+   without it the flex item refuses to shrink and the badge is pushed out of the card again.
+
+   The badge's own colour, radius and padding are NOT here. They are inline in
+   Charitable_Dashboard::get_top_donor_crown_html(), because the same badge also renders on
+   the non-v3 four-column table, which this stylesheet is not loaded for - see that method's
+   docblock.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 .charitable-donor-card-v3 .donor-name {
+	display: flex;
+	align-items: center;
+	overflow: visible;
+}
+
+body.charitable-dash-v3 .charitable-donor-card-v3 .donor-name .donor-name-link {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   29. Header icon hover animations
+   ──────────────────────────────────────────────────────────────────────────
+   One per icon, all decorative, all hover-only.
+
+   THE FIRST PROBLEM IS NOT THE ANIMATION. charitable-admin.css carries
+
+     #charitable-admin-header .charitable-header-logos ul li a:hover { opacity: 0.5 }
+
+   which dims every header icon on hover. Left in place it half-dissolves all four of these,
+   and it is specifically what makes the YouTube red read as a washed pink rather than red.
+   So each icon below cancels it. The selectors carry the full ancestor chain because that
+   rule is (1,3,4) - an id plus three classes plus four elements - and a short selector loses
+   to it silently, changing nothing.
+
+   Motion is suppressed under prefers-reduced-motion at the end of this section. That matters
+   more than it looks: this release already had a bug caused by assuming smooth motion was
+   available, and none of these animations carry meaning, so there is nothing to lose by
+   dropping them for people who ask for less movement.
+   ────────────────────────────────────────────────────────────────────────── */
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-inbox:hover,
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-header-videos:hover,
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-header-whats-new:hover,
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-help:hover {
+	opacity: 1;
+}
+
+/*
+INBOX - the glyph and the unread badge hop together.
+
+Same shape as wpchar-bounce-in in charitable-admin.css, but under its OWN NAME, and that is the
+whole point rather than duplication for its own sake. The badge already runs wpchar-bounce-in on
+page load, five iterations. Re-declaring the SAME animation-name on hover does not restart a
+finished animation - the browser treats it as the animation it has already played and leaves it
+finished - so the badge sat still while the glyph hopped out from under it. The glyph worked only
+because its name went from none to something.
+
+A distinct name means the name CHANGES on hover for both elements, which is what actually starts
+them. Applied to the glyph and the badge from one rule so they cannot drift out of sync.
+
+Worth remembering when checking this kind of thing: a computed animation-name proves the
+declaration landed, not that anything is playing. element.getAnimations() is the check that
+distinguishes them.
+*/
+@keyframes charitable-header-inbox-bounce {
+	0%,
+	30%,
+	50%,
+	80%,
+	100% {
+		transform: translateY( 0 );
+	}
+
+	40% {
+		transform: translateY( -6px );
+	}
+
+	60% {
+		transform: translateY( -3px );
+	}
+}
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-inbox:hover svg,
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-inbox:hover .number {
+	animation: charitable-header-inbox-bounce 0.7s ease-in-out 1;
+}
+
+/*
+VIDEOS - the mark pulses INTO the YouTube colours and back out again.
+
+Three animations on one 0.85s beat so they cannot drift: the glyph scales, the plate fills red,
+and the play triangle goes white. On the half-beat it is the YouTube mark; on the whole beat it is
+back to the grey outline it sits at when untouched. The earlier version parked it permanently on
+red for as long as you hovered, which is a state change rather than a pulse.
+
+#ff0000 is YouTube's own brand red, deliberately NOT drawn from the Charitable token file - the
+whole job of this icon is to be recognisably theirs. Noting it so a palette sweep leaves it alone.
+
+#8c8e96 is the resting colour these four header icons already share in this file, matched rather
+than re-picked. It is written out rather than left as currentColor because the 0% and 100% stops
+have to name a concrete colour for the interpolation to have somewhere to come back to.
+
+`transparent` rather than `none` on the plate's 0%/100% stop: the markup carries fill="none",
+which renders identically but does not interpolate - animating from none to #ff0000 gives a hard
+switch instead of a fade.
+*/
+@keyframes charitable-header-videos-pulse {
+	0%,
+	100% {
+		transform: scale( 1 );
+	}
+
+	50% {
+		transform: scale( 1.14 );
+	}
+}
+
+@keyframes charitable-header-videos-plate {
+	0%,
+	100% {
+		fill: transparent;
+		stroke: #8c8e96;
+	}
+
+	50% {
+		fill: #ff0000;
+		stroke: #ff0000;
+	}
+}
+
+@keyframes charitable-header-videos-play {
+	0%,
+	100% {
+		fill: #8c8e96;
+	}
+
+	50% {
+		fill: #fff;
+	}
+}
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-header-videos:hover svg {
+	animation: charitable-header-videos-pulse 0.85s ease-in-out infinite;
+}
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-header-videos:hover svg rect {
+	animation: charitable-header-videos-plate 0.85s ease-in-out infinite;
+}
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-header-videos:hover svg path {
+	animation: charitable-header-videos-play 0.85s ease-in-out infinite;
+}
+
+/*
+WHAT'S NEW - the signal radiates out of the mast.
+
+transform-box: view-box is the load-bearing line. Without it transform-origin resolves against
+each path's OWN bounding box, so the inner and outer arc pairs would each scale about their own
+centre and the pair would drift apart instead of radiating from one point. With view-box the
+percentages resolve against the glyph's 0 0 20 20 viewBox, so 50% 33% is the beacon at (10, 6.6)
+- the tower's emitter - and both arcs expand from it.
+
+The outer pair is delayed by a third of the cycle, which is what turns two scaling arcs into one
+travelling pulse. It rests at opacity 0.55 (an attribute on the path) and brightens past that
+mid-pulse, which is correct: it is the wave arriving, not the icon's resting depth.
+*/
+@keyframes charitable-header-wn-pulse {
+	0% {
+		transform: scale( 0.7 );
+		opacity: 0;
+	}
+
+	35% {
+		opacity: 1;
+	}
+
+	100% {
+		transform: scale( 1.2 );
+		opacity: 0;
+	}
+}
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-header-whats-new svg .charitable-header-wn-wave {
+	transform-box: view-box;
+	transform-origin: 50% 33%;
+}
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-header-whats-new:hover svg .charitable-header-wn-wave--inner {
+	animation: charitable-header-wn-pulse 1.1s ease-out infinite;
+}
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-header-whats-new:hover svg .charitable-header-wn-wave--outer {
+	animation: charitable-header-wn-pulse 1.1s ease-out infinite;
+	animation-delay: 0.36s;
+}
+
+/*
+HELP - the mark draws itself in, then three sparkles pop.
+
+The tilt this replaces was not visible enough to be worth having: 9deg on a 28px icon is about
+two pixels of travel, and it was rotating a PNG, which is also why nothing inside it could move.
+The glyph is now an inline SVG (v3 only - see the branch in templates/header.php, since this
+icon renders on the classic screens too) so the ring and the question mark can actually be drawn.
+
+Drawing is stroke-dashoffset. Each dasharray is set to just over the path's own length - ring
+circumference is 2 * pi * 8.25 = 51.8, the mark's arc measures about 11 - so an offset equal to
+that length hides the stroke completely and animating it to 0 paints it on. Both sit at offset 0
+at rest, so the icon looks finished until you touch it.
+
+Order matters here and is what makes it read as drawing rather than flickering: ring first, then
+the mark over it, then the dot, then the sparkles staggered behind. Total 1.05s.
+
+The sparkles live OUTSIDE the ring - the corners of a 20x20 box are 10 units from its centre and
+the ring's radius is 8.25 - so they read as emanating from the icon rather than decorating it.
+*/
+@keyframes charitable-help-draw-ring {
+	from {
+		stroke-dashoffset: 52;
+	}
+
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+
+@keyframes charitable-help-draw-mark {
+	from {
+		stroke-dashoffset: 12;
+	}
+
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+
+@keyframes charitable-help-pop {
+	0% {
+		transform: scale( 0 );
+		opacity: 0;
+	}
+
+	60% {
+		transform: scale( 1.35 );
+		opacity: 1;
+	}
+
+	100% {
+		transform: scale( 1 );
+		opacity: 1;
+	}
+}
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-help--svg svg .charitable-help-ring {
+	stroke-dasharray: 52;
+	stroke-dashoffset: 0;
+}
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-help--svg svg .charitable-help-mark {
+	stroke-dasharray: 12;
+	stroke-dashoffset: 0;
+}
+
+/* Popped things scale about their own centre, so fill-box is right here - unlike the What's New
+   waves, which all had to expand from one shared point and needed view-box. */
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-help--svg svg .charitable-help-dot,
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-help--svg svg .charitable-help-spark {
+	transform-box: fill-box;
+	transform-origin: 50% 50%;
+}
+
+/*
+The sparkles are HIDDEN at rest. Left visible they turned a plain question-mark-in-a-circle into
+a cluttered glyph with three tick marks stuck to it, permanently, on every Charitable screen
+running v3 - the icon has to look untouched until it is touched. The pop animation carries them
+to opacity 1 and `both` holds them there while the pointer stays; leaving hover drops the
+animation and they return to 0.
+*/
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-help--svg svg .charitable-help-spark {
+	opacity: 0;
+}
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-help--svg:hover svg .charitable-help-ring {
+	animation: charitable-help-draw-ring 0.55s ease-out 1;
+}
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-help--svg:hover svg .charitable-help-mark {
+	animation: charitable-help-draw-mark 0.35s ease-out 0.3s both;
+}
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-help--svg:hover svg .charitable-help-dot {
+	animation: charitable-help-pop 0.25s ease-out 0.62s both;
+}
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-help--svg:hover svg .charitable-help-spark--1 {
+	animation: charitable-help-pop 0.3s ease-out 0.7s both;
+}
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-help--svg:hover svg .charitable-help-spark--2 {
+	animation: charitable-help-pop 0.3s ease-out 0.8s both;
+}
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-help--svg:hover svg .charitable-help-spark--3 {
+	animation: charitable-help-pop 0.3s ease-out 0.9s both;
+}
+
+/* Sizing and colour to match the other three header icons. */
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-help--svg {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 30px;
+	color: #8c8e96;
+}
+
+body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-help--svg svg {
+	width: 28px;
+	height: 28px;
+	display: block;
+	overflow: visible;
+}
+
+/* Nothing here carries meaning, so it can all go. */
+@media ( prefers-reduced-motion: reduce ) {
+	body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-inbox:hover svg,
+	body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-inbox:hover .number,
+	body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-header-videos:hover svg,
+	body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-header-videos:hover svg *,
+	body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-header-whats-new:hover svg .charitable-header-wn-wave,
+	body.charitable-dash-v3 #charitable-admin-header .charitable-header-logos ul li a.charitable-notification-help--svg:hover svg * {
+		animation: none;
+	}
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Site Analysis promo card: restore the top and bottom padding on the DASHBOARD.
+
+   charitable-admin-reports-v3.min.css carries
+
+       body.charitable-dash-v3 #charitable-dashboard-v2-site-analysis
+           .charitable-dashboard-v2-section-content { padding: 0 30px 4px }
+
+   paired with a second rule that puts the bottom padding back to 30px, but only
+   under .charitable-reports-v3-analysis - the Reports page wrapper. On the
+   Reports screen the pair reads 30px; on the dashboard only the 4px half
+   applies, leaving the green button 5px off the card's bottom edge.
+
+   That pair was harmless until 1.8.15, because the dashboard had no
+   charitable-dash-v3 body class and neither rule reached it. Widening the gate
+   to style the reworked dashboard is what exposed it - the exact hazard the
+   1.8.14 gate docblock warned about when it said the same breadth "would
+   silently restyle it".
+
+   Fixed here rather than by narrowing the reports rule, so 1.8.14's shipped
+   Reports behaviour is not touched. This sheet is enqueued after
+   charitable-admin-reports-v3, so an equal-specificity rule wins on order.
+
+   20px to match the other dashboard cards, whose section-content is
+   padding: 0 0 20px 0 in charitable-admin-dashboard.min.css, and the value this
+   card's own inline <style> asked for before the reports rule outranked it. The
+   30px horizontal is left as the v3 sheets set it.
+
+   NOTE the source/min divergence that made this hard to find:
+   charitable-admin-reports-v3.css does NOT contain that rule - only its .min
+   does. Grepping the source finds nothing. Check the .min when a rule seems to
+   come from nowhere.
+
+   THE TOP HALF IS THE SAME BUG, found by QA after the bottom was fixed (1.8.15,
+   Olivia). "padding: 0 30px 4px" sets the TOP to 0 as well, so the icon plate and
+   the first line of copy sat hard against the header's bottom border with no gap
+   at all. The reports sheet's own comment on that rule claims the card "pads 30px
+   left, right and top" - it does not; the shorthand's first value is 0. Do not
+   trust that line.
+
+   Measured against the cards this one sits beside, first ink below the divider:
+   Raise More 22px, Enhance Your Campaign 20px, Quick Access 17px, Site Analysis
+   0px. 20px puts the copy on the same line as Enhance Your Campaign and the icon
+   plate at 23px, within a pixel of Raise More's 22px, because the plate carries
+   the 3px half-leading nudge from section 30(b) below.
+
+   TOP AND BOTTOM ARE IN SEPARATE RULES, and the top one carries the page class.
+   This sheet is enqueued on the REPORTS screen as well as the dashboard - both
+   carry body.charitable-dash-v3 - and the Site Analysis card renders on both, so
+   an id-only selector reaches Reports too. The bottom half gets away with it
+   because .charitable-reports-v3-analysis sets padding-bottom: 30px at higher
+   specificity and wins there; nothing sets padding-top at all, so an unscoped top
+   rule WOULD have landed on Reports and pushed its copy from 17px to 37px below
+   the divider. Measured, not assumed. Reports is left exactly as 1.8.14 shipped
+   it.
+
+   The page class is charitable_page_charitable-dashboard. Note the near-miss
+   beside it: the dashboard also carries charitable-admin-reports-DASHBOARD while
+   Reports carries charitable-admin-reports - different tokens, so one does not
+   match the other, but they are one hyphen apart and easy to mistype into a
+   selector that matches both or neither.
+   ────────────────────────────────────────────────────────────────────────── */
+body.charitable-dash-v3 #charitable-dashboard-v2-site-analysis .charitable-dashboard-v2-section-content {
+	padding-bottom: 20px;
+}
+
+body.charitable-dash-v3.charitable_page_charitable-dashboard #charitable-dashboard-v2-site-analysis .charitable-dashboard-v2-section-content {
+	padding-top: 20px;
+	padding-right: 25px;
+	padding-left: 25px;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Site Analysis promo card: 25px horizontal inset on the DASHBOARD, to match
+   the cards it is stacked with.
+
+   Same two reports-v3 rules as above, same gate, same reason - this is the
+   horizontal half of the inset the block above corrects vertically.
+
+       .charitable-dashboard-v2-section-content { padding: 0 30px 4px }
+       .charitable-dashboard-v2-section-header  { padding-left: 30px }
+
+   30px is correct on REPORTS, where the addon rows, the Payment Methods legend
+   and the digest body were all moved to 30 to share one edge. It is wrong on the
+   dashboard, where every other card sits on 25. Measured, insets from the card's
+   own box:
+
+       Site Analysis    left 31  right 31
+       Latest Updates   left 26  right 26   <- directly below it in the same rail
+       Enhance Your Campaign, Raise More, Quick Access, Works With Your Tools: 26
+
+   So the card hung 5px inside its neighbours on BOTH edges - and since Latest
+   Updates sits immediately under it in the right rail, the step showed up as two
+   stacked cards whose titles did not start on the same line.
+
+   The header gets padding-LEFT only. Its padding-right is already 25px from the
+   base sheet; the reports rule only ever overrode the left, which left this one
+   card asymmetric (30 left, 25 right) on both screens. Setting the left to 25
+   here squares the dashboard copy up as a side effect; Reports keeps its 30/25
+   exactly as 1.8.14 shipped it.
+
+   Right and left are written as longhands, not as a "padding: 20px 25px"
+   shorthand, so the padding-bottom that the unscoped sibling rule above sets to
+   20px is not silently re-declared from inside a gated rule. A shorthand here
+   would hand the dashboard's bottom padding to a selector Reports cannot reach,
+   and the next person to change one value would have to know that.
+   ────────────────────────────────────────────────────────────────────────── */
+body.charitable-dash-v3.charitable_page_charitable-dashboard #charitable-dashboard-v2-site-analysis .charitable-dashboard-v2-section-header {
+	padding-left: 25px;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Health card: buttons sit on a common bottom line.
+
+   The grid already stretches both cells in a row to the same height, but the
+   content inside flowed from the top, so a cell whose fact wraps to two lines
+   pushed its button a line lower than its neighbour's. Gateways ("Stripe,
+   Square") against AI Ready ("24+ Abilities available to AI assistants.") showed
+   it most: one line versus two, and the two buttons sat at different heights.
+
+   Done with justify-content rather than margin-top:auto on the anchor so the
+   anchor's own 8px top margin survives as a MINIMUM gap. With auto the margin is
+   discarded, which is fine in the short-fact case and collapses the gap to the
+   fact's 5px when the fact is the taller one.
+
+   align-self keeps the anchor hugging its label: it is display:inline-flex, and
+   as a flex item in a column it would otherwise stretch to the full cell width.
+
+   Both children are conditional in render_rail_status_cards() - a row can carry a
+   fact, a button, both or neither - and space-between handles all four: with one
+   child it stays at the top, which is what a factless button should do.
+   ────────────────────────────────────────────────────────────────────────── */
+body.charitable-dash-v3 .charitable-health-stat {
+	display: flex;
+	flex-direction: column;
+}
+
+body.charitable-dash-v3 .charitable-health-stat-note {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+body.charitable-dash-v3 .charitable-health-stat-note a {
+	align-self: flex-start;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   30. Right-rail padding corrections reported against 1.8.15
+
+   Three separate cards in the rail, one cause each. Grouped because they were
+   reported together and because all three are the same shape: a block that
+   kept its pre-v3 inset after the cards around it were reworked.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/*
+(a) The "You're running the latest version" pill, inside the Latest Updates card.
+
+charitable-admin-dashboard.css gives the pill
+
+    margin: 0 0 16px 23px;
+
+and the pill is a DIRECT CHILD of <section>, not of
+.charitable-dashboard-v2-section-content - so that 23px is the whole of its left
+inset. Everything else in the card sits on 25px:
+
+  .charitable-dashboard-v2-section          no padding
+  .charitable-dashboard-v2-section-header   padding: 0 25px   -> the <h3> at 25
+  .charitable-whats-new-v3-list             margin: 0 -25px   -> paired with
+  .charitable-whats-new-v3-row-link         padding: 13px 25px -> rows at 25
+
+So the pill hangs 2px to the LEFT of the title above it and the post rows below
+it. Small, but it is the one element in the card that does not share the edge,
+and on a card this narrow a 2px step on a tinted block that spans most of the
+width is visible.
+
+25px, not 0: zeroing the margin would park the pill on the card border and trade
+a 2px error for a 25px one. The 16px bottom margin is kept, being the only gap
+between the pill and the first post row.
+
+Scoped to #charitable-dashboard-v2-latest-updates. The same two classes are also
+emitted by render_dashboard_version_pill(), which has its own
+.charitable-dash-v3-version-line reset further up this file, and they appear on
+screens this sheet has no business restyling.
+
+THE TOP MARGIN is the second half of the same QA ticket as the Site Analysis top
+padding in section 20 above (1.8.15, Olivia). Being a direct child of <section>
+the pill gets no top inset from .charitable-dashboard-v2-section-content either,
+and .charitable-dashboard-v2-latest-updates-uptodate/-behind in
+charitable-admin-dashboard.css set margin-top: 0 - so the tinted block's top edge
+sat exactly on the header's bottom border.
+
+20px on the BOX, not on its text: the pill is a filled block, so what has to line
+up with the 20px first-ink rhythm of the neighbouring cards is its edge, the same
+way Enhance Your Campaign's image sits at 20px. Its own 6px padding then puts the
+tick and the label at 26px, which is correct for a tinted block and not a second
+error to chase.
+
+The 16px bottom margin above is unchanged, so this adds a gap rather than moving
+one: 20px above the pill, 16px below it.
+*/
+body.charitable-dash-v3 #charitable-dashboard-v2-latest-updates > .charitable-dashboard-v2-latest-updates-uptodate,
+body.charitable-dash-v3 #charitable-dashboard-v2-latest-updates > .charitable-dashboard-v2-latest-updates-behind {
+	margin-top: 20px;
+	margin-left: 25px;
+}
+
+/*
+(b) The Free Site Analysis promo icon.
+
+.charitable-sa-dash-body is align-items: flex-start, so the 40px icon plate's
+top edge lines up with the TOP OF THE FIRST LINE BOX of the copy beside it, not
+with the top of the glyphs. At 13.5px/1.5 the half-leading is ~3.4px, so the
+plate sits that much proud of the text it is supposed to be level with - which
+is what reads as the icon "floating" above the paragraph.
+
+Nudged down by the half-leading rather than switched to align-items: center:
+centring a 40px plate against a three-line paragraph would drop it to the middle
+of the block and lose the association with the first line entirely.
+
+Here rather than in the card's inline <style> because that block is printed
+inside the body on every dashboard load and this sheet is the place v3 layout
+corrections live. The inline block stays the owner of the card's colours.
+*/
+body.charitable-dash-v3 #charitable-dashboard-v2-site-analysis .charitable-sa-dash-icon {
+	margin-top: 3px;
+}
+
+/*
+(c) Quick Access: first row jammed under the header, dead strip under the footer.
+
+TOP. charitable-admin-dashboard.css carries
+
+    .charitable-dashboard-v2-quick-access-item:first-child { padding-top: 0; }
+
+while every other row gets padding: 15px 0. The reset reads as deliberate, and
+it was - but nothing between the header and that first row contributes any top
+space of its own: .charitable-dashboard-v2-section-content is padding: 0 0 20px
+and .charitable-dashboard-v2-quick-access-content is padding: 0 25px. So
+"Getting Started" starts immediately below the header's 1px bottom border with
+no gap at all, and the row looks clipped rather than tight. 15px puts it on the
+same rhythm as its siblings.
+
+BOTTOM. The white strip under the cream band has TWO sources, and which one
+applies depends on the column the card lands in. Both are fixed, because the
+card renders in either.
+
+  1. In the right column: the cream <footer> is the LAST CHILD of
+     .charitable-dashboard-v2-section-content, which is padding: 0 0 20px 0, so
+     the band ends 20px short of the card edge.
+
+  2. Outside the right column: the card ALSO picks up
+
+         .charitable-dashboard-v2-section:not(
+           .charitable-dashboard-v2-right-column .charitable-dashboard-v2-section
+         ) { padding: 20px }
+
+     from charitable-admin-dashboard.css. This is the hazard section 9 of this
+     file already writes down - "the stats and tabs cards each override it back
+     to 0; a new left-column card inherits it and lands 20px in from its
+     siblings. Any future card added to this column needs the same padding: 0
+     reset." Quick Access is such a card and never got the reset. Measured: its
+     header and rows sat at 46px from the card edge against 26px for every other
+     card in the column, and the same 20px showed up again under the footer.
+
+The padding goes rather than the footer moving: dropping the footer's own margin
+would pull it up and leave the strip exactly where it is.
+
+Zeroing the card padding also pulls the horizontal inset back to the 25px the
+header and content already carry, which is what puts the card on its siblings'
+line - the same end the stats and tabs cards reach with their own padding: 0.
+
+The collapsed state sets padding-top and padding-bottom on section-content with
+!important of its own, so neither rule interferes with the toggle.
+
+The 30px + 20px of separation above the footer is left alone - it is the
+shipping look and was not what was reported.
+*/
+body.charitable-dash-v3 #charitable-dashboard-v2-quick-access .charitable-dashboard-v2-quick-access-items .charitable-dashboard-v2-quick-access-item:first-child {
+	padding-top: 15px;
+}
+
+body.charitable-dash-v3 #charitable-dashboard-v2-quick-access {
+	padding: 0;
+}
+
+body.charitable-dash-v3 #charitable-dashboard-v2-quick-access .charitable-dashboard-v2-section-content {
+	padding-bottom: 0;
+}

@@ -312,6 +312,60 @@ if ( ! class_exists( 'Charitable_Admin_Splash' ) ) :
 						),
 					),
 				),
+				/*
+				 * 1.8.15 — the dashboard and Reports Overview, ported from Pro across
+				 * roughly a dozen commits. Placed third, matching where Pro's
+				 * equivalent section sits, so the AI assistant keeps the hero slot.
+				 *
+				 * The copy is deliberately NOT Pro's. Pro's version of this section
+				 * promises "compare two date ranges side by side", CSV/PDF export and
+				 * a weekly summary emailed to your board. None of those are in Lite --
+				 * on Lite's own Reports Overview they appear as an upsell for Pro
+				 * 1.8.19, so reusing that wording here would advertise Pro features to
+				 * Lite users. Every claim below was read off the rendered Lite 1.8.15
+				 * dashboard: the status cards, the Site Analysis score, Integrations,
+				 * Raise More, latest donations, top donors, and headline figures
+				 * carrying the change from the previous period.
+				 *
+				 * Pro's screenshot is not reusable either, for the same reason: it
+				 * shows Donation Guard, the Rewards/Ambassadors/Events dashboards,
+				 * recovered donations, a Comments tab and a 1.8.19 version pill.
+				 *
+				 * The image is Lite's own dashboard, shot at 1005x743 to match the
+				 * crop Pro's equivalent uses. A straight capture was not usable: the
+				 * default Last 7 Days view trends DOWN (-23.5%), so the shot uses Last
+				 * 30 Days, which is genuinely positive. Dev-site clutter (the GiveWP
+				 * import notice, the "Are You Enjoying Charitable?" prompt, the admin
+				 * bar and sidebar) was hidden for the capture only -- nothing about
+				 * the site was changed to get it.
+				 *
+				 * Two cards still read amber in the shot: Spam Protection OFF and
+				 * Email Status BASIC. Those are real state on a site with no captcha
+				 * keys and no WP Mail SMTP, and arguably show the cards doing their
+				 * job. Pro's shot has them green because that site is configured.
+				 */
+				array(
+					'new'     => true,
+					'version' => '1.8.15',
+					'layout'  => 'fifty-fifty',
+					'class'   => 'no-order',
+					'title'   => __( 'A Redesigned Dashboard and Reports Overview', 'charitable' ),
+					'content' => __( 'See where your fundraising stands at a glance. Pick a period and the figures and chart follow, with each headline number compared to the period before. Status cards show whether your gateways, captcha and email are set up properly, a free Site Analysis scores your setup, and new Integrations and Raise More panels show what else Charitable works with.', 'charitable' ),
+					'img'     => array(
+						'url'    => charitable()->get_path( 'assets', false ) . 'images/splash/1-8-15-dashboard.png',
+						'shadow' => 'none',
+					),
+					'buttons' => array(
+						'main'      => array(
+							'text' => __( 'Get Started', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/dashboard-reports-getting-started/', 'splash-modal', 'Dashboard Reports Main' ),
+						),
+						'secondary' => array(
+							'text' => __( 'Learn More', 'charitable' ),
+							'url'  => charitable_utm_link( 'https://www.wpcharitable.com/dashboard-reports-learn-more/', 'splash-modal', 'Dashboard Reports Secondary' ),
+						),
+					),
+				),
 				// 1.8.12 — Beacon campaign templates.
 				array(
 					'new'     => true,

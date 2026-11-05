@@ -17,7 +17,25 @@
   position: absolute;
   top: 75px;
   left: 50%;
-  margin: 0 auto 0 -365px;
+  /*
+   * Centred with a transform, not a negative margin.
+   *
+   * This was `margin: 0 auto 0 -365px` - half of the declared 730px width. But
+   * the element is content-box, so the 40px padding below sits OUTSIDE that
+   * width and the box actually renders 810px wide. Half of 810 is 405, so the
+   * popup sat 40px right of centre on every Code Snippets load.
+   *
+   * translateX(-50%) takes its 50% from the element's own rendered width, so it
+   * cannot drift when the width or the padding changes - including under
+   * `max-width: 90%`, where the box shrinks on narrow screens while a fixed
+   * -365px margin would not. box-sizing also makes that max-width mean what it
+   * looks like it means.
+   *
+   * @since 1.8.15
+   */
+  transform: translateX(-50%);
+  margin: 0;
+  box-sizing: border-box;
   z-index: 100;
   display: flex;
   width: 730px;

@@ -557,6 +557,35 @@ function charitable_get_minimum_donation_amount( $campaign_id = 0 ) {
 }
 
 /**
+ * Whether a submitted amount has to be refused as a zero donation.
+ *
+ * This answers the no-minimum case only, which is the one the minimum check does
+ * not cover: that check runs first and owns every campaign with a real minimum.
+ * Callers combine this with the `charitable_permit_0_donation` filter, which is
+ * left at the call site so it keeps firing where it always has.
+ *
+ * Both arguments are compared as floats on purpose. The minimum reaching a caller
+ * is an integer zero only while nothing has been saved against the campaign; once
+ * a minimum of zero has been stored it has been through charitable_sanitize_amount()
+ * and arrives as a float, and the `charitable_minimum_donation_amount` filter can
+ * return anything at all. Comparing it strictly against an integer zero therefore
+ * matched the unsaved case and missed the saved one, which left this guard inert
+ * on exactly the campaigns that had been through the builder.
+ *
+ * Kept identical to the helper of the same name in Charitable Pro, which carried
+ * the same defect and fixed it in 1.8.19.6, so the two lanes cannot drift apart.
+ *
+ * @since  1.8.15
+ *
+ * @param  mixed $amount  The submitted donation amount.
+ * @param  mixed $minimum The campaign's minimum donation amount.
+ * @return boolean True when the amount must be refused, absent a permitting filter.
+ */
+function charitable_donation_amount_is_zero_without_minimum( $amount, $minimum ) {
+	return (float) $minimum <= 0 && (float) $amount <= 0;
+}
+
+/**
  * Return the maximum donation amount.
  *
  * @since  1.6.60

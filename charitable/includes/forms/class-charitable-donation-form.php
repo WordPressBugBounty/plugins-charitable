@@ -858,7 +858,7 @@ if ( ! class_exists( 'Charitable_Donation_Form' ) ) :
 				charitable_log_form_error( 'validation_failure', 'amount_above_maximum', $context );
 
 				$ret = false;
-			} elseif ( $minimum === 0 && $amount <= 0 && ! apply_filters( 'charitable_permit_0_donation', false ) ) {
+			} elseif ( charitable_donation_amount_is_zero_without_minimum( $amount, $minimum ) && ! apply_filters( 'charitable_permit_0_donation', false ) ) {
 				charitable_get_notices()->add_error(
 					sprintf(
 					/* translators: %s: minimum donation amount */

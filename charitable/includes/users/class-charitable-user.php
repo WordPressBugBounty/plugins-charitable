@@ -752,7 +752,7 @@ if ( ! class_exists( 'Charitable_User' ) ) :
 				$this->add_role( 'donor' );
 			}
 
-			do_action( 'charitable_after_insert_donor', $donor_id, $this );
+			do_action( 'charitable_after_insert_donor', $donor_id, $this, $submitted );
 
 			return $donor_id;
 		}

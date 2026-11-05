@@ -121,6 +121,33 @@ if ( ! class_exists( 'Charitable_Square_Helpers' ) ) :
 		}
 
 		/**
+		 * Retrieve the Square webhook signing secret for a mode.
+		 *
+		 * Single source of truth for the webhook processor, the Signature Key
+		 * field and the missing-secret admin notice, so all three always agree
+		 * on which key is in use. Lite's own group (`gateways_square`, written
+		 * by the Signature Key field) wins; Charitable Pro's group
+		 * (`gateways_square_core`) is the fallback for sites that moved from
+		 * Pro to Lite.
+		 *
+		 * @since 1.8.15
+		 *
+		 * @param string $mode 'test' or 'live'.
+		 *
+		 * @return string The signing secret, or an empty string if none is stored.
+		 */
+		public static function get_webhook_signature_key( string $mode ): string {
+			foreach ( array( 'gateways_square', 'gateways_square_core' ) as $group ) {
+				$settings = charitable_get_option( $group );
+				if ( is_array( $settings ) && isset( $settings[ $mode ] ) && is_array( $settings[ $mode ] ) && ! empty( $settings[ $mode ]['webhooks-secret'] ) && is_scalar( $settings[ $mode ]['webhooks-secret'] ) ) {
+					return (string) $settings[ $mode ]['webhooks-secret'];
+				}
+			}
+
+			return '';
+		}
+
+		/**
 		 * Retrieve Square Business Location ID from Charitable settings.
 		 *
 		 * @since 1.8.7

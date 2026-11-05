@@ -87,7 +87,7 @@ if ( ! class_exists( 'Charitable_Builder_Panel_Settings' ) ) :
 
 			foreach ( $this->submenu_panels as $panel ) {
 				$panel = sanitize_file_name( $panel );
-				$file  = require_once charitable()->get_path( 'includes' ) . "admin/campaign-builder/panels/settings/class-settings-{$panel}.php";
+				$file  = apply_filters( 'charitable_builder_panels_settings_file', charitable()->get_path( 'includes' ) . "admin/campaign-builder/panels/settings/class-settings-{$panel}.php", $panel );
 
 				if ( file_exists( $file ) ) {
 					require_once $file;

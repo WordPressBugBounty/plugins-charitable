@@ -347,6 +347,40 @@ if ( ! class_exists( 'Charitable_Stripe_Customer' ) ) :
 		}
 
 		/**
+		 * Return a payment method identifier that is safe to embed in a stored log message.
+		 *
+		 * Stripe object identifiers only ever contain alphanumeric characters and
+		 * underscores, so anything outside that set did not come from Stripe. The donation
+		 * log is rendered on the donation edit screen, so a submitted identifier must never
+		 * reach it verbatim. The cleaned identifier is still reported, because knowing what
+		 * was submitted is the point of the log entry, and a note is appended when anything
+		 * had to be removed so the site owner can see the value was tampered with.
+		 *
+		 * @since  1.8.15
+		 *
+		 * @param  mixed $payment_method_id The submitted payment method identifier.
+		 * @return string
+		 */
+		private function get_loggable_payment_method_id( $payment_method_id ) {
+			if ( ! is_scalar( $payment_method_id ) ) {
+				return '(none)';
+			}
+
+			$payment_method_id = (string) $payment_method_id;
+			$safe_id           = substr( preg_replace( '/[^A-Za-z0-9_]/', '', $payment_method_id ), 0, 64 );
+
+			if ( '' === $safe_id ) {
+				return '(invalid)';
+			}
+
+			if ( $safe_id !== $payment_method_id ) {
+				return $safe_id . ' (invalid characters removed)';
+			}
+
+			return $safe_id;
+		}
+
+		/**
 		 * Add payment method to the customer.
 		 *
 		 * @since  1.4.0
@@ -399,7 +433,7 @@ if ( ! class_exists( 'Charitable_Stripe_Customer' ) ) :
 				if ( $decline_code ) {
 					$detail_parts[] = sprintf( 'Decline code: %s', $decline_code );
 				}
-				$detail_parts[] = sprintf( 'Payment method: %s', $payment_method_id );
+				$detail_parts[] = sprintf( 'Payment method: %s', $this->get_loggable_payment_method_id( $payment_method_id ) );
 				$detail_parts[] = 'Note: Card declines occur during verification when attaching the payment method to the customer. This happens before any charge is created, so the attempt will not appear in the Stripe Dashboard Payments section (check Developers > Logs in Stripe instead).';
 
 				$this->last_error = implode( ' | ', $detail_parts );

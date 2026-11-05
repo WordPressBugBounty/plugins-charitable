@@ -928,6 +928,7 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 		 * Retrieve the webhooks content.
 		 *
 		 * @since 1.8.7
+		 * @version 1.8.15 Render the Signature Key field, and show the exact URL signatures are verified against.
 		 *
 		 * @return string
 		 */
@@ -943,8 +944,44 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 				);
 			}
 
-			// Always use query parameter format (for when permalinks are not active).
-			$webhook_url = add_query_arg( array( 'charitable-listener' => self::ID ), home_url() );
+			/*
+			 * Show the same URL the webhook processor verifies signatures
+			 * against. Square signs over the exact notification URL, so any
+			 * difference (such as a missing slash before the query string)
+			 * makes every webhook fail verification once a key is saved.
+			 */
+			$webhook_url = Charitable_Square_Helpers::get_webhook_url();
+			if ( empty( $webhook_url ) ) {
+				$webhook_url = Charitable_Square_Helpers::get_webhook_url_for_rest();
+			}
+
+			/*
+			 * Signature Key field for the active mode. save_settings() reads
+			 * square_webhooks_secret_sandbox / square_webhooks_secret_live and
+			 * stores it under gateways_square[ mode ][ webhooks-secret ], which
+			 * is where the webhook processor looks for it. Pre-filled with the
+			 * key actually in use (the same lookup the processor makes) so the
+			 * field always shows what verification uses, and saving the screen
+			 * does not wipe a stored key.
+			 */
+			$mode         = Charitable_Square_Helpers::get_mode();
+			$field_suffix = ( 'test' === $mode ) ? 'sandbox' : 'live';
+			$saved_secret = Charitable_Square_Helpers::get_webhook_signature_key( $mode );
+			$secret_label = ( 'sandbox' === $field_suffix )
+				? __( 'Test Mode Signature Key', 'charitable' )
+				: __( 'Live Mode Signature Key', 'charitable' );
+
+			$signature_field = sprintf(
+				'<div class="charitable-webhook-signature-key" style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #e2e4e7;">
+					<label for="charitable-square-webhook-secret" style="display:block; font-weight:600; margin-bottom:6px;">%1$s</label>
+					<input type="text" id="charitable-square-webhook-secret" name="charitable_settings[gateways_square][square_webhooks_secret_%2$s]" value="%3$s" class="widefat" autocomplete="off" spellcheck="false" style="max-width:480px;" />
+					<div class="charitable-help" style="margin-top:6px;">%4$s</div>
+				</div>',
+				esc_html( $secret_label ),
+				esc_attr( $field_suffix ),
+				esc_attr( $saved_secret ),
+				$this->get_webhooks_secret_desc( $field_suffix ) // Escaped via wp_kses inside the helper.
+			);
 
 			$message = sprintf(
 				'<div class="charitable-webhook-manual-setup">
@@ -971,22 +1008,31 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 							<li><code>oauth.authorization.revoked</code></li>
 							<li><code>payment.created</code></li>
 							<li><code>payment.updated</code></li>
-							<li><code>refund.created</code></li>
+							<li><code>refund.updated</code></li>
+						</ul>
+						<p style="margin-top: 15px;"><strong>%s</strong><br>
+						%s</p>
+						<ul style="margin: 8px 0 0 20px;">
+							<li><code>subscription.created</code></li>
+							<li><code>subscription.updated</code></li>
 						</ul>
 						<p style="margin-top: 20px;">%s</p>
 					</div>
+					%s
 				</div>',
 				esc_html__( 'Manual Webhook Setup Required', 'charitable' ),
-				esc_html__( 'To enable webhook functionality, you need to manually add a webhook to your Square dashboard using the URL below.', 'charitable' ),
-				esc_html__( 'Webhook URL to add in Square Dashboard', 'charitable' ),
-				esc_url( $webhook_url ),
+				esc_html__( 'To enable webhook functionality, add a webhook subscription in your Square Developer Console (developer.squareup.com) using the URL below, then paste its Signature Key into the field below and save.', 'charitable' ),
+				esc_html__( 'Webhook URL to add in your Square Developer Console', 'charitable' ),
+				esc_attr( $webhook_url ), // esc_attr, not esc_url: must match the verifier's URL byte for byte.
 				esc_attr__( 'Copy URL', 'charitable' ),
 				esc_html__( 'Required webhook subscriptions:', 'charitable' ),
 				esc_html__( 'When creating the webhook in Square, subscribe to these events:', 'charitable' ),
+				esc_html__( 'Additional webhook subscriptions for recurring donations:', 'charitable' ),
+				esc_html__( 'If you plan to use recurring donations, also subscribe to these events:', 'charitable' ),
 				sprintf(
 					wp_kses(
 						/* translators: %s - charitable.com URL for Square webhooks documentation. */
-						__( 'Please see <a href="%s" target="_blank" rel="noopener noreferrer">our documentation on Square webhooks</a> for detailed instructions on how to add this webhook to your Square dashboard.', 'charitable' ),
+						__( 'Please see <a href="%s" target="_blank" rel="noopener noreferrer">our documentation on Square webhooks</a> for detailed instructions on how to add this webhook in your Square Developer Console.', 'charitable' ),
 						array(
 							'a' => array(
 								'href'   => array(),
@@ -997,6 +1043,7 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 					),
 					esc_url( charitable_utm_link( 'https://www.wpcharitable.com/documentation/setting-up-square-webhooks/', 'Settings - Payments', 'Square Webhooks Documentation' ) )
 				),
+				$signature_field
 			);
 
 			return $message;
@@ -1446,6 +1493,27 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 					$values['gateways_square']['live']['webhooks-secret'] = sanitize_text_field( $_POST['charitable_settings']['gateways_square']['square_webhooks_secret_live'] ); //phpcs:ignore
 				} else {
 					$values['gateways_square']['live']['webhooks-secret'] = '';
+				}
+			}
+
+			/*
+			 * Keep Charitable Pro's copy of the key in step. Pro and Lite share
+			 * this option; Pro stores the key under gateways_square_core and
+			 * reads that first. If a key saved by Pro is still there, mirror
+			 * what was entered here (including clearing it) so both plugins
+			 * use the same key: otherwise a key rotated in Lite is ignored
+			 * after moving back to Pro, and a key cleared in Lite reappears
+			 * from Pro's copy. Pro's group is never created when it holds no
+			 * key.
+			 *
+			 * @since 1.8.15
+			 */
+			foreach ( array( 'sandbox' => 'test', 'live' => 'live' ) as $field_suffix => $mode ) {
+				if ( ! isset( $_POST['charitable_settings']['gateways_square'][ 'square_webhooks_secret_' . $field_suffix ] ) ) { //phpcs:ignore
+					continue;
+				}
+				if ( isset( $values['gateways_square_core'][ $mode ] ) && is_array( $values['gateways_square_core'][ $mode ] ) && ! empty( $values['gateways_square_core'][ $mode ]['webhooks-secret'] ) ) {
+					$values['gateways_square_core'][ $mode ]['webhooks-secret'] = $values['gateways_square'][ $mode ]['webhooks-secret'];
 				}
 			}
 
@@ -1903,6 +1971,18 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 						error_log( 'Adding Square admin notice: ' . $admin_message ); //phpcs:ignore
 					}
 
+					/*
+					 * Charitable_Admin_Notices::render_notice() passes the message through
+					 * wp_kses_post(), which permits markup, and the `Details:` half of this
+					 * string is whatever the Square API returned. Escape it before it
+					 * reaches the notice. The static half carries no markup of its own, so
+					 * escaping the whole message is equivalent and keeps the two halves in
+					 * step. $admin_message is deliberately left as-is: it is also sent to
+					 * the donor as a JSON error and written to the debug log above, and
+					 * neither of those should change.
+					 */
+					$admin_notice_message = esc_html( $admin_message );
+
 					// Get current notices.
 					$current_notices = charitable_get_admin_notices()->get_notices();
 					$notice_exists   = false;
@@ -1910,7 +1990,7 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 					// Check if this exact error message already exists.
 					if ( ! empty( $current_notices['error'] ) ) {
 						foreach ( $current_notices['error'] as $notice ) {
-							if ( $notice['message'] === $admin_message ) {
+							if ( $notice['message'] === $admin_notice_message ) {
 								$notice_exists = true;
 								break;
 							}
@@ -1919,7 +1999,7 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 
 					// Only add the notice if it doesn't already exist.
 					if ( ! $notice_exists ) {
-						charitable_get_admin_notices()->add_notice( $admin_message, 'error', false, true );
+						charitable_get_admin_notices()->add_notice( $admin_notice_message, 'error', false, true );
 					}
 
 					if ( charitable_is_debug( 'square' ) ) {

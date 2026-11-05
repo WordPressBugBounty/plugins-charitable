@@ -235,7 +235,7 @@ if ( ! class_exists( 'Charitable_Square_WebhooksHealthCheck' ) ) :
 
 			// Use WordPress admin notices.
 			?>
-			<div class="notice notice-error is-dismissible" data-notice-id="<?php echo esc_attr( self::NOTICE_ID ); ?>">
+			<div class="notice charitable-notice notice-error is-dismissible" data-notice-id="<?php echo esc_attr( self::NOTICE_ID ); ?>">
 				<p><?php echo wp_kses_post( $notice ); ?></p>
 			</div>
 			<?php
@@ -264,18 +264,17 @@ if ( ! class_exists( 'Charitable_Square_WebhooksHealthCheck' ) ) :
 				return;
 			}
 
-			$mode     = Charitable_Square_Helpers::get_mode();
-			$settings = charitable_get_option( 'gateways_square' );
-
 			// A secret is stored for the active mode, so verification works.
-			if ( is_array( $settings ) && ! empty( $settings[ $mode ]['webhooks-secret'] ) ) {
+			// Same lookup as the webhook processor, so the notice never
+			// disagrees with what verification actually uses.
+			if ( '' !== Charitable_Square_Helpers::get_webhook_signature_key( Charitable_Square_Helpers::get_mode() ) ) {
 				return;
 			}
 
 			$notice = sprintf(
 				wp_kses(
 					/* translators: %1$s: URL to the Square settings screen, %2$s: URL to the webhooks documentation */
-					__( 'Charitable cannot verify incoming Square webhooks because no webhook signing secret is stored for the current mode. Unverified webhooks are rejected, so Square donations and refunds will not update automatically. Add your signing secret on the <a href="%1$s">Square settings screen</a>. See our <a href="%2$s" rel="nofollow noopener" target="_blank">documentation</a> for the steps.', 'charitable' ),
+					__( 'Charitable cannot verify incoming Square webhooks because no webhook signing secret is stored for the current mode. Unverified webhooks are rejected, so Square donations and refunds will not update automatically. Paste the Signature Key from your Square webhook subscription into the Enable Webhooks section of the <a href="%1$s">Square settings screen</a>. See our <a href="%2$s" rel="nofollow noopener" target="_blank">documentation</a> for the steps.', 'charitable' ),
 					array(
 						'a' => array(
 							'href'   => array(),
@@ -289,7 +288,7 @@ if ( ! class_exists( 'Charitable_Square_WebhooksHealthCheck' ) ) :
 			);
 
 			?>
-			<div class="notice notice-error is-dismissible" data-notice-id="<?php echo esc_attr( self::MISSING_SECRET_NOTICE_ID ); ?>">
+			<div class="notice charitable-notice notice-error is-dismissible" data-notice-id="<?php echo esc_attr( self::MISSING_SECRET_NOTICE_ID ); ?>">
 				<p><?php echo wp_kses_post( $notice ); ?></p>
 			</div>
 			<?php

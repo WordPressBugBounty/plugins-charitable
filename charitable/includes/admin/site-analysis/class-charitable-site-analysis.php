@@ -38,6 +38,24 @@ if ( ! class_exists( 'Charitable_Site_Analysis' ) ) :
 		 */
 		const LAST_RUN_OPTION = 'charitable_analysis_last_run';
 
+		/**
+		 * The last real score, kept as an option so it OUTLIVES the report cache.
+		 *
+		 * CACHE_TRANSIENT is the wrong home for this and the difference matters. That transient
+		 * expires after CACHE_TTL, and flush_cache() deletes it on five hooks - two of which,
+		 * save_post_campaign and update_option_charitable_settings, fire during ordinary work. Both
+		 * behaviours are right for a cache whose job is to stop showing a stale *report*, and wrong
+		 * for a score on the dashboard: on a site where somebody is editing campaigns the score
+		 * would appear and then vanish minutes later with nothing to explain it.
+		 *
+		 * So the snapshot is stored separately and never invalidated - the same reasoning that puts
+		 * LAST_RUN_OPTION outside the transient above. What keeps a stale number honest is the
+		 * "Last analyzed N ago" line rendered beside it, not deleting the number.
+		 *
+		 * @since 1.8.15
+		 */
+		const LAST_SCORE_OPTION = 'charitable_analysis_last_score';
+
 		/** Plugin-side cache lifetime. */
 		const CACHE_TTL = 7 * DAY_IN_SECONDS;
 
@@ -105,6 +123,132 @@ if ( ! class_exists( 'Charitable_Site_Analysis' ) ) :
 		 */
 		public function flush_cache() {
 			delete_transient( self::CACHE_TRANSIENT );
+		}
+
+		/**
+		 * The last real score, or null if this site has never completed an analysis.
+		 *
+		 * Shape is the contract the dashboard's score reader expects:
+		 *
+		 *   value      int     0-100
+		 *   band       string  band slug, as the remote report gives it
+		 *   complete   bool    whether every dimension was scorable
+		 *   potential  int     score reachable by acting on the recommendations
+		 *   fix_first  int     how many "Fix first" items were outstanding
+		 *   time       int     when the analysis ran
+		 *   dimensions array   activation|health|growth|optimization => value, complete
+		 *
+		 * Returns null rather than a zeroed array when nothing is stored, because zero is a
+		 * legitimate score and callers need to tell "scored 0" from "never scored". Callers must
+		 * render a "New" pill on null and NEVER a placeholder number - a confident passing score on
+		 * a site that has never been analyzed is worse than no score at all.
+		 *
+		 * @since 1.8.15
+		 *
+		 * @return array|null
+		 */
+		public function get_last_known_score() {
+
+			$score = get_option( self::LAST_SCORE_OPTION, null );
+
+			if ( ! is_array( $score ) || ! isset( $score['value'] ) || empty( $score['dimensions'] ) ) {
+				return null;
+			}
+
+			return $score;
+		}
+
+		/**
+		 * Store the score half of a successful report.
+		 *
+		 * Deliberately narrow: this keeps the four dimension values and the counts, and drops the
+		 * recommendation bodies, their copy and their CTAs. Those are the cache's job - they go
+		 * stale, they can be long, and an option is the wrong place for any of it.
+		 *
+		 * fix_first is counted here rather than stored as a list for the same reason. 'foundational'
+		 * is the remote tier that assets/js/admin/charitable-site-analysis.js labels "Fix first", so
+		 * the count follows that tier and not a local idea of severity.
+		 *
+		 * @since 1.8.15
+		 *
+		 * @param  array $report The decoded remote report.
+		 * @return void
+		 */
+		private function store_score_snapshot( array $report ) {
+
+			$score = isset( $report['score'] ) && is_array( $report['score'] ) ? $report['score'] : array();
+
+			// No score means nothing worth keeping; leave any previous snapshot alone rather than
+			// overwriting a real number with an empty one.
+			if ( ! isset( $score['value'] ) ) {
+				return;
+			}
+
+			$dimensions = array();
+
+			foreach ( array( 'activation', 'health', 'growth', 'optimization' ) as $key ) {
+				$dim = isset( $score['dimensions'][ $key ] ) && is_array( $score['dimensions'][ $key ] )
+					? $score['dimensions'][ $key ]
+					: array();
+
+				$dimensions[ $key ] = array(
+					'value'    => max( 0, min( 100, isset( $dim['value'] ) ? (int) $dim['value'] : 0 ) ),
+					'complete' => ! empty( $dim['complete'] ),
+				);
+			}
+
+			$fix_first = 0;
+			$next_step = array();
+
+			if ( ! empty( $report['recommendations'] ) && is_array( $report['recommendations'] ) ) {
+				foreach ( $report['recommendations'] as $rec ) {
+					if ( ! is_array( $rec ) || ! isset( $rec['tier'] ) || 'foundational' !== $rec['tier'] ) {
+						continue;
+					}
+
+					++$fix_first;
+
+					/*
+					ONE recommendation is kept, and only its name and its points.
+
+					The docblock above says this method drops recommendation bodies because they go
+					stale and can be long, and that still holds for the bodies - but a "do this next"
+					line needs somewhere to live, and the only other place that text exists is
+					CACHE_TRANSIENT, which flush_cache() deletes on five hooks, two of them ordinary
+					work (save_post_campaign, update_option_charitable_settings). Reading it from
+					there would give a card whose recommendation vanishes while somebody edits a
+					campaign - the exact failure this option was created to avoid.
+
+					So: the highest-priority foundational item only, name truncated, points as an
+					int. Bounded in size, dated by the 'time' key beside it, and autoload is off.
+					*/
+					if ( empty( $next_step ) ) {
+						$name = isset( $rec['name'] ) ? sanitize_text_field( (string) $rec['name'] ) : '';
+
+						if ( '' !== $name ) {
+							$next_step = array(
+								'name'  => mb_substr( $name, 0, 160 ),
+								'score' => max( 0, min( 100, isset( $rec['score'] ) ? (int) $rec['score'] : 0 ) ),
+							);
+						}
+					}
+				}
+			}
+
+			update_option(
+				self::LAST_SCORE_OPTION,
+				array(
+					'value'      => max( 0, min( 100, (int) $score['value'] ) ),
+					'band'       => isset( $score['band'] ) ? sanitize_key( (string) $score['band'] ) : '',
+					'complete'   => ! empty( $score['complete'] ),
+					'potential'  => max( 0, min( 100, isset( $score['potential'] ) ? (int) $score['potential'] : 0 ) ),
+					'dimensions' => $dimensions,
+					'fix_first'  => $fix_first,
+					'next_step'  => $next_step,
+					'time'       => time(),
+				),
+				false // autoload = no; only the dashboard and the Reports card read it.
+			);
 		}
 
 		/** Timestamp of the last successful API call, or 0 if it has never run. */
@@ -312,6 +456,14 @@ if ( ! class_exists( 'Charitable_Site_Analysis' ) ) :
 			// count, so a failed call stays retryable - which is what fail_with_cache()'s stale-report
 			// path and the JS retry link both assume.
 			update_option( self::LAST_RUN_OPTION, time(), false ); // autoload = no
+			/*
+			The durable score snapshot, kept outside the transient for the same reason as the stamp
+			above: the dashboard reads it long after flush_cache() has discarded the report. Written
+			last because it is the only step here that is not needed to serve this response - if it
+			somehow failed, the caller would still get its report. See LAST_SCORE_OPTION.
+			@since 1.8.15
+			*/
+			$this->store_score_snapshot( $report );
 			wp_send_json_success( $report );
 		}
 

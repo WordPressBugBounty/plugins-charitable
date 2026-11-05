@@ -1707,6 +1707,105 @@ body.charitable_page_charitable-about h2.nav-tab-wrapper a.nav-tab {
   font-weight: 400;
   border-bottom: 2px solid transparent;
 }
+
+/*
+ * TOOLS NAV ONLY: stop the tab strip wrapping into a float staircase.
+ *
+ * WordPress core sets `.nav-tab { float: left }` in load-styles.php. The rule
+ * above gives each tab `padding-bottom: 25px`, which makes it 50px tall against
+ * core's ~30px. When a float no longer fits it drops to the next line, but it
+ * cannot rise above the taller floats still occupying the band beside it, so it
+ * lands at THEIR horizontal offset instead of at the left edge. Measured on the
+ * Tools page at an 827px content box: ten tabs needing 1094px produced FOUR
+ * rows, 160px tall, with "AI MCP" and "Code Snippets" each stranded alone at
+ * x=658 under "System Info". The Categories screen produced three.
+ *
+ * display:flex is the fix rather than any width tweak: float is ignored on a
+ * flex item, so the row simply wraps left-aligned. margin-right:0 then recovers
+ * 151px (1094px -> 943px of strip), which is enough to keep all ten tabs on one
+ * row on any content area at or above 963px - roughly a 1280px browser upward.
+ * The 15px padding each side already separates the labels, so dropping the
+ * margin costs no visual separation.
+ *
+ * SCOPED to the four Tools surfaces, deliberately. The blocks above are shared
+ * with Reports, Settings, About and Growth Tools, whose strips wrap at narrow
+ * widths too (Settings needs 997px, Reports 861px) but which were not part of
+ * the reported issue. Widening this to those selectors is a one-line change
+ * when somebody wants it.
+ *
+ * KNOWN LIMIT: when the strip does still wrap, the active tab's underline on a
+ * non-final row sits above the wrapper's bottom border rather than meeting it,
+ * because the border belongs to the wrapper and the 25px padding only reaches
+ * it on the last row. That is pre-existing and is not made worse here; closing
+ * it means either a single scrolling row, which hides tabs, or moving the rule
+ * onto each tab, which is a design change rather than a fix.
+ *
+ * Edited in the .css directly, NOT assets/scss/admin/charitable-admin.scss -
+ * the build has no sass step, so the .scss is not the source of truth for this
+ * file. Keep charitable-admin.min.css in step.
+ *
+ * @since 1.8.15
+ */
+body.charitable_page_charitable-tools h2.nav-tab-wrapper,
+body.post-type-charitable.edit-tags-php h2.nav-tab-wrapper,
+body.term-php.taxonomy-campaign_category h2.nav-tab-wrapper,
+body.term-php.taxonomy-campaign_tag h2.nav-tab-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  /*
+   * Breathing room between wrapped rows. Without it the active tab's 2px
+   * underline sits 4px above the next row's labels, measured - close enough to
+   * read as attached to the wrong row. 12px takes that to 16px.
+   *
+   * row-gap rather than a margin on the tab, because it applies BETWEEN rows
+   * only: a strip that fits on one row is unchanged, and nothing is added below
+   * the last row where it would push the labels off the wrapper's border. It
+   * also means this costs nothing on the single-row case, which is the common
+   * one at 1280px and up.
+   *
+   * Needs the flex container above to have any effect - flex gap does nothing
+   * to a float layout, which is why the Settings and Reports strips cannot get
+   * this without being flexed too.
+   */
+  row-gap: 12px;
+}
+body.charitable_page_charitable-tools h2.nav-tab-wrapper a.nav-tab,
+body.post-type-charitable.edit-tags-php h2.nav-tab-wrapper a.nav-tab,
+body.term-php.taxonomy-campaign_category h2.nav-tab-wrapper a.nav-tab,
+body.term-php.taxonomy-campaign_tag h2.nav-tab-wrapper a.nav-tab {
+  margin-right: 0;
+}
+
+/*
+ * ...but give the margin back once there is room for it.
+ *
+ * Dropping margin-right above buys 151px, which is what keeps ten tabs on one
+ * row at middling widths. The cost is that the labels then sit 30px apart (the
+ * 15px padding either side) where every other Charitable strip - Settings,
+ * Reports - sits at 45px, so on a wide screen the Tools tabs read as cramped
+ * against their siblings.
+ *
+ * 1360px is measured, not guessed. With the margin the strip needs 1094px of
+ * tabs plus the wrapper's own 20px padding-right, so 1114px of nav box; nav box
+ * runs 242px narrower than the viewport with the admin menu expanded (160px menu
+ * + 20px #wpcontent padding + the .wrap margins), which puts the real threshold
+ * at 1356px. 1360 takes it with a little headroom.
+ *
+ * Below that the tighter 30px wins, because one tidy row beats two roomy ones.
+ * The auto-fold menu does not muddy this: it collapses to 36px below 960px,
+ * far under this breakpoint, so the 242px offset holds wherever this applies.
+ *
+ * @since 1.8.15
+ */
+@media (min-width: 1360px) {
+  body.charitable_page_charitable-tools h2.nav-tab-wrapper a.nav-tab,
+  body.post-type-charitable.edit-tags-php h2.nav-tab-wrapper a.nav-tab,
+  body.term-php.taxonomy-campaign_category h2.nav-tab-wrapper a.nav-tab,
+  body.term-php.taxonomy-campaign_tag h2.nav-tab-wrapper a.nav-tab {
+    margin-right: 15px;
+  }
+}
 body.charitable_page_charitable-reports h2.nav-tab-wrapper a.nav-tab.nav-tab-active,
 body.charitable_page_charitable-tools h2.nav-tab-wrapper a.nav-tab.nav-tab-active,
 body.post-type-charitable.edit-tags-php h2.nav-tab-wrapper a.nav-tab.nav-tab-active,

@@ -210,7 +210,7 @@
                 var isNegative = stats.donations_change.indexOf('-') === 0 && changeValue < 0;
                 var svgId = 'mask0_1904_1526_' + Date.now() + '_1';
                 // Positive = green, Negative = red, Zero = black
-                var svgColor = isZero ? '#000000' : (isPositive ? '#31944D' : '#DC2626');
+                var svgColor = isZero ? '#000000' : (isPositive ? '#31714c' : '#DC2626');
                 // Use up arrow for positive, down arrow for negative, up arrow for zero
                 var svgPath = (isPositive || isZero) ?
                     'M1.82849 9.52507L1.07562 8.804L5.05505 4.96689L7.20609 7.02708L10.0024 4.37458H8.60426V3.34448H11.8308V6.43477H10.7553V5.09565L7.20609 8.49497L5.05505 6.43477L1.82849 9.52507Z' :
@@ -244,7 +244,7 @@
                 var isNegative = stats.avg_change.indexOf('-') === 0 && changeValue < 0;
                 var svgId = 'mask0_1904_1526_' + Date.now() + '_2';
                 // Positive = green, Negative = red, Zero = black
-                var svgColor = isZero ? '#000000' : (isPositive ? '#31944D' : '#DC2626');
+                var svgColor = isZero ? '#000000' : (isPositive ? '#31714c' : '#DC2626');
                 // Use up arrow for positive, down arrow for negative, up arrow for zero
                 var svgPath = (isPositive || isZero) ?
                     'M1.82849 9.52507L1.07562 8.804L5.05505 4.96689L7.20609 7.02708L10.0024 4.37458H8.60426V3.34448H11.8308V6.43477H10.7553V5.09565L7.20609 8.49497L5.05505 6.43477L1.82849 9.52507Z' :
@@ -274,6 +274,18 @@
 
             // Update total refunds
             $('.charitable-dashboard-v2-stat-item').eq(3).find('.charitable-dashboard-v2-stat-amount').text(decodeHtmlEntities(stats.total_refunds));
+
+            // The refunds tile is the only one whose TITLE carries a value, so it needs updating
+            // too - otherwise the count stays on whatever the initial render produced while the
+            // amount beside it moves with the period.
+            //
+            // The server sends the finished, pluralised label ("1 Refund" / "2 Refunds"), built
+            // with _n() in get_dashboard_stats(). Do NOT rebuild it here from a count plus a word:
+            // there is no gettext in JS, and a singular/plural pair cannot express locales that
+            // have three or more plural forms.
+            if (typeof stats.total_refunds_label !== 'undefined') {
+                $('.charitable-dashboard-v2-stat-item').eq(3).find('.charitable-dashboard-v2-stat-title').text(stats.total_refunds_label);
+            }
         },
 
         /**
@@ -331,6 +343,12 @@
 
             // Update total refunds with "-"
             $('.charitable-dashboard-v2-stat-item').eq(3).find('.charitable-dashboard-v2-stat-amount').text('-');
+
+            // The refunds TITLE is deliberately left alone here. It is now a single translated
+            // label, so there is no number to blank on its own, and replacing the whole thing
+            // with "-" would drop the word "Refunds" from the tile while it loads. The "-" in the
+            // amount already says the figure is in flight; updateStats() corrects the label a
+            // moment later.
         },
 
         /**
@@ -495,7 +513,7 @@
                         data: chartData.donation_axis
                     }
                 ],
-                colors: ["#5AA15226"],
+                colors: ["#31714c26"],
                 grid: {
                     borderColor: "#C9D4CA",
                     clipMarkers: false,
@@ -507,7 +525,7 @@
                 },
                 stroke: {
                     width: 3,
-                    colors: ["#5AA152"]
+                    colors: ["#31714c"]
                 },
                 fill: {
                     type: "solid"
@@ -522,7 +540,7 @@
                 markers: {
                     size: 5,
                     colors: ["#FFFFFF"],
-                    strokeColor: "#5AA152",
+                    strokeColor: "#31714c",
                     strokeWidth: 4
                 },
                 xaxis: {

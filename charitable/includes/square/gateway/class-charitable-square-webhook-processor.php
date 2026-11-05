@@ -317,8 +317,13 @@ if ( ! class_exists( 'Charitable_Square_Webhook_Processor' ) ) :
 
 					$message = call_user_func( $default_processors[ $this->event['type'] ], $this->event );
 
-					/* Kill processing with a message returned by the event processor. */
-					die( $message ); // phpcs:ignore
+					/*
+					 * Kill processing with a message returned by the event processor.
+					 * Some processors return null, and die( null ) is deprecated as of
+					 * PHP 8.4. Only null is replaced, so a filtered processor that
+					 * returns an int exit status keeps its behaviour.
+					 */
+					die( null === $message ? '' : $message ); // phpcs:ignore
 				}
 			}
 
@@ -1376,19 +1381,14 @@ if ( ! class_exists( 'Charitable_Square_Webhook_Processor' ) ) :
 			$mode             = Charitable_Square_Helpers::get_mode();
 
 			/*
-			 * The signing secret is stored per-mode by the webhooks manager.
-			 * Lite saves it under the `gateways_square` group; read the
-			 * `gateways_square_core` group first for forward-compatibility and
-			 * fall back to `gateways_square` where it actually lives.
+			 * The signing secret is stored per mode. Lite's Signature Key field
+			 * saves it under `gateways_square`, so that wins. Charitable Pro
+			 * saves it under `gateways_square_core`, which is kept as a
+			 * fallback so a site that moved from Pro to Lite keeps verifying.
+			 * Lite must be read first: otherwise a stale Pro key would override
+			 * a new key entered in Lite and every webhook would fail.
 			 */
-			$core_settings   = charitable_get_option( 'gateways_square_core' );
-			$legacy_settings = charitable_get_option( 'gateways_square' );
-			$signature_key   = '';
-			if ( is_array( $core_settings ) && ! empty( $core_settings[ $mode ]['webhooks-secret'] ) ) {
-				$signature_key = $core_settings[ $mode ]['webhooks-secret'];
-			} elseif ( is_array( $legacy_settings ) && ! empty( $legacy_settings[ $mode ]['webhooks-secret'] ) ) {
-				$signature_key = $legacy_settings[ $mode ]['webhooks-secret'];
-			}
+			$signature_key = Charitable_Square_Helpers::get_webhook_signature_key( $mode );
 
 			/*
 			 * Verify against the exact URL registered with Square
@@ -1430,15 +1430,50 @@ if ( ! class_exists( 'Charitable_Square_Webhook_Processor' ) ) :
 					return false;
 				}
 
-				try {
-					$is_valid = $helper_class::verifySignature( $body, $signature_header, $signature_key, $notification_url );
-				} catch ( \Throwable $e ) {
-					// Fail closed on any error/exception from the SDK: a signed
-					// request we could not verify is treated as untrusted.
-					if ( charitable_is_debug( 'square' ) ) {
-						error_log( 'Square webhook signature verification error: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				/*
+				 * Square signs over the EXACT notification URL saved in the
+				 * webhook subscription. Before 1.8.15 the settings screen showed
+				 * the URL without the slash before the query string, and Pro
+				 * offers a path form, so sites can be registered under more than
+				 * one form. Verify against every form this site could have been
+				 * registered under and accept if any matches, as Pro does. This
+				 * does not weaken security: a valid signature for any candidate
+				 * still requires the signing secret.
+				 *
+				 * @since 1.8.15
+				 */
+				$listener_arg   = array( 'charitable-listener' => Charitable_Gateway_Square::ID );
+				$candidate_urls = array(
+					$notification_url,
+					Charitable_Square_Helpers::get_webhook_url_for_rest(),
+					esc_url_raw( add_query_arg( $listener_arg, untrailingslashit( home_url() ) ) ),
+					sprintf( '%s/charitable-listener/%s', untrailingslashit( home_url() ), Charitable_Gateway_Square::ID ),
+				);
+
+				// The URL exactly as this request arrived (proxies, www, scheme edge cases).
+				if ( ! empty( $_SERVER['HTTP_HOST'] ) && ! empty( $_SERVER['REQUEST_URI'] ) ) {
+					$is_https         = ( ! empty( $_SERVER['HTTPS'] ) && 'off' !== $_SERVER['HTTPS'] ) || 443 === (int) ( isset( $_SERVER['SERVER_PORT'] ) ? $_SERVER['SERVER_PORT'] : 0 );
+					$candidate_urls[] = ( $is_https ? 'https://' : 'http://' ) . wp_unslash( $_SERVER['HTTP_HOST'] ) . wp_unslash( $_SERVER['REQUEST_URI'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- Only used as HMAC input; a forged value cannot produce a valid signature without the secret.
+				}
+
+				$candidate_urls = array_values( array_unique( array_filter( array_map( 'strval', $candidate_urls ) ) ) );
+
+				$is_valid = false;
+				foreach ( $candidate_urls as $candidate_url ) {
+					try {
+						if ( $helper_class::verifySignature( $body, $signature_header, $signature_key, $candidate_url ) ) {
+							$is_valid = true;
+							if ( charitable_is_debug( 'square' ) ) {
+								error_log( 'Square webhook signature verified against URL: ' . $candidate_url ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+							}
+							break;
+						}
+					} catch ( \Throwable $e ) {
+						// Fail closed: an SDK error on one candidate never counts as a match.
+						if ( charitable_is_debug( 'square' ) ) {
+							error_log( 'Square webhook signature verification error: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+						}
 					}
-					return false;
 				}
 
 				if ( ! $is_valid ) {
@@ -1466,16 +1501,17 @@ if ( ! class_exists( 'Charitable_Square_Webhook_Processor' ) ) :
 			 * any site that had not yet stored a signing secret. Fail closed: the
 			 * event is refused unless enforcement is explicitly disabled.
 			 *
-			 * Sites connected through the Square settings screen store a signing
-			 * secret during onboarding, so they never reach this branch and are
-			 * unaffected. For the rare site that has webhooks enabled but no
-			 * stored secret, refused events stop donations/refunds from
-			 * reconciling, which the hourly Charitable_Square_WebhooksHealthCheck
-			 * detects and surfaces as an admin notice prompting a reconnect (which
-			 * re-registers the subscription and stores a fresh signing secret,
-			 * restoring verification).
+			 * Connecting Square over OAuth does NOT register a webhook or store a
+			 * signing secret. The admin creates the subscription in the Square
+			 * Developer Console and pastes its Signature Key into the Enable
+			 * Webhooks section of the Square settings screen (saved to
+			 * gateways_square[ mode ][ webhooks-secret ]). Until that is done,
+			 * refused events stop donations and refunds from reconciling, and
+			 * Charitable_Square_WebhooksHealthCheck::missing_signing_secret_notice()
+			 * shows an admin notice pointing at that field.
 			 *
 			 * @since 1.8.12
+			 * @version 1.8.15 Corrected: a reconnect never stored the secret.
 			 */
 			if ( empty( $signature_key ) ) {
 
@@ -1495,7 +1531,7 @@ if ( ! class_exists( 'Charitable_Square_Webhook_Processor' ) ) :
 				$enforce_signature = (bool) apply_filters( 'charitable_square_webhook_enforce_signature', true );
 
 				if ( $enforce_signature ) {
-					error_log( 'Square webhook REJECTED: no signing secret stored. Reconnect Square (Settings > Payment > Square) to register webhooks and enable signature verification. To temporarily accept unsigned events, use the charitable_square_webhook_enforce_signature filter.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					error_log( 'Square webhook REJECTED: no signing secret stored. Paste the Signature Key from your Square Developer Console webhook subscription into Charitable > Settings > Payment Gateways > Square > Enable Webhooks, then save.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 					return false;
 				}
 

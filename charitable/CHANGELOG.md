@@ -1,3 +1,11 @@
+# 1.8.15
+* NEW: A redesigned Charitable dashboard. A donation chart with selectable time periods, at-a-glance cards for site health, spam protection and email, a Site Analysis score, recent donations and top donors, and new Integrations and Raise More panels showing what else Charitable works with.
+* FIX: Improved reliability of Square donations and refunds.
+* FIX: Zero and negative donation amounts are now refused on campaigns with no minimum donation amount set.
+* FIX: Improvements to campaign builder when an extension adds its own panel to the Settings tab.
+* FIX: Security: payment details submitted with a donation can no longer place script in the donation log.
+* FIX: Security: a PayPal IPN response that does not match the donation no longer records the entire request in the donation log.
+
 # 1.8.14.1
 * FIX: Filtering the Reports dashboard no longer replaces the Activity timeline with sample data.
 * FIX: Activity timeline in reports - resolved "Unknown" entries issue.

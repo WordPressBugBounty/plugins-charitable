@@ -435,6 +435,82 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 		}
 
 		/**
+		 * Clean a single value from an IPN request before it is stored.
+		 *
+		 * IPN fields are parsed straight out of an unauthenticated request body by
+		 * get_encoded_ipn_data() with no sanitization, and the values stored here are
+		 * rendered on the donation edit screen -- the donation log metabox, and the
+		 * details metabox for the transaction ID -- so no IPN value may be stored
+		 * verbatim. Values are stripped of markup, reduced to printable ASCII and capped,
+		 * which is lossless for the identifiers, status codes, amounts and email addresses
+		 * PayPal actually sends.
+		 *
+		 * @since  1.8.15
+		 *
+		 * @param  mixed $value      The raw IPN value.
+		 * @param  int   $max_length Maximum number of characters to keep.
+		 * @return string
+		 */
+		private static function sanitize_ipn_log_value( $value, $max_length = 64 ) {
+			if ( ! is_scalar( $value ) ) {
+				return '(not provided)';
+			}
+
+			$value = sanitize_text_field( (string) $value );
+			$value = preg_replace( '/[^\x20-\x7E]/', '', $value );
+
+			if ( '' === $value ) {
+				return '(empty)';
+			}
+
+			if ( strlen( $value ) > $max_length ) {
+				return substr( $value, 0, $max_length ) . '...';
+			}
+
+			return $value;
+		}
+
+		/**
+		 * Return a bounded summary of the IPN fields needed to diagnose a rejected IPN.
+		 *
+		 * This replaces dumping the entire decoded request body into the donation log.
+		 * That stored an unbounded amount of unauthenticated input in post meta, in every
+		 * key and every value, where the only fields that help diagnose a rejection are
+		 * the handful summarised here.
+		 *
+		 * @since  1.8.15
+		 *
+		 * @param  array $data The decoded IPN request.
+		 * @return string
+		 */
+		private static function get_ipn_log_summary( $data ) {
+			$summary = array();
+
+			$fields = array(
+				'txn_id',
+				'parent_txn_id',
+				'payment_status',
+				'mc_gross',
+				'mc_currency',
+				'business',
+				'receiver_email',
+				'invoice',
+			);
+
+			foreach ( $fields as $field ) {
+				if ( isset( $data[ $field ] ) ) {
+					$summary[] = $field . ': ' . self::sanitize_ipn_log_value( $data[ $field ] );
+				}
+			}
+
+			if ( empty( $summary ) ) {
+				return '(no recognised IPN fields)';
+			}
+
+			return implode( ', ', $summary );
+		}
+
+		/**
 		 * Receives verified IPN data from PayPal and processes the donation.
 		 *
 		 * @since  1.0.0
@@ -492,7 +568,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 			/* Verify that the business email matches the PayPal email in the settings */
 			if ( strcasecmp( $business_email, trim( self::get_paypal_email() ) ) != 0 ) {
 
-				$message = sprintf( '%s %s', __( 'Invalid Business email in the IPN response. IPN data:', 'charitable' ), wp_json_encode( $data ) );
+				$message = sprintf( '%s %s', __( 'Invalid Business email in the IPN response. IPN data:', 'charitable' ), self::get_ipn_log_summary( $data ) );
 				$donation->log()->add( $message );
 				$donation->update_status( 'charitable-failed' );
 				die( esc_html( __( 'Incorrect Business Email', 'charitable' ) ) );
@@ -502,7 +578,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 			/* Verify that the currency matches. */
 			if ( $donation->get_currency() !== $currency_code ) {
 
-				$message = sprintf( '%s %s', __( 'The currency in the IPN response does not match the site currency. IPN data:', 'charitable' ), wp_json_encode( $data ) );
+				$message = sprintf( '%s %s', __( 'The currency in the IPN response does not match the site currency. IPN data:', 'charitable' ), self::get_ipn_log_summary( $data ) );
 				$donation->log()->add( $message );
 				$donation->update_status( 'charitable-failed' );
 
@@ -517,14 +593,14 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 				if ( $amount < $donation->get_total_donation_amount( true ) ) {
 					$message = sprintf( '%s: #%s',
 						__( 'Partial PayPal refund processed', 'charitable' ),
-						isset( $data['parent_txn_id'] ) ? $data['parent_txn_id'] : ''
+						self::sanitize_ipn_log_value( isset( $data['parent_txn_id'] ) ? $data['parent_txn_id'] : '' )
 					);
 				} else {
 					$message = sprintf( '%s #%s %s: %s',
 						__( 'PayPal Payment', 'charitable' ),
-						isset( $data['parent_txn_id'] ) ? $data['parent_txn_id'] : '',
+						self::sanitize_ipn_log_value( isset( $data['parent_txn_id'] ) ? $data['parent_txn_id'] : '' ),
 						__( 'refunded with reason', 'charitable' ),
-						isset( $data['reason_code'] ) ? $data['reason_code'] : ''
+						self::sanitize_ipn_log_value( isset( $data['reason_code'] ) ? $data['reason_code'] : '' )
 					);
 				}
 
@@ -537,7 +613,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 			/* Mark a payment as failed. */
 			if ( in_array( $payment_status, array( 'declined', 'failed', 'denied', 'expired', 'voided' ) ) ) {
 
-				$message = sprintf( '%s: %s', __( 'The donation has failed with the following status', 'charitable' ), $payment_status );
+				$message = sprintf( '%s: %s', __( 'The donation has failed with the following status', 'charitable' ), self::sanitize_ipn_log_value( $payment_status ) );
 				$donation->log()->add( $message );
 				$donation->update_status( 'charitable-failed' );
 
@@ -553,7 +629,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 			/* Verify that the donation key matches the one stored for the donation. */
 			if ( $donation_key != $donation->get_donation_key() ) {
 
-				$message = sprintf( '%s %s', __( 'Donation key in the IPN response does not match the donation. IPN data:', 'charitable' ), wp_json_encode( $data ) );
+				$message = sprintf( '%s %s', __( 'Donation key in the IPN response does not match the donation. IPN data:', 'charitable' ), self::get_ipn_log_summary( $data ) );
 				$donation->log()->add( $message );
 				$donation->update_status( 'charitable-failed' );
 
@@ -564,7 +640,7 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 			/* Verify that the amount in the IPN matches the amount we expected. */
 			if ( $amount < $donation->get_total_donation_amount( true ) ) {
 
-				$message = sprintf( '%s %s', __( 'The amount in the IPN response does not match the expected donation amount. IPN data:', 'charitable' ), wp_json_encode( $data ) );
+				$message = sprintf( '%s %s', __( 'The amount in the IPN response does not match the expected donation amount. IPN data:', 'charitable' ), self::get_ipn_log_summary( $data ) );
 				$donation->log()->add( $message );
 				$donation->update_status( 'charitable-failed' );
 
@@ -572,13 +648,20 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 
 			}
 
-			/* Save the transation ID */
-			$donation->set_gateway_transaction_id( $data['txn_id'] );
+			/*
+			 * Save the transation ID.
+			 *
+			 * charitable_sanitize_donation_meta() does not clean this key, and the value is
+			 * shown on the donation details metabox, so it is sanitized here.
+			 *
+			 * @since 1.8.15 Sanitized.
+			 */
+			$donation->set_gateway_transaction_id( self::sanitize_ipn_log_value( $data['txn_id'] ) );
 
 			/* Process a completed donation. */
 			if ( 'completed' == $payment_status ) {
 
-				$message = sprintf( '%s: %s', __( 'PayPal Transaction ID', 'charitable' ), $data['txn_id'] );
+				$message = sprintf( '%s: %s', __( 'PayPal Transaction ID', 'charitable' ), self::sanitize_ipn_log_value( $data['txn_id'] ) );
 				$donation->log()->add( $message );
 				$donation->update_status( 'charitable-completed' );
 
@@ -871,8 +954,15 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 					break;
 
 				default:
+					/*
+					 * The reason code is an unrecognised value from the IPN request body,
+					 * and this note is stored in the donation log, so it is cleaned before
+					 * being interpolated. Every branch above returns a fixed string.
+					 *
+					 * @since 1.8.15 Reason code sanitized.
+					 */
 					/* translators: %s: reason code given by PayPal */
-					$note = sprintf( __( 'Payment is pending for unknown reasons. Contact PayPal support for assistance. Reason code: %s', 'charitable' ), $reason_code );
+					$note = sprintf( __( 'Payment is pending for unknown reasons. Contact PayPal support for assistance. Reason code: %s', 'charitable' ), self::sanitize_ipn_log_value( $reason_code ) );
 			}
 
 			/**
