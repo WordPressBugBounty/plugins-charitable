@@ -850,8 +850,8 @@ class Charitable_Square_API {
 
 			$this->errors[] = array(
 				'message'  => esc_html__( 'Square fail: order was not created.', 'charitable' ),
-				'category' => $error_category,
-				'code'     => $error_code,
+				'category' => esc_html( (string) $error_category ),
+				'code'     => esc_html( (string) $error_code ),
 			);
 			return null;
 		}

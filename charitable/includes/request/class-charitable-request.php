@@ -8,6 +8,7 @@
  * @license   http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since     1.0.0
  * @version   1.6.58
+ * @version   1.8.15.1 - Honour ?amount= on campaign pages that display the donation form inline.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -81,6 +82,9 @@ if ( ! class_exists( 'Charitable_Request' ) ) :
 
 			/* Add any supported donation parameters to the session. */
 			add_action( 'charitable_is_donate_page', array( $this, 'add_donation_params_to_session' ) );
+
+			/* Do the same on campaign pages that show the donation form inline. */
+			add_action( 'wp', array( $this, 'maybe_add_donation_params_to_session' ) );
 
 			/* Set the current campaign before a donation form is displayed, and reset to original after. */
 			add_action( 'charitable_donation_form_before', array( $this, 'set_current_campaign_before_donation_form' ) );
@@ -304,19 +308,175 @@ if ( ! class_exists( 'Charitable_Request' ) ) :
 	 *
 	 * @since  1.6.25
 	 * @version 1.8.9.1
+	 * @version 1.8.15.1 - Validate the amount and period before they reach the session.
 	 *
 	 * @param  int $campaign_id The campaign receiving the donation.
-	 * @return void
+	 * @return boolean Whether anything was added to the session.
 	 */
 	public function add_donation_params_to_session( $campaign_id ) {
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
-		if ( array_key_exists( 'amount', $_REQUEST ) ) {
-			$amount = sanitize_text_field( wp_unslash( $_REQUEST['amount'] ) );
-			$period = array_key_exists( 'period', $_REQUEST ) ? sanitize_text_field( wp_unslash( $_REQUEST['period'] ) ) : 'once';
-
-			charitable_get_session()->add_donation( $campaign_id, $amount, $period );
+		if ( ! array_key_exists( 'amount', $_REQUEST ) ) {
+			return false;
 		}
+
+		$amount = $this->sanitize_requested_amount( wp_unslash( $_REQUEST['amount'] ), $campaign_id );
+
+		if ( false === $amount ) {
+			return false;
+		}
+
+		$period = array_key_exists( 'period', $_REQUEST )
+			? $this->sanitize_requested_period( wp_unslash( $_REQUEST['period'] ) )
+			: 'once';
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+		charitable_get_session()->add_donation( $campaign_id, $amount, $period );
+
+		return true;
+	}
+
+	/**
+	 * Sanitize a donation amount arriving as a URL or form parameter.
+	 *
+	 * Returns false for anything that should never reach the session. Storing a junk value is
+	 * worse than ignoring it: the session amount is always cast to a float, so an unusable
+	 * value is no longer the integer 0 that donation-amount-list.php tests for with
+	 * `0 === $charitable_amount`, and the campaign's default suggested amount stops being
+	 * pre-selected. The donor is then shown a form with no amount selected at all, and the
+	 * value persists for the life of the session.
+	 *
+	 * @since  1.8.15.1
+	 *
+	 * @param  mixed $amount      The raw parameter value.
+	 * @param  int   $campaign_id The campaign receiving the donation.
+	 * @return float|false Sanitized amount, or false if it should be ignored.
+	 */
+	private function sanitize_requested_amount( $amount, $campaign_id = 0 ) {
+		if ( ! is_scalar( $amount ) ) {
+			return false;
+		}
+
+		$amount = charitable_get_currency_helper()->cast_to_decimal_format( sanitize_text_field( $amount ) );
+
+		if ( ! is_numeric( $amount ) ) {
+			return false;
+		}
+
+		$amount = (float) $amount;
+
+		if ( ! is_finite( $amount ) || $amount <= 0 ) {
+			return false;
+		}
+
+		/*
+		 * Above roughly 1e14, casting a float back to a string produces scientific notation,
+		 * which the amount templates re-parse into an unrelated number. The donor would then
+		 * be shown one figure while a different one is submitted, so refuse these outright.
+		 */
+		if ( $amount >= 1000000000000 ) {
+			return false;
+		}
+
+		$maximum = charitable_get_maximum_donation_amount( $campaign_id );
+
+		if ( false !== $maximum && $amount > (float) $maximum ) {
+			return false;
+		}
+
+		return $amount;
+	}
+
+	/**
+	 * Sanitize a donation period arriving as a URL or form parameter.
+	 *
+	 * Anything unrecognised becomes 'once'. The raw value was previously stored as the
+	 * session's donation_period, and donation-amount-list.php suppresses every amount button
+	 * when the period is not one the campaign accepts, so an arbitrary string left the form
+	 * with nothing selected.
+	 *
+	 * @since  1.8.15.1
+	 *
+	 * @param  mixed $period The raw parameter value.
+	 * @return string
+	 */
+	private function sanitize_requested_period( $period ) {
+		if ( ! is_scalar( $period ) ) {
+			return 'once';
+		}
+
+		$period  = sanitize_text_field( $period );
+		$allowed = array( 'once', 'month', 'quarter', 'semiannual', 'year' );
+
+		if ( function_exists( 'charitable_recurring_get_donation_periods_i18n' ) ) {
+			$allowed = array_merge( array( 'once' ), array_keys( (array) charitable_recurring_get_donation_periods_i18n() ) );
+		}
+
+		return in_array( $period, $allowed, true ) ? $period : 'once';
+	}
+
+	/**
+	 * If set, add supported donation parameters to the session on campaign pages.
+	 *
+	 * add_donation_params_to_session() is hooked to 'charitable_is_donate_page', which is
+	 * only fired by Charitable_Campaign_Donation_Endpoint::setup_template(). That endpoint
+	 * only becomes the current endpoint when /donate/ is actually in the URL, because
+	 * Charitable_Endpoints::get_current_endpoint() resolves endpoints with 'strict' => true
+	 * and the endpoint's is_page() returns false under a strict check without it.
+	 *
+	 * When the donation form is shown on the campaign page itself, /donate/ is never in the
+	 * URL: with the 'same_page' display setting, the endpoint's own get_page_url() returns
+	 * the plain campaign permalink. Anything sending a donor to that URL with ?amount= set,
+	 * such as the mini widget shortcode in redirect mode, therefore had the requested amount
+	 * silently dropped, and the form fell back to the campaign's default suggested amount.
+	 *
+	 * @since  1.8.15.1
+	 *
+	 * @global WP_Query $wp_query
+	 * @return void
+	 */
+	public function maybe_add_donation_params_to_session() {
+		global $wp_query;
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! array_key_exists( 'amount', $_REQUEST ) ) {
+			return;
+		}
+
+		if ( ! is_singular( Charitable::CAMPAIGN_POST_TYPE ) ) {
+			return;
+		}
+
+		/*
+		 * The /donate/ endpoint fires 'charitable_is_donate_page' for itself, so leave that
+		 * path untouched rather than writing the same values to the session twice.
+		 */
+		if ( isset( $wp_query->query_vars ) && array_key_exists( 'donate', $wp_query->query_vars ) ) {
+			return;
+		}
+
+		$campaign_id = charitable_get_current_campaign_id();
+
+		if ( ! $campaign_id ) {
+			return;
+		}
+
+		if ( ! $this->add_donation_params_to_session( $campaign_id ) ) {
+			return;
+		}
+
+		/*
+		 * What this page renders now depends on a query parameter, so it must not be written to
+		 * a full page cache: otherwise the first visitor's amount is served to everyone who
+		 * follows. Charitable_Endpoints::disable_endpoint_cache() does this for the /donate/
+		 * endpoint, which is exactly the endpoint that does not resolve here.
+		 */
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- DONOTCACHEPAGE is a third-party constant used by caching plugins for compatibility.
+			define( 'DONOTCACHEPAGE', true );
+
+			/** This action is documented in includes/endpoints/class-charitable-endpoints.php */
+			do_action( 'charitable_do_not_cache' );
+		}
 	}
 
 		/**

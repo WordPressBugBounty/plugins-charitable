@@ -229,7 +229,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 							'title'    => '',
 							'type'     => 'content',
 							'class'    => 'manually-modify',
-							'content'  => '<a href="#" data-charitable-args="mode=' . $mode . '" data-charitable-action="show-stripe-keys" class="manually-modify-keys" id="charitable-modify-keys">Manually Modify Keys</a>',
+							'content'  => '<a href="#" data-charitable-args="mode=' . esc_attr( $mode ) . '" data-charitable-action="show-stripe-keys" data-nonce="' . esc_attr( wp_create_nonce( 'charitable-show-stripe-keys' ) ) . '" class="manually-modify-keys" id="charitable-modify-keys">Manually Modify Keys</a>',
 							'priority' => 15,
 						],
 					);
@@ -1045,7 +1045,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 					sprintf(
 						/* translators: %s: transaction reference. */
 						__( 'Stripe refund transaction ID: %s', 'charitable' ),
-						$refund->id
+						esc_html( (string) $refund->id )
 					)
 				);
 
@@ -1055,7 +1055,7 @@ if ( ! class_exists( 'Charitable_Gateway_Stripe_AM' ) ) :
 					sprintf(
 						/* translators: %s: error message. */
 						__( 'Stripe refund failed: %s', 'charitable' ),
-						$e->getStripeCode()
+						esc_html( (string) $e->getStripeCode() )
 					)
 				);
 				return false;

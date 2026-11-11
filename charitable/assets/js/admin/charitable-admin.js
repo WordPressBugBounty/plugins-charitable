@@ -749,7 +749,7 @@ CHARITABLE_ADMIN = window.CHARITABLE_ADMIN || {};
 			var data = {
 				action  : 'charitable-' + $(this).data( 'charitable-action' ),
 				args 	: $(this).data( 'charitable-args' ),
-				nonce   : $(this).data( 'nonce' )
+				nonce   : $(this).attr( 'data-nonce' ) // attr, not data(): data() turns an all-digit nonce into a number.
 			};
 
 			$.ajax({

@@ -279,7 +279,8 @@ if ( ! class_exists( 'Charitable_Public' ) ) :
 				$settings = get_option( 'charitable_settings' );
 
 				// If there is no public key, skip loading Stripe scripts but continue.
-				if ( isset( $keys['public_key'] ) && ! empty( $keys['public_key'] ) ) {
+				// Only a publishable key (pk_) may reach the browser; anything else (e.g. a secret key saved in the wrong field) is never output.
+				if ( isset( $keys['public_key'] ) && ! empty( $keys['public_key'] ) && 0 === strpos( $keys['public_key'], 'pk_' ) ) {
 
 					$cc_fields_format = ( ! empty( $settings['gateways_stripe']['cc_fields_format'] ) && '' !== $settings['gateways_stripe']['cc_fields_format'] ) ? $settings['gateways_stripe']['cc_fields_format'] : '';
 

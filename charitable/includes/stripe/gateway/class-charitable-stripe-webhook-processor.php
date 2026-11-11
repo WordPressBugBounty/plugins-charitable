@@ -1151,35 +1151,33 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 				return false;
 			}
 
-			$sig_header     = isset( $_SERVER['HTTP_STRIPE_SIGNATURE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_STRIPE_SIGNATURE'] ) ) : '';
-			$signing_secret = self::get_webhook_signing_secret();
+			$sig_header      = isset( $_SERVER['HTTP_STRIPE_SIGNATURE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_STRIPE_SIGNATURE'] ) ) : '';
+			$signing_secrets = self::get_webhook_signing_secrets();
 
-			// If we have both a signature header and a signing secret, verify cryptographically.
-			if ( ! empty( $sig_header ) && ! empty( $signing_secret ) ) {
-				try {
-					$event = \Stripe\Webhook::constructEvent( $body, $sig_header, $signing_secret );
-					return $event;
-				} catch ( \Stripe\Error\SignatureVerification $e ) {
-					if ( charitable_is_debug() ) {
-						error_log( 'Charitable Stripe webhook signature verification failed: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			// If we have both a signature header and at least one signing secret, verify cryptographically.
+			// A site can hold more than one secret for the current mode (its own account's endpoint and a
+			// Connect endpoint each have their own), so try each one before rejecting the event.
+			if ( ! empty( $sig_header ) && ! empty( $signing_secrets ) ) {
+				$last_error = '';
+				foreach ( $signing_secrets as $secret_key => $signing_secret ) {
+					try {
+						$event = \Stripe\Webhook::constructEvent( $body, $sig_header, $signing_secret );
+						if ( charitable_is_debug() ) {
+							error_log( 'Charitable Stripe webhook verified with signing secret: ' . $secret_key ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+						}
+						return $event;
+					} catch ( \Exception $e ) {
+						// Covers \Stripe\Error\SignatureVerification, \Stripe\Exception\SignatureVerificationException and
+						// \UnexpectedValueException. Try the next stored secret.
+						$last_error = $secret_key . ': ' . $e->getMessage();
 					}
-					self::record_verification_failure();
-					return false;
-				} catch ( \UnexpectedValueException $e ) {
-					if ( charitable_is_debug() ) {
-						error_log( 'Charitable Stripe webhook invalid payload: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-					}
-					self::record_verification_failure();
-					return false;
-				} catch ( \Exception $e ) {
-					// Catches \Stripe\Exception\SignatureVerificationException from newer Stripe SDK versions
-					// in addition to the legacy \Stripe\Error\SignatureVerification namespace above.
-					if ( charitable_is_debug() ) {
-						error_log( 'Charitable Stripe webhook signature verification failed: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-					}
-					self::record_verification_failure();
-					return false;
 				}
+
+				if ( charitable_is_debug() ) {
+					error_log( 'Charitable Stripe webhook signature verification failed for every stored secret. Last: ' . $last_error ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				}
+				self::record_verification_failure();
+				return false;
 			}
 
 			// Fallback: if no signing secret is stored yet (e.g., legacy installs before upgrade),
@@ -1221,31 +1219,35 @@ if ( ! class_exists( 'Charitable_Stripe_Webhook_Processor' ) ) :
 		 *
 		 * @since  1.8.9.8
 		 *
-		 * @return string|false The signing secret, or false if not found.
+		 * @since  1.8.15.1 Returns every stored secret for the current mode, most likely match first.
+		 *
+		 * @return string[] Signing secrets keyed by option name; empty when none are stored.
 		 */
-		private static function get_webhook_signing_secret() {
+		private static function get_webhook_signing_secrets() {
 			// Allow override via constant (useful for Stripe CLI testing).
 			if ( defined( 'CHARITABLE_WEBHOOK_SIGNING_SECRET' ) && CHARITABLE_WEBHOOK_SIGNING_SECRET ) {
-				return CHARITABLE_WEBHOOK_SIGNING_SECRET;
+				return array( 'CHARITABLE_WEBHOOK_SIGNING_SECRET' => CHARITABLE_WEBHOOK_SIGNING_SECRET );
 			}
 
-			$test_mode = charitable_get_option( 'test_mode', false );
+			$mode = charitable_get_option( 'test_mode', false ) ? 'test' : 'live';
 
-			// Check the signing secret keys in priority order based on current mode.
-			if ( $test_mode ) {
-				$keys = array( 'test_connect_webhook_signing_secret', 'test_webhook_signing_secret' );
+			// Most likely match first: the Connect endpoint's secret when the site uses Stripe Connect,
+			// otherwise the site's own account endpoint. The other is still tried as a fallback.
+			if ( function_exists( 'charitable_using_stripe_connect' ) && charitable_using_stripe_connect() ) {
+				$keys = array( $mode . '_connect_webhook_signing_secret', $mode . '_webhook_signing_secret' );
 			} else {
-				$keys = array( 'live_connect_webhook_signing_secret', 'live_webhook_signing_secret' );
+				$keys = array( $mode . '_webhook_signing_secret', $mode . '_connect_webhook_signing_secret' );
 			}
 
+			$secrets = array();
 			foreach ( $keys as $key ) {
 				$secret = charitable_get_option( array( 'gateways_stripe', $key ) );
-				if ( ! empty( $secret ) ) {
-					return $secret;
+				if ( ! empty( $secret ) && is_string( $secret ) ) {
+					$secrets[ $key ] = $secret;
 				}
 			}
 
-			return false;
+			return $secrets;
 		}
 
 		/**

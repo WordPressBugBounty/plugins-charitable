@@ -4,7 +4,7 @@ Tags: donation, donate, fundraising, crowdfunding, recurring donations
 Requires at least: 5.9
 Tested up to: 7.1.4
 Requires PHP: 7.4
-Stable tag: 1.8.15
+Stable tag: 1.8.15.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -271,6 +271,13 @@ You can post in the [support forum](https://wordpress.org/support/plugin/charita
 6. Setting up Charitable Donation Forms: The General settings area.
 
 == Changelog ==
+
+= Donation Form & Fundraising Campaigns v1.8.15.1 =
+* FIX: Security: improved handling of Stripe API keys saved in settings. Also fixes the Manually Modify Keys link, and Stripe webhooks being rejected after saving or on sites with more than one webhook endpoint, which left donations Pending.
+* FIX: Security: improved validation of PayPal IPN responses and escaping of gateway fields in the donation log.
+* FIX: Security: improved session handling and donation receipt access checks.
+* FIX: A donation amount chosen on a campaign page now carries through to the donation form shown on that same page.
+* FIX: Sorting the donations list no longer changes other queries on the same page, and a failed Square refund logs the reason instead of "Array".
 
 = Donation Form & Fundraising Campaigns v1.8.15 =
 * NEW: A redesigned Charitable dashboard. A donation chart with selectable time periods, at-a-glance cards for site health, spam protection and email, a Site Analysis score, recent donations and top donors, and new Integrations and Raise More panels showing what else Charitable works with.

@@ -184,7 +184,7 @@ add_filter( 'request', array( Charitable_Donation_List_Table::get_instance(), 'f
  *
  * @see Charitable_Donation_List_Table::sort_donations()
  */
-add_filter( 'posts_clauses', array( Charitable_Donation_List_Table::get_instance(), 'sort_donations' ) );
+add_filter( 'posts_clauses', array( Charitable_Donation_List_Table::get_instance(), 'sort_donations' ), 10, 2 );
 
 /**
  * Render blank state when there are no donations.

@@ -794,13 +794,39 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 		 *
 		 * @global string $typenow The current post type.
 		 * @global WPDB $wpdb The WPDB object.
-		 * @param  array $clauses Array of SQL query clauses.
+		 * @param  array    $clauses Array of SQL query clauses.
+		 * @param  WP_Query $query   The query the clauses belong to. Added in 1.8.15.1.
 		 * @return array
 		 */
-		public function sort_donations( $clauses ) {
+		public function sort_donations( $clauses, $query = null ) {
 			global $typenow, $wpdb;
 
 			if ( Charitable::DONATION_POST_TYPE != $typenow ) {
+				return $clauses;
+			}
+
+			/*
+			 * posts_clauses fires for every WP_Query on the page, not only the list
+			 * table's own. $typenow and $_GET['orderby'] are both page-level, so they
+			 * cannot tell those queries apart, and this callback used to declare only
+			 * the $clauses parameter - so it never saw the $query WordPress passes as
+			 * the second argument and had no way to ask.
+			 *
+			 * The result on edit.php?post_type=donation&orderby=amount was that the
+			 * queries wp_print_font_faces() runs for wp_global_styles, and the one
+			 * get_page_templates() runs for wp_template behind Quick Edit, were sorted
+			 * by cd.amount and had their tax_query join replaced by the assignment
+			 * below, logging "Unknown column 'wp_term_relationships.term_taxonomy_id'"
+			 * on a page that still returned 200.
+			 *
+			 * The test is deliberately one-sided: bail only when $query is positively
+			 * known to be a secondary query. A caller that invokes the filter with one
+			 * argument keeps the previous behaviour rather than silently losing the
+			 * sort.
+			 *
+			 * @since 1.8.15.1
+			 */
+			if ( $query instanceof WP_Query && ! $query->is_main_query() ) {
 				return $clauses;
 			}
 
@@ -813,7 +839,23 @@ if ( ! class_exists( 'Charitable_Donation_List_Table' ) ) :
 
 			switch ( sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				case 'amount':
-					$clauses['join']    = "JOIN {$wpdb->prefix}charitable_campaign_donations cd ON cd.donation_id = $wpdb->posts.ID ";
+					/*
+					 * Append, never assign. The old line replaced whatever join core had
+					 * already built - a tax_query join among them - which is the second
+					 * half of the bug described above. The alias check keeps the join
+					 * idempotent if the filter is ever applied twice to one query, which
+					 * would otherwise fail with "Not unique table/alias: 'cd'".
+					 *
+					 * @since 1.8.15.1
+					 */
+					if ( ! isset( $clauses['join'] ) ) {
+						$clauses['join'] = '';
+					}
+
+					if ( false === strpos( $clauses['join'], 'charitable_campaign_donations cd' ) ) {
+						$clauses['join'] .= " JOIN {$wpdb->prefix}charitable_campaign_donations cd ON cd.donation_id = {$wpdb->posts}.ID ";
+					}
+
 					$clauses['orderby'] = 'cd.amount ' . $order;
 					break;
 			}

@@ -1,3 +1,10 @@
+# 1.8.15.1
+* FIX: Security: improved handling of Stripe API keys saved in settings. Also fixes the Manually Modify Keys link, and Stripe webhooks being rejected after saving or on sites with more than one webhook endpoint, which left donations Pending.
+* FIX: Security: improved validation of PayPal IPN responses and escaping of gateway fields in the donation log.
+* FIX: Security: improved session handling and donation receipt access checks.
+* FIX: A donation amount chosen on a campaign page now carries through to the donation form shown on that same page.
+* FIX: Sorting the donations list no longer changes other queries on the same page, and a failed Square refund logs the reason instead of "Array".
+
 # 1.8.15
 * NEW: A redesigned Charitable dashboard. A donation chart with selectable time periods, at-a-glance cards for site health, spam protection and email, a Site Analysis score, recent donations and top donors, and new Integrations and Raise More panels showing what else Charitable works with.
 * FIX: Improved reliability of Square donations and refunds.

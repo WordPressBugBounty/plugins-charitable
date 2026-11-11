@@ -71,28 +71,62 @@ final class WP_Session extends Recursive_ArrayAccess { // phpcs:ignore WordPress
 	 * @param $session_id
 	 */
 	protected function __construct() {
+		/*
+		 * Charitable patch as of Lite 1.8.15.1: a session cookie that does not parse is treated as
+		 * no session at all, rather than as a session whose ID is the empty string.
+		 *
+		 * The ID is derived by stripping every character outside [A-Za-z0-9_], so a cookie whose
+		 * first crumb is punctuation (for example "!!!||0||0", or an empty first crumb) reduced to
+		 * ''. That still took the branch below, which reads and writes option "_wp_session_" with
+		 * nothing appended: a single row shared by every visitor in that state. Because a visitor
+		 * with no cookie at all also has an empty ID and still writes at shutdown, real session
+		 * data accumulated in that shared row, and anyone sending a deliberately malformed cookie
+		 * read it back as their own session. Charitable stores donation keys there, and
+		 * Charitable_Abstract_Donation::is_from_current_user() grants access to a donation receipt
+		 * on the strength of a matching key, so the shared row let one visitor open another's
+		 * receipt.
+		 *
+		 * Requiring all three crumbs also stops an undefined array key warning on the two absint()
+		 * calls for any cookie that contains no "||" separator.
+		 *
+		 * An empty ID is already a supported state: Charitable_Session::has_session_id() reports
+		 * false and the front end enqueues the script that writes a fresh cookie, so a visitor
+		 * arriving with a malformed cookie simply starts a new session on that page load.
+		 */
+		$this->session_id = '';
+		$this->container  = array();
+
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Cookie data, handled by stripslashes and sanitized by preg_replace below
-		if ( isset( $_COOKIE[WP_SESSION_COOKIE] ) ) {
-			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Cookie data, sanitized by preg_replace below
-			$cookie = stripslashes( wp_unslash( $_COOKIE[WP_SESSION_COOKIE] ) );
-			$cookie_crumbs = explode( '||', $cookie );
-
-			$this->session_id = preg_replace("/[^A-Za-z0-9_]/", '', $cookie_crumbs[0] );
-			$this->expires = absint( $cookie_crumbs[1] );
-			$this->exp_variant = absint( $cookie_crumbs[2] );
-
-			// Update the session expiration if we're past the variant time
-			if ( time() > $this->exp_variant ) {
-				$this->set_expiration();
-				delete_option( "_wp_session_expires_{$this->session_id}" );
-				add_option( "_wp_session_expires_{$this->session_id}", $this->expires, '', 'no' );
-			}
-
-			$this->read_data();
-		} else {
-			$this->session_id = '';
-			$this->container  = array();
+		if ( ! isset( $_COOKIE[WP_SESSION_COOKIE] ) ) {
+			return;
 		}
+
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Cookie data, sanitized by preg_replace below
+		$cookie = stripslashes( wp_unslash( $_COOKIE[WP_SESSION_COOKIE] ) );
+		$cookie_crumbs = explode( '||', $cookie );
+
+		if ( count( $cookie_crumbs ) < 3 ) {
+			return;
+		}
+
+		$session_id = preg_replace("/[^A-Za-z0-9_]/", '', $cookie_crumbs[0] );
+
+		if ( '' === (string) $session_id ) {
+			return;
+		}
+
+		$this->session_id = $session_id;
+		$this->expires = absint( $cookie_crumbs[1] );
+		$this->exp_variant = absint( $cookie_crumbs[2] );
+
+		// Update the session expiration if we're past the variant time
+		if ( time() > $this->exp_variant ) {
+			$this->set_expiration();
+			delete_option( "_wp_session_expires_{$this->session_id}" );
+			add_option( "_wp_session_expires_{$this->session_id}", $this->expires, '', 'no' );
+		}
+
+		$this->read_data();
 	}
 
 	/**
@@ -155,6 +189,18 @@ final class WP_Session extends Recursive_ArrayAccess { // phpcs:ignore WordPress
 	public function write_data() {
 		/* Nothing has changed. */
 		if ( ! $this->dirty ) {
+			return;
+		}
+
+		/*
+		 * Charitable patch as of Lite 1.8.15.1: never write without a session ID.
+		 *
+		 * A visitor with no cookie has an empty ID and never reads, but still reached this method
+		 * at shutdown and wrote to the shared "_wp_session_" row described in the constructor.
+		 * Guarding the read alone would leave that row populated on existing installs, and
+		 * guarding the write alone would leave existing rows readable, so both are needed.
+		 */
+		if ( '' === (string) $this->session_id ) {
 			return;
 		}
 

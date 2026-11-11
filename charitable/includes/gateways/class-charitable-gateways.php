@@ -1500,57 +1500,65 @@ if ( ! class_exists( 'Charitable_Gateways' ) ) :
 		 */
 		public function show_stripe_manual_keys_ajax() {
 
-			if ( ! isset( $_POST ) || 'charitable-show-stripe-keys' !== $_POST['action'] ) { // phpcs:ignore
-				return;
+			if ( ! isset( $_POST['action'] ) || 'charitable-show-stripe-keys' !== $_POST['action'] ) { // phpcs:ignore
+				wp_send_json_error();
+			}
+
+			// The admin JS posts the nonce as `nonce`; `_wpnonce` in the query string is still accepted for older callers.
+			$nonce = '';
+			if ( isset( $_POST['nonce'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				$nonce = sanitize_text_field( wp_unslash( $_POST['nonce'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			} elseif ( isset( $_GET['_wpnonce'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$nonce = sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			}
 
 			// Invalid nonce, bail.
-			if ( ! wp_verify_nonce( $_GET['_wpnonce'], 'charitable-show-stripe-keys' ) ) { // phpcs:ignore
-				return;
+			if ( ! wp_verify_nonce( $nonce, 'charitable-show-stripe-keys' ) ) {
+				wp_send_json_error();
 			}
 
 			// Current user cannot handle this request.
 			if ( ! current_user_can( 'manage_options' ) ) {
-				return;
+				wp_send_json_error();
 			}
 
 			$settings = get_option( 'charitable_settings' );
 
 			if ( false === $settings ) {
-				return;
+				wp_send_json_error();
 			}
 
 			$gateway_id = 'stripe';
 
-			$live_secret_key = $settings[ 'gateways_' . $gateway_id ]['live_secret_key'];
-			$live_public_key = $settings[ 'gateways_' . $gateway_id ]['live_public_key'];
-			$test_secret_key = $settings[ 'gateways_' . $gateway_id ]['test_secret_key'];
-			$test_public_key = $settings[ 'gateways_' . $gateway_id ]['test_public_key'];
+			$live_secret_key = isset( $settings[ 'gateways_' . $gateway_id ]['live_secret_key'] ) ? (string) $settings[ 'gateways_' . $gateway_id ]['live_secret_key'] : '';
+			$live_public_key = isset( $settings[ 'gateways_' . $gateway_id ]['live_public_key'] ) ? (string) $settings[ 'gateways_' . $gateway_id ]['live_public_key'] : '';
+			$test_secret_key = isset( $settings[ 'gateways_' . $gateway_id ]['test_secret_key'] ) ? (string) $settings[ 'gateways_' . $gateway_id ]['test_secret_key'] : '';
+			$test_public_key = isset( $settings[ 'gateways_' . $gateway_id ]['test_public_key'] ) ? (string) $settings[ 'gateways_' . $gateway_id ]['test_public_key'] : '';
 
 			$html = '<tr><th scope="row">Live Settings</th><td><hr  />
 			</td></tr><tr class="wide"><th scope="row">Live Secret Key</th><td><input type="text"
 				id="charitable_settings_gateways_stripe_live_secret_key"
 				name="charitable_settings[gateways_stripe][live_secret_key]"
-				value="' . trim( $live_secret_key ) . '"
+				value="' . esc_attr( trim( $live_secret_key ) ) . '"
 				class="charitable-settings-field wide"
 				 />
 			</td></tr><tr class="wide"><th scope="row">Live Publishable Key</th><td><input type="text"
 				id="charitable_settings_gateways_stripe_live_public_key"
 				name="charitable_settings[gateways_stripe][live_public_key]"
-				value="' . trim( $live_public_key ) . '"
+				value="' . esc_attr( trim( $live_public_key ) ) . '"
 				class="charitable-settings-field wide"
 				 />
 			</td></tr><tr><th scope="row">Test Settings</th><td><hr  />
 			</td></tr><tr class="wide"><th scope="row">Test Secret Key</th><td><input type="text"
 				id="charitable_settings_gateways_stripe_test_secret_key"
 				name="charitable_settings[gateways_stripe][test_secret_key]"
-				value="' . trim( $test_secret_key ) . '"
+				value="' . esc_attr( trim( $test_secret_key ) ) . '"
 				class="charitable-settings-field wide"
 				 />
 			</td></tr><tr class="wide"><th scope="row">Test Publishable Key</th><td><input type="text"
 				id="charitable_settings_gateways_stripe_test_public_key"
 				name="charitable_settings[gateways_stripe][test_public_key]"
-				value="' . trim( $test_public_key ) . '"
+				value="' . esc_attr( trim( $test_public_key ) ) . '"
 				class="charitable-settings-field wide"
 				 />
 			</td></tr>';

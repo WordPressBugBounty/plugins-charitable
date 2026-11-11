@@ -565,6 +565,37 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 			$currency_code  = strtoupper( $data['mc_currency'] );
 			$business_email = isset( $data['business'] ) && is_email( $data['business'] ) ? trim( $data['business'] ) : trim( $data['receiver_email'] );
 
+			/*
+			 * Verify that the donation key matches the one stored for the donation.
+			 *
+			 * This has to come before every branch below that writes to the donation. The
+			 * key is the only field in the notification that proves it belongs to the
+			 * donation named in `custom` at all. It used to sit after the refund branch and
+			 * after both failure branches, so an IPN carrying the wrong key could refund the
+			 * donation or mark it failed before the key was ever compared - the authenticity
+			 * check ran after the actions it exists to authorise.
+			 *
+			 * That is reachable whenever "Disable IPN Verification" is enabled, because
+			 * nothing else then establishes that PayPal sent the notification. It is off by
+			 * default, but its own help text invites switching it on when donations are not
+			 * being marked Paid.
+			 *
+			 * A mismatch means the notification cannot be attributed to this donation, so it
+			 * is logged and rejected without touching the donation's status. Failing a
+			 * donation on the strength of an unattributable message is itself a denial of
+			 * service, and simply reordering the old block would have kept that.
+			 *
+			 * @since 1.8.15.1 Moved above the mutating branches, and no longer fails the donation.
+			 */
+			if ( $donation_key != $donation->get_donation_key() ) {
+
+				$message = sprintf( '%s %s', __( 'Donation key in the IPN response does not match the donation. IPN data:', 'charitable' ), self::get_ipn_log_summary( $data ) );
+				$donation->log()->add( $message );
+
+				die( esc_html( __( 'Invalid Donation Key', 'charitable' ) ) );
+
+			}
+
 			/* Verify that the business email matches the PayPal email in the settings */
 			if ( strcasecmp( $business_email, trim( self::get_paypal_email() ) ) != 0 ) {
 
@@ -624,17 +655,6 @@ if ( ! class_exists( 'Charitable_Gateway_Paypal' ) ) :
 			/* If we have already processed this donation, stop here. */
 			if ( 'charitable-completed' == get_post_status( $donation_id ) ) {
 				die( esc_html( __( 'Donation Processed Already', 'charitable' ) ) );
-			}
-
-			/* Verify that the donation key matches the one stored for the donation. */
-			if ( $donation_key != $donation->get_donation_key() ) {
-
-				$message = sprintf( '%s %s', __( 'Donation key in the IPN response does not match the donation. IPN data:', 'charitable' ), self::get_ipn_log_summary( $data ) );
-				$donation->log()->add( $message );
-				$donation->update_status( 'charitable-failed' );
-
-				die( esc_html( __( 'Invalid Donation Key', 'charitable' ) ) );
-
 			}
 
 			/* Verify that the amount in the IPN matches the amount we expected. */

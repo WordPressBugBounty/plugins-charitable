@@ -420,7 +420,7 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 					$values['gateways_stripe']['live_secret_key'] = $old_values['gateways_stripe']['live_secret_key'];
 				}
 				if ( ! array_key_exists( 'live_public_key', $values['gateways_stripe'] ) && isset( $old_values['gateways_stripe']['live_public_key'] ) && ( false !== $old_values['gateways_stripe']['live_public_key'] ) ) {
-					$values['gateways_stripe']['live_public_key'] = $old_values['gateways_stripe']['live_secret_key'];
+					$values['gateways_stripe']['live_public_key'] = $old_values['gateways_stripe']['live_public_key'];
 				}
 				if ( ! array_key_exists( 'test_secret_key', $values['gateways_stripe'] ) && isset( $old_values['gateways_stripe']['test_secret_key'] ) && ( false !== $old_values['gateways_stripe']['test_secret_key'] ) ) {
 					$values['gateways_stripe']['test_secret_key'] = $old_values['gateways_stripe']['test_secret_key'];
@@ -461,12 +461,25 @@ if ( ! class_exists( 'Charitable_Settings' ) ) :
 			}
 
 			// preserve any webhook keys, regardless if stripe connect addon is active or not.
-			if ( in_array( 'gateways_stripe', $settings_keys ) ) {
-				if ( ! empty( $old_values['gateways_stripe'] ) && array_key_exists( 'test_webhook_id', $old_values['gateways_stripe'] ) && isset( $old_values['gateways_stripe']['test_webhook_id'] ) ) {
-					$new_values['gateways_stripe']['test_webhook_id'] = $old_values['gateways_stripe']['test_webhook_id'];
-				}
-				if ( ! empty( $old_values['gateways_stripe'] ) && array_key_exists( 'live_webhook_id', $old_values['gateways_stripe'] ) && isset( $old_values['gateways_stripe']['live_webhook_id'] ) ) {
-					$new_values['gateways_stripe']['live_webhook_id'] = $old_values['gateways_stripe']['live_webhook_id'];
+			// These are written by code (webhook setup, signing-secret refresh), never by the settings form,
+			// so a save of the Stripe tab must carry them over. Losing a signing secret makes every
+			// webhook fall back to API re-verification, which can reject them with a 403.
+			if ( in_array( 'gateways_stripe', $settings_keys ) && ! empty( $old_values['gateways_stripe'] ) && is_array( $old_values['gateways_stripe'] ) ) {
+				$preserved_stripe_keys = array(
+					'test_webhook_id',
+					'live_webhook_id',
+					'test_connect_webhook_id',
+					'live_connect_webhook_id',
+					'test_webhook_signing_secret',
+					'live_webhook_signing_secret',
+					'test_connect_webhook_signing_secret',
+					'live_connect_webhook_signing_secret',
+					'account_id',
+				);
+				foreach ( $preserved_stripe_keys as $preserved_key ) {
+					if ( isset( $old_values['gateways_stripe'][ $preserved_key ] ) && ! isset( $new_values['gateways_stripe'][ $preserved_key ] ) ) {
+						$new_values['gateways_stripe'][ $preserved_key ] = $old_values['gateways_stripe'][ $preserved_key ];
+					}
 				}
 			}
 

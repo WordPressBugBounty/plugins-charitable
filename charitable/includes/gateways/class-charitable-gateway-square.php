@@ -2394,7 +2394,7 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 						sprintf(
 							/* translators: %s: error message. */
 							__( 'Square refund failed: %s', 'charitable' ),
-							$api->get_errors()
+							self::stringify_api_errors( $api->get_errors() )
 						)
 					);
 					return false;
@@ -2404,7 +2404,7 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 					sprintf(
 						/* translators: %s: transaction reference. */
 						__( 'Square refund successful. Refund transaction ID: %s', 'charitable' ),
-						$refund->getId()
+						esc_html( (string) $refund->getId() )
 					)
 				);
 
@@ -2440,6 +2440,69 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 
 			// Return the standard donation amount.
 			return (float) $donation->get_total_donation_amount( true );
+		}
+
+		/**
+		 * Flatten Square API errors into a readable single-line string.
+		 *
+		 * Charitable_Square_API::get_errors() is documented as array|null, and nearly
+		 * every entry it pushes is a plain translated string - but
+		 * send_create_order_request() pushes an associative array of
+		 * message / category / code. That makes both sprintf( '%s', $errors ) and a bare
+		 * implode() unsafe: each emits an "Array to string conversion" warning and
+		 * writes the literal word "Array" into the donation log, which is exactly the
+		 * text someone reads when they are trying to find out why a refund or a
+		 * cancellation failed.
+		 *
+		 * Null and empty both fall back to a generic message rather than leaving an
+		 * empty tail after the colon.
+		 *
+		 * @since 1.8.15.1
+		 *
+		 * @param  array|null $errors Errors as returned by Charitable_Square_API::get_errors().
+		 * @return string Readable error text, never an array and never empty.
+		 */
+		private static function stringify_api_errors( $errors ) {
+
+			if ( empty( $errors ) || ! is_array( $errors ) ) {
+				return __( 'Unknown error.', 'charitable' );
+			}
+
+			$parts = array();
+
+			foreach ( $errors as $error ) {
+
+				if ( is_scalar( $error ) ) {
+					$parts[] = (string) $error;
+					continue;
+				}
+
+				if ( ! is_array( $error ) ) {
+					continue;
+				}
+
+				$message = isset( $error['message'] ) && is_scalar( $error['message'] ) ? (string) $error['message'] : '';
+				$code    = isset( $error['code'] ) && is_scalar( $error['code'] ) ? (string) $error['code'] : '';
+
+				if ( '' !== $message && '' !== $code ) {
+					$parts[] = sprintf( '%1$s (%2$s)', $message, $code );
+				} elseif ( '' !== $message ) {
+					$parts[] = $message;
+				} elseif ( '' !== $code ) {
+					$parts[] = $code;
+				} else {
+					// Unknown array shape: keep the scalar leaves, drop the rest.
+					$leaves = array_filter( $error, 'is_scalar' );
+
+					if ( ! empty( $leaves ) ) {
+						$parts[] = implode( ' ', array_map( 'strval', $leaves ) );
+					}
+				}
+			}
+
+			$parts = array_filter( array_map( 'trim', $parts ), 'strlen' );
+
+			return ! empty( $parts ) ? implode( ', ', $parts ) : __( 'Unknown error.', 'charitable' );
 		}
 
 		/**
@@ -2487,8 +2550,7 @@ if ( ! class_exists( 'Charitable_Gateway_Square' ) ) :
 				update_post_meta( $donation->ID, '_square_cancelled_to_be_confirmed', 'true' );
 				return true;
 			} else {
-				$errors  = $api->get_errors();
-				$message = ! empty( $errors ) ? implode( ', ', $errors ) : __( 'Unknown error.', 'charitable' );
+				$message = self::stringify_api_errors( $api->get_errors() );
 
 				$donation->log()->add(
 					sprintf(
